@@ -3,29 +3,39 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		E405A48A2C21B0A1006FE791 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A4892C21B0A1006FE791 /* Localizable.xcstrings */; };
 		E405A48C2C21B0AF006FE791 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */; };
 		E405A48F2C21B157006FE791 /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E405A48E2C21B157006FE791 /* Komponents */; };
-		E4A7694A2C21A20A00BE3491 /* CirclesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A769492C21A20A00BE3491 /* CirclesApp.swift */; };
-		E4A7694C2C21A20A00BE3491 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A7694B2C21A20A00BE3491 /* MainTabView.swift */; };
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
-		E4A769532C21A20B00BE3491 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A769522C21A20B00BE3491 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		E405A4892C21B0A1006FE791 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E4A769492C21A20A00BE3491 /* CirclesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclesApp.swift; sourceTree = "<group>"; };
-		E4A7694B2C21A20A00BE3491 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		E4A7694F2C21A20B00BE3491 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		E4A769522C21A20B00BE3491 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E405A4912C21B706006FE791 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				App.swift,
+				MainTabView.swift,
+				Map/MapView.swift,
+			);
+			target = E4A769452C21A20A00BE3491 /* CiRCLES */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		E405A4902C21B6E1006FE791 /* Views */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E405A4912C21B706006FE791 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Views; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		E4A769432C21A20A00BE3491 /* Frameworks */ = {
@@ -62,19 +72,9 @@
 				E4A7694F2C21A20B00BE3491 /* Assets.xcassets */,
 				E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */,
 				E405A4892C21B0A1006FE791 /* Localizable.xcstrings */,
-				E4A769492C21A20A00BE3491 /* CirclesApp.swift */,
-				E4A7694B2C21A20A00BE3491 /* MainTabView.swift */,
-				E4A769512C21A20B00BE3491 /* Preview Content */,
+				E405A4902C21B6E1006FE791 /* Views */,
 			);
 			path = CiRCLES;
-			sourceTree = "<group>";
-		};
-		E4A769512C21A20B00BE3491 /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				E4A769522C21A20B00BE3491 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -116,7 +116,7 @@
 				};
 			};
 			buildConfigurationList = E4A769412C21A20A00BE3491 /* Build configuration list for PBXProject "CiRCLES" */;
-			compatibilityVersion = "Xcode 14.0";
+			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = ja;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -142,7 +142,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E4A769532C21A20B00BE3491 /* Preview Assets.xcassets in Resources */,
 				E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */,
 				E405A48C2C21B0AF006FE791 /* InfoPlist.xcstrings in Resources */,
 				E405A48A2C21B0A1006FE791 /* Localizable.xcstrings in Resources */,
@@ -156,8 +155,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E4A7694C2C21A20A00BE3491 /* MainTabView.swift in Sources */,
-				E4A7694A2C21A20A00BE3491 /* CirclesApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -169,6 +166,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -233,6 +231,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -292,7 +291,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"CiRCLES/Preview Content\"";
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -323,7 +321,6 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"CiRCLES/Preview Content\"";
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
