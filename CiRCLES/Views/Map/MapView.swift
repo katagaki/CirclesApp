@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MapView: View {
     var body: some View {
-        Image(systemName: "map.fill")
+        ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
     }
 }
 
