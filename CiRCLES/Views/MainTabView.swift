@@ -18,22 +18,25 @@ struct ContentView: View {
                 .tabItem {
                     Label("Tab.Map", systemImage: "map.fill")
                 }
-            Color.clear
+            ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
                 .tabItem {
                     Label("Tab.Circles", systemImage: "square.grid.3x3.fill")
                 }
-            Color.clear
+            ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
                 .tabItem {
                     Label("Tab.Checklists", systemImage: "checklist")
                 }
-            Color.clear
+            ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
                 .tabItem {
                     Label("Tab.Profile", systemImage: "person.crop.circle.fill")
                 }
-            Color.clear
+            ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
                 .tabItem {
                     Label("Tab.More", systemImage: "ellipsis")
                 }
+        }
+        .sheet(isPresented: .constant(true)) {
+            LoginView()
         }
     }
 }
