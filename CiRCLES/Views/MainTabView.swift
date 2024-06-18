@@ -14,7 +14,7 @@ struct ContentView: View {
 
     var body: some View {
         TabView {
-            Color.clear
+            MapView()
                 .tabItem {
                     Label("Tab.Map", systemImage: "map.fill")
                 }
