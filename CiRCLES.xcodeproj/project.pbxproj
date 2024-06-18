@@ -7,20 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E4A7694A2C21A20A00BE3491 /* CiRCLESApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A769492C21A20A00BE3491 /* CiRCLESApp.swift */; };
-		E4A7694C2C21A20A00BE3491 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A7694B2C21A20A00BE3491 /* ContentView.swift */; };
-		E4A7694E2C21A20A00BE3491 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A7694D2C21A20A00BE3491 /* Item.swift */; };
+		E405A48A2C21B0A1006FE791 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A4892C21B0A1006FE791 /* Localizable.xcstrings */; };
+		E405A48C2C21B0AF006FE791 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */; };
+		E405A48F2C21B157006FE791 /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E405A48E2C21B157006FE791 /* Komponents */; };
+		E4A7694A2C21A20A00BE3491 /* CirclesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A769492C21A20A00BE3491 /* CirclesApp.swift */; };
+		E4A7694C2C21A20A00BE3491 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A7694B2C21A20A00BE3491 /* MainTabView.swift */; };
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
 		E4A769532C21A20B00BE3491 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A769522C21A20B00BE3491 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		E405A4892C21B0A1006FE791 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E4A769492C21A20A00BE3491 /* CiRCLESApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CiRCLESApp.swift; sourceTree = "<group>"; };
-		E4A7694B2C21A20A00BE3491 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		E4A7694D2C21A20A00BE3491 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
+		E4A769492C21A20A00BE3491 /* CirclesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclesApp.swift; sourceTree = "<group>"; };
+		E4A7694B2C21A20A00BE3491 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		E4A7694F2C21A20B00BE3491 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4A769522C21A20B00BE3491 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -28,6 +32,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E405A48F2C21B157006FE791 /* Komponents in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,10 +58,12 @@
 		E4A769482C21A20A00BE3491 /* CiRCLES */ = {
 			isa = PBXGroup;
 			children = (
-				E4A769492C21A20A00BE3491 /* CiRCLESApp.swift */,
-				E4A7694B2C21A20A00BE3491 /* ContentView.swift */,
-				E4A7694D2C21A20A00BE3491 /* Item.swift */,
+				E4A769592C21A2A000BE3491 /* Info.plist */,
 				E4A7694F2C21A20B00BE3491 /* Assets.xcassets */,
+				E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */,
+				E405A4892C21B0A1006FE791 /* Localizable.xcstrings */,
+				E4A769492C21A20A00BE3491 /* CirclesApp.swift */,
+				E4A7694B2C21A20A00BE3491 /* MainTabView.swift */,
 				E4A769512C21A20B00BE3491 /* Preview Content */,
 			);
 			path = CiRCLES;
@@ -86,6 +93,9 @@
 			dependencies = (
 			);
 			name = CiRCLES;
+			packageProductDependencies = (
+				E405A48E2C21B157006FE791 /* Komponents */,
+			);
 			productName = CiRCLES;
 			productReference = E4A769462C21A20A00BE3491 /* CiRCLES.app */;
 			productType = "com.apple.product-type.application";
@@ -107,13 +117,17 @@
 			};
 			buildConfigurationList = E4A769412C21A20A00BE3491 /* Build configuration list for PBXProject "CiRCLES" */;
 			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = en;
+			developmentRegion = ja;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				ja,
 			);
 			mainGroup = E4A7693D2C21A20A00BE3491;
+			packageReferences = (
+				E405A48D2C21B157006FE791 /* XCRemoteSwiftPackageReference "Komponents" */,
+			);
 			productRefGroup = E4A769472C21A20A00BE3491 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -130,6 +144,8 @@
 			files = (
 				E4A769532C21A20B00BE3491 /* Preview Assets.xcassets in Resources */,
 				E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */,
+				E405A48C2C21B0AF006FE791 /* InfoPlist.xcstrings in Resources */,
+				E405A48A2C21B0A1006FE791 /* Localizable.xcstrings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -140,9 +156,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E4A7694C2C21A20A00BE3491 /* ContentView.swift in Sources */,
-				E4A7694E2C21A20A00BE3491 /* Item.swift in Sources */,
-				E4A7694A2C21A20A00BE3491 /* CiRCLESApp.swift in Sources */,
+				E4A7694C2C21A20A00BE3491 /* MainTabView.swift in Sources */,
+				E4A7694A2C21A20A00BE3491 /* CirclesApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -208,6 +223,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -264,6 +280,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -279,6 +296,7 @@
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CiRCLES/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -292,6 +310,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -308,6 +327,7 @@
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CiRCLES/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -321,6 +341,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -348,6 +369,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E405A48D2C21B157006FE791 /* XCRemoteSwiftPackageReference "Komponents" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/katagaki/Komponents";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E405A48E2C21B157006FE791 /* Komponents */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E405A48D2C21B157006FE791 /* XCRemoteSwiftPackageReference "Komponents" */;
+			productName = Komponents;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E4A7693E2C21A20A00BE3491 /* Project object */;
 }

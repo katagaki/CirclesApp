@@ -1,0 +1,15 @@
+{
+  "originHash" : "05dbd282237eff74d633121b36198ea390d5cd0f964ea459d306e9c29d57af83",
+  "pins" : [
+    {
+      "identity" : "komponents",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/katagaki/Komponents",
+      "state" : {
+        "branch" : "main",
+        "revision" : "a3f43f2cf3aceca8a83925dfcc0cb9dd00667f86"
+      }
+    }
+  ],
+  "version" : 3
+}
