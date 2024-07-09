@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  MainTabView.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/06/18.
@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct ContentView: View {
+struct MainTabView: View {
 
     @Environment(\.modelContext) private var modelContext
 
@@ -36,7 +36,7 @@ struct ContentView: View {
                 }
         }
         .sheet(isPresented: .constant(true)) {
-            LoginView()
+            SafariView(url: AuthManager().authURL)
         }
     }
 }
