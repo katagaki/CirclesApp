@@ -35,6 +35,7 @@
 		E47269092C3D73F100D5335D /* OpenID.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OpenID.plist; sourceTree = "<group>"; };
 		E472690B2C3D742300D5335D /* OpenID-Sample.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "OpenID-Sample.plist"; sourceTree = "<group>"; };
 		E472690E2C3D766C00D5335D /* OpenIDClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenIDClient.swift; sourceTree = "<group>"; };
+		E47269122C3D796800D5335D /* ci_post_clone.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = ci_post_clone.sh; sourceTree = "<group>"; };
 		E482FFBD2C21BD93009225BD /* MapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		E482FFBF2C21BD93009225BD /* App.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E482FFC02C21BD93009225BD /* MainTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
@@ -96,6 +97,14 @@
 			path = Structs;
 			sourceTree = "<group>";
 		};
+		E47269112C3D795400D5335D /* ci_scripts */ = {
+			isa = PBXGroup;
+			children = (
+				E47269122C3D796800D5335D /* ci_post_clone.sh */,
+			);
+			path = ci_scripts;
+			sourceTree = "<group>";
+		};
 		E482FFBE2C21BD93009225BD /* Map */ = {
 			isa = PBXGroup;
 			children = (
@@ -119,6 +128,7 @@
 		E4A7693D2C21A20A00BE3491 = {
 			isa = PBXGroup;
 			children = (
+				E47269112C3D795400D5335D /* ci_scripts */,
 				E4A769482C21A20A00BE3491 /* CiRCLES */,
 				E4A769472C21A20A00BE3491 /* Products */,
 			);
