@@ -19,7 +19,7 @@ struct SafariView: UIViewControllerRepresentable {
         let safariViewController = SFSafariViewController(
             url: url,
             configuration: configuration)
-        safariViewController.dismissButtonStyle = .close
+        safariViewController.dismissButtonStyle = .cancel
         safariViewController.preferredControlTintColor = .accent
         safariViewController.hidesBottomBarWhenPushed = false
 

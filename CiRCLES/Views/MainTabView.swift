@@ -39,7 +39,8 @@ struct MainTabView: View {
                 }
         }
         .sheet(isPresented: $isAuthenticating) {
-            SafariView(url: AuthManager().authURL)
+            SafariView(url: authManager.authURL)
+                .ignoresSafeArea()
         }
         .onAppear {
             if authManager.code == nil {
