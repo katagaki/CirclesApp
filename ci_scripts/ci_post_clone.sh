@@ -6,7 +6,7 @@
 #  Created by シン・ジャスティン on 2024/07/09.
 #  
 
-OPENID_PLIST_PATH="OpenID.plist"
+OPENID_PLIST_PATH="../CiRCLES/OpenID.plist"
 
 /usr/libexec/PlistBuddy -c "Clear dict" $OPENID_PLIST_PATH || /usr/libexec/PlistBuddy -c "Add : dict" $OPENID_PLIST_PATH
 
