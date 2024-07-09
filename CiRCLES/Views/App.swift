@@ -23,7 +23,21 @@ struct CirclesApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
+                .onOpenURL { url in
+                    debugPrint("URL scheme invoked: \(url)")
+                    if let components = URLComponents(url: url, resolvingAgainstBaseURL: true) {
+                        if let queryItems = components.queryItems {
+                            var parameters: [String: String] = [:]
+                            for item in queryItems {
+                                if let value = item.value {
+                                    parameters[item.name] = value
+                                    debugPrint("\(item.name)  :  \(value)")
+                                }
+                            }
+                        }
+                    }
+                }
         }
         .modelContainer(sharedModelContainer)
     }
