@@ -11,6 +11,9 @@ import Foundation
 let circlesAuthEndpoint: URL = URL(string: "https://auth1-sandbox.circle.ms")!
 let circlesAPIEndpoint: URL = URL(string: "https://api1-sandbox.circle.ms")!
 #else
-let circlesAuthEndpoint: URL = URL(string: "https://auth1.circle.ms")!
-let circlesAPIEndpoint: URL = URL(string: "https://api1.circle.ms")!
+// TODO: Force sandbox until app is ready for production server
+let circlesAuthEndpoint: URL = URL(string: "https://auth1-sandbox.circle.ms")!
+let circlesAPIEndpoint: URL = URL(string: "https://api1-sandbox.circle.ms")!
+//let circlesAuthEndpoint: URL = URL(string: "https://auth1.circle.ms")!
+//let circlesAPIEndpoint: URL = URL(string: "https://api1.circle.ms")!
 #endif
