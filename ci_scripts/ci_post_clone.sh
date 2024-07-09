@@ -12,6 +12,6 @@ OPENID_PLIST_PATH="$CI_PRIMARY_REPOSITORY_PATH/CiRCLES/OpenID.plist"
 
 /usr/libexec/PlistBuddy -c "Add :client_id string $OPENID_CLIENT_ID" $OPENID_PLIST_PATH
 /usr/libexec/PlistBuddy -c "Add :client_secret string $OPENID_CLIENT_SECRET" $OPENID_PLIST_PATH
-/usr/libexec/PlistBuddy -c "Add :client_redirect_url string $OPENID_CLIENT_REDIRECT_URL" $OPENID_PLIST_PATH
+/usr/libexec/PlistBuddy -c "Add :redirect_url string $OPENID_CLIENT_REDIRECT_URL" $OPENID_PLIST_PATH
 
 echo "OpenID.plist created at $OPENID_PLIST_PATH"
