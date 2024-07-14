@@ -6,16 +6,21 @@
 //
 
 import Foundation
+import KeychainAccess
 
 @Observable
+@MainActor
 class AuthManager {
 
+    let keychain = Keychain(service: "com.tsubuzaki.CiRCLES")
+
     var code: String? = nil
+    var token: OpenIDToken? = nil
     
     @ObservationIgnored let client: OpenIDClient
 
     var authURL: URL {
-        let baseURL = circlesAuthEndpoint.appending(path: "OAuth2")
+        let baseURL = circleMsAuthEndpoint.appending(path: "OAuth2")
         let responseType = "code"
         let clientID = client.id
         let redirectURI = client.redirectURL
@@ -44,9 +49,17 @@ class AuthManager {
         } catch {
             fatalError("OpenID client initialization failed. Did you set up your OpenID.plist file yet?")
         }
+
+        // Read token from keychain
+        if let tokenInKeychain = try? keychain.get("CircleMsAuthToken"),
+           let token = try? JSONDecoder().decode(OpenIDToken.self,
+                                                 from: tokenInKeychain.data(using: .utf8) ?? Data()) {
+            self.token = token
+        }
     }
 
-    func completeAuthentication(from url: URL) {
+    func getAuthenticationCode(from url: URL) {
+        debugPrint("Getting authentication code...")
         if let components = URLComponents(url: url, resolvingAgainstBaseURL: true) {
             if let queryItems = components.queryItems {
                 var parameters: [String: String] = [:]
@@ -58,10 +71,74 @@ class AuthManager {
                 if let code = parameters["code"],
                     let state = parameters ["state"] {
                     if state == "auth" {
+                        debugPrint("Authentication code length: \(code.count)")
                         self.code = code
                     }
                 }
             }
         }
+    }
+
+    func getAuthenticationToken() async {
+        debugPrint("Getting authentication token...")
+        let request = urlRequestForToken(parameters: [
+            "grant_type": "authorization_code",
+            "code": code ?? ""
+        ])
+
+        if let (data, _) = try? await URLSession.shared.data(for: request) {
+            decodeAuthenticationToken(data: data)
+        } else {
+            self.token = nil
+        }
+    }
+
+    func refreshAuthenticationToken() async {
+        if let refreshToken = token?.refreshToken {
+            debugPrint("Refreshing authentication token...")
+            let request = urlRequestForToken(parameters: [
+                "grant_type": "refresh_token",
+                "refresh_token": refreshToken
+            ])
+
+            if let (data, _) = try? await URLSession.shared.data(for: request) {
+                decodeAuthenticationToken(data: data)
+            } else {
+                self.token = nil
+            }
+        } else {
+            debugPrint("No refresh token to use!")
+        }
+    }
+
+    func decodeAuthenticationToken(data: Data) {
+        debugPrint("Authentication token length: \(data.count)")
+        if let token = try? JSONDecoder().decode(OpenIDToken.self, from: data) {
+            debugPrint("Decoded authentication token")
+            self.token = token
+            if let tokenEncoded = try? JSONEncoder().encode(token),
+               let tokenString = String(data: tokenEncoded, encoding: .utf8) {
+                debugPrint(tokenString)
+                try? keychain.set(tokenString, key: "CircleMsAuthToken")
+            }
+        }
+    }
+
+    func urlRequestForToken(parameters: [String: String]) -> URLRequest {
+        let endpoint = URL(string: "\(circleMsAuthEndpoint)/OAuth2/Token")!
+
+        var parameters: [String: String] = parameters
+        parameters["client_id"] = client.id
+        parameters["client_secret"] = client.secret
+        
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        request.httpBody = parameters
+            .map { "\($0.key)=\($0.value)" }
+            .joined(separator: "&")
+            .data(using: .utf8)
+
+        return request
     }
 }

@@ -11,44 +11,56 @@ import SwiftData
 struct MainTabView: View {
 
     @Environment(\.modelContext) private var modelContext
+    @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
 
     @State var isAuthenticating: Bool = false
 
     var body: some View {
-        TabView {
+        TabView(selection: $navigationManager.selectedTab) {
             MapView()
                 .tabItem {
                     Label("Tab.Map", systemImage: "map.fill")
                 }
+                .tag(TabType.map)
             ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
                 .tabItem {
                     Label("Tab.Circles", systemImage: "square.grid.3x3.fill")
                 }
+                .tag(TabType.circles)
             ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
                 .tabItem {
                     Label("Tab.Checklists", systemImage: "checklist")
                 }
-            ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
+                .tag(TabType.checklists)
+            ProfileView()
                 .tabItem {
                     Label("Tab.Profile", systemImage: "person.crop.circle.fill")
                 }
-            ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
+                .tag(TabType.profile)
+            MoreView()
                 .tabItem {
                     Label("Tab.More", systemImage: "ellipsis")
                 }
+                .tag(TabType.more)
         }
         .sheet(isPresented: $isAuthenticating) {
-            SafariView(url: authManager.authURL)
-                .ignoresSafeArea()
+            LoginView()
+                .interactiveDismissDisabled()
         }
         .onAppear {
-            if authManager.code == nil {
+            if authManager.token == nil {
                 isAuthenticating = true
             }
         }
-        .onChange(of: authManager.code) { _, newValue in
+        .onChange(of: authManager.token) { _, newValue in
             isAuthenticating = newValue == nil
         }
+        .onReceive(navigationManager.$selectedTab, perform: { newValue in
+            if newValue == navigationManager.previouslySelectedTab {
+                navigationManager.popToRoot(for: newValue)
+            }
+            navigationManager.previouslySelectedTab = newValue
+        })
     }
 }

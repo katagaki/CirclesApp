@@ -11,29 +11,24 @@ import SwiftData
 @main
 struct CirclesApp: App {
     
+    @StateObject var navigationManager = NavigationManager()
     @State var authManager = AuthManager()
-
-    // TODO: Move model container to shared space
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    @State var userManager = UserManager()
 
     var body: some Scene {
         WindowGroup {
             MainTabView()
-                .environment(authManager)
                 .onOpenURL { url in
                     debugPrint("URL scheme invoked: \(url)")
-                    authManager.completeAuthentication(from: url)
+                    authManager.getAuthenticationCode(from: url)
                 }
         }
         .modelContainer(sharedModelContainer)
+        .environmentObject(navigationManager)
+        .environment(authManager)
+        .environment(userManager)
+        .onChange(of: navigationManager.selectedTab) { _, _ in
+            navigationManager.saveToDefaults()
+        }
     }
 }
