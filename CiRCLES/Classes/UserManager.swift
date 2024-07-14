@@ -23,8 +23,6 @@ class UserManager {
 
         if let (data, _) = try? await URLSession.shared.data(for: request) {
             debugPrint("User info response length: \(data.count)")
-            debugPrint(String(data: data, encoding: .utf8))
-            try! JSONDecoder().decode(UserInfo.self, from: data)
             if let userInfo = try? JSONDecoder().decode(UserInfo.self, from: data) {
                 debugPrint("Decoded user info")
                 self.userInfo = userInfo.response
