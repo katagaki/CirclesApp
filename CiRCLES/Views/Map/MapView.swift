@@ -12,7 +12,3 @@ struct MapView: View {
         ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
     }
 }
-
-#Preview {
-    MapView()
-}

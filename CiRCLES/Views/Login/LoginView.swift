@@ -8,30 +8,17 @@
 import SwiftUI
 
 struct LoginView: View {
-    @State var username: String = ""
-    @State var password: String = ""
+
+    @Environment(AuthManager.self) var authManager
+
+    @State var isAuthenticating: Bool = false
+    @State var isShowingDemoAlert: Bool = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 20.0) {
+        VStack(alignment: .leading, spacing: 16.0) {
             Text("Login.Title")
                 .fontWeight(.bold)
                 .font(.largeTitle)
-            Spacer()
-            VStack(alignment: .leading, spacing: 8.0) {
-                Text("Shared.Email")
-                TextField("Shared.Email", text: $username)
-                    .textFieldStyle(.roundedBorder)
-                    .keyboardType(.emailAddress)
-                    .autocorrectionDisabled(true)
-                    .textInputAutocapitalization(.none)
-            }
-            VStack(alignment: .leading, spacing: 8.0) {
-                Text("Shared.Password")
-                SecureField("Shared.Password", text: $password)
-                    .textFieldStyle(.roundedBorder)
-                    .privacySensitive()
-                Link("Shared.ForgotPassword", destination: URL(string: "https://auth2.circle.ms/Account/RecoveryPassword")!)
-            }
             Spacer()
             HStack {
                 Image(systemName: "info.circle")
@@ -41,7 +28,17 @@ struct LoginView: View {
             .font(.subheadline)
             .foregroundStyle(.secondary)
             Button {
-                // TODO
+                isShowingDemoAlert = true
+            } label: {
+                Text("Shared.Login.Demo")
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity)
+                    .padding([.top, .bottom], 6.0)
+            }
+            .buttonStyle(.bordered)
+            .clipShape(.capsule(style: .continuous))
+            Button {
+                isAuthenticating = true
             } label: {
                 Text("Shared.Login")
                     .fontWeight(.bold)
@@ -52,12 +49,23 @@ struct LoginView: View {
             .clipShape(.capsule(style: .continuous))
         }
         .padding()
-    }
-}
-
-#Preview {
-    Color.clear
-        .sheet(isPresented: .constant(true)) {
-            LoginView()
+        .sheet(isPresented: $isAuthenticating) {
+            SafariView(url: authManager.authURL)
+                .ignoresSafeArea()
         }
+        .alert("Alert.Unavailable.Title", isPresented: $isShowingDemoAlert) {
+            Button("Shared.OK") {
+                isShowingDemoAlert = false
+            }
+        } message: {
+            Text("Alert.Unavailable.Text")
+        }
+        .onChange(of: authManager.code) { oldValue, newValue in
+            if oldValue == nil && newValue != nil {
+                Task {
+                    await authManager.getAuthenticationToken()
+                }
+            }
+        }
+    }
 }

@@ -1,6 +1,38 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "Alert.Unavailable.Text" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This feature is currently unavailable.\nStay tuned for updates!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "この機能は未公開のため、アクセスできません。\n公開するまでしばらくお待ちください。"
+          }
+        }
+      }
+    },
+    "Alert.Unavailable.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feature Unavailable"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未公開の機能です"
+          }
+        }
+      }
+    },
     "Login.Disclaimer" : {
       "localizations" : {
         "en" : {
@@ -22,45 +54,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Login to Circle.ms"
+            "value" : "Login to CiRCLES"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Circle.msにログイン"
-          }
-        }
-      }
-    },
-    "Shared.Email" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Email Address"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "メールアドレス"
-          }
-        }
-      }
-    },
-    "Shared.ForgotPassword" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Forgot Password"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "パスワード再発行"
+            "value" : "サークルズにログイン"
           }
         }
       }
@@ -70,13 +70,45 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Login"
+            "value" : "Sign In With circle.ms"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ログイン"
+            "value" : "circle.msでログイン"
+          }
+        }
+      }
+    },
+    "Shared.Login.Demo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try CiRCLES Without Signing In"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログインせずに使ってみる"
+          }
+        }
+      }
+    },
+    "Shared.LoginAgain" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign In Again"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再度ログイン"
           }
         }
       }
@@ -97,18 +129,18 @@
         }
       }
     },
-    "Shared.Password" : {
+    "Shared.OK" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Password"
+            "value" : "Got it"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "パスワード"
+            "value" : "OK"
           }
         }
       }
@@ -178,6 +210,22 @@
       }
     },
     "Tab.Profile" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profile"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プロフィール"
+          }
+        }
+      }
+    },
+    "ViewTitle.Profile" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
