@@ -9,7 +9,7 @@ import Foundation
 
 @Observable
 @MainActor
-class EventManager {
+class EventManager: NSObject {
 
     var events: [WebCatalogEvent.Response.Event] = []
     var latestEventId: Int?
@@ -17,6 +17,8 @@ class EventManager {
 
     var textDatabaseURL: URL?
     var imageDatabaseURL: URL?
+
+    let documentsDirectoryURL: URL? = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
 
     func getEvents(authToken: OpenIDToken) async {
         let request = urlRequestForWebCatalogAPI("GetEventList", type: .webCatalog, authToken: authToken)
@@ -34,7 +36,7 @@ class EventManager {
 
     func getDatabases(for event: WebCatalogEvent.Response.Event, authToken: OpenIDToken) async {
         var request = urlRequestForWebCatalogAPI("All", type: .catalogBase, authToken: authToken)
-        var parameters: [String: String] = [
+        let parameters: [String: String] = [
             "event_id": String(event.id),
             "event_no": String(event.number)
         ]
@@ -52,6 +54,36 @@ class EventManager {
                 self.imageDatabaseURL = databases.response.databaseFor211By300Images()
             }
         }
+    }
+
+    func downloadDatabases() async {
+        if let textDatabaseURL {
+            self.textDatabaseURL = await download(textDatabaseURL, as: "textdb.db")
+            debugPrint(self.textDatabaseURL?.absoluteString)
+            // TODO: Process text database URL
+        }
+        if let imageDatabaseURL {
+            self.imageDatabaseURL = await download(imageDatabaseURL, as: "images.db")
+            debugPrint(self.imageDatabaseURL?.absoluteString)
+            // TODO: Process image database URL
+        }
+    }
+
+    func download(_ url: URL?, as filename: String) async -> URL? {
+        if let url = url, let documentsDirectoryURL {
+            do {
+                let (downloadedFileURL, _) = try await URLSession.shared.download(from: url)
+
+                let saveDestinationURL = documentsDirectoryURL.appending(path: filename)
+                try? FileManager.default.removeItem(at: saveDestinationURL)
+                try FileManager.default.moveItem(at: downloadedFileURL, to: saveDestinationURL)
+                return saveDestinationURL
+            } catch {
+                debugPrint(error.localizedDescription)
+                return nil
+            }
+        }
+        return nil
     }
 
     func urlRequestForWebCatalogAPI(_ endpoint: String, type: WebCatalogAPIType, authToken: OpenIDToken) -> URLRequest {
