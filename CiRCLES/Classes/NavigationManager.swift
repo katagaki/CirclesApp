@@ -18,7 +18,6 @@ class NavigationManager: ObservableObject {
         .map: [],
         .circles: [],
         .checklists: [],
-        .profile: [],
         .more: []
     ]
 

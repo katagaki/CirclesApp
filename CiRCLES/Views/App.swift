@@ -10,7 +10,7 @@ import SwiftData
 
 @main
 struct CirclesApp: App {
-    
+
     @StateObject var navigationManager = NavigationManager()
     @State var authManager = AuthManager()
     @State var userManager = UserManager()
