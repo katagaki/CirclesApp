@@ -33,6 +33,8 @@
 		E480AA9D2C44A6F1009C1445 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA9C2C44A6F1009C1445 /* SQLite */; };
 		E480AA9F2C44A75D009C1445 /* MoreDatabaseAdministratiion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA9E2C44A759009C1445 /* MoreDatabaseAdministratiion.swift */; };
 		E480AAA12C44AA77009C1445 /* WebCatalogDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AAA02C44AA74009C1445 /* WebCatalogDatabase.swift */; };
+		E480AAA32C44B723009C1445 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AAA22C44B71E009C1445 /* DatabaseManager.swift */; };
+		E480AAA62C44BB77009C1445 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = E480AAA52C44BB77009C1445 /* ZIPFoundation */; };
 		E482FFC22C21BD93009225BD /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFBD2C21BD93009225BD /* MapView.swift */; };
 		E482FFC32C21BD93009225BD /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFBF2C21BD93009225BD /* App.swift */; };
 		E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFC02C21BD93009225BD /* MainTabView.swift */; };
@@ -64,6 +66,7 @@
 		E480AA992C44A497009C1445 /* WebCatalogEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCatalogEvent.swift; sourceTree = "<group>"; };
 		E480AA9E2C44A759009C1445 /* MoreDatabaseAdministratiion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreDatabaseAdministratiion.swift; sourceTree = "<group>"; };
 		E480AAA02C44AA74009C1445 /* WebCatalogDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCatalogDatabase.swift; sourceTree = "<group>"; };
+		E480AAA22C44B71E009C1445 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		E482FFBD2C21BD93009225BD /* MapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		E482FFBF2C21BD93009225BD /* App.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E482FFC02C21BD93009225BD /* MainTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
@@ -80,6 +83,7 @@
 				E480AA9D2C44A6F1009C1445 /* SQLite in Frameworks */,
 				E480AA772C441DD1009C1445 /* KeychainAccess in Frameworks */,
 				E405A48F2C21B157006FE791 /* Komponents in Frameworks */,
+				E480AAA62C44BB77009C1445 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,6 +112,7 @@
 				E47269032C3D716300D5335D /* AuthManager.swift */,
 				E480AA7E2C4423AD009C1445 /* UserManager.swift */,
 				E480AA972C44A471009C1445 /* EventManager.swift */,
+				E480AAA22C44B71E009C1445 /* DatabaseManager.swift */,
 				E480AA872C442980009C1445 /* NavigationManager.swift */,
 			);
 			path = Classes;
@@ -263,6 +268,7 @@
 				E405A48E2C21B157006FE791 /* Komponents */,
 				E480AA762C441DD1009C1445 /* KeychainAccess */,
 				E480AA9C2C44A6F1009C1445 /* SQLite */,
+				E480AAA52C44BB77009C1445 /* ZIPFoundation */,
 			);
 			productName = CiRCLES;
 			productReference = E4A769462C21A20A00BE3491 /* CiRCLES.app */;
@@ -297,6 +303,7 @@
 				E405A48D2C21B157006FE791 /* XCRemoteSwiftPackageReference "Komponents" */,
 				E480AA752C441DD1009C1445 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 				E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */,
+				E480AAA42C44BB77009C1445 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 			);
 			productRefGroup = E4A769472C21A20A00BE3491 /* Products */;
 			projectDirPath = "";
@@ -353,6 +360,7 @@
 				E480AA942C44A0B3009C1445 /* EventSelector.swift in Sources */,
 				E480AA912C442DD7009C1445 /* MoreView.swift in Sources */,
 				E480AA9A2C44A49F009C1445 /* WebCatalogEvent.swift in Sources */,
+				E480AAA32C44B723009C1445 /* DatabaseManager.swift in Sources */,
 				E480AA8B2C4429B4009C1445 /* TabType.swift in Sources */,
 				E482FFC32C21BD93009225BD /* App.swift in Sources */,
 				E46D51A92C22390E000524B9 /* LoginView.swift in Sources */,
@@ -609,6 +617,14 @@
 				minimumVersion = 0.15.3;
 			};
 		};
+		E480AAA42C44BB77009C1445 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.19;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -626,6 +642,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */;
 			productName = SQLite;
+		};
+		E480AAA52C44BB77009C1445 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E480AAA42C44BB77009C1445 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
