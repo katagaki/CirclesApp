@@ -23,7 +23,6 @@
 		E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA7A2C44230B009C1445 /* SwiftData.swift */; };
 		E480AA7F2C4423AF009C1445 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA7E2C4423AD009C1445 /* UserManager.swift */; };
 		E480AA832C44278F009C1445 /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA822C44278D009C1445 /* UserInfo.swift */; };
-		E480AA862C4428E2009C1445 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA852C4428E0009C1445 /* ProfileView.swift */; };
 		E480AA882C442982009C1445 /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA872C442980009C1445 /* NavigationManager.swift */; };
 		E480AA8B2C4429B4009C1445 /* TabType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA8A2C4429B3009C1445 /* TabType.swift */; };
 		E480AA8D2C4429CD009C1445 /* ViewPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA8C2C4429CC009C1445 /* ViewPath.swift */; };
@@ -50,7 +49,6 @@
 		E480AA7A2C44230B009C1445 /* SwiftData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftData.swift; sourceTree = "<group>"; };
 		E480AA7E2C4423AD009C1445 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
 		E480AA822C44278D009C1445 /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
-		E480AA852C4428E0009C1445 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		E480AA872C442980009C1445 /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
 		E480AA8A2C4429B3009C1445 /* TabType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabType.swift; sourceTree = "<group>"; };
 		E480AA8C2C4429CC009C1445 /* ViewPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPath.swift; sourceTree = "<group>"; };
@@ -145,14 +143,6 @@
 			path = "Data Models";
 			sourceTree = "<group>";
 		};
-		E480AA842C4428DA009C1445 /* Profile */ = {
-			isa = PBXGroup;
-			children = (
-				E480AA852C4428E0009C1445 /* ProfileView.swift */,
-			);
-			path = Profile;
-			sourceTree = "<group>";
-		};
 		E480AA892C4429AC009C1445 /* Enums */ = {
 			isa = PBXGroup;
 			children = (
@@ -193,7 +183,6 @@
 				E482FFC02C21BD93009225BD /* MainTabView.swift */,
 				E46D51A72C223903000524B9 /* Login */,
 				E482FFBE2C21BD93009225BD /* Map */,
-				E480AA842C4428DA009C1445 /* Profile */,
 				E480AA8F2C442DD1009C1445 /* More */,
 				E47269052C3D738900D5335D /* Shared */,
 			);
@@ -246,6 +235,7 @@
 				E4A769422C21A20A00BE3491 /* Sources */,
 				E4A769432C21A20A00BE3491 /* Frameworks */,
 				E4A769442C21A20A00BE3491 /* Resources */,
+				E480AA922C449C04009C1445 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -313,6 +303,27 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		E480AA922C449C04009C1445 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		E4A769422C21A20A00BE3491 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -332,7 +343,6 @@
 				E472690F2C3D767000D5335D /* OpenIDClient.swift in Sources */,
 				E480AA832C44278F009C1445 /* UserInfo.swift in Sources */,
 				E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */,
-				E480AA862C4428E2009C1445 /* ProfileView.swift in Sources */,
 				E47269042C3D716500D5335D /* AuthManager.swift in Sources */,
 				E480AA882C442982009C1445 /* NavigationManager.swift in Sources */,
 				E480AA8D2C4429CD009C1445 /* ViewPath.swift in Sources */,
@@ -474,6 +484,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CiRCLES/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -504,6 +515,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CiRCLES/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

@@ -54,13 +54,45 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Login to CiRCLES"
+            "value" : "Sign in to use CiRCLES"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "サークルズにログイン"
+          }
+        }
+      }
+    },
+    "Profile.Edit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Profile in My Portal"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイポータルで編集"
+          }
+        }
+      }
+    },
+    "Profile.GenericUser" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "User"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ユーザー"
           }
         }
       }
@@ -205,38 +237,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "その他"
-          }
-        }
-      }
-    },
-    "Tab.Profile" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Profile"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プロフィール"
-          }
-        }
-      }
-    },
-    "ViewTitle.Profile" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Profile"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "プロフィール"
           }
         }
       }

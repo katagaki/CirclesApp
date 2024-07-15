@@ -33,11 +33,6 @@ struct MainTabView: View {
                     Label("Tab.Checklists", systemImage: "checklist")
                 }
                 .tag(TabType.checklists)
-            ProfileView()
-                .tabItem {
-                    Label("Tab.Profile", systemImage: "person.crop.circle.fill")
-                }
-                .tag(TabType.profile)
             MoreView()
                 .tabItem {
                     Label("Tab.More", systemImage: "ellipsis")
