@@ -13,8 +13,8 @@ struct EventSelector: View {
 
     var body: some View {
         List {
-            ForEach(eventManager.events, id: \.eventId) { event in
-                Text(String(event.eventId))
+            ForEach(eventManager.events, id: \.id) { event in
+                Text(String(event.id))
             }
         }
         .task {
