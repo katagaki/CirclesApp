@@ -8,5 +8,6 @@
 import Foundation
 
 enum ViewPath: Hashable {
+    case moreDBAdmin
     case moreAttributions
 }

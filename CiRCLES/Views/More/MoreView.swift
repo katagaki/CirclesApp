@@ -17,7 +17,7 @@ struct MoreView: View {
 
     var body: some View {
         NavigationStack(path: $navigationManager[.more]) {
-            MoreList(repoName: "katagaki/CirclesApp") {
+            MoreList(repoName: "katagaki/CirclesApp", viewPath: ViewPath.moreAttributions) {
                 Section {
                     HStack(alignment: .center, spacing: 16.0) {
                         Image("Profile.1")
@@ -25,7 +25,8 @@ struct MoreView: View {
                             .frame(width: 56.0, height: 56.0)
                             .clipShape(.circle)
                         VStack(alignment: .leading) {
-                            Text(userManager.userInfo?.nickname ?? NSLocalizedString("Profile.GenericUser", comment: ""))
+                            Text(userManager.userInfo?.nickname ?? NSLocalizedString("Profile.GenericUser",
+                                                                                     comment: ""))
                                 .fontWeight(.medium)
                                 .font(.title3)
                             if isShowingUserPID {
@@ -60,11 +61,75 @@ struct MoreView: View {
                     ListSectionHeader(text: "More.Events")
                         .font(.body)
                 }
+                Section {
+                    NavigationLink(value: ViewPath.moreDBAdmin) {
+                        ListRow(image: "ListIcon.MasterDB", title: "More.DBAdmin.ManageDB")
+                    }
+                } header: {
+                    ListSectionHeader(text: "More.DBAdmin")
+                        .font(.body)
+                }
             }
             .task {
                 if let token = authManager.token {
                     await userManager.getUser(authToken: token)
                     await userManager.getEvents(authToken: token)
+                }
+            }
+            .navigationDestination(for: ViewPath.self) { viewPath in
+                switch viewPath {
+                case .moreDBAdmin: MoreDatabaseAdministratiion()
+                case .moreAttributions:
+                    LicensesView(licenses: [
+                        License(libraryName: "KeychainAccess", text: """
+The MIT License (MIT)
+
+Copyright (c) 2014 kishikawa katsumi
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+"""),
+                        License(libraryName: "SQlite.swift", text: """
+(The MIT License)
+
+Copyright (c) 2014-2015 Stephen Celis (<stephen@stephencelis.com>)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+""")
+                    ])
                 }
             }
         }

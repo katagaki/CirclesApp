@@ -65,6 +65,40 @@
         }
       }
     },
+    "More.DBAdmin" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Event Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベントデータ"
+          }
+        }
+      }
+    },
+    "More.DBAdmin.ManageDB" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Event Database"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベントデータを管理"
+          }
+        }
+      }
+    },
     "More.Events" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -195,7 +229,20 @@
       }
     },
     "Shared.SelectEvent" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Event"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベントを選択"
+          }
+        }
+      }
     },
     "Tab.Checklists" : {
       "localizations" : {

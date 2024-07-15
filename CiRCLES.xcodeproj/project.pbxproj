@@ -30,6 +30,9 @@
 		E480AA962C44A15D009C1445 /* UserCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA952C44A15A009C1445 /* UserCircle.swift */; };
 		E480AA982C44A473009C1445 /* EventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA972C44A471009C1445 /* EventManager.swift */; };
 		E480AA9A2C44A49F009C1445 /* WebCatalogEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA992C44A497009C1445 /* WebCatalogEvent.swift */; };
+		E480AA9D2C44A6F1009C1445 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA9C2C44A6F1009C1445 /* SQLite */; };
+		E480AA9F2C44A75D009C1445 /* MoreDatabaseAdministratiion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA9E2C44A759009C1445 /* MoreDatabaseAdministratiion.swift */; };
+		E480AAA12C44AA77009C1445 /* WebCatalogDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AAA02C44AA74009C1445 /* WebCatalogDatabase.swift */; };
 		E482FFC22C21BD93009225BD /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFBD2C21BD93009225BD /* MapView.swift */; };
 		E482FFC32C21BD93009225BD /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFBF2C21BD93009225BD /* App.swift */; };
 		E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFC02C21BD93009225BD /* MainTabView.swift */; };
@@ -59,6 +62,8 @@
 		E480AA952C44A15A009C1445 /* UserCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCircle.swift; sourceTree = "<group>"; };
 		E480AA972C44A471009C1445 /* EventManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventManager.swift; sourceTree = "<group>"; };
 		E480AA992C44A497009C1445 /* WebCatalogEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCatalogEvent.swift; sourceTree = "<group>"; };
+		E480AA9E2C44A759009C1445 /* MoreDatabaseAdministratiion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreDatabaseAdministratiion.swift; sourceTree = "<group>"; };
+		E480AAA02C44AA74009C1445 /* WebCatalogDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCatalogDatabase.swift; sourceTree = "<group>"; };
 		E482FFBD2C21BD93009225BD /* MapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		E482FFBF2C21BD93009225BD /* App.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E482FFC02C21BD93009225BD /* MainTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
@@ -72,6 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E480AA9D2C44A6F1009C1445 /* SQLite in Frameworks */,
 				E480AA772C441DD1009C1445 /* KeychainAccess in Frameworks */,
 				E405A48F2C21B157006FE791 /* Komponents in Frameworks */,
 			);
@@ -165,6 +171,7 @@
 				E480AA822C44278D009C1445 /* UserInfo.swift */,
 				E480AA952C44A15A009C1445 /* UserCircle.swift */,
 				E480AA992C44A497009C1445 /* WebCatalogEvent.swift */,
+				E480AAA02C44AA74009C1445 /* WebCatalogDatabase.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -173,6 +180,7 @@
 			isa = PBXGroup;
 			children = (
 				E480AA902C442DD6009C1445 /* MoreView.swift */,
+				E480AA9E2C44A759009C1445 /* MoreDatabaseAdministratiion.swift */,
 			);
 			path = More;
 			sourceTree = "<group>";
@@ -254,6 +262,7 @@
 			packageProductDependencies = (
 				E405A48E2C21B157006FE791 /* Komponents */,
 				E480AA762C441DD1009C1445 /* KeychainAccess */,
+				E480AA9C2C44A6F1009C1445 /* SQLite */,
 			);
 			productName = CiRCLES;
 			productReference = E4A769462C21A20A00BE3491 /* CiRCLES.app */;
@@ -287,6 +296,7 @@
 			packageReferences = (
 				E405A48D2C21B157006FE791 /* XCRemoteSwiftPackageReference "Komponents" */,
 				E480AA752C441DD1009C1445 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */,
 			);
 			productRefGroup = E4A769472C21A20A00BE3491 /* Products */;
 			projectDirPath = "";
@@ -338,6 +348,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E480AA9F2C44A75D009C1445 /* MoreDatabaseAdministratiion.swift in Sources */,
 				E482FFC22C21BD93009225BD /* MapView.swift in Sources */,
 				E480AA942C44A0B3009C1445 /* EventSelector.swift in Sources */,
 				E480AA912C442DD7009C1445 /* MoreView.swift in Sources */,
@@ -352,6 +363,7 @@
 				E480AA982C44A473009C1445 /* EventManager.swift in Sources */,
 				E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */,
 				E472690F2C3D767000D5335D /* OpenIDClient.swift in Sources */,
+				E480AAA12C44AA77009C1445 /* WebCatalogDatabase.swift in Sources */,
 				E480AA832C44278F009C1445 /* UserInfo.swift in Sources */,
 				E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */,
 				E47269042C3D716500D5335D /* AuthManager.swift in Sources */,
@@ -589,6 +601,14 @@
 				minimumVersion = 4.2.2;
 			};
 		};
+		E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.15.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -601,6 +621,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E480AA752C441DD1009C1445 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		E480AA9C2C44A6F1009C1445 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */;
+			productName = SQLite;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

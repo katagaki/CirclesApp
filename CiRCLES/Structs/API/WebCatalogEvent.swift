@@ -16,12 +16,12 @@ struct WebCatalogEvent: Codable {
         let latestEventNo: Int
 
         struct Event: Codable {
-            let eventId: Int
-            let eventNo: Int
+            let id: Int
+            let number: Int
 
             enum CodingKeys: String, CodingKey {
-                case eventId = "EventId"
-                case eventNo = "EventNo"
+                case id = "EventId"
+                case number = "EventNo"
             }
         }
 
