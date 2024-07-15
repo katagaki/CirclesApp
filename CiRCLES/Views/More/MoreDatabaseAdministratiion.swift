@@ -13,7 +13,7 @@ struct MoreDatabaseAdministratiion: View {
     @Environment(DatabaseManager.self) var databaseManager
 
     var body: some View {
-        List(databaseManager.maps, id: \.hashValue) { map in
+        List(databaseManager.maps, id: \.self) { map in
             Text(map.name)
         }
             .task {
