@@ -13,7 +13,9 @@ struct MoreDatabaseAdministratiion: View {
     @Environment(DatabaseManager.self) var databaseManager
 
     var body: some View {
-        ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
+        List(databaseManager.maps, id: \.hashValue) { map in
+            Text(map.name)
+        }
             .task {
                 if let token = authManager.token {
                     await eventManager.getEvents(authToken: token)

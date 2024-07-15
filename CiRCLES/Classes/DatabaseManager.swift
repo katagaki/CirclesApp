@@ -15,21 +15,27 @@ typealias Expression = SQLite.Expression
 @MainActor
 class DatabaseManager {
 
+    @ObservationIgnored let documentsDirectoryURL: URL? = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
     var textDatabaseURL: URL?
     var imageDatabaseURL: URL?
 
-    let documentsDirectoryURL: URL? = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+    var maps: [ComiketMap] = []
 
     func getComiketMap() {
         if let textDatabaseURL {
             do {
                 debugPrint("Opening database")
                 let database = try Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
+
                 debugPrint("Selecting from ComiketMapWC")
                 let mapTable = Table("ComiketMapWC")
-                let mapName = Expression<String>("name")
+                let comiketNumber = Expression<Int>("comiketNo")
+                let name = Expression<String>("name")
+
                 for map in try database.prepare(mapTable) {
-                    debugPrint(map[mapName])
+                    maps.append(ComiketMap(
+                        comiketNumber: map[comiketNumber], name: map[name]
+                    ))
                 }
             } catch {
                 debugPrint(error.localizedDescription)
