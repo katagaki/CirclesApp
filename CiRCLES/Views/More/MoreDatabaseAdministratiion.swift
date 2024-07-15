@@ -10,6 +10,7 @@ import SwiftUI
 struct MoreDatabaseAdministratiion: View {
     @Environment(AuthManager.self) var authManager
     @Environment(EventManager.self) var eventManager
+    @Environment(DatabaseManager.self) var databaseManager
 
     var body: some View {
         ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
@@ -18,8 +19,9 @@ struct MoreDatabaseAdministratiion: View {
                     await eventManager.getEvents(authToken: token)
                     if let placeholderEvent = eventManager.events.first {
                         // TODO: Load all events instead of .first
-                        await eventManager.getDatabases(for: placeholderEvent, authToken: token)
-                        await eventManager.downloadDatabases()
+                        await databaseManager.getDatabases(for: placeholderEvent, authToken: token)
+                        await databaseManager.downloadDatabases()
+                        databaseManager.getComiketMap()
                     }
                 }
             }
