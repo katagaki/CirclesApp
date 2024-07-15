@@ -44,7 +44,22 @@ class DatabaseManager {
         // SELECT * FROM ComiketMapWC
     }
 
-    func getDatabases(for event: WebCatalogEvent.Response.Event, authToken: OpenIDToken) async {
+    func downloadDatabases(for event: WebCatalogEvent.Response.Event, authToken: OpenIDToken) async {
+        // Reuse existing database if it exists
+        if let documentsDirectoryURL {
+            let textDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number).db")
+            let imageDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number)Image1.db")
+            if FileManager.default.fileExists(atPath: textDatabaseURL.path(percentEncoded: false)),
+               FileManager.default.fileExists(atPath: imageDatabaseURL.path(percentEncoded: false)) {
+                self.textDatabaseURL = textDatabaseURL
+                self.imageDatabaseURL = imageDatabaseURL
+                return
+            }
+        }
+
+        // Download zipped database
+        var textDatabaseURL: URL?
+        var imageDatabaseURL: URL?
         var request = urlRequestForWebCatalogAPI("All", authToken: authToken)
         let parameters: [String: String] = [
             "event_id": String(event.id),
@@ -60,13 +75,12 @@ class DatabaseManager {
             debugPrint("Web Catalog databases response length: \(data.count)")
             if let databases = try? JSONDecoder().decode(WebCatalogDatabase.self, from: data) {
                 debugPrint("Decoded databases")
-                self.textDatabaseURL = databases.response.databaseForText()
-                self.imageDatabaseURL = databases.response.databaseFor211By300Images()
+                textDatabaseURL = databases.response.databaseForText()
+                imageDatabaseURL = databases.response.databaseFor211By300Images()
             }
         }
-    }
 
-    func downloadDatabases() async {
+        // Unzip databases
         if let textDatabaseZippedURL = await download(textDatabaseURL),
            let imageDatabaseZippedURL = await download(imageDatabaseURL) {
             self.textDatabaseURL = unzip(textDatabaseZippedURL)
