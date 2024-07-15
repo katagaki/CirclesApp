@@ -14,6 +14,6 @@ let circleMsAPIEndpoint: URL = URL(string: "https://api1-sandbox.circle.ms")!
 // TODO: Force sandbox until app is ready for production server
 let circleMsAuthEndpoint: URL = URL(string: "https://auth1-sandbox.circle.ms")!
 let circleMsAPIEndpoint: URL = URL(string: "https://api1-sandbox.circle.ms")!
-//let circleMsAuthEndpoint: URL = URL(string: "https://auth1.circle.ms")!
-//let circleMsAPIEndpoint: URL = URL(string: "https://api1.circle.ms")!
+// let circleMsAuthEndpoint: URL = URL(string: "https://auth1.circle.ms")!
+// let circleMsAPIEndpoint: URL = URL(string: "https://api1.circle.ms")!
 #endif

@@ -14,9 +14,9 @@ class AuthManager {
 
     let keychain = Keychain(service: "com.tsubuzaki.CiRCLES")
 
-    var code: String? = nil
-    var token: OpenIDToken? = nil
-    
+    var code: String?
+    var token: OpenIDToken?
+
     @ObservationIgnored let client: OpenIDClient
 
     var authURL: URL {
@@ -41,7 +41,7 @@ class AuthManager {
 
     init() {
         // Read OpenID information from OpenID.plist
-        let url = Bundle.main.url(forResource: "OpenID", withExtension:"plist")!
+        let url = Bundle.main.url(forResource: "OpenID", withExtension: "plist")!
         do {
             let data = try Data(contentsOf: url)
             let result = try PropertyListDecoder().decode(OpenIDClient.self, from: data)
@@ -59,7 +59,7 @@ class AuthManager {
     }
 
     func getAuthenticationCode(from url: URL) {
-        debugPrint("Getting authentication code...")
+        debugPrint("Getting authentication code")
         if let components = URLComponents(url: url, resolvingAgainstBaseURL: true) {
             if let queryItems = components.queryItems {
                 var parameters: [String: String] = [:]
@@ -80,7 +80,7 @@ class AuthManager {
     }
 
     func getAuthenticationToken() async {
-        debugPrint("Getting authentication token...")
+        debugPrint("Getting authentication token")
         let request = urlRequestForToken(parameters: [
             "grant_type": "authorization_code",
             "code": code ?? ""
@@ -95,7 +95,7 @@ class AuthManager {
 
     func refreshAuthenticationToken() async {
         if let refreshToken = token?.refreshToken {
-            debugPrint("Refreshing authentication token...")
+            debugPrint("Refreshing authentication token")
             let request = urlRequestForToken(parameters: [
                 "grant_type": "refresh_token",
                 "refresh_token": refreshToken
@@ -118,7 +118,7 @@ class AuthManager {
             self.token = token
             if let tokenEncoded = try? JSONEncoder().encode(token),
                let tokenString = String(data: tokenEncoded, encoding: .utf8) {
-                debugPrint(tokenString)
+                debugPrint("Saving authentication token to keychain")
                 try? keychain.set(tokenString, key: "CircleMsAuthToken")
             }
         }
@@ -130,7 +130,7 @@ class AuthManager {
         var parameters: [String: String] = parameters
         parameters["client_id"] = client.id
         parameters["client_secret"] = client.secret
-        
+
         var request = URLRequest(url: endpoint)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")

@@ -14,6 +14,7 @@ struct CirclesApp: App {
     @StateObject var navigationManager = NavigationManager()
     @State var authManager = AuthManager()
     @State var userManager = UserManager()
+    @State var eventManager = EventManager()
 
     var body: some Scene {
         WindowGroup {
@@ -27,6 +28,7 @@ struct CirclesApp: App {
         .environmentObject(navigationManager)
         .environment(authManager)
         .environment(userManager)
+        .environment(eventManager)
         .onChange(of: navigationManager.selectedTab) { _, _ in
             navigationManager.saveToDefaults()
         }

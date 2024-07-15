@@ -14,5 +14,4 @@ struct UserInfo: Codable {
         let r18: Int
         let nickname: String
     }
-
 }
