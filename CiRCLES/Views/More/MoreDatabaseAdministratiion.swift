@@ -21,8 +21,7 @@ struct MoreDatabaseAdministratiion: View {
                     await eventManager.getEvents(authToken: token)
                     if let placeholderEvent = eventManager.events.first {
                         // TODO: Load all events instead of .first
-                        await databaseManager.getDatabases(for: placeholderEvent, authToken: token)
-                        await databaseManager.downloadDatabases()
+                        await databaseManager.downloadDatabases(for: placeholderEvent, authToken: token)
                         databaseManager.getComiketMap()
                     }
                 }
