@@ -11,15 +11,10 @@ import Foundation
 @MainActor
 class UserManager {
     var userInfo: UserInfo.Response?
+    var userCircles: [UserCircle.Response.Circle] = []
 
     func getUser(authToken: OpenIDToken) async {
-        let endpoint = URL(string: "\(circleMsAPIEndpoint)/User/Info/")!
-        
-        var request = URLRequest(url: endpoint)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(authToken.accessToken)", forHTTPHeaderField: "Authorization")
-
-        debugPrint(authToken.accessToken)
+        let request = urlRequestForUserAPI(endpoint: "Info", authToken: authToken)
 
         if let (data, _) = try? await URLSession.shared.data(for: request) {
             debugPrint("User info response length: \(data.count)")
@@ -30,4 +25,25 @@ class UserManager {
         }
     }
 
+    func getEvents(authToken: OpenIDToken) async {
+        let request = urlRequestForUserAPI(endpoint: "Circles", authToken: authToken)
+
+        if let (data, _) = try? await URLSession.shared.data(for: request) {
+            debugPrint("User info response length: \(data.count)")
+            if let userCircles = try? JSONDecoder().decode(UserCircle.self, from: data) {
+                debugPrint("Decoded user circles")
+                self.userCircles = userCircles.response.circles
+            }
+        }
+    }
+
+    func urlRequestForUserAPI(endpoint: String, authToken: OpenIDToken) -> URLRequest {
+        let endpoint = URL(string: "\(circleMsAPIEndpoint)/User/\(endpoint)/")!
+
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(authToken.accessToken)", forHTTPHeaderField: "Authorization")
+
+        return request
+    }
 }

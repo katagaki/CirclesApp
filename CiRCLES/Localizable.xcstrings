@@ -65,6 +65,23 @@
         }
       }
     },
+    "More.Events" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Events"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベント一覧"
+          }
+        }
+      }
+    },
     "Profile.Edit" : {
       "localizations" : {
         "en" : {
@@ -176,6 +193,9 @@
           }
         }
       }
+    },
+    "Shared.SelectEvent" : {
+
     },
     "Tab.Checklists" : {
       "localizations" : {

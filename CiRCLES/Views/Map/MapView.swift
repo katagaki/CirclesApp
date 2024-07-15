@@ -8,7 +8,24 @@
 import SwiftUI
 
 struct MapView: View {
+    @EnvironmentObject var navigationManager: NavigationManager
+
+    // TODO: Put this in an environment state
+    @State var isSelectingEvent: Bool = false
+
     var body: some View {
-        ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
+        NavigationStack(path: $navigationManager[.map]) {
+            ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Shared.SelectEvent", systemImage: "calendar") {
+                            isSelectingEvent = true
+                        }
+                    }
+                }
+                .sheet(isPresented: $isSelectingEvent) {
+                    EventSelector()
+                }
+        }
     }
 }

@@ -12,7 +12,6 @@
 		E405A48F2C21B157006FE791 /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E405A48E2C21B157006FE791 /* Komponents */; };
 		E46D51A92C22390E000524B9 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51A82C22390E000524B9 /* LoginView.swift */; };
 		E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47268F32C38EACB00D5335D /* Endpoints.swift */; };
-		E47268F92C38ECA800D5335D /* Auth.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47268F82C38ECA100D5335D /* Auth.swift */; };
 		E47269042C3D716500D5335D /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47269032C3D716300D5335D /* AuthManager.swift */; };
 		E47269072C3D739700D5335D /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47269062C3D739500D5335D /* SafariView.swift */; };
 		E472690A2C3D73F100D5335D /* OpenID.plist in Resources */ = {isa = PBXBuildFile; fileRef = E47269092C3D73F100D5335D /* OpenID.plist */; };
@@ -27,6 +26,10 @@
 		E480AA8B2C4429B4009C1445 /* TabType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA8A2C4429B3009C1445 /* TabType.swift */; };
 		E480AA8D2C4429CD009C1445 /* ViewPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA8C2C4429CC009C1445 /* ViewPath.swift */; };
 		E480AA912C442DD7009C1445 /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA902C442DD6009C1445 /* MoreView.swift */; };
+		E480AA942C44A0B3009C1445 /* EventSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA932C44A0AF009C1445 /* EventSelector.swift */; };
+		E480AA962C44A15D009C1445 /* UserCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA952C44A15A009C1445 /* UserCircle.swift */; };
+		E480AA982C44A473009C1445 /* EventManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA972C44A471009C1445 /* EventManager.swift */; };
+		E480AA9A2C44A49F009C1445 /* WebCatalogEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA992C44A497009C1445 /* WebCatalogEvent.swift */; };
 		E482FFC22C21BD93009225BD /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFBD2C21BD93009225BD /* MapView.swift */; };
 		E482FFC32C21BD93009225BD /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFBF2C21BD93009225BD /* App.swift */; };
 		E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFC02C21BD93009225BD /* MainTabView.swift */; };
@@ -38,7 +41,6 @@
 		E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		E46D51A82C22390E000524B9 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		E47268F32C38EACB00D5335D /* Endpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoints.swift; sourceTree = "<group>"; };
-		E47268F82C38ECA100D5335D /* Auth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Auth.swift; sourceTree = "<group>"; };
 		E47269032C3D716300D5335D /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		E47269062C3D739500D5335D /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
 		E47269092C3D73F100D5335D /* OpenID.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = OpenID.plist; sourceTree = "<group>"; };
@@ -53,6 +55,10 @@
 		E480AA8A2C4429B3009C1445 /* TabType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabType.swift; sourceTree = "<group>"; };
 		E480AA8C2C4429CC009C1445 /* ViewPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPath.swift; sourceTree = "<group>"; };
 		E480AA902C442DD6009C1445 /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
+		E480AA932C44A0AF009C1445 /* EventSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventSelector.swift; sourceTree = "<group>"; };
+		E480AA952C44A15A009C1445 /* UserCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCircle.swift; sourceTree = "<group>"; };
+		E480AA972C44A471009C1445 /* EventManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventManager.swift; sourceTree = "<group>"; };
+		E480AA992C44A497009C1445 /* WebCatalogEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCatalogEvent.swift; sourceTree = "<group>"; };
 		E482FFBD2C21BD93009225BD /* MapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		E482FFBF2C21BD93009225BD /* App.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E482FFC02C21BD93009225BD /* MainTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
@@ -85,7 +91,6 @@
 		E47268F72C38EC8B00D5335D /* API */ = {
 			isa = PBXGroup;
 			children = (
-				E47268F82C38ECA100D5335D /* Auth.swift */,
 				E47268F32C38EACB00D5335D /* Endpoints.swift */,
 			);
 			path = API;
@@ -96,6 +101,7 @@
 			children = (
 				E47269032C3D716300D5335D /* AuthManager.swift */,
 				E480AA7E2C4423AD009C1445 /* UserManager.swift */,
+				E480AA972C44A471009C1445 /* EventManager.swift */,
 				E480AA872C442980009C1445 /* NavigationManager.swift */,
 			);
 			path = Classes;
@@ -105,6 +111,7 @@
 			isa = PBXGroup;
 			children = (
 				E47269062C3D739500D5335D /* SafariView.swift */,
+				E480AA932C44A0AF009C1445 /* EventSelector.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -156,6 +163,8 @@
 			isa = PBXGroup;
 			children = (
 				E480AA822C44278D009C1445 /* UserInfo.swift */,
+				E480AA952C44A15A009C1445 /* UserCircle.swift */,
+				E480AA992C44A497009C1445 /* WebCatalogEvent.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -330,7 +339,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				E482FFC22C21BD93009225BD /* MapView.swift in Sources */,
+				E480AA942C44A0B3009C1445 /* EventSelector.swift in Sources */,
 				E480AA912C442DD7009C1445 /* MoreView.swift in Sources */,
+				E480AA9A2C44A49F009C1445 /* WebCatalogEvent.swift in Sources */,
 				E480AA8B2C4429B4009C1445 /* TabType.swift in Sources */,
 				E482FFC32C21BD93009225BD /* App.swift in Sources */,
 				E46D51A92C22390E000524B9 /* LoginView.swift in Sources */,
@@ -338,12 +349,13 @@
 				E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */,
 				E47269072C3D739700D5335D /* SafariView.swift in Sources */,
 				E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */,
-				E47268F92C38ECA800D5335D /* Auth.swift in Sources */,
+				E480AA982C44A473009C1445 /* EventManager.swift in Sources */,
 				E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */,
 				E472690F2C3D767000D5335D /* OpenIDClient.swift in Sources */,
 				E480AA832C44278F009C1445 /* UserInfo.swift in Sources */,
 				E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */,
 				E47269042C3D716500D5335D /* AuthManager.swift in Sources */,
+				E480AA962C44A15D009C1445 /* UserCircle.swift in Sources */,
 				E480AA882C442982009C1445 /* NavigationManager.swift in Sources */,
 				E480AA8D2C4429CD009C1445 /* ViewPath.swift in Sources */,
 			);
