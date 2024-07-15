@@ -14,10 +14,13 @@ struct MoreDatabaseAdministratiion: View {
     var body: some View {
         ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
             .task {
-                if let token = authManager.token,
-                   let placeholderEvent = eventManager.events.first {
-                    // TODO: Load all events instead of .first
-                    await eventManager.getDatabases(for: placeholderEvent, authToken: token)
+                if let token = authManager.token {
+                    await eventManager.getEvents(authToken: token)
+                    if let placeholderEvent = eventManager.events.first {
+                        // TODO: Load all events instead of .first
+                        await eventManager.getDatabases(for: placeholderEvent, authToken: token)
+                        await eventManager.downloadDatabases()
+                    }
                 }
             }
     }
