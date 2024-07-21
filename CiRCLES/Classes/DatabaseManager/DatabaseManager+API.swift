@@ -1,118 +1,14 @@
 //
-//  DatabaseManager.swift
+//  DatabaseManager+API.swift
 //  CiRCLES
 //
-//  Created by シン・ジャスティン on 2024/07/15.
+//  Created by シン・ジャスティン on 2024/07/21.
 //
 
 import Foundation
-import SQLite
 import ZIPFoundation
 
-typealias Expression = SQLite.Expression
-
-@Observable
-@MainActor
-class DatabaseManager {
-
-    @ObservationIgnored let documentsDirectoryURL: URL? = FileManager.default.urls(
-        for: .documentDirectory,
-        in: .userDomainMask
-    ).first
-
-    var textDatabaseURL: URL?
-    var imageDatabaseURL: URL?
-
-    var database: Connection?
-
-    var events: [ComiketEvent] = []
-    var eventDates: [ComiketDate] = []
-    var eventMaps: [ComiketMap] = []
-    var eventAreas: [ComiketArea] = []
-    var eventBlocks: [ComiketBlock] = []
-    var eventGenres: [ComiketGenre] = []
-    var eventLayouts: [ComiketLayout] = []
-    var eventCircles: [ComiketCircle] = []
-
-    // MARK: SQLite Database Operations
-
-    func loadDatabase() {
-        if let textDatabaseURL {
-            do {
-                debugPrint("Opening database")
-                database = try Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-    }
-
-    func loadEvents() {
-        if let events = loadTable("ComiketInfoWC", of: ComiketEvent.self) as? [ComiketEvent] {
-            self.events = events
-        }
-    }
-
-    func loadDates() {
-        if let eventDates = loadTable("ComiketDateWC", of: ComiketDate.self) as? [ComiketDate] {
-            self.eventDates = eventDates
-        }
-    }
-
-    func loadMaps() {
-        if let eventMaps = loadTable("ComiketMapWC", of: ComiketMap.self) as? [ComiketMap] {
-            self.eventMaps = eventMaps
-        }
-    }
-
-    func loadAreas() {
-        if let eventAreas = loadTable("ComiketAreaWC", of: ComiketArea.self) as? [ComiketArea] {
-            self.eventAreas = eventAreas
-        }
-    }
-
-    func loadBlocks() {
-        if let eventBlocks = loadTable("ComiketBlockWC", of: ComiketBlock.self) as? [ComiketBlock] {
-            self.eventBlocks = eventBlocks
-        }
-    }
-
-    func loadGenres() {
-        if let eventGenres = loadTable("ComiketGenreWC", of: ComiketGenre.self) as? [ComiketGenre] {
-            self.eventGenres = eventGenres
-        }
-    }
-
-    func loadLayouts() {
-        if let eventLayouts = loadTable("ComiketLayoutWC", of: ComiketLayout.self) as? [ComiketLayout] {
-            self.eventLayouts = eventLayouts
-        }
-    }
-
-    func loadCircles() {
-        if let eventCircles = loadTable("ComiketCircleWC", of: ComiketCircle.self) as? [ComiketCircle] {
-            self.eventCircles = eventCircles
-        }
-    }
-
-    func loadTable<T: SQLiteable>(_ tableName: String, of type: T.Type) -> [SQLiteable]? {
-        if let database {
-            do {
-                debugPrint("Selecting from \(tableName)")
-                let table = Table("\(tableName)")
-                var loadedRows: [SQLiteable] = []
-                for row in try database.prepare(table) {
-                    loadedRows.append(T(from: row))
-                }
-                return loadedRows
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-        return []
-    }
-
-    // MARK: API Operations
+extension DatabaseManager {
 
     func downloadDatabases(for event: WebCatalogEvent.Response.Event, authToken: OpenIDToken) async {
         // Reuse existing database if it exists
@@ -161,19 +57,6 @@ class DatabaseManager {
            let imageDatabaseZippedURL = await download(imageDatabaseURL) {
             self.textDatabaseURL = unzip(textDatabaseZippedURL)
             self.imageDatabaseURL = unzip(imageDatabaseZippedURL)
-        }
-    }
-
-    func deleteDatabases() {
-        if let documentsDirectoryURL {
-            try? FileManager.default.removeItem(at: documentsDirectoryURL)
-            self.textDatabaseURL = nil
-            self.imageDatabaseURL = nil
-            self.database = nil
-            self.events.removeAll()
-            self.eventDates.removeAll()
-            self.eventMaps.removeAll()
-            self.eventAreas.removeAll()
         }
     }
 
@@ -226,4 +109,5 @@ class DatabaseManager {
 
         return request
     }
+
 }

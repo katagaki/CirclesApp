@@ -48,13 +48,13 @@ final class ComiketCircle: SQLiteable {
         let colCircleNameKana = Expression<String>("circleKana")
         let colPenName = Expression<String>("penName")
         let colBookName = Expression<String>("bookName")
-        let colURL = Expression<String?>("url")
+        let colURL = Expression<String>("url")
         let colMailAddress = Expression<String>("mailAddr")
         let colSupplementaryDescription = Expression<String>("description")
         let colMemo = Expression<String>("memo")
         let colUpdateID = Expression<Int>("updateId")
         let colUpdateData = Expression<String>("updateData")
-        let colCircleMsURL = Expression<String?>("circlems")
+        let colCircleMsURL = Expression<String>("circlems")
         let colRSS = Expression<String>("rss")
         let colUpdateFlag = Expression<Int>("updateFlag")
 
@@ -72,7 +72,7 @@ final class ComiketCircle: SQLiteable {
         self.penName = row[colPenName]
         self.bookName = row[colBookName]
 
-        if let url = URL(string: row[colURL] ?? "") {
+        if let url = URL(string: row[colURL]) {
             self.url = url
         }
 
@@ -82,7 +82,7 @@ final class ComiketCircle: SQLiteable {
         self.updateID = row[colUpdateID]
         self.updateData = row[colUpdateData]
 
-        if let circleMsURL = URL(string: row[colCircleMsURL] ?? "") {
+        if let circleMsURL = URL(string: row[colCircleMsURL]) {
             self.circleMsURL = circleMsURL
         }
 

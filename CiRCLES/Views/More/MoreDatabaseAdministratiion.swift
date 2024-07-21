@@ -11,21 +11,21 @@ import SwiftUI
 struct MoreDatabaseAdministratiion: View {
     @Environment(AuthManager.self) var authManager
     @Environment(EventManager.self) var eventManager
-    @Environment(DatabaseManager.self) var databaseManager
+    @Environment(DatabaseManager.self) var database
 
     var body: some View {
         List {
             Section {
                 Button("More.DBAdmin.DeleteDBs", role: .destructive) {
-                    databaseManager.deleteDatabases()
+                    database.deleteDatabases()
                 }
             }
             Section {
-                ForEach(databaseManager.events, id: \.self) { event in
+                ForEach(database.events, id: \.self) { event in
                     VStack(alignment: .leading) {
                         Text(event.name)
                         Divider()
-                        let eventDates = databaseManager.eventDates.filter({ $0.eventNumber == event.eventNumber })
+                        let eventDates = database.eventDates.filter({ $0.eventNumber == event.eventNumber })
                         HStack {
                             if eventDates.count > 0 {
                                 ForEach(eventDates, id: \.self) { eventDate in
@@ -43,7 +43,7 @@ struct MoreDatabaseAdministratiion: View {
                     .font(.body)
             }
             Section {
-                ForEach(databaseManager.eventMaps, id: \.self) { eventMap in
+                ForEach(database.eventMaps, id: \.self) { eventMap in
                     Text(eventMap.filename)
                 }
             } header: {
@@ -51,7 +51,7 @@ struct MoreDatabaseAdministratiion: View {
                     .font(.body)
             }
             Section {
-                ForEach(databaseManager.eventAreas, id: \.self) { eventArea in
+                ForEach(database.eventAreas, id: \.self) { eventArea in
                     Text(eventArea.name)
                 }
             } header: {
@@ -59,7 +59,7 @@ struct MoreDatabaseAdministratiion: View {
                     .font(.body)
             }
             Section {
-                ForEach(databaseManager.eventBlocks, id: \.self) { eventBlock in
+                ForEach(database.eventBlocks, id: \.self) { eventBlock in
                     Text(eventBlock.name)
                 }
             } header: {
@@ -67,7 +67,7 @@ struct MoreDatabaseAdministratiion: View {
                     .font(.body)
             }
             Section {
-                ForEach(databaseManager.eventGenres, id: \.self) { eventGenre in
+                ForEach(database.eventGenres, id: \.self) { eventGenre in
                     Text(eventGenre.name)
                 }
             } header: {
@@ -75,7 +75,7 @@ struct MoreDatabaseAdministratiion: View {
                     .font(.body)
             }
             Section {
-                ForEach(databaseManager.eventLayouts, id: \.self) { eventLayout in
+                ForEach(database.eventLayouts, id: \.self) { eventLayout in
                     Text(verbatim: "\(eventLayout.blockID) | \(eventLayout.spaceNumber)")
                 }
             } header: {
@@ -83,13 +83,20 @@ struct MoreDatabaseAdministratiion: View {
                     .font(.body)
             }
             Section {
-                ForEach(databaseManager.eventCircles, id: \.self) { eventCircle in
-                    VStack(alignment: .leading) {
-                        Text(verbatim: "\(eventCircle.circleName) | \(eventCircle.penName)")
-                        Divider()
-                        Text(verbatim: "\(eventCircle.blockID) | \(eventCircle.spaceNumber) | \(eventCircle.spaceNumberSuffix)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                ForEach(database.eventCircles, id: \.self) { eventCircle in
+                    HStack {
+                        if let image = database.circleImage(for: eventCircle.id) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 32.0, height: 32.0)
+                        }
+                        VStack(alignment: .leading) {
+                            Text(verbatim: "\(eventCircle.circleName) | \(eventCircle.penName)")
+                            Text(verbatim: "\(eventCircle.blockID) | \(eventCircle.spaceNumber) | \(eventCircle.spaceNumberSuffix)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             } header: {
@@ -102,16 +109,20 @@ struct MoreDatabaseAdministratiion: View {
                 await eventManager.getEvents(authToken: token)
                 if let placeholderEvent = eventManager.events.first {
                     // TODO: Load all events instead of .first
-                    await databaseManager.downloadDatabases(for: placeholderEvent, authToken: token)
-                    databaseManager.loadDatabase()
-                    databaseManager.loadEvents()
-                    databaseManager.loadDates()
-                    databaseManager.loadMaps()
-                    databaseManager.loadAreas()
-                    databaseManager.loadBlocks()
-                    databaseManager.loadGenres()
-                    databaseManager.loadLayouts()
-                    databaseManager.loadCircles()
+                    await database.downloadDatabases(for: placeholderEvent, authToken: token)
+                    database.loadDatabase()
+                    database.loadEvents()
+                    database.loadDates()
+                    database.loadMaps()
+                    database.loadAreas()
+                    database.loadBlocks()
+                    database.loadGenres()
+                    database.loadLayouts()
+                    database.loadCircles()
+                    database.loadCircleExtendedInformtion()
+                    database.loadCommonImages()
+                    database.loadCircleImages()
+                    debugPrint("Database loaded")
                 }
             }
         }
