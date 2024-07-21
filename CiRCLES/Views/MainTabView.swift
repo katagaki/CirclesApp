@@ -23,7 +23,7 @@ struct MainTabView: View {
                     Label("Tab.Map", systemImage: "map.fill")
                 }
                 .tag(TabType.map)
-            ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
+            CirclesView()
                 .tabItem {
                     Label("Tab.Circles", systemImage: "square.grid.3x3.fill")
                 }
