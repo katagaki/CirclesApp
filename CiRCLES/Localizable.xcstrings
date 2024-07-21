@@ -164,6 +164,50 @@
         }
       }
     },
+    "Shared.Areas" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "地区"
+          }
+        }
+      }
+    },
+    "Shared.Blocks" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ブロック"
+          }
+        }
+      }
+    },
+    "Shared.Events" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベント"
+          }
+        }
+      }
+    },
+    "Shared.Genres" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンル"
+          }
+        }
+      }
+    },
     "Shared.Login" : {
       "localizations" : {
         "en" : {
@@ -208,6 +252,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "再度ログイン"
+          }
+        }
+      }
+    },
+    "Shared.Maps" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "地図"
           }
         }
       }

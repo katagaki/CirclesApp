@@ -48,6 +48,7 @@
 		E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFC02C21BD93009225BD /* MainTabView.swift */; };
 		E49351EA2C4CC62F004CBDA1 /* ComiketArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */; };
 		E49351EC2C4CC972004CBDA1 /* ComiketBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */; };
+		E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351EE2C4CCD0B004CBDA1 /* ComiketGenre.swift */; };
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -90,6 +91,7 @@
 		E482FFC02C21BD93009225BD /* MainTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
 		E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketArea.swift; sourceTree = "<group>"; };
 		E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketBlock.swift; sourceTree = "<group>"; };
+		E49351EE2C4CCD0B004CBDA1 /* ComiketGenre.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketGenre.swift; sourceTree = "<group>"; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A7694F2C21A20B00BE3491 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -179,11 +181,12 @@
 		E480AA792C4422E8009C1445 /* Data Models */ = {
 			isa = PBXGroup;
 			children = (
-				E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */,
 				E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */,
+				E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */,
 				E480AAB42C4C9C82009C1445 /* ComiketDate.swift */,
-				E480AAB22C4C9BFF009C1445 /* ComiketMap.swift */,
 				E480AAA92C4C93A1009C1445 /* ComiketEvent.swift */,
+				E49351EE2C4CCD0B004CBDA1 /* ComiketGenre.swift */,
+				E480AAB22C4C9BFF009C1445 /* ComiketMap.swift */,
 			);
 			path = "Data Models";
 			sourceTree = "<group>";
@@ -433,6 +436,7 @@
 				E480AAAD2C4C9831009C1445 /* Point.swift in Sources */,
 				E480AA962C44A15D009C1445 /* UserCircle.swift in Sources */,
 				E480AA882C442982009C1445 /* NavigationManager.swift in Sources */,
+				E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */,
 				E480AA8D2C4429CD009C1445 /* ViewPath.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
