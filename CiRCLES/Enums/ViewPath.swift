@@ -8,6 +8,7 @@
 import Foundation
 
 enum ViewPath: Hashable {
+    case circlesDetail(circle: ComiketCircle)
     case moreDBAdmin
     case moreAttributions
 }

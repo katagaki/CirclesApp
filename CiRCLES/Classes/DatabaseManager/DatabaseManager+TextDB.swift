@@ -51,9 +51,13 @@ extension DatabaseManager {
         }
     }
 
-    func loadCircles() {
-        if let eventCircles = loadTable("ComiketCircleWC", of: ComiketCircle.self) as? [ComiketCircle] {
-            self.eventCircles = eventCircles
+    func loadCircles(forcefully: Bool = false) {
+        if forcefully || self.eventCircles.count == 0 {
+            if let eventCircles = loadTable("ComiketCircleWC", of: ComiketCircle.self) as? [ComiketCircle] {
+                self.eventCircles = eventCircles
+            }
+        } else {
+            debugPrint("Circles data loaded from cache")
         }
     }
 

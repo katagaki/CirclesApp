@@ -29,29 +29,24 @@ struct CirclesView: View {
                           phoneColumnConfiguration : padOrMacColumnConfiguration,
                           spacing: 2.0) {
                     ForEach(database.eventCircles.sorted(by: {$0.id < $1.id})) { circle in
-                        if let image = database.circleImage(for: circle.id) {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                        } else {
-                            Text(circle.circleName)
+                        NavigationLink(value: ViewPath.circlesDetail(circle: circle)) {
+                            if let image = database.circleImage(for: circle.id) {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                            } else {
+                                Text(circle.circleName)
+                            }
                         }
                     }
                 }
             }
             .searchable(text: $searchTerm,
                         placement: .navigationBarDrawer(displayMode: .always))
-            .task {
-                if let token = authManager.token {
-                    await eventManager.getEvents(authToken: token)
-                    if let placeholderEvent = eventManager.events.first {
-                        // TODO: Load all events instead of .first
-                        await database.downloadDatabases(for: placeholderEvent, authToken: token)
-                        database.loadDatabase()
-                        database.loadCircles()
-                        database.loadCircleImages()
-                        debugPrint("Database loaded with only circle information")
-                    }
+            .navigationDestination(for: ViewPath.self) { viewPath in
+                switch viewPath {
+                case .circlesDetail(let circle): CircleDetailView(circle: circle)
+                default: Color.clear
                 }
             }
         }

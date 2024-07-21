@@ -13,8 +13,11 @@ struct MainTabView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
+    @Environment(EventManager.self) var eventManager
+    @Environment(DatabaseManager.self) var database
 
     @State var isAuthenticating: Bool = false
+    @State var isLoadingDatabase: Bool = false
 
     var body: some View {
         TabView(selection: $navigationManager.selectedTab) {
@@ -39,17 +42,38 @@ struct MainTabView: View {
                 }
                 .tag(TabType.more)
         }
+        .overlay {
+            if isLoadingDatabase {
+                ZStack {
+                    Color.clear
+                        .ignoresSafeArea()
+                    ProgressView("Shared.LoadingText.Databases")
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                }
+                .background(Material.ultraThin)
+            }
+        }
         .sheet(isPresented: $isAuthenticating) {
             LoginView()
                 .interactiveDismissDisabled()
         }
-        .onAppear {
+        .task {
             if authManager.token == nil {
                 isAuthenticating = true
+            } else {
+                await authManager.refreshAuthenticationToken()
+                await loadDatabase()
             }
         }
         .onChange(of: authManager.token) { _, newValue in
-            isAuthenticating = newValue == nil
+            if newValue == nil {
+                isAuthenticating = true
+            } else {
+                Task {
+                    await loadDatabase()
+                    isAuthenticating = false
+                }
+            }
         }
         .onReceive(navigationManager.$selectedTab, perform: { newValue in
             if newValue == navigationManager.previouslySelectedTab {
@@ -57,5 +81,33 @@ struct MainTabView: View {
             }
             navigationManager.previouslySelectedTab = newValue
         })
+    }
+
+    func loadDatabase() async {
+        withAnimation(.snappy.speed(2.0)) {
+            isLoadingDatabase = true
+        }
+        if let token = authManager.token {
+            await eventManager.getEvents(authToken: token)
+            if let latestEvent = eventManager.latestEvent() {
+                await database.downloadDatabases(for: latestEvent, authToken: token)
+                database.loadDatabase()
+                database.loadEvents()
+                database.loadDates()
+                database.loadMaps()
+                database.loadAreas()
+                database.loadBlocks()
+                database.loadGenres()
+                database.loadLayouts()
+                database.loadCircles()
+                database.loadCircleExtendedInformtion()
+                database.loadCommonImages()
+                database.loadCircleImages()
+                debugPrint("Database loaded")
+            }
+        }
+        withAnimation(.snappy.speed(2.0)) {
+            isLoadingDatabase = false
+        }
     }
 }
