@@ -48,21 +48,25 @@ extension DatabaseManager {
 
     // MARK: Circle Images
 
-    func loadCircleImages() {
-        if let imageDatabase {
-            do {
-                debugPrint("Loading circle images")
-                let table = Table("ComiketCircleImage")
-                let colID = Expression<Int>("id")
-                // let colWebCatalogID = Expression<String>("WCId")
-                let colCutImage = Expression<Data>("cutImage")
-                self.circleImages.removeAll()
-                for row in try imageDatabase.prepare(table) {
-                    self.circleImages[row[colID]] = UIImage(data: row[colCutImage])
+    func loadCircleImages(forcefully: Bool = false) {
+        if forcefully || self.circleImages.count == 0 {
+            if let imageDatabase {
+                do {
+                    debugPrint("Loading circle images")
+                    let table = Table("ComiketCircleImage")
+                    let colID = Expression<Int>("id")
+                    // let colWebCatalogID = Expression<String>("WCId")
+                    let colCutImage = Expression<Data>("cutImage")
+                    self.circleImages.removeAll()
+                    for row in try imageDatabase.prepare(table) {
+                        self.circleImages[row[colID]] = UIImage(data: row[colCutImage])
+                    }
+                } catch {
+                    debugPrint(error.localizedDescription)
                 }
-            } catch {
-                debugPrint(error.localizedDescription)
             }
+        } else {
+            debugPrint("Circle images loaded from cache")
         }
     }
 

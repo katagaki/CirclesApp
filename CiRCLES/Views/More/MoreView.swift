@@ -154,6 +154,7 @@ SOFTWARE.
 
 """)
                     ])
+                default: Color.clear
                 }
             }
         }

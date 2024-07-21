@@ -59,6 +59,8 @@
 		E49352022C4CF282004CBDA1 /* Type Aliases.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352012C4CF281004CBDA1 /* Type Aliases.swift */; };
 		E49352042C4CF4A1004CBDA1 /* ComiketHall.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352032C4CF49C004CBDA1 /* ComiketHall.swift */; };
 		E49352072C4CFBDC004CBDA1 /* CirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352062C4CFBDA004CBDA1 /* CirclesView.swift */; };
+		E49352092C4D1418004CBDA1 /* CircleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352082C4D1414004CBDA1 /* CircleDetailView.swift */; };
+		E493520B2C4D153E004CBDA1 /* ToolbarAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */; };
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -112,6 +114,8 @@
 		E49352012C4CF281004CBDA1 /* Type Aliases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Type Aliases.swift"; sourceTree = "<group>"; };
 		E49352032C4CF49C004CBDA1 /* ComiketHall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketHall.swift; sourceTree = "<group>"; };
 		E49352062C4CFBDA004CBDA1 /* CirclesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclesView.swift; sourceTree = "<group>"; };
+		E49352082C4D1414004CBDA1 /* CircleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleDetailView.swift; sourceTree = "<group>"; };
+		E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarAccessory.swift; sourceTree = "<group>"; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A7694F2C21A20B00BE3491 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -163,6 +167,7 @@
 		E47269052C3D738900D5335D /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */,
 				E47269062C3D739500D5335D /* SafariView.swift */,
 				E480AA932C44A0AF009C1445 /* EventSelector.swift */,
 			);
@@ -302,6 +307,7 @@
 			isa = PBXGroup;
 			children = (
 				E49352062C4CFBDA004CBDA1 /* CirclesView.swift */,
+				E49352082C4D1414004CBDA1 /* CircleDetailView.swift */,
 			);
 			path = Circles;
 			sourceTree = "<group>";
@@ -464,6 +470,7 @@
 				E480AAAA2C4C93A5009C1445 /* ComiketEvent.swift in Sources */,
 				E480AAB52C4C9C84009C1445 /* ComiketDate.swift in Sources */,
 				E480AA7F2C4423AF009C1445 /* UserManager.swift in Sources */,
+				E493520B2C4D153E004CBDA1 /* ToolbarAccessory.swift in Sources */,
 				E480AAB32C4C9C01009C1445 /* ComiketMap.swift in Sources */,
 				E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */,
 				E480AAAF2C4C9834009C1445 /* Size.swift in Sources */,
@@ -485,6 +492,7 @@
 				E480AAB92C4CA294009C1445 /* MapConfiguration.swift in Sources */,
 				E480AAA12C44AA77009C1445 /* WebCatalogDatabase.swift in Sources */,
 				E480AA832C44278F009C1445 /* UserInfo.swift in Sources */,
+				E49352092C4D1418004CBDA1 /* CircleDetailView.swift in Sources */,
 				E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */,
 				E47269042C3D716500D5335D /* AuthManager.swift in Sources */,
 				E49351FA2C4CF171004CBDA1 /* DatabaseManager+Loading.swift in Sources */,

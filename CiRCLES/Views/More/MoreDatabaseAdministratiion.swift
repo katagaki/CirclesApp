@@ -104,27 +104,5 @@ struct MoreDatabaseAdministratiion: View {
                     .font(.body)
             }
         }
-        .task {
-            if let token = authManager.token {
-                await eventManager.getEvents(authToken: token)
-                if let placeholderEvent = eventManager.events.first {
-                    // TODO: Load all events instead of .first
-                    await database.downloadDatabases(for: placeholderEvent, authToken: token)
-                    database.loadDatabase()
-                    database.loadEvents()
-                    database.loadDates()
-                    database.loadMaps()
-                    database.loadAreas()
-                    database.loadBlocks()
-                    database.loadGenres()
-                    database.loadLayouts()
-                    database.loadCircles()
-                    database.loadCircleExtendedInformtion()
-                    database.loadCommonImages()
-                    database.loadCircleImages()
-                    debugPrint("Database loaded")
-                }
-            }
-        }
     }
 }
