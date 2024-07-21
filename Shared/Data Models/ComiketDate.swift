@@ -16,13 +16,13 @@ final class ComiketDate: SQLiteable {
     var date: Date
 
     init(from row: Row) {
-        let colNumber = Expression<Int>("comiketNo")
+        let colEventNumber = Expression<Int>("comiketNo")
         let colID = Expression<Int>("id")
         let colYear = Expression<Int>("year")
         let colMonth = Expression<Int>("month")
         let colDay = Expression<Int>("day")
 
-        self.eventNumber = row[colNumber]
+        self.eventNumber = row[colEventNumber]
         self.id = row[colID]
 
         let dateFormatter = DateFormatter()

@@ -49,6 +49,8 @@
 		E49351EA2C4CC62F004CBDA1 /* ComiketArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */; };
 		E49351EC2C4CC972004CBDA1 /* ComiketBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */; };
 		E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351EE2C4CCD0B004CBDA1 /* ComiketGenre.swift */; };
+		E49351F12C4CD0C3004CBDA1 /* ComiketLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351F02C4CD0C1004CBDA1 /* ComiketLayout.swift */; };
+		E49351F32C4CD503004CBDA1 /* ComiketCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351F22C4CD501004CBDA1 /* ComiketCircle.swift */; };
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -92,6 +94,8 @@
 		E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketArea.swift; sourceTree = "<group>"; };
 		E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketBlock.swift; sourceTree = "<group>"; };
 		E49351EE2C4CCD0B004CBDA1 /* ComiketGenre.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketGenre.swift; sourceTree = "<group>"; };
+		E49351F02C4CD0C1004CBDA1 /* ComiketLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketLayout.swift; sourceTree = "<group>"; };
+		E49351F22C4CD501004CBDA1 /* ComiketCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketCircle.swift; sourceTree = "<group>"; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A7694F2C21A20B00BE3491 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -181,6 +185,8 @@
 		E480AA792C4422E8009C1445 /* Data Models */ = {
 			isa = PBXGroup;
 			children = (
+				E49351F22C4CD501004CBDA1 /* ComiketCircle.swift */,
+				E49351F02C4CD0C1004CBDA1 /* ComiketLayout.swift */,
 				E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */,
 				E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */,
 				E480AAB42C4C9C82009C1445 /* ComiketDate.swift */,
@@ -425,8 +431,10 @@
 				E49351EA2C4CC62F004CBDA1 /* ComiketArea.swift in Sources */,
 				E480AABB2C4CA2A7009C1445 /* CircleCutConfiguration.swift in Sources */,
 				E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */,
+				E49351F12C4CD0C3004CBDA1 /* ComiketLayout.swift in Sources */,
 				E480AA982C44A473009C1445 /* EventManager.swift in Sources */,
 				E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */,
+				E49351F32C4CD503004CBDA1 /* ComiketCircle.swift in Sources */,
 				E472690F2C3D767000D5335D /* OpenIDClient.swift in Sources */,
 				E480AAB92C4CA294009C1445 /* MapConfiguration.swift in Sources */,
 				E480AAA12C44AA77009C1445 /* WebCatalogDatabase.swift in Sources */,

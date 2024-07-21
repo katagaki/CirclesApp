@@ -16,6 +16,11 @@ struct MoreDatabaseAdministratiion: View {
     var body: some View {
         List {
             Section {
+                Button("More.DBAdmin.DeleteDBs", role: .destructive) {
+                    databaseManager.deleteDatabases()
+                }
+            }
+            Section {
                 ForEach(databaseManager.events, id: \.self) { event in
                     VStack(alignment: .leading) {
                         Text(event.name)
@@ -70,9 +75,26 @@ struct MoreDatabaseAdministratiion: View {
                     .font(.body)
             }
             Section {
-                Button("More.DBAdmin.DeleteDBs", role: .destructive) {
-                    databaseManager.deleteDatabases()
+                ForEach(databaseManager.eventLayouts, id: \.self) { eventLayout in
+                    Text(verbatim: "\(eventLayout.blockID) | \(eventLayout.spaceNumber)")
                 }
+            } header: {
+                ListSectionHeader(text: "Shared.Layouts")
+                    .font(.body)
+            }
+            Section {
+                ForEach(databaseManager.eventCircles, id: \.self) { eventCircle in
+                    VStack(alignment: .leading) {
+                        Text(verbatim: "\(eventCircle.circleName) | \(eventCircle.penName)")
+                        Divider()
+                        Text(verbatim: "\(eventCircle.blockID) | \(eventCircle.spaceNumber) | \(eventCircle.spaceNumberSuffix)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            } header: {
+                ListSectionHeader(text: "Shared.Circles")
+                    .font(.body)
             }
         }
         .task {
@@ -88,6 +110,8 @@ struct MoreDatabaseAdministratiion: View {
                     databaseManager.loadAreas()
                     databaseManager.loadBlocks()
                     databaseManager.loadGenres()
+                    databaseManager.loadLayouts()
+                    databaseManager.loadCircles()
                 }
             }
         }

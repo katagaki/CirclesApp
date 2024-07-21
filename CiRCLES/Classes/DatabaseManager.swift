@@ -31,6 +31,8 @@ class DatabaseManager {
     var eventAreas: [ComiketArea] = []
     var eventBlocks: [ComiketBlock] = []
     var eventGenres: [ComiketGenre] = []
+    var eventLayouts: [ComiketLayout] = []
+    var eventCircles: [ComiketCircle] = []
 
     // MARK: SQLite Database Operations
 
@@ -78,6 +80,18 @@ class DatabaseManager {
     func loadGenres() {
         if let eventGenres = loadTable("ComiketGenreWC", of: ComiketGenre.self) as? [ComiketGenre] {
             self.eventGenres = eventGenres
+        }
+    }
+
+    func loadLayouts() {
+        if let eventLayouts = loadTable("ComiketLayoutWC", of: ComiketLayout.self) as? [ComiketLayout] {
+            self.eventLayouts = eventLayouts
+        }
+    }
+
+    func loadCircles() {
+        if let eventCircles = loadTable("ComiketCircleWC", of: ComiketCircle.self) as? [ComiketCircle] {
+            self.eventCircles = eventCircles
         }
     }
 
