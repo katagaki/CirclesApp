@@ -15,15 +15,15 @@ struct UserCircle: Codable {
         let circles: [Circle]
 
         struct Circle: Codable {
-            let eventId: Int
-            let webCatalogId: Int
-            let circleMsId: Int
+            let eventID: Int
+            let webCatalogID: Int
+            let circleMsID: Int
             let name: String
 
             enum CodingKeys: String, CodingKey {
-                case eventId = "EventId"
-                case webCatalogId = "wcid"
-                case circleMsId = "circlemsId"
+                case eventID = "EventId"
+                case webCatalogID = "wcid"
+                case circleMsID = "circlemsId"
                 case name = "name"
             }
         }

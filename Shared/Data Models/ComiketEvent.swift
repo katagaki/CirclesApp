@@ -10,7 +10,7 @@ import SwiftData
 
 @Model
 final class ComiketEvent: SQLiteable {
-    @Attribute(.unique) var number: Int
+    @Attribute(.unique) var eventNumber: Int
     var name: String
     var circleCutConfiguration: CircleCutConfiguration
     var mapConfiguration: MapConfiguration
@@ -34,7 +34,7 @@ final class ComiketEvent: SQLiteable {
         let colHdMapOriginX = Expression<Int>("map2OriginX")
         let colHdMapOriginY = Expression<Int>("map2OriginY")
 
-        self.number = row[colNumber]
+        self.eventNumber = row[colNumber]
         self.name = row[colName]
 
         self.circleCutConfiguration = CircleCutConfiguration(

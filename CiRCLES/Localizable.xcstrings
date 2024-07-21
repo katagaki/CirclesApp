@@ -82,6 +82,22 @@
         }
       }
     },
+    "More.DBAdmin.DeleteDBs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete All Event Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべてのイベントデータを消去"
+          }
+        }
+      }
+    },
     "More.DBAdmin.ManageDB" : {
       "extractionState" : "manual",
       "localizations" : {

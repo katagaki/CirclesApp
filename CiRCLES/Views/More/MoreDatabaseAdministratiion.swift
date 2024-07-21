@@ -19,7 +19,7 @@ struct MoreDatabaseAdministratiion: View {
                     VStack(alignment: .leading) {
                         Text(event.name)
                         Divider()
-                        let eventDates = databaseManager.eventDates.filter({ $0.number == event.number })
+                        let eventDates = databaseManager.eventDates.filter({ $0.eventNumber == event.eventNumber })
                         HStack {
                             if eventDates.count > 0 {
                                 ForEach(eventDates, id: \.self) { eventDate in
@@ -38,6 +38,16 @@ struct MoreDatabaseAdministratiion: View {
                     Text(eventMap.filename)
                 }
             }
+            Section {
+                ForEach(databaseManager.eventAreas, id: \.self) { eventArea in
+                    Text(eventArea.name)
+                }
+            }
+            Section {
+                Button("More.DBAdmin.DeleteDBs", role: .destructive) {
+                    databaseManager.deleteDatabases()
+                }
+            }
         }
         .task {
             if let token = authManager.token {
@@ -49,6 +59,7 @@ struct MoreDatabaseAdministratiion: View {
                     databaseManager.loadEvents()
                     databaseManager.loadDates()
                     databaseManager.loadMaps()
+                    databaseManager.loadAreas()
                 }
             }
         }
