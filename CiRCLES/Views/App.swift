@@ -15,7 +15,7 @@ struct CirclesApp: App {
     @State var authManager = AuthManager()
     @State var userManager = UserManager()
     @State var eventManager = EventManager()
-    @State var databaseManager = DatabaseManager()
+    @State var database = DatabaseManager()
 
     var body: some Scene {
         WindowGroup {
@@ -30,7 +30,7 @@ struct CirclesApp: App {
         .environment(authManager)
         .environment(userManager)
         .environment(eventManager)
-        .environment(databaseManager)
+        .environment(database)
         .onChange(of: navigationManager.selectedTab) { _, _ in
             navigationManager.saveToDefaults()
         }

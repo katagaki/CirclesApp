@@ -51,6 +51,13 @@
 		E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351EE2C4CCD0B004CBDA1 /* ComiketGenre.swift */; };
 		E49351F12C4CD0C3004CBDA1 /* ComiketLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351F02C4CD0C1004CBDA1 /* ComiketLayout.swift */; };
 		E49351F32C4CD503004CBDA1 /* ComiketCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351F22C4CD501004CBDA1 /* ComiketCircle.swift */; };
+		E49351F72C4CD91F004CBDA1 /* ComiketCircleExtendedInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351F62C4CD90F004CBDA1 /* ComiketCircleExtendedInformation.swift */; };
+		E49351FA2C4CF171004CBDA1 /* DatabaseManager+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351F92C4CF16B004CBDA1 /* DatabaseManager+Loading.swift */; };
+		E49351FC2C4CF191004CBDA1 /* DatabaseManager+TextDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351FB2C4CF18E004CBDA1 /* DatabaseManager+TextDB.swift */; };
+		E49351FE2C4CF1C3004CBDA1 /* DatabaseManager+API.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351FD2C4CF1BC004CBDA1 /* DatabaseManager+API.swift */; };
+		E49352002C4CF21F004CBDA1 /* DatabaseManager+ImageDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351FF2C4CF21A004CBDA1 /* DatabaseManager+ImageDB.swift */; };
+		E49352022C4CF282004CBDA1 /* Type Aliases.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352012C4CF281004CBDA1 /* Type Aliases.swift */; };
+		E49352042C4CF4A1004CBDA1 /* ComiketHall.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352032C4CF49C004CBDA1 /* ComiketHall.swift */; };
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -96,6 +103,13 @@
 		E49351EE2C4CCD0B004CBDA1 /* ComiketGenre.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketGenre.swift; sourceTree = "<group>"; };
 		E49351F02C4CD0C1004CBDA1 /* ComiketLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketLayout.swift; sourceTree = "<group>"; };
 		E49351F22C4CD501004CBDA1 /* ComiketCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketCircle.swift; sourceTree = "<group>"; };
+		E49351F62C4CD90F004CBDA1 /* ComiketCircleExtendedInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketCircleExtendedInformation.swift; sourceTree = "<group>"; };
+		E49351F92C4CF16B004CBDA1 /* DatabaseManager+Loading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+Loading.swift"; sourceTree = "<group>"; };
+		E49351FB2C4CF18E004CBDA1 /* DatabaseManager+TextDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+TextDB.swift"; sourceTree = "<group>"; };
+		E49351FD2C4CF1BC004CBDA1 /* DatabaseManager+API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+API.swift"; sourceTree = "<group>"; };
+		E49351FF2C4CF21A004CBDA1 /* DatabaseManager+ImageDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+ImageDB.swift"; sourceTree = "<group>"; };
+		E49352012C4CF281004CBDA1 /* Type Aliases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Type Aliases.swift"; sourceTree = "<group>"; };
+		E49352032C4CF49C004CBDA1 /* ComiketHall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketHall.swift; sourceTree = "<group>"; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A7694F2C21A20B00BE3491 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -135,8 +149,8 @@
 		E47269022C3D715500D5335D /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				E49351F82C4CF156004CBDA1 /* DatabaseManager */,
 				E47269032C3D716300D5335D /* AuthManager.swift */,
-				E480AAA22C44B71E009C1445 /* DatabaseManager.swift */,
 				E480AA972C44A471009C1445 /* EventManager.swift */,
 				E480AA872C442980009C1445 /* NavigationManager.swift */,
 				E480AA7E2C4423AD009C1445 /* UserManager.swift */,
@@ -174,6 +188,7 @@
 		E480AA782C4422DE009C1445 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				E49352012C4CF281004CBDA1 /* Type Aliases.swift */,
 				E480AA792C4422E8009C1445 /* Data Models */,
 				E480AAAB2C4C9822009C1445 /* Structs */,
 				E49351ED2C4CC986004CBDA1 /* Protocols */,
@@ -185,13 +200,14 @@
 		E480AA792C4422E8009C1445 /* Data Models */ = {
 			isa = PBXGroup;
 			children = (
-				E49351F22C4CD501004CBDA1 /* ComiketCircle.swift */,
-				E49351F02C4CD0C1004CBDA1 /* ComiketLayout.swift */,
 				E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */,
 				E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */,
+				E49351F22C4CD501004CBDA1 /* ComiketCircle.swift */,
+				E49351F62C4CD90F004CBDA1 /* ComiketCircleExtendedInformation.swift */,
 				E480AAB42C4C9C82009C1445 /* ComiketDate.swift */,
 				E480AAA92C4C93A1009C1445 /* ComiketEvent.swift */,
 				E49351EE2C4CCD0B004CBDA1 /* ComiketGenre.swift */,
+				E49351F02C4CD0C1004CBDA1 /* ComiketLayout.swift */,
 				E480AAB22C4C9BFF009C1445 /* ComiketMap.swift */,
 			);
 			path = "Data Models";
@@ -200,6 +216,7 @@
 		E480AA892C4429AC009C1445 /* Enums */ = {
 			isa = PBXGroup;
 			children = (
+				E49352032C4CF49C004CBDA1 /* ComiketHall.swift */,
 				E480AA8A2C4429B3009C1445 /* TabType.swift */,
 				E480AA8C2C4429CC009C1445 /* ViewPath.swift */,
 			);
@@ -264,6 +281,18 @@
 				E480AAB62C4C9F8D009C1445 /* SQLiteable.swift */,
 			);
 			path = Protocols;
+			sourceTree = "<group>";
+		};
+		E49351F82C4CF156004CBDA1 /* DatabaseManager */ = {
+			isa = PBXGroup;
+			children = (
+				E480AAA22C44B71E009C1445 /* DatabaseManager.swift */,
+				E49351F92C4CF16B004CBDA1 /* DatabaseManager+Loading.swift */,
+				E49351FB2C4CF18E004CBDA1 /* DatabaseManager+TextDB.swift */,
+				E49351FF2C4CF21A004CBDA1 /* DatabaseManager+ImageDB.swift */,
+				E49351FD2C4CF1BC004CBDA1 /* DatabaseManager+API.swift */,
+			);
+			path = DatabaseManager;
 			sourceTree = "<group>";
 		};
 		E4A7693D2C21A20A00BE3491 = {
@@ -427,12 +456,17 @@
 				E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */,
 				E480AAAF2C4C9834009C1445 /* Size.swift in Sources */,
 				E480AAB72C4C9FAA009C1445 /* SQLiteable.swift in Sources */,
+				E49351FE2C4CF1C3004CBDA1 /* DatabaseManager+API.swift in Sources */,
+				E49352002C4CF21F004CBDA1 /* DatabaseManager+ImageDB.swift in Sources */,
 				E47269072C3D739700D5335D /* SafariView.swift in Sources */,
+				E49352022C4CF282004CBDA1 /* Type Aliases.swift in Sources */,
 				E49351EA2C4CC62F004CBDA1 /* ComiketArea.swift in Sources */,
+				E49351FC2C4CF191004CBDA1 /* DatabaseManager+TextDB.swift in Sources */,
 				E480AABB2C4CA2A7009C1445 /* CircleCutConfiguration.swift in Sources */,
 				E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */,
 				E49351F12C4CD0C3004CBDA1 /* ComiketLayout.swift in Sources */,
 				E480AA982C44A473009C1445 /* EventManager.swift in Sources */,
+				E49352042C4CF4A1004CBDA1 /* ComiketHall.swift in Sources */,
 				E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */,
 				E49351F32C4CD503004CBDA1 /* ComiketCircle.swift in Sources */,
 				E472690F2C3D767000D5335D /* OpenIDClient.swift in Sources */,
@@ -441,10 +475,12 @@
 				E480AA832C44278F009C1445 /* UserInfo.swift in Sources */,
 				E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */,
 				E47269042C3D716500D5335D /* AuthManager.swift in Sources */,
+				E49351FA2C4CF171004CBDA1 /* DatabaseManager+Loading.swift in Sources */,
 				E480AAAD2C4C9831009C1445 /* Point.swift in Sources */,
 				E480AA962C44A15D009C1445 /* UserCircle.swift in Sources */,
 				E480AA882C442982009C1445 /* NavigationManager.swift in Sources */,
 				E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */,
+				E49351F72C4CD91F004CBDA1 /* ComiketCircleExtendedInformation.swift in Sources */,
 				E480AA8D2C4429CD009C1445 /* ViewPath.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
