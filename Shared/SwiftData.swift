@@ -8,7 +8,7 @@
 import SwiftData
 
 let sharedModelContainer: ModelContainer = {
-    let schema = Schema([ComiketMap.self])
+    let schema = Schema([ComiketEvent.self, ComiketDate.self, ComiketMap.self])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
     do {

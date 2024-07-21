@@ -15,34 +15,69 @@ typealias Expression = SQLite.Expression
 @MainActor
 class DatabaseManager {
 
-    @ObservationIgnored let documentsDirectoryURL: URL? = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+    @ObservationIgnored let documentsDirectoryURL: URL? = FileManager.default.urls(
+        for: .documentDirectory,
+        in: .userDomainMask
+    ).first
+
     var textDatabaseURL: URL?
     var imageDatabaseURL: URL?
 
-    var maps: [ComiketMap] = []
+    var database: Connection?
 
-    func getComiketMap() {
+    var events: [ComiketEvent] = []
+    var eventDates: [ComiketDate] = []
+    var eventMaps: [ComiketMap] = []
+
+    // MARK: SQLite Database Operations
+
+    func loadDatabase() {
         if let textDatabaseURL {
             do {
                 debugPrint("Opening database")
-                let database = try Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
-
-                debugPrint("Selecting from ComiketMapWC")
-                let mapTable = Table("ComiketMapWC")
-                let comiketNumber = Expression<Int>("comiketNo")
-                let name = Expression<String>("name")
-
-                for map in try database.prepare(mapTable) {
-                    maps.append(ComiketMap(
-                        comiketNumber: map[comiketNumber], name: map[name]
-                    ))
-                }
+                database = try Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
             } catch {
                 debugPrint(error.localizedDescription)
             }
         }
-        // SELECT * FROM ComiketMapWC
     }
+
+    func loadEvents() {
+        if let events = loadTable("ComiketInfoWC", of: ComiketEvent.self) as? [ComiketEvent] {
+            self.events = events
+        }
+    }
+
+    func loadDates() {
+        if let eventDates = loadTable("ComiketDateWC", of: ComiketDate.self) as? [ComiketDate] {
+            self.eventDates = eventDates
+        }
+    }
+
+    func loadMaps() {
+        if let eventMaps = loadTable("ComiketMapWC", of: ComiketMap.self) as? [ComiketMap] {
+            self.eventMaps = eventMaps
+        }
+    }
+
+    func loadTable<T: SQLiteable>(_ tableName: String, of type: T.Type) -> [SQLiteable]? {
+        if let database {
+            do {
+                debugPrint("Selecting from \(tableName)")
+                let table = Table("\(tableName)")
+                var loadedRows: [SQLiteable] = []
+                for row in try database.prepare(table) {
+                    loadedRows.append(T(from: row))
+                }
+                return loadedRows
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return []
+    }
+
+    // MARK: API Operations
 
     func downloadDatabases(for event: WebCatalogEvent.Response.Event, authToken: OpenIDToken) async {
         // Reuse existing database if it exists
