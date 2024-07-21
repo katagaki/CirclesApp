@@ -58,6 +58,7 @@
 		E49352002C4CF21F004CBDA1 /* DatabaseManager+ImageDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351FF2C4CF21A004CBDA1 /* DatabaseManager+ImageDB.swift */; };
 		E49352022C4CF282004CBDA1 /* Type Aliases.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352012C4CF281004CBDA1 /* Type Aliases.swift */; };
 		E49352042C4CF4A1004CBDA1 /* ComiketHall.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352032C4CF49C004CBDA1 /* ComiketHall.swift */; };
+		E49352072C4CFBDC004CBDA1 /* CirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352062C4CFBDA004CBDA1 /* CirclesView.swift */; };
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -110,6 +111,7 @@
 		E49351FF2C4CF21A004CBDA1 /* DatabaseManager+ImageDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+ImageDB.swift"; sourceTree = "<group>"; };
 		E49352012C4CF281004CBDA1 /* Type Aliases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Type Aliases.swift"; sourceTree = "<group>"; };
 		E49352032C4CF49C004CBDA1 /* ComiketHall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketHall.swift; sourceTree = "<group>"; };
+		E49352062C4CFBDA004CBDA1 /* CirclesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclesView.swift; sourceTree = "<group>"; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A7694F2C21A20B00BE3491 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -269,6 +271,7 @@
 				E482FFC02C21BD93009225BD /* MainTabView.swift */,
 				E46D51A72C223903000524B9 /* Login */,
 				E482FFBE2C21BD93009225BD /* Map */,
+				E49352052C4CFBD5004CBDA1 /* Circles */,
 				E480AA8F2C442DD1009C1445 /* More */,
 				E47269052C3D738900D5335D /* Shared */,
 			);
@@ -293,6 +296,14 @@
 				E49351FD2C4CF1BC004CBDA1 /* DatabaseManager+API.swift */,
 			);
 			path = DatabaseManager;
+			sourceTree = "<group>";
+		};
+		E49352052C4CFBD5004CBDA1 /* Circles */ = {
+			isa = PBXGroup;
+			children = (
+				E49352062C4CFBDA004CBDA1 /* CirclesView.swift */,
+			);
+			path = Circles;
 			sourceTree = "<group>";
 		};
 		E4A7693D2C21A20A00BE3491 = {
@@ -443,6 +454,7 @@
 				E482FFC22C21BD93009225BD /* MapView.swift in Sources */,
 				E480AA942C44A0B3009C1445 /* EventSelector.swift in Sources */,
 				E480AA912C442DD7009C1445 /* MoreView.swift in Sources */,
+				E49352072C4CFBDC004CBDA1 /* CirclesView.swift in Sources */,
 				E480AA9A2C44A49F009C1445 /* WebCatalogEvent.swift in Sources */,
 				E480AAA32C44B723009C1445 /* DatabaseManager.swift in Sources */,
 				E49351EC2C4CC972004CBDA1 /* ComiketBlock.swift in Sources */,
