@@ -20,7 +20,7 @@ final class ComiketMap: SQLiteable {
     var rotation: Int
 
     init(from row: Row) {
-        let colNumber = Expression<Int>("comiketNo")
+        let colEventNumber = Expression<Int>("comiketNo")
         let colID = Expression<Int>("id")
         let colName = Expression<String>("name")
         let colFilename = Expression<String>("filename")
@@ -35,7 +35,7 @@ final class ComiketMap: SQLiteable {
         let colHdMapH = Expression<Int>("h2")
         let colRotation = Expression<Int>("rotate")
 
-        self.eventNumber = row[colNumber]
+        self.eventNumber = row[colEventNumber]
         self.id = row[colID]
         self.name = row[colName]
 

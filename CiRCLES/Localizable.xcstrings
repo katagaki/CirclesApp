@@ -167,6 +167,12 @@
     "Shared.Areas" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Areas"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -178,6 +184,12 @@
     "Shared.Blocks" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blocks"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -186,9 +198,32 @@
         }
       }
     },
+    "Shared.Circles" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サークル"
+          }
+        }
+      }
+    },
     "Shared.Events" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Events"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -200,10 +235,33 @@
     "Shared.Genres" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Genres"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンル"
+          }
+        }
+      }
+    },
+    "Shared.Layouts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Map Layouts"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マップ配置情報"
           }
         }
       }
@@ -259,6 +317,12 @@
     "Shared.Maps" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Maps"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",

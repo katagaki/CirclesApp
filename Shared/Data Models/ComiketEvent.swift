@@ -17,7 +17,7 @@ final class ComiketEvent: SQLiteable {
     var hdMapConfiguration: MapConfiguration
 
     init(from row: Row) {
-        let colNumber = Expression<Int>("comiketNo")
+        let colEventNumber = Expression<Int>("comiketNo")
         let colName = Expression<String>("comiketName")
         let colCutSizeW = Expression<Int>("cutSizeW")
         let colCutSizeH = Expression<Int>("cutSizeH")
@@ -34,7 +34,7 @@ final class ComiketEvent: SQLiteable {
         let colHdMapOriginX = Expression<Int>("map2OriginX")
         let colHdMapOriginY = Expression<Int>("map2OriginY")
 
-        self.eventNumber = row[colNumber]
+        self.eventNumber = row[colEventNumber]
         self.name = row[colName]
 
         self.circleCutConfiguration = CircleCutConfiguration(

@@ -20,7 +20,7 @@ final class ComiketArea: SQLiteable {
     var hdMapConfiguration: MapConfiguration
 
     init(from row: Row) {
-        let colNumber = Expression<Int>("comiketNo")
+        let colEventNumber = Expression<Int>("comiketNo")
         let colID = Expression<Int>("id")
         let colName = Expression<String>("name")
         let colSimpleName = Expression<String>("simpleName")
@@ -35,7 +35,7 @@ final class ComiketArea: SQLiteable {
         let colHdMapW = Expression<Int>("w2")
         let colHdMapH = Expression<Int>("h2")
 
-        self.eventNumber = row[colNumber]
+        self.eventNumber = row[colEventNumber]
         self.id = row[colID]
         self.name = row[colName]
         self.simpleName = row[colSimpleName]
