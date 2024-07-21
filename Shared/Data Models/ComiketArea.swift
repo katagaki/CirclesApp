@@ -1,5 +1,5 @@
 //
-//  ComiketMap.swift
+//  ComiketArea.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/07/21.
@@ -9,21 +9,22 @@ import SQLite
 import SwiftData
 
 @Model
-final class ComiketMap: SQLiteable {
+final class ComiketArea: SQLiteable {
     var eventNumber: Int
     var id: Int
     var name: String
-    var filename: String
+    var simpleName: String
+    var mapID: Int
+    var mapConfiguration: MapConfiguration
     var allFilename: String
-    var configuration: MapConfiguration
-    var hdConfiguration: MapConfiguration
-    var rotation: Int
+    var hdMapConfiguration: MapConfiguration
 
     init(from row: Row) {
         let colNumber = Expression<Int>("comiketNo")
         let colID = Expression<Int>("id")
         let colName = Expression<String>("name")
-        let colFilename = Expression<String>("filename")
+        let colSimpleName = Expression<String>("simpleName")
+        let colMapID = Expression<Int>("mapId")
         let colMapX = Expression<Int>("x")
         let colMapY = Expression<Int>("y")
         let colMapW = Expression<Int>("w")
@@ -33,25 +34,23 @@ final class ComiketMap: SQLiteable {
         let colHdMapY = Expression<Int>("y2")
         let colHdMapW = Expression<Int>("w2")
         let colHdMapH = Expression<Int>("h2")
-        let colRotation = Expression<Int>("rotate")
 
         self.eventNumber = row[colNumber]
         self.id = row[colID]
         self.name = row[colName]
+        self.simpleName = row[colSimpleName]
+        self.mapID = row[colMapID]
 
-        self.filename = row[colFilename]
         self.allFilename = row[colAllFilename]
 
-        self.configuration = MapConfiguration(
+        self.mapConfiguration = MapConfiguration(
             size: Size(width: row[colMapW], height: row[colMapH]),
             origin: Point(x: row[colMapX], y: row[colMapY])
         )
 
-        self.hdConfiguration = MapConfiguration(
+        self.hdMapConfiguration = MapConfiguration(
             size: Size(width: row[colHdMapW], height: row[colHdMapH]),
             origin: Point(x: row[colHdMapX], y: row[colHdMapY])
         )
-
-        self.rotation = row[colRotation]
     }
 }

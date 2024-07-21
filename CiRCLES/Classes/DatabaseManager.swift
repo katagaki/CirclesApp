@@ -28,6 +28,7 @@ class DatabaseManager {
     var events: [ComiketEvent] = []
     var eventDates: [ComiketDate] = []
     var eventMaps: [ComiketMap] = []
+    var eventAreas: [ComiketArea] = []
 
     // MARK: SQLite Database Operations
 
@@ -57,6 +58,12 @@ class DatabaseManager {
     func loadMaps() {
         if let eventMaps = loadTable("ComiketMapWC", of: ComiketMap.self) as? [ComiketMap] {
             self.eventMaps = eventMaps
+        }
+    }
+
+    func loadAreas() {
+        if let eventAreas = loadTable("ComiketAreaWC", of: ComiketArea.self) as? [ComiketArea] {
+            self.eventAreas = eventAreas
         }
     }
 
@@ -92,6 +99,12 @@ class DatabaseManager {
             }
         }
 
+        // Create Documents folder if it doesn't exist
+        if let documentsDirectoryURL,
+           !FileManager.default.fileExists(atPath: documentsDirectoryURL.path()) {
+            try? FileManager.default.createDirectory(at: documentsDirectoryURL, withIntermediateDirectories: false)
+        }
+
         // Download zipped database
         var textDatabaseURL: URL?
         var imageDatabaseURL: URL?
@@ -120,6 +133,19 @@ class DatabaseManager {
            let imageDatabaseZippedURL = await download(imageDatabaseURL) {
             self.textDatabaseURL = unzip(textDatabaseZippedURL)
             self.imageDatabaseURL = unzip(imageDatabaseZippedURL)
+        }
+    }
+
+    func deleteDatabases() {
+        if let documentsDirectoryURL {
+            try? FileManager.default.removeItem(at: documentsDirectoryURL)
+            self.textDatabaseURL = nil
+            self.imageDatabaseURL = nil
+            self.database = nil
+            self.events.removeAll()
+            self.eventDates.removeAll()
+            self.eventMaps.removeAll()
+            self.eventAreas.removeAll()
         }
     }
 

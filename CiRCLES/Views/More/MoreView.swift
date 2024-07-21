@@ -54,7 +54,7 @@ struct MoreView: View {
                     }
                 }
                 Section {
-                    ForEach(userManager.userCircles, id: \.eventId) { event in
+                    ForEach(userManager.userCircles, id: \.eventID) { event in
                         Text(event.name)
                     }
                 } header: {

@@ -12,7 +12,7 @@ import Foundation
 class EventManager: NSObject {
 
     var events: [WebCatalogEvent.Response.Event] = []
-    var latestEventId: Int?
+    var latestEventID: Int?
     var latestEventNo: Int?
 
     func getEvents(authToken: OpenIDToken) async {
@@ -23,7 +23,7 @@ class EventManager: NSObject {
             if let events = try? JSONDecoder().decode(WebCatalogEvent.self, from: data) {
                 debugPrint("Decoded event list")
                 self.events = events.response.list
-                self.latestEventId = events.response.latestEventId
+                self.latestEventID = events.response.latestEventID
                 self.latestEventNo = events.response.latestEventNo
             }
         }

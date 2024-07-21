@@ -46,6 +46,8 @@
 		E482FFC22C21BD93009225BD /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFBD2C21BD93009225BD /* MapView.swift */; };
 		E482FFC32C21BD93009225BD /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFBF2C21BD93009225BD /* App.swift */; };
 		E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFC02C21BD93009225BD /* MainTabView.swift */; };
+		E49351EA2C4CC62F004CBDA1 /* ComiketArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */; };
+		E49351EC2C4CC972004CBDA1 /* ComiketBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */; };
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -86,6 +88,8 @@
 		E482FFBD2C21BD93009225BD /* MapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		E482FFBF2C21BD93009225BD /* App.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E482FFC02C21BD93009225BD /* MainTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketArea.swift; sourceTree = "<group>"; };
+		E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketBlock.swift; sourceTree = "<group>"; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A7694F2C21A20B00BE3491 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -166,6 +170,7 @@
 			children = (
 				E480AA792C4422E8009C1445 /* Data Models */,
 				E480AAAB2C4C9822009C1445 /* Structs */,
+				E49351ED2C4CC986004CBDA1 /* Protocols */,
 				E480AA7A2C44230B009C1445 /* SwiftData.swift */,
 			);
 			path = Shared;
@@ -174,6 +179,8 @@
 		E480AA792C4422E8009C1445 /* Data Models */ = {
 			isa = PBXGroup;
 			children = (
+				E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */,
+				E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */,
 				E480AAB42C4C9C82009C1445 /* ComiketDate.swift */,
 				E480AAB22C4C9BFF009C1445 /* ComiketMap.swift */,
 				E480AAA92C4C93A1009C1445 /* ComiketEvent.swift */,
@@ -215,7 +222,6 @@
 			children = (
 				E480AABA2C4CA2A3009C1445 /* CircleCutConfiguration.swift */,
 				E480AAB82C4CA292009C1445 /* MapConfiguration.swift */,
-				E480AAB62C4C9F8D009C1445 /* SQLiteable.swift */,
 				E480AAAC2C4C9830009C1445 /* Point.swift */,
 				E480AAAE2C4C9834009C1445 /* Size.swift */,
 			);
@@ -241,6 +247,14 @@
 				E47269052C3D738900D5335D /* Shared */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		E49351ED2C4CC986004CBDA1 /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				E480AAB62C4C9F8D009C1445 /* SQLiteable.swift */,
+			);
+			path = Protocols;
 			sourceTree = "<group>";
 		};
 		E4A7693D2C21A20A00BE3491 = {
@@ -393,6 +407,7 @@
 				E480AA912C442DD7009C1445 /* MoreView.swift in Sources */,
 				E480AA9A2C44A49F009C1445 /* WebCatalogEvent.swift in Sources */,
 				E480AAA32C44B723009C1445 /* DatabaseManager.swift in Sources */,
+				E49351EC2C4CC972004CBDA1 /* ComiketBlock.swift in Sources */,
 				E480AA8B2C4429B4009C1445 /* TabType.swift in Sources */,
 				E482FFC32C21BD93009225BD /* App.swift in Sources */,
 				E46D51A92C22390E000524B9 /* LoginView.swift in Sources */,
@@ -404,6 +419,7 @@
 				E480AAAF2C4C9834009C1445 /* Size.swift in Sources */,
 				E480AAB72C4C9FAA009C1445 /* SQLiteable.swift in Sources */,
 				E47269072C3D739700D5335D /* SafariView.swift in Sources */,
+				E49351EA2C4CC62F004CBDA1 /* ComiketArea.swift in Sources */,
 				E480AABB2C4CA2A7009C1445 /* CircleCutConfiguration.swift in Sources */,
 				E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */,
 				E480AA982C44A473009C1445 /* EventManager.swift in Sources */,

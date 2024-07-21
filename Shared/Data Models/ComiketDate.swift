@@ -11,7 +11,7 @@ import SwiftData
 
 @Model
 final class ComiketDate: SQLiteable {
-    var number: Int
+    var eventNumber: Int
     var id: Int
     var date: Date
 
@@ -22,9 +22,9 @@ final class ComiketDate: SQLiteable {
         let colMonth = Expression<Int>("month")
         let colDay = Expression<Int>("day")
 
-        self.number = row[colNumber]
+        self.eventNumber = row[colNumber]
         self.id = row[colID]
-        
+
         let dateFormatter = DateFormatter()
         dateFormatter.timeZone = .init(identifier: "Asia/Tokyo")
         dateFormatter.dateFormat = "yyyy-MM-dd"
