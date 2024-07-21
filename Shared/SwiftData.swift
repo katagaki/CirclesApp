@@ -12,7 +12,9 @@ let sharedModelContainer: ModelContainer = {
         ComiketEvent.self,
         ComiketDate.self,
         ComiketMap.self,
-        ComiketArea.self
+        ComiketArea.self,
+        ComiketBlock.self,
+        ComiketGenre.self
     ])
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 

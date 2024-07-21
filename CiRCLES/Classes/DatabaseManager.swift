@@ -29,6 +29,8 @@ class DatabaseManager {
     var eventDates: [ComiketDate] = []
     var eventMaps: [ComiketMap] = []
     var eventAreas: [ComiketArea] = []
+    var eventBlocks: [ComiketBlock] = []
+    var eventGenres: [ComiketGenre] = []
 
     // MARK: SQLite Database Operations
 
@@ -64,6 +66,18 @@ class DatabaseManager {
     func loadAreas() {
         if let eventAreas = loadTable("ComiketAreaWC", of: ComiketArea.self) as? [ComiketArea] {
             self.eventAreas = eventAreas
+        }
+    }
+
+    func loadBlocks() {
+        if let eventBlocks = loadTable("ComiketBlockWC", of: ComiketBlock.self) as? [ComiketBlock] {
+            self.eventBlocks = eventBlocks
+        }
+    }
+
+    func loadGenres() {
+        if let eventGenres = loadTable("ComiketGenreWC", of: ComiketGenre.self) as? [ComiketGenre] {
+            self.eventGenres = eventGenres
         }
     }
 

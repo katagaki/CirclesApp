@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2024/07/15.
 //
 
+import Komponents
 import SwiftUI
 
 struct MoreDatabaseAdministratiion: View {
@@ -32,16 +33,41 @@ struct MoreDatabaseAdministratiion: View {
                         .foregroundStyle(.secondary)
                     }
                 }
+            } header: {
+                ListSectionHeader(text: "Shared.Events")
+                    .font(.body)
             }
             Section {
                 ForEach(databaseManager.eventMaps, id: \.self) { eventMap in
                     Text(eventMap.filename)
                 }
+            } header: {
+                ListSectionHeader(text: "Shared.Maps")
+                    .font(.body)
             }
             Section {
                 ForEach(databaseManager.eventAreas, id: \.self) { eventArea in
                     Text(eventArea.name)
                 }
+            } header: {
+                ListSectionHeader(text: "Shared.Areas")
+                    .font(.body)
+            }
+            Section {
+                ForEach(databaseManager.eventBlocks, id: \.self) { eventBlock in
+                    Text(eventBlock.name)
+                }
+            } header: {
+                ListSectionHeader(text: "Shared.Blocks")
+                    .font(.body)
+            }
+            Section {
+                ForEach(databaseManager.eventGenres, id: \.self) { eventGenre in
+                    Text(eventGenre.name)
+                }
+            } header: {
+                ListSectionHeader(text: "Shared.Genres")
+                    .font(.body)
             }
             Section {
                 Button("More.DBAdmin.DeleteDBs", role: .destructive) {
@@ -60,6 +86,8 @@ struct MoreDatabaseAdministratiion: View {
                     databaseManager.loadDates()
                     databaseManager.loadMaps()
                     databaseManager.loadAreas()
+                    databaseManager.loadBlocks()
+                    databaseManager.loadGenres()
                 }
             }
         }
