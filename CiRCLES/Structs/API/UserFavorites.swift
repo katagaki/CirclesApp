@@ -11,8 +11,8 @@ struct UserFavorites: Codable {
     let response: Response
 
     struct Response: Codable {
-        let count: String
-        let maxCount: String
+        let count: Int
+        let maxCount: Int
         let list: [FavoriteItem]
 
         struct FavoriteItem: Codable {

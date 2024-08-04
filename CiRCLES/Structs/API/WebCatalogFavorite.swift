@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2024/08/04.
 //
 
+// swiftlint:disable nesting
 struct WebCatalogFavorite: Codable {
     let webCatalogID: Int
     let circleName: String
@@ -12,6 +13,18 @@ struct WebCatalogFavorite: Codable {
     let memo: String
     let free: String
     let updateDate: String
+
+    struct Request: Codable {
+        let webCatalogID: Int
+        let color: WebCatalogColor
+        let memo: String
+
+        enum CodingKeys: String, CodingKey {
+            case webCatalogID = "wcid"
+            case color = "color"
+            case memo = "memo"
+        }
+    }
 
     enum CodingKeys: String, CodingKey {
         case webCatalogID = "wcid"
@@ -22,3 +35,4 @@ struct WebCatalogFavorite: Codable {
         case updateDate = "update_date"
     }
 }
+// swiftlint:enable nesting

@@ -11,6 +11,8 @@ struct CircleDetailView: View {
 
     @Environment(\.openURL) var openURL
 
+    @Environment(AuthManager.self) var authManager
+    @Environment(FavoritesManager.self) var favorites
     @Environment(DatabaseManager.self) var database
 
     var circle: ComiketCircle
@@ -18,16 +20,19 @@ struct CircleDetailView: View {
     @State var extendedInformation: ComiketCircleExtendedInformation?
 
     @State var isAddingToFavorites: Bool = false
+    @State var favoriteColorToAddTo: WebCatalogColor?
 
     var body: some View {
         List {
             Text(circle.supplementaryDescription)
             Text(circle.memo)
-            Button("Shared.AddToFavorites", systemImage: "star") {
-                isAddingToFavorites = true
-            }
-            .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
-                FavoriteColorSelector()
+            if let extendedInformation {
+                Button("Shared.AddToFavorites", systemImage: "star") {
+                    isAddingToFavorites = true
+                }
+                .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
+                    FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
+                }
             }
         }
         .navigationTitle(circle.circleName)
@@ -83,6 +88,19 @@ struct CircleDetailView: View {
             if let extendedInformation = database.extendedCircleInformation(for: circle.id) {
                 debugPrint("Extended information found for circle with ID \(circle.id)")
                 self.extendedInformation = extendedInformation
+            }
+        }
+        .onChange(of: favoriteColorToAddTo) { oldValue, newValue in
+            if let extendedInformation, let token = authManager.token, let favoriteColorToAddTo {
+                Task {
+                    await favorites.add(
+                        circle,
+                        using: extendedInformation,
+                        to: favoriteColorToAddTo,
+                        authToken: token
+                    )
+                    isAddingToFavorites = false
+                }
             }
         }
     }
