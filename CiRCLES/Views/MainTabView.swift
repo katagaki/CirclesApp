@@ -16,6 +16,7 @@ struct MainTabView: View {
     @Environment(EventManager.self) var eventManager
     @Environment(DatabaseManager.self) var database
 
+    @State var isInitialTokenRefreshComplete: Bool = false
     @State var isAuthenticating: Bool = false
     @State var isLoadingDatabase: Bool = false
 
@@ -31,7 +32,7 @@ struct MainTabView: View {
                     Label("Tab.Circles", systemImage: "square.grid.3x3.fill")
                 }
                 .tag(TabType.circles)
-            ContentUnavailableView("Shared.NotImplemented", systemImage: "questionmark.square.dashed")
+            ChecklistsView()
                 .tabItem {
                     Label("Tab.Checklists", systemImage: "checklist")
                 }
@@ -58,11 +59,13 @@ struct MainTabView: View {
                 .interactiveDismissDisabled()
         }
         .task {
-            if authManager.token == nil {
-                isAuthenticating = true
-            } else {
-                await authManager.refreshAuthenticationToken()
-                await loadDatabase()
+            if !isInitialTokenRefreshComplete {
+                if authManager.token == nil {
+                    isAuthenticating = true
+                } else {
+                    await authManager.refreshAuthenticationToken()
+                    isInitialTokenRefreshComplete = true
+                }
             }
         }
         .onChange(of: authManager.token) { _, newValue in

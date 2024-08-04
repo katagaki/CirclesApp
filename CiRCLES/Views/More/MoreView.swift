@@ -11,7 +11,7 @@ import SwiftUI
 struct MoreView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
-    @Environment(UserManager.self) var userManager
+    @Environment(UserManager.self) var user
 
     @State var isShowingUserPID: Bool = false
 
@@ -25,12 +25,12 @@ struct MoreView: View {
                             .frame(width: 56.0, height: 56.0)
                             .clipShape(.circle)
                         VStack(alignment: .leading) {
-                            Text(userManager.userInfo?.nickname ?? NSLocalizedString("Profile.GenericUser",
+                            Text(user.info?.nickname ?? NSLocalizedString("Profile.GenericUser",
                                                                                      comment: ""))
                                 .fontWeight(.medium)
                                 .font(.title3)
                             if isShowingUserPID {
-                                Text("PID " + String(userManager.userInfo?.pid ?? 0))
+                                Text("PID " + String(user.info?.pid ?? 0))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -54,7 +54,7 @@ struct MoreView: View {
                     }
                 }
                 Section {
-                    ForEach(userManager.userCircles, id: \.eventID) { event in
+                    ForEach(user.circles, id: \.eventID) { event in
                         Text(event.name)
                     }
                 } header: {
@@ -72,8 +72,8 @@ struct MoreView: View {
             }
             .task {
                 if let token = authManager.token {
-                    await userManager.getUser(authToken: token)
-                    await userManager.getEvents(authToken: token)
+                    await user.getUser(authToken: token)
+                    await user.getEvents(authToken: token)
                 }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in

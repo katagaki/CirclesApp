@@ -10,8 +10,8 @@ import Foundation
 @Observable
 @MainActor
 class UserManager {
-    var userInfo: UserInfo.Response?
-    var userCircles: [UserCircle.Response.Circle] = []
+    var info: UserInfo.Response?
+    var circles: [UserCircle.Response.Circle] = []
 
     func getUser(authToken: OpenIDToken) async {
         let request = urlRequestForUserAPI(endpoint: "Info", authToken: authToken)
@@ -20,7 +20,7 @@ class UserManager {
             debugPrint("User info response length: \(data.count)")
             if let userInfo = try? JSONDecoder().decode(UserInfo.self, from: data) {
                 debugPrint("Decoded user info")
-                self.userInfo = userInfo.response
+                self.info = userInfo.response
             }
         }
     }
@@ -32,7 +32,7 @@ class UserManager {
             debugPrint("User info response length: \(data.count)")
             if let userCircles = try? JSONDecoder().decode(UserCircle.self, from: data) {
                 debugPrint("Decoded user circles")
-                self.userCircles = userCircles.response.circles
+                self.circles = userCircles.response.circles
             }
         }
     }

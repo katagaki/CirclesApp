@@ -232,6 +232,9 @@
         }
       }
     },
+    "Shared.Filter" : {
+
+    },
     "Shared.Genres" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -378,6 +381,15 @@
           }
         }
       }
+    },
+    "Shared.OpenInCircleMs" : {
+
+    },
+    "Shared.OpenPixiv" : {
+
+    },
+    "Shared.OpenTwitter" : {
+
     },
     "Shared.SelectEvent" : {
       "localizations" : {
