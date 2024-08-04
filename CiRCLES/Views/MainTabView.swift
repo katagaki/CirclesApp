@@ -32,11 +32,11 @@ struct MainTabView: View {
                     Label("Tab.Circles", systemImage: "square.grid.3x3.fill")
                 }
                 .tag(TabType.circles)
-            ChecklistsView()
+            FavoritesView()
                 .tabItem {
-                    Label("Tab.Checklists", systemImage: "checklist")
+                    Label("Tab.Favorites", systemImage: "star.fill")
                 }
-                .tag(TabType.checklists)
+                .tag(TabType.favorites)
             MoreView()
                 .tabItem {
                     Label("Tab.More", systemImage: "ellipsis")

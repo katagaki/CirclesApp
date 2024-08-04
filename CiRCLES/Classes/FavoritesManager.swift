@@ -1,5 +1,5 @@
 //
-//  ChecklistsManager.swift
+//  FavoritesManager.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/08/04.
@@ -9,17 +9,17 @@ import Foundation
 
 @Observable
 @MainActor
-class ChecklistsManager {
-    var checklists: [Checklist.Response.ChecklistItem] = []
+class FavoritesManager {
+    var items: [UserFavorites.Response.FavoriteItem] = []
 
-    func getChecklists(authToken: OpenIDToken) async {
+    func getAll(authToken: OpenIDToken) async {
         let request = urlRequestForReadersAPI(endpoint: "FavoriteCircles", authToken: authToken)
 
         if let (data, _) = try? await URLSession.shared.data(for: request) {
-            debugPrint("Checklists response length: \(data.count)")
-            if let checklists = try? JSONDecoder().decode(Checklist.self, from: data) {
-                debugPrint("Decoded checklists")
-                self.checklists = checklists.response.list
+            debugPrint("Favorites response length: \(data.count)")
+            if let favorites = try? JSONDecoder().decode(UserFavorites.self, from: data) {
+                debugPrint("Decoded favorites")
+                self.items = favorites.response.list
             }
         }
     }

@@ -14,7 +14,7 @@ struct CirclesApp: App {
     @StateObject var navigationManager = NavigationManager()
     @State var authManager = AuthManager()
     @State var user = UserManager()
-    @State var checklists = ChecklistsManager()
+    @State var favorites = FavoritesManager()
     @State var eventManager = EventManager()
     @State var database = DatabaseManager()
 
@@ -35,7 +35,7 @@ struct CirclesApp: App {
         .environmentObject(navigationManager)
         .environment(authManager)
         .environment(user)
-        .environment(checklists)
+        .environment(favorites)
         .environment(eventManager)
         .environment(database)
         .onChange(of: navigationManager.selectedTab) { _, _ in

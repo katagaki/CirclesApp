@@ -17,7 +17,7 @@ class NavigationManager: ObservableObject {
     @Published var tabPaths: [TabType: [ViewPath]] = [
         .map: [],
         .circles: [],
-        .checklists: [],
+        .favorites: [],
         .more: []
     ]
 

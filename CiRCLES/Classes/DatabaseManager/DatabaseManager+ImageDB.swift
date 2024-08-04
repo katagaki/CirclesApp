@@ -36,13 +36,13 @@ extension DatabaseManager {
 
     func mapImage(for hall: ComiketHall, on day: Int, usingHighDefinition: Bool) -> UIImage? {
         let mapImageNamePrefix = usingHighDefinition ? "LWMP" : "WMP"
-        var mapImageName = "\(mapImageNamePrefix)\(day)\(hall.rawValue)"
+        let mapImageName = "\(mapImageNamePrefix)\(day)\(hall.rawValue)"
         return image(named: mapImageName)
     }
 
     func genreImage(for hall: ComiketHall, on day: Int, usingHighDefinition: Bool) -> UIImage? {
         let genreImageNamePrefix = usingHighDefinition ? "LWGR" : "WGR"
-        var genreImageName = "\(genreImageNamePrefix)\(day)\(hall.rawValue)"
+        let genreImageName = "\(genreImageNamePrefix)\(day)\(hall.rawValue)"
         return image(named: genreImageName)
     }
 

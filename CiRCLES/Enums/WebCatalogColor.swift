@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum WebCatalogColor: Int, Codable {
+enum WebCatalogColor: Int, CaseIterable, Codable {
     case brown = 1
     case pink = 2
     case yellow = 3
@@ -18,7 +18,7 @@ enum WebCatalogColor: Int, Codable {
     case lime = 8
     case red = 9
 
-    func color() -> Color {
+    func swiftUIColor() -> Color {
         switch self {
         case .brown: return Color(red: 1.0, green: 0.58, blue: 0.29)
         case .pink: return Color(red: 1.0, green: 0.0, blue: 1.0)
