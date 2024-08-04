@@ -13,7 +13,8 @@ struct CirclesApp: App {
 
     @StateObject var navigationManager = NavigationManager()
     @State var authManager = AuthManager()
-    @State var userManager = UserManager()
+    @State var user = UserManager()
+    @State var checklists = ChecklistsManager()
     @State var eventManager = EventManager()
     @State var database = DatabaseManager()
 
@@ -23,12 +24,18 @@ struct CirclesApp: App {
                 .onOpenURL { url in
                     debugPrint("URL scheme invoked: \(url)")
                     authManager.getAuthenticationCode(from: url)
+                    if authManager.code != nil {
+                        Task {
+                            await authManager.getAuthenticationToken()
+                        }
+                    }
                 }
         }
         .modelContainer(sharedModelContainer)
         .environmentObject(navigationManager)
         .environment(authManager)
-        .environment(userManager)
+        .environment(user)
+        .environment(checklists)
         .environment(eventManager)
         .environment(database)
         .onChange(of: navigationManager.selectedTab) { _, _ in

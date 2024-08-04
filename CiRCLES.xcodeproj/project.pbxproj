@@ -46,6 +46,12 @@
 		E482FFC22C21BD93009225BD /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFBD2C21BD93009225BD /* MapView.swift */; };
 		E482FFC32C21BD93009225BD /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFBF2C21BD93009225BD /* App.swift */; };
 		E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E482FFC02C21BD93009225BD /* MainTabView.swift */; };
+		E48B628F2C5FB14C007874AE /* ChecklistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48B628E2C5FB14A007874AE /* ChecklistsView.swift */; };
+		E48B62912C5FC023007874AE /* ChecklistsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48B62902C5FC01E007874AE /* ChecklistsManager.swift */; };
+		E48B62932C5FC1C0007874AE /* Checklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48B62922C5FC1BE007874AE /* Checklist.swift */; };
+		E48B62952C5FC218007874AE /* WebCatalogCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48B62942C5FC217007874AE /* WebCatalogCircle.swift */; };
+		E48B62972C5FC21E007874AE /* WebCatalogFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48B62962C5FC21B007874AE /* WebCatalogFavorite.swift */; };
+		E48B62992C5FC359007874AE /* WebCatalogColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48B62982C5FC356007874AE /* WebCatalogColor.swift */; };
 		E49351EA2C4CC62F004CBDA1 /* ComiketArea.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */; };
 		E49351EC2C4CC972004CBDA1 /* ComiketBlock.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */; };
 		E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351EE2C4CCD0B004CBDA1 /* ComiketGenre.swift */; };
@@ -101,6 +107,12 @@
 		E482FFBD2C21BD93009225BD /* MapView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		E482FFBF2C21BD93009225BD /* App.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		E482FFC02C21BD93009225BD /* MainTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		E48B628E2C5FB14A007874AE /* ChecklistsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistsView.swift; sourceTree = "<group>"; };
+		E48B62902C5FC01E007874AE /* ChecklistsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChecklistsManager.swift; sourceTree = "<group>"; };
+		E48B62922C5FC1BE007874AE /* Checklist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Checklist.swift; sourceTree = "<group>"; };
+		E48B62942C5FC217007874AE /* WebCatalogCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCatalogCircle.swift; sourceTree = "<group>"; };
+		E48B62962C5FC21B007874AE /* WebCatalogFavorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCatalogFavorite.swift; sourceTree = "<group>"; };
+		E48B62982C5FC356007874AE /* WebCatalogColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCatalogColor.swift; sourceTree = "<group>"; };
 		E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketArea.swift; sourceTree = "<group>"; };
 		E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketBlock.swift; sourceTree = "<group>"; };
 		E49351EE2C4CCD0B004CBDA1 /* ComiketGenre.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketGenre.swift; sourceTree = "<group>"; };
@@ -157,6 +169,7 @@
 			children = (
 				E49351F82C4CF156004CBDA1 /* DatabaseManager */,
 				E47269032C3D716300D5335D /* AuthManager.swift */,
+				E48B62902C5FC01E007874AE /* ChecklistsManager.swift */,
 				E480AA972C44A471009C1445 /* EventManager.swift */,
 				E480AA872C442980009C1445 /* NavigationManager.swift */,
 				E480AA7E2C4423AD009C1445 /* UserManager.swift */,
@@ -226,6 +239,7 @@
 				E49352032C4CF49C004CBDA1 /* ComiketHall.swift */,
 				E480AA8A2C4429B3009C1445 /* TabType.swift */,
 				E480AA8C2C4429CC009C1445 /* ViewPath.swift */,
+				E48B62982C5FC356007874AE /* WebCatalogColor.swift */,
 			);
 			path = Enums;
 			sourceTree = "<group>";
@@ -233,10 +247,13 @@
 		E480AA8E2C442CAA009C1445 /* API */ = {
 			isa = PBXGroup;
 			children = (
-				E480AA822C44278D009C1445 /* UserInfo.swift */,
+				E48B62922C5FC1BE007874AE /* Checklist.swift */,
 				E480AA952C44A15A009C1445 /* UserCircle.swift */,
-				E480AA992C44A497009C1445 /* WebCatalogEvent.swift */,
+				E480AA822C44278D009C1445 /* UserInfo.swift */,
+				E48B62942C5FC217007874AE /* WebCatalogCircle.swift */,
 				E480AAA02C44AA74009C1445 /* WebCatalogDatabase.swift */,
+				E480AA992C44A497009C1445 /* WebCatalogEvent.swift */,
+				E48B62962C5FC21B007874AE /* WebCatalogFavorite.swift */,
 			);
 			path = API;
 			sourceTree = "<group>";
@@ -277,10 +294,19 @@
 				E46D51A72C223903000524B9 /* Login */,
 				E482FFBE2C21BD93009225BD /* Map */,
 				E49352052C4CFBD5004CBDA1 /* Circles */,
+				E48B628D2C5FB142007874AE /* Checklists */,
 				E480AA8F2C442DD1009C1445 /* More */,
 				E47269052C3D738900D5335D /* Shared */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		E48B628D2C5FB142007874AE /* Checklists */ = {
+			isa = PBXGroup;
+			children = (
+				E48B628E2C5FB14A007874AE /* ChecklistsView.swift */,
+			);
+			path = Checklists;
 			sourceTree = "<group>";
 		};
 		E49351ED2C4CC986004CBDA1 /* Protocols */ = {
@@ -456,6 +482,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E48B62992C5FC359007874AE /* WebCatalogColor.swift in Sources */,
 				E480AA9F2C44A75D009C1445 /* MoreDatabaseAdministratiion.swift in Sources */,
 				E482FFC22C21BD93009225BD /* MapView.swift in Sources */,
 				E480AA942C44A0B3009C1445 /* EventSelector.swift in Sources */,
@@ -466,12 +493,16 @@
 				E49351EC2C4CC972004CBDA1 /* ComiketBlock.swift in Sources */,
 				E480AA8B2C4429B4009C1445 /* TabType.swift in Sources */,
 				E482FFC32C21BD93009225BD /* App.swift in Sources */,
+				E48B62912C5FC023007874AE /* ChecklistsManager.swift in Sources */,
 				E46D51A92C22390E000524B9 /* LoginView.swift in Sources */,
 				E480AAAA2C4C93A5009C1445 /* ComiketEvent.swift in Sources */,
 				E480AAB52C4C9C84009C1445 /* ComiketDate.swift in Sources */,
+				E48B62932C5FC1C0007874AE /* Checklist.swift in Sources */,
+				E48B62952C5FC218007874AE /* WebCatalogCircle.swift in Sources */,
 				E480AA7F2C4423AF009C1445 /* UserManager.swift in Sources */,
 				E493520B2C4D153E004CBDA1 /* ToolbarAccessory.swift in Sources */,
 				E480AAB32C4C9C01009C1445 /* ComiketMap.swift in Sources */,
+				E48B62972C5FC21E007874AE /* WebCatalogFavorite.swift in Sources */,
 				E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */,
 				E480AAAF2C4C9834009C1445 /* Size.swift in Sources */,
 				E480AAB72C4C9FAA009C1445 /* SQLiteable.swift in Sources */,
@@ -490,6 +521,7 @@
 				E49351F32C4CD503004CBDA1 /* ComiketCircle.swift in Sources */,
 				E472690F2C3D767000D5335D /* OpenIDClient.swift in Sources */,
 				E480AAB92C4CA294009C1445 /* MapConfiguration.swift in Sources */,
+				E48B628F2C5FB14C007874AE /* ChecklistsView.swift in Sources */,
 				E480AAA12C44AA77009C1445 /* WebCatalogDatabase.swift in Sources */,
 				E480AA832C44278F009C1445 /* UserInfo.swift in Sources */,
 				E49352092C4D1418004CBDA1 /* CircleDetailView.swift in Sources */,

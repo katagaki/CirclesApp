@@ -9,6 +9,8 @@ import SQLite
 
 extension DatabaseManager {
 
+    // MARK: Loading
+
     func loadEvents() {
         if let events = loadTable("ComiketInfoWC", of: ComiketEvent.self) as? [ComiketEvent] {
             self.events = events
@@ -68,6 +70,14 @@ extension DatabaseManager {
         ) as? [ComiketCircleExtendedInformation] {
             self.eventCircleExtendedInformation = eventCircleExtendedInformation
         }
+    }
+
+    // MARK: Fetching
+
+    func extendedCircleInformation(for circleID: Int) -> ComiketCircleExtendedInformation? {
+        return self.eventCircleExtendedInformation.first(where: {
+            $0.id == circleID
+        })
     }
 
     // MARK: Shared Functions

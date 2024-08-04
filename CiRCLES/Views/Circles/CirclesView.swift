@@ -41,6 +41,13 @@ struct CirclesView: View {
                     }
                 }
             }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Shared.Filter", systemImage: "line.3.horizontal.decrease.circle") {
+                        // TODO: Implement filters
+                    }
+                }
+            }
             .searchable(text: $searchTerm,
                         placement: .navigationBarDrawer(displayMode: .always))
             .navigationDestination(for: ViewPath.self) { viewPath in
