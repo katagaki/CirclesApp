@@ -10,6 +10,6 @@ import Foundation
 enum TabType: Int {
     case map = 0
     case circles = 1
-    case checklists = 2
+    case favorites = 2
     case more = 3
 }

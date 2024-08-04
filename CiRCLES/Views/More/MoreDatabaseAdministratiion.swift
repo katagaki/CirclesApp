@@ -93,7 +93,9 @@ struct MoreDatabaseAdministratiion: View {
                         }
                         VStack(alignment: .leading) {
                             Text(verbatim: "\(eventCircle.circleName) | \(eventCircle.penName)")
-                            Text(verbatim: "\(eventCircle.blockID) | \(eventCircle.spaceNumber) | \(eventCircle.spaceNumberSuffix)")
+                            Text(verbatim: """
+\(eventCircle.blockID) | \(eventCircle.spaceNumber) | \(eventCircle.spaceNumberSuffix)
+""")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }

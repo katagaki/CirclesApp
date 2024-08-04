@@ -164,6 +164,22 @@
         }
       }
     },
+    "Shared.AddToFavorites" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Favorites"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お気に入りに追加"
+          }
+        }
+      }
+    },
     "Shared.Areas" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -233,7 +249,20 @@
       }
     },
     "Shared.Filter" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filter"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "フィルター"
+          }
+        }
+      }
     },
     "Shared.Genres" : {
       "extractionState" : "manual",
@@ -383,13 +412,68 @@
       }
     },
     "Shared.OpenInCircleMs" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open in Circle.ms"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circle.msで開く"
+          }
+        }
+      }
     },
     "Shared.OpenPixiv" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pixiv"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pixiv"
+          }
+        }
+      }
     },
     "Shared.OpenTwitter" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X"
+          }
+        }
+      }
+    },
+    "Shared.SelectColor" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Color"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "色を選択"
+          }
+        }
+      }
     },
     "Shared.SelectEvent" : {
       "localizations" : {
@@ -407,22 +491,6 @@
         }
       }
     },
-    "Tab.Checklists" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Checklists"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "チェックリスト"
-          }
-        }
-      }
-    },
     "Tab.Circles" : {
       "localizations" : {
         "en" : {
@@ -435,6 +503,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サークル"
+          }
+        }
+      }
+    },
+    "Tab.Favorites" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorites"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お気に入り"
           }
         }
       }

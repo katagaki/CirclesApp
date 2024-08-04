@@ -17,10 +17,18 @@ struct CircleDetailView: View {
     @State var circleImage: UIImage?
     @State var extendedInformation: ComiketCircleExtendedInformation?
 
+    @State var isAddingToFavorites: Bool = false
+
     var body: some View {
         List {
             Text(circle.supplementaryDescription)
             Text(circle.memo)
+            Button("Shared.AddToFavorites", systemImage: "star") {
+                isAddingToFavorites = true
+            }
+            .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
+                FavoriteColorSelector()
+            }
         }
         .navigationTitle(circle.circleName)
         .navigationBarTitleDisplayMode(.inline)

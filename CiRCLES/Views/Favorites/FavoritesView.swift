@@ -1,5 +1,5 @@
 //
-//  ChecklistsView.swift
+//  FavoritesView.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/08/04.
@@ -7,21 +7,21 @@
 
 import SwiftUI
 
-struct ChecklistsView: View {
+struct FavoritesView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
-    @Environment(ChecklistsManager.self) var checklists
+    @Environment(FavoritesManager.self) var favorites
     @Environment(DatabaseManager.self) var database
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.checklists]) {
-            List(checklists.checklists, id: \.circle.webCatalogID) { checklist in
-                Text(checklist.circle.name)
+        NavigationStack(path: $navigationManager[.favorites]) {
+            List(favorites.items, id: \.circle.webCatalogID) { favorite in
+                Text(favorite.circle.name)
             }
         }
         .task {
             if let token = authManager.token {
-                await checklists.getChecklists(authToken: token)
+                await favorites.getAll(authToken: token)
             }
         }
     }
