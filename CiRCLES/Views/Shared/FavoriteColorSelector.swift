@@ -9,6 +9,7 @@ import SwiftUI
 
 struct FavoriteColorSelector: View {
 
+    @Binding var selectedColor: WebCatalogColor?
     let colors: [WebCatalogColor] = WebCatalogColor.allCases
 
     var body: some View {
@@ -22,7 +23,7 @@ struct FavoriteColorSelector: View {
                 ) {
                     ForEach(colors, id: \.self) { color in
                         Button {
-                            // TODO: Selected color
+                            selectedColor = color
                         } label: {
                             color.swiftUIColor()
                                 .aspectRatio(1.0, contentMode: .fit)
@@ -30,6 +31,13 @@ struct FavoriteColorSelector: View {
                                 .overlay {
                                     RoundedRectangle(cornerRadius: 6.0)
                                         .stroke(Color.primary.opacity(0.3))
+                                }
+                                .overlay {
+                                    if color.rawValue == selectedColor?.rawValue {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(.white)
+                                            .font(.title2)
+                                    }
                                 }
                         }
                     }
@@ -39,11 +47,4 @@ struct FavoriteColorSelector: View {
         }
         .presentationCompactAdaptation(.popover)
     }
-}
-
-#Preview {
-    Button("") {}
-        .popover(isPresented: .constant(true)) {
-            FavoriteColorSelector()
-        }
 }
