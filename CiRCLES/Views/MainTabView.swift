@@ -20,6 +20,8 @@ struct MainTabView: View {
     @State var isAuthenticating: Bool = false
     @State var isLoadingDatabase: Bool = false
 
+    @State var progressViewTextKey: String = ""
+
     var body: some View {
         TabView(selection: $navigationManager.selectedTab) {
             MapView()
@@ -48,7 +50,7 @@ struct MainTabView: View {
                 ZStack {
                     Color.clear
                         .ignoresSafeArea()
-                    ProgressView("Shared.LoadingText.Databases")
+                    ProgressView(NSLocalizedString(progressViewTextKey, comment: ""))
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 .background(Material.ultraThin)
@@ -72,7 +74,7 @@ struct MainTabView: View {
             if newValue == nil {
                 isAuthenticating = true
             } else {
-                Task {
+                Task.detached {
                     await loadDatabase()
                     isAuthenticating = false
                 }
@@ -88,24 +90,40 @@ struct MainTabView: View {
 
     func loadDatabase() async {
         withAnimation(.snappy.speed(2.0)) {
+            progressViewTextKey = "Shared.LoadingText.Databases"
             isLoadingDatabase = true
         }
         if let token = authManager.token {
             await eventManager.getEvents(authToken: token)
             if let latestEvent = eventManager.latestEvent() {
                 await database.downloadDatabases(for: latestEvent, authToken: token)
-                database.loadDatabase()
-                database.loadEvents()
-                database.loadDates()
-                database.loadMaps()
-                database.loadAreas()
-                database.loadBlocks()
-                database.loadGenres()
-                database.loadLayouts()
-                database.loadCircles()
-                database.loadCircleExtendedInformtion()
-                database.loadCommonImages()
-                database.loadCircleImages()
+                await database.loadDatabase()
+                await MainActor.run {
+                    progressViewTextKey = "Shared.LoadingText.Events"
+                }
+                await database.loadEvents()
+                await database.loadDates()
+                await MainActor.run {
+                    progressViewTextKey = "Shared.LoadingText.Maps"
+                }
+                await database.loadMaps()
+                await database.loadAreas()
+                await database.loadBlocks()
+                await MainActor.run {
+                    progressViewTextKey = "Shared.LoadingText.Genres"
+                }
+                await database.loadGenres()
+                await database.loadLayouts()
+                await MainActor.run {
+                    progressViewTextKey = "Shared.LoadingText.Circles"
+                }
+                await database.loadCircles()
+                await database.loadCircleExtendedInformtion()
+                await MainActor.run {
+                    progressViewTextKey = "Shared.LoadingText.Images"
+                }
+                await database.loadCommonImages()
+                await database.loadCircleImages()
                 debugPrint("Database loaded")
             }
         }

@@ -30,15 +30,16 @@ class FavoritesManager {
         to color: WebCatalogColor,
         authToken: OpenIDToken
     ) async {
-        var request = urlRequestForReadersAPI(endpoint: "Favorite", authToken: authToken)
-
-        let favorite = WebCatalogFavorite.Request(
-            webCatalogID: extendedInformation.webCatalogID,
-            color: color,
-            memo: ""
+        let request = urlRequestForReadersAPI(
+            endpoint: "Favorite",
+            parameters: [
+                "access_token": authToken.accessToken,
+                "wcid": String(extendedInformation.webCatalogID),
+                "color": String(color.rawValue),
+                "memo": "CiRCLESにより追加されました。"
+                ],
+            authToken: authToken
         )
-
-        request.httpBody = try? JSONEncoder().encode(favorite)
 
         if let (data, _) = try? await URLSession.shared.data(for: request) {
             debugPrint("Response length after attempting to add favorite: \(data.count)")
@@ -51,14 +52,31 @@ class FavoritesManager {
         }
     }
 
-    func urlRequestForReadersAPI(endpoint: String, authToken: OpenIDToken) -> URLRequest {
-        let endpoint = URL(string: "\(circleMsAPIEndpoint)/Readers/\(endpoint)/")!
+    func urlRequestForReadersAPI(
+        endpoint: String,
+        method: String = "POST",
+        parameters: [String: String] = [:],
+        authToken: OpenIDToken
+    ) -> URLRequest {
+        var endpointComponents = URLComponents(string: "\(circleMsAPIEndpoint)/Readers/\(endpoint)")!
 
-        var request = URLRequest(url: endpoint)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(authToken.accessToken)", forHTTPHeaderField: "Authorization")
+        if parameters.keys.count > 0 {
+            var queryItems: [URLQueryItem] = []
+            for (key, value) in parameters {
+                queryItems.append(URLQueryItem(name: key, value: value))
+            }
+            endpointComponents.queryItems = queryItems
+        }
 
-        return request
+        if let endpoint = endpointComponents.url {
+            var request = URLRequest(url: endpoint)
+            request.httpMethod = method
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.setValue("Bearer \(authToken.accessToken)", forHTTPHeaderField: "Authorization")
+
+            return request
+        } else {
+            fatalError("Fatal error when trying to get URL request for Favorites API")
+        }
     }
 }

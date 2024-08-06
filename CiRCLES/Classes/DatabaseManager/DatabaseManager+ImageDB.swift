@@ -6,26 +6,36 @@
 //
 
 import Foundation
-import SQLite
+@preconcurrency import SQLite
 import UIKit
 
 extension DatabaseManager {
 
     // MARK: Common Images
 
-    func loadCommonImages() {
+    func loadCommonImages() async {
         if let imageDatabase {
-            do {
-                debugPrint("Loading common images")
+            debugPrint("Loading common images")
+            self.commonImages.removeAll()
+            self.commonImages = await withTaskGroup(of: (String, Data).self, returning: [String: Data].self) { group in
                 let table = Table("ComiketCommonImage")
                 let colName = Expression<String>("name")
                 let colImage = Expression<Data>("image")
-                self.commonImages.removeAll()
-                for row in try imageDatabase.prepare(table) {
-                    self.commonImages[row[colName]] = UIImage(data: row[colImage])
+
+                var commonImages: [String: Data] = [:]
+                do {
+                    for row in try imageDatabase.prepare(table) {
+                        group.addTask {
+                            return (row[colName], row[colImage])
+                        }
+                    }
+                } catch {
+                    debugPrint(error.localizedDescription)
                 }
-            } catch {
-                debugPrint(error.localizedDescription)
+                for await result in group {
+                    commonImages[result.0] = result.1
+                }
+                return commonImages
             }
         }
     }
@@ -48,21 +58,30 @@ extension DatabaseManager {
 
     // MARK: Circle Images
 
-    func loadCircleImages(forcefully: Bool = false) {
+    func loadCircleImages(forcefully: Bool = false) async {
         if forcefully || self.circleImages.count == 0 {
             if let imageDatabase {
-                do {
-                    debugPrint("Loading circle images")
+                debugPrint("Loading circle images")
+                self.circleImages.removeAll()
+                self.circleImages = await withTaskGroup(of: (Int, Data).self, returning: [Int: Data].self) { group in
                     let table = Table("ComiketCircleImage")
                     let colID = Expression<Int>("id")
-                    // let colWebCatalogID = Expression<String>("WCId")
                     let colCutImage = Expression<Data>("cutImage")
-                    self.circleImages.removeAll()
-                    for row in try imageDatabase.prepare(table) {
-                        self.circleImages[row[colID]] = UIImage(data: row[colCutImage])
+
+                    var circleImages: [Int: Data] = [:]
+                    do {
+                        for row in try imageDatabase.prepare(table) {
+                            group.addTask {
+                                return (row[colID], row[colCutImage])
+                            }
+                        }
+                    } catch {
+                        debugPrint(error.localizedDescription)
                     }
-                } catch {
-                    debugPrint(error.localizedDescription)
+                    for await result in group {
+                        circleImages[result.0] = result.1
+                    }
+                    return circleImages
                 }
             }
         } else {
@@ -70,13 +89,18 @@ extension DatabaseManager {
         }
     }
 
-    func circleImage(for id: Int) -> UIImage? { return circleImages[id] }
+    func circleImage(for id: Int) -> UIImage? {
+        if let circleImageData = circleImages[id] {
+            return UIImage(data: circleImageData)
+        }
+        return nil
+    }
 
     // MARK: Shared
 
     func image(named imageName: String) -> UIImage? {
-        if let image = commonImages[imageName] {
-            return image
+        if let imageData = commonImages[imageName] {
+            return UIImage(data: imageData)
         }
         return nil
     }

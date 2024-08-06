@@ -90,13 +90,13 @@ struct CircleDetailView: View {
                 self.extendedInformation = extendedInformation
             }
         }
-        .onChange(of: favoriteColorToAddTo) { oldValue, newValue in
-            if let extendedInformation, let token = authManager.token, let favoriteColorToAddTo {
+        .onChange(of: favoriteColorToAddTo) { _, newValue in
+            if let extendedInformation, let token = authManager.token, let newValue {
                 Task {
                     await favorites.add(
                         circle,
                         using: extendedInformation,
-                        to: favoriteColorToAddTo,
+                        to: newValue,
                         authToken: token
                     )
                     isAddingToFavorites = false
