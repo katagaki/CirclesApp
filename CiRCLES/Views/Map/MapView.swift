@@ -21,15 +21,20 @@ struct MapView: View {
 
     var body: some View {
         NavigationStack(path: $navigationManager[.map]) {
-            ScrollView([.horizontal, .vertical]) {
-                if let selectedEventDate, let selectedHall,
-                   let mapImage = database.mapImage(for: selectedHall,
-                                                    on: selectedEventDate,
-                                                    usingHighDefinition: true) {
-                    Image(uiImage: mapImage)
-                        .ignoresSafeArea(.all)
+            VStack(alignment: .leading) {
+                ScrollView([.horizontal, .vertical]) {
+                    if let selectedEventDate, let selectedHall,
+                       let mapImage = database.mapImage(for: selectedHall,
+                                                        on: selectedEventDate,
+                                                        usingHighDefinition: true) {
+                        Image(uiImage: mapImage)
+                    }
                 }
+                .scrollIndicators(.hidden)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("ViewTitle.Map")
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
@@ -84,6 +89,7 @@ struct MapView: View {
                         .padding([.leading, .trailing], 16.0)
                         .padding([.top, .bottom], 12.0)
                     }
+                    .scrollIndicators(.hidden)
                 }
             }
             .sheet(isPresented: $isSelectingEvent) {
