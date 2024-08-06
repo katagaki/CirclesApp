@@ -164,6 +164,22 @@
         }
       }
     },
+    "Shared.%lldth.Day" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Day %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld日目"
+          }
+        }
+      }
+    },
     "Shared.AddToFavorites" : {
       "localizations" : {
         "en" : {
@@ -298,7 +314,25 @@
         }
       }
     },
+    "Shared.LoadingText.Circles" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading circles..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サークルデータを読み込み中…"
+          }
+        }
+      }
+    },
     "Shared.LoadingText.Databases" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -310,6 +344,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "データベースを読み込み中…"
+          }
+        }
+      }
+    },
+    "Shared.LoadingText.Events" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading events…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベントデータを読み込み中…"
+          }
+        }
+      }
+    },
+    "Shared.LoadingText.Genres" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading genres..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンルデータを読み込み中…"
+          }
+        }
+      }
+    },
+    "Shared.LoadingText.Images" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading images..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像データを読み込み中…"
+          }
+        }
+      }
+    },
+    "Shared.LoadingText.Maps" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading maps..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マップデータを読み込み中…"
           }
         }
       }
@@ -375,22 +477,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "地図"
-          }
-        }
-      }
-    },
-    "Shared.NotImplemented" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Feature currently unavailable."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この機能は実装予定です。"
           }
         }
       }

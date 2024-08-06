@@ -40,7 +40,6 @@ struct MoreDatabaseAdministratiion: View {
                 }
             } header: {
                 ListSectionHeader(text: "Shared.Events")
-                    .font(.body)
             }
             Section {
                 ForEach(database.eventMaps, id: \.self) { eventMap in
@@ -48,7 +47,6 @@ struct MoreDatabaseAdministratiion: View {
                 }
             } header: {
                 ListSectionHeader(text: "Shared.Maps")
-                    .font(.body)
             }
             Section {
                 ForEach(database.eventAreas, id: \.self) { eventArea in
@@ -56,7 +54,6 @@ struct MoreDatabaseAdministratiion: View {
                 }
             } header: {
                 ListSectionHeader(text: "Shared.Areas")
-                    .font(.body)
             }
             Section {
                 ForEach(database.eventBlocks, id: \.self) { eventBlock in
@@ -64,7 +61,6 @@ struct MoreDatabaseAdministratiion: View {
                 }
             } header: {
                 ListSectionHeader(text: "Shared.Blocks")
-                    .font(.body)
             }
             Section {
                 ForEach(database.eventGenres, id: \.self) { eventGenre in
@@ -72,7 +68,6 @@ struct MoreDatabaseAdministratiion: View {
                 }
             } header: {
                 ListSectionHeader(text: "Shared.Genres")
-                    .font(.body)
             }
             Section {
                 ForEach(database.eventLayouts, id: \.self) { eventLayout in
@@ -80,7 +75,6 @@ struct MoreDatabaseAdministratiion: View {
                 }
             } header: {
                 ListSectionHeader(text: "Shared.Layouts")
-                    .font(.body)
             }
             Section {
                 ForEach(database.eventCircles, id: \.self) { eventCircle in
@@ -103,7 +97,6 @@ struct MoreDatabaseAdministratiion: View {
                 }
             } header: {
                 ListSectionHeader(text: "Shared.Circles")
-                    .font(.body)
             }
         }
     }

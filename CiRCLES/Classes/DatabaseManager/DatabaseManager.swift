@@ -34,8 +34,8 @@ class DatabaseManager {
     var eventCircles: [ComiketCircle] = []
     var eventCircleExtendedInformation: [ComiketCircleExtendedInformation] = []
 
-    var commonImages: [String: UIImage] = [:]
-    var circleImages: [Int: UIImage] = [:]
+    var commonImages: [String: Data] = [:]
+    var circleImages: [Int: Data] = [:]
 
     func deleteDatabases() {
         if let documentsDirectoryURL {

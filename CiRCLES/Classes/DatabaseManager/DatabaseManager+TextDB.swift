@@ -11,49 +11,49 @@ extension DatabaseManager {
 
     // MARK: Loading
 
-    func loadEvents() {
+    func loadEvents() async {
         if let events = loadTable("ComiketInfoWC", of: ComiketEvent.self) as? [ComiketEvent] {
             self.events = events
         }
     }
 
-    func loadDates() {
+    func loadDates() async {
         if let eventDates = loadTable("ComiketDateWC", of: ComiketDate.self) as? [ComiketDate] {
             self.eventDates = eventDates
         }
     }
 
-    func loadMaps() {
+    func loadMaps() async {
         if let eventMaps = loadTable("ComiketMapWC", of: ComiketMap.self) as? [ComiketMap] {
             self.eventMaps = eventMaps
         }
     }
 
-    func loadAreas() {
+    func loadAreas() async {
         if let eventAreas = loadTable("ComiketAreaWC", of: ComiketArea.self) as? [ComiketArea] {
             self.eventAreas = eventAreas
         }
     }
 
-    func loadBlocks() {
+    func loadBlocks() async {
         if let eventBlocks = loadTable("ComiketBlockWC", of: ComiketBlock.self) as? [ComiketBlock] {
             self.eventBlocks = eventBlocks
         }
     }
 
-    func loadGenres() {
+    func loadGenres() async {
         if let eventGenres = loadTable("ComiketGenreWC", of: ComiketGenre.self) as? [ComiketGenre] {
             self.eventGenres = eventGenres
         }
     }
 
-    func loadLayouts() {
+    func loadLayouts() async {
         if let eventLayouts = loadTable("ComiketLayoutWC", of: ComiketLayout.self) as? [ComiketLayout] {
             self.eventLayouts = eventLayouts
         }
     }
 
-    func loadCircles(forcefully: Bool = false) {
+    func loadCircles(forcefully: Bool = false) async {
         if forcefully || self.eventCircles.count == 0 {
             if let eventCircles = loadTable("ComiketCircleWC", of: ComiketCircle.self) as? [ComiketCircle] {
                 self.eventCircles = eventCircles
@@ -63,7 +63,7 @@ extension DatabaseManager {
         }
     }
 
-    func loadCircleExtendedInformtion() {
+    func loadCircleExtendedInformtion() async {
         if let eventCircleExtendedInformation = loadTable(
             "ComiketCircleExtend",
             of: ComiketCircleExtendedInformation.self

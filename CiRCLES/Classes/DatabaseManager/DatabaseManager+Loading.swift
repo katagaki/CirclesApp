@@ -9,7 +9,7 @@ import SQLite
 
 extension DatabaseManager {
 
-    func loadDatabase() {
+    func loadDatabase() async {
         if let textDatabaseURL {
             do {
                 debugPrint("Opening text database")

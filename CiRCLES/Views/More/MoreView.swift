@@ -59,7 +59,6 @@ struct MoreView: View {
                     }
                 } header: {
                     ListSectionHeader(text: "More.Events")
-                        .font(.body)
                 }
                 Section {
                     NavigationLink(value: ViewPath.moreDBAdmin) {
@@ -67,7 +66,6 @@ struct MoreView: View {
                     }
                 } header: {
                     ListSectionHeader(text: "More.DBAdmin")
-                        .font(.body)
                 }
             }
             .task {
