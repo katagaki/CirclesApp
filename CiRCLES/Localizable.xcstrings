@@ -577,6 +577,22 @@
         }
       }
     },
+    "Shared.ZoomToFit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom to Fit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画面に合わせる"
+          }
+        }
+      }
+    },
     "Tab.Circles" : {
       "localizations" : {
         "en" : {
