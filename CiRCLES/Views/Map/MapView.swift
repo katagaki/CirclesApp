@@ -16,21 +16,40 @@ struct MapView: View {
     @State var selectedHall: ComiketHall?
     @State var selectedHallName: String?
 
+    @State var isZoomedToFit: Bool = false
+
     // TODO: Put this in an environment state
     @State var isSelectingEvent: Bool = false
 
+    @Namespace var mapZoomTransitionNamespace
+
     var body: some View {
         NavigationStack(path: $navigationManager[.map]) {
-            VStack(alignment: .leading) {
-                ScrollView([.horizontal, .vertical]) {
+            VStack(alignment: .center) {
+                if isZoomedToFit {
                     if let selectedEventDate, let selectedHall,
                        let mapImage = database.mapImage(for: selectedHall,
                                                         on: selectedEventDate,
                                                         usingHighDefinition: true) {
                         Image(uiImage: mapImage)
+                            .resizable()
+                            .scaledToFit()
+                            .matchedGeometryEffect(id: "Map", in: mapZoomTransitionNamespace)
+                            .transition(.opacity)
                     }
+                } else {
+                    ScrollView([.horizontal, .vertical]) {
+                        if let selectedEventDate, let selectedHall,
+                           let mapImage = database.mapImage(for: selectedHall,
+                                                            on: selectedEventDate,
+                                                            usingHighDefinition: true) {
+                            Image(uiImage: mapImage)
+                                .matchedGeometryEffect(id: "Map", in: mapZoomTransitionNamespace)
+                                .transition(.opacity)
+                        }
+                    }
+                    .scrollIndicators(.hidden)
                 }
-                .scrollIndicators(.hidden)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationBarTitleDisplayMode(.inline)
@@ -51,6 +70,16 @@ struct MapView: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Shared.SelectEvent", systemImage: "calendar") {
                         isSelectingEvent = true
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Shared.ZoomToFit",
+                           systemImage: (isZoomedToFit ?
+                                         "arrow.down.backward.and.arrow.up.forward" :
+                                            "arrow.up.forward.and.arrow.down.backward")) {
+                        withAnimation(.snappy.speed(2.0)) {
+                            isZoomedToFit.toggle()
+                        }
                     }
                 }
             }
