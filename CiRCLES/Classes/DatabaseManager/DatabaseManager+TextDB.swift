@@ -41,6 +41,12 @@ extension DatabaseManager {
         }
     }
 
+    func loadMapping() async {
+        if let eventMapping = loadTable("ComiketMappingWC", of: ComiketMapping.self) as? [ComiketMapping] {
+            self.eventMapping = eventMapping
+        }
+    }
+
     func loadGenres() async {
         if let eventGenres = loadTable("ComiketGenreWC", of: ComiketGenre.self) as? [ComiketGenre] {
             self.eventGenres = eventGenres
@@ -73,6 +79,18 @@ extension DatabaseManager {
     }
 
     // MARK: Fetching
+
+    func circles(in layout: ComiketLayout) -> [ComiketCircle] {
+        return eventCircles.filter({
+            $0.blockID == layout.blockID && $0.spaceNumber == layout.spaceNumber
+        })
+    }
+
+    func layouts(for map: ComiketMap) -> [ComiketLayout] {
+        let currentMappings: [ComiketMapping] = eventMapping.filter({ $0.mapID == map.id })
+        let currentBlockIDs: [Int] = currentMappings.map({ $0.blockID })
+        return eventLayouts.filter({ currentBlockIDs.contains($0.blockID) })
+    }
 
     func extendedCircleInformation(for circleID: Int) -> ComiketCircleExtendedInformation? {
         return self.eventCircleExtendedInformation.first(where: {

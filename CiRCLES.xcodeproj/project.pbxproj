@@ -12,6 +12,10 @@
 		E405A48F2C21B157006FE791 /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E405A48E2C21B157006FE791 /* Komponents */; };
 		E42003CC2C6308B600770992 /* InteractiveMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42003CB2C6308AB00770992 /* InteractiveMap.swift */; };
 		E42003CF2C631E4E00770992 /* ConditionalFit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42003CE2C631E4900770992 /* ConditionalFit.swift */; };
+		E43C74062C6DE8A1003522C8 /* ComiketMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C74052C6DE89F003522C8 /* ComiketMapping.swift */; };
+		E43C74082C6DF843003522C8 /* InteractiveMapButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C74072C6DF83D003522C8 /* InteractiveMapButton.swift */; };
+		E43C740A2C6DFA6F003522C8 /* AdaptiveInvert.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C74092C6DFA69003522C8 /* AdaptiveInvert.swift */; };
+		E43C740C2C6DFD1B003522C8 /* InteractiveMapDetailPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C740B2C6DFD15003522C8 /* InteractiveMapDetailPopover.swift */; };
 		E46D51A92C22390E000524B9 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51A82C22390E000524B9 /* LoginView.swift */; };
 		E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47268F32C38EACB00D5335D /* Endpoints.swift */; };
 		E47269042C3D716500D5335D /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47269032C3D716300D5335D /* AuthManager.swift */; };
@@ -78,6 +82,10 @@
 		E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		E42003CB2C6308AB00770992 /* InteractiveMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveMap.swift; sourceTree = "<group>"; };
 		E42003CE2C631E4900770992 /* ConditionalFit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionalFit.swift; sourceTree = "<group>"; };
+		E43C74052C6DE89F003522C8 /* ComiketMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketMapping.swift; sourceTree = "<group>"; };
+		E43C74072C6DF83D003522C8 /* InteractiveMapButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveMapButton.swift; sourceTree = "<group>"; };
+		E43C74092C6DFA69003522C8 /* AdaptiveInvert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveInvert.swift; sourceTree = "<group>"; };
+		E43C740B2C6DFD15003522C8 /* InteractiveMapDetailPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveMapDetailPopover.swift; sourceTree = "<group>"; };
 		E46D51A82C22390E000524B9 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		E47268F32C38EACB00D5335D /* Endpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoints.swift; sourceTree = "<group>"; };
 		E47269032C3D716300D5335D /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
@@ -157,6 +165,7 @@
 		E42003CD2C631E4100770992 /* View Modifiers */ = {
 			isa = PBXGroup;
 			children = (
+				E43C74092C6DFA69003522C8 /* AdaptiveInvert.swift */,
 				E42003CE2C631E4900770992 /* ConditionalFit.swift */,
 			);
 			path = "View Modifiers";
@@ -244,6 +253,7 @@
 				E49351EE2C4CCD0B004CBDA1 /* ComiketGenre.swift */,
 				E49351F02C4CD0C1004CBDA1 /* ComiketLayout.swift */,
 				E480AAB22C4C9BFF009C1445 /* ComiketMap.swift */,
+				E43C74052C6DE89F003522C8 /* ComiketMapping.swift */,
 			);
 			path = "Data Models";
 			sourceTree = "<group>";
@@ -298,6 +308,8 @@
 			children = (
 				E482FFBD2C21BD93009225BD /* MapView.swift */,
 				E42003CB2C6308AB00770992 /* InteractiveMap.swift */,
+				E43C74072C6DF83D003522C8 /* InteractiveMapButton.swift */,
+				E43C740B2C6DFD15003522C8 /* InteractiveMapDetailPopover.swift */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -504,6 +516,7 @@
 				E482FFC22C21BD93009225BD /* MapView.swift in Sources */,
 				E480AA942C44A0B3009C1445 /* EventSelector.swift in Sources */,
 				E48B629B2C5FCA95007874AE /* FavoriteColorSelector.swift in Sources */,
+				E43C740A2C6DFA6F003522C8 /* AdaptiveInvert.swift in Sources */,
 				E480AA912C442DD7009C1445 /* MoreView.swift in Sources */,
 				E49352072C4CFBDC004CBDA1 /* CirclesView.swift in Sources */,
 				E480AA9A2C44A49F009C1445 /* WebCatalogEvent.swift in Sources */,
@@ -519,6 +532,7 @@
 				E48B62952C5FC218007874AE /* WebCatalogCircle.swift in Sources */,
 				E480AA7F2C4423AF009C1445 /* UserManager.swift in Sources */,
 				E493520B2C4D153E004CBDA1 /* ToolbarAccessory.swift in Sources */,
+				E43C740C2C6DFD1B003522C8 /* InteractiveMapDetailPopover.swift in Sources */,
 				E480AAB32C4C9C01009C1445 /* ComiketMap.swift in Sources */,
 				E48B62972C5FC21E007874AE /* WebCatalogFavorite.swift in Sources */,
 				E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */,
@@ -545,7 +559,9 @@
 				E49352092C4D1418004CBDA1 /* CircleDetailView.swift in Sources */,
 				E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */,
 				E42003CC2C6308B600770992 /* InteractiveMap.swift in Sources */,
+				E43C74082C6DF843003522C8 /* InteractiveMapButton.swift in Sources */,
 				E47269042C3D716500D5335D /* AuthManager.swift in Sources */,
+				E43C74062C6DE8A1003522C8 /* ComiketMapping.swift in Sources */,
 				E49351FA2C4CF171004CBDA1 /* DatabaseManager+Loading.swift in Sources */,
 				E480AAAD2C4C9831009C1445 /* Point.swift in Sources */,
 				E480AA962C44A15D009C1445 /* UserCircle.swift in Sources */,
