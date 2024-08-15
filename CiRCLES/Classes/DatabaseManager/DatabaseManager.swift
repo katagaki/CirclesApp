@@ -29,6 +29,7 @@ class DatabaseManager {
     var eventMaps: [ComiketMap] = []
     var eventAreas: [ComiketArea] = []
     var eventBlocks: [ComiketBlock] = []
+    var eventMapping: [ComiketMapping] = []
     var eventGenres: [ComiketGenre] = []
     var eventLayouts: [ComiketLayout] = []
     var eventCircles: [ComiketCircle] = []

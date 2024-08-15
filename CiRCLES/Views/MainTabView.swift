@@ -76,7 +76,9 @@ struct MainTabView: View {
             } else {
                 Task.detached {
                     await loadDatabase()
-                    isAuthenticating = false
+                    await MainActor.run {
+                        isAuthenticating = false
+                    }
                 }
             }
         }
@@ -109,6 +111,7 @@ struct MainTabView: View {
                 await database.loadMaps()
                 await database.loadAreas()
                 await database.loadBlocks()
+                await database.loadMapping()
                 await MainActor.run {
                     progressViewTextKey = "Shared.LoadingText.Genres"
                 }

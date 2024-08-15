@@ -12,9 +12,8 @@ struct MapView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(DatabaseManager.self) var database
 
-    @State var selectedEventDate: Int?
-    @State var selectedHall: ComiketHall?
-    @State var selectedHallName: String?
+    @State var selectedEventDate: ComiketDate?
+    @State var selectedMap: ComiketMap?
 
     @State var isZoomedToFit: Bool = false
 
@@ -25,7 +24,7 @@ struct MapView: View {
         NavigationStack(path: $navigationManager[.map]) {
             InteractiveMap(
                 selectedEventDate: $selectedEventDate,
-                selectedHall: $selectedHall,
+                selectedMap: $selectedMap,
                 isZoomedToFit: $isZoomedToFit
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -35,12 +34,12 @@ struct MapView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack(spacing: 2.0) {
-                        if let selectedEventDate, let selectedHallName {
-                            Text("Shared.\(selectedEventDate)th.Day")
-                                .bold()
-                            Text(selectedHallName)
+                        if let selectedEventDate, let selectedMap {
+                            Text("Shared.\(selectedEventDate.id)th.Day")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
+                            Text(selectedMap.name)
+                                .bold()
                         }
                     }
                 }
@@ -63,32 +62,33 @@ struct MapView: View {
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 BarAccessory(placement: .bottom) {
                     ScrollView(.horizontal) {
-                        HStack(spacing: 8.0) {
+                        HStack(spacing: 12.0) {
                             ForEach(database.eventDates, id: \.id) { date in
-                                VStack(alignment: .leading, spacing: 6.0) {
+                                VStack(alignment: .leading, spacing: 8.0) {
                                     Text("Shared.\(date.id)th.Day")
+                                        .font(.title3)
                                         .bold()
                                     HStack(spacing: 8.0) {
                                         ForEach(database.eventMaps, id: \.id) { map in
-                                            if selectedEventDate == date.id && selectedHall?.rawValue == map.filename {
-                                                BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
-                                                                   isTextLight: true) { }
-                                            } else {
-                                                BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
-                                                                   isSecondary: true) {
-                                                    withAnimation(.snappy.speed(2.0)) {
-                                                        selectedEventDate = date.id
-                                                        selectedHall = ComiketHall(rawValue: map.filename)
-                                                        selectedHallName = map.name
-                                                    }
+                                            BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
+                                                               accentColor: accentColorForMap(map),
+                                                               isTextLight: true) {
+                                                withAnimation(.snappy.speed(2.0)) {
+                                                    selectedEventDate = date
+                                                    selectedMap = map
                                                 }
                                             }
                                         }
                                     }
                                 }
+                                .padding(12.0)
+                                .background {
+                                    RoundedRectangle(cornerRadius: 12.0)
+                                        .stroke(Color.primary.opacity(0.1))
+                                }
                             }
                         }
-                        .padding([.leading, .trailing], 16.0)
+                        .padding([.leading, .trailing], 12.0)
                         .padding([.top, .bottom], 12.0)
                     }
                     .scrollIndicators(.hidden)
@@ -97,6 +97,20 @@ struct MapView: View {
             .sheet(isPresented: $isSelectingEvent) {
                 EventSelector()
             }
+        }
+    }
+
+    func accentColorForMap(_ map: ComiketMap) -> Color? {
+        if map.name.starts(with: "東") {
+            return Color.red
+        } else if map.name.starts(with: "西") {
+            return Color.blue
+        } else if map.name.starts(with: "南") {
+            return Color.green
+        } else if map.name.starts(with: "会議") || map.name.starts(with: "会") {
+            return Color.gray
+        } else {
+            return nil
         }
     }
 }
