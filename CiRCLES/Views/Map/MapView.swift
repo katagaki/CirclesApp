@@ -21,36 +21,13 @@ struct MapView: View {
     // TODO: Put this in an environment state
     @State var isSelectingEvent: Bool = false
 
-    @Namespace var mapZoomTransitionNamespace
-
     var body: some View {
         NavigationStack(path: $navigationManager[.map]) {
-            VStack(alignment: .center) {
-                if isZoomedToFit {
-                    if let selectedEventDate, let selectedHall,
-                       let mapImage = database.mapImage(for: selectedHall,
-                                                        on: selectedEventDate,
-                                                        usingHighDefinition: true) {
-                        Image(uiImage: mapImage)
-                            .resizable()
-                            .scaledToFit()
-                            .matchedGeometryEffect(id: "Map", in: mapZoomTransitionNamespace)
-                            .transition(.opacity)
-                    }
-                } else {
-                    ScrollView([.horizontal, .vertical]) {
-                        if let selectedEventDate, let selectedHall,
-                           let mapImage = database.mapImage(for: selectedHall,
-                                                            on: selectedEventDate,
-                                                            usingHighDefinition: true) {
-                            Image(uiImage: mapImage)
-                                .matchedGeometryEffect(id: "Map", in: mapZoomTransitionNamespace)
-                                .transition(.opacity)
-                        }
-                    }
-                    .scrollIndicators(.hidden)
-                }
-            }
+            InteractiveMap(
+                selectedEventDate: $selectedEventDate,
+                selectedHall: $selectedHall,
+                isZoomedToFit: $isZoomedToFit
+            )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle("ViewTitle.Map")
@@ -88,27 +65,23 @@ struct MapView: View {
                     ScrollView(.horizontal) {
                         HStack(spacing: 8.0) {
                             ForEach(database.eventDates, id: \.id) { date in
-                                BarAccessoryButton("Shared.\(date.id)th.Day",
-                                                   icon: "calendar",
-                                                   isTextLight: true) {
-                                    withAnimation(.snappy.speed(2.0)) {
-                                        if selectedEventDate == date.id {
-                                            selectedEventDate = nil
-                                            selectedHall = nil
-                                            selectedHallName = nil
-                                        } else {
-                                            selectedEventDate = date.id
-                                        }
-                                    }
-                                }
-                                if date.id == selectedEventDate {
-                                    ForEach(database.eventMaps, id: \.id) { map in
-                                        BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
-                                                           icon: "map",
-                                                           isSecondary: true) {
-                                            withAnimation(.snappy.speed(2.0)) {
-                                                selectedHallName = map.name
-                                                selectedHall = ComiketHall(rawValue: map.filename)
+                                VStack(alignment: .leading, spacing: 6.0) {
+                                    Text("Shared.\(date.id)th.Day")
+                                        .bold()
+                                    HStack(spacing: 8.0) {
+                                        ForEach(database.eventMaps, id: \.id) { map in
+                                            if selectedEventDate == date.id && selectedHall?.rawValue == map.filename {
+                                                BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
+                                                                   isTextLight: true) { }
+                                            } else {
+                                                BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
+                                                                   isSecondary: true) {
+                                                    withAnimation(.snappy.speed(2.0)) {
+                                                        selectedEventDate = date.id
+                                                        selectedHall = ComiketHall(rawValue: map.filename)
+                                                        selectedHallName = map.name
+                                                    }
+                                                }
                                             }
                                         }
                                     }
