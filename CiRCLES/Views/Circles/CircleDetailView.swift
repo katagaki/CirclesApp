@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2024/07/21.
 //
 
+import Komponents
 import SwiftUI
 
 struct CircleDetailView: View {
@@ -24,17 +25,26 @@ struct CircleDetailView: View {
 
     var body: some View {
         List {
-            Text(circle.supplementaryDescription)
-            Text(circle.memo)
             if let extendedInformation {
-                Button("Shared.AddToFavorites", systemImage: "star") {
-                    isAddingToFavorites = true
-                }
-                .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
-                    FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
+                Section {
+                    Button("Shared.AddToFavorites", systemImage: "star") {
+                        isAddingToFavorites = true
+                    }
+                    .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
+                        FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
+                    }
                 }
             }
+            Section {
+                Text(circle.supplementaryDescription)
+                if circle.memo.count > 0 {
+                    Text(circle.memo)
+                }
+            } header: {
+                ListSectionHeader(text: "Shared.Description")
+            }
         }
+        .listSectionSpacing(.compact)
         .navigationTitle(circle.circleName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
@@ -44,6 +54,7 @@ struct CircleDetailView: View {
                     Text(circle.circleName)
                         .bold()
                     Text(circle.penName)
+                        .font(.caption)
                         .foregroundStyle(.secondary)
                 }
             }

@@ -36,11 +36,11 @@ struct MapView: View {
                 ToolbarItem(placement: .principal) {
                     VStack(spacing: 2.0) {
                         if let selectedEventDate, let selectedMap {
+                            Text(selectedMap.name)
+                                .bold()
                             Text("Shared.\(selectedEventDate.id)th.Day")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
-                            Text(selectedMap.name)
-                                .bold()
                         }
                     }
                 }

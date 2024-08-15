@@ -247,6 +247,23 @@
         }
       }
     },
+    "Shared.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Description"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "詳細"
+          }
+        }
+      }
+    },
     "Shared.Events" : {
       "extractionState" : "manual",
       "localizations" : {
