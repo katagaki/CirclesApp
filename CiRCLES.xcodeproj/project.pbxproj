@@ -10,6 +10,8 @@
 		E405A48A2C21B0A1006FE791 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A4892C21B0A1006FE791 /* Localizable.xcstrings */; };
 		E405A48C2C21B0AF006FE791 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */; };
 		E405A48F2C21B157006FE791 /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E405A48E2C21B157006FE791 /* Komponents */; };
+		E42003CC2C6308B600770992 /* InteractiveMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42003CB2C6308AB00770992 /* InteractiveMap.swift */; };
+		E42003CF2C631E4E00770992 /* ConditionalFit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42003CE2C631E4900770992 /* ConditionalFit.swift */; };
 		E46D51A92C22390E000524B9 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51A82C22390E000524B9 /* LoginView.swift */; };
 		E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47268F32C38EACB00D5335D /* Endpoints.swift */; };
 		E47269042C3D716500D5335D /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47269032C3D716300D5335D /* AuthManager.swift */; };
@@ -74,6 +76,8 @@
 /* Begin PBXFileReference section */
 		E405A4892C21B0A1006FE791 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
+		E42003CB2C6308AB00770992 /* InteractiveMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveMap.swift; sourceTree = "<group>"; };
+		E42003CE2C631E4900770992 /* ConditionalFit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionalFit.swift; sourceTree = "<group>"; };
 		E46D51A82C22390E000524B9 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		E47268F32C38EACB00D5335D /* Endpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoints.swift; sourceTree = "<group>"; };
 		E47269032C3D716300D5335D /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
@@ -150,6 +154,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E42003CD2C631E4100770992 /* View Modifiers */ = {
+			isa = PBXGroup;
+			children = (
+				E42003CE2C631E4900770992 /* ConditionalFit.swift */,
+			);
+			path = "View Modifiers";
+			sourceTree = "<group>";
+		};
 		E46D51A72C223903000524B9 /* Login */ = {
 			isa = PBXGroup;
 			children = (
@@ -285,6 +297,7 @@
 			isa = PBXGroup;
 			children = (
 				E482FFBD2C21BD93009225BD /* MapView.swift */,
+				E42003CB2C6308AB00770992 /* InteractiveMap.swift */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -370,6 +383,7 @@
 				E472690B2C3D742300D5335D /* OpenID-Sample.plist */,
 				E47268F72C38EC8B00D5335D /* API */,
 				E482FFC12C21BD93009225BD /* Views */,
+				E42003CD2C631E4100770992 /* View Modifiers */,
 				E47269022C3D715500D5335D /* Classes */,
 				E472690D2C3D766600D5335D /* Structs */,
 				E480AA892C4429AC009C1445 /* Enums */,
@@ -530,6 +544,7 @@
 				E480AA832C44278F009C1445 /* UserInfo.swift in Sources */,
 				E49352092C4D1418004CBDA1 /* CircleDetailView.swift in Sources */,
 				E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */,
+				E42003CC2C6308B600770992 /* InteractiveMap.swift in Sources */,
 				E47269042C3D716500D5335D /* AuthManager.swift in Sources */,
 				E49351FA2C4CF171004CBDA1 /* DatabaseManager+Loading.swift in Sources */,
 				E480AAAD2C4C9831009C1445 /* Point.swift in Sources */,
@@ -537,6 +552,7 @@
 				E480AA882C442982009C1445 /* NavigationManager.swift in Sources */,
 				E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */,
 				E49351F72C4CD91F004CBDA1 /* ComiketCircleExtendedInformation.swift in Sources */,
+				E42003CF2C631E4E00770992 /* ConditionalFit.swift in Sources */,
 				E480AA8D2C4429CD009C1445 /* ViewPath.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
