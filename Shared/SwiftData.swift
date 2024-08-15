@@ -14,6 +14,7 @@ let sharedModelContainer: ModelContainer = {
         ComiketMap.self,
         ComiketArea.self,
         ComiketBlock.self,
+        ComiketMapping.self,
         ComiketGenre.self,
         ComiketLayout.self,
         ComiketCircle.self,
