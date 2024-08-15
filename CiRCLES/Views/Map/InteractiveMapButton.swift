@@ -11,6 +11,8 @@ struct InteractiveMapButton: View {
 
     @Environment(DatabaseManager.self) var database
 
+    @Binding var selectedEventDate: ComiketDate?
+
     @State var layout: ComiketLayout
 
     @State var isCircleDetailPopoverPresented: Bool = false
@@ -18,14 +20,18 @@ struct InteractiveMapButton: View {
 
     var body: some View {
         Button {
-            circlesInSpace = database.circles(in: layout)
+            if let selectedEventDate {
+                circlesInSpace = database.circles(in: layout, on: selectedEventDate.id)
+            } else {
+                circlesInSpace = database.circles(in: layout)
+            }
             isCircleDetailPopoverPresented = true
         } label: {
             Rectangle()
                 .foregroundStyle(.clear)
         }
         .popover(isPresented: $isCircleDetailPopoverPresented) {
-            InteractiveMapDetailPopover(circles: $circlesInSpace)
+            InteractiveMapDetailPopover(isPresented: $isCircleDetailPopoverPresented, circles: $circlesInSpace)
         }
     }
 }

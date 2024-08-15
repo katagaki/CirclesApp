@@ -9,6 +9,7 @@ import Komponents
 import SwiftUI
 
 struct MapView: View {
+
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(DatabaseManager.self) var database
 
@@ -96,6 +97,12 @@ struct MapView: View {
             }
             .sheet(isPresented: $isSelectingEvent) {
                 EventSelector()
+            }
+            .navigationDestination(for: ViewPath.self) { viewPath in
+                switch viewPath {
+                case .circlesDetail(let circle): CircleDetailView(circle: circle)
+                default: Color.clear
+                }
             }
         }
     }

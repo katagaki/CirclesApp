@@ -86,6 +86,10 @@ extension DatabaseManager {
         })
     }
 
+    func circles(in layout: ComiketLayout, on date: Int) -> [ComiketCircle] {
+        return circles(in: layout).filter({ $0.day == date })
+    }
+
     func layouts(for map: ComiketMap) -> [ComiketLayout] {
         let currentMappings: [ComiketMapping] = eventMapping.filter({ $0.mapID == map.id })
         let currentBlockIDs: [Int] = currentMappings.map({ $0.blockID })

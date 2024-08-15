@@ -664,6 +664,12 @@
             "state" : "translated",
             "value" : "Map"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マップ"
+          }
         }
       }
     }

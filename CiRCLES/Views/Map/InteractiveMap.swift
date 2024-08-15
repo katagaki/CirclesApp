@@ -34,7 +34,7 @@ struct InteractiveMap: View {
                                 if !isZoomedToFit {
                                     ZStack(alignment: .topLeading) {
                                         ForEach(layouts, id: \.self) { layout in
-                                            InteractiveMapButton(layout: layout)
+                                            InteractiveMapButton(selectedEventDate: $selectedEventDate, layout: layout)
                                             .position(
                                                 x: CGFloat(layout.hdPosition.x + Int(spaceSize / 2)),
                                                 y: CGFloat(layout.hdPosition.y + Int(spaceSize / 2))
