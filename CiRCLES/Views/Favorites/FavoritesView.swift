@@ -18,6 +18,8 @@ struct FavoritesView: View {
             List(favorites.items, id: \.circle.webCatalogID) { favorite in
                 Text(favorite.circle.name)
             }
+            .navigationTitle("ViewTitle.Favorites")
+            .navigationBarTitleDisplayMode(.inline)
         }
         .task {
             if let token = authManager.token {
