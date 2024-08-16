@@ -6,7 +6,7 @@
 //
 
 import Foundation
-@preconcurrency import SQLite
+import SQLite
 import UIKit
 
 extension DatabaseManager {

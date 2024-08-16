@@ -8,7 +8,6 @@
 import Foundation
 
 @Observable
-@MainActor
 class EventManager: NSObject {
 
     let defaults = UserDefaults.standard
@@ -34,6 +33,7 @@ class EventManager: NSObject {
         return events?.first(where: {$0.id == latestEventID && $0.number == latestEventNumber})
     }
 
+    @MainActor
     func getEvents(authToken: OpenIDToken) async {
         if events == nil || latestEventID == nil || latestEventNumber == nil {
             let request = urlRequestForWebCatalogAPI("GetEventList", authToken: authToken)
