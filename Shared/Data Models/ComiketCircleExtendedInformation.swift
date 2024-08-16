@@ -42,4 +42,8 @@ final class ComiketCircleExtendedInformation: SQLiteable {
             self.circleMsPortalURL = circleMsPortalURL
         }
     }
+
+    func hasAccessibleURLs() -> Bool {
+        return twitterURL != nil || pixivURL != nil || circleMsPortalURL != nil
+    }
 }

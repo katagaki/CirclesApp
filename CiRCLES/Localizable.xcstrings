@@ -315,6 +315,22 @@
         }
       }
     },
+    "Shared.Block" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Block"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ブロック"
+          }
+        }
+      }
+    },
     "Shared.Blocks" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -648,38 +664,6 @@
         }
       }
     },
-    "Shared.OpenPixiv" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "pixiv"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "pixiv"
-          }
-        }
-      }
-    },
-    "Shared.OpenTwitter" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "X"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "X"
-          }
-        }
-      }
-    },
     "Shared.SelectColor" : {
       "localizations" : {
         "en" : {
@@ -708,6 +692,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "イベントを選択"
+          }
+        }
+      }
+    },
+    "Shared.SNS.CircleMsPortal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circle.ms Portal"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circle.msポータル"
+          }
+        }
+      }
+    },
+    "Shared.SNS.Pixiv" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pixiv"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "pixiv"
+          }
+        }
+      }
+    },
+    "Shared.SNS.Twitter" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X (Twitter)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "X（旧Twitter）"
           }
         }
       }

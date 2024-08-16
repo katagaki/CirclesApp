@@ -65,10 +65,11 @@ struct MapView: View {
                     ScrollView(.horizontal) {
                         HStack(spacing: 12.0) {
                             ForEach(database.eventDates, id: \.id) { date in
-                                VStack(alignment: .leading, spacing: 8.0) {
+                                VStack(alignment: .leading, spacing: 12.0) {
                                     Text("Shared.\(date.id)th.Day")
                                         .font(.title3)
                                         .bold()
+                                    Divider()
                                     HStack(spacing: 8.0) {
                                         ForEach(database.eventMaps, id: \.id) { map in
                                             BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
