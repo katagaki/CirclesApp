@@ -11,7 +11,7 @@ struct LoginView: View {
 
     @Environment(AuthManager.self) var authManager
 
-    @State var isAuthenticating: Bool = false
+    @State var isShowingAuthSafariViewController: Bool = false
     @State var isShowingDemoAlert: Bool = false
 
     var body: some View {
@@ -55,7 +55,7 @@ struct LoginView: View {
                 .buttonStyle(.bordered)
                 .clipShape(.capsule(style: .continuous))
                 Button {
-                    isAuthenticating = true
+                    isShowingAuthSafariViewController = true
                 } label: {
                     Text("Shared.Login")
                         .fontWeight(.bold)
@@ -67,7 +67,7 @@ struct LoginView: View {
             }
             .padding(18.0)
         }
-        .sheet(isPresented: $isAuthenticating) {
+        .sheet(isPresented: $isShowingAuthSafariViewController) {
             SafariView(url: authManager.authURL)
                 .ignoresSafeArea()
         }

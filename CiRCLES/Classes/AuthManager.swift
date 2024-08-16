@@ -13,6 +13,9 @@ import KeychainAccess
 class AuthManager {
 
     let keychain = Keychain(service: "com.tsubuzaki.CiRCLES")
+    let keychainAuthTokenKey: String = "CircleMsAuthToken"
+
+    var isAuthenticating: Bool = false
 
     var code: String?
     var token: OpenIDToken?
@@ -51,11 +54,18 @@ class AuthManager {
         }
 
         // Read token from keychain
-        if let tokenInKeychain = try? keychain.get("CircleMsAuthToken"),
+        if let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),
            let token = try? JSONDecoder().decode(OpenIDToken.self,
                                                  from: tokenInKeychain.data(using: .utf8) ?? Data()) {
             self.token = token
         }
+    }
+
+    func resetAuthentication() {
+        code = nil
+        token = nil
+        try? keychain.removeAll()
+        debugPrint("Signed out and deleted authentication token from local device.")
     }
 
     func getAuthenticationCode(from url: URL) {
@@ -121,7 +131,7 @@ class AuthManager {
             if let tokenEncoded = try? JSONEncoder().encode(token),
                let tokenString = String(data: tokenEncoded, encoding: .utf8) {
                 debugPrint("Saving authentication token to keychain")
-                try? keychain.set(tokenString, key: "CircleMsAuthToken")
+                try? keychain.set(tokenString, key: keychainAuthTokenKey)
             }
         }
     }

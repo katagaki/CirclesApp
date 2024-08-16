@@ -583,6 +583,22 @@
         }
       }
     },
+    "Shared.Logout" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sign Out"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログアウト"
+          }
+        }
+      }
+    },
     "Shared.Maps" : {
       "extractionState" : "manual",
       "localizations" : {
