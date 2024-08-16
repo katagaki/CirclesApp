@@ -89,13 +89,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Assign colors to your favorite circles and easily find them on the day of the event"
+            "value" : "Assign colors to your favorite circles and easily find them on the day of the Comic Market"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "好きなサークルに色付けて、イベント当日に簡単に見分ける"
+            "value" : "好きなサークルに色付けて、コミケ当日に簡単に見分ける"
           }
         }
       }
@@ -123,7 +123,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Plan and execute your visit to the Comic Market event"
+            "value" : "Plan and execute your visit to the Comic Market"
           }
         },
         "ja" : {
