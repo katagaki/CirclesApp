@@ -33,6 +33,108 @@
         }
       }
     },
+    "Hero.Circles.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse participating circles without an Internet connection"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "インターネットに接続できなくても、サークルの情報にアクセスできる"
+          }
+        }
+      }
+    },
+    "Hero.Circles.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Browse Circles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サークルデータ"
+          }
+        }
+      }
+    },
+    "Hero.Favorites.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Assign colors to your favorite circles and easily find them on the day of the event"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "好きなサークルに色付けて、イベント当日に簡単に見分ける"
+          }
+        }
+      }
+    },
+    "Hero.Favorites.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Favorites"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お気に入りを管理"
+          }
+        }
+      }
+    },
+    "Hero.Map.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plan and execute your visit to the Comic Market event"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コミケの前でも、当日でも簡単にマップを見て計画する"
+          }
+        }
+      }
+    },
+    "Hero.Map.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Navigate Halls"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "会場マップ"
+          }
+        }
+      }
+    },
     "Login.Disclaimer" : {
       "localizations" : {
         "en" : {
@@ -438,13 +540,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sign In With circle.ms"
+            "value" : "Sign In With Circle.ms"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "circle.msでログイン"
+            "value" : "Circle.msでログイン"
           }
         }
       }
