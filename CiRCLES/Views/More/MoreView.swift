@@ -20,7 +20,7 @@ struct MoreView: View {
             MoreList(repoName: "katagaki/CirclesApp", viewPath: ViewPath.moreAttributions) {
                 Section {
                     HStack(alignment: .center, spacing: 16.0) {
-                        Image("Profile.1")
+                        Image(.profile1)
                             .resizable()
                             .frame(width: 56.0, height: 56.0)
                             .clipShape(.circle)

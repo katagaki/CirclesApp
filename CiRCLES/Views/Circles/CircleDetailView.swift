@@ -69,27 +69,59 @@ struct CircleDetailView: View {
         }
         .safeAreaInset(edge: .top) {
             ToolbarAccessory(placement: .top) {
-                VStack {
-                    if let circleImage {
-                        Image(uiImage: circleImage)
-                    }
-                    Text(circle.bookName)
-                    if let extendedInformation {
-                        Divider()
-                        HStack {
-                            if let twitterURL = extendedInformation.twitterURL {
-                                Button("Shared.OpenTwitter") {
-                                    openURL(twitterURL)
-                                }
-                            }
-                            if let pixivURL = extendedInformation.pixivURL {
-                                Button("Shared.OpenPixiv") {
-                                    openURL(pixivURL)
-                                }
-                            }
+                VStack(spacing: 12.0) {
+                    Group {
+                        if let circleImage {
+                            Image(uiImage: circleImage)
                         }
+                        Text(circle.bookName)
+                    }
+                    .padding([.leading, .trailing], 18.0)
+                    if let extendedInformation, extendedInformation.hasAccessibleURLs() {
+                        Divider()
+                        ScrollView(.horizontal) {
+                            HStack(spacing: 10.0) {
+                                Group {
+                                    if let twitterURL = extendedInformation.twitterURL {
+                                        Button {
+                                            openURL(twitterURL)
+                                        } label: {
+                                            Image(.snsTwitter)
+                                                .resizable()
+                                                .frame(width: 32.0, height: 32.0)
+                                            Text("Shared.SNS.Twitter")
+                                        }
+                                    }
+                                    if let pixivURL = extendedInformation.pixivURL {
+                                        Button {
+                                            openURL(pixivURL)
+                                        } label: {
+                                            Image(.snsPixiv)
+                                                .resizable()
+                                                .frame(width: 32.0, height: 32.0)
+                                            Text("Shared.SNS.Pixiv")
+                                        }
+                                    }
+                                    if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
+                                        Button {
+                                            openURL(circleMsPortalURL)
+                                        } label: {
+                                            Image(.snsCircleMs)
+                                                .resizable()
+                                                .frame(width: 32.0, height: 32.0)
+                                            Text("Shared.SNS.CircleMsPortal")
+                                        }
+                                    }
+                                }
+                                .clipShape(.capsule(style: .continuous))
+                                .buttonStyle(.borderedProminent)
+                            }
+                            .padding([.leading, .trailing], 18.0)
+                        }
+                        .scrollIndicators(.hidden)
                     }
                 }
+                .padding(.bottom, 12.0)
             }
         }
         .task {

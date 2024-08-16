@@ -28,7 +28,7 @@ struct InteractiveMapButton: View {
             isCircleDetailPopoverPresented = true
         } label: {
             Rectangle()
-                .foregroundStyle(.clear)
+                .foregroundStyle(isCircleDetailPopoverPresented ? .accent.opacity(0.3) : .clear)
         }
         .popover(isPresented: $isCircleDetailPopoverPresented) {
             InteractiveMapDetailPopover(isPresented: $isCircleDetailPopoverPresented, circles: $circlesInSpace)

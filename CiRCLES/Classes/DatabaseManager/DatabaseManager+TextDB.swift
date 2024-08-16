@@ -80,6 +80,12 @@ extension DatabaseManager {
 
     // MARK: Fetching
 
+    func circles(in block: ComiketBlock) -> [ComiketCircle] {
+        return eventCircles.filter({
+            $0.blockID == block.id
+        })
+    }
+
     func circles(in layout: ComiketLayout) -> [ComiketCircle] {
         return eventCircles.filter({
             $0.blockID == layout.blockID && $0.spaceNumber == layout.spaceNumber
@@ -88,6 +94,12 @@ extension DatabaseManager {
 
     func circles(in layout: ComiketLayout, on date: Int) -> [ComiketCircle] {
         return circles(in: layout).filter({ $0.day == date })
+    }
+
+    func blocks(in map: ComiketMap) -> [ComiketBlock] {
+        let mapLayouts = eventLayouts.filter({ $0.mapID == map.id })
+        let mapBlockIDs = mapLayouts.map({ $0.blockID })
+        return eventBlocks.filter({ mapBlockIDs.contains($0.id) }).sorted(by: { $0.id < $1.id })
     }
 
     func layouts(for map: ComiketMap) -> [ComiketLayout] {
