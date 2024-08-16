@@ -920,6 +920,22 @@
         }
       }
     },
+    "ViewTitle.Favorites" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Favorites"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お気に入り"
+          }
+        }
+      }
+    },
     "ViewTitle.Map" : {
       "localizations" : {
         "en" : {
