@@ -17,12 +17,11 @@ struct MainTabView: View {
     @Environment(DatabaseManager.self) var database
 
     @State var isInitialTokenRefreshComplete: Bool = false
-    @State var isAuthenticating: Bool = false
-    @State var isLoadingDatabase: Bool = false
 
     @State var progressViewTextKey: String = ""
 
     var body: some View {
+        @Bindable var authManager = authManager
         TabView(selection: $navigationManager.selectedTab) {
             MapView()
                 .tabItem {
@@ -46,7 +45,7 @@ struct MainTabView: View {
                 .tag(TabType.more)
         }
         .overlay {
-            if isLoadingDatabase {
+            if database.isBusy {
                 ZStack {
                     Color.clear
                         .ignoresSafeArea()
@@ -56,29 +55,26 @@ struct MainTabView: View {
                 .background(Material.ultraThin)
             }
         }
-        .sheet(isPresented: $isAuthenticating) {
+        .sheet(isPresented: $authManager.isAuthenticating) {
             LoginView()
                 .interactiveDismissDisabled()
         }
         .task {
             if !isInitialTokenRefreshComplete {
+                await authManager.refreshAuthenticationToken()
                 if authManager.token == nil {
-                    isAuthenticating = true
-                } else {
-                    await authManager.refreshAuthenticationToken()
-                    isInitialTokenRefreshComplete = true
+                    authManager.isAuthenticating = true
                 }
+                isInitialTokenRefreshComplete = true
             }
         }
         .onChange(of: authManager.token) { _, newValue in
             if newValue == nil {
-                isAuthenticating = true
+                authManager.isAuthenticating = true
             } else {
+                authManager.isAuthenticating = false
                 Task.detached {
                     await loadDatabase()
-                    await MainActor.run {
-                        isAuthenticating = false
-                    }
                 }
             }
         }
@@ -93,7 +89,7 @@ struct MainTabView: View {
     func loadDatabase() async {
         withAnimation(.snappy.speed(2.0)) {
             progressViewTextKey = "Shared.LoadingText.Databases"
-            isLoadingDatabase = true
+            database.isBusy = true
         }
         if let token = authManager.token {
             await eventManager.getEvents(authToken: token)
@@ -131,7 +127,7 @@ struct MainTabView: View {
             }
         }
         withAnimation(.snappy.speed(2.0)) {
-            isLoadingDatabase = false
+            database.isBusy = false
         }
     }
 }

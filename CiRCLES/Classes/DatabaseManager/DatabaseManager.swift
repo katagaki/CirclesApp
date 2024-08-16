@@ -24,6 +24,8 @@ class DatabaseManager {
     var textDatabase: Connection?
     var imageDatabase: Connection?
 
+    var isBusy: Bool = false
+
     var events: [ComiketEvent] = []
     var eventDates: [ComiketDate] = []
     var eventMaps: [ComiketMap] = []

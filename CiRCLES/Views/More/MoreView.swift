@@ -49,8 +49,13 @@ struct MoreView: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
-                    Button("Shared.LoginAgain", role: .destructive) {
-                        authManager.token = nil
+                    Button("Shared.Logout", role: .destructive) {
+                        authManager.resetAuthentication()
+                    }
+                    .contextMenu {
+                        Button("Shared.LoginAgain", role: .destructive) {
+                            authManager.token = nil
+                        }
                     }
                 }
                 Section {
