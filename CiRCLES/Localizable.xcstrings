@@ -33,6 +33,38 @@
         }
       }
     },
+    "Circles.NoFilterSelected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Circles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "該当するサークルなし"
+          }
+        }
+      }
+    },
+    "Circles.NoFilterSelected.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a block to view the list of circles."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サークルの一覧を閲覧するには、ブロックを選択してください。"
+          }
+        }
+      }
+    },
     "Circles.Search.Prompt" : {
       "localizations" : {
         "en" : {
