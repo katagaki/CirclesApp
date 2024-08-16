@@ -133,6 +133,9 @@ class AuthManager {
                 debugPrint("Saving authentication token to keychain")
                 try? keychain.set(tokenString, key: keychainAuthTokenKey)
             }
+        } else {
+            self.code = nil
+            self.token = nil
         }
     }
     // swiftlint:enable non_optional_string_data_conversion
