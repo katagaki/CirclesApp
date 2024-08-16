@@ -33,6 +33,22 @@
         }
       }
     },
+    "Circles.Search.Prompt" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circle Name"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サークル名"
+          }
+        }
+      }
+    },
     "Hero.Circles.Description" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -298,6 +314,22 @@
         }
       }
     },
+    "Shared.All" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "すべて"
+          }
+        }
+      }
+    },
     "Shared.Areas" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -365,6 +397,22 @@
         }
       }
     },
+    "Shared.Day" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開催日"
+          }
+        }
+      }
+    },
     "Shared.Description" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -395,22 +443,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "イベント"
-          }
-        }
-      }
-    },
-    "Shared.Filter" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Filter"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "フィルター"
           }
         }
       }
@@ -820,6 +852,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "その他"
+          }
+        }
+      }
+    },
+    "ViewTitle.Circles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サークル"
           }
         }
       }
