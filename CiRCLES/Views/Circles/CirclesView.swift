@@ -55,6 +55,15 @@ struct CirclesView: View {
             .navigationTitle("ViewTitle.Circles")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .tabBar)
+            .overlay {
+                if selectedBlock == nil {
+                    ContentUnavailableView(
+                        "Circles.NoFilterSelected",
+                        systemImage: "questionmark.square.dashed",
+                        description: Text("Circles.NoFilterSelected.Description")
+                    )
+                }
+            }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 BarAccessory(placement: .bottom) {
                     ScrollView(.horizontal) {

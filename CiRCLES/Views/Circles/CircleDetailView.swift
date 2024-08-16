@@ -29,16 +29,6 @@ struct CircleDetailView: View {
 
     var body: some View {
         List {
-            if extendedInformation != nil {
-                Section {
-                    Button("Shared.AddToFavorites", systemImage: "star") {
-                        isAddingToFavorites = true
-                    }
-                    .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
-                        FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
-                    }
-                }
-            }
             if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
                 Section {
                     Text(circle.supplementaryDescription)
@@ -96,20 +86,35 @@ struct CircleDetailView: View {
                         Text(circle.bookName)
                     }
                     .padding([.leading, .trailing], 18.0)
-                    if let extendedInformation, extendedInformation.hasAccessibleURLs() {
+                    if let extendedInformation {
                         Divider()
                         ScrollView(.horizontal) {
                             HStack(spacing: 10.0) {
                                 Group {
+                                    Button {
+                                        isAddingToFavorites = true
+                                    } label: {
+                                        Image(systemName: "star.fill")
+                                            .resizable()
+                                            .padding(2.0)
+                                            .frame(width: 28.0, height: 28.0)
+                                            .scaledToFit()
+                                        Text("Shared.AddToFavorites")
+                                    }
+                                    .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
+                                        FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
+                                    }
                                     if let twitterURL = extendedInformation.twitterURL {
                                         Button {
                                             openURL(twitterURL)
                                         } label: {
                                             Image(.snsTwitter)
                                                 .resizable()
-                                                .frame(width: 32.0, height: 32.0)
+                                                .frame(width: 28.0, height: 28.0)
                                             Text("Shared.SNS.Twitter")
                                         }
+                                        .foregroundStyle(.background)
+                                        .tint(.primary)
                                     }
                                     if let pixivURL = extendedInformation.pixivURL {
                                         Button {
@@ -117,9 +122,11 @@ struct CircleDetailView: View {
                                         } label: {
                                             Image(.snsPixiv)
                                                 .resizable()
-                                                .frame(width: 32.0, height: 32.0)
+                                                .frame(width: 28.0, height: 28.0)
                                             Text("Shared.SNS.Pixiv")
                                         }
+                                        .foregroundStyle(.white)
+                                        .tint(.blue)
                                     }
                                     if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
                                         Button {
@@ -127,15 +134,17 @@ struct CircleDetailView: View {
                                         } label: {
                                             Image(.snsCircleMs)
                                                 .resizable()
-                                                .frame(width: 32.0, height: 32.0)
+                                                .frame(width: 28.0, height: 28.0)
                                             Text("Shared.SNS.CircleMsPortal")
                                         }
+                                        .foregroundStyle(.white)
+                                        .tint(.green)
                                     }
                                 }
                                 .clipShape(.capsule(style: .continuous))
                                 .buttonStyle(.borderedProminent)
                             }
-                            .padding([.leading, .trailing], 18.0)
+                            .padding([.leading, .trailing], 12.0)
                         }
                         .scrollIndicators(.hidden)
                     }
