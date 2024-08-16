@@ -7,6 +7,7 @@
 
 import Komponents
 import SwiftUI
+import Translation
 
 struct CircleDetailView: View {
 
@@ -23,9 +24,12 @@ struct CircleDetailView: View {
     @State var isAddingToFavorites: Bool = false
     @State var favoriteColorToAddTo: WebCatalogColor?
 
+    @State var isShowingTranslationPopover: Bool = false
+    @State var textToTranslate: String = ""
+
     var body: some View {
         List {
-            if let extendedInformation {
+            if extendedInformation != nil {
                 Section {
                     Button("Shared.AddToFavorites", systemImage: "star") {
                         isAddingToFavorites = true
@@ -35,13 +39,28 @@ struct CircleDetailView: View {
                     }
                 }
             }
-            Section {
-                Text(circle.supplementaryDescription)
-                if circle.memo.count > 0 {
-                    Text(circle.memo)
+            if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
+                Section {
+                    Text(circle.supplementaryDescription)
+                        .textSelection(.enabled)
+                } header: {
+                    HStack {
+                        ListSectionHeader(text: "Shared.Description")
+                        Spacer()
+                        Button("Shared.Translate", systemImage: "character.bubble") {
+                            textToTranslate = circle.supplementaryDescription
+                            isShowingTranslationPopover = true
+                        }
+                        .textCase(nil)
+                        .foregroundStyle(.teal)
+                    }
                 }
-            } header: {
-                ListSectionHeader(text: "Shared.Description")
+            }
+            if circle.memo.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
+                Section {
+                    Text(circle.memo)
+                        .textSelection(.enabled)
+                }
             }
         }
         .listSectionSpacing(.compact)
@@ -124,6 +143,7 @@ struct CircleDetailView: View {
                 .padding(.bottom, 12.0)
             }
         }
+        .translationPresentation(isPresented: $isShowingTranslationPopover, text: textToTranslate)
         .task {
             if let circleImage = database.circleImage(for: circle.id) {
                 self.circleImage = circleImage

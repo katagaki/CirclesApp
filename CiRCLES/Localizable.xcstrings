@@ -776,6 +776,22 @@
         }
       }
     },
+    "Shared.Translate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻訳"
+          }
+        }
+      }
+    },
     "Shared.ZoomToFit" : {
       "localizations" : {
         "en" : {
