@@ -825,6 +825,7 @@
       }
     },
     "Shared.ZoomToFit" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
