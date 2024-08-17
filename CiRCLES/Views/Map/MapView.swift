@@ -13,10 +13,10 @@ struct MapView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(DatabaseManager.self) var database
 
+    @State var orientation = UIDeviceOrientation.portrait
+
     @State var selectedEventDate: ComiketDate?
     @State var selectedMap: ComiketMap?
-
-    @State var isZoomedToFit: Bool = false
 
     // TODO: Put this in an environment state
     @State var isSelectingEvent: Bool = false
@@ -25,8 +25,7 @@ struct MapView: View {
         NavigationStack(path: $navigationManager[.map]) {
             InteractiveMap(
                 selectedEventDate: $selectedEventDate,
-                selectedMap: $selectedMap,
-                isZoomedToFit: $isZoomedToFit
+                selectedMap: $selectedMap
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationBarTitleDisplayMode(.inline)
@@ -49,51 +48,51 @@ struct MapView: View {
                         isSelectingEvent = true
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Shared.ZoomToFit",
-                           systemImage: (isZoomedToFit ?
-                                         "arrow.down.backward.and.arrow.up.forward" :
-                                            "arrow.up.forward.and.arrow.down.backward")) {
-                        withAnimation(.snappy.speed(2.0)) {
-                            isZoomedToFit.toggle()
-                        }
-                    }
-                }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 BarAccessory(placement: .bottom) {
-                    ScrollView(.horizontal) {
-                        HStack(spacing: 12.0) {
-                            ForEach(database.eventDates, id: \.id) { date in
-                                VStack(alignment: .leading, spacing: 12.0) {
-                                    Text("Shared.\(date.id)th.Day")
-                                        .font(.title3)
-                                        .bold()
-                                    Divider()
-                                    HStack(spacing: 8.0) {
-                                        ForEach(database.eventMaps, id: \.id) { map in
-                                            BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
-                                                               accentColor: accentColorForMap(map),
-                                                               isTextLight: true) {
-                                                withAnimation(.snappy.speed(2.0)) {
-                                                    selectedEventDate = date
-                                                    selectedMap = map
+                    Group {
+                        if orientation.isPortrait || UIDevice.current.userInterfaceIdiom == .pad {
+                            ScrollView(.horizontal) {
+                                HStack(spacing: 12.0) {
+                                    ForEach(database.eventDates, id: \.id) { date in
+                                        VStack(alignment: .leading, spacing: 12.0) {
+                                            Text("Shared.\(date.id)th.Day")
+                                                .font(.title3)
+                                                .bold()
+                                            Divider()
+                                            HStack(spacing: 8.0) {
+                                                ForEach(database.eventMaps, id: \.id) { map in
+                                                    BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
+                                                                       accentColor: accentColorForMap(map),
+                                                                       isTextLight: true) {
+                                                        withAnimation(.snappy.speed(2.0)) {
+                                                            selectedEventDate = date
+                                                            selectedMap = map
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
+                                        .padding(12.0)
+                                        .background {
+                                            RoundedRectangle(cornerRadius: 12.0)
+                                                .stroke(Color.primary.opacity(0.1))
+                                        }
                                     }
                                 }
-                                .padding(12.0)
-                                .background {
-                                    RoundedRectangle(cornerRadius: 12.0)
-                                        .stroke(Color.primary.opacity(0.1))
-                                }
+                                .padding([.leading, .trailing], 12.0)
+                                .padding([.top, .bottom], 12.0)
                             }
+                            .scrollIndicators(.hidden)
+                        } else {
+                            Color.clear
+                                .frame(height: 0.0)
                         }
-                        .padding([.leading, .trailing], 12.0)
-                        .padding([.top, .bottom], 12.0)
                     }
-                    .scrollIndicators(.hidden)
+                    .onRotate { newOrientation in
+                        orientation = newOrientation
+                    }
                 }
             }
             .sheet(isPresented: $isSelectingEvent) {

@@ -15,42 +15,77 @@ struct InteractiveMap: View {
 
     @Binding var selectedEventDate: ComiketDate?
     @Binding var selectedMap: ComiketMap?
-    @Binding var isZoomedToFit: Bool
 
     @State var mapImage: UIImage?
     @State var circles: [ComiketCircle] = []
     @State var layouts: [ComiketLayout] = []
 
+    @State var zoomDivisor: Int = 1
+
     var body: some View {
         VStack(alignment: .leading) {
             if let mapImage {
-                GeometryReader { proxy in
-                    ScrollView([.horizontal, .vertical]) {
-                        Image(uiImage: mapImage)
-                            .resizable()
-                            .scaled($isZoomedToFit, to: proxy.size)
-                            .colorInvert(adaptive: true)
-                            .overlay {
-                                if !isZoomedToFit {
-                                    ZStack(alignment: .topLeading) {
-                                        ForEach(layouts, id: \.self) { layout in
-                                            InteractiveMapButton(selectedEventDate: $selectedEventDate, layout: layout)
-                                            .position(
-                                                x: CGFloat(layout.hdPosition.x + Int(spaceSize / 2)),
-                                                y: CGFloat(layout.hdPosition.y + Int(spaceSize / 2))
-                                            )
-                                            .frame(
-                                                width: CGFloat(spaceSize),
-                                                height: CGFloat(spaceSize),
-                                                alignment: .topLeading
-                                            )
-                                        }
-                                        Color.clear
-                                    }
+                ScrollView([.horizontal, .vertical]) {
+                    Image(uiImage: mapImage)
+                        .resizable()
+                        .frame(
+                            width: CGFloat(Int(mapImage.size.width) / zoomDivisor),
+                            height: CGFloat(Int(mapImage.size.height) / zoomDivisor)
+                        )
+                        .colorInvert(adaptive: true)
+                        .overlay {
+                            ZStack(alignment: .topLeading) {
+                                ForEach(layouts, id: \.self) { layout in
+                                    InteractiveMapButton(selectedEventDate: $selectedEventDate, layout: layout)
+                                    .position(
+                                        x: CGFloat((layout.hdPosition.x + Int(spaceSize / 2)) / zoomDivisor),
+                                        y: CGFloat((layout.hdPosition.y + Int(spaceSize / 2)) / zoomDivisor)
+                                    )
+                                    .frame(
+                                        width: CGFloat(spaceSize / zoomDivisor),
+                                        height: CGFloat(spaceSize / zoomDivisor),
+                                        alignment: .topLeading
+                                    )
                                 }
+                                Color.clear
                             }
+                        }
+                }
+                .scrollIndicators(.hidden)
+                .overlay {
+                    ZStack(alignment: .bottomTrailing) {
+                        VStack(alignment: .center, spacing: 0.0) {
+                            Button {
+                                withAnimation(.smooth.speed(2.0)) {
+                                    zoomDivisor -= 1
+                                }
+                            } label: {
+                                Image(systemName: "plus")
+                                    .font(.title)
+                            }
+                            .frame(width: 48.0, height: 48.0, alignment: .center)
+                            .contentShape(.rect)
+                            .disabled(zoomDivisor <= 1)
+                            Divider()
+                            Button {
+                                withAnimation(.smooth.speed(2.0)) {
+                                    zoomDivisor += 1
+                                }
+                            } label: {
+                                Image(systemName: "minus")
+                                    .font(.title)
+                            }
+                            .frame(width: 48.0, height: 48.0, alignment: .center)
+                            .contentShape(.rect)
+                            .disabled(zoomDivisor >= 3)
+                        }
+                        .frame(maxWidth: 48.0)
+                        .background(Material.thin)
+                        .clipShape(.rect(cornerRadius: 8.0))
+                        .offset(x: -12.0, y: -12.0)
+                        .shadow(color: .black.opacity(0.2), radius: 4.0, y: 2.0)
+                        Color.clear
                     }
-                    .scrollIndicators(.hidden)
                 }
             }
         }
