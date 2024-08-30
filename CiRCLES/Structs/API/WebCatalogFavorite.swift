@@ -6,7 +6,7 @@
 //
 
 // swiftlint:disable nesting
-struct WebCatalogFavorite: Codable {
+struct WebCatalogFavorite: Codable, Hashable {
     let webCatalogID: Int
     let circleName: String
     let color: WebCatalogColor
@@ -33,6 +33,10 @@ struct WebCatalogFavorite: Codable {
         case memo = "memo"
         case free = "free"
         case updateDate = "update_date"
+    }
+
+    static func == (lhs: WebCatalogFavorite, rhs: WebCatalogFavorite) -> Bool {
+        return lhs.webCatalogID == rhs.webCatalogID
     }
 }
 // swiftlint:enable nesting

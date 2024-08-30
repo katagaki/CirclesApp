@@ -5,7 +5,7 @@
 //  Created by シン・ジャスティン on 2024/08/04.
 //
 
-struct WebCatalogCircle: Codable {
+struct WebCatalogCircle: Codable, Hashable {
     let webCatalogID: Int
     let name: String
     let nameKana: String
@@ -26,7 +26,7 @@ struct WebCatalogCircle: Codable {
     let updateID: String
     let updateDate: String
 
-    struct OnlineStore: Codable {
+    struct OnlineStore: Codable, Hashable {
         let name: String
         let link: String
     }
@@ -51,5 +51,10 @@ struct WebCatalogCircle: Codable {
         case onlineStores = "onlinestore"
         case updateID = "updateId"
         case updateDate = "update_date"
+    }
+    
+    static func == (lhs: WebCatalogCircle, rhs: WebCatalogCircle) -> Bool {
+        return lhs.webCatalogID == rhs.webCatalogID &&
+        lhs.circlemsID == rhs.circlemsID
     }
 }

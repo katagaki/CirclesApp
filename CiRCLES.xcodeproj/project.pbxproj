@@ -78,6 +78,7 @@
 		E493520B2C4D153E004CBDA1 /* ToolbarAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */; };
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
 		E4CA64562C81FCC3001F50BB /* UserFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64552C81FCC1001F50BB /* UserFavorite.swift */; };
+		E4CA64582C8203A4001F50BB /* CircleGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64572C8203A2001F50BB /* CircleGrid.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -151,6 +152,7 @@
 		E4A7694F2C21A20B00BE3491 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E4CA64552C81FCC1001F50BB /* UserFavorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserFavorite.swift; sourceTree = "<group>"; };
+		E4CA64572C8203A2001F50BB /* CircleGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleGrid.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -211,6 +213,7 @@
 		E47269052C3D738900D5335D /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				E4CA64572C8203A2001F50BB /* CircleGrid.swift */,
 				E48B629A2C5FCA8D007874AE /* FavoriteColorSelector.swift */,
 				E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */,
 				E47269062C3D739500D5335D /* SafariView.swift */,
@@ -525,6 +528,7 @@
 				E482FFC22C21BD93009225BD /* MapView.swift in Sources */,
 				E43C74122C702750003522C8 /* Rotation.swift in Sources */,
 				E4CA64562C81FCC3001F50BB /* UserFavorite.swift in Sources */,
+				E4CA64582C8203A4001F50BB /* CircleGrid.swift in Sources */,
 				E480AA942C44A0B3009C1445 /* EventSelector.swift in Sources */,
 				E48B629B2C5FCA95007874AE /* FavoriteColorSelector.swift in Sources */,
 				E43C740A2C6DFA6F003522C8 /* AdaptiveInvert.swift in Sources */,

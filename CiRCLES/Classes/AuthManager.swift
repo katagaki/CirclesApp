@@ -127,7 +127,6 @@ class AuthManager {
         if let token = try? JSONDecoder().decode(OpenIDToken.self, from: data) {
             debugPrint("Decoded authentication token")
             self.token = token
-            debugPrint(token)
             if let tokenEncoded = try? JSONEncoder().encode(token),
                let tokenString = String(data: tokenEncoded, encoding: .utf8) {
                 debugPrint("Saving authentication token to keychain")

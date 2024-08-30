@@ -15,8 +15,6 @@ struct CirclesView: View {
     @Environment(EventManager.self) var eventManager
     @Environment(DatabaseManager.self) var database
 
-    let gridSpacing: CGFloat = 1.0
-
     @State var displayedCircles: [ComiketCircle] = []
     @State var searchedCircles: [ComiketCircle]?
 
@@ -26,29 +24,15 @@ struct CirclesView: View {
     @State var searchTerm: String = ""
 
     var body: some View {
-
-        let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 60.0), spacing: gridSpacing)]
-    #if targetEnvironment(macCatalyst)
-        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 60.0), spacing: gridSpacing)]
-    #else
-        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 100.0), spacing: gridSpacing)]
-    #endif
-
         NavigationStack(path: $navigationManager[.circles]) {
-            ScrollView {
-                LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
-                          phoneColumnConfiguration : padOrMacColumnConfiguration,
-                          spacing: gridSpacing) {
-                    ForEach(searchedCircles == nil ? displayedCircles : searchedCircles ?? []) { circle in
-                        NavigationLink(value: ViewPath.circlesDetail(circle: circle)) {
-                            if let image = database.circleImage(for: circle.id) {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFit()
-                            } else {
-                                Text(circle.circleName)
-                            }
-                        }
+            Group {
+                if let searchedCircles {
+                    CircleGrid(circles: searchedCircles) { circle in
+                        navigationManager.push(.circlesDetail(circle: circle), for: .circles)
+                    }
+                } else {
+                    CircleGrid(circles: displayedCircles) { circle in
+                        navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                     }
                 }
             }

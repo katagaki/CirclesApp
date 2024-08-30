@@ -15,7 +15,7 @@ struct UserFavorites: Codable {
         let maxCount: Int
         let list: [FavoriteItem]
 
-        struct FavoriteItem: Codable {
+        struct FavoriteItem: Codable, Hashable {
             let circle: WebCatalogCircle
             let favorite: WebCatalogFavorite
         }
