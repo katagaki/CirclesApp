@@ -34,7 +34,10 @@ struct FavoritesView: View {
         .task {
             if let token = authManager.token {
                 await favorites.getAll(authToken: token)
-                for favorite in favorites.items {
+                let favoriteItemsSorted = favorites.items.sorted(by: {
+                    $0.favorite.color.rawValue < $1.favorite.color.rawValue
+                })
+                for favorite in favoriteItemsSorted {
                     if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID) {
                         favoriteCircles.append(webCatalogCircle)
                         favoriteItems[webCatalogCircle.id] = favorite
