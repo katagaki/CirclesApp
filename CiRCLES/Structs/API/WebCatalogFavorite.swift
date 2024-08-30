@@ -10,8 +10,8 @@ struct WebCatalogFavorite: Codable {
     let webCatalogID: Int
     let circleName: String
     let color: WebCatalogColor
-    let memo: String
-    let free: String
+    let memo: String?
+    let free: String?
     let updateDate: String
 
     struct Request: Codable {
