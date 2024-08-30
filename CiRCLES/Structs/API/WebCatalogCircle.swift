@@ -9,12 +9,12 @@ struct WebCatalogCircle: Codable {
     let webCatalogID: Int
     let name: String
     let nameKana: String
-    let circlemsID: Int
+    let circlemsID: String
     let cutURL: String
     let cutBaseURL: String
     let cutWebURL: String
     let cutWebUpdateDate: String
-    let genre: Int
+    let genre: String
     let url: String
     let pixivURL: String
     let twitterURL: String
@@ -23,7 +23,7 @@ struct WebCatalogCircle: Codable {
     let tag: String
     let description: String
     let onlineStores: [OnlineStore]
-    let updateID: Int
+    let updateID: String
     let updateDate: String
 
     struct OnlineStore: Codable {
