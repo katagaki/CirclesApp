@@ -7,7 +7,7 @@
 
 import Foundation
 
-#if !DEBUG
+#if DEBUG
 let circleMsAuthEndpoint: URL = URL(string: "https://auth1-sandbox.circle.ms")!
 let circleMsAPIEndpoint: URL = URL(string: "https://api1-sandbox.circle.ms")!
 #else
