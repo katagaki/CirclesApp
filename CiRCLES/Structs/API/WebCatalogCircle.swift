@@ -44,7 +44,7 @@ struct WebCatalogCircle: Codable {
         case url
         case pixivURL = "pixiv_url"
         case twitterURL = "twitter_url"
-        case clipStudioURL = "clipStudio_url"
+        case clipStudioURL = "clipstudio_url"
         case niconicoURL = "niconico_url"
         case tag
         case description
