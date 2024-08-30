@@ -80,6 +80,16 @@ extension DatabaseManager {
 
     // MARK: Fetching
 
+    func circle(for webCatalogID: Int) -> ComiketCircle? {
+        if let extendedInfo = eventCircleExtendedInformation.first(where: {$0.webCatalogID == webCatalogID}) {
+            return eventCircles.first(where: {
+                $0.id == extendedInfo.id
+            })
+        } else {
+            return nil
+        }
+    }
+
     func circles(in block: ComiketBlock) -> [ComiketCircle] {
         return eventCircles.filter({
             $0.blockID == block.id

@@ -19,7 +19,6 @@ class FavoritesManager {
             debugPrint("Favorites response length: \(data.count)")
             if let favorites = try? JSONDecoder().decode(UserFavorites.self, from: data) {
                 debugPrint("Decoded favorites")
-                debugPrint(favorites.response)
                 self.items = favorites.response.list
             }
         }
