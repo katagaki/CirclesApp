@@ -55,6 +55,7 @@ class FavoritesManager {
                 debugPrint("Decoded response")
                 if response.status == "success" {
                     debugPrint("Favorite added successfully")
+                    await getAll(authToken: authToken)
                 }
             }
         }
@@ -80,6 +81,7 @@ class FavoritesManager {
                 debugPrint("Decoded response")
                 if response.status == "success" {
                     debugPrint("Favorite deleted successfully")
+                    await getAll(authToken: authToken)
                 }
             }
         }

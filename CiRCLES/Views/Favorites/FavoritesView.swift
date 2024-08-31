@@ -37,6 +37,8 @@ struct FavoritesView: View {
                 let favoriteItemsSorted = favorites.items.sorted(by: {
                     $0.favorite.color.rawValue < $1.favorite.color.rawValue
                 })
+                favoriteCircles.removeAll()
+                favoriteItems.removeAll()
                 for favorite in favoriteItemsSorted {
                     if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID) {
                         favoriteCircles.append(webCatalogCircle)
