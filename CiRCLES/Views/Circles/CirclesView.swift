@@ -37,17 +37,21 @@ struct CirclesView: View {
 
     @State var searchTerm: String = ""
 
+    @Namespace var circlesNamespace
+
     var body: some View {
         NavigationStack(path: $navigationManager[.circles]) {
             Group {
                 if let searchedCircles {
                     CircleGrid(circles: searchedCircles,
-                               favorites: favoriteItems) { circle in
+                               favorites: favoriteItems,
+                               namespace: circlesNamespace) { circle in
                         navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                     }
                 } else {
                     CircleGrid(circles: displayedCircles,
-                               favorites: favoriteItems) { circle in
+                               favorites: favoriteItems,
+                               namespace: circlesNamespace) { circle in
                         navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                     }
                 }
@@ -152,7 +156,9 @@ struct CirclesView: View {
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
-                case .circlesDetail(let circle): CircleDetailView(circle: circle)
+                case .circlesDetail(let circle):
+                    CircleDetailView(circle: circle)
+                        .automaticNavigationTransition(id: circle.id, in: circlesNamespace)
                 default: Color.clear
                 }
             }

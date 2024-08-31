@@ -13,6 +13,9 @@ struct CircleGrid: View {
 
     var circles: [ComiketCircle]
     var favorites: [Int: UserFavorites.Response.FavoriteItem]?
+
+    var namespace: Namespace.ID
+
     var onSelect: ((ComiketCircle) -> Void)
 
     let gridSpacing: CGFloat = 1.0
@@ -63,6 +66,7 @@ struct CircleGrid: View {
                             }
                         }
                     }
+                    .automaticMatchedTransitionSource(id: circle.id, in: namespace)
                 }
             }
         }

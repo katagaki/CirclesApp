@@ -18,10 +18,13 @@ struct FavoritesView: View {
     @State var favoriteCircles: [ComiketCircle] = []
     @State var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
 
+    @Namespace var favoritesNamespace
+
     var body: some View {
         NavigationStack(path: $navigationManager[.favorites]) {
             CircleGrid(circles: favoriteCircles,
-                       favorites: favoriteItems) { circle in
+                       favorites: favoriteItems,
+                       namespace: favoritesNamespace) { circle in
                 navigationManager.push(.circlesDetail(circle: circle), for: .favorites)
             }
             .navigationTitle("ViewTitle.Favorites")
@@ -30,21 +33,23 @@ struct FavoritesView: View {
                     ProgressView()
                 }
             }
-            .navigationDestination(for: ViewPath.self) { viewPath in
-                switch viewPath {
-                case .circlesDetail(let circle): CircleDetailView(circle: circle)
-                default: Color.clear
+            .refreshable {
+                Task.detached {
+                    await reloadFavorites()
                 }
             }
-        }
-        .refreshable {
-            Task.detached {
-                await reloadFavorites()
+            .onChange(of: favorites.items) { _, _ in
+                Task.detached {
+                    await reloadFavorites()
+                }
             }
-        }
-        .onChange(of: favorites.items) { _, _ in
-            Task.detached {
-                await reloadFavorites()
+            .navigationDestination(for: ViewPath.self) { viewPath in
+                switch viewPath {
+                case .circlesDetail(let circle):
+                    CircleDetailView(circle: circle)
+                        .automaticNavigationTransition(id: circle.id, in: favoritesNamespace)
+                default: Color.clear
+                }
             }
         }
     }

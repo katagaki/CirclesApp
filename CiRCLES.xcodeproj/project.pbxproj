@@ -27,6 +27,8 @@
 		E472690F2C3D767000D5335D /* OpenIDClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E472690E2C3D766C00D5335D /* OpenIDClient.swift */; };
 		E4755B9F2C8296C30032DA2F /* Downloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755B9E2C8296BE0032DA2F /* Downloader.swift */; };
 		E4755BAA2C82BF8F0032DA2F /* UserResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BA92C82BF8E0032DA2F /* UserResponse.swift */; };
+		E4755BAE2C8350820032DA2F /* AutomaticMatchedTransitionSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BAD2C83507D0032DA2F /* AutomaticMatchedTransitionSource.swift */; };
+		E4755BB02C8353620032DA2F /* AutomaticNavigationTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BAF2C83535E0032DA2F /* AutomaticNavigationTransition.swift */; };
 		E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA732C441B64009C1445 /* OpenIDToken.swift */; };
 		E480AA772C441DD1009C1445 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA762C441DD1009C1445 /* KeychainAccess */; };
 		E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA7A2C44230B009C1445 /* SwiftData.swift */; };
@@ -103,6 +105,8 @@
 		E47269122C3D796800D5335D /* ci_post_clone.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = ci_post_clone.sh; sourceTree = "<group>"; };
 		E4755B9E2C8296BE0032DA2F /* Downloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Downloader.swift; sourceTree = "<group>"; };
 		E4755BA92C82BF8E0032DA2F /* UserResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserResponse.swift; sourceTree = "<group>"; };
+		E4755BAD2C83507D0032DA2F /* AutomaticMatchedTransitionSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomaticMatchedTransitionSource.swift; sourceTree = "<group>"; };
+		E4755BAF2C83535E0032DA2F /* AutomaticNavigationTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomaticNavigationTransition.swift; sourceTree = "<group>"; };
 		E480AA732C441B64009C1445 /* OpenIDToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenIDToken.swift; sourceTree = "<group>"; };
 		E480AA7A2C44230B009C1445 /* SwiftData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftData.swift; sourceTree = "<group>"; };
 		E480AA7E2C4423AD009C1445 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
@@ -175,9 +179,11 @@
 		E42003CD2C631E4100770992 /* View Modifiers */ = {
 			isa = PBXGroup;
 			children = (
-				E43C74112C702748003522C8 /* Rotation.swift */,
+				E4755BAF2C83535E0032DA2F /* AutomaticNavigationTransition.swift */,
 				E43C74092C6DFA69003522C8 /* AdaptiveInvert.swift */,
+				E4755BAD2C83507D0032DA2F /* AutomaticMatchedTransitionSource.swift */,
 				E42003CE2C631E4900770992 /* ConditionalFit.swift */,
+				E43C74112C702748003522C8 /* Rotation.swift */,
 			);
 			path = "View Modifiers";
 			sourceTree = "<group>";
@@ -560,6 +566,7 @@
 				E47269072C3D739700D5335D /* SafariView.swift in Sources */,
 				E49352022C4CF282004CBDA1 /* Type Aliases.swift in Sources */,
 				E49351EA2C4CC62F004CBDA1 /* ComiketArea.swift in Sources */,
+				E4755BB02C8353620032DA2F /* AutomaticNavigationTransition.swift in Sources */,
 				E49351FC2C4CF191004CBDA1 /* DatabaseManager+TextDB.swift in Sources */,
 				E480AABB2C4CA2A7009C1445 /* CircleCutConfiguration.swift in Sources */,
 				E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */,
@@ -589,6 +596,7 @@
 				E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */,
 				E49351F72C4CD91F004CBDA1 /* ComiketCircleExtendedInformation.swift in Sources */,
 				E42003CF2C631E4E00770992 /* ConditionalFit.swift in Sources */,
+				E4755BAE2C8350820032DA2F /* AutomaticMatchedTransitionSource.swift in Sources */,
 				E480AA8D2C4429CD009C1445 /* ViewPath.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
