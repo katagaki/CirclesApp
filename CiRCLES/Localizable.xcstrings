@@ -215,6 +215,22 @@
         }
       }
     },
+    "Login.Subtitle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To use CiRCLES, you will need a Gold Member subscription."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circle.msでログインするには、ゴールド会員に入会する必要があります。"
+          }
+        }
+      }
+    },
     "Login.Title" : {
       "localizations" : {
         "en" : {

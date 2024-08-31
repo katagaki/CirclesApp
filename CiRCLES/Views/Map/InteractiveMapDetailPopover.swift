@@ -16,7 +16,7 @@ struct InteractiveMapDetailPopover: View {
     @Binding var circles: [ComiketCircle]
 
     var body: some View {
-        VStack(spacing: 8.0) {
+        VStack(alignment: .leading, spacing: 8.0) {
             ForEach(circles, id: \.id) { circle in
                 Button {
                     isPresented = false
