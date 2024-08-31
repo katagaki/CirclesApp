@@ -22,18 +22,18 @@ struct MapView: View {
     @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
     var maps: [ComiketMap]
 
-    @AppStorage(wrappedValue: 0, "Map.SelectedEventDateID") var selectedEventDateID: Int
+    @AppStorage(wrappedValue: 0, "Map.SelectedDateID") var selectedDateID: Int
     @AppStorage(wrappedValue: 0, "Map.SelectedMapID") var selectedMapID: Int
 
-    @State var selectedEventDate: ComiketDate?
+    @State var selectedDate: ComiketDate?
     @State var selectedMap: ComiketMap?
 
-    @State var isSettingsRestored: Bool = false
+    @State var isInitialLoadCompleted: Bool = false
 
     var body: some View {
         NavigationStack(path: $navigationManager[.map]) {
             InteractiveMap(
-                date: $selectedEventDate,
+                date: $selectedDate,
                 map: $selectedMap
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -43,10 +43,10 @@ struct MapView: View {
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     VStack(spacing: 2.0) {
-                        if let selectedEventDate, let selectedMap {
+                        if let selectedDate, let selectedMap {
                             Text(selectedMap.name)
                                 .bold()
-                            Text("Shared.\(selectedEventDate.id)th.Day")
+                            Text("Shared.\(selectedDate.id)th.Day")
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -71,7 +71,7 @@ struct MapView: View {
                                                                        accentColor: accentColorForMap(map),
                                                                        isTextLight: true) {
                                                         withAnimation(.snappy.speed(2.0)) {
-                                                            selectedEventDate = date
+                                                            selectedDate = date
                                                             selectedMap = map
                                                         }
                                                     }
@@ -100,18 +100,22 @@ struct MapView: View {
                 }
             }
             .onAppear {
-                if !isSettingsRestored {
+                if !isInitialLoadCompleted {
                     debugPrint("Restoring Maps view state")
-                    selectedEventDate = dates.first(where: {$0.id == selectedEventDateID})
+                    selectedDate = dates.first(where: {$0.id == selectedDateID})
                     selectedMap = maps.first(where: {$0.id == selectedMapID})
-                    isSettingsRestored = true
+                    isInitialLoadCompleted = true
                 }
             }
-            .onChange(of: selectedEventDate) { _, _ in
-                selectedEventDateID = selectedEventDate?.id ?? 0
+            .onChange(of: selectedDate) { _, _ in
+                if isInitialLoadCompleted {
+                    selectedDateID = selectedDate?.id ?? 0
+                }
             }
             .onChange(of: selectedMap) { _, _ in
-                selectedMapID = selectedMap?.id ?? 0
+                if isInitialLoadCompleted {
+                    selectedMapID = selectedMap?.id ?? 0
+                }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
