@@ -32,21 +32,23 @@ struct InteractiveMap: View {
                             width: CGFloat(Int(mapImage.size.width) / zoomDivisor),
                             height: CGFloat(Int(mapImage.size.height) / zoomDivisor)
                         )
+                        .padding(.trailing, 72.0)
                         .animation(.smooth.speed(2.0), value: zoomDivisor)
                         .colorInvert(adaptive: true)
                         .overlay {
                             ZStack(alignment: .topLeading) {
                                 ForEach(layouts, id: \.self) { layout in
                                     InteractiveMapButton(selectedEventDate: $date, layout: layout)
-                                    .position(
-                                        x: CGFloat((layout.hdPosition.x + Int(spaceSize / 2)) / zoomDivisor),
-                                        y: CGFloat((layout.hdPosition.y + Int(spaceSize / 2)) / zoomDivisor)
-                                    )
-                                    .frame(
-                                        width: CGFloat(spaceSize / zoomDivisor),
-                                        height: CGFloat(spaceSize / zoomDivisor),
-                                        alignment: .topLeading
-                                    )
+                                        .id(String(layout.blockID) + "|" + String(layout.spaceNumber))
+                                        .position(
+                                            x: CGFloat((layout.hdPosition.x + Int(spaceSize / 2)) / zoomDivisor),
+                                            y: CGFloat((layout.hdPosition.y + Int(spaceSize / 2)) / zoomDivisor)
+                                        )
+                                        .frame(
+                                            width: CGFloat(spaceSize / zoomDivisor),
+                                            height: CGFloat(spaceSize / zoomDivisor),
+                                            alignment: .topLeading
+                                        )
                                 }
                                 Color.clear
                             }
