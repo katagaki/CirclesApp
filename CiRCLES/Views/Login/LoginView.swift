@@ -44,6 +44,11 @@ struct LoginView: View {
                 }
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
+                Divider()
+                Text("Login.Subtitle")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
 //                Button {
 //                    isShowingDemoAlert = true
 //                } label: {

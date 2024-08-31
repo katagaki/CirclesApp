@@ -85,7 +85,7 @@ struct CircleDetailView: View {
             ToolbarAccessory(placement: .top) {
                 VStack(spacing: 12.0) {
                     Group {
-                        VStack(spacing: 6.0) {
+                        HStack(spacing: 6.0) {
                             if let circleImage {
                                 Image(uiImage: circleImage)
                             }
