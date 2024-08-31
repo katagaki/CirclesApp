@@ -52,13 +52,13 @@ struct MainTabView: View {
                     VStack {
                         if let progressTextKey = database.downloadProgressTextKey {
                             Text(NSLocalizedString(progressTextKey, comment: ""))
+                                .foregroundStyle(.secondary)
                         }
                         if isProgressDeterminate {
                             ProgressView(value: database.downloadProgress, total: 1.0)
                             .progressViewStyle(.linear)
                         } else {
                             ProgressView()
-                                .controlSize(.large)
                         }
                     }
                     .padding()
