@@ -13,6 +13,8 @@ struct FavoritesView: View {
     @Environment(FavoritesManager.self) var favorites
     @Environment(DatabaseManager.self) var database
 
+    @State var isPreparing: Bool = false
+
     @State var favoriteCircles: [ComiketCircle] = []
     @State var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
 
@@ -24,6 +26,11 @@ struct FavoritesView: View {
             }
             .navigationTitle("ViewTitle.Favorites")
             .navigationBarTitleDisplayMode(.inline)
+            .overlay {
+                if isPreparing {
+                    ProgressView()
+                }
+            }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .circlesDetail(let circle): CircleDetailView(circle: circle)
@@ -31,20 +38,42 @@ struct FavoritesView: View {
                 }
             }
         }
-        .task {
-            if let token = authManager.token {
-                await favorites.getAll(authToken: token)
-                let favoriteItemsSorted = favorites.items.sorted(by: {
-                    $0.favorite.color.rawValue < $1.favorite.color.rawValue
-                })
-                favoriteCircles.removeAll()
-                favoriteItems.removeAll()
-                for favorite in favoriteItemsSorted {
-                    if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID) {
-                        favoriteCircles.append(webCatalogCircle)
-                        favoriteItems[webCatalogCircle.id] = favorite
-                    }
-                }
+        .refreshable {
+            Task.detached {
+                await reloadFavorites()
+            }
+        }
+        .onChange(of: favorites.items) { _, _ in
+            Task.detached {
+                await reloadFavorites()
+            }
+        }
+    }
+
+    func reloadFavorites() async {
+        await MainActor.run {
+            self.isPreparing = true
+        }
+
+        let favoriteItemsSorted = favorites.items.sorted(by: {
+            $0.favorite.color.rawValue < $1.favorite.color.rawValue
+        })
+
+        var favoriteCircles: [ComiketCircle] = []
+        var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
+
+        for favorite in favoriteItemsSorted {
+            if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID) {
+                favoriteCircles.append(webCatalogCircle)
+                favoriteItems[webCatalogCircle.id] = favorite
+            }
+        }
+
+        await MainActor.run {
+            withAnimation(.snappy.speed(2.0)) {
+                self.favoriteCircles = favoriteCircles
+                self.favoriteItems = favoriteItems
+                self.isPreparing = false
             }
         }
     }

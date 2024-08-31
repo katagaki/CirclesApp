@@ -84,16 +84,21 @@ struct CircleDetailView: View {
         .safeAreaInset(edge: .top) {
             ToolbarAccessory(placement: .top) {
                 VStack(spacing: 12.0) {
-                    Group {
+                    VStack(spacing: 6.0) {
                         HStack(spacing: 6.0) {
-                            if let circleImage {
-                                Image(uiImage: circleImage)
+                            Group {
+                                if let circleCutURL {
+                                    AsyncImage(url: circleCutURL)
+                                } else {
+                                    if let circleImage {
+                                        Image(uiImage: circleImage)
+                                            .resizable()
+                                    }
+                                }
                             }
-                            if let circleCutURL {
-                                AsyncImage(url: circleCutURL)
-                            }
+                            .frame(width: 180.0, height: 256.0, alignment: .center)
+                            .transition(.opacity)
                         }
-                        .frame(width: 180.0, height: 256.0, alignment: .center)
                         Text(circle.bookName)
                     }
                     .padding([.leading, .trailing], 18.0)
@@ -195,7 +200,9 @@ struct CircleDetailView: View {
                                                                 using: extendedInformation,
                                                                 authToken: token),
                    let circleInformation = circleResponse.response.circle {
-                    circleCutURL = URL(string: circleInformation.cutWebURL)
+                    withAnimation(.snappy.speed(2.0)) {
+                        circleCutURL = URL(string: circleInformation.cutWebURL)
+                    }
                 }
             }
         }

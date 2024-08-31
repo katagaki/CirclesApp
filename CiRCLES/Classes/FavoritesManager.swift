@@ -77,7 +77,7 @@ class FavoritesManager {
 
         if let (data, _) = try? await URLSession.shared.data(for: request) {
             debugPrint("Response length after attempting to delete favorite: \(data.count)")
-            if let response = try? JSONDecoder().decode(UserFavorite.self, from: data) {
+            if let response = try? JSONDecoder().decode(UserResponse.self, from: data) {
                 debugPrint("Decoded response")
                 if response.status == "success" {
                     debugPrint("Favorite deleted successfully")
