@@ -109,8 +109,10 @@ struct MainTabView: View {
         if let token = authManager.token {
             await eventManager.getEvents(authToken: token)
             if let latestEvent = eventManager.latestEvent() {
+                UIApplication.shared.isIdleTimerDisabled = true
                 await database.downloadDatabases(for: latestEvent, authToken: token)
                 await database.loadAll()
+                UIApplication.shared.isIdleTimerDisabled = false
                 debugPrint("Database loaded")
             }
         }
