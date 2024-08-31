@@ -13,7 +13,7 @@ struct FavoritesView: View {
     @Environment(FavoritesManager.self) var favorites
     @Environment(DatabaseManager.self) var database
 
-    @State var isPreparing: Bool = false
+    @State var isPreparing: Bool = true
 
     @State var favoriteCircles: [ComiketCircle] = []
     @State var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
@@ -22,31 +22,49 @@ struct FavoritesView: View {
 
     var body: some View {
         NavigationStack(path: $navigationManager[.favorites]) {
-            CircleGrid(circles: favoriteCircles,
-                       favorites: favoriteItems,
-                       namespace: favoritesNamespace) { circle in
-                navigationManager.push(.circlesDetail(circle: circle), for: .favorites)
-            }
-            .navigationTitle("ViewTitle.Favorites")
-            .overlay {
+            ZStack(alignment: .center) {
                 if isPreparing {
-                    ProgressView()
+                    ProgressView("Favorites.Loading")
+                } else {
+                    if favoriteCircles.count == 0 {
+                        ContentUnavailableView(
+                            "Favorites.NoFavorites",
+                            systemImage: "star.leadinghalf.filled",
+                            description: Text("Favorites.NoFavorites.Description")
+                        )
+                    } else {
+                        CircleGrid(circles: favoriteCircles,
+                                   favorites: favoriteItems,
+                                   namespace: favoritesNamespace) { circle in
+                            navigationManager.push(.circlesDetail(circle: circle), for: .favorites)
+                        }
+                    }
                 }
             }
+            .navigationTitle("ViewTitle.Favorites")
             .refreshable {
-                Task.detached {
-                    await reloadFavorites()
+                if let token = authManager.token {
+                    withAnimation(.snappy.speed(2.0)) {
+                        self.isPreparing = true
+                    }
+                    Task.detached {
+                        await favorites.getAll(authToken: token)
+                        await reloadFavorites()
+                        await MainActor.run {
+                            withAnimation(.snappy.speed(2.0)) {
+                                self.isPreparing = false
+                            }
+                        }
+                    }
                 }
             }
             .onChange(of: favorites.items) { _, _ in
                 Task.detached {
                     await reloadFavorites()
-                }
-            }
-            .onChange(of: authManager.token) { _, newValue in
-                if newValue != nil {
-                    Task.detached {
-                        await reloadFavorites()
+                    await MainActor.run {
+                        withAnimation(.snappy.speed(2.0)) {
+                            self.isPreparing = false
+                        }
                     }
                 }
             }
@@ -61,15 +79,12 @@ struct FavoritesView: View {
         }
     }
 
-    func reloadFavorites() async {
-        await MainActor.run {
-            self.isPreparing = true
-        }
+    func reloadFavorites() {
+        debugPrint("Reloading favorites")
 
         let favoriteItemsSorted = favorites.items.sorted(by: {
             $0.favorite.color.rawValue < $1.favorite.color.rawValue
         })
-
         var favoriteCircles: [ComiketCircle] = []
         var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
         for favorite in favoriteItemsSorted {
@@ -79,12 +94,7 @@ struct FavoritesView: View {
             }
         }
 
-        await MainActor.run {
-            withAnimation(.snappy.speed(2.0)) {
-                self.favoriteCircles = favoriteCircles
-                self.favoriteItems = favoriteItems
-                self.isPreparing = false
-            }
-        }
+        self.favoriteCircles = favoriteCircles
+        self.favoriteItems = favoriteItems
     }
 }

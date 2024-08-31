@@ -26,9 +26,17 @@ struct CirclesView: View {
     @Query(sort: [SortDescriptor(\ComiketGenre.id, order: .forward)])
     var genres: [ComiketGenre]
 
+    @Query(sort: [SortDescriptor(\ComiketBlock.id, order: .forward)])
+    var blocks: [ComiketBlock]
+
     @State var displayedCircles: [ComiketCircle] = []
     @State var searchedCircles: [ComiketCircle]?
     @State var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
+
+    @AppStorage(wrappedValue: 0, "Circles.SelectedGenreID") var selectedGenreID: Int
+    @AppStorage(wrappedValue: 0, "Circles.SelectedMapID") var selectedMapID: Int
+    @AppStorage(wrappedValue: 0, "Circles.SelectedBlockID") var selectedBlockID: Int
+    @AppStorage(wrappedValue: 0, "Circles.SelectedDateID") var selectedDateID: Int
 
     @State var selectedGenre: ComiketGenre?
     @State var selectedMap: ComiketMap?
@@ -37,22 +45,26 @@ struct CirclesView: View {
 
     @State var searchTerm: String = ""
 
+    @State var isInitialLoadCompleted: Bool = false
+
     @Namespace var circlesNamespace
 
     var body: some View {
         NavigationStack(path: $navigationManager[.circles]) {
-            Group {
-                if let searchedCircles {
-                    CircleGrid(circles: searchedCircles,
-                               favorites: favoriteItems,
-                               namespace: circlesNamespace) { circle in
-                        navigationManager.push(.circlesDetail(circle: circle), for: .circles)
-                    }
-                } else {
-                    CircleGrid(circles: displayedCircles,
-                               favorites: favoriteItems,
-                               namespace: circlesNamespace) { circle in
-                        navigationManager.push(.circlesDetail(circle: circle), for: .circles)
+            ZStack(alignment: .center) {
+                Group {
+                    if let searchedCircles {
+                        CircleGrid(circles: searchedCircles,
+                                   favorites: favoriteItems,
+                                   namespace: circlesNamespace) { circle in
+                            navigationManager.push(.circlesDetail(circle: circle), for: .circles)
+                        }
+                    } else {
+                        CircleGrid(circles: displayedCircles,
+                                   favorites: favoriteItems,
+                                   namespace: circlesNamespace) { circle in
+                            navigationManager.push(.circlesDetail(circle: circle), for: .circles)
+                        }
                     }
                 }
             }
@@ -72,7 +84,8 @@ struct CirclesView: View {
                     ScrollView(.horizontal) {
                         HStack(spacing: 12.0) {
                             BarAccessoryMenu(LocalizedStringKey(selectedGenre?.name ?? "Shared.Genre"),
-                                             icon: "theatermask.and.paintbrush") {
+                                             icon: (selectedGenre?.name == "ブルーアーカイブ" ?
+                                                    "scope" : "theatermask.and.paintbrush")) {
                                 Picker(selection: $selectedGenre.animation(.snappy.speed(2.0))) {
                                     Text("Shared.All")
                                         .tag(nil as ComiketGenre?)
@@ -135,21 +148,43 @@ struct CirclesView: View {
             .searchable(text: $searchTerm,
                         placement: .navigationBarDrawer(displayMode: .always),
                         prompt: "Circles.Search.Prompt")
-            .onChange(of: selectedGenre) { _, _ in
-                reloadDisplayedCircles()
+            .onAppear {
+                if !isInitialLoadCompleted {
+                    debugPrint("Restoring Circles view state")
+                    selectedGenre = genres.first(where: {$0.id == selectedGenreID})
+                    selectedMap = maps.first(where: {$0.id == selectedMapID})
+                    selectedBlock = blocks.first(where: {$0.id == selectedBlockID})
+                    selectedDate = dates.first(where: {$0.id == selectedDateID})
+                    isInitialLoadCompleted = true
+                }
             }
-            .onChange(of: selectedMap) { oldValue, newValue in
-                if oldValue != newValue {
-                    selectedBlock = nil
-                } else {
+            .onChange(of: selectedGenre) { _, _ in
+                if isInitialLoadCompleted {
+                    selectedGenreID = selectedGenre?.id ?? 0
                     reloadDisplayedCircles()
                 }
             }
+            .onChange(of: selectedMap) { oldValue, newValue in
+                if isInitialLoadCompleted {
+                    selectedMapID = selectedMap?.id ?? 0
+                    if oldValue != newValue {
+                        selectedBlock = nil
+                    } else {
+                        reloadDisplayedCircles()
+                    }
+                }
+            }
             .onChange(of: selectedBlock) { _, _ in
-                reloadDisplayedCircles()
+                if isInitialLoadCompleted {
+                    selectedBlockID = selectedBlock?.id ?? 0
+                    reloadDisplayedCircles()
+                }
             }
             .onChange(of: selectedDate) { _, _ in
-                reloadDisplayedCircles()
+                if isInitialLoadCompleted {
+                    selectedDateID = selectedDate?.id ?? 0
+                    reloadDisplayedCircles()
+                }
             }
             .onChange(of: searchTerm) { _, _ in
                 searchCircles()
