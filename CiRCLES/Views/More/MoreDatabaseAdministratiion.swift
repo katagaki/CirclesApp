@@ -17,9 +17,9 @@ struct MoreDatabaseAdministratiion: View {
         List {
             Section {
                 Button("More.DBAdmin.RedownloadDBs", role: .destructive) {
-                    Task {
-                        if let token = authManager.token,
-                           let latestEvent = catalog.latestEvent() {
+                    if let token = authManager.token,
+                       let latestEvent = catalog.latestEvent() {
+                        Task.detached {
                             database.deleteDatabases()
                             await database.downloadDatabases(for: latestEvent, authToken: token)
                         }
@@ -29,10 +29,14 @@ struct MoreDatabaseAdministratiion: View {
                     withAnimation(.snappy.speed(2.0)) {
                         database.isBusy = true
                     }
-                    database.deleteAllData()
-                    database.loadAll(forcefully: true)
-                    withAnimation(.snappy.speed(2.0)) {
-                        database.isBusy = false
+                    Task.detached {
+                        database.deleteAllData()
+                        database.loadAll(forcefully: true)
+                        await MainActor.run {
+                            withAnimation(.snappy.speed(2.0)) {
+                                database.isBusy = false
+                            }
+                        }
                     }
                 }
             }

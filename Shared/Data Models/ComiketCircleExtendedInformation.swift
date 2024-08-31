@@ -18,7 +18,7 @@ final class ComiketCircleExtendedInformation: SQLiteable {
     var pixivURL: URL?
     var circleMsPortalURL: URL?
 
-    @Relationship(.unique, deleteRule: .deny) var circle: ComiketCircle?
+    @Relationship(.unique, deleteRule: .nullify) var circle: ComiketCircle?
 
     init(from row: Row) {
         let table = Table("ComiketCircleExtend")
