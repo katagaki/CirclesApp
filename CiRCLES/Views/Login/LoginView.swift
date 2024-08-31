@@ -37,6 +37,10 @@ struct LoginView: View {
                 }
                 Spacer()
                 Divider()
+                Text("Login.Subtitle")
+                    .font(.subheadline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Divider()
                 HStack {
                     Image(systemName: "info.circle")
                     Text("Login.Disclaimer")
@@ -44,11 +48,6 @@ struct LoginView: View {
                 }
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-                Divider()
-                Text("Login.Subtitle")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
 //                Button {
 //                    isShowingDemoAlert = true
 //                } label: {

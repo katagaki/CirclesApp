@@ -559,36 +559,53 @@
         }
       }
     },
-    "Shared.LoadingText.DatabaseDownload" : {
+    "Shared.LoadingText.Database" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Downloading databases…"
+            "value" : "Connecting to databases…"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "データベースをダウンロード中…"
+            "value" : "データベースに接続中…"
           }
         }
       }
     },
-    "Shared.LoadingText.Databases" : {
+    "Shared.LoadingText.DownloadImageDatabase" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Loading databases..."
+            "value" : "Downloading images…"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "データベースを読み込み中…"
+            "value" : "画像データをダウンロード中…"
+          }
+        }
+      }
+    },
+    "Shared.LoadingText.DownloadTextDatabase" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading event data…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベントデータをダウンロード中…"
           }
         }
       }
