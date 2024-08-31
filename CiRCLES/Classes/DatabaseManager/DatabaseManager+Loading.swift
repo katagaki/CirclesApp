@@ -12,7 +12,8 @@ import SwiftData
 extension DatabaseManager {
 
     func loadDatabase() {
-        downloadProgressTextKey = "Shared.LoadingText.Databases"
+        downloadProgressTextKey = "Shared.LoadingText.Database"
+
         if let textDatabaseURL {
             do {
                 debugPrint("Opening text database")
