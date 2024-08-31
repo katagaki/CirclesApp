@@ -25,6 +25,13 @@ struct CirclesApp: App {
                     debugPrint("URL scheme invoked: \(url)")
                     authManager.getAuthenticationCode(from: url)
                 }
+                .onChange(of: authManager.code) { _, newValue in
+                    if newValue != nil {
+                        Task {
+                            await authManager.getAuthenticationToken()
+                        }
+                    }
+                }
         }
         .modelContainer(sharedModelContainer)
         .environmentObject(navigationManager)
