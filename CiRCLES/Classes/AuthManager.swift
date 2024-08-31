@@ -100,6 +100,7 @@ class AuthManager {
             decodeAuthenticationToken(data: data)
         } else {
             self.token = nil
+            self.isAuthenticating = true
         }
     }
 
@@ -115,6 +116,7 @@ class AuthManager {
                 decodeAuthenticationToken(data: data)
             } else {
                 self.token = nil
+                self.isAuthenticating = true
             }
         } else {
             debugPrint("No refresh token to use!")
@@ -135,6 +137,7 @@ class AuthManager {
         } else {
             self.code = nil
             self.token = nil
+            self.isAuthenticating = true
         }
     }
     // swiftlint:enable non_optional_string_data_conversion
