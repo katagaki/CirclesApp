@@ -26,6 +26,7 @@
 		E472690C2C3D742300D5335D /* OpenID-Sample.plist in Resources */ = {isa = PBXBuildFile; fileRef = E472690B2C3D742300D5335D /* OpenID-Sample.plist */; };
 		E472690F2C3D767000D5335D /* OpenIDClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = E472690E2C3D766C00D5335D /* OpenIDClient.swift */; };
 		E4755B9F2C8296C30032DA2F /* Downloader.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755B9E2C8296BE0032DA2F /* Downloader.swift */; };
+		E4755BAA2C82BF8F0032DA2F /* UserResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BA92C82BF8E0032DA2F /* UserResponse.swift */; };
 		E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA732C441B64009C1445 /* OpenIDToken.swift */; };
 		E480AA772C441DD1009C1445 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA762C441DD1009C1445 /* KeychainAccess */; };
 		E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA7A2C44230B009C1445 /* SwiftData.swift */; };
@@ -102,6 +103,7 @@
 		E472690E2C3D766C00D5335D /* OpenIDClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenIDClient.swift; sourceTree = "<group>"; };
 		E47269122C3D796800D5335D /* ci_post_clone.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = ci_post_clone.sh; sourceTree = "<group>"; };
 		E4755B9E2C8296BE0032DA2F /* Downloader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Downloader.swift; sourceTree = "<group>"; };
+		E4755BA92C82BF8E0032DA2F /* UserResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserResponse.swift; sourceTree = "<group>"; };
 		E480AA732C441B64009C1445 /* OpenIDToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenIDToken.swift; sourceTree = "<group>"; };
 		E480AA7A2C44230B009C1445 /* SwiftData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftData.swift; sourceTree = "<group>"; };
 		E480AA7E2C4423AD009C1445 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
@@ -286,6 +288,7 @@
 		E480AA8E2C442CAA009C1445 /* API */ = {
 			isa = PBXGroup;
 			children = (
+				E4755BA92C82BF8E0032DA2F /* UserResponse.swift */,
 				E4CA64552C81FCC1001F50BB /* UserFavorite.swift */,
 				E480AA952C44A15A009C1445 /* UserCircle.swift */,
 				E48B62922C5FC1BE007874AE /* UserFavorites.swift */,
@@ -566,6 +569,7 @@
 				E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */,
 				E49351F12C4CD0C3004CBDA1 /* ComiketLayout.swift in Sources */,
 				E43C74102C6EDD85003522C8 /* LoginFeatureHero.swift in Sources */,
+				E4755BAA2C82BF8F0032DA2F /* UserResponse.swift in Sources */,
 				E480AA982C44A473009C1445 /* CatalogManager.swift in Sources */,
 				E49352042C4CF4A1004CBDA1 /* ComiketHall.swift in Sources */,
 				E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */,

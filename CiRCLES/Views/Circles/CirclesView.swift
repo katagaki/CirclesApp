@@ -12,11 +12,13 @@ struct CirclesView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
+    @Environment(FavoritesManager.self) var favorites
     @Environment(CatalogManager.self) var catalog
     @Environment(DatabaseManager.self) var database
 
     @State var displayedCircles: [ComiketCircle] = []
     @State var searchedCircles: [ComiketCircle]?
+    @State var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
 
     @State var selectedBlock: ComiketBlock?
     @State var selectedDate: ComiketDate?
@@ -28,11 +30,13 @@ struct CirclesView: View {
         NavigationStack(path: $navigationManager[.circles]) {
             Group {
                 if let searchedCircles {
-                    CircleGrid(circles: searchedCircles) { circle in
+                    CircleGrid(circles: searchedCircles,
+                               favorites: favoriteItems) { circle in
                         navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                     }
                 } else {
-                    CircleGrid(circles: displayedCircles) { circle in
+                    CircleGrid(circles: displayedCircles,
+                               favorites: favoriteItems) { circle in
                         navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                     }
                 }
@@ -97,7 +101,9 @@ struct CirclesView: View {
                     .scrollIndicators(.hidden)
                 }
             }
-            .searchable(text: $searchTerm, placement: .navigationBarDrawer(displayMode: .always), prompt: "Circles.Search.Prompt")
+            .searchable(text: $searchTerm,
+                        placement: .navigationBarDrawer(displayMode: .always),
+                        prompt: "Circles.Search.Prompt")
             .onChange(of: selectedGenre) { _, _ in
                 reloadDisplayedCircles()
             }
@@ -133,7 +139,19 @@ struct CirclesView: View {
                 !circlesInSelectedBlock.contains($0)
             })
         }
-        self.displayedCircles = displayedCircles
+
+        var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
+        for favorite in favorites.items {
+            if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID),
+               displayedCircles.contains(webCatalogCircle) {
+                favoriteItems[webCatalogCircle.id] = favorite
+            }
+        }
+
+        withAnimation(.snappy.speed(2.0)) {
+            self.favoriteItems = favoriteItems
+            self.displayedCircles = displayedCircles
+        }
     }
 
     func searchCircles() {
