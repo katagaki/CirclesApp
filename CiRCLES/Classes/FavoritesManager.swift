@@ -11,17 +11,28 @@ import Foundation
 @MainActor
 class FavoritesManager {
     var items: [UserFavorites.Response.FavoriteItem] = []
+    var wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
+    var isFirstRefreshComplete: Bool = false
+    var isRefreshing: Bool = false
 
     func getAll(authToken: OpenIDToken) async {
         let request = urlRequestForReadersAPI(endpoint: "FavoriteCircles", authToken: authToken)
 
+        isRefreshing = true
         if let (data, _) = try? await URLSession.shared.data(for: request) {
             debugPrint("Favorites response length: \(data.count)")
             if let favorites = try? JSONDecoder().decode(UserFavorites.self, from: data) {
                 debugPrint("Decoded favorites")
-                self.items = favorites.response.list
+                self.items = favorites.response.list.sorted(by: {
+                    $0.favorite.color.rawValue < $1.favorite.color.rawValue
+                })
+                for favorite in items {
+                    wcIDMappedItems[favorite.circle.webCatalogID] = favorite
+                }
             }
         }
+        isRefreshing = false
+        isFirstRefreshComplete = true
     }
 
     func contains(_ extendedInformation: ComiketCircleExtendedInformation?) -> Bool {

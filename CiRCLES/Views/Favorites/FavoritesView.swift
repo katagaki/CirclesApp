@@ -13,17 +13,15 @@ struct FavoritesView: View {
     @Environment(FavoritesManager.self) var favorites
     @Environment(DatabaseManager.self) var database
 
-    @State var isPreparing: Bool = true
-
     @State var favoriteCircles: [ComiketCircle] = []
-    @State var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
+    @State var isPreparingCircles: Bool = false
 
     @Namespace var favoritesNamespace
 
     var body: some View {
         NavigationStack(path: $navigationManager[.favorites]) {
             ZStack(alignment: .center) {
-                if isPreparing {
+                if favorites.isRefreshing || !favorites.isFirstRefreshComplete || isPreparingCircles {
                     ProgressView("Favorites.Loading")
                 } else {
                     if favoriteCircles.count == 0 {
@@ -34,7 +32,7 @@ struct FavoritesView: View {
                         )
                     } else {
                         CircleGrid(circles: favoriteCircles,
-                                   favorites: favoriteItems,
+                                   favorites: favorites.wcIDMappedItems,
                                    namespace: favoritesNamespace) { circle in
                             navigationManager.push(.circlesDetail(circle: circle), for: .favorites)
                         }
@@ -44,28 +42,24 @@ struct FavoritesView: View {
             .navigationTitle("ViewTitle.Favorites")
             .refreshable {
                 if let token = authManager.token {
-                    withAnimation(.snappy.speed(2.0)) {
-                        self.isPreparing = true
-                    }
                     Task.detached {
                         await favorites.getAll(authToken: token)
-                        await reloadFavorites()
-                        await MainActor.run {
-                            withAnimation(.snappy.speed(2.0)) {
-                                self.isPreparing = false
-                            }
-                        }
                     }
                 }
             }
             .onChange(of: favorites.items) { _, _ in
-                Task.detached {
-                    await reloadFavorites()
-                    await MainActor.run {
-                        withAnimation(.snappy.speed(2.0)) {
-                            self.isPreparing = false
-                        }
+                debugPrint("Reloading favorites")
+                withAnimation(.snappy.speed(2.0)) {
+                    isPreparingCircles = true
+                }
+                favoriteCircles.removeAll()
+                for favorite in favorites.items {
+                    if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID) {
+                        favoriteCircles.append(webCatalogCircle)
                     }
+                }
+                withAnimation(.snappy.speed(2.0)) {
+                    isPreparingCircles = false
                 }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
@@ -77,24 +71,5 @@ struct FavoritesView: View {
                 }
             }
         }
-    }
-
-    func reloadFavorites() {
-        debugPrint("Reloading favorites")
-
-        let favoriteItemsSorted = favorites.items.sorted(by: {
-            $0.favorite.color.rawValue < $1.favorite.color.rawValue
-        })
-        var favoriteCircles: [ComiketCircle] = []
-        var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
-        for favorite in favoriteItemsSorted {
-            if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID) {
-                favoriteCircles.append(webCatalogCircle)
-                favoriteItems[webCatalogCircle.id] = favorite
-            }
-        }
-
-        self.favoriteCircles = favoriteCircles
-        self.favoriteItems = favoriteItems
     }
 }

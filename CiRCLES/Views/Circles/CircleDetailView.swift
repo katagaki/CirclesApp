@@ -84,22 +84,37 @@ struct CircleDetailView: View {
         .safeAreaInset(edge: .top) {
             ToolbarAccessory(placement: .top) {
                 VStack(spacing: 12.0) {
-                    VStack(spacing: 6.0) {
-                        HStack(spacing: 6.0) {
-                            Group {
-                                if let circleCutURL {
-                                    AsyncImage(url: circleCutURL)
-                                } else {
-                                    if let circleImage {
-                                        Image(uiImage: circleImage)
-                                            .resizable()
-                                    }
+                    VStack(spacing: 10.0) {
+                        Group {
+                            if let circleCutURL {
+                                AsyncImage(url: circleCutURL)
+                            } else {
+                                if let circleImage {
+                                    Image(uiImage: circleImage)
+                                        .resizable()
                                 }
                             }
-                            .frame(width: 180.0, height: 256.0, alignment: .center)
-                            .transition(.opacity)
                         }
-                        Text(circle.bookName)
+                        .frame(width: 180.0, height: 256.0, alignment: .center)
+                        .transition(.opacity)
+                        if let block = database.block(circle.blockID) {
+                            Text("\(block.name)\(circle.spaceNumberCombined())")
+                            .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(Color.init(uiColor: UIColor.label))
+                                .padding([.top, .bottom], 2.0)
+                                .padding([.leading, .trailing], 6.0)
+                                .background(Material.ultraThin)
+                                .clipShape(.capsule)
+                                .overlay {
+                                    Capsule()
+                                        .stroke(lineWidth: 1)
+                                        .foregroundColor(.secondary)
+                                }
+                        }
+                        if (circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "") {
+                            Text(circle.bookName)
+                        }
                     }
                     .padding([.leading, .trailing], 18.0)
                     if let extendedInformation {
