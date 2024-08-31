@@ -108,7 +108,6 @@ class FavoritesManager {
             request.httpMethod = method
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue("Bearer \(authToken.accessToken)", forHTTPHeaderField: "Authorization")
-
             return request
         } else {
             fatalError("Fatal error when trying to get URL request for Favorites API")

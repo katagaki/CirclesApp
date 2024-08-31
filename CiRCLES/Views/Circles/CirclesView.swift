@@ -12,7 +12,7 @@ struct CirclesView: View {
 
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
-    @Environment(EventManager.self) var eventManager
+    @Environment(CatalogManager.self) var catalog
     @Environment(DatabaseManager.self) var database
 
     @State var displayedCircles: [ComiketCircle] = []

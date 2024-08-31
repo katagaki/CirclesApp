@@ -10,7 +10,7 @@ import SwiftUI
 
 struct MoreDatabaseAdministratiion: View {
     @Environment(AuthManager.self) var authManager
-    @Environment(EventManager.self) var eventManager
+    @Environment(CatalogManager.self) var catalog
     @Environment(DatabaseManager.self) var database
 
     var body: some View {
@@ -26,7 +26,7 @@ struct MoreDatabaseAdministratiion: View {
                     }
                     Task {
                         if let token = authManager.token,
-                           let latestEvent = eventManager.latestEvent() {
+                           let latestEvent = catalog.latestEvent() {
                             await database.downloadDatabases(for: latestEvent, authToken: token)
                             await database.loadAll()
                             database.isBusy = false

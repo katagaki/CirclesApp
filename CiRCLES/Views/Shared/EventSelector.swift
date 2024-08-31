@@ -9,17 +9,17 @@ import SwiftUI
 
 struct EventSelector: View {
     @Environment(AuthManager.self) var authManager
-    @Environment(EventManager.self) var eventManager
+    @Environment(CatalogManager.self) var catalog
 
     var body: some View {
         List {
-            ForEach(eventManager.events ?? [], id: \.id) { event in
+            ForEach(catalog.events ?? [], id: \.id) { event in
                 Text(String(event.id))
             }
         }
         .task {
             if let token = authManager.token {
-                await eventManager.getEvents(authToken: token)
+                await catalog.getEvents(authToken: token)
             }
         }
     }
