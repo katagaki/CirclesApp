@@ -22,14 +22,19 @@ struct MapView: View {
     @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
     var maps: [ComiketMap]
 
+    @AppStorage(wrappedValue: 0, "Map.SelectedEventDateID") var selectedEventDateID: Int
+    @AppStorage(wrappedValue: 0, "Map.SelectedMapID") var selectedMapID: Int
+
     @State var selectedEventDate: ComiketDate?
     @State var selectedMap: ComiketMap?
+
+    @State var isSettingsRestored: Bool = false
 
     var body: some View {
         NavigationStack(path: $navigationManager[.map]) {
             InteractiveMap(
-                selectedEventDate: $selectedEventDate,
-                selectedMap: $selectedMap
+                date: $selectedEventDate,
+                map: $selectedMap
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationBarTitleDisplayMode(.inline)
@@ -93,6 +98,20 @@ struct MapView: View {
                         orientation = newOrientation
                     }
                 }
+            }
+            .onAppear {
+                if !isSettingsRestored {
+                    debugPrint("Restoring Maps view state")
+                    selectedEventDate = dates.first(where: {$0.id == selectedEventDateID})
+                    selectedMap = maps.first(where: {$0.id == selectedMapID})
+                    isSettingsRestored = true
+                }
+            }
+            .onChange(of: selectedEventDate) { _, _ in
+                selectedEventDateID = selectedEventDate?.id ?? 0
+            }
+            .onChange(of: selectedMap) { _, _ in
+                selectedMapID = selectedMap?.id ?? 0
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {

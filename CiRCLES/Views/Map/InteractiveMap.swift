@@ -13,14 +13,14 @@ struct InteractiveMap: View {
 
     let spaceSize: Int = 40
 
-    @Binding var selectedEventDate: ComiketDate?
-    @Binding var selectedMap: ComiketMap?
+    @Binding var date: ComiketDate?
+    @Binding var map: ComiketMap?
 
     @State var mapImage: UIImage?
     @State var circles: [ComiketCircle] = []
     @State var layouts: [ComiketLayout] = []
 
-    @State var zoomDivisor: Int = 1
+    @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -32,11 +32,12 @@ struct InteractiveMap: View {
                             width: CGFloat(Int(mapImage.size.width) / zoomDivisor),
                             height: CGFloat(Int(mapImage.size.height) / zoomDivisor)
                         )
+                        .animation(.smooth.speed(2.0), value: zoomDivisor)
                         .colorInvert(adaptive: true)
                         .overlay {
                             ZStack(alignment: .topLeading) {
                                 ForEach(layouts, id: \.self) { layout in
-                                    InteractiveMapButton(selectedEventDate: $selectedEventDate, layout: layout)
+                                    InteractiveMapButton(selectedEventDate: $date, layout: layout)
                                     .position(
                                         x: CGFloat((layout.hdPosition.x + Int(spaceSize / 2)) / zoomDivisor),
                                         y: CGFloat((layout.hdPosition.y + Int(spaceSize / 2)) / zoomDivisor)
@@ -56,9 +57,7 @@ struct InteractiveMap: View {
                     ZStack(alignment: .bottomTrailing) {
                         VStack(alignment: .center, spacing: 0.0) {
                             Button {
-                                withAnimation(.smooth.speed(2.0)) {
-                                    zoomDivisor -= 1
-                                }
+                                zoomDivisor -= 1
                             } label: {
                                 Image(systemName: "plus")
                                     .font(.title)
@@ -68,9 +67,7 @@ struct InteractiveMap: View {
                             .disabled(zoomDivisor <= 1)
                             Divider()
                             Button {
-                                withAnimation(.smooth.speed(2.0)) {
-                                    zoomDivisor += 1
-                                }
+                                zoomDivisor += 1
                             } label: {
                                 Image(systemName: "minus")
                                     .font(.title)
@@ -89,7 +86,10 @@ struct InteractiveMap: View {
                 }
             }
         }
-        .onChange(of: selectedMap) { _, _ in
+        .onChange(of: database.commonImages) { _, _ in
+            reloadAll()
+        }
+        .onChange(of: map) { _, _ in
             reloadAll()
         }
     }
@@ -103,24 +103,24 @@ struct InteractiveMap: View {
     }
 
     func reloadMapImage() {
-        if let selectedEventDate, let selectedMap, let selectedHall = ComiketHall(rawValue: selectedMap.filename) {
+        if let date, let map, let selectedHall = ComiketHall(rawValue: map.filename) {
             mapImage = database.mapImage(
                 for: selectedHall,
-                on: selectedEventDate.id,
+                on: date.id,
                 usingHighDefinition: true
             )
         }
     }
 
     func reloadMapCircles() {
-        if let selectedEventDate {
-            circles = database.circles(on: selectedEventDate.id)
+        if let date {
+            circles = database.circles(on: date.id)
         }
     }
 
     func reloadMapLayouts() {
-        if let selectedMap {
-            layouts = database.layouts(for: selectedMap)
+        if let map {
+            layouts = database.layouts(for: map)
         }
     }
 }

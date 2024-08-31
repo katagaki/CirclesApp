@@ -17,14 +17,15 @@ extension DatabaseManager {
         downloadProgressTextKey = "Shared.LoadingText.Images"
         if let imageDatabase {
             debugPrint("Loading common images")
-            self.commonImages.removeAll()
             do {
                 let table = Table("ComiketCommonImage")
                 let colName = Expression<String>("name")
                 let colImage = Expression<Data>("image")
+                var commonImages: [String: Data] = [:]
                 for row in try imageDatabase.prepare(table) {
-                    self.commonImages[row[colName]] = row[colImage]
+                    commonImages[row[colName]] = row[colImage]
                 }
+                self.commonImages = commonImages
             } catch {
                 debugPrint(error.localizedDescription)
             }
@@ -54,14 +55,15 @@ extension DatabaseManager {
         if forcefully || self.circleImages.count == 0 {
             if let imageDatabase {
                 debugPrint("Loading circle images")
-                self.circleImages.removeAll()
                 do {
                     let table = Table("ComiketCircleImage")
                     let colID = Expression<Int>("id")
                     let colCutImage = Expression<Data>("cutImage")
+                    var circleImages: [Int: Data] = [:]
                     for row in try imageDatabase.prepare(table) {
-                        self.circleImages[row[colID]] = row[colCutImage]
+                        circleImages[row[colID]] = row[colCutImage]
                     }
+                    self.circleImages = circleImages
                 } catch {
                     debugPrint(error.localizedDescription)
                 }
