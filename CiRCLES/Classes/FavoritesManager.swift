@@ -24,6 +24,14 @@ class FavoritesManager {
         }
     }
 
+    func contains(_ extendedInformation: ComiketCircleExtendedInformation?) -> Bool {
+        if let extendedInformation {
+            return items.contains(where: { $0.circle.webCatalogID == extendedInformation.webCatalogID})
+        } else {
+            return false
+        }
+    }
+
     func add(
         _ circle: ComiketCircle,
         using extendedInformation: ComiketCircleExtendedInformation,
@@ -47,6 +55,31 @@ class FavoritesManager {
                 debugPrint("Decoded response")
                 if response.status == "success" {
                     debugPrint("Favorite added successfully")
+                }
+            }
+        }
+    }
+
+    func delete(
+        using extendedInformation: ComiketCircleExtendedInformation,
+        authToken: OpenIDToken
+    ) async {
+        let request = urlRequestForReadersAPI(
+            endpoint: "Favorite",
+            method: "DELETE",
+            parameters: [
+                "access_token": authToken.accessToken,
+                "wcid": String(extendedInformation.webCatalogID)
+                ],
+            authToken: authToken
+        )
+
+        if let (data, _) = try? await URLSession.shared.data(for: request) {
+            debugPrint("Response length after attempting to delete favorite: \(data.count)")
+            if let response = try? JSONDecoder().decode(UserFavorite.self, from: data) {
+                debugPrint("Decoded response")
+                if response.status == "success" {
+                    debugPrint("Favorite deleted successfully")
                 }
             }
         }

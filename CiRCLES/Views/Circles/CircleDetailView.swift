@@ -29,21 +29,24 @@ struct CircleDetailView: View {
 
     var body: some View {
         List {
-            if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
-                Section {
+            Section {
+                if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
                     Text(circle.supplementaryDescription)
                         .textSelection(.enabled)
-                } header: {
-                    HStack {
-                        ListSectionHeader(text: "Shared.Description")
-                        Spacer()
-                        Button("Shared.Translate", systemImage: "character.bubble") {
-                            textToTranslate = circle.supplementaryDescription
-                            isShowingTranslationPopover = true
-                        }
-                        .textCase(nil)
-                        .foregroundStyle(.teal)
+                } else {
+                    Text("Circles.NoDescription")
+                        .foregroundStyle(.secondary)
+                }
+            } header: {
+                HStack {
+                    ListSectionHeader(text: "Shared.Description")
+                    Spacer()
+                    Button("Shared.Translate", systemImage: "character.bubble") {
+                        textToTranslate = circle.supplementaryDescription
+                        isShowingTranslationPopover = true
                     }
+                    .textCase(nil)
+                    .foregroundStyle(.teal)
                 }
             }
             if circle.memo.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
@@ -91,18 +94,36 @@ struct CircleDetailView: View {
                         ScrollView(.horizontal) {
                             HStack(spacing: 10.0) {
                                 Group {
-                                    Button {
-                                        isAddingToFavorites = true
-                                    } label: {
-                                        Image(systemName: "star.fill")
-                                            .resizable()
-                                            .padding(2.0)
-                                            .frame(width: 28.0, height: 28.0)
-                                            .scaledToFit()
-                                        Text("Shared.AddToFavorites")
-                                    }
-                                    .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
-                                        FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
+                                    if favorites.contains(extendedInformation) {
+                                        Button {
+                                            if let token = authManager.token {
+                                                Task {
+                                                    await favorites.delete(using: extendedInformation, authToken: token)
+                                                    isAddingToFavorites = false
+                                                }
+                                            }
+                                        } label: {
+                                            Image(systemName: "star.slash.fill")
+                                                .resizable()
+                                                .padding(2.0)
+                                                .frame(width: 28.0, height: 28.0)
+                                                .scaledToFit()
+                                            Text("Shared.RemoveFromFavorites")
+                                        }
+                                    } else {
+                                        Button {
+                                            isAddingToFavorites = true
+                                        } label: {
+                                            Image(systemName: "star.fill")
+                                                .resizable()
+                                                .padding(2.0)
+                                                .frame(width: 28.0, height: 28.0)
+                                                .scaledToFit()
+                                            Text("Shared.AddToFavorites")
+                                        }
+                                        .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
+                                            FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
+                                        }
                                     }
                                     if let twitterURL = extendedInformation.twitterURL {
                                         Button {

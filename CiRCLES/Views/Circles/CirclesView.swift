@@ -41,7 +41,7 @@ struct CirclesView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .tabBar)
             .overlay {
-                if selectedBlock == nil {
+                if selectedGenre == nil && selectedBlock == nil {
                     ContentUnavailableView(
                         "Circles.NoFilterSelected",
                         systemImage: "questionmark.square.dashed",
