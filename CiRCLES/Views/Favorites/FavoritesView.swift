@@ -43,6 +43,13 @@ struct FavoritesView: View {
                     await reloadFavorites()
                 }
             }
+            .onChange(of: authManager.token) { _, newValue in
+                if newValue != nil {
+                    Task.detached {
+                        await reloadFavorites()
+                    }
+                }
+            }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .circlesDetail(let circle):
