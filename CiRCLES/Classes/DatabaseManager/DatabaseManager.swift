@@ -41,23 +41,26 @@ class DatabaseManager {
         modelContext = sharedModelContainer.mainContext
     }
 
-    func deleteAllData() {
+    func deleteDatabases() {
         if let documentsDirectoryURL {
             try? FileManager.default.removeItem(at: documentsDirectoryURL)
             textDatabaseURL = nil
             imageDatabaseURL = nil
             textDatabase = nil
             imageDatabase = nil
-            try? modelContext.delete(model: ComiketEvent.self)
-            try? modelContext.delete(model: ComiketDate.self)
-            try? modelContext.delete(model: ComiketMap.self)
-            try? modelContext.delete(model: ComiketArea.self)
-            try? modelContext.delete(model: ComiketBlock.self)
-            try? modelContext.delete(model: ComiketMapping.self)
-            try? modelContext.delete(model: ComiketGenre.self)
-            try? modelContext.delete(model: ComiketLayout.self)
-            try? modelContext.delete(model: ComiketCircle.self)
         }
+    }
+
+    func deleteAllData() {
+        try? modelContext.delete(model: ComiketEvent.self)
+        try? modelContext.delete(model: ComiketDate.self)
+        try? modelContext.delete(model: ComiketMap.self)
+        try? modelContext.delete(model: ComiketArea.self)
+        try? modelContext.delete(model: ComiketBlock.self)
+        try? modelContext.delete(model: ComiketMapping.self)
+        try? modelContext.delete(model: ComiketGenre.self)
+        try? modelContext.delete(model: ComiketLayout.self)
+        try? modelContext.delete(model: ComiketCircle.self)
     }
 
 }

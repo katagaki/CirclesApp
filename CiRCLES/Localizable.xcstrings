@@ -264,22 +264,6 @@
         }
       }
     },
-    "More.DBAdmin.DeleteDBs" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete All Event Data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "すべてのイベントデータを消去"
-          }
-        }
-      }
-    },
     "More.DBAdmin.ManageDB" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -297,7 +281,25 @@
         }
       }
     },
-    "More.DBAdmin.ReloadDBs" : {
+    "More.DBAdmin.RedownloadDBs" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Re-download Event Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベントデータを再ダウンロード"
+          }
+        }
+      }
+    },
+    "More.DBAdmin.RepairData" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {

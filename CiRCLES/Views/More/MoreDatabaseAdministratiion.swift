@@ -16,19 +16,23 @@ struct MoreDatabaseAdministratiion: View {
     var body: some View {
         List {
             Section {
-                Button("More.DBAdmin.DeleteDBs", role: .destructive) {
-                    database.deleteAllData()
-                }
-                Button("More.DBAdmin.ReloadDBs", role: .destructive) {
-                    withAnimation(.snappy.speed(2.0)) {
-                        database.isBusy = true
-                    }
+                Button("More.DBAdmin.RedownloadDBs", role: .destructive) {
                     Task {
                         if let token = authManager.token,
                            let latestEvent = catalog.latestEvent() {
-                            await database.loadAll(forcefully: true)
-                            database.isBusy = false
+                            database.deleteDatabases()
+                            await database.downloadDatabases(for: latestEvent, authToken: token)
                         }
+                    }
+                }
+                Button("More.DBAdmin.RepairData", role: .destructive) {
+                    withAnimation(.snappy.speed(2.0)) {
+                        database.isBusy = true
+                    }
+                    database.deleteAllData()
+                    database.loadAll(forcefully: true)
+                    withAnimation(.snappy.speed(2.0)) {
+                        database.isBusy = false
                     }
                 }
             }

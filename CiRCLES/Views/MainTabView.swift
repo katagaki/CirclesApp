@@ -110,7 +110,7 @@ struct MainTabView: View {
             if let latestEvent = catalog.latestEvent() {
                 UIApplication.shared.isIdleTimerDisabled = true
                 await database.downloadDatabases(for: latestEvent, authToken: token)
-                await database.loadAll()
+                database.loadAll()
                 UIApplication.shared.isIdleTimerDisabled = false
             }
         }
