@@ -120,6 +120,7 @@ class AuthManager {
             }
         } else {
             debugPrint("No refresh token to use!")
+            self.isAuthenticating = true
         }
     }
 

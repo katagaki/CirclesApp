@@ -54,7 +54,7 @@ struct MoreView: View {
                     }
                     .contextMenu {
                         Button("Shared.LoginAgain", role: .destructive) {
-                            authManager.token = nil
+                            authManager.isAuthenticating = true
                         }
                     }
                 }
