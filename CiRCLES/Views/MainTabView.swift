@@ -80,13 +80,10 @@ struct MainTabView: View {
         }
         .onChange(of: authManager.token) { _, newValue in
             if let newValue {
-                authManager.isAuthenticating = false
                 Task.detached {
                     await loadDatabase()
                     await favorites.getAll(authToken: newValue)
                 }
-            } else {
-                authManager.isAuthenticating = true
             }
         }
         .onChange(of: database.downloadProgress) { _, newValue in
