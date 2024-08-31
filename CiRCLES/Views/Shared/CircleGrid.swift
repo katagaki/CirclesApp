@@ -20,6 +20,8 @@ struct CircleGrid: View {
 
     let gridSpacing: CGFloat = 1.0
 
+    @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
+
     var body: some View {
 
         let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 70.0), spacing: gridSpacing)]
@@ -43,7 +45,7 @@ struct CircleGrid: View {
                                     .resizable()
                                     .scaledToFit()
                             } else {
-                                ZStack {
+                                ZStack(alignment: .center) {
                                     ProgressView()
                                     Color.clear
                                 }
@@ -61,6 +63,27 @@ struct CircleGrid: View {
                                             .offset(x: 0.03 * proxy.size.width,
                                                     y: 0.03 * proxy.size.width)
                                     }
+                                    Color.clear
+                                }
+                            }
+                        }
+                        .overlay {
+                            if showHallAndBlock, let block = database.block(circle.blockID) {
+                                ZStack(alignment: .bottomTrailing) {
+                                    Text("\(block.name)\(circle.spaceNumberCombined())")
+                                        .font(.caption)
+                                        .fontWeight(.semibold)
+                                        .foregroundStyle(Color.init(uiColor: UIColor.label))
+                                        .padding([.top, .bottom], 2.0)
+                                        .padding([.leading, .trailing], 6.0)
+                                        .background(Material.ultraThin)
+                                        .clipShape(.capsule)
+                                        .overlay {
+                                            Capsule()
+                                                .stroke(lineWidth: 1)
+                                                .foregroundColor(.secondary)
+                                        }
+                                        .padding(2.0)
                                     Color.clear
                                 }
                             }

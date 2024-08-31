@@ -1,6 +1,16 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "%@%@" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@%2$@"
+          }
+        }
+      }
+    },
     "Alert.Unavailable.Text" : {
       "localizations" : {
         "en" : {
@@ -292,6 +302,27 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サークルズにログイン"
+          }
+        }
+      }
+    },
+    "More.Customization" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カスタマイズ"
+          }
+        }
+      }
+    },
+    "More.Customization.ShowHallAndBlock" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "棟とブロックを表示"
           }
         }
       }

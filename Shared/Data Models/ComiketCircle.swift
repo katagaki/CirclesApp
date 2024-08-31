@@ -94,4 +94,15 @@ final class ComiketCircle: SQLiteable {
         self.rss = row[colRSS]
         self.updateFlag = row[colUpdateFlag]
     }
+
+    func spaceNumberCombined() -> String {
+        var combinedSpaceNumber = String(spaceNumber)
+        switch spaceNumberSuffix {
+        case 0: combinedSpaceNumber += "a"
+        case 1: combinedSpaceNumber += "b"
+        case 2: combinedSpaceNumber += "c"
+        default: break
+        }
+        return combinedSpaceNumber
+    }
 }
