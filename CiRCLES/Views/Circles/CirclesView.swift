@@ -20,6 +20,7 @@ struct CirclesView: View {
 
     @State var selectedBlock: ComiketBlock?
     @State var selectedDate: ComiketDate?
+    @State var selectedGenre: ComiketGenre?
 
     @State var searchTerm: String = ""
 
@@ -52,6 +53,18 @@ struct CirclesView: View {
                 BarAccessory(placement: .bottom) {
                     ScrollView(.horizontal) {
                         HStack(spacing: 12.0) {
+                            BarAccessoryMenu("Shared.Genre", icon: "theatermask.and.paintbrush") {
+                                Picker(selection: $selectedGenre) {
+                                    Text("Shared.All")
+                                        .tag(nil as ComiketGenre?)
+                                    ForEach(database.eventGenres, id: \.id) { genre in
+                                        Text(genre.name)
+                                            .tag(genre)
+                                    }
+                                } label: {
+                                    Text("Shared.Genre")
+                                }
+                            }
                             BarAccessoryMenu("Shared.Block", icon: "table.furniture") {
                                 ForEach(database.eventMaps, id: \.id) { map in
                                     Picker(selection: $selectedBlock) {
@@ -85,6 +98,9 @@ struct CirclesView: View {
                 }
             }
             .searchable(text: $searchTerm, placement: .navigationBarDrawer(displayMode: .always), prompt: "Circles.Search.Prompt")
+            .onChange(of: selectedGenre) { _, _ in
+                reloadDisplayedCircles()
+            }
             .onChange(of: selectedBlock) { _, _ in
                 reloadDisplayedCircles()
             }
@@ -104,15 +120,20 @@ struct CirclesView: View {
     }
 
     func reloadDisplayedCircles() {
-        if let selectedBlock {
-            var newDisplayedCircles = database.circles(in: selectedBlock).sorted(by: {$0.id < $1.id})
-            if let selectedDate {
-                newDisplayedCircles.removeAll(where: { $0.day != selectedDate.id })
-            }
-            displayedCircles = newDisplayedCircles
-        } else {
-            displayedCircles.removeAll()
+        var displayedCircles: [ComiketCircle] = []
+        if let selectedGenre {
+            displayedCircles = database.circles(with: selectedGenre)
         }
+        if let selectedBlock {
+            var circlesInSelectedBlock = database.circles(in: selectedBlock).sorted(by: {$0.id < $1.id})
+            if let selectedDate {
+                circlesInSelectedBlock.removeAll(where: { $0.day != selectedDate.id })
+            }
+            displayedCircles.removeAll(where: {
+                !circlesInSelectedBlock.contains($0)
+            })
+        }
+        self.displayedCircles = displayedCircles
     }
 
     func searchCircles() {
