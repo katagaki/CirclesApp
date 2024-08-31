@@ -47,20 +47,14 @@ struct FavoritesView: View {
                     }
                 }
             }
+            .onAppear {
+                if favoriteCircles.count == 0 {
+                    prepareCircles()
+                }
+            }
             .onChange(of: favorites.items) { _, _ in
-                debugPrint("Reloading favorites")
-                withAnimation(.snappy.speed(2.0)) {
-                    isPreparingCircles = true
-                }
-                favoriteCircles.removeAll()
-                for favorite in favorites.items {
-                    if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID) {
-                        favoriteCircles.append(webCatalogCircle)
-                    }
-                }
-                withAnimation(.snappy.speed(2.0)) {
-                    isPreparingCircles = false
-                }
+                debugPrint("Preparing favorites")
+                prepareCircles()
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
@@ -70,6 +64,21 @@ struct FavoritesView: View {
                 default: Color.clear
                 }
             }
+        }
+    }
+
+    func prepareCircles() {
+        withAnimation(.snappy.speed(2.0)) {
+            isPreparingCircles = true
+        }
+        favoriteCircles.removeAll()
+        for favorite in favorites.items {
+            if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID) {
+                favoriteCircles.append(webCatalogCircle)
+            }
+        }
+        withAnimation(.snappy.speed(2.0)) {
+            isPreparingCircles = false
         }
     }
 }
