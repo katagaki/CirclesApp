@@ -336,6 +336,12 @@
             "state" : "translated",
             "value" : "Show Day"
           }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開催日を表示"
+          }
         }
       }
     },
