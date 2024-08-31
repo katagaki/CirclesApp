@@ -106,6 +106,12 @@ extension DatabaseManager {
         })
     }
 
+    func circles(with genre: ComiketGenre) -> [ComiketCircle] {
+        return eventCircles.filter({
+            $0.genreID == genre.id
+        })
+    }
+
     func circles(in layout: ComiketLayout) -> [ComiketCircle] {
         return eventCircles.filter({
             $0.blockID == layout.blockID && $0.spaceNumber == layout.spaceNumber
