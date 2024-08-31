@@ -23,6 +23,8 @@ extension DatabaseManager {
             }
         }
 
+        downloadProgressTextKey = "Shared.LoadingText.DatabaseDownload"
+
         // Create Documents folder if it doesn't exist
         if let documentsDirectoryURL,
            !FileManager.default.fileExists(atPath: documentsDirectoryURL.path()) {
@@ -55,6 +57,7 @@ extension DatabaseManager {
         // Unzip databases
         if let textDatabaseZippedURL = await download(textDatabaseURL),
            let imageDatabaseZippedURL = await download(imageDatabaseURL) {
+            self.downloadProgress = nil
             self.textDatabaseURL = unzip(textDatabaseZippedURL)
             self.imageDatabaseURL = unzip(imageDatabaseZippedURL)
         }
@@ -86,12 +89,9 @@ extension DatabaseManager {
         if let url = url, let documentsDirectoryURL {
             do {
                 debugPrint("Downloading \(url.path())")
-                let (downloadedFileURL, _) = try await URLSession.shared.download(from: url)
-
-                let saveDestinationURL = documentsDirectoryURL.appending(path: url.lastPathComponent)
-                try? FileManager.default.removeItem(at: saveDestinationURL)
-                try FileManager.default.moveItem(at: downloadedFileURL, to: saveDestinationURL)
-                return saveDestinationURL
+                return try await downloader.download(from: url, to: documentsDirectoryURL) { progress in
+                    self.downloadProgress = progress
+                }
             } catch {
                 debugPrint(error.localizedDescription)
                 return nil
@@ -109,5 +109,4 @@ extension DatabaseManager {
 
         return request
     }
-
 }

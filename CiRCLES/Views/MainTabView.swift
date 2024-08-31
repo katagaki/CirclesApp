@@ -18,7 +18,7 @@ struct MainTabView: View {
 
     @State var isInitialTokenRefreshComplete: Bool = false
 
-    @State var progressViewTextKey: String = ""
+    @State var isProgressDeterminate: Bool = false
 
     var body: some View {
         @Bindable var authManager = authManager
@@ -49,8 +49,20 @@ struct MainTabView: View {
                 ZStack {
                     Color.clear
                         .ignoresSafeArea()
-                    ProgressView(NSLocalizedString(progressViewTextKey, comment: ""))
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    VStack {
+                        if let progressTextKey = database.downloadProgressTextKey {
+                            Text(NSLocalizedString(progressTextKey, comment: ""))
+                        }
+                        if isProgressDeterminate {
+                            ProgressView(value: database.downloadProgress, total: 1.0)
+                            .progressViewStyle(.linear)
+                        } else {
+                            ProgressView()
+                                .controlSize(.large)
+                        }
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
                 .background(Material.ultraThin)
             }
@@ -62,9 +74,6 @@ struct MainTabView: View {
         .task {
             if !isInitialTokenRefreshComplete {
                 await authManager.refreshAuthenticationToken()
-                if authManager.token == nil {
-                    authManager.isAuthenticating = true
-                }
                 isInitialTokenRefreshComplete = true
             }
         }
@@ -78,6 +87,13 @@ struct MainTabView: View {
                 }
             }
         }
+        .onChange(of: database.downloadProgress) { _, newValue in
+            if newValue != nil {
+                isProgressDeterminate = true
+            } else {
+                isProgressDeterminate = false
+            }
+        }
         .onReceive(navigationManager.$selectedTab, perform: { newValue in
             if newValue == navigationManager.previouslySelectedTab {
                 navigationManager.popToRoot(for: newValue)
@@ -88,41 +104,13 @@ struct MainTabView: View {
 
     func loadDatabase() async {
         withAnimation(.snappy.speed(2.0)) {
-            progressViewTextKey = "Shared.LoadingText.Databases"
             database.isBusy = true
         }
         if let token = authManager.token {
             await eventManager.getEvents(authToken: token)
             if let latestEvent = eventManager.latestEvent() {
                 await database.downloadDatabases(for: latestEvent, authToken: token)
-                await database.loadDatabase()
-                await MainActor.run {
-                    progressViewTextKey = "Shared.LoadingText.Events"
-                }
-                await database.loadEvents()
-                await database.loadDates()
-                await MainActor.run {
-                    progressViewTextKey = "Shared.LoadingText.Maps"
-                }
-                await database.loadMaps()
-                await database.loadAreas()
-                await database.loadBlocks()
-                await database.loadMapping()
-                await MainActor.run {
-                    progressViewTextKey = "Shared.LoadingText.Genres"
-                }
-                await database.loadGenres()
-                await database.loadLayouts()
-                await MainActor.run {
-                    progressViewTextKey = "Shared.LoadingText.Circles"
-                }
-                await database.loadCircles()
-                await database.loadCircleExtendedInformtion()
-                await MainActor.run {
-                    progressViewTextKey = "Shared.LoadingText.Images"
-                }
-                await database.loadCommonImages()
-                await database.loadCircleImages()
+                await database.loadAll()
                 debugPrint("Database loaded")
             }
         }

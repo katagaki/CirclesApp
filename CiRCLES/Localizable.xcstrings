@@ -265,6 +265,22 @@
         }
       }
     },
+    "More.DBAdmin.RedownloadDBs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Redownload Databases"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データベースを再ダウンロード"
+          }
+        }
+      }
+    },
     "More.Events" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -526,6 +542,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サークルデータを読み込み中…"
+          }
+        }
+      }
+    },
+    "Shared.LoadingText.DatabaseDownload" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloading databases…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データベースをダウンロード中…"
           }
         }
       }
@@ -820,23 +853,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "翻訳"
-          }
-        }
-      }
-    },
-    "Shared.ZoomToFit" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Zoom to Fit"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画面に合わせる"
           }
         }
       }

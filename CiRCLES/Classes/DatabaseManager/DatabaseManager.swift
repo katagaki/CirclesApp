@@ -10,7 +10,6 @@ import SQLite
 import UIKit
 
 @Observable
-@MainActor
 class DatabaseManager {
 
     @ObservationIgnored let documentsDirectoryURL: URL? = FileManager.default.urls(
@@ -25,6 +24,9 @@ class DatabaseManager {
     var imageDatabase: Connection?
 
     var isBusy: Bool = false
+    @ObservationIgnored var downloader: Downloader = Downloader()
+    var downloadProgressTextKey: String?
+    var downloadProgress: Double?
 
     var events: [ComiketEvent] = []
     var eventDates: [ComiketDate] = []
