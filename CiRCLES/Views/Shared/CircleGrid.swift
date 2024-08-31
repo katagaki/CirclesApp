@@ -21,6 +21,7 @@ struct CircleGrid: View {
     let gridSpacing: CGFloat = 1.0
 
     @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
+    @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
 
     var body: some View {
 
@@ -68,22 +69,31 @@ struct CircleGrid: View {
                             }
                         }
                         .overlay {
-                            if showHallAndBlock, let block = database.block(circle.blockID) {
+                            if showHallAndBlock || showDay {
                                 ZStack(alignment: .bottomTrailing) {
-                                    Text("\(block.name)\(circle.spaceNumberCombined())")
+                                    VStack(alignment: .trailing, spacing: 2.0) {
+                                        Group {
+                                            if showDay {
+                                                Text("Shared.\(circle.day)th.Day")
+                                            }
+                                            if showHallAndBlock, let block = database.block(circle.blockID) {
+                                                Text("\(block.name)\(circle.spaceNumberCombined())")
+                                            }
+                                        }
                                         .font(.caption)
                                         .fontWeight(.semibold)
                                         .foregroundStyle(Color.init(uiColor: UIColor.label))
                                         .padding([.top, .bottom], 2.0)
                                         .padding([.leading, .trailing], 6.0)
-                                        .background(Material.ultraThin)
+                                        .background(Material.regular)
                                         .clipShape(.capsule)
                                         .overlay {
                                             Capsule()
                                                 .stroke(lineWidth: 1)
                                                 .foregroundColor(.secondary)
                                         }
-                                        .padding(2.0)
+                                    }
+                                    .padding(2.0)
                                     Color.clear
                                 }
                             }

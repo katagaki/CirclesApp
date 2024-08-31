@@ -65,5 +65,4 @@ class DatabaseManager {
         try? modelContext.delete(model: ComiketCircle.self)
         try? modelContext.save()
     }
-
 }

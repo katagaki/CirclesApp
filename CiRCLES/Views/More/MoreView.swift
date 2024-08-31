@@ -16,6 +16,7 @@ struct MoreView: View {
     @Environment(UserManager.self) var user
 
     @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
+    @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
 
     @State var isShowingUserPID: Bool = false
 
@@ -121,6 +122,7 @@ struct MoreView: View {
                 }
                 Section {
                     Toggle("More.Customization.ShowHallAndBlock", isOn: $showHallAndBlock)
+                    Toggle("More.Customization.ShowDay", isOn: $showDay)
                 } header: {
                     ListSectionHeader(text: "More.Customization")
                 }
@@ -132,10 +134,12 @@ struct MoreView: View {
                     ListSectionHeader(text: "More.DBAdmin")
                 }
             }
-            .task {
-                if let token = authManager.token {
-                    await user.getUser(authToken: token)
-                    await user.getEvents(authToken: token)
+            .onChange(of: authManager.token) { _, newValue in
+                if let newValue {
+                    Task.detached {
+                        await user.getUser(authToken: newValue)
+                        await user.getEvents(authToken: newValue)
+                    }
                 }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
