@@ -14,12 +14,14 @@ struct CircleDetailView: View {
     @Environment(\.openURL) var openURL
 
     @Environment(AuthManager.self) var authManager
+    @Environment(CatalogManager.self) var catalog
     @Environment(FavoritesManager.self) var favorites
     @Environment(DatabaseManager.self) var database
 
     var circle: ComiketCircle
     @State var circleImage: UIImage?
     @State var extendedInformation: ComiketCircleExtendedInformation?
+    @State var circleCutURL: URL?
 
     @State var isAddingToFavorites: Bool = false
     @State var favoriteColorToAddTo: WebCatalogColor?
@@ -83,9 +85,15 @@ struct CircleDetailView: View {
             ToolbarAccessory(placement: .top) {
                 VStack(spacing: 12.0) {
                     Group {
-                        if let circleImage {
-                            Image(uiImage: circleImage)
+                        VStack(spacing: 6.0) {
+                            if let circleImage {
+                                Image(uiImage: circleImage)
+                            }
+                            if let circleCutURL {
+                                AsyncImage(url: circleCutURL)
+                            }
                         }
+                        .frame(width: 180.0, height: 256.0, alignment: .center)
                         Text(circle.bookName)
                     }
                     .padding([.leading, .trailing], 18.0)
@@ -181,6 +189,14 @@ struct CircleDetailView: View {
             if let extendedInformation = database.extendedCircleInformation(for: circle.id) {
                 debugPrint("Extended information found for circle with ID \(circle.id)")
                 self.extendedInformation = extendedInformation
+            }
+            if let token = authManager.token, let extendedInformation {
+                if let circleResponse = await catalog.getCircle(self.circle,
+                                                                using: extendedInformation,
+                                                                authToken: token),
+                   let circleInformation = circleResponse.response.circle {
+                    circleCutURL = URL(string: circleInformation.cutWebURL)
+                }
             }
         }
         .onChange(of: favoriteColorToAddTo) { _, newValue in
