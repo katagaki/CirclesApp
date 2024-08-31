@@ -52,7 +52,7 @@ struct WebCatalogCircle: Codable, Hashable {
         case updateID = "updateId"
         case updateDate = "update_date"
     }
-    
+
     static func == (lhs: WebCatalogCircle, rhs: WebCatalogCircle) -> Bool {
         return lhs.webCatalogID == rhs.webCatalogID &&
         lhs.circlemsID == rhs.circlemsID

@@ -17,74 +17,23 @@ struct MoreDatabaseAdministratiion: View {
         List {
             Section {
                 Button("More.DBAdmin.DeleteDBs", role: .destructive) {
-                    database.deleteDatabases()
+                    database.deleteAllData()
                 }
-                Button("More.DBAdmin.RedownloadDBs", role: .destructive) {
-                    database.deleteDatabases()
+                Button("More.DBAdmin.ReloadDBs", role: .destructive) {
                     withAnimation(.snappy.speed(2.0)) {
                         database.isBusy = true
                     }
                     Task {
                         if let token = authManager.token,
                            let latestEvent = catalog.latestEvent() {
-                            await database.downloadDatabases(for: latestEvent, authToken: token)
-                            await database.loadAll()
+                            await database.loadAll(forcefully: true)
                             database.isBusy = false
                         }
                     }
                 }
             }
-            Section {
-                ForEach(database.events, id: \.self) { event in
-                    VStack(alignment: .leading) {
-                        Text(event.name)
-                        Divider()
-                        let eventDates = database.eventDates.filter({ $0.eventNumber == event.eventNumber })
-                        HStack {
-                            if eventDates.count > 0 {
-                                ForEach(eventDates, id: \.self) { eventDate in
-                                    Text(eventDate.date, style: .date)
-                                    Divider()
-                                }
-                            }
-                        }
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    }
-                }
-            } header: {
-                ListSectionHeader(text: "Shared.Events")
-            }
-            Section {
-                Text(String(database.eventMaps.count))
-            } header: {
-                ListSectionHeader(text: "Shared.Maps")
-            }
-            Section {
-                Text(String(database.eventAreas.count))
-            } header: {
-                ListSectionHeader(text: "Shared.Areas")
-            }
-            Section {
-                Text(String(database.eventBlocks.count))
-            } header: {
-                ListSectionHeader(text: "Shared.Blocks")
-            }
-            Section {
-                Text(String(database.eventGenres.count))
-            } header: {
-                ListSectionHeader(text: "Shared.Genres")
-            }
-            Section {
-                Text(String(database.eventLayouts.count))
-            } header: {
-                ListSectionHeader(text: "Shared.Layouts")
-            }
-            Section {
-                Text(String(database.eventCircles.count))
-            } header: {
-                ListSectionHeader(text: "Shared.Circles")
-            }
         }
+        .navigationTitle("ViewTitle.More.DBAdmin")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

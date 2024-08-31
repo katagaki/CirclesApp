@@ -34,9 +34,15 @@ final class ComiketCircle: SQLiteable {
     var rss: String
     var updateFlag: Int
 
+    @Relationship(.unique, deleteRule: .cascade,
+                  inverse: \ComiketCircleExtendedInformation.circle)
+    var extendedInformation: ComiketCircleExtendedInformation?
+
     init(from row: Row) {
-        let colEventNumber = Expression<Int>("comiketNo")
-        let colID = Expression<Int>("id")
+        let table = Table("ComiketCircleWC")
+
+        let colEventNumber = table[Expression<Int>("comiketNo")]
+        let colID = table[Expression<Int>("id")]
         let colPageNumber = Expression<Int>("pageNo")
         let colCutIndex = Expression<Int>("cutIndex")
         let colDay = Expression<Int>("day")

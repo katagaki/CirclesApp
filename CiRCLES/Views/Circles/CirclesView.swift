@@ -19,10 +19,11 @@ struct CirclesView: View {
     @State var displayedCircles: [ComiketCircle] = []
     @State var searchedCircles: [ComiketCircle]?
     @State var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
-
+    
+    @State var selectedGenre: ComiketGenre?
+    @State var selectedMap: ComiketMap?
     @State var selectedBlock: ComiketBlock?
     @State var selectedDate: ComiketDate?
-    @State var selectedGenre: ComiketGenre?
 
     @State var searchTerm: String = ""
 
@@ -42,7 +43,6 @@ struct CirclesView: View {
                 }
             }
             .navigationTitle("ViewTitle.Circles")
-            .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .tabBar)
             .overlay {
                 if selectedGenre == nil && selectedBlock == nil {
@@ -57,11 +57,12 @@ struct CirclesView: View {
                 BarAccessory(placement: .bottom) {
                     ScrollView(.horizontal) {
                         HStack(spacing: 12.0) {
-                            BarAccessoryMenu("Shared.Genre", icon: "theatermask.and.paintbrush") {
-                                Picker(selection: $selectedGenre) {
+                            BarAccessoryMenu(LocalizedStringKey(selectedGenre?.name ?? "Shared.Genre"),
+                                             icon: "theatermask.and.paintbrush") {
+                                Picker(selection: $selectedGenre.animation(.snappy.speed(2.0))) {
                                     Text("Shared.All")
                                         .tag(nil as ComiketGenre?)
-                                    ForEach(database.eventGenres, id: \.id) { genre in
+                                    ForEach(database.genres(), id: \.id) { genre in
                                         Text(genre.name)
                                             .tag(genre)
                                     }
@@ -69,24 +70,40 @@ struct CirclesView: View {
                                     Text("Shared.Genre")
                                 }
                             }
-                            BarAccessoryMenu("Shared.Block", icon: "table.furniture") {
-                                ForEach(database.eventMaps, id: \.id) { map in
-                                    Picker(selection: $selectedBlock) {
-                                        ForEach(database.blocks(in: map), id: \.id) { block in
+                            BarAccessoryMenu(LocalizedStringKey(selectedMap?.name ?? "Shared.Map"),
+                                             icon: "map") {
+                                Picker(selection: $selectedMap.animation(.snappy.speed(2.0))) {
+                                    Text("Shared.All")
+                                        .tag(nil as ComiketMap?)
+                                    ForEach(database.maps(), id: \.id) { map in
+                                        Text(map.name)
+                                            .tag(map)
+                                    }
+                                } label: {
+                                    Text("Shared.Map")
+                                }
+                            }
+                            if let selectedMap {
+                                BarAccessoryMenu(LocalizedStringKey(selectedBlock?.name ?? "Shared.Block"),
+                                                 icon: "table.furniture") {
+                                    Picker(selection: $selectedBlock.animation(.snappy.speed(2.0))) {
+                                        Text("Shared.All")
+                                            .tag(nil as ComiketBlock?)
+                                        ForEach(database.blocks(in: selectedMap), id: \.id) { block in
                                             Text(block.name)
                                                 .tag(block)
                                         }
                                     } label: {
-                                        Text(map.name)
+                                        Text("Shared.Block")
                                     }
-                                    .pickerStyle(.menu)
                                 }
                             }
-                            BarAccessoryMenu("Shared.Day", icon: "calendar") {
-                                Picker(selection: $selectedDate) {
+                            BarAccessoryMenu((selectedDate != nil ? "Shared.\(selectedDate!.id)th.Day" : "Shared.Day"),
+                                             icon: "calendar") {
+                                Picker(selection: $selectedDate.animation(.snappy.speed(2.0))) {
                                     Text("Shared.All")
                                         .tag(nil as ComiketDate?)
-                                    ForEach(database.eventDates, id: \.id) { date in
+                                    ForEach(database.dates(), id: \.id) { date in
                                         Text("Shared.\(date.id)th.Day")
                                             .tag(date)
                                     }
@@ -126,42 +143,42 @@ struct CirclesView: View {
     }
 
     func reloadDisplayedCircles() {
-        var displayedCircles: [ComiketCircle] = []
+        var displayedCircles: [ComiketCircle]?
         if let selectedGenre {
             displayedCircles = database.circles(with: selectedGenre)
         }
         if let selectedBlock {
-            var circlesInSelectedBlock = database.circles(in: selectedBlock).sorted(by: {$0.id < $1.id})
-            if let selectedDate {
-                circlesInSelectedBlock.removeAll(where: { $0.day != selectedDate.id })
+            let circlesInSelectedBlock = database.circles(in: selectedBlock)
+            if displayedCircles == nil {
+                displayedCircles = circlesInSelectedBlock
+            } else {
+                displayedCircles?.removeAll(where: {
+                    !circlesInSelectedBlock.contains($0)
+                })
             }
-            displayedCircles.removeAll(where: {
-                !circlesInSelectedBlock.contains($0)
-            })
+        }
+        if let selectedDate {
+            displayedCircles?.removeAll(where: { $0.day != selectedDate.id })
         }
 
         var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
-        for favorite in favorites.items {
-            if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID),
-               displayedCircles.contains(webCatalogCircle) {
-                favoriteItems[webCatalogCircle.id] = favorite
+        for displayedCircle in displayedCircles ?? [] {
+            if let favoriteForDisplayedCircle = favorites.items.first(where: {
+                $0.circle.webCatalogID == displayedCircle.extendedInformation?.webCatalogID
+            }) {
+                favoriteItems[displayedCircle.id] = favoriteForDisplayedCircle
             }
         }
 
         withAnimation(.snappy.speed(2.0)) {
             self.favoriteItems = favoriteItems
-            self.displayedCircles = displayedCircles
+            self.displayedCircles = displayedCircles ?? []
         }
     }
 
     func searchCircles() {
-        let searchTermLowercased = searchTerm.lowercased()
         if searchTerm.trimmingCharacters(in: .whitespaces).count > 2 {
-            searchedCircles = database.eventCircles.filter({
-                $0.circleName.lowercased().contains(searchTermLowercased) ||
-                $0.circleNameKana.lowercased().contains(searchTermLowercased) ||
-                $0.penName.lowercased().contains(searchTermLowercased)
-            })
+            searchedCircles = database.circles(containing: searchTerm)
         } else {
             searchedCircles = nil
         }

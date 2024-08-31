@@ -30,6 +30,7 @@ struct InteractiveMapDetailPopover: View {
                                 .frame(width: 72.0)
                         }
                         Text(circle.circleName)
+                        Spacer(minLength: 0.0)
                     }
                     .contentShape(.rect)
                 }

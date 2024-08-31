@@ -5,11 +5,13 @@
 //  Created by シン・ジャスティン on 2024/07/21.
 //
 
+import Foundation
 import SQLite
+import SwiftData
 
 extension DatabaseManager {
 
-    func loadDatabase() async {
+    func loadDatabase() {
         downloadProgressTextKey = "Shared.LoadingText.Databases"
         if let textDatabaseURL {
             do {
@@ -29,18 +31,32 @@ extension DatabaseManager {
         }
     }
 
-    func loadAll() async {
-        await loadDatabase()
-        await loadEvents()
-        await loadDates()
-        await loadMaps()
-        await loadAreas()
-        await loadBlocks()
-        await loadMapping()
-        await loadLayouts()
-        await loadGenres()
-        await loadCircles()
-        await loadCircleExtendedInformtion()
+    func loadAll(forcefully: Bool = false) async {
+        if !UserDefaults.standard.bool(forKey: databasesInitializedKey) || forcefully {
+            do {
+                loadDatabase()
+                try modelContext.transaction {
+                    loadEvents()
+                    loadDates()
+                    loadMaps()
+                    loadAreas()
+                    loadBlocks()
+                    loadMapping()
+                    loadLayouts()
+                    loadGenres()
+                    loadCircles()
+                }
+                try modelContext.save()
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+            UserDefaults.standard.set(true, forKey: databasesInitializedKey)
+            debugPrint("Database loaded")
+        } else {
+            debugPrint("Skipped loading database into persistent model cache")
+            loadDatabase()
+        }
+        // TODO: Cache images
         await loadCommonImages()
         await loadCircleImages()
         downloadProgressTextKey = nil

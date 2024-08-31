@@ -25,7 +25,6 @@ struct FavoritesView: View {
                 navigationManager.push(.circlesDetail(circle: circle), for: .favorites)
             }
             .navigationTitle("ViewTitle.Favorites")
-            .navigationBarTitleDisplayMode(.inline)
             .overlay {
                 if isPreparing {
                     ProgressView()
@@ -61,7 +60,6 @@ struct FavoritesView: View {
 
         var favoriteCircles: [ComiketCircle] = []
         var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
-
         for favorite in favoriteItemsSorted {
             if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID) {
                 favoriteCircles.append(webCatalogCircle)

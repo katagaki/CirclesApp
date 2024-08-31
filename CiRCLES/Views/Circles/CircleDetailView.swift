@@ -191,7 +191,7 @@ struct CircleDetailView: View {
             if let circleImage = database.circleImage(for: circle.id) {
                 self.circleImage = circleImage
             }
-            if let extendedInformation = database.extendedCircleInformation(for: circle.id) {
+            if let extendedInformation = circle.extendedInformation {
                 debugPrint("Extended information found for circle with ID \(circle.id)")
                 self.extendedInformation = extendedInformation
             }

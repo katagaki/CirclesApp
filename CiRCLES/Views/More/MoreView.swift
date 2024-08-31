@@ -11,6 +11,8 @@ import SwiftUI
 struct MoreView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
+    @Environment(CatalogManager.self) var catalog
+    @Environment(DatabaseManager.self) var database
     @Environment(UserManager.self) var user
 
     @State var isShowingUserPID: Bool = false
@@ -58,10 +60,60 @@ struct MoreView: View {
                         }
                     }
                 }
-                Section {
-                    ForEach(user.circles, id: \.eventID) { event in
-                        Text(event.name)
+                if let latestEventNumber = catalog.latestEventNumber,
+                   let event = database.event(for: latestEventNumber) {
+                    Section {
+                        let eventDates = database.dates(for: event.eventNumber)
+                        if eventDates.count > 0 {
+                            ForEach(eventDates, id: \.self) { eventDate in
+                                HStack {
+                                    Text("Shared.\(eventDate.id)th.Day")
+                                    Spacer()
+                                    Text(eventDate.date, style: .date)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    } header: {
+                        ListSectionHeader(text: event.name)
                     }
+                }
+                Section {
+                    Group {
+                        switch Locale.current.language.languageCode {
+                        case .japanese:
+                            Link(destination: URL(string: "https://www.bigsight.jp/visitor/floormap/")!) {
+                                HStack(alignment: .center) {
+                                    ListRow(image: "ListIcon.BigSight", title: "More.UsefulResources.BigSightMap")
+                                        .foregroundStyle(.foreground)
+                                    Spacer()
+                                    Image(systemName: "safari")
+                                        .foregroundStyle(.foreground.opacity(0.5))
+                                }
+                            }
+                        default:
+                            Link(destination: URL(string: "https://www.bigsight.jp/english/visitor/floormap/")!) {
+                                HStack(alignment: .center) {
+                                    ListRow(image: "ListIcon.BigSight", title: "More.UsefulResources.BigSightMap")
+                                        .foregroundStyle(.foreground)
+                                    Spacer()
+                                    Image(systemName: "safari")
+                                        .foregroundStyle(.foreground.opacity(0.5))
+                                }
+                            }
+                        }
+                    }
+                } header: {
+                    ListSectionHeader(text: "More.UsefulResources")
+                }
+                Section {
+                    Picker(selection: .constant(catalog.latestEventID)) {
+                        ForEach(catalog.events?.sorted(by: {$0.number > $1.number}) ?? [], id: \.id) { event in
+                            Text("Shared.Event.\(event.number)")
+                                .tag(event.id)
+                        }
+                    } label: { }
+                    .pickerStyle(.inline)
                 } header: {
                     ListSectionHeader(text: "More.Events")
                 }
