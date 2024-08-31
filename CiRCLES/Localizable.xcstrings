@@ -3,6 +3,12 @@
   "strings" : {
     "%@%@" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@%2$@"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "new",
@@ -309,6 +315,12 @@
     "More.Customization" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Customization"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -319,6 +331,12 @@
     },
     "More.Customization.ShowHallAndBlock" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Hall and Block"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",

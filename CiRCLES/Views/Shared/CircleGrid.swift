@@ -55,8 +55,8 @@ struct CircleGrid: View {
                         .overlay {
                             GeometryReader { proxy in
                                 ZStack(alignment: .topLeading) {
-                                    if let favorites,
-                                       let favorite = favorites[circle.id] {
+                                    if let favorites, let extendedInformation = circle.extendedInformation,
+                                       let favorite = favorites[extendedInformation.webCatalogID] {
                                         favorite.favorite.color.swiftUIColor()
                                             .frame(width: 0.23 * proxy.size.width,
                                                    height: 0.23 * proxy.size.width)
