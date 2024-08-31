@@ -19,9 +19,17 @@ struct MoreDatabaseAdministratiion: View {
                 Button("More.DBAdmin.RedownloadDBs", role: .destructive) {
                     if let token = authManager.token,
                        let latestEvent = catalog.latestEvent() {
+                        withAnimation(.snappy.speed(2.0)) {
+                            database.isBusy = true
+                        }
                         Task.detached {
                             database.deleteDatabases()
                             await database.downloadDatabases(for: latestEvent, authToken: token)
+                            await MainActor.run {
+                                withAnimation(.snappy.speed(2.0)) {
+                                    database.isBusy = false
+                                }
+                            }
                         }
                     }
                 }
