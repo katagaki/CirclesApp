@@ -44,16 +44,16 @@ struct LoginView: View {
                 }
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
-                Button {
-                    isShowingDemoAlert = true
-                } label: {
-                    Text("Shared.Login.Demo")
-                        .fontWeight(.bold)
-                        .frame(maxWidth: .infinity)
-                        .padding([.top, .bottom], 6.0)
-                }
-                .buttonStyle(.bordered)
-                .clipShape(.capsule(style: .continuous))
+//                Button {
+//                    isShowingDemoAlert = true
+//                } label: {
+//                    Text("Shared.Login.Demo")
+//                        .fontWeight(.bold)
+//                        .frame(maxWidth: .infinity)
+//                        .padding([.top, .bottom], 6.0)
+//                }
+//                .buttonStyle(.bordered)
+//                .clipShape(.capsule(style: .continuous))
                 Button {
                     isShowingAuthSafariViewController = true
                 } label: {
@@ -77,13 +77,6 @@ struct LoginView: View {
             }
         } message: {
             Text("Alert.Unavailable.Text")
-        }
-        .onChange(of: authManager.code) { oldValue, newValue in
-            if oldValue == nil && newValue != nil {
-                Task {
-                    await authManager.getAuthenticationToken()
-                }
-            }
         }
     }
 }

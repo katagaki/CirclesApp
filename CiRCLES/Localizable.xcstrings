@@ -697,6 +697,7 @@
       }
     },
     "Shared.Login.Demo" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

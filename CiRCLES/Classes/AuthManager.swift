@@ -66,6 +66,7 @@ class AuthManager {
         token = nil
         try? keychain.removeAll()
         debugPrint("Signed out and deleted authentication token from local device.")
+        isAuthenticating = true
     }
 
     func getAuthenticationCode(from url: URL) {
@@ -83,6 +84,7 @@ class AuthManager {
                     if state == "auth" {
                         debugPrint("Authentication code length: \(code.count)")
                         self.code = code
+                        self.isAuthenticating = false
                     }
                 }
             }
