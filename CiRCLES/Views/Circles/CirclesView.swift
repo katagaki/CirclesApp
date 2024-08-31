@@ -167,7 +167,7 @@ struct CirclesView: View {
             .onChange(of: selectedMap) { oldValue, newValue in
                 if isInitialLoadCompleted {
                     selectedMapID = selectedMap?.id ?? 0
-                    if oldValue != newValue {
+                    if oldValue != newValue && oldValue != nil {
                         selectedBlock = nil
                     } else {
                         reloadDisplayedCircles()

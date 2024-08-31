@@ -136,7 +136,11 @@ extension DatabaseManager {
     }
 
     func block(_ id: Int) -> ComiketBlock? {
-        let fetchDescriptor = FetchDescriptor<ComiketBlock>()
+        let fetchDescriptor = FetchDescriptor<ComiketBlock>(
+            predicate: #Predicate<ComiketBlock> {
+                $0.id == id
+            }
+        )
         do {
             return (try modelContext.fetch(fetchDescriptor)).first
         } catch {

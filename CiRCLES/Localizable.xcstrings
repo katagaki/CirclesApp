@@ -329,6 +329,16 @@
         }
       }
     },
+    "More.Customization.ShowDay" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Day"
+          }
+        }
+      }
+    },
     "More.Customization.ShowHallAndBlock" : {
       "localizations" : {
         "en" : {
