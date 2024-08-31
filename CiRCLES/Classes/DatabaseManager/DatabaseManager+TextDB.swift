@@ -135,6 +135,16 @@ extension DatabaseManager {
         }
     }
 
+    func block(_ id: Int) -> ComiketBlock? {
+        let fetchDescriptor = FetchDescriptor<ComiketBlock>()
+        do {
+            return (try modelContext.fetch(fetchDescriptor)).first
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
+    }
+
     func blocks(in map: ComiketMap) -> [ComiketBlock] {
         let mapLayouts = layouts(for: map)
         let mapBlockIDs = mapLayouts.map({ $0.blockID })

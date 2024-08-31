@@ -15,6 +15,8 @@ struct MoreView: View {
     @Environment(DatabaseManager.self) var database
     @Environment(UserManager.self) var user
 
+    @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
+
     @State var isShowingUserPID: Bool = false
 
     var body: some View {
@@ -116,6 +118,11 @@ struct MoreView: View {
                     .pickerStyle(.inline)
                 } header: {
                     ListSectionHeader(text: "More.Events")
+                }
+                Section {
+                    Toggle("More.Customization.ShowHallAndBlock", isOn: $showHallAndBlock)
+                } header: {
+                    ListSectionHeader(text: "More.Customization")
                 }
                 Section {
                     NavigationLink(value: ViewPath.moreDBAdmin) {
