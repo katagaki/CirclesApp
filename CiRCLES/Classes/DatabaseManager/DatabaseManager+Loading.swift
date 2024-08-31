@@ -10,6 +10,7 @@ import SQLite
 extension DatabaseManager {
 
     func loadDatabase() async {
+        downloadProgressTextKey = "Shared.LoadingText.Databases"
         if let textDatabaseURL {
             do {
                 debugPrint("Opening text database")
@@ -26,5 +27,22 @@ extension DatabaseManager {
                 debugPrint(error.localizedDescription)
             }
         }
+    }
+
+    func loadAll() async {
+        await loadDatabase()
+        await loadEvents()
+        await loadDates()
+        await loadMaps()
+        await loadAreas()
+        await loadBlocks()
+        await loadMapping()
+        await loadLayouts()
+        await loadGenres()
+        await loadCircles()
+        await loadCircleExtendedInformtion()
+        await loadCommonImages()
+        await loadCircleImages()
+        downloadProgressTextKey = nil
     }
 }

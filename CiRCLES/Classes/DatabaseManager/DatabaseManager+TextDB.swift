@@ -12,54 +12,63 @@ extension DatabaseManager {
     // MARK: Loading
 
     func loadEvents() async {
+        downloadProgressTextKey = "Shared.LoadingText.Events"
         if let events = loadTable("ComiketInfoWC", of: ComiketEvent.self) as? [ComiketEvent] {
             self.events = events
         }
     }
 
     func loadDates() async {
+        downloadProgressTextKey = "Shared.LoadingText.Events"
         if let eventDates = loadTable("ComiketDateWC", of: ComiketDate.self) as? [ComiketDate] {
             self.eventDates = eventDates
         }
     }
 
     func loadMaps() async {
+        downloadProgressTextKey = "Shared.LoadingText.Maps"
         if let eventMaps = loadTable("ComiketMapWC", of: ComiketMap.self) as? [ComiketMap] {
             self.eventMaps = eventMaps
         }
     }
 
     func loadAreas() async {
+        downloadProgressTextKey = "Shared.LoadingText.Maps"
         if let eventAreas = loadTable("ComiketAreaWC", of: ComiketArea.self) as? [ComiketArea] {
             self.eventAreas = eventAreas
         }
     }
 
     func loadBlocks() async {
+        downloadProgressTextKey = "Shared.LoadingText.Maps"
         if let eventBlocks = loadTable("ComiketBlockWC", of: ComiketBlock.self) as? [ComiketBlock] {
             self.eventBlocks = eventBlocks
         }
     }
 
     func loadMapping() async {
+        downloadProgressTextKey = "Shared.LoadingText.Maps"
         if let eventMapping = loadTable("ComiketMappingWC", of: ComiketMapping.self) as? [ComiketMapping] {
             self.eventMapping = eventMapping
         }
     }
 
     func loadGenres() async {
+        downloadProgressTextKey = "Shared.LoadingText.Genres"
         if let eventGenres = loadTable("ComiketGenreWC", of: ComiketGenre.self) as? [ComiketGenre] {
             self.eventGenres = eventGenres
         }
     }
 
     func loadLayouts() async {
+        downloadProgressTextKey = "Shared.LoadingText.Maps"
         if let eventLayouts = loadTable("ComiketLayoutWC", of: ComiketLayout.self) as? [ComiketLayout] {
             self.eventLayouts = eventLayouts
         }
     }
 
     func loadCircles(forcefully: Bool = false) async {
+        downloadProgressTextKey = "Shared.LoadingText.Circles"
         if forcefully || self.eventCircles.count == 0 {
             if let eventCircles = loadTable("ComiketCircleWC", of: ComiketCircle.self) as? [ComiketCircle] {
                 self.eventCircles = eventCircles
@@ -70,6 +79,7 @@ extension DatabaseManager {
     }
 
     func loadCircleExtendedInformtion() async {
+        downloadProgressTextKey = "Shared.LoadingText.Circles"
         if let eventCircleExtendedInformation = loadTable(
             "ComiketCircleExtend",
             of: ComiketCircleExtendedInformation.self

@@ -24,11 +24,6 @@ struct CirclesApp: App {
                 .onOpenURL { url in
                     debugPrint("URL scheme invoked: \(url)")
                     authManager.getAuthenticationCode(from: url)
-                    if authManager.code != nil {
-                        Task {
-                            await authManager.getAuthenticationToken()
-                        }
-                    }
                 }
         }
         .modelContainer(sharedModelContainer)

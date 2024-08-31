@@ -14,6 +14,7 @@ extension DatabaseManager {
     // MARK: Common Images
 
     func loadCommonImages() async {
+        downloadProgressTextKey = "Shared.LoadingText.Images"
         if let imageDatabase {
             debugPrint("Loading common images")
             self.commonImages.removeAll()
@@ -59,6 +60,7 @@ extension DatabaseManager {
     // MARK: Circle Images
 
     func loadCircleImages(forcefully: Bool = false) async {
+        downloadProgressTextKey = "Shared.LoadingText.Images"
         if forcefully || self.circleImages.count == 0 {
             if let imageDatabase {
                 debugPrint("Loading circle images")
