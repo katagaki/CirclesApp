@@ -12,7 +12,7 @@ import SwiftData
 @Model
 final class ComiketCircle: SQLiteable {
     var eventNumber: Int
-    var id: Int
+    @Attribute(.unique) var id: Int
     var pageNumber: Int
     var cutIndex: Int
     var day: Int
@@ -34,8 +34,7 @@ final class ComiketCircle: SQLiteable {
     var rss: String
     var updateFlag: Int
 
-    @Relationship(.unique, deleteRule: .cascade,
-                  inverse: \ComiketCircleExtendedInformation.circle)
+    @Relationship(.unique, deleteRule: .cascade, inverse: \ComiketCircleExtendedInformation.circle)
     var extendedInformation: ComiketCircleExtendedInformation?
 
     init(from row: Row) {

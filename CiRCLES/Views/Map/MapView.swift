@@ -6,6 +6,7 @@
 //
 
 import Komponents
+import SwiftData
 import SwiftUI
 
 struct MapView: View {
@@ -14,6 +15,12 @@ struct MapView: View {
     @Environment(DatabaseManager.self) var database
 
     @State var orientation = UIDeviceOrientation.portrait
+
+    @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
+    var dates: [ComiketDate]
+
+    @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
+    var maps: [ComiketMap]
 
     @State var selectedEventDate: ComiketDate?
     @State var selectedMap: ComiketMap?
@@ -47,14 +54,14 @@ struct MapView: View {
                         if orientation.isPortrait || UIDevice.current.userInterfaceIdiom == .pad {
                             ScrollView(.horizontal) {
                                 HStack(spacing: 12.0) {
-                                    ForEach(database.dates(), id: \.id) { date in
+                                    ForEach(dates, id: \.id) { date in
                                         VStack(alignment: .leading, spacing: 12.0) {
                                             Text("Shared.\(date.id)th.Day")
                                                 .font(.title3)
                                                 .bold()
                                             Divider()
                                             HStack(spacing: 8.0) {
-                                                ForEach(database.maps(), id: \.id) { map in
+                                                ForEach(maps, id: \.id) { map in
                                                     BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
                                                                        accentColor: accentColorForMap(map),
                                                                        isTextLight: true) {

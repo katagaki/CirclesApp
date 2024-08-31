@@ -52,6 +52,7 @@ class DatabaseManager {
     }
 
     func deleteAllData() {
+        debugPrint("Deleting all data")
         try? modelContext.delete(model: ComiketEvent.self)
         try? modelContext.delete(model: ComiketDate.self)
         try? modelContext.delete(model: ComiketMap.self)
@@ -60,7 +61,9 @@ class DatabaseManager {
         try? modelContext.delete(model: ComiketMapping.self)
         try? modelContext.delete(model: ComiketGenre.self)
         try? modelContext.delete(model: ComiketLayout.self)
+        try? modelContext.delete(model: ComiketCircleExtendedInformation.self)
         try? modelContext.delete(model: ComiketCircle.self)
+        try? modelContext.save()
     }
 
 }

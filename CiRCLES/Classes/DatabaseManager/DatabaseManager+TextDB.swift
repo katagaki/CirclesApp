@@ -120,30 +120,6 @@ extension DatabaseManager {
         }
     }
 
-    func events() -> [ComiketEvent] {
-        let fetchDescriptor = FetchDescriptor<ComiketEvent>(
-            sortBy: [SortDescriptor(\.eventNumber, order: .reverse)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
-
-    func dates() -> [ComiketDate] {
-        let fetchDescriptor = FetchDescriptor<ComiketDate>(
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
-
     func dates(for eventNumber: Int) -> [ComiketDate] {
         let fetchDescriptor = FetchDescriptor<ComiketDate>(
             predicate: #Predicate<ComiketDate> {
@@ -159,76 +135,13 @@ extension DatabaseManager {
         }
     }
 
-    func maps() -> [ComiketMap] {
-        let fetchDescriptor = FetchDescriptor<ComiketMap>(
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
-
-    func areas() -> [ComiketArea] {
-        let fetchDescriptor = FetchDescriptor<ComiketArea>(
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
-
-    func blocks() -> [ComiketBlock] {
-        let fetchDescriptor = FetchDescriptor<ComiketBlock>(
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
-
     func blocks(in map: ComiketMap) -> [ComiketBlock] {
         let mapLayouts = layouts(for: map)
         let mapBlockIDs = mapLayouts.map({ $0.blockID })
-        return blocks()
-            .filter({ mapBlockIDs.contains($0.id) })
-            .sorted(by: { $0.id < $1.id })
-    }
-
-    func mapping() -> [ComiketMapping] {
-        let fetchDescriptor = FetchDescriptor<ComiketMapping>(
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
-
-    func genres() -> [ComiketGenre] {
-        let fetchDescriptor = FetchDescriptor<ComiketGenre>(
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
-
-    func layouts() -> [ComiketLayout] {
-        let fetchDescriptor = FetchDescriptor<ComiketLayout>(
+        let fetchDescriptor = FetchDescriptor<ComiketBlock>(
+            predicate: #Predicate<ComiketBlock> {
+                mapBlockIDs.contains($0.id)
+            },
             sortBy: [SortDescriptor(\.id, order: .forward)]
         )
         do {
@@ -267,18 +180,6 @@ extension DatabaseManager {
         } catch {
             debugPrint(error.localizedDescription)
             return nil
-        }
-    }
-
-    func circles() -> [ComiketCircle] {
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
         }
     }
 

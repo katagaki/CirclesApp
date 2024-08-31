@@ -19,9 +19,9 @@ struct CircleGrid: View {
 
     var body: some View {
 
-        let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 72.0), spacing: gridSpacing)]
+        let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 70.0), spacing: gridSpacing)]
         #if targetEnvironment(macCatalyst)
-        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 86.0), spacing: gridSpacing)]
+        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: gridSpacing)]
         #else
         let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 100.0), spacing: gridSpacing)]
         #endif

@@ -6,6 +6,7 @@
 //
 
 import Komponents
+import SwiftData
 import SwiftUI
 
 struct CirclesView: View {
@@ -16,10 +17,19 @@ struct CirclesView: View {
     @Environment(CatalogManager.self) var catalog
     @Environment(DatabaseManager.self) var database
 
+    @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
+    var dates: [ComiketDate]
+
+    @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
+    var maps: [ComiketMap]
+
+    @Query(sort: [SortDescriptor(\ComiketGenre.id, order: .forward)])
+    var genres: [ComiketGenre]
+
     @State var displayedCircles: [ComiketCircle] = []
     @State var searchedCircles: [ComiketCircle]?
     @State var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
-    
+
     @State var selectedGenre: ComiketGenre?
     @State var selectedMap: ComiketMap?
     @State var selectedBlock: ComiketBlock?
@@ -62,7 +72,7 @@ struct CirclesView: View {
                                 Picker(selection: $selectedGenre.animation(.snappy.speed(2.0))) {
                                     Text("Shared.All")
                                         .tag(nil as ComiketGenre?)
-                                    ForEach(database.genres(), id: \.id) { genre in
+                                    ForEach(genres) { genre in
                                         Text(genre.name)
                                             .tag(genre)
                                     }
@@ -75,7 +85,7 @@ struct CirclesView: View {
                                 Picker(selection: $selectedMap.animation(.snappy.speed(2.0))) {
                                     Text("Shared.All")
                                         .tag(nil as ComiketMap?)
-                                    ForEach(database.maps(), id: \.id) { map in
+                                    ForEach(maps) { map in
                                         Text(map.name)
                                             .tag(map)
                                     }
@@ -103,7 +113,7 @@ struct CirclesView: View {
                                 Picker(selection: $selectedDate.animation(.snappy.speed(2.0))) {
                                     Text("Shared.All")
                                         .tag(nil as ComiketDate?)
-                                    ForEach(database.dates(), id: \.id) { date in
+                                    ForEach(dates) { date in
                                         Text("Shared.\(date.id)th.Day")
                                             .tag(date)
                                     }
@@ -124,6 +134,13 @@ struct CirclesView: View {
             .onChange(of: selectedGenre) { _, _ in
                 reloadDisplayedCircles()
             }
+            .onChange(of: selectedMap) { oldValue, newValue in
+                if oldValue != newValue {
+                    selectedBlock = nil
+                } else {
+                    reloadDisplayedCircles()
+                }
+            }
             .onChange(of: selectedBlock) { _, _ in
                 reloadDisplayedCircles()
             }
@@ -143,6 +160,7 @@ struct CirclesView: View {
     }
 
     func reloadDisplayedCircles() {
+        debugPrint("Reloading displayed circles")
         var displayedCircles: [ComiketCircle]?
         if let selectedGenre {
             displayedCircles = database.circles(with: selectedGenre)
