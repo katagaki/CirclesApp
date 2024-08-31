@@ -32,7 +32,7 @@ extension DatabaseManager {
         }
     }
 
-    func loadAll(forcefully: Bool = false) async {
+    func loadAll(forcefully: Bool = false) {
         if !UserDefaults.standard.bool(forKey: databasesInitializedKey) || forcefully {
             do {
                 loadDatabase()
@@ -57,9 +57,8 @@ extension DatabaseManager {
             debugPrint("Skipped loading database into persistent model cache")
             loadDatabase()
         }
-        // TODO: Cache images
-        await loadCommonImages()
-        await loadCircleImages()
+        loadCommonImages()
+        loadCircleImages()
         downloadProgressTextKey = nil
     }
 }
