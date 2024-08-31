@@ -286,7 +286,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Manage Event Database"
+            "value" : "Manage Event Data"
           }
         },
         "ja" : {
@@ -297,18 +297,18 @@
         }
       }
     },
-    "More.DBAdmin.RedownloadDBs" : {
+    "More.DBAdmin.ReloadDBs" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Redownload Databases"
+            "value" : "Repair Event Data"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "データベースを再ダウンロード"
+            "value" : "イベントデータを修復"
           }
         }
       }
@@ -326,6 +326,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "イベント一覧"
+          }
+        }
+      }
+    },
+    "More.UsefulResources" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Useful Information"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "便利な情報"
+          }
+        }
+      }
+    },
+    "More.UsefulResources.BigSightMap" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tokyo Big Sight Floor Map"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "東京ビッグサイト フロアマップ"
           }
         }
       }
@@ -410,23 +444,6 @@
         }
       }
     },
-    "Shared.Areas" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Areas"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "地区"
-          }
-        }
-      }
-    },
     "Shared.Block" : {
       "localizations" : {
         "en" : {
@@ -439,40 +456,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ブロック"
-          }
-        }
-      }
-    },
-    "Shared.Blocks" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Blocks"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ブロック"
-          }
-        }
-      }
-    },
-    "Shared.Circles" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Circles"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サークル"
           }
         }
       }
@@ -510,6 +493,22 @@
         }
       }
     },
+    "Shared.Event.%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comic Market %lld"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コミックマーケット%lld"
+          }
+        }
+      }
+    },
     "Shared.Events" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -539,40 +538,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンル"
-          }
-        }
-      }
-    },
-    "Shared.Genres" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Genres"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ジャンル"
-          }
-        }
-      }
-    },
-    "Shared.Layouts" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Map Layouts"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "マップ配置情報"
           }
         }
       }
@@ -712,23 +677,6 @@
         }
       }
     },
-    "Shared.Login.Demo" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Try CiRCLES Without Signing In"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ログインせずに使ってみる"
-          }
-        }
-      }
-    },
     "Shared.LoginAgain" : {
       "localizations" : {
         "en" : {
@@ -761,19 +709,18 @@
         }
       }
     },
-    "Shared.Maps" : {
-      "extractionState" : "manual",
+    "Shared.Map" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Maps"
+            "value" : "Hall"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "地図"
+            "value" : "棟"
           }
         }
       }
@@ -843,6 +790,7 @@
       }
     },
     "Shared.SelectEvent" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1030,6 +978,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "マップ"
+          }
+        }
+      }
+    },
+    "ViewTitle.More.DBAdmin" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Event Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベントデータ"
           }
         }
       }

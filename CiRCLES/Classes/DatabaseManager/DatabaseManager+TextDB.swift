@@ -5,151 +5,382 @@
 //  Created by シン・ジャスティン on 2024/07/21.
 //
 
+import Foundation
 import SQLite
+import SwiftData
 
 extension DatabaseManager {
 
     // MARK: Loading
 
-    func loadEvents() async {
+    func loadEvents() {
         downloadProgressTextKey = "Shared.LoadingText.Events"
         if let events = loadTable("ComiketInfoWC", of: ComiketEvent.self) as? [ComiketEvent] {
-            self.events = events
+            for event in events {
+                modelContext.insert(event)
+            }
         }
     }
 
-    func loadDates() async {
+    func loadDates() {
         downloadProgressTextKey = "Shared.LoadingText.Events"
         if let eventDates = loadTable("ComiketDateWC", of: ComiketDate.self) as? [ComiketDate] {
-            self.eventDates = eventDates
+            for date in eventDates {
+                modelContext.insert(date)
+            }
         }
     }
 
-    func loadMaps() async {
+    func loadMaps() {
         downloadProgressTextKey = "Shared.LoadingText.Maps"
         if let eventMaps = loadTable("ComiketMapWC", of: ComiketMap.self) as? [ComiketMap] {
-            self.eventMaps = eventMaps
+            for map in eventMaps {
+                modelContext.insert(map)
+            }
         }
     }
 
-    func loadAreas() async {
+    func loadAreas() {
         downloadProgressTextKey = "Shared.LoadingText.Maps"
         if let eventAreas = loadTable("ComiketAreaWC", of: ComiketArea.self) as? [ComiketArea] {
-            self.eventAreas = eventAreas
+            for area in eventAreas {
+                modelContext.insert(area)
+            }
         }
     }
 
-    func loadBlocks() async {
+    func loadBlocks() {
         downloadProgressTextKey = "Shared.LoadingText.Maps"
         if let eventBlocks = loadTable("ComiketBlockWC", of: ComiketBlock.self) as? [ComiketBlock] {
-            self.eventBlocks = eventBlocks
+            for block in eventBlocks {
+                modelContext.insert(block)
+            }
         }
     }
 
-    func loadMapping() async {
+    func loadMapping() {
         downloadProgressTextKey = "Shared.LoadingText.Maps"
         if let eventMapping = loadTable("ComiketMappingWC", of: ComiketMapping.self) as? [ComiketMapping] {
-            self.eventMapping = eventMapping
+            for mapping in eventMapping {
+                modelContext.insert(mapping)
+            }
         }
     }
 
-    func loadGenres() async {
+    func loadGenres() {
         downloadProgressTextKey = "Shared.LoadingText.Genres"
         if let eventGenres = loadTable("ComiketGenreWC", of: ComiketGenre.self) as? [ComiketGenre] {
-            self.eventGenres = eventGenres
+            for genre in eventGenres {
+                modelContext.insert(genre)
+            }
         }
     }
 
-    func loadLayouts() async {
+    func loadLayouts() {
         downloadProgressTextKey = "Shared.LoadingText.Maps"
         if let eventLayouts = loadTable("ComiketLayoutWC", of: ComiketLayout.self) as? [ComiketLayout] {
-            self.eventLayouts = eventLayouts
-        }
-    }
-
-    func loadCircles(forcefully: Bool = false) async {
-        downloadProgressTextKey = "Shared.LoadingText.Circles"
-        if forcefully || self.eventCircles.count == 0 {
-            if let eventCircles = loadTable("ComiketCircleWC", of: ComiketCircle.self) as? [ComiketCircle] {
-                self.eventCircles = eventCircles
+            for layout in eventLayouts {
+                modelContext.insert(layout)
             }
-        } else {
-            debugPrint("Circles data loaded from cache")
         }
     }
 
-    func loadCircleExtendedInformtion() async {
+    func loadCircles() {
         downloadProgressTextKey = "Shared.LoadingText.Circles"
-        if let eventCircleExtendedInformation = loadTable(
-            "ComiketCircleExtend",
-            of: ComiketCircleExtendedInformation.self
-        ) as? [ComiketCircleExtendedInformation] {
-            self.eventCircleExtendedInformation = eventCircleExtendedInformation
+        let circlesTableWithExtendedInformation: [Row] = joinTable(
+            from: "ComiketCircleExtend",
+            into: "ComiketCircleWC",
+            on: "id"
+        )
+        var eventCircles: [ComiketCircle] = []
+        for row in circlesTableWithExtendedInformation {
+            let circle: ComiketCircle = ComiketCircle(from: row)
+            let extendedInformation: ComiketCircleExtendedInformation = ComiketCircleExtendedInformation(from: row)
+            circle.extendedInformation = extendedInformation
+            eventCircles.append(circle)
+        }
+        for circle in eventCircles {
+            modelContext.insert(circle)
         }
     }
 
     // MARK: Fetching
 
-    func circle(for webCatalogID: Int) -> ComiketCircle? {
-        if let extendedInfo = eventCircleExtendedInformation.first(where: {$0.webCatalogID == webCatalogID}) {
-            return eventCircles.first(where: {
-                $0.id == extendedInfo.id
-            })
-        } else {
+    func event(for eventNumber: Int) -> ComiketEvent? {
+        let fetchDescriptor = FetchDescriptor<ComiketEvent>(
+            predicate: #Predicate<ComiketEvent> {
+                $0.eventNumber == eventNumber
+            }
+        )
+        do {
+            return (try modelContext.fetch(fetchDescriptor)).first
+        } catch {
+            debugPrint(error.localizedDescription)
             return nil
         }
     }
 
+    func events() -> [ComiketEvent] {
+        let fetchDescriptor = FetchDescriptor<ComiketEvent>(
+            sortBy: [SortDescriptor(\.eventNumber, order: .reverse)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func dates() -> [ComiketDate] {
+        let fetchDescriptor = FetchDescriptor<ComiketDate>(
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func dates(for eventNumber: Int) -> [ComiketDate] {
+        let fetchDescriptor = FetchDescriptor<ComiketDate>(
+            predicate: #Predicate<ComiketDate> {
+                $0.eventNumber == eventNumber
+            },
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func maps() -> [ComiketMap] {
+        let fetchDescriptor = FetchDescriptor<ComiketMap>(
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func areas() -> [ComiketArea] {
+        let fetchDescriptor = FetchDescriptor<ComiketArea>(
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func blocks() -> [ComiketBlock] {
+        let fetchDescriptor = FetchDescriptor<ComiketBlock>(
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func blocks(in map: ComiketMap) -> [ComiketBlock] {
+        let mapLayouts = layouts(for: map)
+        let mapBlockIDs = mapLayouts.map({ $0.blockID })
+        return blocks()
+            .filter({ mapBlockIDs.contains($0.id) })
+            .sorted(by: { $0.id < $1.id })
+    }
+
+    func mapping() -> [ComiketMapping] {
+        let fetchDescriptor = FetchDescriptor<ComiketMapping>(
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func genres() -> [ComiketGenre] {
+        let fetchDescriptor = FetchDescriptor<ComiketGenre>(
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func layouts() -> [ComiketLayout] {
+        let fetchDescriptor = FetchDescriptor<ComiketLayout>(
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func layouts(for map: ComiketMap) -> [ComiketLayout] {
+        let mapID = map.id
+        let fetchDescriptor = FetchDescriptor<ComiketLayout>(
+            predicate: #Predicate<ComiketLayout> {
+                $0.mapID == mapID
+            },
+            sortBy: [SortDescriptor(\.mapID, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func circle(for webCatalogID: Int) -> ComiketCircle? {
+        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+            predicate: #Predicate<ComiketCircle> {
+                $0.extendedInformation?.webCatalogID == webCatalogID
+            },
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return (try modelContext.fetch(fetchDescriptor)).first
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
+    }
+
+    func circles() -> [ComiketCircle] {
+        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func circles(containing searchTerm: String) -> [ComiketCircle] {
+        let orderedSame = ComparisonResult.orderedSame
+        let searchTermLowercased = searchTerm.lowercased()
+        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+            predicate: #Predicate<ComiketCircle> {
+                $0.circleName.caseInsensitiveCompare(searchTermLowercased) == orderedSame ||
+                $0.circleNameKana.caseInsensitiveCompare(searchTermLowercased) == orderedSame ||
+                $0.penName.caseInsensitiveCompare(searchTermLowercased) == orderedSame
+            },
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
     func circles(in block: ComiketBlock) -> [ComiketCircle] {
-        return eventCircles.filter({
-            $0.blockID == block.id
-        })
+        let blockID = block.id
+        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+            predicate: #Predicate<ComiketCircle> {
+                $0.blockID == blockID
+            },
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
     }
 
     func circles(with genre: ComiketGenre) -> [ComiketCircle] {
-        return eventCircles.filter({
-            $0.genreID == genre.id
-        })
+        let genreID = genre.id
+        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+            predicate: #Predicate<ComiketCircle> {
+                $0.genreID == genreID
+            },
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func circles(on date: Int) -> [ComiketCircle] {
+        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+            predicate: #Predicate<ComiketCircle> {
+                $0.day == date
+            },
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
     }
 
     func circles(in layout: ComiketLayout) -> [ComiketCircle] {
-        return eventCircles.filter({
-            $0.blockID == layout.blockID && $0.spaceNumber == layout.spaceNumber
-        })
+        let blockID = layout.blockID
+        let spaceNumber = layout.spaceNumber
+        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+            predicate: #Predicate<ComiketCircle> {
+                $0.blockID == blockID && $0.spaceNumber == spaceNumber
+            },
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
     }
 
     func circles(in layout: ComiketLayout, on date: Int) -> [ComiketCircle] {
         return circles(in: layout).filter({ $0.day == date })
     }
 
-    func blocks(in map: ComiketMap) -> [ComiketBlock] {
-        let mapLayouts = eventLayouts.filter({ $0.mapID == map.id })
-        let mapBlockIDs = mapLayouts.map({ $0.blockID })
-        return eventBlocks.filter({ mapBlockIDs.contains($0.id) }).sorted(by: { $0.id < $1.id })
-    }
-
-    func layouts(for map: ComiketMap) -> [ComiketLayout] {
-        let currentMappings: [ComiketMapping] = eventMapping.filter({ $0.mapID == map.id })
-        let currentBlockIDs: [Int] = currentMappings.map({ $0.blockID })
-        return eventLayouts.filter({ currentBlockIDs.contains($0.blockID) })
-    }
-
-    func extendedCircleInformation(for circleID: Int) -> ComiketCircleExtendedInformation? {
-        return self.eventCircleExtendedInformation.first(where: {
-            $0.id == circleID
-        })
-    }
-
     // MARK: Shared Functions
 
-    func loadTable<T: SQLiteable>(_ tableName: String, of type: T.Type) -> [SQLiteable]? {
+    func loadTable<T: SQLiteable & PersistentModel>(_ tableName: String, of type: T.Type) -> [SQLiteable]? {
         if let textDatabase {
             do {
                 debugPrint("Selecting from \(tableName)")
                 let table = Table("\(tableName)")
                 var loadedRows: [SQLiteable] = []
                 for row in try textDatabase.prepare(table) {
-                    loadedRows.append(T(from: row))
+                    let swiftDataObjectFromTableRow = T(from: row)
+                    modelContext.insert(swiftDataObjectFromTableRow)
+                    loadedRows.append(swiftDataObjectFromTableRow)
                 }
                 return loadedRows
             } catch {
@@ -159,4 +390,30 @@ extension DatabaseManager {
         return []
     }
 
+    func joinTable(from rhsTableName: String, into lhsTableName: String, on columnName: String) -> [Row] {
+        if let textDatabase {
+            do {
+                debugPrint("Joining into \(lhsTableName) from \(rhsTableName) on \(columnName)")
+                let lhsTable = Table("\(lhsTableName)")
+                let rhsTable = Table("\(rhsTableName)")
+                // TODO: Allow Int and String expressions for this
+                let columnToJoin = Expression<Int>(columnName)
+
+                let joinedTable = lhsTable.join(
+                    .leftOuter,
+                    rhsTable,
+                    on: lhsTable[columnToJoin] == rhsTable[columnToJoin]
+                )
+
+                var rows: [Row] = []
+                for row in try textDatabase.prepare(joinedTable) {
+                    rows.append(row)
+                }
+                return rows
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return []
+    }
 }

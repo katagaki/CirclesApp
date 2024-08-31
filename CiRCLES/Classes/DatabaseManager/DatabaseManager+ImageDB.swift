@@ -18,25 +18,15 @@ extension DatabaseManager {
         if let imageDatabase {
             debugPrint("Loading common images")
             self.commonImages.removeAll()
-            self.commonImages = await withTaskGroup(of: (String, Data).self, returning: [String: Data].self) { group in
+            do {
                 let table = Table("ComiketCommonImage")
                 let colName = Expression<String>("name")
                 let colImage = Expression<Data>("image")
-
-                var commonImages: [String: Data] = [:]
-                do {
-                    for row in try imageDatabase.prepare(table) {
-                        group.addTask {
-                            return (row[colName], row[colImage])
-                        }
-                    }
-                } catch {
-                    debugPrint(error.localizedDescription)
+                for row in try imageDatabase.prepare(table) {
+                    self.commonImages[row[colName]] = row[colImage]
                 }
-                for await result in group {
-                    commonImages[result.0] = result.1
-                }
-                return commonImages
+            } catch {
+                debugPrint(error.localizedDescription)
             }
         }
     }
@@ -65,25 +55,15 @@ extension DatabaseManager {
             if let imageDatabase {
                 debugPrint("Loading circle images")
                 self.circleImages.removeAll()
-                self.circleImages = await withTaskGroup(of: (Int, Data).self, returning: [Int: Data].self) { group in
+                do {
                     let table = Table("ComiketCircleImage")
                     let colID = Expression<Int>("id")
                     let colCutImage = Expression<Data>("cutImage")
-
-                    var circleImages: [Int: Data] = [:]
-                    do {
-                        for row in try imageDatabase.prepare(table) {
-                            group.addTask {
-                                return (row[colID], row[colCutImage])
-                            }
-                        }
-                    } catch {
-                        debugPrint(error.localizedDescription)
+                    for row in try imageDatabase.prepare(table) {
+                        self.circleImages[row[colID]] = row[colCutImage]
                     }
-                    for await result in group {
-                        circleImages[result.0] = result.1
-                    }
-                    return circleImages
+                } catch {
+                    debugPrint(error.localizedDescription)
                 }
             }
         } else {

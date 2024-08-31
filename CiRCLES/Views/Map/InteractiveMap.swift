@@ -114,7 +114,7 @@ struct InteractiveMap: View {
 
     func reloadMapCircles() {
         if let selectedEventDate {
-            circles = database.eventCircles.filter({ $0.day == selectedEventDate.id })
+            circles = database.circles(on: selectedEventDate.id)
         }
     }
 

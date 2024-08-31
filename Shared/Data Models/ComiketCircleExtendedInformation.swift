@@ -18,9 +18,13 @@ final class ComiketCircleExtendedInformation: SQLiteable {
     var pixivURL: URL?
     var circleMsPortalURL: URL?
 
+    @Relationship(.unique, deleteRule: .deny) var circle: ComiketCircle?
+
     init(from row: Row) {
-        let colEventNumber = Expression<Int>("comiketNo")
-        let colID = Expression<Int>("id")
+        let table = Table("ComiketCircleExtend")
+
+        let colEventNumber = table[Expression<Int>("comiketNo")]
+        let colID = table[Expression<Int>("id")]
         let colWebCatalogID = Expression<Int>("WCId")
         let colTwitterURL = Expression<String>("twitterURL")
         let colPixivURL = Expression<String>("pixivURL")

@@ -25,7 +25,7 @@ struct InteractiveMapButton: View {
             } else {
                 circlesInSpace = database.circles(in: layout)
             }
-            isCircleDetailPopoverPresented = true
+            isCircleDetailPopoverPresented.toggle()
         } label: {
             Rectangle()
                 .foregroundStyle(isCircleDetailPopoverPresented ? .accent.opacity(0.3) : .clear)

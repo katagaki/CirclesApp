@@ -18,9 +18,6 @@ struct MapView: View {
     @State var selectedEventDate: ComiketDate?
     @State var selectedMap: ComiketMap?
 
-    // TODO: Put this in an environment state
-    @State var isSelectingEvent: Bool = false
-
     var body: some View {
         NavigationStack(path: $navigationManager[.map]) {
             InteractiveMap(
@@ -43,11 +40,6 @@ struct MapView: View {
                         }
                     }
                 }
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Shared.SelectEvent", systemImage: "calendar") {
-                        isSelectingEvent = true
-                    }
-                }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 BarAccessory(placement: .bottom) {
@@ -55,14 +47,14 @@ struct MapView: View {
                         if orientation.isPortrait || UIDevice.current.userInterfaceIdiom == .pad {
                             ScrollView(.horizontal) {
                                 HStack(spacing: 12.0) {
-                                    ForEach(database.eventDates, id: \.id) { date in
+                                    ForEach(database.dates(), id: \.id) { date in
                                         VStack(alignment: .leading, spacing: 12.0) {
                                             Text("Shared.\(date.id)th.Day")
                                                 .font(.title3)
                                                 .bold()
                                             Divider()
                                             HStack(spacing: 8.0) {
-                                                ForEach(database.eventMaps, id: \.id) { map in
+                                                ForEach(database.maps(), id: \.id) { map in
                                                     BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
                                                                        accentColor: accentColorForMap(map),
                                                                        isTextLight: true) {
@@ -94,9 +86,6 @@ struct MapView: View {
                         orientation = newOrientation
                     }
                 }
-            }
-            .sheet(isPresented: $isSelectingEvent) {
-                EventSelector()
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {

@@ -7,15 +7,16 @@
 
 import Foundation
 import SQLite
+import SwiftData
 import UIKit
 
 @Observable
 class DatabaseManager {
 
-    @ObservationIgnored let documentsDirectoryURL: URL? = FileManager.default.urls(
-        for: .documentDirectory,
-        in: .userDomainMask
-    ).first
+    @ObservationIgnored let documentsDirectoryURL: URL?
+    @ObservationIgnored var modelContext: ModelContext
+
+    let databasesInitializedKey: String = "Database.Initialized"
 
     var textDatabaseURL: URL?
     var imageDatabaseURL: URL?
@@ -28,31 +29,34 @@ class DatabaseManager {
     var downloadProgressTextKey: String?
     var downloadProgress: Double?
 
-    var events: [ComiketEvent] = []
-    var eventDates: [ComiketDate] = []
-    var eventMaps: [ComiketMap] = []
-    var eventAreas: [ComiketArea] = []
-    var eventBlocks: [ComiketBlock] = []
-    var eventMapping: [ComiketMapping] = []
-    var eventGenres: [ComiketGenre] = []
-    var eventLayouts: [ComiketLayout] = []
-    var eventCircles: [ComiketCircle] = []
-    var eventCircleExtendedInformation: [ComiketCircleExtendedInformation] = []
-
     var commonImages: [String: Data] = [:]
     var circleImages: [Int: Data] = [:]
 
-    func deleteDatabases() {
+    @MainActor
+    init() {
+        documentsDirectoryURL = FileManager.default.urls(
+            for: .documentDirectory,
+            in: .userDomainMask
+        ).first
+        modelContext = sharedModelContainer.mainContext
+    }
+
+    func deleteAllData() {
         if let documentsDirectoryURL {
             try? FileManager.default.removeItem(at: documentsDirectoryURL)
-            self.textDatabaseURL = nil
-            self.imageDatabaseURL = nil
-            self.textDatabase = nil
-            self.imageDatabase = nil
-            self.events.removeAll()
-            self.eventDates.removeAll()
-            self.eventMaps.removeAll()
-            self.eventAreas.removeAll()
+            textDatabaseURL = nil
+            imageDatabaseURL = nil
+            textDatabase = nil
+            imageDatabase = nil
+            try? modelContext.delete(model: ComiketEvent.self)
+            try? modelContext.delete(model: ComiketDate.self)
+            try? modelContext.delete(model: ComiketMap.self)
+            try? modelContext.delete(model: ComiketArea.self)
+            try? modelContext.delete(model: ComiketBlock.self)
+            try? modelContext.delete(model: ComiketMapping.self)
+            try? modelContext.delete(model: ComiketGenre.self)
+            try? modelContext.delete(model: ComiketLayout.self)
+            try? modelContext.delete(model: ComiketCircle.self)
         }
     }
 

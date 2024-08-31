@@ -50,7 +50,7 @@ struct MainTabView: View {
                 ZStack {
                     Color.clear
                         .ignoresSafeArea()
-                    VStack {
+                    VStack(spacing: 12.0) {
                         if let progressTextKey = database.downloadProgressTextKey {
                             Text(NSLocalizedString(progressTextKey, comment: ""))
                                 .foregroundStyle(.secondary)
@@ -112,7 +112,6 @@ struct MainTabView: View {
                 await database.downloadDatabases(for: latestEvent, authToken: token)
                 await database.loadAll()
                 UIApplication.shared.isIdleTimerDisabled = false
-                debugPrint("Database loaded")
             }
         }
         withAnimation(.snappy.speed(2.0)) {
