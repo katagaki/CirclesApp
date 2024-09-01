@@ -11,8 +11,8 @@ import SwiftData
 
 extension DatabaseManager {
 
-    func loadDatabase() {
-        downloadProgressTextKey = "Shared.LoadingText.Database"
+    func connect() {
+        progressTextKey = "Shared.LoadingText.Database"
 
         if let textDatabaseURL {
             do {
@@ -32,33 +32,11 @@ extension DatabaseManager {
         }
     }
 
-    func loadAll(forcefully: Bool = false) {
-        if !UserDefaults.standard.bool(forKey: databasesInitializedKey) || forcefully {
-            do {
-                loadDatabase()
-                try modelContext.transaction {
-                    loadEvents()
-                    loadDates()
-                    loadMaps()
-                    loadAreas()
-                    loadBlocks()
-                    loadMapping()
-                    loadLayouts()
-                    loadGenres()
-                    loadCircles()
-                }
-                try modelContext.save()
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-            UserDefaults.standard.set(true, forKey: databasesInitializedKey)
-            debugPrint("Database loaded")
-        } else {
-            debugPrint("Skipped loading database into persistent model cache")
-            loadDatabase()
-        }
-        loadCommonImages()
-        loadCircleImages()
-        downloadProgressTextKey = nil
+    func setInitialLoadCompleted() {
+        UserDefaults.standard.set(true, forKey: databasesInitializedKey)
+    }
+
+    func isInitialLoadCompleted() -> Bool {
+        return UserDefaults.standard.bool(forKey: databasesInitializedKey)
     }
 }

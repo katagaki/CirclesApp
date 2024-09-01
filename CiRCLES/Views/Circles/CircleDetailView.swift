@@ -112,7 +112,7 @@ struct CircleDetailView: View {
                                         .foregroundColor(.secondary)
                                 }
                         }
-                        if (circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "") {
+                        if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
                             Text(circle.bookName)
                         }
                     }

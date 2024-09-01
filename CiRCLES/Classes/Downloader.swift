@@ -9,20 +9,21 @@ import Foundation
 
 final class Downloader: NSObject, URLSessionDownloadDelegate {
 
-    var progressCallback: ((Double) -> Void)?
-    var continuation: CheckedContinuation<URL, Error>?
-    var session: URLSession?
-    var destinationURL: URL?
+    private var progressCallback: ((Double) -> Void)?
+    private var continuation: CheckedContinuation<URL, Error>?
+    private var session: URLSession?
+    private var destinationURL: URL?
 
     override init() {
         super.init()
         self.session = URLSession(
-            configuration: .background(withIdentifier: "com.tsubuzaki.CiRCLES.Downloader"),
+            configuration: .background(withIdentifier: "com.tsubuzaki.CiRCLES.Downloader.\(UUID().uuidString)"),
             delegate: self,
             delegateQueue: .main
         )
     }
 
+    @MainActor
     func download(
         from sourceURL: URL,
         to destinationURL: URL,
@@ -35,7 +36,6 @@ final class Downloader: NSObject, URLSessionDownloadDelegate {
             let downloadRequest = URLRequest(url: sourceURL)
             let downloadTask = session?.downloadTask(with: downloadRequest)
             downloadTask?.resume()
-            progressCallback?(0.0)
         }
     }
 

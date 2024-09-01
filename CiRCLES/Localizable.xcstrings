@@ -794,6 +794,23 @@
         }
       }
     },
+    "Shared.LoadingText.RepairingData" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repairing data..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ修復中…"
+          }
+        }
+      }
+    },
     "Shared.Login" : {
       "localizations" : {
         "en" : {

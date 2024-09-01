@@ -10,6 +10,7 @@ import ZIPFoundation
 
 extension DatabaseManager {
 
+    @MainActor
     func downloadDatabases(for event: WebCatalogEvent.Response.Event, authToken: OpenIDToken) async {
         // Reuse existing database if it exists
         if let documentsDirectoryURL {
@@ -53,14 +54,18 @@ extension DatabaseManager {
         }
 
         // Download databases
-        downloadProgressTextKey = "Shared.LoadingText.DownloadTextDatabase"
+        self.isDownloading = true
+
+        progressTextKey = "Shared.LoadingText.DownloadTextDatabase"
         let textDatabaseZippedURL = await download(textDatabaseURL)
-        downloadProgressTextKey = "Shared.LoadingText.DownloadImageDatabase"
+
+        progressTextKey = "Shared.LoadingText.DownloadImageDatabase"
         let imageDatabaseZippedURL = await download(imageDatabaseURL)
+
+        self.isDownloading = false
 
         // Unzip databases
         if let textDatabaseZippedURL, let imageDatabaseZippedURL {
-            self.downloadProgress = nil
             self.textDatabaseURL = unzip(textDatabaseZippedURL)
             self.imageDatabaseURL = unzip(imageDatabaseZippedURL)
         }
@@ -88,10 +93,12 @@ extension DatabaseManager {
         return nil
     }
 
+    @MainActor
     func download(_ url: URL?) async -> URL? {
         if let url = url, let documentsDirectoryURL {
             do {
                 debugPrint("Downloading \(url.path())")
+                let downloader: Downloader = Downloader()
                 return try await downloader.download(from: url, to: documentsDirectoryURL) { progress in
                     self.downloadProgress = progress
                 }
