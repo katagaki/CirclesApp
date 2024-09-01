@@ -147,14 +147,6 @@ struct CircleDetailView: View {
                     }
                 }
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                if let extendedInformation,
-                    let circleMsPortalURL = extendedInformation.circleMsPortalURL {
-                    Button("Shared.OpenInCircleMs", systemImage: "safari") {
-                        openURL(circleMsPortalURL)
-                    }
-                }
-            }
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             ToolbarAccessory(placement: .bottom) {
@@ -163,74 +155,27 @@ struct CircleDetailView: View {
                         Divider()
                         ScrollView(.horizontal) {
                             HStack(spacing: 10.0) {
-                                Group {
-                                    if favorites.contains(webCatalogID: extendedInformation.webCatalogID) {
-                                        Button {
-                                            Task.detached {
-                                                await deleteFavorite()
-                                            }
-                                        } label: {
-                                            Image(systemName: "star.slash.fill")
-                                                .resizable()
-                                                .padding(2.0)
-                                                .frame(width: 28.0, height: 28.0)
-                                                .scaledToFit()
-                                            Text("Shared.RemoveFromFavorites")
-                                        }
-                                    } else {
-                                        Button {
-                                            isAddingToFavorites = true
-                                        } label: {
-                                            Image(systemName: "star.fill")
-                                                .resizable()
-                                                .padding(2.0)
-                                                .frame(width: 28.0, height: 28.0)
-                                                .scaledToFit()
-                                            Text("Shared.AddToFavorites")
-                                        }
-                                        .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
-                                            FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
-                                        }
-                                    }
-                                    if let twitterURL = extendedInformation.twitterURL {
-                                        Button {
-                                            openURL(twitterURL)
-                                        } label: {
-                                            Image(.snsTwitter)
-                                                .resizable()
-                                                .frame(width: 28.0, height: 28.0)
-                                            Text("Shared.SNS.Twitter")
-                                        }
-                                        .foregroundStyle(.background)
-                                        .tint(.primary)
-                                    }
-                                    if let pixivURL = extendedInformation.pixivURL {
-                                        Button {
-                                            openURL(pixivURL)
-                                        } label: {
-                                            Image(.snsPixiv)
-                                                .resizable()
-                                                .frame(width: 28.0, height: 28.0)
-                                            Text("Shared.SNS.Pixiv")
-                                        }
-                                        .foregroundStyle(.white)
-                                        .tint(.blue)
-                                    }
-                                    if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
-                                        Button {
-                                            openURL(circleMsPortalURL)
-                                        } label: {
-                                            Image(.snsCircleMs)
-                                                .resizable()
-                                                .frame(width: 28.0, height: 28.0)
-                                            Text("Shared.SNS.CircleMsPortal")
-                                        }
-                                        .foregroundStyle(.white)
-                                        .tint(.green)
+                                FavoriteButton {
+                                    favorites.contains(webCatalogID: extendedInformation.webCatalogID)
+                                } onAdd: {
+                                    isAddingToFavorites = true
+                                } onDelete: {
+                                    Task.detached {
+                                        await deleteFavorite()
                                     }
                                 }
-                                .clipShape(.capsule(style: .continuous))
-                                .buttonStyle(.borderedProminent)
+                                .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
+                                    FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
+                                }
+                                if let twitterURL = extendedInformation.twitterURL {
+                                    SNSButton(twitterURL, type: .twitter)
+                                }
+                                if let pixivURL = extendedInformation.pixivURL {
+                                    SNSButton(pixivURL, type: .pixiv)
+                                }
+                                if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
+                                    SNSButton(circleMsPortalURL, type: .circleMs)
+                                }
                             }
                             .padding([.leading, .trailing], 12.0)
                         }
@@ -242,35 +187,39 @@ struct CircleDetailView: View {
         }
         .translationPresentation(isPresented: $isShowingTranslationPopover, text: textToTranslate)
         .task {
-            if let circleImage = database.circleImage(for: circle.id) {
-                self.circleImage = circleImage
-            }
-            if let extendedInformation = circle.extendedInformation {
-                debugPrint("Extended information found for circle with ID \(circle.id)")
-                self.extendedInformation = extendedInformation
-            }
-            if let token = authManager.token, let extendedInformation {
-                if let circleResponse = await WebCatalog.circle(
-                    with: extendedInformation.webCatalogID, authToken: token
-                ),
-                   let webCatalogInformation = circleResponse.response.circle {
-                    withAnimation(.snappy.speed(2.0)) {
-                        self.circleCutURL = URL(string: webCatalogInformation.cutWebURL)
-                        self.webCatalogInformation = webCatalogInformation
-                    }
-                }
-            }
-            let actor = DataFetcher(modelContainer: sharedModelContainer)
-            let circleBlockName = await actor.blockName(circle.blockID)
-            if let circleBlockName {
-                await MainActor.run {
-                    self.circleBlockName = "\(circleBlockName)\(circle.spaceNumberCombined())"
-                }
-            }
+            await prepareCircle()
         }
         .onChange(of: favoriteColorToAddTo) { _, newValue in
             Task.detached {
                 await addToFavorites(with: newValue)
+            }
+        }
+    }
+
+    func prepareCircle() async {
+        if let circleImage = database.circleImage(for: circle.id) {
+            self.circleImage = circleImage
+        }
+        if let extendedInformation = circle.extendedInformation {
+            debugPrint("Extended information found for circle with ID \(circle.id)")
+            self.extendedInformation = extendedInformation
+        }
+        if let token = authManager.token, let extendedInformation {
+            if let circleResponse = await WebCatalog.circle(
+                with: extendedInformation.webCatalogID, authToken: token
+            ),
+               let webCatalogInformation = circleResponse.response.circle {
+                withAnimation(.snappy.speed(2.0)) {
+                    self.circleCutURL = URL(string: webCatalogInformation.cutWebURL)
+                    self.webCatalogInformation = webCatalogInformation
+                }
+            }
+        }
+        let actor = DataFetcher(modelContainer: sharedModelContainer)
+        let circleBlockName = await actor.blockName(circle.blockID)
+        if let circleBlockName {
+            await MainActor.run {
+                self.circleBlockName = "\(circleBlockName)\(circle.spaceNumberCombined())"
             }
         }
     }

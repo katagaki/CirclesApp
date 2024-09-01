@@ -37,6 +37,9 @@
 		E4755BCE2C8493810032DA2F /* CircleBlockPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BCD2C84937E0032DA2F /* CircleBlockPill.swift */; };
 		E4755BD02C84942C0032DA2F /* CircleBlockPillSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BCF2C8494280032DA2F /* CircleBlockPillSize.swift */; };
 		E4755BD42C84A4D50032DA2F /* GenreOverlayTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BD32C84A4D20032DA2F /* GenreOverlayTip.swift */; };
+		E4755BD62C84B6060032DA2F /* SNSButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BD52C84B6010032DA2F /* SNSButton.swift */; };
+		E4755BD82C84B6230032DA2F /* SNSType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BD72C84B6210032DA2F /* SNSType.swift */; };
+		E4755BDA2C84B71D0032DA2F /* FavoriteButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BD92C84B71B0032DA2F /* FavoriteButton.swift */; };
 		E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA732C441B64009C1445 /* OpenIDToken.swift */; };
 		E480AA772C441DD1009C1445 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA762C441DD1009C1445 /* KeychainAccess */; };
 		E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA7A2C44230B009C1445 /* SwiftData.swift */; };
@@ -121,6 +124,9 @@
 		E4755BCD2C84937E0032DA2F /* CircleBlockPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleBlockPill.swift; sourceTree = "<group>"; };
 		E4755BCF2C8494280032DA2F /* CircleBlockPillSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleBlockPillSize.swift; sourceTree = "<group>"; };
 		E4755BD32C84A4D20032DA2F /* GenreOverlayTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreOverlayTip.swift; sourceTree = "<group>"; };
+		E4755BD52C84B6010032DA2F /* SNSButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SNSButton.swift; sourceTree = "<group>"; };
+		E4755BD72C84B6210032DA2F /* SNSType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SNSType.swift; sourceTree = "<group>"; };
+		E4755BD92C84B71B0032DA2F /* FavoriteButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteButton.swift; sourceTree = "<group>"; };
 		E480AA732C441B64009C1445 /* OpenIDToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenIDToken.swift; sourceTree = "<group>"; };
 		E480AA7A2C44230B009C1445 /* SwiftData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftData.swift; sourceTree = "<group>"; };
 		E480AA7E2C4423AD009C1445 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -228,9 +234,11 @@
 			children = (
 				E4755BCD2C84937E0032DA2F /* CircleBlockPill.swift */,
 				E4CA64572C8203A2001F50BB /* CircleGrid.swift */,
+				E4755BD92C84B71B0032DA2F /* FavoriteButton.swift */,
 				E48B629A2C5FCA8D007874AE /* FavoriteColorSelector.swift */,
-				E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */,
 				E47269062C3D739500D5335D /* SafariView.swift */,
+				E4755BD52C84B6010032DA2F /* SNSButton.swift */,
+				E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -329,6 +337,7 @@
 		E480AA892C4429AC009C1445 /* Enums */ = {
 			isa = PBXGroup;
 			children = (
+				E4755BD72C84B6210032DA2F /* SNSType.swift */,
 				E4755BCF2C8494280032DA2F /* CircleBlockPillSize.swift */,
 				E49352032C4CF49C004CBDA1 /* ComiketHall.swift */,
 				E4755BCB2C848D800032DA2F /* DatabaseType.swift */,
@@ -600,6 +609,7 @@
 				E480AA9A2C44A49F009C1445 /* WebCatalogEvent.swift in Sources */,
 				E480AAA32C44B723009C1445 /* DatabaseManager.swift in Sources */,
 				E49351EC2C4CC972004CBDA1 /* ComiketBlock.swift in Sources */,
+				E4755BDA2C84B71D0032DA2F /* FavoriteButton.swift in Sources */,
 				E480AA8B2C4429B4009C1445 /* TabType.swift in Sources */,
 				E482FFC32C21BD93009225BD /* App.swift in Sources */,
 				E48B62912C5FC023007874AE /* FavoritesManager.swift in Sources */,
@@ -641,6 +651,8 @@
 				E480AA832C44278F009C1445 /* UserInfo.swift in Sources */,
 				E49352092C4D1418004CBDA1 /* CircleDetailView.swift in Sources */,
 				E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */,
+				E4755BD62C84B6060032DA2F /* SNSButton.swift in Sources */,
+				E4755BD82C84B6230032DA2F /* SNSType.swift in Sources */,
 				E42003CC2C6308B600770992 /* InteractiveMap.swift in Sources */,
 				E43C74082C6DF843003522C8 /* InteractiveMapButton.swift in Sources */,
 				E47269042C3D716500D5335D /* AuthManager.swift in Sources */,
