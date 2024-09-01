@@ -1117,6 +1117,28 @@
         }
       }
     },
+    "Tip.GenreOverlay.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンル表示をオンにすると、ジャンルの配置情報がマップに重ねて表示されます。"
+          }
+        }
+      }
+    },
+    "Tip.GenreOverlay.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンルをマップに表示"
+          }
+        }
+      }
+    },
     "ViewTitle.Circles" : {
       "localizations" : {
         "en" : {

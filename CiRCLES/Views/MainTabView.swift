@@ -7,6 +7,7 @@
 
 import SwiftUI
 import SwiftData
+import TipKit
 
 struct MainTabView: View {
 
@@ -22,6 +23,7 @@ struct MainTabView: View {
 
     var body: some View {
         @Bindable var authManager = authManager
+        @Bindable var database = database
         TabView(selection: $navigationManager.selectedTab) {
             MapView()
                 .tabItem {
@@ -44,39 +46,33 @@ struct MainTabView: View {
                 }
                 .tag(TabType.more)
         }
-        .overlay {
-            if database.isBusy {
-                ZStack {
-                    Color.clear
-                        .ignoresSafeArea()
-                    VStack(spacing: 12.0) {
-                        if let progressHeaderText {
-                            Text(NSLocalizedString(progressHeaderText, comment: ""))
-                                .font(.title2)
-                                .fontWeight(.bold)
-                        }
-                        if let progressTextKey = database.progressTextKey {
-                            Text(NSLocalizedString(progressTextKey, comment: ""))
-                                .foregroundStyle(.secondary)
-                        }
-                        if database.isDownloading {
-                            ProgressView(value: database.downloadProgress, total: 1.0)
-                            .progressViewStyle(.linear)
-                        } else {
-                            ProgressView()
-                        }
+        .fullScreenCover(isPresented: $database.isBusy) {
+            VStack(spacing: 12.0) {
+                VStack(spacing: 6.0) {
+                    if let progressHeaderText {
+                        Text(NSLocalizedString(progressHeaderText, comment: ""))
+                            .font(.body)
+                            .fontWeight(.bold)
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    if let progressTextKey = database.progressTextKey {
+                        Text(NSLocalizedString(progressTextKey, comment: ""))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
-                .background {
-                    ZStack {
-                        Color(uiColor: .systemBackground).opacity(0.2)
-                            .ignoresSafeArea()
-                            .background(Material.bar)
-                    }
+                if database.isDownloading {
+                    ProgressView(value: database.downloadProgress, total: 1.0)
+                    .progressViewStyle(.linear)
+                } else {
+                    ProgressView()
                 }
             }
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Material.regular)
+            .clipShape(RoundedRectangle(cornerRadius: 16.0))
+            .padding(32.0)
+            .presentationBackground(.black.opacity(0.7))
         }
         .sheet(isPresented: $authManager.isAuthenticating) {
             LoginView()
@@ -87,21 +83,20 @@ struct MainTabView: View {
                 await authManager.refreshAuthenticationToken()
                 isInitialTokenRefreshComplete = true
             }
+            try? Tips.configure([
+                .displayFrequency(.immediate),
+                .datastoreLocation(.applicationDefault)
+            ])
         }
         .onChange(of: authManager.token) { _, newValue in
             if newValue != nil {
-                withAnimation(.snappy.speed(2.0)) {
-                    database.isBusy = true
-                } completion: {
-                    Task.detached {
-                        await loadDataFromDatabase()
-                        await loadFavorites()
-                        await MainActor.run {
-                            withAnimation(.snappy.speed(2.0)) {
-                                database.isBusy = false
-                                progressHeaderText = nil
-                            }
-                        }
+                self.database.isBusy = true
+                Task.detached {
+                    await loadDataFromDatabase()
+                    await loadFavorites()
+                    await MainActor.run {
+                        self.database.isBusy = false
+                        progressHeaderText = nil
                     }
                 }
             }
