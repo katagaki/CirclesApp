@@ -31,6 +31,44 @@ struct CircleDetailView: View {
     var body: some View {
         List {
             Section {
+                VStack(spacing: 10.0) {
+                    Group {
+                        if let circleCutURL {
+                            AsyncImage(url: circleCutURL)
+                        } else {
+                            if let circleImage {
+                                Image(uiImage: circleImage)
+                                    .resizable()
+                            }
+                        }
+                    }
+                    .frame(width: 180.0, height: 256.0, alignment: .center)
+                    .transition(.opacity)
+                    if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
+                        Text(circle.bookName)
+                    }
+                    if let block = database.block(circle.blockID) {
+                        Text("\(block.name)\(circle.spaceNumberCombined())")
+                            .font(.title3)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(Color.init(uiColor: UIColor.label))
+                        .padding([.top, .bottom], 2.0)
+                        .padding([.leading, .trailing], 10.0)
+                        .background(Material.ultraThin)
+                        .clipShape(.capsule)
+                        .overlay {
+                            Capsule()
+                                .stroke(lineWidth: 1)
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(2.0)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .center)
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets())
+            }
+            Section {
                 if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
                     Text(circle.supplementaryDescription)
                         .textSelection(.enabled)
@@ -57,10 +95,9 @@ struct CircleDetailView: View {
                 }
             }
         }
-        .listSectionSpacing(.compact)
         .navigationTitle(circle.circleName)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbarBackground(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 0.0) {
@@ -80,42 +117,9 @@ struct CircleDetailView: View {
                 }
             }
         }
-        .safeAreaInset(edge: .top) {
-            ToolbarAccessory(placement: .top) {
+        .safeAreaInset(edge: .bottom, spacing: 0.0) {
+            ToolbarAccessory(placement: .bottom) {
                 VStack(spacing: 12.0) {
-                    VStack(spacing: 10.0) {
-                        Group {
-                            if let circleCutURL {
-                                AsyncImage(url: circleCutURL)
-                            } else {
-                                if let circleImage {
-                                    Image(uiImage: circleImage)
-                                        .resizable()
-                                }
-                            }
-                        }
-                        .frame(width: 180.0, height: 256.0, alignment: .center)
-                        .transition(.opacity)
-                        if let block = database.block(circle.blockID) {
-                            Text("\(block.name)\(circle.spaceNumberCombined())")
-                            .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(Color.init(uiColor: UIColor.label))
-                                .padding([.top, .bottom], 2.0)
-                                .padding([.leading, .trailing], 6.0)
-                                .background(Material.ultraThin)
-                                .clipShape(.capsule)
-                                .overlay {
-                                    Capsule()
-                                        .stroke(lineWidth: 1)
-                                        .foregroundColor(.secondary)
-                                }
-                        }
-                        if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
-                            Text(circle.bookName)
-                        }
-                    }
-                    .padding([.leading, .trailing], 18.0)
                     if let extendedInformation {
                         Divider()
                         ScrollView(.horizontal) {
@@ -233,7 +237,10 @@ struct CircleDetailView: View {
                 authToken: token
             )
             if favoritesAddResult {
+                let (items, wcIDMappedItems) = await actor.all(authToken: token)
                 await MainActor.run {
+                    favorites.items = items
+                    favorites.wcIDMappedItems = wcIDMappedItems
                     isAddingToFavorites = false
                 }
             }
@@ -248,7 +255,10 @@ struct CircleDetailView: View {
                 authToken: token
             )
             if favoritesDeleteResult {
+                let (items, wcIDMappedItems) = await actor.all(authToken: token)
                 await MainActor.run {
+                    favorites.items = items
+                    favorites.wcIDMappedItems = wcIDMappedItems
                     isAddingToFavorites = false
                 }
             }
