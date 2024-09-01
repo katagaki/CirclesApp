@@ -10,7 +10,7 @@ import SwiftData
 
 struct MainTabView: View {
 
-    @Environment(\.modelContext) private var modelContext
+    @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
     @Environment(FavoritesManager.self) var favorites
