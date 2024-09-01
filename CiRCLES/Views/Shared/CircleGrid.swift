@@ -11,14 +11,14 @@ struct CircleGrid: View {
 
     @Environment(DatabaseManager.self) var database
 
+    let gridSpacing: CGFloat = 1.0
+
     var circles: [ComiketCircle]
     var favorites: [Int: UserFavorites.Response.FavoriteItem]?
-
     var namespace: Namespace.ID
-
     var onSelect: ((ComiketCircle) -> Void)
 
-    let gridSpacing: CGFloat = 1.0
+    @State var hallAndBlockMappings: [Int: String] = [:]
 
     @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
@@ -76,8 +76,9 @@ struct CircleGrid: View {
                                             if showDay {
                                                 Text("Shared.\(circle.day)th.Day")
                                             }
-                                            if showHallAndBlock, let block = database.block(circle.blockID) {
-                                                Text("\(block.name)\(circle.spaceNumberCombined())")
+                                            if showHallAndBlock,
+                                                let hallAndBlockName = hallAndBlockMappings[circle.id] {
+                                                Text(hallAndBlockName)
                                             }
                                         }
                                         .font(.caption)
@@ -85,7 +86,7 @@ struct CircleGrid: View {
                                         .foregroundStyle(Color.init(uiColor: UIColor.label))
                                         .padding([.top, .bottom], 2.0)
                                         .padding([.leading, .trailing], 6.0)
-                                        .background(Material.regular)
+                                        .background(.background.opacity(0.8))
                                         .clipShape(.capsule)
                                         .overlay {
                                             Capsule()
@@ -102,6 +103,29 @@ struct CircleGrid: View {
                     .automaticMatchedTransitionSource(id: circle.id, in: namespace)
                 }
             }
+        }
+        .onChange(of: circles) { _, _ in
+            Task.detached {
+                await reloadMappings()
+            }
+        }
+    }
+
+    func reloadMappings() async {
+        debugPrint("Getting display text mappings for circle grid")
+        let actor = DataFetcher(modelContainer: sharedModelContainer)
+
+        var hallAndBlockMappings: [Int: String] = [:]
+        for circle in circles {
+            let circleID = circle.id
+            let blockName = await actor.blockName(circle.blockID)
+            if let blockName {
+                hallAndBlockMappings[circleID] = "\(blockName)\(circle.spaceNumberCombined())"
+            }
+        }
+
+        await MainActor.run {
+            self.hallAndBlockMappings = hallAndBlockMappings
         }
     }
 }

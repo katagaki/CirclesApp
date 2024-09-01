@@ -1,22 +1,6 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
-    "%@%@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%1$@%2$@"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@%2$@"
-          }
-        }
-      }
-    },
     "Alert.Unavailable.Text" : {
       "localizations" : {
         "en" : {
@@ -45,6 +29,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "未公開の機能です"
+          }
+        }
+      }
+    },
+    "Circles.Image.Catalog" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Catalog"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カタログ版"
+          }
+        }
+      }
+    },
+    "Circles.Image.Web" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブ版"
           }
         }
       }
@@ -93,6 +109,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "サークルの一覧を閲覧するには、ジャンルまたは棟とブロックを選択してください。"
+          }
+        }
+      }
+    },
+    "Circles.NoImage" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Image"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像なし"
           }
         }
       }
@@ -790,7 +822,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "データ修復中…"
+            "value" : "データを修復中…"
           }
         }
       }

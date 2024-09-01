@@ -1,5 +1,5 @@
 //
-//  DatabaseActor.swift
+//  DataConverter.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/09/01.
@@ -10,7 +10,7 @@ import SQLite
 import SwiftData
 
 @ModelActor
-actor DatabaseActor {
+actor DataConverter {
 
     func save() {
         do {
