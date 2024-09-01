@@ -114,7 +114,7 @@ struct MainTabView: View {
                 database.connect()
 
                 if !database.isInitialLoadCompleted() {
-                    let actor = DatabaseActor(modelContainer: sharedModelContainer)
+                    let actor = DataConverter(modelContainer: sharedModelContainer)
 
                     await actor.deleteAllData()
 

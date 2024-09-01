@@ -26,20 +26,6 @@ extension DatabaseManager {
         }
     }
 
-    func block(_ id: Int) -> ComiketBlock? {
-        let fetchDescriptor = FetchDescriptor<ComiketBlock>(
-            predicate: #Predicate<ComiketBlock> {
-                $0.id == id
-            }
-        )
-        do {
-            return (try modelContext.fetch(fetchDescriptor)).first
-        } catch {
-            debugPrint(error.localizedDescription)
-            return nil
-        }
-    }
-
     func blocks(in map: ComiketMap) -> [ComiketBlock] {
         let mapLayouts = layouts(for: map)
         let mapBlockIDs = mapLayouts.map({ $0.blockID })
@@ -171,6 +157,19 @@ extension DatabaseManager {
     }
 
     func circles(in layout: ComiketLayout, on date: Int) -> [ComiketCircle] {
-        return circles(in: layout).filter({ $0.day == date })
+        let blockID = layout.blockID
+        let spaceNumber = layout.spaceNumber
+        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+            predicate: #Predicate<ComiketCircle> {
+                $0.blockID == blockID && $0.spaceNumber == spaceNumber && $0.day == date
+            },
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return try modelContext.fetch(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
     }
 }

@@ -57,7 +57,7 @@ struct MoreDatabaseAdministratiion: View {
                                         database.progressTextKey = "Shared.LoadingText.RepairingData"
                                     }
                                 }
-                                var actor = DatabaseActor(modelContainer: sharedModelContainer)
+                                var actor = DataConverter(modelContainer: sharedModelContainer)
                                 await actor.deleteAllData()
                                 await actor.loadAll(from: textDatabase)
                                 await MainActor.run {

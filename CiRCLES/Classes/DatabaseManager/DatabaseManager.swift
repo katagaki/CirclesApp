@@ -34,7 +34,7 @@ class DatabaseManager {
     var commonImages: [String: Data] = [:]
     var circleImages: [Int: Data] = [:]
 
-    var actor: DatabaseActor = DatabaseActor(modelContainer: sharedModelContainer)
+    var actor: DataConverter = DataConverter(modelContainer: sharedModelContainer)
 
     init() {
         documentsDirectoryURL = FileManager.default.urls(
