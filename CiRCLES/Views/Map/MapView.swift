@@ -39,6 +39,7 @@ struct MapView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle("ViewTitle.Map")
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
