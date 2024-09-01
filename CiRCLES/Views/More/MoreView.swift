@@ -256,10 +256,12 @@ SOFTWARE.
                 }
 
                 await MainActor.run {
-                    self.userInfo = userInfo
-                    self.userEvents = userEvents
-                    self.eventData = eventData
-                    self.eventDates = eventDates
+                    withAnimation(.snappy.speed(2.0)) {
+                        self.userInfo = userInfo
+                        self.userEvents = userEvents
+                        self.eventData = eventData
+                        self.eventDates = eventDates
+                    }
                 }
             }
         }

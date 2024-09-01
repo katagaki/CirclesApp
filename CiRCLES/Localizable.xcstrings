@@ -674,6 +674,40 @@
         }
       }
     },
+    "Shared.LoadingHeader.Download" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updating Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ更新中"
+          }
+        }
+      }
+    },
+    "Shared.LoadingHeader.Initial" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Getting Ready"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "初期設定中"
+          }
+        }
+      }
+    },
     "Shared.LoadingText.Circles" : {
       "extractionState" : "manual",
       "localizations" : {

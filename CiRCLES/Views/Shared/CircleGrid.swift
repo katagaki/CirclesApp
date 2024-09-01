@@ -84,7 +84,7 @@ struct CircleGrid: View {
                                         }
                                         .font(.caption)
                                         .fontWeight(.semibold)
-                                        .foregroundStyle(Color.init(uiColor: UIColor.label))
+                                        .foregroundStyle(Color(uiColor: UIColor.label))
                                         .padding([.top, .bottom], 2.0)
                                         .padding([.leading, .trailing], 6.0)
                                         .background(.background.opacity(0.8))
