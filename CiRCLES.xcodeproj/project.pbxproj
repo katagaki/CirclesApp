@@ -41,7 +41,7 @@
 		E480AA8D2C4429CD009C1445 /* ViewPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA8C2C4429CC009C1445 /* ViewPath.swift */; };
 		E480AA912C442DD7009C1445 /* MoreView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA902C442DD6009C1445 /* MoreView.swift */; };
 		E480AA962C44A15D009C1445 /* UserCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA952C44A15A009C1445 /* UserCircle.swift */; };
-		E480AA982C44A473009C1445 /* CatalogManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA972C44A471009C1445 /* CatalogManager.swift */; };
+		E480AA982C44A473009C1445 /* WebCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA972C44A471009C1445 /* WebCatalog.swift */; };
 		E480AA9A2C44A49F009C1445 /* WebCatalogEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA992C44A497009C1445 /* WebCatalogEvent.swift */; };
 		E480AA9D2C44A6F1009C1445 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA9C2C44A6F1009C1445 /* SQLite */; };
 		E480AA9F2C44A75D009C1445 /* MoreDatabaseAdministratiion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA9E2C44A759009C1445 /* MoreDatabaseAdministratiion.swift */; };
@@ -120,7 +120,7 @@
 		E480AA8C2C4429CC009C1445 /* ViewPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewPath.swift; sourceTree = "<group>"; };
 		E480AA902C442DD6009C1445 /* MoreView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreView.swift; sourceTree = "<group>"; };
 		E480AA952C44A15A009C1445 /* UserCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCircle.swift; sourceTree = "<group>"; };
-		E480AA972C44A471009C1445 /* CatalogManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatalogManager.swift; sourceTree = "<group>"; };
+		E480AA972C44A471009C1445 /* WebCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCatalog.swift; sourceTree = "<group>"; };
 		E480AA992C44A497009C1445 /* WebCatalogEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCatalogEvent.swift; sourceTree = "<group>"; };
 		E480AA9E2C44A759009C1445 /* MoreDatabaseAdministratiion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoreDatabaseAdministratiion.swift; sourceTree = "<group>"; };
 		E480AAA02C44AA74009C1445 /* WebCatalogDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebCatalogDatabase.swift; sourceTree = "<group>"; };
@@ -207,10 +207,10 @@
 				E47269032C3D716300D5335D /* AuthManager.swift */,
 				E49351F82C4CF156004CBDA1 /* DatabaseManager */,
 				E4755B9E2C8296BE0032DA2F /* Downloader.swift */,
-				E480AA972C44A471009C1445 /* CatalogManager.swift */,
 				E48B62902C5FC01E007874AE /* FavoritesManager.swift */,
 				E480AA872C442980009C1445 /* NavigationManager.swift */,
 				E480AA7E2C4423AD009C1445 /* User.swift */,
+				E480AA972C44A471009C1445 /* WebCatalog.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -597,7 +597,7 @@
 				E49351F12C4CD0C3004CBDA1 /* ComiketLayout.swift in Sources */,
 				E43C74102C6EDD85003522C8 /* LoginFeatureHero.swift in Sources */,
 				E4755BAA2C82BF8F0032DA2F /* UserResponse.swift in Sources */,
-				E480AA982C44A473009C1445 /* CatalogManager.swift in Sources */,
+				E480AA982C44A473009C1445 /* WebCatalog.swift in Sources */,
 				E49352042C4CF4A1004CBDA1 /* ComiketHall.swift in Sources */,
 				E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */,
 				E49351F32C4CD503004CBDA1 /* ComiketCircle.swift in Sources */,
