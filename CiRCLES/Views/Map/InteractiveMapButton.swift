@@ -32,7 +32,8 @@ struct InteractiveMapButton: View {
                 ForEach(circlesInSpace) { circle in
                     Group {
                         if let extendedInformation = circle.extendedInformation,
-                           let favoriteCircle = favorites.wcIDMappedItems[extendedInformation.webCatalogID] {
+                           let wcIDMappedItems = favorites.wcIDMappedItems,
+                           let favoriteCircle = wcIDMappedItems[extendedInformation.webCatalogID] {
                             Rectangle()
                                 .foregroundStyle(favoriteCircle.favorite.color.swiftUIColor().opacity(0.5))
                         } else {
