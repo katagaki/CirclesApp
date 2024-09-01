@@ -198,13 +198,12 @@ extension DatabaseManager {
     }
 
     func circles(containing searchTerm: String) -> [ComiketCircle] {
-        let orderedSame = ComparisonResult.orderedSame
         let searchTermLowercased = searchTerm.lowercased()
         let fetchDescriptor = FetchDescriptor<ComiketCircle>(
             predicate: #Predicate<ComiketCircle> {
-                $0.circleName.caseInsensitiveCompare(searchTermLowercased) == orderedSame ||
-                $0.circleNameKana.caseInsensitiveCompare(searchTermLowercased) == orderedSame ||
-                $0.penName.caseInsensitiveCompare(searchTermLowercased) == orderedSame
+                $0.circleName.localizedStandardContains(searchTermLowercased) ||
+                $0.circleNameKana.localizedStandardContains(searchTermLowercased) ||
+                $0.penName.localizedStandardContains(searchTermLowercased)
             },
             sortBy: [SortDescriptor(\.id, order: .forward)]
         )
