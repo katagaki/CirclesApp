@@ -76,7 +76,6 @@
 		E49351F72C4CD91F004CBDA1 /* ComiketCircleExtendedInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351F62C4CD90F004CBDA1 /* ComiketCircleExtendedInformation.swift */; };
 		E49351FC2C4CF191004CBDA1 /* DatabaseManager+Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351FB2C4CF18E004CBDA1 /* DatabaseManager+Data.swift */; };
 		E49351FE2C4CF1C3004CBDA1 /* DatabaseManager+Others.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351FD2C4CF1BC004CBDA1 /* DatabaseManager+Others.swift */; };
-		E49352002C4CF21F004CBDA1 /* DatabaseManager+Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351FF2C4CF21A004CBDA1 /* DatabaseManager+Images.swift */; };
 		E49352022C4CF282004CBDA1 /* Type Aliases.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352012C4CF281004CBDA1 /* Type Aliases.swift */; };
 		E49352042C4CF4A1004CBDA1 /* ComiketHall.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352032C4CF49C004CBDA1 /* ComiketHall.swift */; };
 		E49352072C4CFBDC004CBDA1 /* CirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352062C4CFBDA004CBDA1 /* CirclesView.swift */; };
@@ -154,7 +153,6 @@
 		E49351F62C4CD90F004CBDA1 /* ComiketCircleExtendedInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketCircleExtendedInformation.swift; sourceTree = "<group>"; };
 		E49351FB2C4CF18E004CBDA1 /* DatabaseManager+Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+Data.swift"; sourceTree = "<group>"; };
 		E49351FD2C4CF1BC004CBDA1 /* DatabaseManager+Others.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+Others.swift"; sourceTree = "<group>"; };
-		E49351FF2C4CF21A004CBDA1 /* DatabaseManager+Images.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+Images.swift"; sourceTree = "<group>"; };
 		E49352012C4CF281004CBDA1 /* Type Aliases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Type Aliases.swift"; sourceTree = "<group>"; };
 		E49352032C4CF49C004CBDA1 /* ComiketHall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketHall.swift; sourceTree = "<group>"; };
 		E49352062C4CFBDA004CBDA1 /* CirclesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclesView.swift; sourceTree = "<group>"; };
@@ -397,7 +395,6 @@
 			children = (
 				E480AAA22C44B71E009C1445 /* DatabaseManager.swift */,
 				E49351FB2C4CF18E004CBDA1 /* DatabaseManager+Data.swift */,
-				E49351FF2C4CF21A004CBDA1 /* DatabaseManager+Images.swift */,
 				E49351FD2C4CF1BC004CBDA1 /* DatabaseManager+Others.swift */,
 			);
 			path = DatabaseManager;
@@ -591,7 +588,6 @@
 				E480AAAF2C4C9834009C1445 /* Size.swift in Sources */,
 				E480AAB72C4C9FAA009C1445 /* SQLiteable.swift in Sources */,
 				E49351FE2C4CF1C3004CBDA1 /* DatabaseManager+Others.swift in Sources */,
-				E49352002C4CF21F004CBDA1 /* DatabaseManager+Images.swift in Sources */,
 				E47269072C3D739700D5335D /* SafariView.swift in Sources */,
 				E49352022C4CF282004CBDA1 /* Type Aliases.swift in Sources */,
 				E49351EA2C4CC62F004CBDA1 /* ComiketArea.swift in Sources */,

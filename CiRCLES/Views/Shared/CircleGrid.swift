@@ -18,6 +18,7 @@ struct CircleGrid: View {
     var namespace: Namespace.ID
     var onSelect: ((ComiketCircle) -> Void)
 
+    @State var isHallAndBlockMappingsReady: Bool = false
     @State var hallAndBlockMappings: [Int: String] = [:]
 
     @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
@@ -102,6 +103,14 @@ struct CircleGrid: View {
                     }
                     .automaticMatchedTransitionSource(id: circle.id, in: namespace)
                 }
+            }
+        }
+        .onAppear {
+            if !isHallAndBlockMappingsReady {
+                Task.detached {
+                    await reloadMappings()
+                }
+                isHallAndBlockMappingsReady = true
             }
         }
         .onChange(of: circles) { _, _ in
