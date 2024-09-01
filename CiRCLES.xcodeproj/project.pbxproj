@@ -91,6 +91,7 @@
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
 		E4CA64562C81FCC3001F50BB /* UserFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64552C81FCC1001F50BB /* UserFavorite.swift */; };
 		E4CA64582C8203A4001F50BB /* CircleGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64572C8203A2001F50BB /* CircleGrid.swift */; };
+		E4D74B6A2C84BAA10014CD16 /* TranslateButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B692C84BA9F0014CD16 /* TranslateButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -177,6 +178,7 @@
 		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		E4CA64552C81FCC1001F50BB /* UserFavorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserFavorite.swift; sourceTree = "<group>"; };
 		E4CA64572C8203A2001F50BB /* CircleGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleGrid.swift; sourceTree = "<group>"; };
+		E4D74B692C84BA9F0014CD16 /* TranslateButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -232,6 +234,7 @@
 		E47269052C3D738900D5335D /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				E4D74B692C84BA9F0014CD16 /* TranslateButton.swift */,
 				E4755BCD2C84937E0032DA2F /* CircleBlockPill.swift */,
 				E4CA64572C8203A2001F50BB /* CircleGrid.swift */,
 				E4755BD92C84B71B0032DA2F /* FavoriteButton.swift */,
@@ -653,6 +656,7 @@
 				E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */,
 				E4755BD62C84B6060032DA2F /* SNSButton.swift in Sources */,
 				E4755BD82C84B6230032DA2F /* SNSType.swift in Sources */,
+				E4D74B6A2C84BAA10014CD16 /* TranslateButton.swift in Sources */,
 				E42003CC2C6308B600770992 /* InteractiveMap.swift in Sources */,
 				E43C74082C6DF843003522C8 /* InteractiveMapButton.swift in Sources */,
 				E47269042C3D716500D5335D /* AuthManager.swift in Sources */,

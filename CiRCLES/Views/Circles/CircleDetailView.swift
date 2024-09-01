@@ -27,9 +27,6 @@ struct CircleDetailView: View {
     @State var isAddingToFavorites: Bool = false
     @State var favoriteColorToAddTo: WebCatalogColor?
 
-    @State var isShowingTranslationPopover: Bool = false
-    @State var textToTranslate: String = ""
-
     var body: some View {
         List {
             Section {
@@ -117,12 +114,20 @@ struct CircleDetailView: View {
                 HStack {
                     ListSectionHeader(text: "Shared.Description")
                     Spacer()
-                    Button("Shared.Translate", systemImage: "character.bubble") {
-                        textToTranslate = circle.supplementaryDescription
-                        isShowingTranslationPopover = true
+                    if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
+                        TranslateButton(translating: circle.supplementaryDescription)
                     }
-                    .textCase(nil)
-                    .foregroundStyle(.teal)
+                }
+            }
+            if let genre = database.genre(circle.genreID) {
+                Section {
+                    Text(genre)
+                } header: {
+                    HStack {
+                        ListSectionHeader(text: "Shared.Genre")
+                        Spacer()
+                        TranslateButton(translating: genre)
+                    }
                 }
             }
             if circle.memo.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
@@ -185,7 +190,6 @@ struct CircleDetailView: View {
                 .padding(.bottom, 12.0)
             }
         }
-        .translationPresentation(isPresented: $isShowingTranslationPopover, text: textToTranslate)
         .task {
             await prepareCircle()
         }
