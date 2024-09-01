@@ -27,4 +27,24 @@ actor DataFetcher {
         }
         return nil
     }
+
+    func dates(for eventNumber: Int) -> [Int: Date] {
+        let fetchDescriptor = FetchDescriptor<ComiketDate>(
+            predicate: #Predicate<ComiketDate> {
+                $0.eventNumber == eventNumber
+            },
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            let dates = try modelContext.fetch(fetchDescriptor)
+            var dayAndDate: [Int: Date] = [:]
+            for date in dates {
+                dayAndDate[date.id] = date.date
+            }
+            return dayAndDate
+        } catch {
+            debugPrint(error.localizedDescription)
+            return [:]
+        }
+    }
 }

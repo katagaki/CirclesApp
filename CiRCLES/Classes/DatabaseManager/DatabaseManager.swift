@@ -44,6 +44,8 @@ class DatabaseManager {
         modelContext = sharedModelContainer.mainContext
     }
 
+    // MARK: Database Connection
+
     func connect() {
         if let textDatabaseURL {
             do {
@@ -67,6 +69,8 @@ class DatabaseManager {
         textDatabase = nil
         imageDatabase = nil
     }
+
+    // MARK: Database Download
 
     func download(for event: WebCatalogEvent.Response.Event, authToken: OpenIDToken) async {
         // Reuse existing database if it exists
@@ -135,6 +139,44 @@ class DatabaseManager {
             imageDatabaseURL = nil
             textDatabase = nil
             imageDatabase = nil
+        }
+    }
+
+    // MARK: Loading
+
+    func loadCommonImages() {
+        if let imageDatabase {
+            debugPrint("Loading common images")
+            do {
+                let table = Table("ComiketCommonImage")
+                let colName = Expression<String>("name")
+                let colImage = Expression<Data>("image")
+                var commonImages: [String: Data] = [:]
+                for row in try imageDatabase.prepare(table) {
+                    commonImages[row[colName]] = row[colImage]
+                }
+                self.commonImages = commonImages
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+    }
+
+    func loadCircleImages() {
+        if let imageDatabase {
+            debugPrint("Loading circle images")
+            do {
+                let table = Table("ComiketCircleImage")
+                let colID = Expression<Int>("id")
+                let colCutImage = Expression<Data>("cutImage")
+                var circleImages: [Int: Data] = [:]
+                for row in try imageDatabase.prepare(table) {
+                    circleImages[row[colID]] = row[colCutImage]
+                }
+                self.circleImages = circleImages
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
         }
     }
 
