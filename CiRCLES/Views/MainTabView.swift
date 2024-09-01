@@ -48,16 +48,18 @@ struct MainTabView: View {
         }
         .fullScreenCover(isPresented: $database.isBusy) {
             VStack(spacing: 12.0) {
-                VStack(spacing: 6.0) {
-                    if let progressHeaderText {
-                        Text(NSLocalizedString(progressHeaderText, comment: ""))
-                            .font(.body)
-                            .fontWeight(.bold)
-                    }
-                    if let progressTextKey = database.progressTextKey {
-                        Text(NSLocalizedString(progressTextKey, comment: ""))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                if progressHeaderText != nil || database.progressTextKey != nil {
+                    VStack(spacing: 6.0) {
+                        if let progressHeaderText {
+                            Text(NSLocalizedString(progressHeaderText, comment: ""))
+                                .font(.body)
+                                .fontWeight(.bold)
+                        }
+                        if let progressTextKey = database.progressTextKey {
+                            Text(NSLocalizedString(progressTextKey, comment: ""))
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
                 if database.isDownloading {

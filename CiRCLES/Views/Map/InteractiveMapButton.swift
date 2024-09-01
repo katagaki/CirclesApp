@@ -26,7 +26,9 @@ struct InteractiveMapButton: View {
             } else {
                 circlesInSpace = database.circles(in: layout)
             }
-            isCircleDetailPopoverPresented.toggle()
+            if circlesInSpace.count > 0 {
+                isCircleDetailPopoverPresented.toggle()
+            }
         } label: {
             HStack(spacing: 0.0) {
                 ForEach(circlesInSpace) { circle in
