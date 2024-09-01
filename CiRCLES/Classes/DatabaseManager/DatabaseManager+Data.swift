@@ -47,6 +47,21 @@ extension DatabaseManager {
         }
     }
 
+    func genre(_ genreID: Int) -> String? {
+        let fetchDescriptor = FetchDescriptor<ComiketGenre>(
+            predicate: #Predicate<ComiketGenre> {
+                $0.id == genreID
+            },
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return (try modelContext.fetch(fetchDescriptor)).first?.name
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
+    }
+
     func circle(for webCatalogID: Int) -> ComiketCircle? {
         let fetchDescriptor = FetchDescriptor<ComiketCircle>(
             predicate: #Predicate<ComiketCircle> {
