@@ -34,7 +34,7 @@
 		E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA732C441B64009C1445 /* OpenIDToken.swift */; };
 		E480AA772C441DD1009C1445 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA762C441DD1009C1445 /* KeychainAccess */; };
 		E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA7A2C44230B009C1445 /* SwiftData.swift */; };
-		E480AA7F2C4423AF009C1445 /* UserManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA7E2C4423AD009C1445 /* UserManager.swift */; };
+		E480AA7F2C4423AF009C1445 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA7E2C4423AD009C1445 /* User.swift */; };
 		E480AA832C44278F009C1445 /* UserInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA822C44278D009C1445 /* UserInfo.swift */; };
 		E480AA882C442982009C1445 /* NavigationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA872C442980009C1445 /* NavigationManager.swift */; };
 		E480AA8B2C4429B4009C1445 /* TabType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA8A2C4429B3009C1445 /* TabType.swift */; };
@@ -113,7 +113,7 @@
 		E4755BC02C841C090032DA2F /* Connection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
 		E480AA732C441B64009C1445 /* OpenIDToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenIDToken.swift; sourceTree = "<group>"; };
 		E480AA7A2C44230B009C1445 /* SwiftData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftData.swift; sourceTree = "<group>"; };
-		E480AA7E2C4423AD009C1445 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
+		E480AA7E2C4423AD009C1445 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		E480AA822C44278D009C1445 /* UserInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserInfo.swift; sourceTree = "<group>"; };
 		E480AA872C442980009C1445 /* NavigationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationManager.swift; sourceTree = "<group>"; };
 		E480AA8A2C4429B3009C1445 /* TabType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabType.swift; sourceTree = "<group>"; };
@@ -210,7 +210,7 @@
 				E480AA972C44A471009C1445 /* CatalogManager.swift */,
 				E48B62902C5FC01E007874AE /* FavoritesManager.swift */,
 				E480AA872C442980009C1445 /* NavigationManager.swift */,
-				E480AA7E2C4423AD009C1445 /* UserManager.swift */,
+				E480AA7E2C4423AD009C1445 /* User.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -577,7 +577,7 @@
 				E480AAB52C4C9C84009C1445 /* ComiketDate.swift in Sources */,
 				E48B62932C5FC1C0007874AE /* UserFavorites.swift in Sources */,
 				E48B62952C5FC218007874AE /* WebCatalogCircle.swift in Sources */,
-				E480AA7F2C4423AF009C1445 /* UserManager.swift in Sources */,
+				E480AA7F2C4423AF009C1445 /* User.swift in Sources */,
 				E493520B2C4D153E004CBDA1 /* ToolbarAccessory.swift in Sources */,
 				E43C740C2C6DFD1B003522C8 /* InteractiveMapDetailPopover.swift in Sources */,
 				E480AAB32C4C9C01009C1445 /* ComiketMap.swift in Sources */,

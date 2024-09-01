@@ -10,19 +10,6 @@ import SQLite
 import SwiftData
 
 extension DatabaseManager {
-    func event(for eventNumber: Int) -> ComiketEvent? {
-        let fetchDescriptor = FetchDescriptor<ComiketEvent>(
-            predicate: #Predicate<ComiketEvent> {
-                $0.eventNumber == eventNumber
-            }
-        )
-        do {
-            return (try modelContext.fetch(fetchDescriptor)).first
-        } catch {
-            debugPrint(error.localizedDescription)
-            return nil
-        }
-    }
 
     func dates(for eventNumber: Int) -> [ComiketDate] {
         let fetchDescriptor = FetchDescriptor<ComiketDate>(

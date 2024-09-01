@@ -8,7 +8,6 @@
 import Foundation
 
 @Observable
-@MainActor
 class FavoritesManager {
     var items: [UserFavorites.Response.FavoriteItem] = []
     var wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem] = [:]

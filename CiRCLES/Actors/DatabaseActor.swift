@@ -22,6 +22,8 @@ actor DatabaseActor {
         }
     }
 
+    // MARK: Loading
+
     func loadAll(from database: Connection?) async {
         loadEvents(from: database)
         loadDates(from: database)
@@ -113,6 +115,24 @@ actor DatabaseActor {
             }
         }
     }
+
+    // MARK: Reading
+
+    func event(for eventNumber: Int) -> PersistentIdentifier? {
+        let fetchDescriptor = FetchDescriptor<ComiketEvent>(
+            predicate: #Predicate<ComiketEvent> {
+                $0.eventNumber == eventNumber
+            }
+        )
+        do {
+            return (try modelContext.fetchIdentifiers(fetchDescriptor)).first
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
+    }
+
+    // MARK: Maintenance
 
     func deleteAllData() {
         debugPrint("Deleting all data via actor")
