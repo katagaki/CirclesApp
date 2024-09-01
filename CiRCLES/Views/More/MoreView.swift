@@ -36,10 +36,13 @@ struct MoreView: View {
                             .frame(width: 56.0, height: 56.0)
                             .clipShape(.circle)
                         VStack(alignment: .leading) {
-                            Text(userInfo?.nickname ?? NSLocalizedString("Profile.GenericUser",
-                                                                                     comment: ""))
+                            if let userInfo {
+                                Text(userInfo.nickname)
                                 .fontWeight(.medium)
                                 .font(.title3)
+                            } else {
+                                ProgressView()
+                            }
                             if isShowingUserPID {
                                 Text("PID " + String(userInfo?.pid ?? 0))
                                     .font(.caption)

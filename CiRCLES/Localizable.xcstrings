@@ -496,22 +496,6 @@
         }
       }
     },
-    "Profile.GenericUser" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "User"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ユーザー"
-          }
-        }
-      }
-    },
     "Shared.%lldth.Day" : {
       "localizations" : {
         "en" : {
