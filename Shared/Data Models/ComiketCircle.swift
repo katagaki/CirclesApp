@@ -96,7 +96,7 @@ final class ComiketCircle: SQLiteable {
     }
 
     func spaceNumberCombined() -> String {
-        var combinedSpaceNumber = String(spaceNumber)
+        var combinedSpaceNumber = String(format: "%02d", spaceNumber)
         switch spaceNumberSuffix {
         case 0: combinedSpaceNumber += "a"
         case 1: combinedSpaceNumber += "b"

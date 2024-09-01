@@ -29,6 +29,8 @@
 		E4755BAA2C82BF8F0032DA2F /* UserResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BA92C82BF8E0032DA2F /* UserResponse.swift */; };
 		E4755BAE2C8350820032DA2F /* AutomaticMatchedTransitionSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BAD2C83507D0032DA2F /* AutomaticMatchedTransitionSource.swift */; };
 		E4755BB02C8353620032DA2F /* AutomaticNavigationTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BAF2C83535E0032DA2F /* AutomaticNavigationTransition.swift */; };
+		E4755BBE2C8419C10032DA2F /* DatabaseActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BBD2C8419BF0032DA2F /* DatabaseActor.swift */; };
+		E4755BC12C841C0B0032DA2F /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BC02C841C090032DA2F /* Connection.swift */; };
 		E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA732C441B64009C1445 /* OpenIDToken.swift */; };
 		E480AA772C441DD1009C1445 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA762C441DD1009C1445 /* KeychainAccess */; };
 		E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA7A2C44230B009C1445 /* SwiftData.swift */; };
@@ -71,9 +73,9 @@
 		E49351F32C4CD503004CBDA1 /* ComiketCircle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351F22C4CD501004CBDA1 /* ComiketCircle.swift */; };
 		E49351F72C4CD91F004CBDA1 /* ComiketCircleExtendedInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351F62C4CD90F004CBDA1 /* ComiketCircleExtendedInformation.swift */; };
 		E49351FA2C4CF171004CBDA1 /* DatabaseManager+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351F92C4CF16B004CBDA1 /* DatabaseManager+Loading.swift */; };
-		E49351FC2C4CF191004CBDA1 /* DatabaseManager+TextDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351FB2C4CF18E004CBDA1 /* DatabaseManager+TextDB.swift */; };
+		E49351FC2C4CF191004CBDA1 /* DatabaseManager+Data.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351FB2C4CF18E004CBDA1 /* DatabaseManager+Data.swift */; };
 		E49351FE2C4CF1C3004CBDA1 /* DatabaseManager+API.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351FD2C4CF1BC004CBDA1 /* DatabaseManager+API.swift */; };
-		E49352002C4CF21F004CBDA1 /* DatabaseManager+ImageDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351FF2C4CF21A004CBDA1 /* DatabaseManager+ImageDB.swift */; };
+		E49352002C4CF21F004CBDA1 /* DatabaseManager+Images.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49351FF2C4CF21A004CBDA1 /* DatabaseManager+Images.swift */; };
 		E49352022C4CF282004CBDA1 /* Type Aliases.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352012C4CF281004CBDA1 /* Type Aliases.swift */; };
 		E49352042C4CF4A1004CBDA1 /* ComiketHall.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352032C4CF49C004CBDA1 /* ComiketHall.swift */; };
 		E49352072C4CFBDC004CBDA1 /* CirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352062C4CFBDA004CBDA1 /* CirclesView.swift */; };
@@ -107,6 +109,8 @@
 		E4755BA92C82BF8E0032DA2F /* UserResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserResponse.swift; sourceTree = "<group>"; };
 		E4755BAD2C83507D0032DA2F /* AutomaticMatchedTransitionSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomaticMatchedTransitionSource.swift; sourceTree = "<group>"; };
 		E4755BAF2C83535E0032DA2F /* AutomaticNavigationTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomaticNavigationTransition.swift; sourceTree = "<group>"; };
+		E4755BBD2C8419BF0032DA2F /* DatabaseActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseActor.swift; sourceTree = "<group>"; };
+		E4755BC02C841C090032DA2F /* Connection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
 		E480AA732C441B64009C1445 /* OpenIDToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenIDToken.swift; sourceTree = "<group>"; };
 		E480AA7A2C44230B009C1445 /* SwiftData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftData.swift; sourceTree = "<group>"; };
 		E480AA7E2C4423AD009C1445 /* UserManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserManager.swift; sourceTree = "<group>"; };
@@ -146,9 +150,9 @@
 		E49351F22C4CD501004CBDA1 /* ComiketCircle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketCircle.swift; sourceTree = "<group>"; };
 		E49351F62C4CD90F004CBDA1 /* ComiketCircleExtendedInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketCircleExtendedInformation.swift; sourceTree = "<group>"; };
 		E49351F92C4CF16B004CBDA1 /* DatabaseManager+Loading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+Loading.swift"; sourceTree = "<group>"; };
-		E49351FB2C4CF18E004CBDA1 /* DatabaseManager+TextDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+TextDB.swift"; sourceTree = "<group>"; };
+		E49351FB2C4CF18E004CBDA1 /* DatabaseManager+Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+Data.swift"; sourceTree = "<group>"; };
 		E49351FD2C4CF1BC004CBDA1 /* DatabaseManager+API.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+API.swift"; sourceTree = "<group>"; };
-		E49351FF2C4CF21A004CBDA1 /* DatabaseManager+ImageDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+ImageDB.swift"; sourceTree = "<group>"; };
+		E49351FF2C4CF21A004CBDA1 /* DatabaseManager+Images.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DatabaseManager+Images.swift"; sourceTree = "<group>"; };
 		E49352012C4CF281004CBDA1 /* Type Aliases.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Type Aliases.swift"; sourceTree = "<group>"; };
 		E49352032C4CF49C004CBDA1 /* ComiketHall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketHall.swift; sourceTree = "<group>"; };
 		E49352062C4CFBDA004CBDA1 /* CirclesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclesView.swift; sourceTree = "<group>"; };
@@ -247,6 +251,22 @@
 				E480AA732C441B64009C1445 /* OpenIDToken.swift */,
 			);
 			path = Auth;
+			sourceTree = "<group>";
+		};
+		E4755BBC2C8419B50032DA2F /* Actors */ = {
+			isa = PBXGroup;
+			children = (
+				E4755BBD2C8419BF0032DA2F /* DatabaseActor.swift */,
+			);
+			path = Actors;
+			sourceTree = "<group>";
+		};
+		E4755BBF2C841C000032DA2F /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				E4755BC02C841C090032DA2F /* Connection.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 		E480AA782C4422DE009C1445 /* Shared */ = {
@@ -373,8 +393,8 @@
 			children = (
 				E480AAA22C44B71E009C1445 /* DatabaseManager.swift */,
 				E49351F92C4CF16B004CBDA1 /* DatabaseManager+Loading.swift */,
-				E49351FB2C4CF18E004CBDA1 /* DatabaseManager+TextDB.swift */,
-				E49351FF2C4CF21A004CBDA1 /* DatabaseManager+ImageDB.swift */,
+				E49351FB2C4CF18E004CBDA1 /* DatabaseManager+Data.swift */,
+				E49351FF2C4CF21A004CBDA1 /* DatabaseManager+Images.swift */,
 				E49351FD2C4CF1BC004CBDA1 /* DatabaseManager+API.swift */,
 			);
 			path = DatabaseManager;
@@ -410,6 +430,7 @@
 		E4A769482C21A20A00BE3491 /* CiRCLES */ = {
 			isa = PBXGroup;
 			children = (
+				E4755BBF2C841C000032DA2F /* Extensions */,
 				E4A769592C21A2A000BE3491 /* Info.plist */,
 				E4A7694F2C21A20B00BE3491 /* Assets.xcassets */,
 				E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */,
@@ -418,6 +439,7 @@
 				E472690B2C3D742300D5335D /* OpenID-Sample.plist */,
 				E482FFC12C21BD93009225BD /* Views */,
 				E42003CD2C631E4100770992 /* View Modifiers */,
+				E4755BBC2C8419B50032DA2F /* Actors */,
 				E47269022C3D715500D5335D /* Classes */,
 				E480AA892C4429AC009C1445 /* Enums */,
 			);
@@ -541,7 +563,9 @@
 				E48B629B2C5FCA95007874AE /* FavoriteColorSelector.swift in Sources */,
 				E43C740A2C6DFA6F003522C8 /* AdaptiveInvert.swift in Sources */,
 				E480AA912C442DD7009C1445 /* MoreView.swift in Sources */,
+				E4755BBE2C8419C10032DA2F /* DatabaseActor.swift in Sources */,
 				E49352072C4CFBDC004CBDA1 /* CirclesView.swift in Sources */,
+				E4755BC12C841C0B0032DA2F /* Connection.swift in Sources */,
 				E480AA9A2C44A49F009C1445 /* WebCatalogEvent.swift in Sources */,
 				E480AAA32C44B723009C1445 /* DatabaseManager.swift in Sources */,
 				E49351EC2C4CC972004CBDA1 /* ComiketBlock.swift in Sources */,
@@ -562,12 +586,12 @@
 				E480AAAF2C4C9834009C1445 /* Size.swift in Sources */,
 				E480AAB72C4C9FAA009C1445 /* SQLiteable.swift in Sources */,
 				E49351FE2C4CF1C3004CBDA1 /* DatabaseManager+API.swift in Sources */,
-				E49352002C4CF21F004CBDA1 /* DatabaseManager+ImageDB.swift in Sources */,
+				E49352002C4CF21F004CBDA1 /* DatabaseManager+Images.swift in Sources */,
 				E47269072C3D739700D5335D /* SafariView.swift in Sources */,
 				E49352022C4CF282004CBDA1 /* Type Aliases.swift in Sources */,
 				E49351EA2C4CC62F004CBDA1 /* ComiketArea.swift in Sources */,
 				E4755BB02C8353620032DA2F /* AutomaticNavigationTransition.swift in Sources */,
-				E49351FC2C4CF191004CBDA1 /* DatabaseManager+TextDB.swift in Sources */,
+				E49351FC2C4CF191004CBDA1 /* DatabaseManager+Data.swift in Sources */,
 				E480AABB2C4CA2A7009C1445 /* CircleCutConfiguration.swift in Sources */,
 				E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */,
 				E49351F12C4CD0C3004CBDA1 /* ComiketLayout.swift in Sources */,

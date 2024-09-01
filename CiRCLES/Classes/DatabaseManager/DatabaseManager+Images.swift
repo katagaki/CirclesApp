@@ -1,5 +1,5 @@
 //
-//  DatabaseManager+ImageDB.swift
+//  DatabaseManager+Images.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/07/21.
@@ -14,7 +14,7 @@ extension DatabaseManager {
     // MARK: Common Images
 
     func loadCommonImages() {
-        downloadProgressTextKey = "Shared.LoadingText.Images"
+        progressTextKey = "Shared.LoadingText.Images"
         if let imageDatabase {
             debugPrint("Loading common images")
             do {
@@ -51,7 +51,7 @@ extension DatabaseManager {
     // MARK: Circle Images
 
     func loadCircleImages(forcefully: Bool = false) {
-        downloadProgressTextKey = "Shared.LoadingText.Images"
+        progressTextKey = "Shared.LoadingText.Images"
         if forcefully || self.circleImages.count == 0 {
             if let imageDatabase {
                 debugPrint("Loading circle images")

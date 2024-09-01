@@ -51,11 +51,11 @@ struct MainTabView: View {
                     Color.clear
                         .ignoresSafeArea()
                     VStack(spacing: 12.0) {
-                        if let progressTextKey = database.downloadProgressTextKey {
+                        if let progressTextKey = database.progressTextKey {
                             Text(NSLocalizedString(progressTextKey, comment: ""))
                                 .foregroundStyle(.secondary)
                         }
-                        if isProgressDeterminate {
+                        if database.isDownloading {
                             ProgressView(value: database.downloadProgress, total: 1.0)
                             .progressViewStyle(.linear)
                         } else {
@@ -80,17 +80,18 @@ struct MainTabView: View {
         }
         .onChange(of: authManager.token) { _, newValue in
             if let newValue {
-                Task.detached {
-                    await loadDatabase()
-                    await favorites.getAll(authToken: newValue)
+                withAnimation(.snappy.speed(2.0)) {
+                    database.isBusy = true
                 }
-            }
-        }
-        .onChange(of: database.downloadProgress) { _, newValue in
-            if newValue != nil {
-                isProgressDeterminate = true
-            } else {
-                isProgressDeterminate = false
+                Task.detached {
+                    await loadDataFromDatabase()
+                    await favorites.getAll(authToken: newValue)
+                    await MainActor.run {
+                        withAnimation(.snappy.speed(2.0)) {
+                            database.isBusy = false
+                        }
+                    }
+                }
             }
         }
         .onReceive(navigationManager.$selectedTab, perform: { newValue in
@@ -101,21 +102,56 @@ struct MainTabView: View {
         })
     }
 
-    func loadDatabase() async {
-        withAnimation(.snappy.speed(2.0)) {
-            database.isBusy = true
-        }
+    func loadDataFromDatabase() async {
         if let token = authManager.token {
             await catalog.getEvents(authToken: token)
             if let latestEvent = catalog.latestEvent() {
                 UIApplication.shared.isIdleTimerDisabled = true
+
                 await database.downloadDatabases(for: latestEvent, authToken: token)
-                database.loadAll()
+                database.connect()
+
+                if !database.isInitialLoadCompleted() {
+                    let actor = DatabaseActor(modelContainer: sharedModelContainer)
+
+                    await actor.deleteAllData()
+
+                    await setProgressTextKey("Shared.LoadingText.Events")
+                    await actor.loadEvents(from: database.textDatabase)
+                    await actor.loadDates(from: database.textDatabase)
+
+                    await setProgressTextKey("Shared.LoadingText.Maps")
+                    await actor.loadMaps(from: database.textDatabase)
+                    await actor.loadAreas(from: database.textDatabase)
+                    await actor.loadBlocks(from: database.textDatabase)
+                    await actor.loadMapping(from: database.textDatabase)
+                    await actor.loadLayouts(from: database.textDatabase)
+
+                    await setProgressTextKey("Shared.LoadingText.Genres")
+                    await actor.loadGenres(from: database.textDatabase)
+
+                    await setProgressTextKey("Shared.LoadingText.Circles")
+                    await actor.loadCircles(from: database.textDatabase)
+
+                    await actor.save()
+
+                    database.setInitialLoadCompleted()
+                } else {
+                    debugPrint("Skipped loading database into persistent model cache")
+                }
+
+                await setProgressTextKey("Shared.LoadingText.Images")
+                database.loadCommonImages()
+                database.loadCircleImages()
+
                 UIApplication.shared.isIdleTimerDisabled = false
             }
         }
-        withAnimation(.snappy.speed(2.0)) {
-            database.isBusy = false
+    }
+
+    func setProgressTextKey(_ progressTextKey: String) async {
+        await MainActor.run {
+            database.progressTextKey = progressTextKey
         }
     }
 }

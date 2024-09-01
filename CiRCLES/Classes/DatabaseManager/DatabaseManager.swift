@@ -16,21 +16,24 @@ class DatabaseManager {
     @ObservationIgnored let documentsDirectoryURL: URL?
     @ObservationIgnored var modelContext: ModelContext
 
-    let databasesInitializedKey: String = "Database.Initialized"
+    @ObservationIgnored let databasesInitializedKey: String = "Database.Initialized"
 
-    var textDatabaseURL: URL?
-    var imageDatabaseURL: URL?
+    @ObservationIgnored var textDatabaseURL: URL?
+    @ObservationIgnored var imageDatabaseURL: URL?
 
-    var textDatabase: Connection?
-    var imageDatabase: Connection?
+    @ObservationIgnored var textDatabase: Connection?
+    @ObservationIgnored var imageDatabase: Connection?
 
     var isBusy: Bool = false
-    @ObservationIgnored var downloader: Downloader = Downloader()
-    var downloadProgressTextKey: String?
-    var downloadProgress: Double?
+    var progressTextKey: String?
+
+    var isDownloading: Bool = false
+    var downloadProgress: Double = .zero
 
     var commonImages: [String: Data] = [:]
     var circleImages: [Int: Data] = [:]
+
+    var actor: DatabaseActor = DatabaseActor(modelContainer: sharedModelContainer)
 
     @MainActor
     init() {
@@ -51,18 +54,8 @@ class DatabaseManager {
         }
     }
 
-    func deleteAllData() {
+    func deleteAllData() async {
         debugPrint("Deleting all data")
-        try? modelContext.delete(model: ComiketEvent.self)
-        try? modelContext.delete(model: ComiketDate.self)
-        try? modelContext.delete(model: ComiketMap.self)
-        try? modelContext.delete(model: ComiketArea.self)
-        try? modelContext.delete(model: ComiketBlock.self)
-        try? modelContext.delete(model: ComiketMapping.self)
-        try? modelContext.delete(model: ComiketGenre.self)
-        try? modelContext.delete(model: ComiketLayout.self)
-        try? modelContext.delete(model: ComiketCircleExtendedInformation.self)
-        try? modelContext.delete(model: ComiketCircle.self)
-        try? modelContext.save()
+        await actor.deleteAllData()
     }
 }
