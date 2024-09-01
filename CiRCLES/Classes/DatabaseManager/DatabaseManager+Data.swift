@@ -12,20 +12,7 @@ import UIKit
 
 extension DatabaseManager {
 
-    func dates(for eventNumber: Int) -> [ComiketDate] {
-        let fetchDescriptor = FetchDescriptor<ComiketDate>(
-            predicate: #Predicate<ComiketDate> {
-                $0.eventNumber == eventNumber
-            },
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
+    // MARK: Event Data
 
     func blocks(in map: ComiketMap) -> [ComiketBlock] {
         let mapLayouts = layouts(for: map)
@@ -176,24 +163,6 @@ extension DatabaseManager {
 
     // MARK: Common Images
 
-    func loadCommonImages() {
-        if let imageDatabase {
-            debugPrint("Loading common images")
-            do {
-                let table = Table("ComiketCommonImage")
-                let colName = Expression<String>("name")
-                let colImage = Expression<Data>("image")
-                var commonImages: [String: Data] = [:]
-                for row in try imageDatabase.prepare(table) {
-                    commonImages[row[colName]] = row[colImage]
-                }
-                self.commonImages = commonImages
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-    }
-
     func coverImage() -> UIImage? { commonImage(named: "0001") }
     func blockImage(_ blockID: Int) -> UIImage? { commonImage(named: "B\(blockID)") }
     func jikoCircleCutImage() -> UIImage? { commonImage(named: "JIKO") }
@@ -211,24 +180,6 @@ extension DatabaseManager {
     }
 
     // MARK: Circle Images
-
-    func loadCircleImages() {
-        if let imageDatabase {
-            debugPrint("Loading circle images")
-            do {
-                let table = Table("ComiketCircleImage")
-                let colID = Expression<Int>("id")
-                let colCutImage = Expression<Data>("cutImage")
-                var circleImages: [Int: Data] = [:]
-                for row in try imageDatabase.prepare(table) {
-                    circleImages[row[colID]] = row[colCutImage]
-                }
-                self.circleImages = circleImages
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-    }
 
     func circleImage(for id: Int) -> UIImage? {
         if let circleImageData = circleImages[id] {

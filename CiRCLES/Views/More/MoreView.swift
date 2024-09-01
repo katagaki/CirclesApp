@@ -20,6 +20,7 @@ struct MoreView: View {
     @State var userInfo: UserInfo.Response?
     @State var userEvents: [UserCircle.Response.Circle] = []
     @State var eventData: WebCatalogEvent.Response?
+    @State var eventDates: [Int: Date]?
 
     @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
@@ -72,16 +73,23 @@ struct MoreView: View {
                         }
                     }
                 }
-                if let latestEvent = events.first {
+                if let latestEvent = events.first, let eventDates {
                     Section {
-                        let eventDates = database.dates(for: latestEvent.eventNumber)
+                        if let coverImage = database.coverImage() {
+                            Image(uiImage: coverImage)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(maxWidth: .infinity, maxHeight: 250.0, alignment: .center)
+                        }
                         if eventDates.count > 0 {
-                            ForEach(eventDates, id: \.self) { eventDate in
+                            ForEach(Array(eventDates.keys).sorted(), id: \.self) { dayID in
                                 HStack {
-                                    Text("Shared.\(eventDate.id)th.Day")
+                                    Text("Shared.\(dayID)th.Day")
                                     Spacer()
-                                    Text(eventDate.date, style: .date)
-                                        .foregroundStyle(.secondary)
+                                    if let date = eventDates[dayID] {
+                                        Text(date, style: .date)
+                                            .foregroundStyle(.secondary)
+                                    }
                                 }
                             }
                         }
@@ -145,10 +153,10 @@ struct MoreView: View {
                 }
             }
             .onAppear {
-                updateUserInfoAndEvents()
+                reloadInformation()
             }
             .onChange(of: authManager.token) { _, _ in
-                updateUserInfoAndEvents()
+                reloadInformation()
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
@@ -234,16 +242,24 @@ SOFTWARE.
         }
     }
 
-    func updateUserInfoAndEvents() {
+    func reloadInformation() {
         if let token = authManager.token {
             Task.detached {
                 let userInfo = await User.info(authToken: token)
                 let userEvents = await User.events(authToken: token)
                 let eventData = await WebCatalog.events(authToken: token)
+
+                var eventDates: [Int: Date]?
+                if let latestEventNumber = eventData?.latestEventNumber {
+                    let actor = DataFetcher(modelContainer: sharedModelContainer)
+                    eventDates = await actor.dates(for: latestEventNumber)
+                }
+
                 await MainActor.run {
                     self.userInfo = userInfo
                     self.userEvents = userEvents
                     self.eventData = eventData
+                    self.eventDates = eventDates
                 }
             }
         }

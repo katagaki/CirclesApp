@@ -17,8 +17,10 @@ struct InteractiveMap: View {
     @Binding var map: ComiketMap?
 
     @State var mapImage: UIImage?
+    @State var genreImage: UIImage?
     @State var layouts: [ComiketLayout] = []
 
+    @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
 
     var body: some View {
@@ -34,6 +36,18 @@ struct InteractiveMap: View {
                         .padding(.trailing, 72.0)
                         .animation(.smooth.speed(2.0), value: zoomDivisor)
                         .colorInvert(adaptive: true)
+                        .overlay {
+                            if showGenreOverlay, let genreImage {
+                                Image(uiImage: genreImage)
+                                    .resizable()
+                                    .frame(
+                                        width: CGFloat(Int(mapImage.size.width) / zoomDivisor),
+                                        height: CGFloat(Int(mapImage.size.height) / zoomDivisor)
+                                    )
+                                    .animation(.smooth.speed(2.0), value: zoomDivisor)
+                                    .allowsHitTesting(false)
+                            }
+                        }
                         .overlay {
                             ZStack(alignment: .topLeading) {
                                 ForEach(layouts, id: \.self) { layout in
@@ -56,32 +70,52 @@ struct InteractiveMap: View {
                 .scrollIndicators(.hidden)
                 .overlay {
                     ZStack(alignment: .bottomTrailing) {
-                        VStack(alignment: .center, spacing: 0.0) {
-                            Button {
-                                zoomDivisor -= 1
-                            } label: {
-                                Image(systemName: "plus")
-                                    .font(.title)
+                        VStack(alignment: .trailing, spacing: 12.0) {
+                            Group {
+                                VStack(alignment: .center, spacing: 0.0) {
+                                    Button {
+                                        showGenreOverlay.toggle()
+                                    } label: {
+                                        Group {
+                                            if showGenreOverlay {
+                                                Image(systemName: "theatermask.and.paintbrush.fill")
+                                            } else {
+                                                Image(systemName: "theatermask.and.paintbrush")
+                                            }
+                                        }
+                                        .font(.title2)
+                                    }
+                                    .frame(width: 48.0, height: 48.0, alignment: .center)
+                                    .contentShape(.rect)
+                                }
+                                VStack(alignment: .center, spacing: 0.0) {
+                                    Button {
+                                        zoomDivisor -= 1
+                                    } label: {
+                                        Image(systemName: "plus")
+                                            .font(.title)
+                                    }
+                                    .frame(width: 48.0, height: 48.0, alignment: .center)
+                                    .contentShape(.rect)
+                                    .disabled(zoomDivisor <= 1)
+                                    Divider()
+                                    Button {
+                                        zoomDivisor += 1
+                                    } label: {
+                                        Image(systemName: "minus")
+                                            .font(.title)
+                                    }
+                                    .frame(width: 48.0, height: 48.0, alignment: .center)
+                                    .contentShape(.rect)
+                                    .disabled(zoomDivisor >= 3)
+                                }
                             }
-                            .frame(width: 48.0, height: 48.0, alignment: .center)
-                            .contentShape(.rect)
-                            .disabled(zoomDivisor <= 1)
-                            Divider()
-                            Button {
-                                zoomDivisor += 1
-                            } label: {
-                                Image(systemName: "minus")
-                                    .font(.title)
-                            }
-                            .frame(width: 48.0, height: 48.0, alignment: .center)
-                            .contentShape(.rect)
-                            .disabled(zoomDivisor >= 3)
+                            .background(Material.regular)
+                            .clipShape(.rect(cornerRadius: 8.0))
+                            .shadow(color: .black.opacity(0.2), radius: 4.0, y: 2.0)
                         }
                         .frame(maxWidth: 48.0)
-                        .background(Material.thin)
-                        .clipShape(.rect(cornerRadius: 8.0))
                         .offset(x: -12.0, y: -12.0)
-                        .shadow(color: .black.opacity(0.2), radius: 4.0, y: 2.0)
                         Color.clear
                     }
                 }
@@ -109,6 +143,11 @@ struct InteractiveMap: View {
     func reloadMapImage() {
         if let date, let map, let selectedHall = ComiketHall(rawValue: map.filename) {
             mapImage = database.mapImage(
+                for: selectedHall,
+                on: date.id,
+                usingHighDefinition: true
+            )
+            genreImage = database.genreImage(
                 for: selectedHall,
                 on: date.id,
                 usingHighDefinition: true
