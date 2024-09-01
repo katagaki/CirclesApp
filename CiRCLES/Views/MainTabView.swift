@@ -108,7 +108,9 @@ struct MainTabView: View {
                 let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
                 UIApplication.shared.isIdleTimerDisabled = true
 
-                await database.downloadDatabases(for: latestEvent, authToken: token)
+                await database.download(for: latestEvent, authToken: token)
+
+                await setProgressTextKey("Shared.LoadingText.Database")
                 database.connect()
 
                 if !database.isInitialLoadCompleted() {
@@ -143,6 +145,8 @@ struct MainTabView: View {
                 await setProgressTextKey("Shared.LoadingText.Images")
                 database.loadCommonImages()
                 database.loadCircleImages()
+
+                database.disconnect()
 
                 UIApplication.shared.isIdleTimerDisabled = false
             }
