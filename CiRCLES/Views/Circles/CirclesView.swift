@@ -14,7 +14,6 @@ struct CirclesView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
     @Environment(FavoritesManager.self) var favorites
-    @Environment(CatalogManager.self) var catalog
     @Environment(DatabaseManager.self) var database
 
     @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])

@@ -14,7 +14,6 @@ struct CircleDetailView: View {
     @Environment(\.openURL) var openURL
 
     @Environment(AuthManager.self) var authManager
-    @Environment(CatalogManager.self) var catalog
     @Environment(FavoritesManager.self) var favorites
     @Environment(DatabaseManager.self) var database
 
@@ -211,9 +210,9 @@ struct CircleDetailView: View {
                 self.extendedInformation = extendedInformation
             }
             if let token = authManager.token, let extendedInformation {
-                if let circleResponse = await catalog.getCircle(self.circle,
-                                                                using: extendedInformation,
-                                                                authToken: token),
+                if let circleResponse = await WebCatalog.circle(
+                    with: extendedInformation.webCatalogID, authToken: token
+                ),
                    let circleInformation = circleResponse.response.circle {
                     withAnimation(.snappy.speed(2.0)) {
                         circleCutURL = URL(string: circleInformation.cutWebURL)

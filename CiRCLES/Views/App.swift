@@ -14,7 +14,6 @@ struct CirclesApp: App {
     @StateObject var navigationManager = NavigationManager()
     @State var authManager = AuthManager()
     @State var favorites = FavoritesManager()
-    @State var catalog = CatalogManager()
     @State var database = DatabaseManager()
 
     var body: some Scene {
@@ -36,7 +35,6 @@ struct CirclesApp: App {
         .environmentObject(navigationManager)
         .environment(authManager)
         .environment(favorites)
-        .environment(catalog)
         .environment(database)
         .onChange(of: navigationManager.selectedTab) { _, _ in
             navigationManager.saveToDefaults()

@@ -13,7 +13,7 @@ struct WebCatalogEvent: Codable {
     struct Response: Codable {
         let list: [Event]
         let latestEventID: Int
-        let latestEventNo: Int
+        let latestEventNumber: Int
 
         struct Event: Codable {
             let id: Int
@@ -28,7 +28,7 @@ struct WebCatalogEvent: Codable {
         enum CodingKeys: String, CodingKey {
             case list = "list"
             case latestEventID = "LatestEventId"
-            case latestEventNo = "LatestEventNo"
+            case latestEventNumber = "LatestEventNo"
         }
     }
 }

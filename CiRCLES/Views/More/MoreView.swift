@@ -12,7 +12,6 @@ import SwiftUI
 struct MoreView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
-    @Environment(CatalogManager.self) var catalog
     @Environment(DatabaseManager.self) var database
 
     @Query(sort: [SortDescriptor(\ComiketEvent.eventNumber, order: .reverse)])
@@ -20,6 +19,7 @@ struct MoreView: View {
 
     @State var userInfo: UserInfo.Response?
     @State var userEvents: [UserCircle.Response.Circle] = []
+    @State var eventData: WebCatalogEvent.Response?
 
     @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
@@ -114,16 +114,18 @@ struct MoreView: View {
                 } header: {
                     ListSectionHeader(text: "More.UsefulResources")
                 }
-                Section {
-                    Picker(selection: .constant(catalog.latestEventID)) {
-                        ForEach(catalog.events?.sorted(by: {$0.number > $1.number}) ?? [], id: \.id) { event in
-                            Text("Shared.Event.\(event.number)")
-                                .tag(event.id)
-                        }
-                    } label: { }
-                    .pickerStyle(.inline)
-                } header: {
-                    ListSectionHeader(text: "More.Events")
+                if let eventData {
+                    Section {
+                        Picker(selection: .constant(eventData.latestEventID)) {
+                            ForEach(eventData.list.sorted(by: {$0.number > $1.number}), id: \.id) { event in
+                                Text("Shared.Event.\(event.number)")
+                                    .tag(event.id)
+                            }
+                        } label: { }
+                            .pickerStyle(.inline)
+                    } header: {
+                        ListSectionHeader(text: "More.Events")
+                    }
                 }
                 Section {
                     Toggle("More.Customization.ShowHallAndBlock", isOn: $showHallAndBlock)
@@ -234,9 +236,11 @@ SOFTWARE.
             Task.detached {
                 let userInfo = await User.info(authToken: token)
                 let userEvents = await User.events(authToken: token)
+                let eventData = await WebCatalog.events(authToken: token)
                 await MainActor.run {
                     self.userInfo = userInfo
                     self.userEvents = userEvents
+                    self.eventData = eventData
                 }
             }
         }

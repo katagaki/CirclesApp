@@ -13,7 +13,6 @@ struct MainTabView: View {
     @Environment(\.modelContext) private var modelContext
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
-    @Environment(CatalogManager.self) var catalog
     @Environment(FavoritesManager.self) var favorites
     @Environment(DatabaseManager.self) var database
 
@@ -104,8 +103,8 @@ struct MainTabView: View {
 
     func loadDataFromDatabase() async {
         if let token = authManager.token {
-            await catalog.getEvents(authToken: token)
-            if let latestEvent = catalog.latestEvent() {
+            if let eventData = await WebCatalog.events(authToken: token),
+                let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
                 UIApplication.shared.isIdleTimerDisabled = true
 
                 await database.downloadDatabases(for: latestEvent, authToken: token)
