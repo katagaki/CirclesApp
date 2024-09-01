@@ -181,6 +181,7 @@ extension DatabaseManager {
 
     // MARK: Circle Images
 
+    @MainActor
     func circleImage(for id: Int) -> UIImage? {
         if let cachedImage = imageCache[String(id)] {
             return cachedImage
@@ -193,6 +194,7 @@ extension DatabaseManager {
         return nil
     }
 
+    @MainActor
     func commonImage(named imageName: String) -> UIImage? {
         if let cachedImage = imageCache[imageName] {
             return cachedImage
