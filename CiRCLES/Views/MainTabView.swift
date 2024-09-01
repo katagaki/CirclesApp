@@ -17,8 +17,8 @@ struct MainTabView: View {
     @Environment(DatabaseManager.self) var database
 
     @State var isInitialTokenRefreshComplete: Bool = false
-
     @State var isProgressDeterminate: Bool = false
+    @State var progressHeaderText: String?
 
     var body: some View {
         @Bindable var authManager = authManager
@@ -50,6 +50,11 @@ struct MainTabView: View {
                     Color.clear
                         .ignoresSafeArea()
                     VStack(spacing: 12.0) {
+                        if let progressHeaderText {
+                            Text(NSLocalizedString(progressHeaderText, comment: ""))
+                                .font(.title2)
+                                .fontWeight(.bold)
+                        }
                         if let progressTextKey = database.progressTextKey {
                             Text(NSLocalizedString(progressTextKey, comment: ""))
                                 .foregroundStyle(.secondary)
@@ -64,7 +69,13 @@ struct MainTabView: View {
                     .padding()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
-                .background(Material.ultraThin)
+                .background {
+                    ZStack {
+                        Color(uiColor: .systemBackground).opacity(0.2)
+                            .ignoresSafeArea()
+                            .background(Material.bar)
+                    }
+                }
             }
         }
         .sheet(isPresented: $authManager.isAuthenticating) {
@@ -88,6 +99,7 @@ struct MainTabView: View {
                         await MainActor.run {
                             withAnimation(.snappy.speed(2.0)) {
                                 database.isBusy = false
+                                progressHeaderText = nil
                             }
                         }
                     }
@@ -107,13 +119,16 @@ struct MainTabView: View {
             if let eventData = await WebCatalog.events(authToken: token),
                 let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
                 UIApplication.shared.isIdleTimerDisabled = true
-
+                
+                await setProgressHeaderKey("Shared.LoadingHeader.Download")
                 await database.download(for: latestEvent, authToken: token)
 
                 await setProgressTextKey("Shared.LoadingText.Database")
                 database.connect()
 
                 if !database.isInitialLoadCompleted() {
+                    await setProgressHeaderKey("Shared.LoadingHeader.Initial")
+
                     let actor = DataConverter(modelContainer: sharedModelContainer)
 
                     await actor.deleteAllData()
@@ -148,6 +163,8 @@ struct MainTabView: View {
 
                 database.disconnect()
 
+                await setProgressHeaderKey(nil)
+
                 UIApplication.shared.isIdleTimerDisabled = false
             }
         }
@@ -161,6 +178,12 @@ struct MainTabView: View {
                 favorites.items = items
                 favorites.wcIDMappedItems = wcIDMappedItems
             }
+        }
+    }
+
+    func setProgressHeaderKey(_ progressHeaderKey: String?) async {
+        await MainActor.run {
+            progressHeaderText = progressHeaderKey
         }
     }
 

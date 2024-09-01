@@ -96,7 +96,7 @@ struct CircleDetailView: View {
                         Text(circleBlockName)
                             .font(.title3)
                             .fontWeight(.semibold)
-                            .foregroundStyle(Color.init(uiColor: UIColor.label))
+                            .foregroundStyle(Color(uiColor: UIColor.label))
                             .padding([.top, .bottom], 2.0)
                             .padding([.leading, .trailing], 10.0)
                             .background(Material.ultraThin)
