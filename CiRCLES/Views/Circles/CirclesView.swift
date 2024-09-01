@@ -69,7 +69,7 @@ struct CirclesView: View {
             .navigationTitle("ViewTitle.Circles")
             .toolbarBackground(.hidden, for: .tabBar)
             .overlay {
-                if selectedGenre == nil && selectedBlock == nil {
+                if (selectedGenre == nil && selectedBlock == nil) && searchedCircles == nil {
                     ContentUnavailableView(
                         "Circles.NoFilterSelected",
                         systemImage: "questionmark.square.dashed",
