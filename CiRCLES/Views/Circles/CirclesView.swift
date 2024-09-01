@@ -224,7 +224,7 @@ struct CirclesView: View {
     }
 
     func searchCircles() {
-        if searchTerm.trimmingCharacters(in: .whitespaces).count > 2 {
+        if searchTerm.trimmingCharacters(in: .whitespaces).count >= 2 {
             searchedCircles = database.circles(containing: searchTerm)
         } else {
             searchedCircles = nil
