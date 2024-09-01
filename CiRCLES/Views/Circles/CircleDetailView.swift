@@ -122,6 +122,7 @@ struct CircleDetailView: View {
             if let genre = database.genre(circle.genreID) {
                 Section {
                     Text(genre)
+                        .textSelection(.enabled)
                 } header: {
                     HStack {
                         ListSectionHeader(text: "Shared.Genre")
