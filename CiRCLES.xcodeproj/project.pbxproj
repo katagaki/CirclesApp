@@ -36,6 +36,7 @@
 		E4755BCC2C848D810032DA2F /* DatabaseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BCB2C848D800032DA2F /* DatabaseType.swift */; };
 		E4755BCE2C8493810032DA2F /* CircleBlockPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BCD2C84937E0032DA2F /* CircleBlockPill.swift */; };
 		E4755BD02C84942C0032DA2F /* CircleBlockPillSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BCF2C8494280032DA2F /* CircleBlockPillSize.swift */; };
+		E4755BD42C84A4D50032DA2F /* GenreOverlayTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BD32C84A4D20032DA2F /* GenreOverlayTip.swift */; };
 		E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA732C441B64009C1445 /* OpenIDToken.swift */; };
 		E480AA772C441DD1009C1445 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA762C441DD1009C1445 /* KeychainAccess */; };
 		E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA7A2C44230B009C1445 /* SwiftData.swift */; };
@@ -119,6 +120,7 @@
 		E4755BCB2C848D800032DA2F /* DatabaseType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseType.swift; sourceTree = "<group>"; };
 		E4755BCD2C84937E0032DA2F /* CircleBlockPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleBlockPill.swift; sourceTree = "<group>"; };
 		E4755BCF2C8494280032DA2F /* CircleBlockPillSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleBlockPillSize.swift; sourceTree = "<group>"; };
+		E4755BD32C84A4D20032DA2F /* GenreOverlayTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenreOverlayTip.swift; sourceTree = "<group>"; };
 		E480AA732C441B64009C1445 /* OpenIDToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenIDToken.swift; sourceTree = "<group>"; };
 		E480AA7A2C44230B009C1445 /* SwiftData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftData.swift; sourceTree = "<group>"; };
 		E480AA7E2C4423AD009C1445 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -276,6 +278,22 @@
 				E4755BC02C841C090032DA2F /* Connection.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		E4755BD12C84A4C60032DA2F /* Structs */ = {
+			isa = PBXGroup;
+			children = (
+				E4755BD22C84A4CD0032DA2F /* Tips */,
+			);
+			path = Structs;
+			sourceTree = "<group>";
+		};
+		E4755BD22C84A4CD0032DA2F /* Tips */ = {
+			isa = PBXGroup;
+			children = (
+				E4755BD32C84A4D20032DA2F /* GenreOverlayTip.swift */,
+			);
+			path = Tips;
 			sourceTree = "<group>";
 		};
 		E480AA782C4422DE009C1445 /* Shared */ = {
@@ -450,6 +468,7 @@
 				E42003CD2C631E4100770992 /* View Modifiers */,
 				E4755BBC2C8419B50032DA2F /* Actors */,
 				E47269022C3D715500D5335D /* Classes */,
+				E4755BD12C84A4C60032DA2F /* Structs */,
 				E480AA892C4429AC009C1445 /* Enums */,
 			);
 			path = CiRCLES;
@@ -571,6 +590,7 @@
 				E4CA64562C81FCC3001F50BB /* UserFavorite.swift in Sources */,
 				E4CA64582C8203A4001F50BB /* CircleGrid.swift in Sources */,
 				E48B629B2C5FCA95007874AE /* FavoriteColorSelector.swift in Sources */,
+				E4755BD42C84A4D50032DA2F /* GenreOverlayTip.swift in Sources */,
 				E43C740A2C6DFA6F003522C8 /* AdaptiveInvert.swift in Sources */,
 				E4755BD02C84942C0032DA2F /* CircleBlockPillSize.swift in Sources */,
 				E480AA912C442DD7009C1445 /* MoreView.swift in Sources */,

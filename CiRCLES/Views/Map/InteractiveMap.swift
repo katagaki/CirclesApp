@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TipKit
 
 struct InteractiveMap: View {
 
@@ -87,6 +88,7 @@ struct InteractiveMap: View {
                                     }
                                     .frame(width: 48.0, height: 48.0, alignment: .center)
                                     .contentShape(.rect)
+                                    .popoverTip(GenreOverlayTip())
                                 }
                                 VStack(alignment: .center, spacing: 0.0) {
                                     Button {
