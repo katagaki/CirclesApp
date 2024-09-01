@@ -14,7 +14,6 @@ extension DatabaseManager {
     // MARK: Common Images
 
     func loadCommonImages() {
-        progressTextKey = "Shared.LoadingText.Images"
         if let imageDatabase {
             debugPrint("Loading common images")
             do {
@@ -50,26 +49,21 @@ extension DatabaseManager {
 
     // MARK: Circle Images
 
-    func loadCircleImages(forcefully: Bool = false) {
-        progressTextKey = "Shared.LoadingText.Images"
-        if forcefully || self.circleImages.count == 0 {
-            if let imageDatabase {
-                debugPrint("Loading circle images")
-                do {
-                    let table = Table("ComiketCircleImage")
-                    let colID = Expression<Int>("id")
-                    let colCutImage = Expression<Data>("cutImage")
-                    var circleImages: [Int: Data] = [:]
-                    for row in try imageDatabase.prepare(table) {
-                        circleImages[row[colID]] = row[colCutImage]
-                    }
-                    self.circleImages = circleImages
-                } catch {
-                    debugPrint(error.localizedDescription)
+    func loadCircleImages() {
+        if let imageDatabase {
+            debugPrint("Loading circle images")
+            do {
+                let table = Table("ComiketCircleImage")
+                let colID = Expression<Int>("id")
+                let colCutImage = Expression<Data>("cutImage")
+                var circleImages: [Int: Data] = [:]
+                for row in try imageDatabase.prepare(table) {
+                    circleImages[row[colID]] = row[colCutImage]
                 }
+                self.circleImages = circleImages
+            } catch {
+                debugPrint(error.localizedDescription)
             }
-        } else {
-            debugPrint("Circle images loaded from cache")
         }
     }
 

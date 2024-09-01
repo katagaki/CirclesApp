@@ -28,8 +28,8 @@ struct MoreDatabaseAdministratiion: View {
                             Task.detached {
                                 if let eventData = await WebCatalog.events(authToken: token),
                                    let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
-                                    await database.deleteDatabases()
-                                    await database.downloadDatabases(for: latestEvent, authToken: token)
+                                    await database.delete()
+                                    await database.download(for: latestEvent, authToken: token)
                                 }
                                 await MainActor.run {
                                     withAnimation(.snappy.speed(2.0)) {

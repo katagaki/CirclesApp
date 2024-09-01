@@ -17,7 +17,6 @@ struct InteractiveMap: View {
     @Binding var map: ComiketMap?
 
     @State var mapImage: UIImage?
-    @State var circles: [ComiketCircle] = []
     @State var layouts: [ComiketLayout] = []
 
     @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
@@ -104,7 +103,6 @@ struct InteractiveMap: View {
             reloadMapImage()
         } completion: {
             reloadMapLayouts()
-            reloadMapCircles()
         }
     }
 
@@ -115,12 +113,6 @@ struct InteractiveMap: View {
                 on: date.id,
                 usingHighDefinition: true
             )
-        }
-    }
-
-    func reloadMapCircles() {
-        if let date {
-            circles = database.circles(on: date.id)
         }
     }
 

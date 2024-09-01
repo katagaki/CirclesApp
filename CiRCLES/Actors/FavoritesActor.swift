@@ -9,7 +9,10 @@ import Foundation
 
 actor FavoritesActor {
 
-    func all(authToken: OpenIDToken) async -> (items: [UserFavorites.Response.FavoriteItem], wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem]) {
+    func all(authToken: OpenIDToken) async -> (
+        items: [UserFavorites.Response.FavoriteItem],
+        wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem]
+    ) {
         let request = urlRequestForReadersAPI(endpoint: "FavoriteCircles", authToken: authToken)
 
         if let (data, _) = try? await URLSession.shared.data(for: request) {

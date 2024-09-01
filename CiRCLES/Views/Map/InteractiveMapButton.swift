@@ -51,15 +51,6 @@ struct InteractiveMapButton: View {
                 }
             }
         }
-//        .onAppear {
-//            if circlesInSpace.count == 0 {
-//                if let selectedEventDate {
-//                    circlesInSpace = database.circles(in: layout, on: selectedEventDate.id)
-//                } else {
-//                    circlesInSpace = database.circles(in: layout)
-//                }
-//            }
-//        }
         .popover(isPresented: $isCircleDetailPopoverPresented) {
             InteractiveMapDetailPopover(isPresented: $isCircleDetailPopoverPresented, circles: $circlesInSpace)
         }
