@@ -73,26 +73,12 @@ struct CircleGrid: View {
                             if showHallAndBlock || showDay {
                                 ZStack(alignment: .bottomTrailing) {
                                     VStack(alignment: .trailing, spacing: 2.0) {
-                                        Group {
-                                            if showDay {
-                                                Text("Shared.\(circle.day)th.Day")
-                                            }
-                                            if showHallAndBlock,
-                                                let hallAndBlockName = hallAndBlockMappings[circle.id] {
-                                                Text(hallAndBlockName)
-                                            }
+                                        if showDay {
+                                            CircleBlockPill("Shared.\(circle.day)th.Day")
                                         }
-                                        .font(.caption)
-                                        .fontWeight(.semibold)
-                                        .foregroundStyle(Color(uiColor: UIColor.label))
-                                        .padding([.top, .bottom], 2.0)
-                                        .padding([.leading, .trailing], 6.0)
-                                        .background(.background.opacity(0.8))
-                                        .clipShape(.capsule)
-                                        .overlay {
-                                            Capsule()
-                                                .stroke(lineWidth: 1)
-                                                .foregroundColor(.secondary)
+                                        if showHallAndBlock,
+                                            let hallAndBlockName = hallAndBlockMappings[circle.id] {
+                                            CircleBlockPill(LocalizedStringKey(hallAndBlockName))
                                         }
                                     }
                                     .padding(2.0)

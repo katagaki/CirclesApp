@@ -25,11 +25,19 @@ struct MoreDatabaseAdministratiion: View {
                             database.isBusy = true
                         } completion: {
                             UIApplication.shared.isIdleTimerDisabled = true
-                            Task.detached {
+                            database.progressTextKey = ""
+                            Task {
                                 if let eventData = await WebCatalog.events(authToken: token),
                                    let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
-                                    await database.delete()
-                                    await database.download(for: latestEvent, authToken: token)
+                                    database.delete()
+                                    await MainActor.run {
+                                        database.progressTextKey = "Shared.LoadingText.DownloadTextDatabase"
+                                    }
+                                    await database.downloadTextDatabase(for: latestEvent, authToken: token)
+                                    await MainActor.run {
+                                        database.progressTextKey = "Shared.LoadingText.DownloadImageDatabase"
+                                    }
+                                    await database.downloadImageDatabase(for: latestEvent, authToken: token)
                                 }
                                 await MainActor.run {
                                     withAnimation(.snappy.speed(2.0)) {
@@ -50,20 +58,19 @@ struct MoreDatabaseAdministratiion: View {
                                 readonly: true
                             )
                             UIApplication.shared.isIdleTimerDisabled = true
-                            Task.detached {
-                                await MainActor.run {
-                                    withAnimation(.snappy.speed(2.0)) {
-                                        database.isBusy = true
-                                        database.progressTextKey = "Shared.LoadingText.RepairingData"
-                                    }
-                                }
-                                let actor = DataConverter(modelContainer: sharedModelContainer)
-                                await actor.deleteAllData()
-                                await actor.loadAll(from: textDatabase)
-                                await MainActor.run {
-                                    withAnimation(.snappy.speed(2.0)) {
-                                        database.isBusy = false
-                                        UIApplication.shared.isIdleTimerDisabled = false
+                            withAnimation(.snappy.speed(2.0)) {
+                                database.isBusy = true
+                                database.progressTextKey = "Shared.LoadingText.RepairingData"
+                            } completion: {
+                                Task {
+                                    let actor = DataConverter(modelContainer: sharedModelContainer)
+                                    await actor.deleteAllData()
+                                    await actor.loadAll(from: textDatabase)
+                                    await MainActor.run {
+                                        withAnimation(.snappy.speed(2.0)) {
+                                            database.isBusy = false
+                                            UIApplication.shared.isIdleTimerDisabled = false
+                                        }
                                     }
                                 }
                             }

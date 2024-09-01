@@ -92,22 +92,13 @@ struct CircleDetailView: View {
                     if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
                         Text(circle.bookName)
                     }
-                    if let circleBlockName {
-                        Text(circleBlockName)
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(Color(uiColor: UIColor.label))
-                            .padding([.top, .bottom], 2.0)
-                            .padding([.leading, .trailing], 10.0)
-                            .background(Material.ultraThin)
-                            .clipShape(.capsule)
-                            .overlay {
-                                Capsule()
-                                    .stroke(lineWidth: 1)
-                                    .foregroundColor(.secondary)
-                            }
-                            .padding(2.0)
+                    HStack(spacing: 5.0) {
+                        CircleBlockPill("Shared.\(circle.day)th.Day", size: .large)
+                        if let circleBlockName {
+                            CircleBlockPill(LocalizedStringKey(circleBlockName), size: .large)
+                        }
                     }
+                    .padding(.bottom, 2.0)
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
                 .listRowSeparator(.hidden)

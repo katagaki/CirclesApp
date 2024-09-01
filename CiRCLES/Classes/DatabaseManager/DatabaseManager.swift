@@ -19,6 +19,7 @@ class DatabaseManager {
 
     @ObservationIgnored let databasesInitializedKey: String = "Database.Initialized"
 
+    @ObservationIgnored var databaseInformation: WebCatalogDatabase?
     @ObservationIgnored var textDatabaseURL: URL?
     @ObservationIgnored var imageDatabaseURL: URL?
 
@@ -72,28 +73,39 @@ class DatabaseManager {
 
     // MARK: Database Download
 
-    func download(for event: WebCatalogEvent.Response.Event, authToken: OpenIDToken) async {
-        // Reuse existing database if it exists
+    func downloadTextDatabase(for event: WebCatalogEvent.Response.Event, authToken: OpenIDToken) async {
+        self.textDatabaseURL = await download(for: event, of: .text, authToken: authToken)
+    }
+
+    func downloadImageDatabase(for event: WebCatalogEvent.Response.Event, authToken: OpenIDToken) async {
+        self.imageDatabaseURL = await download(for: event, of: .images, authToken: authToken)
+    }
+
+    // swiftlint:disable cyclomatic_complexity function_body_length
+    func download(
+        for event: WebCatalogEvent.Response.Event, of type: DatabaseType, authToken: OpenIDToken
+    ) async -> URL? {
+        var databaseNameSuffix: String = ""
+        switch type {
+        case .text: break
+        case .images: databaseNameSuffix = "Image1"
+        }
+
         if let documentsDirectoryURL {
-            let textDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number).db")
-            let imageDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number)Image1.db")
-            if FileManager.default.fileExists(atPath: textDatabaseURL.path(percentEncoded: false)),
-               FileManager.default.fileExists(atPath: imageDatabaseURL.path(percentEncoded: false)) {
-                self.textDatabaseURL = textDatabaseURL
-                self.imageDatabaseURL = imageDatabaseURL
-                return
+            let databaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number)\(databaseNameSuffix).db")
+            debugPrint(databaseURL)
+            if FileManager.default.fileExists(atPath: databaseURL.path(percentEncoded: false)) {
+                return databaseURL
+            } else {
+                if !FileManager.default.fileExists(atPath: documentsDirectoryURL.path()) {
+                    try? FileManager.default.createDirectory(
+                        at: documentsDirectoryURL, withIntermediateDirectories: false
+                    )
+                }
             }
         }
 
-        // Create Documents folder if it doesn't exist
-        if let documentsDirectoryURL,
-           !FileManager.default.fileExists(atPath: documentsDirectoryURL.path()) {
-            try? FileManager.default.createDirectory(at: documentsDirectoryURL, withIntermediateDirectories: false)
-        }
-
-        // Download zipped database
-        var textDatabaseURL: URL?
-        var imageDatabaseURL: URL?
+        var downloadedDatabaseURL: URL?
         var request = urlRequestForWebCatalogAPI("All", authToken: authToken)
         let parameters: [String: String] = [
             "event_id": String(event.id),
@@ -105,32 +117,36 @@ class DatabaseManager {
             .joined(separator: "&")
             .data(using: .utf8)
 
-        if let (data, _) = try? await URLSession.shared.data(for: request) {
-            debugPrint("Web Catalog databases response length: \(data.count)")
-            if let databases = try? JSONDecoder().decode(WebCatalogDatabase.self, from: data) {
-                debugPrint("Decoded databases")
-                textDatabaseURL = databases.response.databaseForText()
-                imageDatabaseURL = databases.response.databaseFor211By300Images()
+        if self.databaseInformation == nil {
+            if let (data, _) = try? await URLSession.shared.data(for: request) {
+                debugPrint("Web Catalog databases response length: \(data.count)")
+                if let databaseInformation = try? JSONDecoder().decode(WebCatalogDatabase.self, from: data) {
+                    debugPrint("Decoded databases")
+                    self.databaseInformation = databaseInformation
+                }
             }
         }
 
-        // Download databases
+        if let databaseInformation = self.databaseInformation {
+            switch type {
+            case .text:
+                downloadedDatabaseURL = databaseInformation.response.databaseForText()
+            case .images:
+                downloadedDatabaseURL = databaseInformation.response.databaseFor211By300Images()
+            }
+        }
+
         self.isDownloading = true
-
-        progressTextKey = "Shared.LoadingText.DownloadTextDatabase"
-        let textDatabaseZippedURL = await download(textDatabaseURL)
-
-        progressTextKey = "Shared.LoadingText.DownloadImageDatabase"
-        let imageDatabaseZippedURL = await download(imageDatabaseURL)
-
+        let databaseZippedURL = await download(downloadedDatabaseURL)
         self.isDownloading = false
 
-        // Unzip databases
-        if let textDatabaseZippedURL, let imageDatabaseZippedURL {
-            self.textDatabaseURL = unzip(textDatabaseZippedURL)
-            self.imageDatabaseURL = unzip(imageDatabaseZippedURL)
+        if let databaseZippedURL {
+            return unzip(databaseZippedURL)
         }
+
+        return nil
     }
+    // swiftlint:enable cyclomatic_complexity function_body_length
 
     func delete() {
         if let documentsDirectoryURL {

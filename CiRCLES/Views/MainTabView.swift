@@ -119,9 +119,14 @@ struct MainTabView: View {
             if let eventData = await WebCatalog.events(authToken: token),
                 let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
                 UIApplication.shared.isIdleTimerDisabled = true
-                
+
                 await setProgressHeaderKey("Shared.LoadingHeader.Download")
-                await database.download(for: latestEvent, authToken: token)
+
+                await setProgressTextKey("Shared.LoadingText.DownloadTextDatabase")
+                await database.downloadTextDatabase(for: latestEvent, authToken: token)
+
+                await setProgressTextKey("Shared.LoadingText.DownloadImageDatabase")
+                await database.downloadImageDatabase(for: latestEvent, authToken: token)
 
                 await setProgressTextKey("Shared.LoadingText.Database")
                 database.connect()
