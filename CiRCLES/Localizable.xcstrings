@@ -1120,6 +1120,12 @@
     "Tip.GenreOverlay.Description" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select this button to turn on/off genre overlays on the map."
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1131,6 +1137,12 @@
     "Tip.GenreOverlay.Title" : {
       "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Event Map x Genres"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
