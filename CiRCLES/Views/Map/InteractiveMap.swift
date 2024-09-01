@@ -127,6 +127,9 @@ struct InteractiveMap: View {
         .onChange(of: database.commonImages) { _, _ in
             reloadAll()
         }
+        .onChange(of: date) { _, _ in
+            reloadAll()
+        }
         .onChange(of: map) { _, _ in
             reloadAll()
         }
