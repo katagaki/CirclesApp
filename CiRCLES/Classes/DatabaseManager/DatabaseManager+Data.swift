@@ -182,15 +182,25 @@ extension DatabaseManager {
     // MARK: Circle Images
 
     func circleImage(for id: Int) -> UIImage? {
+        if let cachedImage = imageCache[String(id)] {
+            return cachedImage
+        }
         if let circleImageData = circleImages[id] {
-            return UIImage(data: circleImageData)
+            let circleImage = UIImage(data: circleImageData)
+            imageCache[String(id)] = circleImage
+            return circleImage
         }
         return nil
     }
 
     func commonImage(named imageName: String) -> UIImage? {
+        if let cachedImage = imageCache[imageName] {
+            return cachedImage
+        }
         if let imageData = commonImages[imageName] {
-            return UIImage(data: imageData)
+            let image = UIImage(data: imageData)
+            imageCache[imageName] = image
+            return image
         }
         return nil
     }

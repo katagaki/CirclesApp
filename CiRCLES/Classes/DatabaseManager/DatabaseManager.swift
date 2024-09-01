@@ -35,6 +35,8 @@ class DatabaseManager {
     var commonImages: [String: Data] = [:]
     var circleImages: [Int: Data] = [:]
 
+    var imageCache: [String: UIImage] = [:]
+
     var actor: DataConverter = DataConverter(modelContainer: sharedModelContainer)
 
     init() {
