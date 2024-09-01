@@ -140,9 +140,11 @@ struct CircleDetailView: View {
                 VStack(spacing: 0.0) {
                     Text(circle.circleName)
                         .bold()
-                    Text(circle.penName)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    if circle.penName.trimmingCharacters(in: .whitespaces) != "" {
+                        Text(circle.penName)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
