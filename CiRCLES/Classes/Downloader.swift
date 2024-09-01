@@ -7,12 +7,12 @@
 
 import Foundation
 
-final class Downloader: NSObject, URLSessionDownloadDelegate {
+class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelegate {
 
-    private var progressCallback: ((Double) -> Void)?
-    private var continuation: CheckedContinuation<URL, Error>?
-    private var session: URLSession?
-    private var destinationURL: URL?
+    var progressCallback: ((Double) -> Void)?
+    var continuation: CheckedContinuation<URL, Error>?
+    var session: URLSession?
+    var destinationURL: URL?
 
     override init() {
         super.init()
