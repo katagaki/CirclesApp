@@ -6,6 +6,7 @@
 //
 
 import Komponents
+import SwiftData
 import SwiftUI
 
 struct MoreView: View {
@@ -13,7 +14,12 @@ struct MoreView: View {
     @Environment(AuthManager.self) var authManager
     @Environment(CatalogManager.self) var catalog
     @Environment(DatabaseManager.self) var database
-    @Environment(UserManager.self) var user
+
+    @Query(sort: [SortDescriptor(\ComiketEvent.eventNumber, order: .reverse)])
+    var events: [ComiketEvent]
+
+    @State var userInfo: UserInfo.Response?
+    @State var userEvents: [UserCircle.Response.Circle] = []
 
     @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
@@ -30,12 +36,12 @@ struct MoreView: View {
                             .frame(width: 56.0, height: 56.0)
                             .clipShape(.circle)
                         VStack(alignment: .leading) {
-                            Text(user.info?.nickname ?? NSLocalizedString("Profile.GenericUser",
+                            Text(userInfo?.nickname ?? NSLocalizedString("Profile.GenericUser",
                                                                                      comment: ""))
                                 .fontWeight(.medium)
                                 .font(.title3)
                             if isShowingUserPID {
-                                Text("PID " + String(user.info?.pid ?? 0))
+                                Text("PID " + String(userInfo?.pid ?? 0))
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -63,10 +69,9 @@ struct MoreView: View {
                         }
                     }
                 }
-                if let latestEventNumber = catalog.latestEventNumber,
-                   let event = database.event(for: latestEventNumber) {
+                if let latestEvent = events.first {
                     Section {
-                        let eventDates = database.dates(for: event.eventNumber)
+                        let eventDates = database.dates(for: latestEvent.eventNumber)
                         if eventDates.count > 0 {
                             ForEach(eventDates, id: \.self) { eventDate in
                                 HStack {
@@ -78,7 +83,7 @@ struct MoreView: View {
                             }
                         }
                     } header: {
-                        ListSectionHeader(text: event.name)
+                        ListSectionHeader(text: latestEvent.name)
                     }
                 }
                 Section {
@@ -134,13 +139,11 @@ struct MoreView: View {
                     ListSectionHeader(text: "More.DBAdmin")
                 }
             }
-            .onChange(of: authManager.token) { _, newValue in
-                if let newValue {
-                    Task.detached {
-                        await user.getUser(authToken: newValue)
-                        await user.getEvents(authToken: newValue)
-                    }
-                }
+            .onAppear {
+                updateUserInfoAndEvents()
+            }
+            .onChange(of: authManager.token) { _, _ in
+                updateUserInfoAndEvents()
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
@@ -221,6 +224,19 @@ SOFTWARE.
 """)
                     ])
                 default: Color.clear
+                }
+            }
+        }
+    }
+
+    func updateUserInfoAndEvents() {
+        if let token = authManager.token {
+            Task.detached {
+                let userInfo = await User.info(authToken: token)
+                let userEvents = await User.events(authToken: token)
+                await MainActor.run {
+                    self.userInfo = userInfo
+                    self.userEvents = userEvents
                 }
             }
         }

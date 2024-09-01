@@ -13,7 +13,6 @@ struct CirclesApp: App {
 
     @StateObject var navigationManager = NavigationManager()
     @State var authManager = AuthManager()
-    @State var user = UserManager()
     @State var favorites = FavoritesManager()
     @State var catalog = CatalogManager()
     @State var database = DatabaseManager()
@@ -36,7 +35,6 @@ struct CirclesApp: App {
         .modelContainer(sharedModelContainer)
         .environmentObject(navigationManager)
         .environment(authManager)
-        .environment(user)
         .environment(favorites)
         .environment(catalog)
         .environment(database)
