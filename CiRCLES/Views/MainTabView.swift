@@ -78,16 +78,17 @@ struct MainTabView: View {
             }
         }
         .onChange(of: authManager.token) { _, newValue in
-            if let newValue {
+            if newValue != nil {
                 withAnimation(.snappy.speed(2.0)) {
                     database.isBusy = true
-                }
-                Task.detached {
-                    await loadDataFromDatabase()
-                    await favorites.getAll(authToken: newValue)
-                    await MainActor.run {
-                        withAnimation(.snappy.speed(2.0)) {
-                            database.isBusy = false
+                } completion: {
+                    Task.detached {
+                        await loadDataFromDatabase()
+                        await loadFavorites()
+                        await MainActor.run {
+                            withAnimation(.snappy.speed(2.0)) {
+                                database.isBusy = false
+                            }
                         }
                     }
                 }
@@ -144,6 +145,17 @@ struct MainTabView: View {
                 database.loadCircleImages()
 
                 UIApplication.shared.isIdleTimerDisabled = false
+            }
+        }
+    }
+
+    func loadFavorites() async {
+        if let token = authManager.token {
+            let actor = FavoritesActor()
+            let (items, wcIDMappedItems) = await actor.all(authToken: token)
+            await MainActor.run {
+                favorites.items = items
+                favorites.wcIDMappedItems = wcIDMappedItems
             }
         }
     }

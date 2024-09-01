@@ -30,7 +30,6 @@ struct CirclesView: View {
 
     @State var displayedCircles: [ComiketCircle] = []
     @State var searchedCircles: [ComiketCircle]?
-    @State var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
 
     @AppStorage(wrappedValue: 0, "Circles.SelectedGenreID") var selectedGenreID: Int
     @AppStorage(wrappedValue: 0, "Circles.SelectedMapID") var selectedMapID: Int
@@ -54,13 +53,13 @@ struct CirclesView: View {
                 Group {
                     if let searchedCircles {
                         CircleGrid(circles: searchedCircles,
-                                   favorites: favoriteItems,
+                                   favorites: favorites.wcIDMappedItems,
                                    namespace: circlesNamespace) { circle in
                             navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                         }
                     } else {
                         CircleGrid(circles: displayedCircles,
-                                   favorites: favoriteItems,
+                                   favorites: favorites.wcIDMappedItems,
                                    namespace: circlesNamespace) { circle in
                             navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                         }
@@ -219,17 +218,7 @@ struct CirclesView: View {
             displayedCircles?.removeAll(where: { $0.day != selectedDate.id })
         }
 
-        var favoriteItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
-        for displayedCircle in displayedCircles ?? [] {
-            if let favoriteForDisplayedCircle = favorites.items.first(where: {
-                $0.circle.webCatalogID == displayedCircle.extendedInformation?.webCatalogID
-            }) {
-                favoriteItems[displayedCircle.id] = favoriteForDisplayedCircle
-            }
-        }
-
         withAnimation(.snappy.speed(2.0)) {
-            self.favoriteItems = favoriteItems
             self.displayedCircles = displayedCircles ?? []
         }
     }

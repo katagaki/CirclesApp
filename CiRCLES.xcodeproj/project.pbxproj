@@ -31,6 +31,7 @@
 		E4755BB02C8353620032DA2F /* AutomaticNavigationTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BAF2C83535E0032DA2F /* AutomaticNavigationTransition.swift */; };
 		E4755BBE2C8419C10032DA2F /* DatabaseActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BBD2C8419BF0032DA2F /* DatabaseActor.swift */; };
 		E4755BC12C841C0B0032DA2F /* Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BC02C841C090032DA2F /* Connection.swift */; };
+		E4755BC32C843D7D0032DA2F /* FavoritesActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4755BC22C843D7B0032DA2F /* FavoritesActor.swift */; };
 		E480AA742C441B67009C1445 /* OpenIDToken.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA732C441B64009C1445 /* OpenIDToken.swift */; };
 		E480AA772C441DD1009C1445 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA762C441DD1009C1445 /* KeychainAccess */; };
 		E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */ = {isa = PBXBuildFile; fileRef = E480AA7A2C44230B009C1445 /* SwiftData.swift */; };
@@ -111,6 +112,7 @@
 		E4755BAF2C83535E0032DA2F /* AutomaticNavigationTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutomaticNavigationTransition.swift; sourceTree = "<group>"; };
 		E4755BBD2C8419BF0032DA2F /* DatabaseActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseActor.swift; sourceTree = "<group>"; };
 		E4755BC02C841C090032DA2F /* Connection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Connection.swift; sourceTree = "<group>"; };
+		E4755BC22C843D7B0032DA2F /* FavoritesActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesActor.swift; sourceTree = "<group>"; };
 		E480AA732C441B64009C1445 /* OpenIDToken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenIDToken.swift; sourceTree = "<group>"; };
 		E480AA7A2C44230B009C1445 /* SwiftData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftData.swift; sourceTree = "<group>"; };
 		E480AA7E2C4423AD009C1445 /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
@@ -256,6 +258,7 @@
 		E4755BBC2C8419B50032DA2F /* Actors */ = {
 			isa = PBXGroup;
 			children = (
+				E4755BC22C843D7B0032DA2F /* FavoritesActor.swift */,
 				E4755BBD2C8419BF0032DA2F /* DatabaseActor.swift */,
 			);
 			path = Actors;
@@ -558,6 +561,7 @@
 				E480AA9F2C44A75D009C1445 /* MoreDatabaseAdministratiion.swift in Sources */,
 				E482FFC22C21BD93009225BD /* MapView.swift in Sources */,
 				E43C74122C702750003522C8 /* Rotation.swift in Sources */,
+				E4755BC32C843D7D0032DA2F /* FavoritesActor.swift in Sources */,
 				E4CA64562C81FCC3001F50BB /* UserFavorite.swift in Sources */,
 				E4CA64582C8203A4001F50BB /* CircleGrid.swift in Sources */,
 				E48B629B2C5FCA95007874AE /* FavoriteColorSelector.swift in Sources */,

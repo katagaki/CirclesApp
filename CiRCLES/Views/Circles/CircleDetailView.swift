@@ -121,13 +121,10 @@ struct CircleDetailView: View {
                         ScrollView(.horizontal) {
                             HStack(spacing: 10.0) {
                                 Group {
-                                    if favorites.contains(extendedInformation) {
+                                    if favorites.contains(webCatalogID: extendedInformation.webCatalogID) {
                                         Button {
-                                            if let token = authManager.token {
-                                                Task {
-                                                    await favorites.delete(using: extendedInformation, authToken: token)
-                                                    isAddingToFavorites = false
-                                                }
+                                            Task.detached {
+                                                await deleteFavorite()
                                             }
                                         } label: {
                                             Image(systemName: "star.slash.fill")
@@ -221,14 +218,37 @@ struct CircleDetailView: View {
             }
         }
         .onChange(of: favoriteColorToAddTo) { _, newValue in
-            if let extendedInformation, let token = authManager.token, let newValue {
-                Task {
-                    await favorites.add(
-                        circle,
-                        using: extendedInformation,
-                        to: newValue,
-                        authToken: token
-                    )
+            Task.detached {
+                await addToFavorites(with: newValue)
+            }
+        }
+    }
+
+    func addToFavorites(with color: WebCatalogColor?) async {
+        if let extendedInformation = circle.extendedInformation, let color, let token = authManager.token {
+            let actor = FavoritesActor()
+            let favoritesAddResult = await actor.add(
+                extendedInformation.webCatalogID,
+                to: color,
+                authToken: token
+            )
+            if favoritesAddResult {
+                await MainActor.run {
+                    isAddingToFavorites = false
+                }
+            }
+        }
+    }
+
+    func deleteFavorite() async {
+        if let extendedInformation = circle.extendedInformation, let token = authManager.token {
+            let actor = FavoritesActor()
+            let favoritesDeleteResult = await actor.delete(
+                extendedInformation.webCatalogID,
+                authToken: token
+            )
+            if favoritesDeleteResult {
+                await MainActor.run {
                     isAddingToFavorites = false
                 }
             }

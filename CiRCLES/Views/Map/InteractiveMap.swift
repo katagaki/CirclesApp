@@ -102,9 +102,10 @@ struct InteractiveMap: View {
     func reloadAll() {
         withAnimation(.snappy.speed(2.0)) {
             reloadMapImage()
+        } completion: {
+            reloadMapLayouts()
+            reloadMapCircles()
         }
-        reloadMapLayouts()
-        reloadMapCircles()
     }
 
     func reloadMapImage() {

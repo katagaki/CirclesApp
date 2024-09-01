@@ -23,18 +23,19 @@ struct MoreDatabaseAdministratiion: View {
                     if let token = authManager.token {
                         withAnimation(.snappy.speed(2.0)) {
                             database.isBusy = true
-                        }
-                        UIApplication.shared.isIdleTimerDisabled = true
-                        Task.detached {
-                            if let eventData = await WebCatalog.events(authToken: token),
-                               let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
-                                await database.deleteDatabases()
-                                await database.downloadDatabases(for: latestEvent, authToken: token)
-                            }
-                            await MainActor.run {
-                                withAnimation(.snappy.speed(2.0)) {
-                                    database.isBusy = false
-                                    UIApplication.shared.isIdleTimerDisabled = false
+                        } completion: {
+                            UIApplication.shared.isIdleTimerDisabled = true
+                            Task.detached {
+                                if let eventData = await WebCatalog.events(authToken: token),
+                                   let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
+                                    await database.deleteDatabases()
+                                    await database.downloadDatabases(for: latestEvent, authToken: token)
+                                }
+                                await MainActor.run {
+                                    withAnimation(.snappy.speed(2.0)) {
+                                        database.isBusy = false
+                                        UIApplication.shared.isIdleTimerDisabled = false
+                                    }
                                 }
                             }
                         }
