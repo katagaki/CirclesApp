@@ -140,6 +140,7 @@ struct CircleDetailView: View {
             if let tags = webCatalogInformation?.tag, tags.trimmingCharacters(in: .whitespaces).count > 0 {
                 Section {
                     Text(tags)
+                        .textSelection(.enabled)
                 } header: {
                     HStack {
                         ListSectionHeader(text: "Shared.Tags")
