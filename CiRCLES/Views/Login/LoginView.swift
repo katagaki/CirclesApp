@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2024/06/19.
 //
 
+import Komponents
 import SwiftUI
 
 struct LoginView: View {
@@ -40,14 +41,6 @@ struct LoginView: View {
                 Text("Login.Subtitle")
                     .font(.subheadline)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Divider()
-                HStack {
-                    Image(systemName: "info.circle")
-                    Text("Login.Disclaimer")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
 //                Button {
 //                    isShowingDemoAlert = true
 //                } label: {
@@ -58,18 +51,32 @@ struct LoginView: View {
 //                }
 //                .buttonStyle(.bordered)
 //                .clipShape(.capsule(style: .continuous))
-                Button {
-                    isShowingAuthSafariViewController = true
-                } label: {
-                    Text("Shared.Login")
-                        .fontWeight(.bold)
-                        .frame(maxWidth: .infinity)
-                        .padding([.top, .bottom], 6.0)
-                }
-                .buttonStyle(.borderedProminent)
-                .clipShape(.capsule(style: .continuous))
             }
             .padding(18.0)
+        }
+        .safeAreaInset(edge: .bottom) {
+            BarAccessory(placement: .bottom) {
+                VStack {
+                    HStack {
+                        Image(systemName: "info.circle")
+                        Text("Login.Disclaimer")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    Button {
+                        isShowingAuthSafariViewController = true
+                    } label: {
+                        Text("Shared.Login")
+                            .fontWeight(.bold)
+                            .frame(maxWidth: .infinity)
+                            .padding([.top, .bottom], 6.0)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .clipShape(.capsule(style: .continuous))
+                }
+                .padding()
+            }
         }
         .sheet(isPresented: $isShowingAuthSafariViewController) {
             SafariView(url: authManager.authURL)

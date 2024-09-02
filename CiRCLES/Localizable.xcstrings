@@ -317,13 +317,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To use CiRCLES, you will need a Gold Member subscription."
+            "value" : "To use CiRCLES, you will need a Comike Web Catalog Gold Member subscription."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Circle.msでログインするには、ゴールド会員に入会する必要があります。"
+            "value" : "Circle.msでログインするには、コミケWebカタログ・有料プラン（Gold会員）を契約する必要があります。"
           }
         }
       }
@@ -742,6 +742,23 @@
         }
       }
     },
+    "Shared.LoadingHeader.Favorites" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updating Favorites"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お気に入り更新中"
+          }
+        }
+      }
+    },
     "Shared.LoadingHeader.Initial" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -840,6 +857,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "イベントデータを読み込み中…"
+          }
+        }
+      }
+    },
+    "Shared.LoadingText.Favorites" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Getting favorites data..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お気に入りの情報を取得中…"
           }
         }
       }
