@@ -76,7 +76,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "詳細が書かれていません。"
+            "value" : "内容が書かれていません。"
           }
         }
       }
@@ -478,6 +478,23 @@
         }
       }
     },
+    "More.ProvidedBy" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data provided by Comike Web Catalog"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データ提供元：コミケWebカタログ"
+          }
+        }
+      }
+    },
     "More.UsefulResources" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -508,6 +525,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "東京ビッグサイト フロアマップ"
+          }
+        }
+      }
+    },
+    "More.UsefulResources.WebCatalog" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Comike Web Catalog"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コミケWebカタログ"
           }
         }
       }
@@ -620,7 +654,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "詳細"
+            "value" : "補足説明/サークルアピール"
           }
         }
       }
@@ -937,23 +971,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
-          }
-        }
-      }
-    },
-    "Shared.OpenInCircleMs" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open in Circle.ms"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Circle.msで開く"
           }
         }
       }
