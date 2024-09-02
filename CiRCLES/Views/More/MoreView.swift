@@ -170,7 +170,12 @@ struct MoreView: View {
                 } header: {
                     ListSectionHeader(text: "More.DBAdmin")
                 } footer: {
-                    Text("More.ProvidedBy")
+                    VStack(alignment: .leading, spacing: 20.0) {
+                        Text("More.ProvidedBy")
+                        Text("More.Disclaimer")
+                    }
+                    .font(.body)
+                    .padding([.top], 20.0)
                 }
             }
             .onAppear {

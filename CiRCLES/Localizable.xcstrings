@@ -461,6 +461,23 @@
         }
       }
     },
+    "More.Disclaimer" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comic Market and Circle.ms bear no responsibility for any issues that may arise with this app. For inquiries, please use the below support options."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "本アプリの不具合について、コミケット及びCircle.msは責任を一切負いません。お問合せは、以下の連絡先までお願いいたします。"
+          }
+        }
+      }
+    },
     "More.Events" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -534,7 +551,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "Comike Web Catalog"
           }
         },
