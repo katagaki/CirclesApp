@@ -92,6 +92,7 @@
 		E4CA64562C81FCC3001F50BB /* UserFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64552C81FCC1001F50BB /* UserFavorite.swift */; };
 		E4CA64582C8203A4001F50BB /* CircleGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64572C8203A2001F50BB /* CircleGrid.swift */; };
 		E4D74B6A2C84BAA10014CD16 /* TranslateButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B692C84BA9F0014CD16 /* TranslateButton.swift */; };
+		E4D74B6C2C85FEDA0014CD16 /* CirclePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B6B2C85FED80014CD16 /* CirclePreview.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -179,6 +180,7 @@
 		E4CA64552C81FCC1001F50BB /* UserFavorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserFavorite.swift; sourceTree = "<group>"; };
 		E4CA64572C8203A2001F50BB /* CircleGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleGrid.swift; sourceTree = "<group>"; };
 		E4D74B692C84BA9F0014CD16 /* TranslateButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateButton.swift; sourceTree = "<group>"; };
+		E4D74B6B2C85FED80014CD16 /* CirclePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclePreview.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -234,14 +236,15 @@
 		E47269052C3D738900D5335D /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				E4D74B692C84BA9F0014CD16 /* TranslateButton.swift */,
 				E4755BCD2C84937E0032DA2F /* CircleBlockPill.swift */,
 				E4CA64572C8203A2001F50BB /* CircleGrid.swift */,
+				E4D74B6B2C85FED80014CD16 /* CirclePreview.swift */,
 				E4755BD92C84B71B0032DA2F /* FavoriteButton.swift */,
 				E48B629A2C5FCA8D007874AE /* FavoriteColorSelector.swift */,
 				E47269062C3D739500D5335D /* SafariView.swift */,
 				E4755BD52C84B6010032DA2F /* SNSButton.swift */,
 				E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */,
+				E4D74B692C84BA9F0014CD16 /* TranslateButton.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -667,6 +670,7 @@
 				E480AA882C442982009C1445 /* NavigationManager.swift in Sources */,
 				E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */,
 				E49351F72C4CD91F004CBDA1 /* ComiketCircleExtendedInformation.swift in Sources */,
+				E4D74B6C2C85FEDA0014CD16 /* CirclePreview.swift in Sources */,
 				E42003CF2C631E4E00770992 /* ConditionalFit.swift in Sources */,
 				E4755BAE2C8350820032DA2F /* AutomaticMatchedTransitionSource.swift in Sources */,
 				E480AA8D2C4429CD009C1445 /* ViewPath.swift in Sources */,

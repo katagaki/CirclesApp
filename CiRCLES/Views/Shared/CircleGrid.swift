@@ -87,6 +87,19 @@ struct CircleGrid: View {
                             }
                         }
                     }
+                    .contextMenu {
+                        if let twitterURL = circle.extendedInformation?.twitterURL {
+                            SNSButton(twitterURL, type: .twitter)
+                        }
+                        if let pixivURL = circle.extendedInformation?.pixivURL {
+                            SNSButton(pixivURL, type: .pixiv)
+                        }
+                        if let circleMsPortalURL = circle.extendedInformation?.circleMsPortalURL {
+                            SNSButton(circleMsPortalURL, type: .circleMs)
+                        }
+                    } preview: {
+                        CirclePreview(database: database, circle: circle)
+                    }
                     .automaticMatchedTransitionSource(id: circle.id, in: namespace)
                 }
             }
