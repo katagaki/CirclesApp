@@ -75,7 +75,7 @@ struct FavoritesView: View {
     func reloadFavorites() async {
         if let token = authManager.token {
             let actor = FavoritesActor()
-            var (items, wcIDMappedItems) = await actor.all(authToken: token)
+            let (items, wcIDMappedItems) = await actor.all(authToken: token)
             await MainActor.run {
                 favorites.items = items
                 favorites.wcIDMappedItems = wcIDMappedItems

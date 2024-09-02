@@ -9,6 +9,7 @@ import Komponents
 import SwiftData
 import SwiftUI
 
+// swiftlint:disable type_body_length
 struct MoreView: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
@@ -287,3 +288,4 @@ SOFTWARE.
         }
     }
 }
+// swiftlint:enable type_body_length
