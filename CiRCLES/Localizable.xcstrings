@@ -1106,6 +1106,23 @@
         }
       }
     },
+    "Shared.Tags" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "タグ"
+          }
+        }
+      }
+    },
     "Shared.Translate" : {
       "localizations" : {
         "en" : {

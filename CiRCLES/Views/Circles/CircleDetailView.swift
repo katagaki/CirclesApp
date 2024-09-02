@@ -137,6 +137,17 @@ struct CircleDetailView: View {
                     }
                 }
             }
+            if let tags = webCatalogInformation?.tag, tags.trimmingCharacters(in: .whitespaces).count > 0 {
+                Section {
+                    Text(tags)
+                } header: {
+                    HStack {
+                        ListSectionHeader(text: "Shared.Tags")
+                        Spacer()
+                        TranslateButton(translating: tags)
+                    }
+                }
+            }
             if circle.memo.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
                 Section {
                     Text(circle.memo)
