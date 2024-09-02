@@ -46,35 +46,40 @@ struct MainTabView: View {
                 }
                 .tag(TabType.more)
         }
-        .fullScreenCover(isPresented: $database.isBusy) {
-            VStack(spacing: 12.0) {
-                if progressHeaderText != nil || database.progressTextKey != nil {
-                    VStack(spacing: 6.0) {
-                        if let progressHeaderText {
-                            Text(NSLocalizedString(progressHeaderText, comment: ""))
-                                .font(.body)
-                                .fontWeight(.bold)
+        .overlay {
+            if database.isBusy {
+                ZStack {
+                    Color.black.opacity(0.7)
+                    VStack(spacing: 12.0) {
+                        if progressHeaderText != nil || database.progressTextKey != nil {
+                            VStack(spacing: 6.0) {
+                                if let progressHeaderText {
+                                    Text(NSLocalizedString(progressHeaderText, comment: ""))
+                                        .fontWeight(.bold)
+                                }
+                                if let progressTextKey = database.progressTextKey {
+                                    Text(NSLocalizedString(progressTextKey, comment: ""))
+                                        .font(.body)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
                         }
-                        if let progressTextKey = database.progressTextKey {
-                            Text(NSLocalizedString(progressTextKey, comment: ""))
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                        if database.isDownloading {
+                            ProgressView(value: database.downloadProgress, total: 1.0)
+                                .progressViewStyle(.linear)
+                        } else {
+                            ProgressView()
                         }
                     }
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Material.regular)
+                    .clipShape(RoundedRectangle(cornerRadius: 16.0))
+                    .padding(32.0)
                 }
-                if database.isDownloading {
-                    ProgressView(value: database.downloadProgress, total: 1.0)
-                    .progressViewStyle(.linear)
-                } else {
-                    ProgressView()
-                }
+                .ignoresSafeArea()
+                .transition(.opacity.animation(.snappy.speed(2.0)))
             }
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(Material.regular)
-            .clipShape(RoundedRectangle(cornerRadius: 16.0))
-            .padding(32.0)
-            .presentationBackground(.black.opacity(0.7))
         }
         .sheet(isPresented: $authManager.isAuthenticating) {
             LoginView()
@@ -97,8 +102,7 @@ struct MainTabView: View {
                     await loadDataFromDatabase()
                     await loadFavorites()
                     await MainActor.run {
-                        self.database.isBusy = false
-                        progressHeaderText = nil
+                        closeLoadingOverlay()
                     }
                 }
             }
@@ -165,14 +169,14 @@ struct MainTabView: View {
 
                 database.disconnect()
 
-                await setProgressHeaderKey(nil)
-
                 UIApplication.shared.isIdleTimerDisabled = false
             }
         }
     }
 
     func loadFavorites() async {
+        await setProgressHeaderKey("Shared.LoadingHeader.Favorites")
+        await setProgressTextKey("Shared.LoadingText.Favorites")
         if let token = authManager.token {
             let actor = FavoritesActor()
             let (items, wcIDMappedItems) = await actor.all(authToken: token)
@@ -192,6 +196,14 @@ struct MainTabView: View {
     func setProgressTextKey(_ progressTextKey: String) async {
         await MainActor.run {
             database.progressTextKey = progressTextKey
+        }
+    }
+
+    func closeLoadingOverlay() {
+        withAnimation(.snappy.speed(2.0)) {
+            self.database.isBusy = false
+            progressHeaderText = nil
+            database.progressTextKey = nil
         }
     }
 }

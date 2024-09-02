@@ -19,63 +19,60 @@ struct MoreDatabaseAdministratiion: View {
     var body: some View {
         List {
             Section {
-                Button("More.DBAdmin.RedownloadDBs", role: .destructive) {
-                    if let token = authManager.token {
-                        withAnimation(.snappy.speed(2.0)) {
-                            database.isBusy = true
-                        } completion: {
-                            UIApplication.shared.isIdleTimerDisabled = true
-                            database.progressTextKey = ""
-                            Task {
-                                if let eventData = await WebCatalog.events(authToken: token),
-                                   let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
-                                    database.delete()
-                                    await MainActor.run {
-                                        database.progressTextKey = "Shared.LoadingText.DownloadTextDatabase"
-                                    }
-                                    await database.downloadTextDatabase(for: latestEvent, authToken: token)
-                                    await MainActor.run {
-                                        database.progressTextKey = "Shared.LoadingText.DownloadImageDatabase"
-                                    }
-                                    await database.downloadImageDatabase(for: latestEvent, authToken: token)
-                                }
-                                await MainActor.run {
-                                    withAnimation(.snappy.speed(2.0)) {
-                                        database.isBusy = false
-                                        UIApplication.shared.isIdleTimerDisabled = false
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
                 Button("More.DBAdmin.RepairData", role: .destructive) {
-                    if let textDatabaseURL = database.textDatabaseURL {
-                        do {
-                            debugPrint("Opening text database")
-                            let textDatabase = try Connection(
-                                textDatabaseURL.path(percentEncoded: false),
-                                readonly: true
-                            )
-                            UIApplication.shared.isIdleTimerDisabled = true
-                            withAnimation(.snappy.speed(2.0)) {
-                                database.isBusy = true
-                                database.progressTextKey = "Shared.LoadingText.RepairingData"
-                            } completion: {
-                                Task {
-                                    let actor = DataConverter(modelContainer: sharedModelContainer)
-                                    await actor.deleteAllData()
-                                    await actor.loadAll(from: textDatabase)
-                                    await MainActor.run {
-                                        withAnimation(.snappy.speed(2.0)) {
-                                            database.isBusy = false
-                                            UIApplication.shared.isIdleTimerDisabled = false
+                    withAnimation(.snappy.speed(2.0)) {
+                        database.isBusy = true
+                    } completion: {
+                        UIApplication.shared.isIdleTimerDisabled = true
+                        database.progressTextKey = ""
+                        Task {
+                            if let token = authManager.token,
+                               let eventData = await WebCatalog.events(authToken: token),
+                               let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
+                                database.delete()
+                                await MainActor.run {
+                                    database.progressTextKey = "Shared.LoadingText.DownloadTextDatabase"
+                                }
+                                await database.downloadTextDatabase(for: latestEvent, authToken: token)
+                                await MainActor.run {
+                                    database.progressTextKey = "Shared.LoadingText.DownloadImageDatabase"
+                                }
+                                await database.downloadImageDatabase(for: latestEvent, authToken: token)
+                            }
+                            if let textDatabaseURL = database.textDatabaseURL {
+                                do {
+                                    debugPrint("Opening text database")
+                                    let textDatabase = try Connection(
+                                        textDatabaseURL.path(percentEncoded: false),
+                                        readonly: true
+                                    )
+                                    UIApplication.shared.isIdleTimerDisabled = true
+                                    withAnimation(.snappy.speed(2.0)) {
+                                        database.isBusy = true
+                                        database.progressTextKey = "Shared.LoadingText.RepairingData"
+                                    } completion: {
+                                        Task {
+                                            let actor = DataConverter(modelContainer: sharedModelContainer)
+                                            await actor.deleteAllData()
+                                            await actor.loadAll(from: textDatabase)
+                                            await MainActor.run {
+                                                withAnimation(.snappy.speed(2.0)) {
+                                                    database.isBusy = false
+                                                    UIApplication.shared.isIdleTimerDisabled = false
+                                                }
+                                            }
                                         }
                                     }
+                                } catch {
+                                    debugPrint(error.localizedDescription)
                                 }
                             }
-                        } catch {
-                            debugPrint(error.localizedDescription)
+                            await MainActor.run {
+                                withAnimation(.snappy.speed(2.0)) {
+                                    database.isBusy = false
+                                    UIApplication.shared.isIdleTimerDisabled = false
+                                }
+                            }
                         }
                     }
                 }
