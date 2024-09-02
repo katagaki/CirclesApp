@@ -46,6 +46,12 @@ struct CircleDetailView: View {
                             if let circleImage {
                                 Image(uiImage: circleImage)
                                     .resizable()
+                            } else {
+                                Rectangle()
+                                    .foregroundStyle(Color.primary.opacity(0.05))
+                                    .overlay {
+                                        ProgressView()
+                                    }
                             }
                             if webCatalogInformation != nil {
                                 if let circleCutURL {
