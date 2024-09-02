@@ -69,7 +69,7 @@ struct CirclesView: View {
             .navigationTitle("ViewTitle.Circles")
             .toolbarBackground(.hidden, for: .tabBar)
             .overlay {
-                if selectedGenre == nil && selectedBlock == nil {
+                if (selectedGenre == nil && selectedBlock == nil) && searchedCircles == nil {
                     ContentUnavailableView(
                         "Circles.NoFilterSelected",
                         systemImage: "questionmark.square.dashed",
@@ -224,7 +224,7 @@ struct CirclesView: View {
     }
 
     func searchCircles() {
-        if searchTerm.trimmingCharacters(in: .whitespaces).count > 2 {
+        if searchTerm.trimmingCharacters(in: .whitespaces).count >= 2 {
             searchedCircles = database.circles(containing: searchTerm)
         } else {
             searchedCircles = nil
