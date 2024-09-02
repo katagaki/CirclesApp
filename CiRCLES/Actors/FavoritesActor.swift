@@ -43,7 +43,7 @@ actor FavoritesActor {
                 "access_token": authToken.accessToken,
                 "wcid": String(webCatalogID),
                 "color": String(color.rawValue),
-                "memo": "CiRCLESにより追加されました。"
+                "memo": ""
                 ],
             authToken: authToken
         )
