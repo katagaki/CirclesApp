@@ -110,10 +110,28 @@ struct MoreView: View {
                                         .foregroundStyle(.foreground.opacity(0.5))
                                 }
                             }
+                            Link(destination: URL(string: "https://webcatalog.circle.ms")!) {
+                                HStack(alignment: .center) {
+                                    ListRow(image: "ListIcon.WebCatalog", title: "More.UsefulResources.WebCatalog")
+                                        .foregroundStyle(.foreground)
+                                    Spacer()
+                                    Image(systemName: "safari")
+                                        .foregroundStyle(.foreground.opacity(0.5))
+                                }
+                            }
                         default:
                             Link(destination: URL(string: "https://www.bigsight.jp/english/visitor/floormap/")!) {
                                 HStack(alignment: .center) {
                                     ListRow(image: "ListIcon.BigSight", title: "More.UsefulResources.BigSightMap")
+                                        .foregroundStyle(.foreground)
+                                    Spacer()
+                                    Image(systemName: "safari")
+                                        .foregroundStyle(.foreground.opacity(0.5))
+                                }
+                            }
+                            Link(destination: URL(string: "https://int.webcatalog.circle.ms/en/catalog")!) {
+                                HStack(alignment: .center) {
+                                    ListRow(image: "ListIcon.WebCatalog", title: "More.UsefulResources.WebCatalog")
                                         .foregroundStyle(.foreground)
                                     Spacer()
                                     Image(systemName: "safari")
@@ -150,6 +168,8 @@ struct MoreView: View {
                     }
                 } header: {
                     ListSectionHeader(text: "More.DBAdmin")
+                } footer: {
+                    Text("More.ProvidedBy")
                 }
             }
             .onAppear {

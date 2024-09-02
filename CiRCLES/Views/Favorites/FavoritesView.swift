@@ -75,7 +75,7 @@ struct FavoritesView: View {
     func reloadFavorites() async {
         if let token = authManager.token {
             let actor = FavoritesActor()
-            let (items, wcIDMappedItems) = await actor.all(authToken: token)
+            var (items, wcIDMappedItems) = await actor.all(authToken: token)
             await MainActor.run {
                 favorites.items = items
                 favorites.wcIDMappedItems = wcIDMappedItems
@@ -85,9 +85,25 @@ struct FavoritesView: View {
 
     func prepareCircles(using favoriteItems: [UserFavorites.Response.FavoriteItem]) async {
         var favoriteCircles: [ComiketCircle] = []
-        for favorite in favoriteItems {
-            if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID) {
-                favoriteCircles.append(webCatalogCircle)
+        let favoriteItemsSorted: [Int: [UserFavorites.Response.FavoriteItem]] = favoriteItems.reduce(
+            into: [Int: [UserFavorites.Response.FavoriteItem]]()
+        ) { partialResult, favoriteItem in
+            if partialResult[favoriteItem.favorite.color.rawValue] != nil {
+                partialResult[favoriteItem.favorite.color.rawValue]?.append(favoriteItem)
+            } else {
+                partialResult[favoriteItem.favorite.color.rawValue] = [favoriteItem]
+            }
+        }
+        for colorKey in favoriteItemsSorted.keys.sorted() {
+            if let favoriteItems = favoriteItemsSorted[colorKey] {
+                var circles: [ComiketCircle] = []
+                for favorite in favoriteItems {
+                    if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID) {
+                        circles.append(webCatalogCircle)
+                    }
+                }
+                circles.sort(by: {$0.id < $1.id})
+                favoriteCircles.append(contentsOf: circles)
             }
         }
         await MainActor.run {
