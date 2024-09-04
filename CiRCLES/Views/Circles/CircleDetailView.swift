@@ -245,7 +245,6 @@ struct CircleDetailView: View {
                 }
             }
         }
-        let actor = DataFetcher(modelContainer: sharedModelContainer)
     }
 
     func addToFavorites(with color: WebCatalogColor?) async {
