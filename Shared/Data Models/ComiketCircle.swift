@@ -37,6 +37,9 @@ final class ComiketCircle: SQLiteable {
     @Relationship(.unique, deleteRule: .cascade, inverse: \ComiketCircleExtendedInformation.circle)
     var extendedInformation: ComiketCircleExtendedInformation?
 
+    @Relationship(deleteRule: .nullify, inverse: \ComiketBlock.circles)
+    var block: ComiketBlock?
+
     init(from row: Row) {
         let table = Table("ComiketCircleWC")
 
@@ -93,6 +96,14 @@ final class ComiketCircle: SQLiteable {
 
         self.rss = row[colRSS]
         self.updateFlag = row[colUpdateFlag]
+    }
+
+    func spaceName() -> String? {
+        if let block {
+            return "\(block.name)\(spaceNumberCombined())"
+        } else {
+            return nil
+        }
     }
 
     func spaceNumberCombined() -> String {

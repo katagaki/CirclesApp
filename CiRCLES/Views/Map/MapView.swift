@@ -64,11 +64,9 @@ struct MapView: View {
                                         VStack(alignment: .leading, spacing: 12.0) {
                                             HStack {
                                                 Text("Shared.\(date.id)th.Day")
-                                                    .font(.title3)
                                                     .bold()
                                                 Spacer()
                                                 Text(date.date, style: .date)
-                                                    .font(.title3)
                                                     .foregroundStyle(.secondary)
                                             }
                                             Divider()

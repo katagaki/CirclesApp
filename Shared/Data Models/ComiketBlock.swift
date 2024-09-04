@@ -15,6 +15,8 @@ final class ComiketBlock: SQLiteable {
     var name: String
     var areaID: Int
 
+    @Relationship(deleteRule: .nullify) var circles: [ComiketCircle]?
+
     init(from row: Row) {
         let colEventNumber = Expression<Int>("comiketNo")
         let colID = Expression<Int>("id")

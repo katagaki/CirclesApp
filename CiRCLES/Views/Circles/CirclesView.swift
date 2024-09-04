@@ -32,7 +32,6 @@ struct CirclesView: View {
 
     @State var displayedCircles: [ComiketCircle] = []
     @State var searchedCircles: [ComiketCircle]?
-    @State var circleSpaceMappings: [Int: String] = [:]
 
     @AppStorage(wrappedValue: 0, "Circles.SelectedGenreID") var selectedGenreID: Int
     @AppStorage(wrappedValue: 0, "Circles.SelectedMapID") var selectedMapID: Int
@@ -60,13 +59,11 @@ struct CirclesView: View {
                 case .grid:
                     if let searchedCircles {
                         CircleGrid(circles: searchedCircles,
-                                   spaceMappings: circleSpaceMappings,
                                    namespace: circlesNamespace) { circle in
                             navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                         }
                     } else {
                         CircleGrid(circles: displayedCircles,
-                                   spaceMappings: circleSpaceMappings,
                                    namespace: circlesNamespace) { circle in
                             navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                         }
@@ -74,13 +71,11 @@ struct CirclesView: View {
                 case .list:
                     if let searchedCircles {
                         CircleList(circles: searchedCircles,
-                                   spaceMappings: circleSpaceMappings,
                                    namespace: circlesNamespace) { circle in
                             navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                         }
                     } else {
                         CircleList(circles: displayedCircles,
-                                   spaceMappings: circleSpaceMappings,
                                    namespace: circlesNamespace) { circle in
                             navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                         }
@@ -245,7 +240,6 @@ struct CirclesView: View {
     func reloadAll() {
         Task.detached {
             await reloadDisplayedCircles()
-            await reloadMappings()
         }
     }
 
@@ -271,55 +265,31 @@ struct CirclesView: View {
         }
 
         await MainActor.run {
+            var displayedCircles: [ComiketCircle] = []
             if let circleIdentifiers {
-                var displayedCircles = database.circles(circleIdentifiers, in: modelContext)
+                displayedCircles = database.circles(circleIdentifiers, in: modelContext)
                 if let selectedDate {
                     displayedCircles.removeAll(where: { $0.day != selectedDate.id })
                 }
-                withAnimation(.snappy.speed(2.0)) {
-                    self.displayedCircles = displayedCircles
-                }
-            } else {
-                withAnimation(.snappy.speed(2.0)) {
-                    self.displayedCircles = []
-                }
             }
-        }
-    }
-
-    func reloadMappings() async {
-        debugPrint("Reloading circle ID to space name mapping")
-        let actor = DataFetcher(modelContainer: sharedModelContainer)
-
-        var circleSpaceMappings: [Int: String] = [:]
-        // TODO: Cache this in a bigger context so that search can also use it with fast performance
-        let circles = searchedCircles == nil ? displayedCircles : searchedCircles!
-        for circle in circles {
-            let circleID = circle.id
-            let blockName = await actor.blockName(circle.blockID)
-            if let blockName {
-                circleSpaceMappings[circleID] = "\(blockName)\(circle.spaceNumberCombined())"
+            withAnimation(.snappy.speed(2.0)) {
+                self.displayedCircles = displayedCircles
             }
-        }
-
-        await MainActor.run {
-            self.circleSpaceMappings = circleSpaceMappings
         }
     }
 
     func searchCircles() async {
+        debugPrint("Reloading searched circles")
         let actor = DataFetcher(modelContainer: sharedModelContainer)
 
         if searchTerm.trimmingCharacters(in: .whitespaces).count >= 2 {
             let circleIdentifiers = await actor.circles(containing: searchTerm)
-
             await MainActor.run {
                 let searchedCircles = database.circles(circleIdentifiers, in: modelContext)
                 withAnimation(.snappy.speed(2.0)) {
                     self.searchedCircles = searchedCircles
                 }
             }
-
         } else {
             await MainActor.run {
                 withAnimation(.snappy.speed(2.0)) {

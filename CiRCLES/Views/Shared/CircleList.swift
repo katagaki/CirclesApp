@@ -13,11 +13,10 @@ struct CircleList: View {
     @Environment(FavoritesManager.self) var favorites
 
     var circles: [ComiketCircle]
-    var spaceMappings: [Int: String]
     var namespace: Namespace.ID
     var onSelect: ((ComiketCircle) -> Void)
 
-    @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
+    @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
 
     var body: some View {
@@ -64,13 +63,12 @@ struct CircleList: View {
                             Text(circle.penName)
                                 .foregroundStyle(.secondary)
                         }
-                        if showHallAndBlock || showDay {
+                        if showSpaceName || showDay {
                             HStack(alignment: .center) {
                                 if showDay {
                                     CircleBlockPill("Shared.\(circle.day)th.Day")
                                 }
-                                if showHallAndBlock,
-                                    let spaceName = spaceMappings[circle.id] {
+                                if showSpaceName, let spaceName = circle.spaceName() {
                                     CircleBlockPill(LocalizedStringKey(spaceName))
                                 }
                             }

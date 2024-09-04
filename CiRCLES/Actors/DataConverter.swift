@@ -84,6 +84,15 @@ actor DataConverter {
                     on: circlesTable[id] == circleExtendedInformationTable[id]
                 )
 
+                debugPrint("Preparing block data for circles")
+                let fetchDescriptor = FetchDescriptor<ComiketBlock>()
+                let blocks = try modelContext.fetch(fetchDescriptor)
+                let blockMappings: [Int: ComiketBlock] = blocks.reduce(
+                    into: [Int: ComiketBlock]()
+                ) { partialResult, block in
+                    partialResult[block.id] = block
+                }
+
                 var rows: [Row] = []
                 for row in try database.prepare(joinedTable) {
                     rows.append(row)
@@ -93,6 +102,7 @@ actor DataConverter {
                     let extendedInformation = ComiketCircleExtendedInformation(from: row)
                     circle.extendedInformation = extendedInformation
                     modelContext.insert(circle)
+                    circle.block = blockMappings[circle.blockID]
                     debugPrint("Inserted circle \(circle.id) via actor")
                 }
             } catch {

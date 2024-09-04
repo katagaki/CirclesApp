@@ -15,11 +15,10 @@ struct CircleGrid: View {
     let gridSpacing: CGFloat = 1.0
 
     var circles: [ComiketCircle]
-    var spaceMappings: [Int: String]
     var namespace: Namespace.ID
     var onSelect: ((ComiketCircle) -> Void)
 
-    @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
+    @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
 
     var body: some View {
@@ -54,7 +53,8 @@ struct CircleGrid: View {
                         .overlay {
                             GeometryReader { proxy in
                                 ZStack(alignment: .topLeading) {
-                                    if let favorites = favorites.wcIDMappedItems, let extendedInformation = circle.extendedInformation,
+                                    if let favorites = favorites.wcIDMappedItems,
+                                       let extendedInformation = circle.extendedInformation,
                                        let favorite = favorites[extendedInformation.webCatalogID] {
                                         favorite.favorite.color.swiftUIColor()
                                             .frame(width: 0.23 * proxy.size.width,
@@ -67,15 +67,14 @@ struct CircleGrid: View {
                             }
                         }
                         .overlay {
-                            if showHallAndBlock || showDay {
+                            if showSpaceName || showDay {
                                 ZStack(alignment: .bottomTrailing) {
                                     VStack(alignment: .trailing, spacing: 2.0) {
                                         if showDay {
                                             CircleBlockPill("Shared.\(circle.day)th.Day")
                                         }
-                                        if showHallAndBlock,
-                                            let hallAndBlockName = spaceMappings[circle.id] {
-                                            CircleBlockPill(LocalizedStringKey(hallAndBlockName))
+                                        if showSpaceName, let spaceName = circle.spaceName() {
+                                            CircleBlockPill(LocalizedStringKey(spaceName))
                                         }
                                     }
                                     .padding(2.0)
