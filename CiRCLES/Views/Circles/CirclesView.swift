@@ -16,6 +16,8 @@ struct CirclesView: View {
     @Environment(FavoritesManager.self) var favorites
     @Environment(DatabaseManager.self) var database
 
+    @Environment(\.modelContext) var modelContext
+
     @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
     var dates: [ComiketDate]
 
@@ -30,6 +32,7 @@ struct CirclesView: View {
 
     @State var displayedCircles: [ComiketCircle] = []
     @State var searchedCircles: [ComiketCircle]?
+    @State var circleSpaceMappings: [Int: String] = [:]
 
     @AppStorage(wrappedValue: 0, "Circles.SelectedGenreID") var selectedGenreID: Int
     @AppStorage(wrappedValue: 0, "Circles.SelectedMapID") var selectedMapID: Int
@@ -45,36 +48,71 @@ struct CirclesView: View {
 
     @State var isInitialLoadCompleted: Bool = false
 
+    @AppStorage(wrappedValue: CircleDisplayMode.grid, "Circles.DisplayMode") var displayMode: CircleDisplayMode
+    @State var displayModeState: CircleDisplayMode = .grid
+
     @Namespace var circlesNamespace
 
     var body: some View {
         NavigationStack(path: $navigationManager[.circles]) {
             ZStack(alignment: .center) {
-                Group {
+                switch displayModeState {
+                case .grid:
                     if let searchedCircles {
                         CircleGrid(circles: searchedCircles,
-                                   favorites: favorites.wcIDMappedItems,
+                                   spaceMappings: circleSpaceMappings,
                                    namespace: circlesNamespace) { circle in
                             navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                         }
                     } else {
                         CircleGrid(circles: displayedCircles,
-                                   favorites: favorites.wcIDMappedItems,
+                                   spaceMappings: circleSpaceMappings,
+                                   namespace: circlesNamespace) { circle in
+                            navigationManager.push(.circlesDetail(circle: circle), for: .circles)
+                        }
+                    }
+                case .list:
+                    if let searchedCircles {
+                        CircleList(circles: searchedCircles,
+                                   spaceMappings: circleSpaceMappings,
+                                   namespace: circlesNamespace) { circle in
+                            navigationManager.push(.circlesDetail(circle: circle), for: .circles)
+                        }
+                    } else {
+                        CircleList(circles: displayedCircles,
+                                   spaceMappings: circleSpaceMappings,
                                    namespace: circlesNamespace) { circle in
                             navigationManager.push(.circlesDetail(circle: circle), for: .circles)
                         }
                     }
                 }
-            }
-            .navigationTitle("ViewTitle.Circles")
-            .toolbarBackground(.hidden, for: .tabBar)
-            .overlay {
                 if (selectedGenre == nil && selectedBlock == nil) && searchedCircles == nil {
                     ContentUnavailableView(
                         "Circles.NoFilterSelected",
                         systemImage: "questionmark.square.dashed",
                         description: Text("Circles.NoFilterSelected.Description")
                     )
+                }
+            }
+            .navigationTitle("ViewTitle.Circles")
+            .toolbarBackground(.hidden, for: .tabBar)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        withAnimation(.snappy.speed(2.0)) {
+                            switch displayModeState {
+                            case .grid: displayModeState = .list
+                            case .list: displayModeState = .grid
+                            }
+                        }
+                    } label: {
+                        switch displayModeState {
+                        case .grid:
+                            Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
+                        case .list:
+                            Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
+                        }
+                    }
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
@@ -149,6 +187,7 @@ struct CirclesView: View {
             .onAppear {
                 if !isInitialLoadCompleted {
                     debugPrint("Restoring Circles view state")
+                    displayModeState = displayMode
                     selectedGenre = genres.first(where: {$0.id == selectedGenreID})
                     selectedMap = maps.first(where: {$0.id == selectedMapID})
                     selectedBlock = blocks.first(where: {$0.id == selectedBlockID})
@@ -159,7 +198,7 @@ struct CirclesView: View {
             .onChange(of: selectedGenre) { _, _ in
                 if isInitialLoadCompleted {
                     selectedGenreID = selectedGenre?.id ?? 0
-                    reloadDisplayedCircles()
+                    reloadAll()
                 }
             }
             .onChange(of: selectedMap) { oldValue, newValue in
@@ -168,24 +207,29 @@ struct CirclesView: View {
                     if oldValue != newValue && oldValue != nil {
                         selectedBlock = nil
                     } else {
-                        reloadDisplayedCircles()
+                        reloadAll()
                     }
                 }
             }
             .onChange(of: selectedBlock) { _, _ in
                 if isInitialLoadCompleted {
                     selectedBlockID = selectedBlock?.id ?? 0
-                    reloadDisplayedCircles()
+                    reloadAll()
                 }
             }
             .onChange(of: selectedDate) { _, _ in
                 if isInitialLoadCompleted {
                     selectedDateID = selectedDate?.id ?? 0
-                    reloadDisplayedCircles()
+                    reloadAll()
                 }
             }
             .onChange(of: searchTerm) { _, _ in
-                searchCircles()
+                Task.detached {
+                    await searchCircles()
+                }
+            }
+            .onChange(of: displayModeState) { _, _ in
+                displayMode = displayModeState
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
@@ -198,36 +242,90 @@ struct CirclesView: View {
         }
     }
 
-    func reloadDisplayedCircles() {
-        debugPrint("Reloading displayed circles")
-        var displayedCircles: [ComiketCircle]?
-        if let selectedGenre {
-            displayedCircles = database.circles(with: selectedGenre)
-        }
-        if let selectedBlock {
-            let circlesInSelectedBlock = database.circles(in: selectedBlock)
-            if displayedCircles == nil {
-                displayedCircles = circlesInSelectedBlock
-            } else {
-                displayedCircles?.removeAll(where: {
-                    !circlesInSelectedBlock.contains($0)
-                })
-            }
-        }
-        if let selectedDate {
-            displayedCircles?.removeAll(where: { $0.day != selectedDate.id })
-        }
-
-        withAnimation(.snappy.speed(2.0)) {
-            self.displayedCircles = displayedCircles ?? []
+    func reloadAll() {
+        Task.detached {
+            await reloadDisplayedCircles()
+            await reloadMappings()
         }
     }
 
-    func searchCircles() {
+    func reloadDisplayedCircles() async {
+        debugPrint("Reloading displayed circles")
+        let actor = DataFetcher(modelContainer: sharedModelContainer)
+
+        var circleIdentifiers: [PersistentIdentifier]?
+        if let selectedGenre {
+            let selectedGenreID = selectedGenre.id
+            circleIdentifiers = await actor.circles(withGenre: selectedGenreID)
+        }
+        if let selectedBlock {
+            let selectedBlockID = selectedBlock.id
+            let circleIdentifiersInSelectedBlock = await actor.circles(inBlock: selectedBlockID)
+            if circleIdentifiers == nil {
+                circleIdentifiers = circleIdentifiersInSelectedBlock
+            } else {
+                circleIdentifiers?.removeAll(where: {
+                    !circleIdentifiersInSelectedBlock.contains($0)
+                })
+            }
+        }
+
+        await MainActor.run {
+            if let circleIdentifiers {
+                var displayedCircles = database.circles(circleIdentifiers, in: modelContext)
+                if let selectedDate {
+                    displayedCircles.removeAll(where: { $0.day != selectedDate.id })
+                }
+                withAnimation(.snappy.speed(2.0)) {
+                    self.displayedCircles = displayedCircles
+                }
+            } else {
+                withAnimation(.snappy.speed(2.0)) {
+                    self.displayedCircles = []
+                }
+            }
+        }
+    }
+
+    func reloadMappings() async {
+        debugPrint("Reloading circle ID to space name mapping")
+        let actor = DataFetcher(modelContainer: sharedModelContainer)
+
+        var circleSpaceMappings: [Int: String] = [:]
+        // TODO: Cache this in a bigger context so that search can also use it with fast performance
+        let circles = searchedCircles == nil ? displayedCircles : searchedCircles!
+        for circle in circles {
+            let circleID = circle.id
+            let blockName = await actor.blockName(circle.blockID)
+            if let blockName {
+                circleSpaceMappings[circleID] = "\(blockName)\(circle.spaceNumberCombined())"
+            }
+        }
+
+        await MainActor.run {
+            self.circleSpaceMappings = circleSpaceMappings
+        }
+    }
+
+    func searchCircles() async {
+        let actor = DataFetcher(modelContainer: sharedModelContainer)
+
         if searchTerm.trimmingCharacters(in: .whitespaces).count >= 2 {
-            searchedCircles = database.circles(containing: searchTerm)
+            let circleIdentifiers = await actor.circles(containing: searchTerm)
+
+            await MainActor.run {
+                let searchedCircles = database.circles(circleIdentifiers, in: modelContext)
+                withAnimation(.snappy.speed(2.0)) {
+                    self.searchedCircles = searchedCircles
+                }
+            }
+
         } else {
-            searchedCircles = nil
+            await MainActor.run {
+                withAnimation(.snappy.speed(2.0)) {
+                    searchedCircles = nil
+                }
+            }
         }
     }
 }

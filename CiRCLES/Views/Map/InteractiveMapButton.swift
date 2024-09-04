@@ -12,38 +12,41 @@ struct InteractiveMapButton: View {
     @Environment(DatabaseManager.self) var database
     @Environment(FavoritesManager.self) var favorites
 
+    @Environment(\.modelContext) var modelContext
+
     @Binding var selectedEventDate: ComiketDate?
 
     var layout: ComiketLayout
 
     @State var isCircleDetailPopoverPresented: Bool = false
-    @State var circlesInSpace: [ComiketCircle] = []
+    @State var circlesInSpace: [ComiketCircle]?
 
     var body: some View {
         Button {
-            if let selectedEventDate {
-                circlesInSpace = database.circles(in: layout, on: selectedEventDate.id)
-            } else {
-                circlesInSpace = database.circles(in: layout)
-            }
-            if circlesInSpace.count > 0 {
+            if (circlesInSpace?.count ?? 0) > 0 {
                 isCircleDetailPopoverPresented.toggle()
             }
         } label: {
-            HStack(spacing: 0.0) {
-                ForEach(circlesInSpace) { circle in
-                    Group {
-                        if let extendedInformation = circle.extendedInformation,
-                           let wcIDMappedItems = favorites.wcIDMappedItems,
-                           let favoriteCircle = wcIDMappedItems[extendedInformation.webCatalogID] {
-                            Rectangle()
-                                .foregroundStyle(favoriteCircle.favorite.color.swiftUIColor().opacity(0.5))
-                        } else {
-                            Rectangle()
-                                .foregroundStyle(.clear)
+            VStack(spacing: 0.0) {
+                if let circlesInSpace {
+                    ForEach(circlesInSpace) { circle in
+                        Group {
+                            if let extendedInformation = circle.extendedInformation,
+                               let wcIDMappedItems = favorites.wcIDMappedItems,
+                               let favoriteCircle = wcIDMappedItems[extendedInformation.webCatalogID] {
+                                Rectangle()
+                                    .foregroundStyle(favoriteCircle.favorite.color.swiftUIColor().opacity(0.5))
+                            } else {
+                                Rectangle()
+                                    .foregroundStyle(.clear)
+                            }
                         }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    Rectangle()
+                        .foregroundStyle(.clear)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -53,8 +56,29 @@ struct InteractiveMapButton: View {
                 }
             }
         }
+        .onAppear {
+            if circlesInSpace == nil {
+                Task.detached {
+                    await reloadCirclesInSpace()
+                }
+            }
+        }
         .popover(isPresented: $isCircleDetailPopoverPresented) {
             InteractiveMapDetailPopover(isPresented: $isCircleDetailPopoverPresented, circles: $circlesInSpace)
+        }
+    }
+
+    func reloadCirclesInSpace() async {
+        let actor = DataFetcher(modelContainer: sharedModelContainer)
+        let blockID = layout.blockID
+        let spaceNumber = layout.spaceNumber
+        let circleIdentifiersInSpace = await actor.circles(inBlock: blockID, inSpace: spaceNumber)
+        await MainActor.run {
+            var circlesInSpace = database.circles(circleIdentifiersInSpace, in: modelContext)
+            if let selectedEventDate {
+                circlesInSpace.removeAll(where: {$0.day != selectedEventDate.id})
+            }
+            self.circlesInSpace = circlesInSpace
         }
     }
 }

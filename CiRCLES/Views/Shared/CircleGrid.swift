@@ -10,22 +10,19 @@ import SwiftUI
 struct CircleGrid: View {
 
     @Environment(DatabaseManager.self) var database
+    @Environment(FavoritesManager.self) var favorites
 
     let gridSpacing: CGFloat = 1.0
 
     var circles: [ComiketCircle]
-    var favorites: [Int: UserFavorites.Response.FavoriteItem]?
+    var spaceMappings: [Int: String]
     var namespace: Namespace.ID
     var onSelect: ((ComiketCircle) -> Void)
-
-    @State var isHallAndBlockMappingsReady: Bool = false
-    @State var hallAndBlockMappings: [Int: String] = [:]
 
     @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
 
     var body: some View {
-
         let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 70.0), spacing: gridSpacing)]
         #if targetEnvironment(macCatalyst)
         let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: gridSpacing)]
@@ -57,7 +54,7 @@ struct CircleGrid: View {
                         .overlay {
                             GeometryReader { proxy in
                                 ZStack(alignment: .topLeading) {
-                                    if let favorites, let extendedInformation = circle.extendedInformation,
+                                    if let favorites = favorites.wcIDMappedItems, let extendedInformation = circle.extendedInformation,
                                        let favorite = favorites[extendedInformation.webCatalogID] {
                                         favorite.favorite.color.swiftUIColor()
                                             .frame(width: 0.23 * proxy.size.width,
@@ -77,7 +74,7 @@ struct CircleGrid: View {
                                             CircleBlockPill("Shared.\(circle.day)th.Day")
                                         }
                                         if showHallAndBlock,
-                                            let hallAndBlockName = hallAndBlockMappings[circle.id] {
+                                            let hallAndBlockName = spaceMappings[circle.id] {
                                             CircleBlockPill(LocalizedStringKey(hallAndBlockName))
                                         }
                                     }
@@ -86,6 +83,7 @@ struct CircleGrid: View {
                                 }
                             }
                         }
+                        .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
                     }
                     .contextMenu {
                         if let twitterURL = circle.extendedInformation?.twitterURL {
@@ -103,37 +101,6 @@ struct CircleGrid: View {
                     .automaticMatchedTransitionSource(id: circle.id, in: namespace)
                 }
             }
-        }
-        .onAppear {
-            if !isHallAndBlockMappingsReady {
-                Task.detached {
-                    await reloadMappings()
-                }
-                isHallAndBlockMappingsReady = true
-            }
-        }
-        .onChange(of: circles) { _, _ in
-            Task.detached {
-                await reloadMappings()
-            }
-        }
-    }
-
-    func reloadMappings() async {
-        debugPrint("Getting display text mappings for circle grid")
-        let actor = DataFetcher(modelContainer: sharedModelContainer)
-
-        var hallAndBlockMappings: [Int: String] = [:]
-        for circle in circles {
-            let circleID = circle.id
-            let blockName = await actor.blockName(circle.blockID)
-            if let blockName {
-                hallAndBlockMappings[circleID] = "\(blockName)\(circle.spaceNumberCombined())"
-            }
-        }
-
-        await MainActor.run {
-            self.hallAndBlockMappings = hallAndBlockMappings
         }
     }
 }
