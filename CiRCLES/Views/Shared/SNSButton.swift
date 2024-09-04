@@ -12,10 +12,12 @@ struct SNSButton: View {
     @Environment(\.openURL) var openURL
 
     var url: URL
+    var showsLabel: Bool
     var type: SNSType
 
-    init(_ url: URL, type: SNSType) {
+    init(_ url: URL, showsLabel: Bool = true, type: SNSType) {
         self.url = url
+        self.showsLabel = showsLabel
         self.type = type
     }
 
@@ -29,7 +31,9 @@ struct SNSButton: View {
                     Image(.snsTwitter)
                         .resizable()
                         .frame(width: 28.0, height: 28.0)
-                    Text("Shared.SNS.Twitter")
+                    if showsLabel {
+                        Text("Shared.SNS.Twitter")
+                    }
                 }
                 .foregroundStyle(.background)
                 .tint(.primary)
@@ -40,7 +44,9 @@ struct SNSButton: View {
                     Image(.snsPixiv)
                         .resizable()
                         .frame(width: 28.0, height: 28.0)
-                    Text("Shared.SNS.Pixiv")
+                    if showsLabel {
+                        Text("Shared.SNS.Pixiv")
+                    }
                 }
                 .foregroundStyle(.white)
                 .tint(.blue)
@@ -51,13 +57,15 @@ struct SNSButton: View {
                     Image(.snsCircleMs)
                         .resizable()
                         .frame(width: 28.0, height: 28.0)
-                    Text("Shared.SNS.CircleMsPortal")
+                    if showsLabel {
+                        Text("Shared.SNS.CircleMsPortal")
+                    }
                 }
                 .foregroundStyle(.white)
                 .tint(.green)
             }
         }
-        .clipShape(.capsule(style: .continuous))
+        .clipShape(showsLabel ? AnyShape(.capsule(style: .continuous)) : AnyShape(.circle))
         .buttonStyle(.borderedProminent)
     }
 }
