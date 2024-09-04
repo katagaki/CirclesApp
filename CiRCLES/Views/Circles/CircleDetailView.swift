@@ -91,19 +91,14 @@ struct CircleDetailView: View {
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
                 .listRowInsets(.init(top: 0.0, leading: 20.0, bottom: 0.0, trailing: 20.0))
-                VStack(spacing: 10.0) {
-                    if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
-                        Text(circle.bookName)
+                HStack(spacing: 5.0) {
+                    CircleBlockPill("Shared.\(circle.day)th.Day", size: .large)
+                    if let circleBlockName {
+                        CircleBlockPill(LocalizedStringKey(circleBlockName), size: .large)
                     }
-                    HStack(spacing: 5.0) {
-                        CircleBlockPill("Shared.\(circle.day)th.Day", size: .large)
-                        if let circleBlockName {
-                            CircleBlockPill(LocalizedStringKey(circleBlockName), size: .large)
-                        }
-                    }
-                    .padding(.bottom, 2.0)
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
+                .padding(.bottom, 2.0)
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
                 .listRowInsets(.init(top: 10.0, leading: 20.0, bottom: 0.0, trailing: 20.0))
@@ -122,6 +117,19 @@ struct CircleDetailView: View {
                     Spacer()
                     if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
                         TranslateButton(translating: circle.supplementaryDescription)
+                    }
+                }
+            }
+            if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
+                Section {
+                    Text(circle.bookName)
+                } header: {
+                    HStack {
+                        ListSectionHeader(text: "Shared.BookName")
+                        Spacer()
+                        if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
+                            TranslateButton(translating: circle.bookName)
+                        }
                     }
                 }
             }

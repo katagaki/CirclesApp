@@ -134,13 +134,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Circle Name"
+            "value" : "Circle Name, Pen Name, Book Name"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サークル名"
+            "value" : "サークル名、執筆者名、配布誌名"
           }
         }
       }
@@ -643,6 +643,23 @@
         }
       }
     },
+    "Shared.BookName" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Book Name"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "頒布予定の誌名"
+          }
+        }
+      }
+    },
     "Shared.Day" : {
       "localizations" : {
         "en" : {
@@ -672,6 +689,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "補足説明/サークルアピール"
+          }
+        }
+      }
+    },
+    "Shared.DisplayMode.Grid" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grid View"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "グリッド表示"
+          }
+        }
+      }
+    },
+    "Shared.DisplayMode.List" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "List View"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リスト表示"
           }
         }
       }

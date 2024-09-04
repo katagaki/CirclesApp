@@ -13,28 +13,33 @@ struct InteractiveMapDetailPopover: View {
     @Environment(DatabaseManager.self) var database
 
     @Binding var isPresented: Bool
-    @Binding var circles: [ComiketCircle]
+    @Binding var circles: [ComiketCircle]?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
-            ForEach(circles, id: \.id) { circle in
-                Button {
-                    isPresented = false
-                    navigationManager.push(.circlesDetail(circle: circle), for: .map)
-                } label: {
-                    HStack {
-                        if let circleImage = database.circleImage(for: circle.id) {
-                            Image(uiImage: circleImage)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 72.0)
+            if let circles {
+                ForEach(circles, id: \.id) { circle in
+                    Button {
+                        isPresented = false
+                        navigationManager.push(.circlesDetail(circle: circle), for: .map)
+                    } label: {
+                        HStack {
+                            if let circleImage = database.circleImage(for: circle.id) {
+                                Image(uiImage: circleImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 70.0, height: 100.0, alignment: .center)
+                            }
+                            Text(circle.circleName)
+                            Spacer(minLength: 0.0)
                         }
-                        Text(circle.circleName)
-                        Spacer(minLength: 0.0)
+                        .contentShape(.rect)
                     }
-                    .contentShape(.rect)
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
+            } else {
+                ProgressView()
+                    .padding()
             }
         }
         .padding()

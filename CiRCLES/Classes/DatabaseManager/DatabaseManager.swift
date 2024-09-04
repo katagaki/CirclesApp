@@ -95,7 +95,6 @@ class DatabaseManager {
 
         if let documentsDirectoryURL {
             let databaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number)\(databaseNameSuffix).db")
-            debugPrint(databaseURL)
             if FileManager.default.fileExists(atPath: databaseURL.path(percentEncoded: false)) {
                 return databaseURL
             } else {

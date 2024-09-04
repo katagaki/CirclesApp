@@ -77,103 +77,15 @@ extension DatabaseManager {
         }
     }
 
-    func circles(containing searchTerm: String) -> [ComiketCircle] {
-        let searchTermLowercased = searchTerm.lowercased()
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.circleName.localizedStandardContains(searchTermLowercased) ||
-                $0.circleNameKana.localizedStandardContains(searchTermLowercased) ||
-                $0.penName.localizedStandardContains(searchTermLowercased)
-            },
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
+    func circles(_ identifiers: [PersistentIdentifier], in modelContext: ModelContext) -> [ComiketCircle] {
+        var circles: [ComiketCircle] = []
+        for identifier in identifiers {
+            if let circle = modelContext.model(for: identifier) as? ComiketCircle {
+                circles.append(circle)
+            }
         }
-    }
-
-    func circles(in block: ComiketBlock) -> [ComiketCircle] {
-        let blockID = block.id
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.blockID == blockID
-            },
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
-
-    func circles(with genre: ComiketGenre) -> [ComiketCircle] {
-        let genreID = genre.id
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.genreID == genreID
-            },
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
-
-    func circles(on date: Int) -> [ComiketCircle] {
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.day == date
-            },
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
-
-    func circles(in layout: ComiketLayout) -> [ComiketCircle] {
-        let blockID = layout.blockID
-        let spaceNumber = layout.spaceNumber
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.blockID == blockID && $0.spaceNumber == spaceNumber
-            },
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
-    }
-
-    func circles(in layout: ComiketLayout, on date: Int) -> [ComiketCircle] {
-        let blockID = layout.blockID
-        let spaceNumber = layout.spaceNumber
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.blockID == blockID && $0.spaceNumber == spaceNumber && $0.day == date
-            },
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
+        circles.sort(by: {$0.id < $1.id})
+        return circles
     }
 
     // MARK: Common Images
