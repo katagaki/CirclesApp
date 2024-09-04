@@ -23,7 +23,7 @@ struct MoreView: View {
     @State var eventData: WebCatalogEvent.Response?
     @State var eventDates: [Int: Date]?
 
-    @AppStorage(wrappedValue: false, "Customization.ShowHallAndBlock") var showHallAndBlock: Bool
+    @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
 
     @State var isShowingUserPID: Bool = false
@@ -158,7 +158,7 @@ struct MoreView: View {
                     }
                 }
                 Section {
-                    Toggle("More.Customization.ShowHallAndBlock", isOn: $showHallAndBlock)
+                    Toggle("More.Customization.ShowHallAndBlock", isOn: $showSpaceName)
                     Toggle("More.Customization.ShowDay", isOn: $showDay)
                 } header: {
                     ListSectionHeader(text: "More.Customization")

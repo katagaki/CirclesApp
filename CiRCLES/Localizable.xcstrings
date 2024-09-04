@@ -461,6 +461,22 @@
         }
       }
     },
+    "More.DBAdmin.SkipDownload" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Skip Data Download"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再ダウンロードをスキップ"
+          }
+        }
+      }
+    },
     "More.Disclaimer" : {
       "extractionState" : "manual",
       "localizations" : {

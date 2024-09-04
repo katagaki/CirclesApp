@@ -11,23 +11,6 @@ import SwiftData
 @ModelActor
 actor DataFetcher {
 
-    func blockName(_ id: Int) -> String? {
-        let fetchDescriptor = FetchDescriptor<ComiketBlock>(
-            predicate: #Predicate<ComiketBlock> {
-                $0.id == id
-            }
-        )
-        do {
-            let block = (try modelContext.fetch(fetchDescriptor)).first
-            if let block {
-                return block.name
-            }
-        } catch {
-            debugPrint(error.localizedDescription)
-        }
-        return nil
-    }
-
     func dates(for eventNumber: Int) -> [Int: Date] {
         let fetchDescriptor = FetchDescriptor<ComiketDate>(
             predicate: #Predicate<ComiketDate> {

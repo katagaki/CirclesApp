@@ -22,7 +22,6 @@ struct CircleDetailView: View {
     @State var extendedInformation: ComiketCircleExtendedInformation?
     @State var webCatalogInformation: WebCatalogCircle?
     @State var circleCutURL: URL?
-    @State var circleBlockName: String?
 
     @State var isAddingToFavorites: Bool = false
     @State var favoriteColorToAddTo: WebCatalogColor?
@@ -93,8 +92,8 @@ struct CircleDetailView: View {
                 .listRowInsets(.init(top: 0.0, leading: 20.0, bottom: 0.0, trailing: 20.0))
                 HStack(spacing: 5.0) {
                     CircleBlockPill("Shared.\(circle.day)th.Day", size: .large)
-                    if let circleBlockName {
-                        CircleBlockPill(LocalizedStringKey(circleBlockName), size: .large)
+                    if let circleSpaceName = circle.spaceName() {
+                        CircleBlockPill(LocalizedStringKey(circleSpaceName), size: .large)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .center)
@@ -247,12 +246,6 @@ struct CircleDetailView: View {
             }
         }
         let actor = DataFetcher(modelContainer: sharedModelContainer)
-        let circleBlockName = await actor.blockName(circle.blockID)
-        if let circleBlockName {
-            await MainActor.run {
-                self.circleBlockName = "\(circleBlockName)\(circle.spaceNumberCombined())"
-            }
-        }
     }
 
     func addToFavorites(with color: WebCatalogColor?) async {

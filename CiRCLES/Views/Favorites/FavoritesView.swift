@@ -31,7 +31,6 @@ struct FavoritesView: View {
                         )
                     } else {
                         CircleGrid(circles: favoriteCircles,
-                                   spaceMappings: [:],
                                    namespace: favoritesNamespace) { circle in
                             navigationManager.push(.circlesDetail(circle: circle), for: .favorites)
                         }
