@@ -49,6 +49,7 @@ struct FavoriteButton: View {
                 }
             }
         }
+        .tint(.orange)
         .clipShape(.capsule(style: .continuous))
         .buttonStyle(.borderedProminent)
     }
