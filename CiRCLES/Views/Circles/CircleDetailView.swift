@@ -198,14 +198,16 @@ struct CircleDetailView: View {
                                 .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
                                     FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
                                 }
-                                if let twitterURL = extendedInformation.twitterURL {
-                                    SNSButton(twitterURL, type: .twitter)
-                                }
-                                if let pixivURL = extendedInformation.pixivURL {
-                                    SNSButton(pixivURL, type: .pixiv)
-                                }
-                                if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
-                                    SNSButton(circleMsPortalURL, type: .circleMs)
+                                HStack(spacing: 5.0) {
+                                    if let twitterURL = extendedInformation.twitterURL {
+                                        SNSButton(twitterURL, showsLabel: false, type: .twitter)
+                                    }
+                                    if let pixivURL = extendedInformation.pixivURL {
+                                        SNSButton(pixivURL, showsLabel: false, type: .pixiv)
+                                    }
+                                    if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
+                                        SNSButton(circleMsPortalURL, showsLabel: false, type: .circleMs)
+                                    }
                                 }
                             }
                             .padding([.leading, .trailing], 12.0)
