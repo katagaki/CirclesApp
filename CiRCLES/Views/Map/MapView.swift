@@ -62,9 +62,15 @@ struct MapView: View {
                                 HStack(spacing: 12.0) {
                                     ForEach(dates, id: \.id) { date in
                                         VStack(alignment: .leading, spacing: 12.0) {
-                                            Text("Shared.\(date.id)th.Day")
-                                                .font(.title3)
-                                                .bold()
+                                            HStack {
+                                                Text("Shared.\(date.id)th.Day")
+                                                    .font(.title3)
+                                                    .bold()
+                                                Spacer()
+                                                Text(date.date, style: .date)
+                                                    .font(.title3)
+                                                    .foregroundStyle(.secondary)
+                                            }
                                             Divider()
                                             HStack(spacing: 8.0) {
                                                 ForEach(maps, id: \.id) { map in
