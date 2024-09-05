@@ -95,6 +95,7 @@
 		E4D74B6C2C85FEDA0014CD16 /* CirclePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B6B2C85FED80014CD16 /* CirclePreview.swift */; };
 		E4D74B6E2C88843B0014CD16 /* CircleDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B6D2C8884310014CD16 /* CircleDisplayMode.swift */; };
 		E4D74B702C88859E0014CD16 /* CircleList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B6F2C88859C0014CD16 /* CircleList.swift */; };
+		E4D74B732C8A02290014CD16 /* MyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B722C8A02280014CD16 /* MyView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -185,6 +186,7 @@
 		E4D74B6B2C85FED80014CD16 /* CirclePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclePreview.swift; sourceTree = "<group>"; };
 		E4D74B6D2C8884310014CD16 /* CircleDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleDisplayMode.swift; sourceTree = "<group>"; };
 		E4D74B6F2C88859C0014CD16 /* CircleList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleList.swift; sourceTree = "<group>"; };
+		E4D74B722C8A02280014CD16 /* MyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -416,6 +418,7 @@
 				E482FFBE2C21BD93009225BD /* Map */,
 				E49352052C4CFBD5004CBDA1 /* Circles */,
 				E48B628D2C5FB142007874AE /* Favorites */,
+				E4D74B712C8A02210014CD16 /* My */,
 				E480AA8F2C442DD1009C1445 /* More */,
 				E47269052C3D738900D5335D /* Shared */,
 			);
@@ -493,6 +496,14 @@
 				E480AA892C4429AC009C1445 /* Enums */,
 			);
 			path = CiRCLES;
+			sourceTree = "<group>";
+		};
+		E4D74B712C8A02210014CD16 /* My */ = {
+			isa = PBXGroup;
+			children = (
+				E4D74B722C8A02280014CD16 /* MyView.swift */,
+			);
+			path = My;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -675,6 +686,7 @@
 				E480AAAD2C4C9831009C1445 /* Point.swift in Sources */,
 				E480AA962C44A15D009C1445 /* UserCircle.swift in Sources */,
 				E4755B9F2C8296C30032DA2F /* Downloader.swift in Sources */,
+				E4D74B732C8A02290014CD16 /* MyView.swift in Sources */,
 				E480AA882C442982009C1445 /* NavigationManager.swift in Sources */,
 				E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */,
 				E49351F72C4CD91F004CBDA1 /* ComiketCircleExtendedInformation.swift in Sources */,
