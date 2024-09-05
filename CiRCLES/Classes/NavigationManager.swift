@@ -18,6 +18,7 @@ class NavigationManager: ObservableObject {
         .map: [],
         .circles: [],
         .favorites: [],
+        .my: [],
         .more: []
     ]
 

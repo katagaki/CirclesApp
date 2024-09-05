@@ -40,6 +40,11 @@ struct MainTabView: View {
                     Label("Tab.Favorites", systemImage: "star.fill")
                 }
                 .tag(TabType.favorites)
+            MyView()
+                .tabItem {
+                    Label("Tab.My", image: .tabIconMy)
+                }
+                .tag(TabType.my)
             MoreView()
                 .tabItem {
                     Label("Tab.More", systemImage: "ellipsis")

@@ -494,23 +494,6 @@
         }
       }
     },
-    "More.Events" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All Events"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "イベント一覧"
-          }
-        }
-      }
-    },
     "More.ProvidedBy" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -575,6 +558,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コミケWebカタログ"
+          }
+        }
+      }
+    },
+    "My.Account" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your Profile"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プロフィール"
+          }
+        }
+      }
+    },
+    "My.Events" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All Events"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベント一覧"
           }
         }
       }
@@ -1268,6 +1285,22 @@
         }
       }
     },
+    "Tab.My" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For You"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイコミケ"
+          }
+        }
+      }
+    },
     "Tip.GenreOverlay.Description" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1363,6 +1396,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "イベントデータ"
+          }
+        }
+      }
+    },
+    "ViewTitle.My" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For You"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マイコミケ"
           }
         }
       }
