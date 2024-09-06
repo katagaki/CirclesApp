@@ -67,7 +67,28 @@ actor DataConverter {
     }
 
     func loadLayouts(from database: Connection?) {
-        loadTable("ComiketLayoutWC", from: database, of: ComiketLayout.self)
+        if let database {
+            do {
+                debugPrint("Preparing map data for layouts")
+                let mapsFetchDescriptor = FetchDescriptor<ComiketMap>()
+                let maps = try modelContext.fetch(mapsFetchDescriptor)
+                let mapMappings: [Int: ComiketMap] = maps.reduce(
+                    into: [Int: ComiketMap]()
+                ) { partialResult, map in
+                    partialResult[map.id] = map
+                }
+
+                debugPrint("Selecting from ComiketLayoutWC via actor")
+                let table = Table("ComiketLayoutWC")
+                for row in try database.prepare(table) {
+                    let layout = ComiketLayout(from: row)
+                    modelContext.insert(layout)
+                    layout.map = mapMappings[layout.mapID]
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
     }
 
     func loadCircles(from database: Connection?) {
@@ -85,24 +106,35 @@ actor DataConverter {
                 )
 
                 debugPrint("Preparing block data for circles")
-                let fetchDescriptor = FetchDescriptor<ComiketBlock>()
-                let blocks = try modelContext.fetch(fetchDescriptor)
+                let blocksFetchDescriptor = FetchDescriptor<ComiketBlock>()
+                let blocks = try modelContext.fetch(blocksFetchDescriptor)
                 let blockMappings: [Int: ComiketBlock] = blocks.reduce(
                     into: [Int: ComiketBlock]()
                 ) { partialResult, block in
                     partialResult[block.id] = block
                 }
 
+                debugPrint("Preparing layout data for circles")
+                let layoutsFetchDescriptor = FetchDescriptor<ComiketLayout>()
+                let layouts = try modelContext.fetch(layoutsFetchDescriptor)
+                let layoutMappings: [String: ComiketLayout] = layouts.reduce(
+                    into: [String: ComiketLayout]()
+                ) { partialResult, layout in
+                    partialResult["\(layout.blockID),\(layout.spaceNumber)"] = layout
+                }
                 var rows: [Row] = []
                 for row in try database.prepare(joinedTable) {
                     rows.append(row)
                 }
+
+                debugPrint("Starting insert of circles")
                 for row in rows {
                     let circle = ComiketCircle(from: row)
                     let extendedInformation = ComiketCircleExtendedInformation(from: row)
                     circle.extendedInformation = extendedInformation
                     modelContext.insert(circle)
                     circle.block = blockMappings[circle.blockID]
+                    circle.layout = layoutMappings["\(circle.blockID),\(circle.spaceNumber)"]
                     debugPrint("Inserted circle \(circle.id) via actor")
                 }
             } catch {

@@ -13,7 +13,8 @@ struct InteractiveMapDetailPopover: View {
     @Environment(DatabaseManager.self) var database
 
     @Binding var isPresented: Bool
-    @Binding var circles: [ComiketCircle]?
+
+    var circles: [ComiketCircle]?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {

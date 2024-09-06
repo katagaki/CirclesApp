@@ -19,6 +19,9 @@ final class ComiketLayout: SQLiteable {
     var mapID: Int
     var hallID: Int
 
+    @Relationship(deleteRule: .nullify, inverse: \ComiketMap.layouts) var map: ComiketMap?
+    @Relationship(deleteRule: .nullify) var circles: [ComiketCircle]?
+
     init(from row: Row) {
         let colEventNumber = Expression<Int>("comiketNo")
         let colBlockID = Expression<Int>("blockId")

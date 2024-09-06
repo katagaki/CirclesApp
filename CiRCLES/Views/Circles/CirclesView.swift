@@ -43,6 +43,8 @@ struct CirclesView: View {
     @State var selectedBlock: ComiketBlock?
     @State var selectedDate: ComiketDate?
 
+    @State var blocksInMap: [ComiketBlock] = []
+
     @State var searchTerm: String = ""
 
     @State var isInitialLoadCompleted: Bool = false
@@ -141,13 +143,13 @@ struct CirclesView: View {
                                     Text("Shared.Map")
                                 }
                             }
-                            if let selectedMap {
+                            if selectedMap != nil {
                                 BarAccessoryMenu(LocalizedStringKey(selectedBlock?.name ?? "Shared.Block"),
                                                  icon: "table.furniture") {
                                     Picker(selection: $selectedBlock.animation(.snappy.speed(2.0))) {
                                         Text("Shared.All")
                                             .tag(nil as ComiketBlock?)
-                                        ForEach(database.blocks(in: selectedMap), id: \.id) { block in
+                                        ForEach(blocksInMap, id: \.id) { block in
                                             Text(block.name)
                                                 .tag(block)
                                         }
@@ -193,7 +195,9 @@ struct CirclesView: View {
             .onChange(of: selectedGenre) { _, _ in
                 if isInitialLoadCompleted {
                     selectedGenreID = selectedGenre?.id ?? 0
-                    reloadAll()
+                    Task.detached {
+                        await reloadDisplayedCircles()
+                    }
                 }
             }
             .onChange(of: selectedMap) { oldValue, newValue in
@@ -201,21 +205,27 @@ struct CirclesView: View {
                     selectedMapID = selectedMap?.id ?? 0
                     if oldValue != newValue && oldValue != nil {
                         selectedBlock = nil
-                    } else {
-                        reloadAll()
+                    }
+                    Task.detached {
+                        await reloadBlocksInMap()
+                        await reloadDisplayedCircles()
                     }
                 }
             }
             .onChange(of: selectedBlock) { _, _ in
                 if isInitialLoadCompleted {
                     selectedBlockID = selectedBlock?.id ?? 0
-                    reloadAll()
+                    Task.detached {
+                        await reloadDisplayedCircles()
+                    }
                 }
             }
             .onChange(of: selectedDate) { _, _ in
                 if isInitialLoadCompleted {
                     selectedDateID = selectedDate?.id ?? 0
-                    reloadAll()
+                    Task.detached {
+                        await reloadDisplayedCircles()
+                    }
                 }
             }
             .onChange(of: searchTerm) { _, _ in
@@ -234,12 +244,6 @@ struct CirclesView: View {
                 default: Color.clear
                 }
             }
-        }
-    }
-
-    func reloadAll() {
-        Task.detached {
-            await reloadDisplayedCircles()
         }
     }
 
@@ -275,6 +279,14 @@ struct CirclesView: View {
             withAnimation(.snappy.speed(2.0)) {
                 self.displayedCircles = displayedCircles
             }
+        }
+    }
+
+    func reloadBlocksInMap() async {
+        let actor = DataFetcher(modelContainer: sharedModelContainer)
+        let blockIdentifiers = await actor.blocks(inMap: selectedMapID)
+        await MainActor.run {
+            self.blocksInMap = database.blocks(blockIdentifiers)
         }
     }
 

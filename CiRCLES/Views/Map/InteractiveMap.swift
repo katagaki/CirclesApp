@@ -19,10 +19,14 @@ struct InteractiveMap: View {
 
     @State var mapImage: UIImage?
     @State var genreImage: UIImage?
-    @State var layouts: [ComiketLayout] = []
 
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
+
+    var dateMap: [Int?] {[
+        date?.id,
+        map?.id
+    ]}
 
     var body: some View {
         VStack(alignment: .leading) {
@@ -50,9 +54,12 @@ struct InteractiveMap: View {
                             }
                         }
                         .overlay {
-                            ZStack(alignment: .topLeading) {
-                                ForEach(layouts, id: \.self) { layout in
-                                    InteractiveMapButton(selectedEventDate: $date, layout: layout)
+                            if let date {
+                                ZStack(alignment: .topLeading) {
+                                    ForEach(map?.layouts ?? [], id: \.self) { layout in
+                                        InteractiveMapButton(selectedEventDateID: date.id,
+                                                             layoutSpaceNumber: layout.spaceNumber,
+                                                             circlesInSpace: layout.circles)
                                         .id(String(layout.blockID) + "|" + String(layout.spaceNumber))
                                         .position(
                                             x: CGFloat((layout.hdPosition.x + Int(spaceSize / 2)) / zoomDivisor),
@@ -63,8 +70,9 @@ struct InteractiveMap: View {
                                             height: CGFloat(spaceSize / zoomDivisor),
                                             alignment: .topLeading
                                         )
+                                    }
+                                    Color.clear
                                 }
-                                Color.clear
                             }
                         }
                 }
@@ -129,10 +137,7 @@ struct InteractiveMap: View {
         .onChange(of: database.commonImages) { _, _ in
             reloadAll()
         }
-        .onChange(of: date) { _, _ in
-            reloadAll()
-        }
-        .onChange(of: map) { _, _ in
+        .onChange(of: dateMap) { _, _ in
             reloadAll()
         }
     }
@@ -140,8 +145,6 @@ struct InteractiveMap: View {
     func reloadAll() {
         withAnimation(.snappy.speed(2.0)) {
             reloadMapImage()
-        } completion: {
-            reloadMapLayouts()
         }
     }
 
@@ -157,12 +160,6 @@ struct InteractiveMap: View {
                 on: date.id,
                 usingHighDefinition: true
             )
-        }
-    }
-
-    func reloadMapLayouts() {
-        if let map {
-            layouts = database.layouts(for: map)
         }
     }
 }
