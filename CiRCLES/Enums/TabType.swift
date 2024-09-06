@@ -7,6 +7,7 @@
 
 import Foundation
 
+// swiftlint:disable identifier_name
 enum TabType: Int {
     case map = 0
     case circles = 1
@@ -14,3 +15,4 @@ enum TabType: Int {
     case my = 3
     case more = 4
 }
+// swiftlint:enable identifier_name

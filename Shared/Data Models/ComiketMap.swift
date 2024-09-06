@@ -19,6 +19,8 @@ final class ComiketMap: SQLiteable {
     var hdConfiguration: MapConfiguration
     var rotation: Int
 
+    @Relationship(deleteRule: .nullify) var layouts: [ComiketLayout]?
+
     init(from row: Row) {
         let colEventNumber = Expression<Int>("comiketNo")
         let colID = Expression<Int>("id")

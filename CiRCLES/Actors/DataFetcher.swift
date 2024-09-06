@@ -90,4 +90,24 @@ actor DataFetcher {
         }
     }
 
+    func blocks(inMap mapID: Int) -> [PersistentIdentifier] {
+        do {
+            let layoutsFetchDescriptor = FetchDescriptor<ComiketLayout>(
+                predicate: #Predicate<ComiketLayout> {
+                    $0.mapID == mapID
+                }
+            )
+            let layouts: [ComiketLayout] = try modelContext.fetch(layoutsFetchDescriptor)
+            let blocks: [Int] = layouts.map({ $0.blockID })
+            let blocksFetchDescriptor = FetchDescriptor<ComiketBlock>(
+                predicate: #Predicate<ComiketBlock> {
+                    blocks.contains($0.id)
+                }
+            )
+            return try modelContext.fetchIdentifiers(blocksFetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
 }

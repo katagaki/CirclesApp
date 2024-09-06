@@ -14,37 +14,26 @@ extension DatabaseManager {
 
     // MARK: Event Data
 
-    func blocks(in map: ComiketMap) -> [ComiketBlock] {
-        let mapLayouts = layouts(for: map)
-        let mapBlockIDs = mapLayouts.map({ $0.blockID })
-        let fetchDescriptor = FetchDescriptor<ComiketBlock>(
-            predicate: #Predicate<ComiketBlock> {
-                mapBlockIDs.contains($0.id)
-            },
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
+    func layouts(_ identifiers: [PersistentIdentifier]) -> [ComiketLayout] {
+        var layouts: [ComiketLayout] = []
+        for identifier in identifiers {
+            if let layout = modelContext.model(for: identifier) as? ComiketLayout {
+                layouts.append(layout)
+            }
         }
+        layouts.sort(by: {$0.mapID < $1.mapID})
+        return layouts
     }
 
-    func layouts(for map: ComiketMap) -> [ComiketLayout] {
-        let mapID = map.id
-        let fetchDescriptor = FetchDescriptor<ComiketLayout>(
-            predicate: #Predicate<ComiketLayout> {
-                $0.mapID == mapID
-            },
-            sortBy: [SortDescriptor(\.mapID, order: .forward)]
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
+    func blocks(_ identifiers: [PersistentIdentifier]) -> [ComiketBlock] {
+        var blocks: [ComiketBlock] = []
+        for identifier in identifiers {
+            if let block = modelContext.model(for: identifier) as? ComiketBlock {
+                blocks.append(block)
+            }
         }
+        blocks.sort(by: {$0.id < $1.id})
+        return blocks
     }
 
     func genre(_ genreID: Int) -> String? {

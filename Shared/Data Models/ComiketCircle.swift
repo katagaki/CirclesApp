@@ -40,6 +40,8 @@ final class ComiketCircle: SQLiteable {
     @Relationship(deleteRule: .nullify, inverse: \ComiketBlock.circles)
     var block: ComiketBlock?
 
+    @Relationship(deleteRule: .nullify, inverse: \ComiketLayout.circles) var layout: ComiketLayout?
+
     init(from row: Row) {
         let table = Table("ComiketCircleWC")
 
