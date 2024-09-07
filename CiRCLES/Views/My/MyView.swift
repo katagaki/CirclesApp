@@ -49,16 +49,21 @@ struct MyView: View {
             .navigationTitle(events.first?.name ?? NSLocalizedString("ViewTitle.My", comment: ""))
             .navigationBarTitleDisplayMode(.inline)
             .background {
-                if let eventCoverImage {
-                    Color(uiColor: eventCoverImage.accentColor)
-                        .opacity(0.2)
-                        .overlay {
-                            Image(uiImage: eventCoverImage)
-                                .ignoresSafeArea()
-                                .scaledToFill()
-                                .opacity(0.1)
-                        }
+                Group {
+                    if let eventCoverImage {
+                        Color(uiColor: eventCoverImage.accentColor)
+                            .opacity(0.2)
+                            .overlay {
+                                Image(uiImage: eventCoverImage)
+                                    .ignoresSafeArea()
+                                    .scaledToFill()
+                                    .opacity(0.1)
+                            }
+                    } else {
+                        Color(uiColor: .systemGroupedBackground)
+                    }
                 }
+                .animation(.smooth.speed(2.0), value: eventCoverImage)
             }
             .scrollContentBackground(.hidden)
             .toolbarBackground(.hidden, for: .navigationBar)
