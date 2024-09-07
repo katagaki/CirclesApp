@@ -42,7 +42,7 @@ struct MyProfileSection: View {
                         }
                     }
                     .scaledToFill()
-                    .frame(width: 96.0, height: 96.0)
+                    .frame(width: 110.0, height: 110.0)
                     .clipShape(.circle)
                 }
                 VStack(alignment: .center) {
