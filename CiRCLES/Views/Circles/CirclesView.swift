@@ -164,30 +164,44 @@ struct CirclesView: View {
         debugPrint("Reloading displayed circles")
         let actor = DataFetcher(modelContainer: sharedModelContainer)
 
-        var circleIdentifiers: [PersistentIdentifier]?
+        var circleIdentifiersByGenre: [PersistentIdentifier]?
+        var circleIdentifiersByMap: [PersistentIdentifier]?
+        var circleIdentifiersByBlock: [PersistentIdentifier]?
+        var circleIdentifiers: [PersistentIdentifier] = []
+
         if let selectedGenre {
-            let selectedGenreID = selectedGenre.id
-            circleIdentifiers = await actor.circles(withGenre: selectedGenreID)
+            circleIdentifiersByGenre = await actor.circles(withGenre: selectedGenre.id)
         }
-        if let selectedBlock {
-            let selectedBlockID = selectedBlock.id
-            let circleIdentifiersInSelectedBlock = await actor.circles(inBlock: selectedBlockID)
-            if circleIdentifiers == nil {
-                circleIdentifiers = circleIdentifiersInSelectedBlock
-            } else {
-                circleIdentifiers?.removeAll(where: {
-                    !circleIdentifiersInSelectedBlock.contains($0)
-                })
+        if let selectedMap {
+            circleIdentifiersByMap = await actor.circles(inMap: selectedMap.id)
+            if let selectedBlock {
+                circleIdentifiersByBlock = await actor.circles(inBlock: selectedBlock.id)
             }
+        }
+
+        if let circleIdentifiersByGenre {
+            circleIdentifiers = circleIdentifiersByGenre
+        }
+        if let circleIdentifiersByMap {
+            if circleIdentifiers.isEmpty {
+                circleIdentifiers = circleIdentifiersByMap
+            } else {
+                circleIdentifiers = Array(
+                    Set(circleIdentifiers).intersection(Set(circleIdentifiersByMap))
+                )
+            }
+        }
+        if let circleIdentifiersByBlock {
+            circleIdentifiers = Array(
+                Set(circleIdentifiers).intersection(Set(circleIdentifiersByBlock))
+            )
         }
 
         await MainActor.run {
             var displayedCircles: [ComiketCircle] = []
-            if let circleIdentifiers {
-                displayedCircles = database.circles(circleIdentifiers)
-                if let selectedDate {
-                    displayedCircles.removeAll(where: { $0.day != selectedDate.id })
-                }
+            displayedCircles = database.circles(circleIdentifiers)
+            if let selectedDate {
+                displayedCircles.removeAll(where: { $0.day != selectedDate.id })
             }
             withAnimation(.snappy.speed(2.0)) {
                 self.displayedCircles = displayedCircles
