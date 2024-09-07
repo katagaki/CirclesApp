@@ -7,15 +7,18 @@
 
 import Foundation
 import KeychainAccess
+import Reachability
 
 @Observable
 @MainActor
 class AuthManager {
 
-    let keychain = Keychain(service: "com.tsubuzaki.CiRCLES")
-    let keychainAuthTokenKey: String = "CircleMsAuthToken"
+    @ObservationIgnored let keychain = Keychain(service: "com.tsubuzaki.CiRCLES")
+    @ObservationIgnored let keychainAuthTokenKey: String = "CircleMsAuthToken"
+    @ObservationIgnored let reachability = try? Reachability()
 
     var isAuthenticating: Bool = false
+    var onlineState: OnlineState = .undetermined
 
     var code: String?
     var token: OpenIDToken?
@@ -58,6 +61,21 @@ class AuthManager {
            let token = try? JSONDecoder().decode(OpenIDToken.self,
                                                  from: tokenInKeychain.data(using: .utf8) ?? Data()) {
             self.token = token
+        }
+        if let reachability {
+            reachability.whenReachable = { _ in
+                debugPrint("Internet is now reachable")
+                self.onlineState = .online
+            }
+            reachability.whenUnreachable = { _ in
+                debugPrint("Internet is no longer reachable")
+                self.onlineState = .offline
+            }
+            do {
+                try reachability.startNotifier()
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
         }
     }
 
@@ -104,6 +122,10 @@ class AuthManager {
             self.token = nil
             self.isAuthenticating = true
         }
+    }
+
+    func useOfflineAuthenticationToken() {
+        self.token = nil
     }
 
     func refreshAuthenticationToken() async {
