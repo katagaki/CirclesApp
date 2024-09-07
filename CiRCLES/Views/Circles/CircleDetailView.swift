@@ -11,10 +11,7 @@ import Translation
 
 struct CircleDetailView: View {
 
-    @Environment(\.openURL) var openURL
-
     @Environment(AuthManager.self) var authManager
-    @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
 
     var circle: ComiketCircle
@@ -22,9 +19,6 @@ struct CircleDetailView: View {
     @State var extendedInformation: ComiketCircleExtendedInformation?
     @State var webCatalogInformation: WebCatalogCircle?
     @State var circleCutURL: URL?
-
-    @State var isAddingToFavorites: Bool = false
-    @State var favoriteColorToAddTo: WebCatalogColor?
 
     var body: some View {
         List {
@@ -181,60 +175,30 @@ struct CircleDetailView: View {
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             ToolbarAccessory(placement: .bottom) {
-                VStack(spacing: 12.0) {
-                    if let extendedInformation {
-                        Divider()
-                        ScrollView(.horizontal) {
-                            HStack(spacing: 10.0) {
-                                FavoriteButton {
-                                    favorites.contains(webCatalogID: extendedInformation.webCatalogID)
-                                } onAdd: {
-                                    isAddingToFavorites = true
-                                } onDelete: {
-                                    Task.detached {
-                                        await deleteFavorite()
-                                    }
-                                }
-                                .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
-                                    FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
-                                }
-                                HStack(spacing: 5.0) {
-                                    if let twitterURL = extendedInformation.twitterURL {
-                                        SNSButton(twitterURL, showsLabel: false, type: .twitter)
-                                    }
-                                    if let pixivURL = extendedInformation.pixivURL {
-                                        SNSButton(pixivURL, showsLabel: false, type: .pixiv)
-                                    }
-                                    if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
-                                        SNSButton(circleMsPortalURL, showsLabel: false, type: .circleMs)
-                                    }
-                                }
-                            }
-                            .padding([.leading, .trailing], 12.0)
-                        }
-                        .scrollIndicators(.hidden)
+                if let extendedInformation {
+                    VStack(spacing: 12.0) {
+                        CircleToolbar(extendedInformation)
                     }
+                    .padding([.top, .bottom], 12.0)
                 }
-                .padding(.bottom, 12.0)
             }
         }
         .task {
             await prepareCircle()
         }
-        .onChange(of: favoriteColorToAddTo) { _, newValue in
-            Task.detached {
-                await addToFavorites(with: newValue)
-            }
-        }
     }
 
     func prepareCircle() async {
         if let circleImage = database.circleImage(for: circle.id) {
-            self.circleImage = circleImage
+            withAnimation(.snappy.speed(2.0)) {
+                self.circleImage = circleImage
+            }
         }
         if let extendedInformation = circle.extendedInformation {
             debugPrint("Extended information found for circle with ID \(circle.id)")
-            self.extendedInformation = extendedInformation
+            withAnimation(.snappy.speed(2.0)) {
+                self.extendedInformation = extendedInformation
+            }
         }
         if let token = authManager.token, let extendedInformation {
             if let circleResponse = await WebCatalog.circle(
@@ -244,43 +208,6 @@ struct CircleDetailView: View {
                 withAnimation(.snappy.speed(2.0)) {
                     self.circleCutURL = URL(string: webCatalogInformation.cutWebURL)
                     self.webCatalogInformation = webCatalogInformation
-                }
-            }
-        }
-    }
-
-    func addToFavorites(with color: WebCatalogColor?) async {
-        if let extendedInformation = circle.extendedInformation, let color, let token = authManager.token {
-            let actor = FavoritesActor()
-            let favoritesAddResult = await actor.add(
-                extendedInformation.webCatalogID,
-                to: color,
-                authToken: token
-            )
-            if favoritesAddResult {
-                let (items, wcIDMappedItems) = await actor.all(authToken: token)
-                await MainActor.run {
-                    favorites.items = items
-                    favorites.wcIDMappedItems = wcIDMappedItems
-                    isAddingToFavorites = false
-                }
-            }
-        }
-    }
-
-    func deleteFavorite() async {
-        if let extendedInformation = circle.extendedInformation, let token = authManager.token {
-            let actor = FavoritesActor()
-            let favoritesDeleteResult = await actor.delete(
-                extendedInformation.webCatalogID,
-                authToken: token
-            )
-            if favoritesDeleteResult {
-                let (items, wcIDMappedItems) = await actor.all(authToken: token)
-                await MainActor.run {
-                    favorites.items = items
-                    favorites.wcIDMappedItems = wcIDMappedItems
-                    isAddingToFavorites = false
                 }
             }
         }

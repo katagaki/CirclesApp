@@ -247,15 +247,11 @@ class Database {
     func jikoCircleCutImage() -> UIImage? { commonImage(named: "JIKO") }
 
     func mapImage(for hall: ComiketHall, on day: Int, usingHighDefinition: Bool) -> UIImage? {
-        let mapImageNamePrefix = usingHighDefinition ? "LWMP" : "WMP"
-        let mapImageName = "\(mapImageNamePrefix)\(day)\(hall.rawValue)"
-        return commonImage(named: mapImageName)
+        return commonImage(named: "\(usingHighDefinition ? "LWMP" : "WMP")\(day)\(hall.rawValue)")
     }
 
     func genreImage(for hall: ComiketHall, on day: Int, usingHighDefinition: Bool) -> UIImage? {
-        let genreImageNamePrefix = usingHighDefinition ? "LWGR" : "WGR"
-        let genreImageName = "\(genreImageNamePrefix)\(day)\(hall.rawValue)"
-        return commonImage(named: genreImageName)
+        return commonImage(named: "\(usingHighDefinition ? "LWGR" : "WGR")\(day)\(hall.rawValue)")
     }
 
     // MARK: Circle Images
