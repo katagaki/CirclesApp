@@ -44,6 +44,18 @@ struct MyView: View {
                 if let eventData {
                     MyEventPickerSection(eventData: eventData)
                 }
+                Section {
+                    Button("Shared.Logout", role: .destructive) {
+                        authManager.resetAuthentication()
+                    }
+                    .contextMenu {
+                        Button("Shared.LoginAgain", role: .destructive) {
+                            authManager.isAuthenticating = true
+                        }
+                    }
+                } header: {
+                    Color.clear
+                }
             }
             .listSectionSpacing(.compact)
             .navigationTitle(events.first?.name ?? NSLocalizedString("ViewTitle.My", comment: ""))
@@ -69,7 +81,7 @@ struct MyView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarBackground(.visible, for: .tabBar)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
+                ToolbarItem(placement: .principal) {
                     Text(events.first?.name ?? NSLocalizedString("ViewTitle.My", comment: ""))
                         .font(.title2)
                         .fontWeight(.bold)
@@ -78,19 +90,6 @@ struct MyView: View {
                                 isShowingEventCoverImage.toggle()
                             }
                         }
-                }
-                ToolbarItem(placement: .principal) {
-                    Color.clear
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Shared.Logout", role: .destructive) {
-                        authManager.resetAuthentication()
-                    }
-                    .contextMenu {
-                        Button("Shared.LoginAgain", role: .destructive) {
-                            authManager.isAuthenticating = true
-                        }
-                    }
                 }
             }
             .safeAreaInset(edge: .top, spacing: 0.0) {
