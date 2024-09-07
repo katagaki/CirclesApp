@@ -17,8 +17,6 @@ struct FavoritesView: View {
 
     @Environment(\.modelContext) var modelContext
 
-    @State var isRefreshing: Bool = false
-
     @State var favoriteCircles: [ComiketCircle]?
 
     @Namespace var favoritesNamespace
@@ -26,19 +24,20 @@ struct FavoritesView: View {
     var body: some View {
         NavigationStack(path: $navigator[.favorites]) {
             ZStack(alignment: .center) {
-                if !isRefreshing, let favoriteCircles {
-                    if favoriteCircles.isEmpty {
-                        ContentUnavailableView(
-                            "Favorites.NoFavorites",
-                            systemImage: "star.leadinghalf.filled",
-                            description: Text("Favorites.NoFavorites.Description")
-                        )
-                    } else {
-                        CircleGrid(circles: favoriteCircles,
-                                   namespace: favoritesNamespace) { circle in
-                            navigator.push(.circlesDetail(circle: circle), for: .favorites)
-                        }
+                if let favoriteCircles {
+                    CircleGrid(circles: favoriteCircles,
+                               namespace: favoritesNamespace) { circle in
+                        navigator.push(.circlesDetail(circle: circle), for: .favorites)
                     }
+                       .overlay {
+                           if favoriteCircles.isEmpty {
+                               ContentUnavailableView(
+                                   "Favorites.NoFavorites",
+                                   systemImage: "star.leadinghalf.filled",
+                                   description: Text("Favorites.NoFavorites.Description")
+                               )
+                           }
+                       }
                 } else {
                     ProgressView("Favorites.Loading")
                 }
@@ -48,9 +47,13 @@ struct FavoritesView: View {
                 await reloadFavorites()
             }
             .onAppear {
-                if favoriteCircles == nil, let favoriteItems = favorites.items {
-                    Task.detached {
-                        await prepareCircles(using: favoriteItems)
+                if authManager.onlineState == .offline {
+                    favoriteCircles = []
+                } else {
+                    if favoriteCircles == nil, let favoriteItems = favorites.items {
+                        Task.detached {
+                            await prepareCircles(using: favoriteItems)
+                        }
                     }
                 }
             }

@@ -46,15 +46,17 @@ struct MyProfileSection: View {
                     .clipShape(.circle)
                 }
                 VStack(alignment: .center) {
-                    if let userInfo {
-                        Text(userInfo.nickname)
-                            .fontWeight(.bold)
-                            .font(.title3)
-                            .onLongPressGesture {
-                                isShowingUserPID.toggle()
-                            }
-                    } else {
-                        ProgressView()
+                    Group {
+                        if let userInfo {
+                            Text(userInfo.nickname)
+                        } else {
+                            Text(verbatim: "-")
+                        }
+                    }
+                    .fontWeight(.bold)
+                    .font(.title3)
+                    .onLongPressGesture {
+                        isShowingUserPID.toggle()
                     }
                     if isShowingUserPID {
                         Text("PID " + String(userInfo?.pid ?? 0))
