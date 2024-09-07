@@ -55,6 +55,7 @@ struct MyParticipationSections: View {
                         Text("My.Ticket.ChangeType")
                     }
                 }
+                .animation(.snappy.speed(2.0), value: participationState)
             } header: {
                 HStack {
                     Text("Shared.\(dayID)th.Day")
