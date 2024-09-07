@@ -33,11 +33,6 @@ struct CirclesView: View {
     @State var displayedCircles: [ComiketCircle] = []
     @State var searchedCircles: [ComiketCircle]?
 
-    @AppStorage(wrappedValue: 0, "Circles.SelectedGenreID") var selectedGenreID: Int
-    @AppStorage(wrappedValue: 0, "Circles.SelectedMapID") var selectedMapID: Int
-    @AppStorage(wrappedValue: 0, "Circles.SelectedBlockID") var selectedBlockID: Int
-    @AppStorage(wrappedValue: 0, "Circles.SelectedDateID") var selectedDateID: Int
-
     @State var selectedGenre: ComiketGenre?
     @State var selectedMap: ComiketMap?
     @State var selectedBlock: ComiketBlock?
@@ -53,6 +48,13 @@ struct CirclesView: View {
     @State var displayModeState: CircleDisplayMode = .grid
 
     @Namespace var circlesNamespace
+
+    var genreMapBlockDate: [Int?] {[
+        selectedGenre?.id,
+        selectedMap?.id,
+        selectedBlock?.id,
+        selectedDate?.id
+    ]}
 
     var body: some View {
         NavigationStack(path: $navigator[.circles]) {
@@ -114,68 +116,12 @@ struct CirclesView: View {
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 BarAccessory(placement: .bottom) {
-                    ScrollView(.horizontal) {
-                        HStack(spacing: 12.0) {
-                            BarAccessoryMenu(LocalizedStringKey(selectedGenre?.name ?? "Shared.Genre"),
-                                             icon: (selectedGenre?.name == "ブルーアーカイブ" ?
-                                                    "scope" : "theatermask.and.paintbrush")) {
-                                Picker(selection: $selectedGenre.animation(.snappy.speed(2.0))) {
-                                    Text("Shared.All")
-                                        .tag(nil as ComiketGenre?)
-                                    ForEach(genres) { genre in
-                                        Text(genre.name)
-                                            .tag(genre)
-                                    }
-                                } label: {
-                                    Text("Shared.Genre")
-                                }
-                            }
-                            BarAccessoryMenu(LocalizedStringKey(selectedMap?.name ?? "Shared.Map"),
-                                             icon: "map") {
-                                Picker(selection: $selectedMap.animation(.snappy.speed(2.0))) {
-                                    Text("Shared.All")
-                                        .tag(nil as ComiketMap?)
-                                    ForEach(maps) { map in
-                                        Text(map.name)
-                                            .tag(map)
-                                    }
-                                } label: {
-                                    Text("Shared.Map")
-                                }
-                            }
-                            if selectedMap != nil {
-                                BarAccessoryMenu(LocalizedStringKey(selectedBlock?.name ?? "Shared.Block"),
-                                                 icon: "table.furniture") {
-                                    Picker(selection: $selectedBlock.animation(.snappy.speed(2.0))) {
-                                        Text("Shared.All")
-                                            .tag(nil as ComiketBlock?)
-                                        ForEach(blocksInMap, id: \.id) { block in
-                                            Text(block.name)
-                                                .tag(block)
-                                        }
-                                    } label: {
-                                        Text("Shared.Block")
-                                    }
-                                }
-                            }
-                            BarAccessoryMenu((selectedDate != nil ? "Shared.\(selectedDate!.id)th.Day" : "Shared.Day"),
-                                             icon: "calendar") {
-                                Picker(selection: $selectedDate.animation(.snappy.speed(2.0))) {
-                                    Text("Shared.All")
-                                        .tag(nil as ComiketDate?)
-                                    ForEach(dates) { date in
-                                        Text("Shared.\(date.id)th.Day")
-                                            .tag(date)
-                                    }
-                                } label: {
-                                    Text("Shared.Day")
-                                }
-                            }
-                        }
-                        .padding([.leading, .trailing], 12.0)
-                        .padding([.top, .bottom], 12.0)
-                    }
-                    .scrollIndicators(.hidden)
+                    CircleFilterBar(
+                        selectedGenre: $selectedGenre,
+                        selectedMap: $selectedMap,
+                        selectedBlock: $selectedBlock,
+                        selectedDate: $selectedDate
+                    )
                 }
             }
             .searchable(text: $searchTerm,
@@ -185,44 +131,11 @@ struct CirclesView: View {
                 if !isInitialLoadCompleted {
                     debugPrint("Restoring Circles view state")
                     displayModeState = displayMode
-                    selectedGenre = genres.first(where: {$0.id == selectedGenreID})
-                    selectedMap = maps.first(where: {$0.id == selectedMapID})
-                    selectedBlock = blocks.first(where: {$0.id == selectedBlockID})
-                    selectedDate = dates.first(where: {$0.id == selectedDateID})
                     isInitialLoadCompleted = true
                 }
             }
-            .onChange(of: selectedGenre) { _, _ in
+            .onChange(of: genreMapBlockDate) { _, _ in
                 if isInitialLoadCompleted {
-                    selectedGenreID = selectedGenre?.id ?? 0
-                    Task.detached {
-                        await reloadDisplayedCircles()
-                    }
-                }
-            }
-            .onChange(of: selectedMap) { oldValue, newValue in
-                if isInitialLoadCompleted {
-                    selectedMapID = selectedMap?.id ?? 0
-                    if oldValue != newValue && oldValue != nil {
-                        selectedBlock = nil
-                    }
-                    Task.detached {
-                        await reloadBlocksInMap()
-                        await reloadDisplayedCircles()
-                    }
-                }
-            }
-            .onChange(of: selectedBlock) { _, _ in
-                if isInitialLoadCompleted {
-                    selectedBlockID = selectedBlock?.id ?? 0
-                    Task.detached {
-                        await reloadDisplayedCircles()
-                    }
-                }
-            }
-            .onChange(of: selectedDate) { _, _ in
-                if isInitialLoadCompleted {
-                    selectedDateID = selectedDate?.id ?? 0
                     Task.detached {
                         await reloadDisplayedCircles()
                     }
@@ -279,14 +192,6 @@ struct CirclesView: View {
             withAnimation(.snappy.speed(2.0)) {
                 self.displayedCircles = displayedCircles
             }
-        }
-    }
-
-    func reloadBlocksInMap() async {
-        let actor = DataFetcher(modelContainer: sharedModelContainer)
-        let blockIdentifiers = await actor.blocks(inMap: selectedMapID)
-        await MainActor.run {
-            self.blocksInMap = database.blocks(blockIdentifiers)
         }
     }
 

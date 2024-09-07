@@ -95,6 +95,7 @@ struct MyParticipationSections: View {
         }
     }
 
+    // swiftlint:disable non_optional_string_data_conversion
     func saveParticipation() {
         if let participationJSONData = try? JSONSerialization.data(
             withJSONObject: participationState,
@@ -105,6 +106,7 @@ struct MyParticipationSections: View {
             }
         }
     }
+    // swiftlint:enable non_optional_string_data_conversion
 
     func setParticipation(_ eventNumber: Int, on day: Int, value: String) {
         var participationData: [String: String] = [:]

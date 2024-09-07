@@ -101,6 +101,8 @@
 		E4D74B7D2C8C16860014CD16 /* ExternalLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B7C2C8C16830014CD16 /* ExternalLink.swift */; };
 		E4D74B7F2C8C172B0014CD16 /* SafariLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B7E2C8C17290014CD16 /* SafariLink.swift */; };
 		E4D74B812C8C8ADB0014CD16 /* LayoutCatalogMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B802C8C8AD40014CD16 /* LayoutCatalogMapping.swift */; };
+		E4D74B842C8C9AFC0014CD16 /* CircleToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B832C8C9AF80014CD16 /* CircleToolbar.swift */; };
+		E4D74B862C8C9D850014CD16 /* CircleFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B852C8C9D800014CD16 /* CircleFilterBar.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -197,6 +199,8 @@
 		E4D74B7C2C8C16830014CD16 /* ExternalLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalLink.swift; sourceTree = "<group>"; };
 		E4D74B7E2C8C17290014CD16 /* SafariLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariLink.swift; sourceTree = "<group>"; };
 		E4D74B802C8C8AD40014CD16 /* LayoutCatalogMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutCatalogMapping.swift; sourceTree = "<group>"; };
+		E4D74B832C8C9AF80014CD16 /* CircleToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleToolbar.swift; sourceTree = "<group>"; };
+		E4D74B852C8C9D800014CD16 /* CircleFilterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleFilterBar.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -458,7 +462,9 @@
 			isa = PBXGroup;
 			children = (
 				E49352062C4CFBDA004CBDA1 /* CirclesView.swift */,
+				E4D74B852C8C9D800014CD16 /* CircleFilterBar.swift */,
 				E49352082C4D1414004CBDA1 /* CircleDetailView.swift */,
+				E4D74B832C8C9AF80014CD16 /* CircleToolbar.swift */,
 			);
 			path = Circles;
 			sourceTree = "<group>";
@@ -632,6 +638,7 @@
 				E48B62992C5FC359007874AE /* WebCatalogColor.swift in Sources */,
 				E480AA9F2C44A75D009C1445 /* MoreDatabaseAdministratiion.swift in Sources */,
 				E482FFC22C21BD93009225BD /* MapView.swift in Sources */,
+				E4D74B862C8C9D850014CD16 /* CircleFilterBar.swift in Sources */,
 				E43C74122C702750003522C8 /* Rotation.swift in Sources */,
 				E4755BC32C843D7D0032DA2F /* FavoritesActor.swift in Sources */,
 				E4CA64562C81FCC3001F50BB /* UserFavorite.swift in Sources */,
@@ -688,6 +695,7 @@
 				E49351F32C4CD503004CBDA1 /* ComiketCircle.swift in Sources */,
 				E472690F2C3D767000D5335D /* OpenIDClient.swift in Sources */,
 				E480AAB92C4CA294009C1445 /* MapConfiguration.swift in Sources */,
+				E4D74B842C8C9AFC0014CD16 /* CircleToolbar.swift in Sources */,
 				E48B628F2C5FB14C007874AE /* FavoritesView.swift in Sources */,
 				E480AAA12C44AA77009C1445 /* WebCatalogDatabase.swift in Sources */,
 				E480AA832C44278F009C1445 /* UserInfo.swift in Sources */,
