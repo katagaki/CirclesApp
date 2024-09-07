@@ -39,7 +39,7 @@ actor DataFetcher {
                 }
             )
             let layouts: [ComiketLayout] = try modelContext.fetch(layoutsFetchDescriptor)
-            let blocks: [Int] = layouts.map({ $0.blockID })
+            let blocks: [Int] = layouts.map({$0.blockID})
             let blocksFetchDescriptor = FetchDescriptor<ComiketBlock>(
                 predicate: #Predicate<ComiketBlock> {
                     blocks.contains($0.id)
@@ -75,8 +75,8 @@ actor DataFetcher {
     ) -> [LayoutCatalogMapping: [Int]] {
         do {
             var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
-            let blockIDs: [Int] = Array(Set(mappings.map({ $0.blockID })))
-            let spaceNumbers: [Int] = Array(Set(mappings.map({ $0.spaceNumber })))
+            let blockIDs: [Int] = Array(Set(mappings.map({$0.blockID})))
+            let spaceNumbers: [Int] = Array(Set(mappings.map({$0.spaceNumber})))
             let fetchDescriptor = FetchDescriptor<ComiketCircle>(
                 predicate: #Predicate<ComiketCircle> { circle in
                     return blockIDs.contains(circle.blockID) &&
@@ -132,13 +132,34 @@ actor DataFetcher {
         }
     }
 
-    func circles(inBlock blockID: Int) -> [PersistentIdentifier] {
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.blockID == blockID
-            }
-        )
+    func circles(inMap mapID: Int) -> [PersistentIdentifier] {
         do {
+            let mappingFetchDescriptor = FetchDescriptor<ComiketMapping>(
+                predicate: #Predicate<ComiketMapping> {
+                    $0.mapID == mapID
+                }
+            )
+            let mappings = try modelContext.fetch(mappingFetchDescriptor)
+            let blockIDs = mappings.map({$0.blockID}).sorted()
+            var circleIdentifiers: [PersistentIdentifier] = []
+            for blockID in blockIDs {
+                circleIdentifiers.append(contentsOf: circles(inBlock: blockID))
+            }
+            return circleIdentifiers
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+
+    }
+
+    func circles(inBlock blockID: Int) -> [PersistentIdentifier] {
+        do {
+            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+                predicate: #Predicate<ComiketCircle> {
+                    $0.blockID == blockID
+                }
+            )
             return try modelContext.fetchIdentifiers(fetchDescriptor)
         } catch {
             debugPrint(error.localizedDescription)
@@ -147,12 +168,12 @@ actor DataFetcher {
     }
 
     func circles(withGenre genreID: Int) -> [PersistentIdentifier] {
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.genreID == genreID
-            }
-        )
         do {
+            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+                predicate: #Predicate<ComiketCircle> {
+                    $0.genreID == genreID
+                }
+            )
             return try modelContext.fetchIdentifiers(fetchDescriptor)
         } catch {
             debugPrint(error.localizedDescription)
