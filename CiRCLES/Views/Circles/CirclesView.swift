@@ -85,7 +85,7 @@ struct CirclesView: View {
                         }
                     }
                 }
-                if (selectedGenre == nil && selectedBlock == nil) && searchedCircles == nil {
+                if (selectedGenre == nil && selectedMap == nil) && searchedCircles == nil {
                     ContentUnavailableView(
                         "Circles.NoFilterSelected",
                         systemImage: "questionmark.square.dashed",

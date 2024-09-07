@@ -231,7 +231,7 @@ class Database {
         in modelContext: ModelContext
     ) -> [T] {
         var models: [T] = []
-        for identifier in identifiers {
+        for identifier in Set(identifiers) {
             if let model = modelContext.model(for: identifier) as? T {
                 models.append(model)
             }
