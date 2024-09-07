@@ -9,8 +9,8 @@ import SwiftUI
 
 struct CircleGrid: View {
 
-    @Environment(DatabaseManager.self) var database
-    @Environment(FavoritesManager.self) var favorites
+    @Environment(Database.self) var database
+    @Environment(Favorites.self) var favorites
 
     let gridSpacing: CGFloat = 1.0
 

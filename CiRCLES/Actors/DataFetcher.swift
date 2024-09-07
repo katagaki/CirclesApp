@@ -69,23 +69,49 @@ actor DataFetcher {
         return []
     }
 
-    func circleWebCatalogIDs(inBlock blockID: Int, inSpace spaceNumber: Int, on dateID: Int) -> [Int] {
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.blockID == blockID &&
-                $0.spaceNumber == spaceNumber &&
-                $0.day == dateID
-            }
-        )
+    func circleWebCatalogIDs(
+        forMappings mappings: [LayoutCatalogMapping],
+        on dateID: Int
+    ) -> [LayoutCatalogMapping: [Int]] {
         do {
-            var circles = try modelContext.fetch(fetchDescriptor)
-            circles.sort(by: {$0.spaceNumber < $1.spaceNumber})
-            return circles
-                .compactMap { $0.extendedInformation }
-                .map { $0.webCatalogID }
+            var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
+            let blockIDs: [Int] = Array(Set(mappings.map({ $0.blockID })))
+            let spaceNumbers: [Int] = Array(Set(mappings.map({ $0.spaceNumber })))
+            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+                predicate: #Predicate<ComiketCircle> { circle in
+                    return blockIDs.contains(circle.blockID) &&
+                    spaceNumbers.contains(circle.spaceNumber) &&
+                    circle.day == dateID
+                },
+                sortBy: [SortDescriptor(\.id, order: .forward)]
+            )
+            let circles = try modelContext.fetch(fetchDescriptor)
+            let circleWebCatalogIDMapping = circles.reduce(
+                into: [LayoutCatalogMapping: [Int]]()
+            ) { partialResult, circle in
+                if let extendedInformation = circle.extendedInformation {
+                    let mapping = LayoutCatalogMapping(blockID: circle.blockID, spaceNumber: circle.spaceNumber)
+                    if partialResult[mapping] != nil {
+                        partialResult[mapping]?
+                            .append(extendedInformation.webCatalogID)
+                    } else {
+                        partialResult[mapping] = [extendedInformation.webCatalogID]
+                    }
+                }
+            }
+            for (blockIDAndSpaceNumber, webCatalogIDs) in circleWebCatalogIDMapping {
+                if let originalMapping = mappings.first(where: {
+                    $0.blockID == blockIDAndSpaceNumber.blockID &&
+                    $0.spaceNumber == blockIDAndSpaceNumber.spaceNumber
+                }) {
+                    layoutWebCatalogIDMappings[originalMapping] = webCatalogIDs
+                }
+            }
+            return layoutWebCatalogIDMappings
         } catch {
+            debugPrint(error)
             debugPrint(error.localizedDescription)
-            return []
+            return [:]
         }
     }
 

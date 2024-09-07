@@ -11,10 +11,10 @@ import SwiftData
 @main
 struct CirclesApp: App {
 
-    @StateObject var navigationManager = NavigationManager()
+    @StateObject var navigator = Navigator()
     @State var authManager = AuthManager()
-    @State var favorites = FavoritesManager()
-    @State var database = DatabaseManager()
+    @State var favorites = Favorites()
+    @State var database = Database()
 
     var body: some Scene {
         WindowGroup {
@@ -32,12 +32,12 @@ struct CirclesApp: App {
                 }
         }
         .modelContainer(sharedModelContainer)
-        .environmentObject(navigationManager)
+        .environmentObject(navigator)
         .environment(authManager)
         .environment(favorites)
         .environment(database)
-        .onChange(of: navigationManager.selectedTab) { _, _ in
-            navigationManager.saveToDefaults()
+        .onChange(of: navigator.selectedTab) { _, _ in
+            navigator.saveToDefaults()
         }
     }
 }

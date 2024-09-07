@@ -1,5 +1,5 @@
 //
-//  FavoritesManager.swift
+//  Favorites.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/08/04.
@@ -8,7 +8,7 @@
 import Foundation
 
 @Observable
-class FavoritesManager {
+class Favorites {
     var items: [UserFavorites.Response.FavoriteItem]?
     var wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem]?
 

@@ -11,9 +11,9 @@ import SwiftUI
 
 struct MyView: View {
 
-    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigator: Navigator
     @Environment(AuthManager.self) var authManager
-    @Environment(DatabaseManager.self) var database
+    @Environment(Database.self) var database
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -35,7 +35,7 @@ struct MyView: View {
     @State var participationState: [String: [String: String]] = [:]
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.my]) {
+        NavigationStack(path: $navigator[.my]) {
             List {
                 MyProfileSection(userInfo: $userInfo)
                 if let latestEvent = events.first, let eventDates, eventDates.count > 0 {

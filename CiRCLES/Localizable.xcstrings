@@ -344,6 +344,22 @@
         }
       }
     },
+    "Map.LoadingLayouts" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading layouts…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "配置情報を読み込み中…"
+          }
+        }
+      }
+    },
     "More.Customization" : {
       "extractionState" : "manual",
       "localizations" : {

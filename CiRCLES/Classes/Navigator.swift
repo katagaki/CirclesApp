@@ -1,5 +1,5 @@
 //
-//  NavigationManager.swift
+//  Navigator.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/07/15.
@@ -7,10 +7,10 @@
 
 import Foundation
 
-class NavigationManager: ObservableObject {
+class Navigator: ObservableObject {
 
     let defaults = UserDefaults.standard
-    let selectedTabKey = "NavigationManager.SelectedTab"
+    let selectedTabKey = "Navigator.SelectedTab"
 
     @Published var selectedTab: TabType
     @Published var previouslySelectedTab: TabType

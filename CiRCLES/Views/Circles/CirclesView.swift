@@ -11,10 +11,10 @@ import SwiftUI
 
 struct CirclesView: View {
 
-    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigator: Navigator
     @Environment(AuthManager.self) var authManager
-    @Environment(FavoritesManager.self) var favorites
-    @Environment(DatabaseManager.self) var database
+    @Environment(Favorites.self) var favorites
+    @Environment(Database.self) var database
 
     @Environment(\.modelContext) var modelContext
 
@@ -55,31 +55,31 @@ struct CirclesView: View {
     @Namespace var circlesNamespace
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.circles]) {
+        NavigationStack(path: $navigator[.circles]) {
             ZStack(alignment: .center) {
                 switch displayModeState {
                 case .grid:
                     if let searchedCircles {
                         CircleGrid(circles: searchedCircles,
                                    namespace: circlesNamespace) { circle in
-                            navigationManager.push(.circlesDetail(circle: circle), for: .circles)
+                            navigator.push(.circlesDetail(circle: circle), for: .circles)
                         }
                     } else {
                         CircleGrid(circles: displayedCircles,
                                    namespace: circlesNamespace) { circle in
-                            navigationManager.push(.circlesDetail(circle: circle), for: .circles)
+                            navigator.push(.circlesDetail(circle: circle), for: .circles)
                         }
                     }
                 case .list:
                     if let searchedCircles {
                         CircleList(circles: searchedCircles,
                                    namespace: circlesNamespace) { circle in
-                            navigationManager.push(.circlesDetail(circle: circle), for: .circles)
+                            navigator.push(.circlesDetail(circle: circle), for: .circles)
                         }
                     } else {
                         CircleList(circles: displayedCircles,
                                    namespace: circlesNamespace) { circle in
-                            navigationManager.push(.circlesDetail(circle: circle), for: .circles)
+                            navigator.push(.circlesDetail(circle: circle), for: .circles)
                         }
                     }
                 }
@@ -271,7 +271,7 @@ struct CirclesView: View {
         await MainActor.run {
             var displayedCircles: [ComiketCircle] = []
             if let circleIdentifiers {
-                displayedCircles = database.circles(circleIdentifiers, in: modelContext)
+                displayedCircles = database.circles(circleIdentifiers)
                 if let selectedDate {
                     displayedCircles.removeAll(where: { $0.day != selectedDate.id })
                 }
@@ -297,7 +297,7 @@ struct CirclesView: View {
         if searchTerm.trimmingCharacters(in: .whitespaces).count >= 2 {
             let circleIdentifiers = await actor.circles(containing: searchTerm)
             await MainActor.run {
-                let searchedCircles = database.circles(circleIdentifiers, in: modelContext)
+                let searchedCircles = database.circles(circleIdentifiers)
                 withAnimation(.snappy.speed(2.0)) {
                     self.searchedCircles = searchedCircles
                 }

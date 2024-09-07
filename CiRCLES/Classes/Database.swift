@@ -1,5 +1,5 @@
 //
-//  DatabaseManager.swift
+//  Database.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/07/15.
@@ -9,10 +9,11 @@ import Foundation
 import SQLite
 import SwiftData
 import UIKit
+import ZIPFoundation
 
 @Observable
 @MainActor
-class DatabaseManager {
+class Database {
 
     @ObservationIgnored let documentsDirectoryURL: URL?
     @ObservationIgnored var modelContext: ModelContext
@@ -20,24 +21,20 @@ class DatabaseManager {
     @ObservationIgnored let databasesInitializedKey: String = "Database.Initialized"
 
     @ObservationIgnored var databaseInformation: WebCatalogDatabase?
-    @ObservationIgnored var textDatabaseURL: URL?
-    @ObservationIgnored var imageDatabaseURL: URL?
-
     @ObservationIgnored var textDatabase: Connection?
     @ObservationIgnored var imageDatabase: Connection?
+    @ObservationIgnored var textDatabaseURL: URL?
+    @ObservationIgnored var imageDatabaseURL: URL?
+    var commonImages: [String: Data] = [:]
+    var circleImages: [Int: Data] = [:]
+    @ObservationIgnored var imageCache: [String: UIImage] = [:]
 
     var isBusy: Bool = false
     var progressTextKey: String?
-
     var isDownloading: Bool = false
     var downloadProgress: Double = .zero
 
-    var commonImages: [String: Data] = [:]
-    var circleImages: [Int: Data] = [:]
-
-   @ObservationIgnored var imageCache: [String: UIImage] = [:]
-
-    var actor: DataConverter = DataConverter(modelContainer: sharedModelContainer)
+    @ObservationIgnored var actor: DataConverter = DataConverter(modelContainer: sharedModelContainer)
 
     init() {
         documentsDirectoryURL = FileManager.default.urls(
@@ -51,20 +48,12 @@ class DatabaseManager {
 
     func connect() {
         if let textDatabaseURL {
-            do {
-                debugPrint("Opening text database")
-                textDatabase = try Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
+            debugPrint("Opening text database")
+            textDatabase = try? Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
         }
         if let imageDatabaseURL {
-            do {
-                debugPrint("Opening image database")
-                imageDatabase = try Connection(imageDatabaseURL.path(percentEncoded: false), readonly: true)
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
+            debugPrint("Opening image database")
+            imageDatabase = try? Connection(imageDatabaseURL.path(percentEncoded: false), readonly: true)
         }
     }
 
@@ -151,11 +140,11 @@ class DatabaseManager {
 
     func delete() {
         if let documentsDirectoryURL {
-            try? FileManager.default.removeItem(at: documentsDirectoryURL)
             textDatabaseURL = nil
             imageDatabaseURL = nil
             textDatabase = nil
             imageDatabase = nil
+            try? FileManager.default.removeItem(at: documentsDirectoryURL)
         }
     }
 
@@ -203,5 +192,145 @@ class DatabaseManager {
 
     func isInitialLoadCompleted() -> Bool {
         return UserDefaults.standard.bool(forKey: databasesInitializedKey)
+    }
+
+    // MARK: Pre-optimized Data Fetches
+    // TODO: Move to actor
+
+    func genre(_ genreID: Int) -> String? {
+        let fetchDescriptor = FetchDescriptor<ComiketGenre>(
+            predicate: #Predicate<ComiketGenre> {
+                $0.id == genreID
+            }
+        )
+        do {
+            return (try modelContext.fetch(fetchDescriptor)).first?.name
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
+    }
+
+    // MARK: Persistent Identifier Fetches
+
+    func layouts(_ identifiers: [PersistentIdentifier]) -> [ComiketLayout] {
+        return models(identifiers, sortedBy: \ComiketLayout.mapID, in: modelContext)
+    }
+
+    func blocks(_ identifiers: [PersistentIdentifier]) -> [ComiketBlock] {
+        return models(identifiers, sortedBy: \ComiketBlock.id, in: modelContext)
+    }
+
+    func circles(_ identifiers: [PersistentIdentifier]) -> [ComiketCircle] {
+        return models(identifiers, sortedBy: \ComiketCircle.id, in: modelContext)
+    }
+
+    func models<T, K: Comparable>(
+        _ identifiers: [PersistentIdentifier],
+        sortedBy keyPath: KeyPath<T, K>,
+        in modelContext: ModelContext
+    ) -> [T] {
+        var models: [T] = []
+        for identifier in identifiers {
+            if let model = modelContext.model(for: identifier) as? T {
+                models.append(model)
+            }
+        }
+        models.sort(by: {$0[keyPath: keyPath] < $1[keyPath: keyPath]})
+        return models
+    }
+
+    // MARK: Common Images
+
+    func coverImage() -> UIImage? { commonImage(named: "0001") }
+    func blockImage(_ blockID: Int) -> UIImage? { commonImage(named: "B\(blockID)") }
+    func jikoCircleCutImage() -> UIImage? { commonImage(named: "JIKO") }
+
+    func mapImage(for hall: ComiketHall, on day: Int, usingHighDefinition: Bool) -> UIImage? {
+        let mapImageNamePrefix = usingHighDefinition ? "LWMP" : "WMP"
+        let mapImageName = "\(mapImageNamePrefix)\(day)\(hall.rawValue)"
+        return commonImage(named: mapImageName)
+    }
+
+    func genreImage(for hall: ComiketHall, on day: Int, usingHighDefinition: Bool) -> UIImage? {
+        let genreImageNamePrefix = usingHighDefinition ? "LWGR" : "WGR"
+        let genreImageName = "\(genreImageNamePrefix)\(day)\(hall.rawValue)"
+        return commonImage(named: genreImageName)
+    }
+
+    // MARK: Circle Images
+
+    func circleImage(for id: Int) -> UIImage? {
+        if let cachedImage = imageCache[String(id)] {
+            return cachedImage
+        }
+        if let circleImageData = circleImages[id] {
+            let circleImage = UIImage(data: circleImageData)
+            imageCache[String(id)] = circleImage
+            return circleImage
+        }
+        return nil
+    }
+
+    func commonImage(named imageName: String) -> UIImage? {
+        if let cachedImage = imageCache[imageName] {
+            return cachedImage
+        }
+        if let imageData = commonImages[imageName] {
+            let image = UIImage(data: imageData)
+            imageCache[imageName] = image
+            return image
+        }
+        return nil
+    }
+
+    // MARK: Others
+
+    func download(_ url: URL?) async -> URL? {
+        if let url = url, let documentsDirectoryURL {
+            do {
+                debugPrint("Downloading \(url.path())")
+                let downloader: Downloader = Downloader()
+                return try await downloader.download(from: url, to: documentsDirectoryURL) { progress in
+                    self.downloadProgress = progress
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+                return nil
+            }
+        }
+        return nil
+    }
+
+    func unzip(_ url: URL?) -> URL? {
+        if let url, let documentsDirectoryURL {
+            do {
+                debugPrint("Unzipping \(url.path())")
+                let unzipDestinationURL = documentsDirectoryURL
+                try? FileManager.default.removeItem(at: unzipDestinationURL
+                    .appendingPathComponent(url.deletingPathExtension().lastPathComponent))
+                try FileManager.default.unzipItem(at: url, to: unzipDestinationURL)
+                if let archive = try? Archive(url: url, accessMode: .read, pathEncoding: .utf8) {
+                    if let firstFileInArchive = archive.first(where: { _ in return true }) {
+                        try? FileManager.default.removeItem(at: url)
+                        return unzipDestinationURL.appending(path: firstFileInArchive.path)
+                    }
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+                return nil
+            }
+        }
+        return nil
+    }
+
+    func urlRequestForWebCatalogAPI(_ endpoint: String, authToken: OpenIDToken) -> URLRequest {
+        let endpoint = URL(string: "\(circleMsAPIEndpoint)/CatalogBase/\(endpoint)/")!
+
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.setValue("Bearer \(authToken.accessToken)", forHTTPHeaderField: "Authorization")
+
+        return request
     }
 }

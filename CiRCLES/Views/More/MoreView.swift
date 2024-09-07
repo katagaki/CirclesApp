@@ -10,15 +10,15 @@ import SwiftData
 import SwiftUI
 
 struct MoreView: View {
-    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigator: Navigator
     @Environment(AuthManager.self) var authManager
-    @Environment(DatabaseManager.self) var database
+    @Environment(Database.self) var database
 
     @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.more]) {
+        NavigationStack(path: $navigator[.more]) {
             MoreList(repoName: "katagaki/CirclesApp", viewPath: ViewPath.moreAttributions) {
                 Section {
                     Toggle("More.Customization.ShowHallAndBlock", isOn: $showSpaceName)

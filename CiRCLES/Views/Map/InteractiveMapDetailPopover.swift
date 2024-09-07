@@ -9,8 +9,8 @@ import SwiftUI
 
 struct InteractiveMapDetailPopover: View {
 
-    @EnvironmentObject var navigationManager: NavigationManager
-    @Environment(DatabaseManager.self) var database
+    @EnvironmentObject var navigator: Navigator
+    @Environment(Database.self) var database
 
     @Environment(\.modelContext) var modelContext
 
@@ -26,7 +26,7 @@ struct InteractiveMapDetailPopover: View {
                 ForEach(circles, id: \.id) { circle in
                     Button {
                         isPresented = false
-                        navigationManager.push(.circlesDetail(circle: circle), for: .map)
+                        navigator.push(.circlesDetail(circle: circle), for: .map)
                     } label: {
                         HStack {
                             if let circleImage = database.circleImage(for: circle.id) {
@@ -59,7 +59,7 @@ struct InteractiveMapDetailPopover: View {
             let actor = DataFetcher(modelContainer: sharedModelContainer)
             let circleIdentifiers = await actor.circles(withWebCatalogIDs: webCatalogIDs)
             await MainActor.run {
-                let circles = database.circles(circleIdentifiers, in: modelContext)
+                let circles = database.circles(circleIdentifiers)
                 self.circles = circles
             }
         }

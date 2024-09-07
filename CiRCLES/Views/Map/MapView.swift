@@ -11,8 +11,8 @@ import SwiftUI
 
 struct MapView: View {
 
-    @EnvironmentObject var navigationManager: NavigationManager
-    @Environment(DatabaseManager.self) var database
+    @EnvironmentObject var navigator: Navigator
+    @Environment(Database.self) var database
 
     @State var orientation = UIDeviceOrientation.portrait
 
@@ -31,7 +31,7 @@ struct MapView: View {
     @State var isInitialLoadCompleted: Bool = false
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.map]) {
+        NavigationStack(path: $navigator[.map]) {
             InteractiveMap(
                 date: $selectedDate,
                 map: $selectedMap
