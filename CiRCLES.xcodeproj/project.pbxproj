@@ -96,6 +96,10 @@
 		E4D74B6E2C88843B0014CD16 /* CircleDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B6D2C8884310014CD16 /* CircleDisplayMode.swift */; };
 		E4D74B702C88859E0014CD16 /* CircleList.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B6F2C88859C0014CD16 /* CircleList.swift */; };
 		E4D74B732C8A02290014CD16 /* MyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B722C8A02280014CD16 /* MyView.swift */; };
+		E4D74B752C8BE0040014CD16 /* UIImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B742C8BE0010014CD16 /* UIImage.swift */; };
+		E4D74B772C8C01980014CD16 /* MyProfileSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B762C8C01930014CD16 /* MyProfileSection.swift */; };
+		E4D74B792C8C02880014CD16 /* MyParticipationSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B782C8C027F0014CD16 /* MyParticipationSections.swift */; };
+		E4D74B7B2C8C03BD0014CD16 /* MyEventPickerSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B7A2C8C03BA0014CD16 /* MyEventPickerSection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -187,6 +191,10 @@
 		E4D74B6D2C8884310014CD16 /* CircleDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleDisplayMode.swift; sourceTree = "<group>"; };
 		E4D74B6F2C88859C0014CD16 /* CircleList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleList.swift; sourceTree = "<group>"; };
 		E4D74B722C8A02280014CD16 /* MyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyView.swift; sourceTree = "<group>"; };
+		E4D74B742C8BE0010014CD16 /* UIImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImage.swift; sourceTree = "<group>"; };
+		E4D74B762C8C01930014CD16 /* MyProfileSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyProfileSection.swift; sourceTree = "<group>"; };
+		E4D74B782C8C027F0014CD16 /* MyParticipationSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyParticipationSections.swift; sourceTree = "<group>"; };
+		E4D74B7A2C8C03BA0014CD16 /* MyEventPickerSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyEventPickerSection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -297,6 +305,7 @@
 			isa = PBXGroup;
 			children = (
 				E4755BC02C841C090032DA2F /* Connection.swift */,
+				E4D74B742C8BE0010014CD16 /* UIImage.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -481,7 +490,6 @@
 		E4A769482C21A20A00BE3491 /* CiRCLES */ = {
 			isa = PBXGroup;
 			children = (
-				E4755BBF2C841C000032DA2F /* Extensions */,
 				E4A769592C21A2A000BE3491 /* Info.plist */,
 				E4A7694F2C21A20B00BE3491 /* Assets.xcassets */,
 				E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */,
@@ -494,6 +502,7 @@
 				E47269022C3D715500D5335D /* Classes */,
 				E4755BD12C84A4C60032DA2F /* Structs */,
 				E480AA892C4429AC009C1445 /* Enums */,
+				E4755BBF2C841C000032DA2F /* Extensions */,
 			);
 			path = CiRCLES;
 			sourceTree = "<group>";
@@ -502,6 +511,9 @@
 			isa = PBXGroup;
 			children = (
 				E4D74B722C8A02280014CD16 /* MyView.swift */,
+				E4D74B762C8C01930014CD16 /* MyProfileSection.swift */,
+				E4D74B782C8C027F0014CD16 /* MyParticipationSections.swift */,
+				E4D74B7A2C8C03BA0014CD16 /* MyEventPickerSection.swift */,
 			);
 			path = My;
 			sourceTree = "<group>";
@@ -630,6 +642,7 @@
 				E4755BBE2C8419C10032DA2F /* DataConverter.swift in Sources */,
 				E49352072C4CFBDC004CBDA1 /* CirclesView.swift in Sources */,
 				E4755BC12C841C0B0032DA2F /* Connection.swift in Sources */,
+				E4D74B7B2C8C03BD0014CD16 /* MyEventPickerSection.swift in Sources */,
 				E480AA9A2C44A49F009C1445 /* WebCatalogEvent.swift in Sources */,
 				E480AAA32C44B723009C1445 /* DatabaseManager.swift in Sources */,
 				E49351EC2C4CC972004CBDA1 /* ComiketBlock.swift in Sources */,
@@ -647,6 +660,7 @@
 				E4755BC52C8456F30032DA2F /* DataFetcher.swift in Sources */,
 				E43C740C2C6DFD1B003522C8 /* InteractiveMapDetailPopover.swift in Sources */,
 				E480AAB32C4C9C01009C1445 /* ComiketMap.swift in Sources */,
+				E4D74B752C8BE0040014CD16 /* UIImage.swift in Sources */,
 				E48B62972C5FC21E007874AE /* WebCatalogFavorite.swift in Sources */,
 				E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */,
 				E4755BCC2C848D810032DA2F /* DatabaseType.swift in Sources */,
@@ -658,6 +672,7 @@
 				E49351EA2C4CC62F004CBDA1 /* ComiketArea.swift in Sources */,
 				E4755BB02C8353620032DA2F /* AutomaticNavigationTransition.swift in Sources */,
 				E49351FC2C4CF191004CBDA1 /* DatabaseManager+Data.swift in Sources */,
+				E4D74B772C8C01980014CD16 /* MyProfileSection.swift in Sources */,
 				E480AABB2C4CA2A7009C1445 /* CircleCutConfiguration.swift in Sources */,
 				E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */,
 				E49351F12C4CD0C3004CBDA1 /* ComiketLayout.swift in Sources */,
@@ -665,6 +680,7 @@
 				E4755BAA2C82BF8F0032DA2F /* UserResponse.swift in Sources */,
 				E480AA982C44A473009C1445 /* WebCatalog.swift in Sources */,
 				E4755BCE2C8493810032DA2F /* CircleBlockPill.swift in Sources */,
+				E4D74B792C8C02880014CD16 /* MyParticipationSections.swift in Sources */,
 				E49352042C4CF4A1004CBDA1 /* ComiketHall.swift in Sources */,
 				E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */,
 				E49351F32C4CD503004CBDA1 /* ComiketCircle.swift in Sources */,
