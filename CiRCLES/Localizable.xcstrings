@@ -506,7 +506,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "経路を探す"
+            "value" : "東京ビッグサイトへの経路"
           }
         }
       }
@@ -608,7 +608,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "東京ビッグサイト フロアマップ"
+            "value" : "東京ビッグサイトフロアマップ"
           }
         }
       }
