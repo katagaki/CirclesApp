@@ -1,5 +1,5 @@
 //
-//  MoreDatabaseManager.swift
+//  MoreDatabase.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/07/15.
@@ -14,7 +14,7 @@ typealias View = SwiftUI.View
 struct MoreDatabaseAdministratiion: View {
 
     @Environment(AuthManager.self) var authManager
-    @Environment(DatabaseManager.self) var database
+    @Environment(Database.self) var database
 
     @AppStorage(wrappedValue: false, "More.DBAdmin.SkipDownload") var willSkipDownload: Bool
 

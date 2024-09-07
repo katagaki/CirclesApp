@@ -9,8 +9,8 @@ import SwiftUI
 
 struct InteractiveMapButton: View {
 
-    @Environment(DatabaseManager.self) var database
-    @Environment(FavoritesManager.self) var favorites
+    @Environment(Database.self) var database
+    @Environment(Favorites.self) var favorites
 
     @Environment(\.modelContext) var modelContext
 

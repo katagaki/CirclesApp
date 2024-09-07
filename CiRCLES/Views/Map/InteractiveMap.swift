@@ -10,7 +10,7 @@ import TipKit
 
 struct InteractiveMap: View {
 
-    @Environment(DatabaseManager.self) var database
+    @Environment(Database.self) var database
 
     let spaceSize: Int = 40
 
@@ -21,7 +21,7 @@ struct InteractiveMap: View {
     @State var genreImage: UIImage?
 
     @State var layouts: [ComiketLayout] = []
-    @State var layoutWebCatalogIDMappings: [[Int]: [Int]] = [:]
+    @State var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
     @State var isLoadingLayouts: Bool = false
 
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
@@ -61,17 +61,16 @@ struct InteractiveMap: View {
                             if let date {
                                 ZStack(alignment: .topLeading) {
                                     ForEach(Array(layoutWebCatalogIDMappings.keys), id: \.self) { layout in
-//                                        Color(red: CGFloat.random(in: 0...1),
-//                                              green: CGFloat.random(in: 0...1),
-//                                              blue: CGFloat.random(in: 0...1))
-                                        InteractiveMapButton(selectedEventDateID: date.id,
-                                                             layoutBlockID: layout[0],
-                                                             layoutSpaceNumber: layout[1],
-                                                             webCatalogIDs: layoutWebCatalogIDMappings[layout] ?? [])
-                                        .id(layout)
+                                        InteractiveMapButton(
+                                            selectedEventDateID: date.id,
+                                            layoutBlockID: layout.blockID,
+                                            layoutSpaceNumber: layout.spaceNumber,
+                                            webCatalogIDs: layoutWebCatalogIDMappings[layout] ?? []
+                                        )
+                                        .id(layout.viewID())
                                         .position(
-                                            x: CGFloat((layout[2] + Int(spaceSize / 2)) / zoomDivisor),
-                                            y: CGFloat((layout[3] + Int(spaceSize / 2)) / zoomDivisor)
+                                            x: CGFloat((layout.positionX + Int(spaceSize / 2)) / zoomDivisor),
+                                            y: CGFloat((layout.positionY + Int(spaceSize / 2)) / zoomDivisor)
                                         )
                                         .frame(
                                             width: CGFloat(spaceSize / zoomDivisor),
@@ -88,11 +87,11 @@ struct InteractiveMap: View {
                 .overlay {
                     if isLoadingLayouts {
                         ZStack(alignment: .center) {
-                            ProgressView()
+                            ProgressView("Map.LoadingLayouts")
                                 .padding()
                                 .background(Material.regular)
-                                .clipShape(RoundedRectangle(cornerRadius: 8.0))
-                            Color(uiColor: .systemBackground).opacity(0.2)
+                                .clipShape(.rect(cornerRadius: 8.0))
+                            Color.clear
                         }
                     }
                 }
@@ -148,11 +147,6 @@ struct InteractiveMap: View {
                         Color.clear
                     }
                 }
-            }
-        }
-        .onAppear {
-            if mapImage == nil || genreImage == nil {
-                reloadAll()
             }
         }
         .onChange(of: database.commonImages) { _, _ in
@@ -213,24 +207,20 @@ struct InteractiveMap: View {
     func reloadWebCatalogIDs() {
         debugPrint("Reloading web catalog ID mappings")
         if let selectedDate = date?.id {
-            let layoutBlockIDAndSpaceNumbers = layouts.map {
-                [$0.blockID, $0.spaceNumber, $0.hdPosition.x, $0.hdPosition.y]
+            let layoutCatalogMappings = layouts.map {
+                LayoutCatalogMapping(
+                    blockID: $0.blockID, spaceNumber: $0.spaceNumber,
+                    positionX: $0.hdPosition.x, positionY: $0.hdPosition.y
+                )
             }
             withAnimation(.smooth.speed(2.0)) {
                 isLoadingLayouts = true
             } completion: {
                 Task.detached {
                     let actor = DataFetcher(modelContainer: sharedModelContainer)
-                    var layoutWebCatalogIDMappings: [[Int]: [Int]] = [:]
-                    for blockIDAndSpaceNumber in layoutBlockIDAndSpaceNumbers {
-                        debugPrint("Reloading web catalog ID mappings for \(blockIDAndSpaceNumber)")
-                        let webCatalogIDs = await actor.circleWebCatalogIDs(
-                            inBlock: blockIDAndSpaceNumber[0],
-                            inSpace: blockIDAndSpaceNumber[1],
-                            on: selectedDate
-                        )
-                        layoutWebCatalogIDMappings[blockIDAndSpaceNumber] = webCatalogIDs
-                    }
+                    let layoutWebCatalogIDMappings = await actor.circleWebCatalogIDs(
+                        forMappings: layoutCatalogMappings, on: selectedDate
+                    )
                     await MainActor.run {
                         withAnimation(.smooth.speed(2.0)) {
                             self.layoutWebCatalogIDMappings = layoutWebCatalogIDMappings

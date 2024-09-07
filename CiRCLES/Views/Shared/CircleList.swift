@@ -9,8 +9,8 @@ import SwiftUI
 
 struct CircleList: View {
 
-    @Environment(DatabaseManager.self) var database
-    @Environment(FavoritesManager.self) var favorites
+    @Environment(Database.self) var database
+    @Environment(Favorites.self) var favorites
 
     var circles: [ComiketCircle]
     var namespace: Namespace.ID

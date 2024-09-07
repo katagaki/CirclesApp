@@ -9,7 +9,7 @@ import SwiftUI
 
 struct CirclePreview: View {
 
-    var database: DatabaseManager
+    var database: Database
 
     var circle: ComiketCircle
 

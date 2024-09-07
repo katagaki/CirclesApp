@@ -10,10 +10,10 @@ import SwiftUI
 
 struct FavoritesView: View {
 
-    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigator: Navigator
     @Environment(AuthManager.self) var authManager
-    @Environment(FavoritesManager.self) var favorites
-    @Environment(DatabaseManager.self) var database
+    @Environment(Favorites.self) var favorites
+    @Environment(Database.self) var database
 
     @Environment(\.modelContext) var modelContext
 
@@ -24,7 +24,7 @@ struct FavoritesView: View {
     @Namespace var favoritesNamespace
 
     var body: some View {
-        NavigationStack(path: $navigationManager[.favorites]) {
+        NavigationStack(path: $navigator[.favorites]) {
             ZStack(alignment: .center) {
                 if !isRefreshing, let favoriteCircles {
                     if favoriteCircles.isEmpty {
@@ -36,7 +36,7 @@ struct FavoritesView: View {
                     } else {
                         CircleGrid(circles: favoriteCircles,
                                    namespace: favoritesNamespace) { circle in
-                            navigationManager.push(.circlesDetail(circle: circle), for: .favorites)
+                            navigator.push(.circlesDetail(circle: circle), for: .favorites)
                         }
                     }
                 } else {
@@ -105,7 +105,7 @@ struct FavoritesView: View {
         await MainActor.run {
             var favoriteCircles: [ComiketCircle] = []
             for (_, circleIdentifiers) in favoriteCircleIdentifiers {
-                var circles = database.circles(circleIdentifiers, in: modelContext)
+                var circles = database.circles(circleIdentifiers)
                 circles.sort(by: {$0.id < $1.id})
                 favoriteCircles.append(contentsOf: circles)
             }

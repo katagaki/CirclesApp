@@ -12,10 +12,10 @@ import TipKit
 struct MainTabView: View {
 
     @Environment(\.modelContext) var modelContext
-    @EnvironmentObject var navigationManager: NavigationManager
+    @EnvironmentObject var navigator: Navigator
     @Environment(AuthManager.self) var authManager
-    @Environment(FavoritesManager.self) var favorites
-    @Environment(DatabaseManager.self) var database
+    @Environment(Favorites.self) var favorites
+    @Environment(Database.self) var database
 
     @State var isInitialTokenRefreshComplete: Bool = false
     @State var isProgressDeterminate: Bool = false
@@ -24,7 +24,7 @@ struct MainTabView: View {
     var body: some View {
         @Bindable var authManager = authManager
         @Bindable var database = database
-        TabView(selection: $navigationManager.selectedTab) {
+        TabView(selection: $navigator.selectedTab) {
             MapView()
                 .tabItem {
                     Label("Tab.Map", systemImage: "map.fill")
@@ -112,11 +112,11 @@ struct MainTabView: View {
                 }
             }
         }
-        .onReceive(navigationManager.$selectedTab, perform: { newValue in
-            if newValue == navigationManager.previouslySelectedTab {
-                navigationManager.popToRoot(for: newValue)
+        .onReceive(navigator.$selectedTab, perform: { newValue in
+            if newValue == navigator.previouslySelectedTab {
+                navigator.popToRoot(for: newValue)
             }
-            navigationManager.previouslySelectedTab = newValue
+            navigator.previouslySelectedTab = newValue
         })
     }
 

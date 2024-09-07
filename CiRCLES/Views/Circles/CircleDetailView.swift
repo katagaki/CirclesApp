@@ -14,8 +14,8 @@ struct CircleDetailView: View {
     @Environment(\.openURL) var openURL
 
     @Environment(AuthManager.self) var authManager
-    @Environment(FavoritesManager.self) var favorites
-    @Environment(DatabaseManager.self) var database
+    @Environment(Favorites.self) var favorites
+    @Environment(Database.self) var database
 
     var circle: ComiketCircle
     @State var circleImage: UIImage?
