@@ -579,6 +579,38 @@
         }
       }
     },
+    "My.ProfilePicture.Remove" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remove"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除"
+          }
+        }
+      }
+    },
+    "My.ProfilePicture.SelectFromPhotos" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select from Photos"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「写真」から選択"
+          }
+        }
+      }
+    },
     "My.Ticket.ChangeType" : {
       "localizations" : {
         "en" : {

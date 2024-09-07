@@ -95,7 +95,12 @@ struct MyView: View {
                             Image(uiImage: eventCoverImage)
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(maxWidth: .infinity, maxHeight: 250.0, alignment: .center)
+                                .clipShape(RoundedRectangle(cornerRadius: 8.0))
+                                .overlay {
+                                    RoundedRectangle(cornerRadius: 8.0)
+                                        .stroke(Color.primary.opacity(0.5), lineWidth: 1/3)
+                                }
+                                .frame(maxWidth: .infinity, maxHeight: 300.0, alignment: .center)
                         }
                         Image(.arrow)
                             .resizable()
