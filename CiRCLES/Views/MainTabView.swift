@@ -136,18 +136,20 @@ struct MainTabView: View {
     func loadDataFromDatabase() async {
         UIApplication.shared.isIdleTimerDisabled = true
 
-        if let token = authManager.token {
-            if let eventData = await WebCatalog.events(authToken: token),
-                let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
+        let token = authManager.token ?? OpenIDToken(
+            accessToken: "", tokenType: "", expiresIn: "", refreshToken: ""
+        )
 
-                await setProgressHeaderKey("Shared.LoadingHeader.Download")
+        if let eventData = await WebCatalog.events(authToken: token),
+           let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
 
-                await setProgressTextKey("Shared.LoadingText.DownloadTextDatabase")
-                await database.downloadTextDatabase(for: latestEvent, authToken: token)
+            await setProgressHeaderKey("Shared.LoadingHeader.Download")
 
-                await setProgressTextKey("Shared.LoadingText.DownloadImageDatabase")
-                await database.downloadImageDatabase(for: latestEvent, authToken: token)
-            }
+            await setProgressTextKey("Shared.LoadingText.DownloadTextDatabase")
+            await database.downloadTextDatabase(for: latestEvent, authToken: token)
+
+            await setProgressTextKey("Shared.LoadingText.DownloadImageDatabase")
+            await database.downloadImageDatabase(for: latestEvent, authToken: token)
         }
 
         await setProgressTextKey("Shared.LoadingText.Database")
