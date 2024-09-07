@@ -29,55 +29,24 @@ struct MoreView: View {
                 Section {
                     switch Locale.current.language.languageCode {
                     case .japanese:
-                        Link(destination: URL(string: "maps://?saddr=現在地&daddr=東京ビッグサイト")!) {
-                            HStack(alignment: .center) {
-                                ListRow(image: "ListIcon.AppleMaps", title: "More.Navigate.Maps")
-                                    .foregroundStyle(.foreground)
-                                Spacer()
-                                Image(systemName: "arrow.up.right.square")
-                                    .foregroundStyle(.foreground.opacity(0.5))
-                            }
+                        if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
+                            ExternalLink("maps://?saddr=現在地&daddr=東京ビッグサイト",
+                                         title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
                         }
-                        if UIApplication.shared.canOpenURL(URL(string: "com.googlemaps://")!) {
-                            Link(destination: URL(string: "comgooglemaps://?saddr=現在地&daddr=東京ビッグサイト")!) {
-                                HStack(alignment: .center) {
-                                    ListRow(image: "ListIcon.GoogleMaps", title: "More.Navigate.GoogleMaps")
-                                        .foregroundStyle(.foreground)
-                                    Spacer()
-                                    Image(systemName: "arrow.up.right.square")
-                                        .foregroundStyle(.foreground.opacity(0.5))
-                                }
-                            }
+                        if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
+                            ExternalLink("comgooglemaps://?saddr=現在地&daddr=東京ビッグサイト",
+                                         title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
                         }
-                        Link(destination: URL(string: "https://map.yahoo.co.jp/route/train?from=現在地&to=東京ビッグサイト")!) {
-                            HStack(alignment: .center) {
-                                ListRow(image: "ListIcon.YahooMap", title: "More.Navigate.YahooMap")
-                                    .foregroundStyle(.foreground)
-                                Spacer()
-                                Image(systemName: "arrow.up.right.square")
-                                    .foregroundStyle(.foreground.opacity(0.5))
-                            }
-                        }
+                        ExternalLink("https://map.yahoo.co.jp/route/train?from=現在地&to=東京ビッグサイト",
+                                     title: "More.Navigate.YahooMap", image: "ListIcon.YahooMap")
                     default:
-                        Link(destination: URL(string: "maps://?saddr=Current+Location&daddr=Tokyo+Big+Sight")!) {
-                            HStack(alignment: .center) {
-                                ListRow(image: "ListIcon.AppleMaps", title: "More.Navigate.Maps")
-                                    .foregroundStyle(.foreground)
-                                Spacer()
-                                Image(systemName: "arrow.up.right.square")
-                                    .foregroundStyle(.foreground.opacity(0.5))
-                            }
+                        if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
+                            ExternalLink("maps://?saddr=Current+Location&daddr=Tokyo+Big+Sight",
+                                         title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
                         }
-                        if UIApplication.shared.canOpenURL(URL(string: "com.googlemaps://")!) {
-                            Link(destination: URL(string: "comgooglemaps://?saddr=My+Location&daddr=Tokyo+Big+Sight")!) {
-                                HStack(alignment: .center) {
-                                    ListRow(image: "ListIcon.GoogleMaps", title: "More.Navigate.GoogleMaps")
-                                        .foregroundStyle(.foreground)
-                                    Spacer()
-                                    Image(systemName: "arrow.up.right.square")
-                                        .foregroundStyle(.foreground.opacity(0.5))
-                                }
-                            }
+                        if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
+                            ExternalLink("comgooglemaps://?saddr=My+Location&daddr=Tokyo+Big+Sight",
+                                         title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
                         }
                     }
                 } header: {
@@ -86,43 +55,15 @@ struct MoreView: View {
                 Section {
                     switch Locale.current.language.languageCode {
                     case .japanese:
-                        Link(destination: URL(string: "https://www.bigsight.jp/visitor/floormap/")!) {
-                            HStack(alignment: .center) {
-                                ListRow(image: "ListIcon.BigSight", title: "More.UsefulResources.BigSightMap")
-                                    .foregroundStyle(.foreground)
-                                Spacer()
-                                Image(systemName: "safari")
-                                    .foregroundStyle(.foreground.opacity(0.5))
-                            }
-                        }
-                        Link(destination: URL(string: "https://webcatalog.circle.ms")!) {
-                            HStack(alignment: .center) {
-                                ListRow(image: "ListIcon.WebCatalog", title: "More.UsefulResources.WebCatalog")
-                                    .foregroundStyle(.foreground)
-                                Spacer()
-                                Image(systemName: "safari")
-                                    .foregroundStyle(.foreground.opacity(0.5))
-                            }
-                        }
+                        SafariLink("https://www.bigsight.jp/visitor/floormap/",
+                                   title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
+                        SafariLink("https://webcatalog.circle.ms",
+                                   title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
                     default:
-                        Link(destination: URL(string: "https://www.bigsight.jp/english/visitor/floormap/")!) {
-                            HStack(alignment: .center) {
-                                ListRow(image: "ListIcon.BigSight", title: "More.UsefulResources.BigSightMap")
-                                    .foregroundStyle(.foreground)
-                                Spacer()
-                                Image(systemName: "safari")
-                                    .foregroundStyle(.foreground.opacity(0.5))
-                            }
-                        }
-                        Link(destination: URL(string: "https://int.webcatalog.circle.ms/en/catalog")!) {
-                            HStack(alignment: .center) {
-                                ListRow(image: "ListIcon.WebCatalog", title: "More.UsefulResources.WebCatalog")
-                                    .foregroundStyle(.foreground)
-                                Spacer()
-                                Image(systemName: "safari")
-                                    .foregroundStyle(.foreground.opacity(0.5))
-                            }
-                        }
+                        SafariLink("https://www.bigsight.jp/english/visitor/floormap/",
+                                   title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
+                        SafariLink("https://int.webcatalog.circle.ms/en/catalog",
+                                   title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
                     }
                 } header: {
                     ListSectionHeader(text: "More.UsefulResources")
