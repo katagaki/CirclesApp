@@ -91,23 +91,36 @@ struct MainTabView: View {
                 .interactiveDismissDisabled()
         }
         .task {
-            if !isInitialTokenRefreshComplete {
-                await authManager.refreshAuthenticationToken()
-                isInitialTokenRefreshComplete = true
-            }
             try? Tips.configure([
                 .displayFrequency(.immediate),
                 .datastoreLocation(.applicationDefault)
             ])
         }
-        .onChange(of: authManager.token) { _, newValue in
-            if newValue != nil {
-                self.database.isBusy = true
+        .onChange(of: authManager.onlineState) { _, newValue in
+            switch newValue {
+            case .online:
+                Task {
+                    await authManager.refreshAuthenticationToken()
+                }
+            case .offline:
+                authManager.useOfflineAuthenticationToken()
                 Task.detached {
                     await loadDataFromDatabase()
-                    await loadFavorites()
-                    await MainActor.run {
-                        closeLoadingOverlay()
+                }
+            default: break
+            }
+        }
+        .onChange(of: authManager.token) { _, newValue in
+            if newValue != nil {
+                withAnimation(.snappy.speed(2.0)) {
+                    self.database.isBusy = true
+                } completion: {
+                    Task.detached {
+                        await loadDataFromDatabase()
+                        await loadFavorites()
+                        await MainActor.run {
+                            closeLoadingOverlay()
+                        }
                     }
                 }
             }
@@ -121,10 +134,11 @@ struct MainTabView: View {
     }
 
     func loadDataFromDatabase() async {
+        UIApplication.shared.isIdleTimerDisabled = true
+
         if let token = authManager.token {
             if let eventData = await WebCatalog.events(authToken: token),
                 let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
-                UIApplication.shared.isIdleTimerDisabled = true
 
                 await setProgressHeaderKey("Shared.LoadingHeader.Download")
 
@@ -133,50 +147,50 @@ struct MainTabView: View {
 
                 await setProgressTextKey("Shared.LoadingText.DownloadImageDatabase")
                 await database.downloadImageDatabase(for: latestEvent, authToken: token)
-
-                await setProgressTextKey("Shared.LoadingText.Database")
-                database.connect()
-
-                if !database.isInitialLoadCompleted() {
-                    await setProgressHeaderKey("Shared.LoadingHeader.Initial")
-
-                    let actor = DataConverter(modelContainer: sharedModelContainer)
-
-                    await actor.deleteAllData()
-
-                    await setProgressTextKey("Shared.LoadingText.Events")
-                    await actor.loadEvents(from: database.textDatabase)
-                    await actor.loadDates(from: database.textDatabase)
-
-                    await setProgressTextKey("Shared.LoadingText.Maps")
-                    await actor.loadMaps(from: database.textDatabase)
-                    await actor.loadAreas(from: database.textDatabase)
-                    await actor.loadBlocks(from: database.textDatabase)
-                    await actor.loadMapping(from: database.textDatabase)
-                    await actor.loadLayouts(from: database.textDatabase)
-
-                    await setProgressTextKey("Shared.LoadingText.Genres")
-                    await actor.loadGenres(from: database.textDatabase)
-
-                    await setProgressTextKey("Shared.LoadingText.Circles")
-                    await actor.loadCircles(from: database.textDatabase)
-
-                    await actor.save()
-
-                    database.setInitialLoadCompleted()
-                } else {
-                    debugPrint("Skipped loading database into persistent model cache")
-                }
-
-                await setProgressTextKey("Shared.LoadingText.Images")
-                database.loadCommonImages()
-                database.loadCircleImages()
-
-                database.disconnect()
-
-                UIApplication.shared.isIdleTimerDisabled = false
             }
         }
+
+        await setProgressTextKey("Shared.LoadingText.Database")
+        database.connect()
+
+        if !database.isInitialLoadCompleted() {
+            await setProgressHeaderKey("Shared.LoadingHeader.Initial")
+
+            let actor = DataConverter(modelContainer: sharedModelContainer)
+
+            await actor.deleteAllData()
+
+            await setProgressTextKey("Shared.LoadingText.Events")
+            await actor.loadEvents(from: database.textDatabase)
+            await actor.loadDates(from: database.textDatabase)
+
+            await setProgressTextKey("Shared.LoadingText.Maps")
+            await actor.loadMaps(from: database.textDatabase)
+            await actor.loadAreas(from: database.textDatabase)
+            await actor.loadBlocks(from: database.textDatabase)
+            await actor.loadMapping(from: database.textDatabase)
+            await actor.loadLayouts(from: database.textDatabase)
+
+            await setProgressTextKey("Shared.LoadingText.Genres")
+            await actor.loadGenres(from: database.textDatabase)
+
+            await setProgressTextKey("Shared.LoadingText.Circles")
+            await actor.loadCircles(from: database.textDatabase)
+
+            await actor.save()
+
+            database.setInitialLoadCompleted()
+        } else {
+            debugPrint("Skipped loading database into persistent model cache")
+        }
+
+        await setProgressTextKey("Shared.LoadingText.Images")
+        database.loadCommonImages()
+        database.loadCircleImages()
+
+        database.disconnect()
+
+        UIApplication.shared.isIdleTimerDisabled = false
     }
 
     func loadFavorites() async {
