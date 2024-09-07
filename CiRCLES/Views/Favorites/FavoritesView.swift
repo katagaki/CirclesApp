@@ -23,7 +23,7 @@ struct FavoritesView: View {
         NavigationStack(path: $navigationManager[.favorites]) {
             ZStack(alignment: .center) {
                 if !isRefreshing, let favoriteCircles {
-                    if favoriteCircles.count == 0 {
+                    if favoriteCircles.isEmpty {
                         ContentUnavailableView(
                             "Favorites.NoFavorites",
                             systemImage: "star.leadinghalf.filled",
@@ -41,9 +41,7 @@ struct FavoritesView: View {
             }
             .navigationTitle("ViewTitle.Favorites")
             .refreshable {
-                Task.detached {
-                    await reloadFavorites()
-                }
+                await reloadFavorites()
             }
             .onAppear {
                 if favoriteCircles == nil, let favoriteItems = favorites.items {
