@@ -12,9 +12,13 @@ struct InteractiveMapDetailPopover: View {
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(DatabaseManager.self) var database
 
+    @Environment(\.modelContext) var modelContext
+
     @Binding var isPresented: Bool
 
-    var circles: [ComiketCircle]?
+    var webCatalogIDs: [Int]
+
+    @State var circles: [ComiketCircle]?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8.0) {
@@ -45,5 +49,19 @@ struct InteractiveMapDetailPopover: View {
         }
         .padding()
         .presentationCompactAdaptation(.popover)
+        .onAppear {
+            fetchCircles()
+        }
+    }
+
+    func fetchCircles() {
+        Task.detached {
+            let actor = DataFetcher(modelContainer: sharedModelContainer)
+            let circleIdentifiers = await actor.circles(withWebCatalogIDs: webCatalogIDs)
+            await MainActor.run {
+                let circles = database.circles(circleIdentifiers, in: modelContext)
+                self.circles = circles
+            }
+        }
     }
 }

@@ -22,6 +22,10 @@ final class ComiketLayout: SQLiteable {
     @Relationship(deleteRule: .nullify, inverse: \ComiketMap.layouts) var map: ComiketMap?
     @Relationship(deleteRule: .nullify) var circles: [ComiketCircle]?
 
+    var mergedID: String {
+        return String(blockID) + "|" + String(spaceNumber)
+    }
+
     init(from row: Row) {
         let colEventNumber = Expression<Int>("comiketNo")
         let colBlockID = Expression<Int>("blockId")

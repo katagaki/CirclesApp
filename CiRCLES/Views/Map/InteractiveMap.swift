@@ -20,6 +20,10 @@ struct InteractiveMap: View {
     @State var mapImage: UIImage?
     @State var genreImage: UIImage?
 
+    @State var layouts: [ComiketLayout] = []
+    @State var layoutWebCatalogIDMappings: [[Int]: [Int]] = [:]
+    @State var isLoadingLayouts: Bool = false
+
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
 
@@ -56,14 +60,18 @@ struct InteractiveMap: View {
                         .overlay {
                             if let date {
                                 ZStack(alignment: .topLeading) {
-                                    ForEach(map?.layouts ?? [], id: \.self) { layout in
+                                    ForEach(Array(layoutWebCatalogIDMappings.keys), id: \.self) { layout in
+//                                        Color(red: CGFloat.random(in: 0...1),
+//                                              green: CGFloat.random(in: 0...1),
+//                                              blue: CGFloat.random(in: 0...1))
                                         InteractiveMapButton(selectedEventDateID: date.id,
-                                                             layoutSpaceNumber: layout.spaceNumber,
-                                                             circlesInSpace: layout.circles)
-                                        .id(String(layout.blockID) + "|" + String(layout.spaceNumber))
+                                                             layoutBlockID: layout[0],
+                                                             layoutSpaceNumber: layout[1],
+                                                             webCatalogIDs: layoutWebCatalogIDMappings[layout] ?? [])
+                                        .id(layout)
                                         .position(
-                                            x: CGFloat((layout.hdPosition.x + Int(spaceSize / 2)) / zoomDivisor),
-                                            y: CGFloat((layout.hdPosition.y + Int(spaceSize / 2)) / zoomDivisor)
+                                            x: CGFloat((layout[2] + Int(spaceSize / 2)) / zoomDivisor),
+                                            y: CGFloat((layout[3] + Int(spaceSize / 2)) / zoomDivisor)
                                         )
                                         .frame(
                                             width: CGFloat(spaceSize / zoomDivisor),
@@ -77,6 +85,17 @@ struct InteractiveMap: View {
                         }
                 }
                 .scrollIndicators(.hidden)
+                .overlay {
+                    if isLoadingLayouts {
+                        ZStack(alignment: .center) {
+                            ProgressView()
+                                .padding()
+                                .background(Material.regular)
+                                .clipShape(RoundedRectangle(cornerRadius: 8.0))
+                            Color(uiColor: .systemBackground).opacity(0.2)
+                        }
+                    }
+                }
                 .overlay {
                     ZStack(alignment: .bottomTrailing) {
                         VStack(alignment: .trailing, spacing: 12.0) {
@@ -132,7 +151,9 @@ struct InteractiveMap: View {
             }
         }
         .onAppear {
-            reloadAll()
+            if mapImage == nil || genreImage == nil {
+                reloadAll()
+            }
         }
         .onChange(of: database.commonImages) { _, _ in
             reloadAll()
@@ -140,11 +161,19 @@ struct InteractiveMap: View {
         .onChange(of: dateMap) { _, _ in
             reloadAll()
         }
+        .onChange(of: layouts) { _, newValue in
+            if newValue.count > 0 {
+                reloadWebCatalogIDs()
+            } else {
+                layoutWebCatalogIDMappings.removeAll()
+            }
+        }
     }
 
     func reloadAll() {
         withAnimation(.snappy.speed(2.0)) {
             reloadMapImage()
+            reloadMapLayouts()
         }
     }
 
@@ -160,6 +189,56 @@ struct InteractiveMap: View {
                 on: date.id,
                 usingHighDefinition: true
             )
+        }
+    }
+
+    func reloadMapLayouts() {
+        withAnimation(.snappy.speed(2.0)) {
+            layouts.removeAll()
+        } completion: {
+            if let map {
+                let mapID = map.id
+                Task.detached {
+                    let actor = DataFetcher(modelContainer: sharedModelContainer)
+                    let layoutIdentifiers = await actor.layouts(inMap: mapID)
+                    await MainActor.run {
+                        let mapLayouts = database.layouts(layoutIdentifiers)
+                        self.layouts = mapLayouts
+                    }
+                }
+            }
+        }
+    }
+
+    func reloadWebCatalogIDs() {
+        debugPrint("Reloading web catalog ID mappings")
+        if let selectedDate = date?.id {
+            let layoutBlockIDAndSpaceNumbers = layouts.map {
+                [$0.blockID, $0.spaceNumber, $0.hdPosition.x, $0.hdPosition.y]
+            }
+            withAnimation(.smooth.speed(2.0)) {
+                isLoadingLayouts = true
+            } completion: {
+                Task.detached {
+                    let actor = DataFetcher(modelContainer: sharedModelContainer)
+                    var layoutWebCatalogIDMappings: [[Int]: [Int]] = [:]
+                    for blockIDAndSpaceNumber in layoutBlockIDAndSpaceNumbers {
+                        debugPrint("Reloading web catalog ID mappings for \(blockIDAndSpaceNumber)")
+                        let webCatalogIDs = await actor.circleWebCatalogIDs(
+                            inBlock: blockIDAndSpaceNumber[0],
+                            inSpace: blockIDAndSpaceNumber[1],
+                            on: selectedDate
+                        )
+                        layoutWebCatalogIDMappings[blockIDAndSpaceNumber] = webCatalogIDs
+                    }
+                    await MainActor.run {
+                        withAnimation(.smooth.speed(2.0)) {
+                            self.layoutWebCatalogIDMappings = layoutWebCatalogIDMappings
+                            self.isLoadingLayouts = false
+                        }
+                    }
+                }
+            }
         }
     }
 }
