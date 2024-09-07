@@ -21,47 +21,43 @@ struct InteractiveMapButton: View {
     @State var isCircleDetailPopoverPresented: Bool = false
 
     var body: some View {
-//        Button {
-//            if (circlesInSpace?.count ?? 0) > 0 {
-//                isCircleDetailPopoverPresented.toggle()
-//            }
-//        } label: {
-            VStack(spacing: 0.0) {
-                if circlesToDisplay().count == 0 {
-                    Rectangle()
-                        .foregroundStyle(.clear)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    ForEach(circlesToDisplay()) { circle in
-                        Group {
-                            if let extendedInformation = circle.extendedInformation,
-                               let wcIDMappedItems = favorites.wcIDMappedItems,
-                               let favoriteCircle = wcIDMappedItems[extendedInformation.webCatalogID] {
-                                Rectangle()
-                                    .foregroundStyle(favoriteCircle.favorite.color.swiftUIColor().opacity(0.5))
-                            } else {
-                                Rectangle()
-                                    .foregroundStyle(.clear)
-                            }
+        VStack(spacing: 0.0) {
+            if circlesToDisplay().count == 0 {
+                Rectangle()
+                    .foregroundStyle(.clear)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                ForEach(circlesToDisplay()) { circle in
+                    Group {
+                        if let extendedInformation = circle.extendedInformation,
+                           let wcIDMappedItems = favorites.wcIDMappedItems,
+                           let favoriteCircle = wcIDMappedItems[extendedInformation.webCatalogID] {
+                            Rectangle()
+                                .foregroundStyle(favoriteCircle.favorite.color.swiftUIColor().opacity(0.5))
+                        } else {
+                            Rectangle()
+                                .foregroundStyle(.clear)
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .contentShape(.rect)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .overlay {
-                if isCircleDetailPopoverPresented {
-                    Color.accent.opacity(0.3)
-                }
+        }
+        .contentShape(.rect)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay {
+            if isCircleDetailPopoverPresented {
+                Color.accent.opacity(0.3)
             }
-//        }
-            .onTapGesture {
-                if (circlesInSpace?.count ?? 0) > 0 {
+        }
+        .onTapGesture {
+            if (circlesInSpace?.count ?? 0) > 0 {
+                withAnimation(.smooth.speed(2.0)) {
                     isCircleDetailPopoverPresented.toggle()
                 }
             }
-        .popover(isPresented: $isCircleDetailPopoverPresented) {
+        }
+        .popover(isPresented: $isCircleDetailPopoverPresented.animation(.smooth.speed(2.0))) {
             InteractiveMapDetailPopover(isPresented: $isCircleDetailPopoverPresented, circles: circlesToDisplay())
         }
     }

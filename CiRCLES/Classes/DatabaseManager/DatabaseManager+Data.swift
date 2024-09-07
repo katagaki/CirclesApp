@@ -12,6 +12,23 @@ import UIKit
 
 extension DatabaseManager {
 
+    // MARK: For Deprecation
+
+    func genre(_ genreID: Int) -> String? {
+        let fetchDescriptor = FetchDescriptor<ComiketGenre>(
+            predicate: #Predicate<ComiketGenre> {
+                $0.id == genreID
+            },
+            sortBy: [SortDescriptor(\.id, order: .forward)]
+        )
+        do {
+            return (try modelContext.fetch(fetchDescriptor)).first?.name
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
+    }
+
     // MARK: Event Data
 
     func layouts(_ identifiers: [PersistentIdentifier]) -> [ComiketLayout] {
@@ -34,36 +51,6 @@ extension DatabaseManager {
         }
         blocks.sort(by: {$0.id < $1.id})
         return blocks
-    }
-
-    func genre(_ genreID: Int) -> String? {
-        let fetchDescriptor = FetchDescriptor<ComiketGenre>(
-            predicate: #Predicate<ComiketGenre> {
-                $0.id == genreID
-            },
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return (try modelContext.fetch(fetchDescriptor)).first?.name
-        } catch {
-            debugPrint(error.localizedDescription)
-            return nil
-        }
-    }
-
-    func circle(for webCatalogID: Int) -> ComiketCircle? {
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.extendedInformation?.webCatalogID == webCatalogID
-            },
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            return (try modelContext.fetch(fetchDescriptor)).first
-        } catch {
-            debugPrint(error.localizedDescription)
-            return nil
-        }
     }
 
     func circles(_ identifiers: [PersistentIdentifier], in modelContext: ModelContext) -> [ComiketCircle] {
