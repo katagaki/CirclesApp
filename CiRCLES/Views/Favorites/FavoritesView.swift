@@ -5,13 +5,17 @@
 //  Created by シン・ジャスティン on 2024/08/04.
 //
 
+import SwiftData
 import SwiftUI
 
 struct FavoritesView: View {
+
     @EnvironmentObject var navigationManager: NavigationManager
     @Environment(AuthManager.self) var authManager
     @Environment(FavoritesManager.self) var favorites
     @Environment(DatabaseManager.self) var database
+
+    @Environment(\.modelContext) var modelContext
 
     @State var isRefreshing: Bool = false
 
@@ -81,7 +85,6 @@ struct FavoritesView: View {
     }
 
     func prepareCircles(using favoriteItems: [UserFavorites.Response.FavoriteItem]) async {
-        var favoriteCircles: [ComiketCircle] = []
         let favoriteItemsSorted: [Int: [UserFavorites.Response.FavoriteItem]] = favoriteItems.reduce(
             into: [Int: [UserFavorites.Response.FavoriteItem]]()
         ) { partialResult, favoriteItem in
@@ -91,19 +94,21 @@ struct FavoritesView: View {
                 partialResult[favoriteItem.favorite.color.rawValue] = [favoriteItem]
             }
         }
+
+        let actor = DataFetcher(modelContainer: sharedModelContainer)
+        var favoriteCircleIdentifiers: [Int: [PersistentIdentifier]] = [:]
         for colorKey in favoriteItemsSorted.keys.sorted() {
             if let favoriteItems = favoriteItemsSorted[colorKey] {
-                var circles: [ComiketCircle] = []
-                for favorite in favoriteItems {
-                    if let webCatalogCircle = database.circle(for: favorite.circle.webCatalogID) {
-                        circles.append(webCatalogCircle)
-                    }
-                }
-                circles.sort(by: {$0.id < $1.id})
-                favoriteCircles.append(contentsOf: circles)
+                favoriteCircleIdentifiers[colorKey] = await actor.circles(forFavorites: favoriteItems)
             }
         }
         await MainActor.run {
+            var favoriteCircles: [ComiketCircle] = []
+            for (_, circleIdentifiers) in favoriteCircleIdentifiers {
+                var circles = database.circles(circleIdentifiers, in: modelContext)
+                circles.sort(by: {$0.id < $1.id})
+                favoriteCircles.append(contentsOf: circles)
+            }
             withAnimation(.snappy.speed(2.0)) {
                 self.favoriteCircles = favoriteCircles
             }

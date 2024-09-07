@@ -90,6 +90,23 @@ actor DataFetcher {
         }
     }
 
+    func circles(forFavorites favoriteItems: [UserFavorites.Response.FavoriteItem]) -> [PersistentIdentifier] {
+        do {
+            let webCatalogIDs = favoriteItems.map({$0.circle.webCatalogID})
+            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+                predicate: #Predicate<ComiketCircle> {
+                    $0.extendedInformation.flatMap {
+                        webCatalogIDs.contains($0.webCatalogID)
+                    } == true
+                }
+            )
+            return try modelContext.fetchIdentifiers(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
     func blocks(inMap mapID: Int) -> [PersistentIdentifier] {
         do {
             let layoutsFetchDescriptor = FetchDescriptor<ComiketLayout>(
