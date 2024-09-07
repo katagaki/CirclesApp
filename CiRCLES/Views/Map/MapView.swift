@@ -114,11 +114,13 @@ struct MapView: View {
             }
             .onChange(of: selectedDate) { _, _ in
                 if isInitialLoadCompleted {
+                    debugPrint("Updating selected date ID")
                     selectedDateID = selectedDate?.id ?? 0
                 }
             }
             .onChange(of: selectedMap) { _, _ in
                 if isInitialLoadCompleted {
+                    debugPrint("Updating selected map ID")
                     selectedMapID = selectedMap?.id ?? 0
                 }
             }
