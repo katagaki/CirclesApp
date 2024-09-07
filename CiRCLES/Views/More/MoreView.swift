@@ -27,45 +27,100 @@ struct MoreView: View {
                     ListSectionHeader(text: "More.Customization")
                 }
                 Section {
-                    Group {
-                        switch Locale.current.language.languageCode {
-                        case .japanese:
-                            Link(destination: URL(string: "https://www.bigsight.jp/visitor/floormap/")!) {
+                    switch Locale.current.language.languageCode {
+                    case .japanese:
+                        Link(destination: URL(string: "maps://?saddr=現在地&daddr=東京ビッグサイト")!) {
+                            HStack(alignment: .center) {
+                                ListRow(image: "ListIcon.AppleMaps", title: "More.Navigate.Maps")
+                                    .foregroundStyle(.foreground)
+                                Spacer()
+                                Image(systemName: "arrow.up.right.square")
+                                    .foregroundStyle(.foreground.opacity(0.5))
+                            }
+                        }
+                        if UIApplication.shared.canOpenURL(URL(string: "com.googlemaps://")!) {
+                            Link(destination: URL(string: "comgooglemaps://?saddr=現在地&daddr=東京ビッグサイト")!) {
                                 HStack(alignment: .center) {
-                                    ListRow(image: "ListIcon.BigSight", title: "More.UsefulResources.BigSightMap")
+                                    ListRow(image: "ListIcon.GoogleMaps", title: "More.Navigate.GoogleMaps")
                                         .foregroundStyle(.foreground)
                                     Spacer()
-                                    Image(systemName: "safari")
+                                    Image(systemName: "arrow.up.right.square")
                                         .foregroundStyle(.foreground.opacity(0.5))
                                 }
                             }
-                            Link(destination: URL(string: "https://webcatalog.circle.ms")!) {
+                        }
+                        Link(destination: URL(string: "https://map.yahoo.co.jp/route/train?from=現在地&to=東京ビッグサイト")!) {
+                            HStack(alignment: .center) {
+                                ListRow(image: "ListIcon.YahooMap", title: "More.Navigate.YahooMap")
+                                    .foregroundStyle(.foreground)
+                                Spacer()
+                                Image(systemName: "arrow.up.right.square")
+                                    .foregroundStyle(.foreground.opacity(0.5))
+                            }
+                        }
+                    default:
+                        Link(destination: URL(string: "maps://?saddr=Current+Location&daddr=Tokyo+Big+Sight")!) {
+                            HStack(alignment: .center) {
+                                ListRow(image: "ListIcon.AppleMaps", title: "More.Navigate.Maps")
+                                    .foregroundStyle(.foreground)
+                                Spacer()
+                                Image(systemName: "arrow.up.right.square")
+                                    .foregroundStyle(.foreground.opacity(0.5))
+                            }
+                        }
+                        if UIApplication.shared.canOpenURL(URL(string: "com.googlemaps://")!) {
+                            Link(destination: URL(string: "comgooglemaps://?saddr=My+Location&daddr=Tokyo+Big+Sight")!) {
                                 HStack(alignment: .center) {
-                                    ListRow(image: "ListIcon.WebCatalog", title: "More.UsefulResources.WebCatalog")
+                                    ListRow(image: "ListIcon.GoogleMaps", title: "More.Navigate.GoogleMaps")
                                         .foregroundStyle(.foreground)
                                     Spacer()
-                                    Image(systemName: "safari")
+                                    Image(systemName: "arrow.up.right.square")
                                         .foregroundStyle(.foreground.opacity(0.5))
                                 }
                             }
-                        default:
-                            Link(destination: URL(string: "https://www.bigsight.jp/english/visitor/floormap/")!) {
-                                HStack(alignment: .center) {
-                                    ListRow(image: "ListIcon.BigSight", title: "More.UsefulResources.BigSightMap")
-                                        .foregroundStyle(.foreground)
-                                    Spacer()
-                                    Image(systemName: "safari")
-                                        .foregroundStyle(.foreground.opacity(0.5))
-                                }
+                        }
+                    }
+                } header: {
+                    ListSectionHeader(text: "More.Navigate")
+                }
+                Section {
+                    switch Locale.current.language.languageCode {
+                    case .japanese:
+                        Link(destination: URL(string: "https://www.bigsight.jp/visitor/floormap/")!) {
+                            HStack(alignment: .center) {
+                                ListRow(image: "ListIcon.BigSight", title: "More.UsefulResources.BigSightMap")
+                                    .foregroundStyle(.foreground)
+                                Spacer()
+                                Image(systemName: "safari")
+                                    .foregroundStyle(.foreground.opacity(0.5))
                             }
-                            Link(destination: URL(string: "https://int.webcatalog.circle.ms/en/catalog")!) {
-                                HStack(alignment: .center) {
-                                    ListRow(image: "ListIcon.WebCatalog", title: "More.UsefulResources.WebCatalog")
-                                        .foregroundStyle(.foreground)
-                                    Spacer()
-                                    Image(systemName: "safari")
-                                        .foregroundStyle(.foreground.opacity(0.5))
-                                }
+                        }
+                        Link(destination: URL(string: "https://webcatalog.circle.ms")!) {
+                            HStack(alignment: .center) {
+                                ListRow(image: "ListIcon.WebCatalog", title: "More.UsefulResources.WebCatalog")
+                                    .foregroundStyle(.foreground)
+                                Spacer()
+                                Image(systemName: "safari")
+                                    .foregroundStyle(.foreground.opacity(0.5))
+                            }
+                        }
+                    default:
+                        Link(destination: URL(string: "https://www.bigsight.jp/english/visitor/floormap/")!) {
+                            HStack(alignment: .center) {
+                                ListRow(image: "ListIcon.BigSight", title: "More.UsefulResources.BigSightMap")
+                                    .foregroundStyle(.foreground)
+                                Spacer()
+                                Image(systemName: "safari")
+                                    .foregroundStyle(.foreground.opacity(0.5))
+                            }
+                        }
+                        Link(destination: URL(string: "https://int.webcatalog.circle.ms/en/catalog")!) {
+                            HStack(alignment: .center) {
+                                ListRow(image: "ListIcon.WebCatalog", title: "More.UsefulResources.WebCatalog")
+                                    .foregroundStyle(.foreground)
+                                Spacer()
+                                Image(systemName: "safari")
+                                    .foregroundStyle(.foreground.opacity(0.5))
                             }
                         }
                     }
