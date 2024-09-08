@@ -37,8 +37,10 @@ struct MoreView: View {
                             ExternalLink("comgooglemaps://?saddr=現在地&daddr=東京ビッグサイト",
                                          title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
                         }
-                        ExternalLink("https://map.yahoo.co.jp/route/train?from=現在地&to=東京ビッグサイト",
-                                     title: "More.Navigate.YahooMap", image: "ListIcon.YahooMap")
+                        if UIApplication.shared.canOpenURL(URL(string: "yjmap://")!) {
+                            ExternalLink("yjmap://route/train?from=現在地&to=東京ビッグサイト",
+                                         title: "More.Navigate.YahooMap", image: "ListIcon.YahooMap")
+                        }
                     default:
                         if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
                             ExternalLink("maps://?saddr=Current+Location&daddr=Tokyo+Big+Sight",
