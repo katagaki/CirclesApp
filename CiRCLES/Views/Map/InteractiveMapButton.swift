@@ -12,6 +12,7 @@ struct InteractiveMapButton: View {
     @Environment(Database.self) var database
     @Environment(Favorites.self) var favorites
 
+    @Environment(\.colorScheme) var colorScheme
     @Environment(\.modelContext) var modelContext
 
     var selectedEventDateID: Int
@@ -33,7 +34,7 @@ struct InteractiveMapButton: View {
                         if let wcIDMappedItems = favorites.wcIDMappedItems,
                            let favoriteCircle = wcIDMappedItems[webCatalogID] {
                             Rectangle()
-                                .foregroundStyle(favoriteCircle.favorite.color.swiftUIColor().opacity(0.5))
+                                .foregroundStyle(highlightColor(favoriteCircle))
                         } else {
                             Rectangle()
                                 .foregroundStyle(.clear)
@@ -62,6 +63,18 @@ struct InteractiveMapButton: View {
                 isPresented: $isCircleDetailPopoverPresented,
                 webCatalogIDs: webCatalogIDs
             )
+        }
+    }
+
+    func highlightColor(_ favoriteCircle: UserFavorites.Response.FavoriteItem) -> Color {
+        switch colorScheme {
+        case .light:
+            return favoriteCircle.favorite.color.swiftUIColor().opacity(0.5)
+        case .dark:
+            return favoriteCircle.favorite.color.swiftUIColor().brightness(0.1).opacity(0.5) as? Color ??
+            favoriteCircle.favorite.color.swiftUIColor().opacity(0.5)
+        @unknown default:
+            return favoriteCircle.favorite.color.swiftUIColor().opacity(0.5)
         }
     }
 }
