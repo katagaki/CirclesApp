@@ -489,6 +489,22 @@
         }
       }
     },
+    "More.Customization.UseHighDefinitionMap" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use High Resolution Maps"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高解像度マップを使用"
+          }
+        }
+      }
+    },
     "More.DBAdmin" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -756,6 +772,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "イベント一覧"
+          }
+        }
+      }
+    },
+    "My.Events.Disclaimer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Older events may not support high resolution maps."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一部のイベントでは、高解像度のマップがご使用できません。"
+          }
+        }
+      }
+    },
+    "My.Events.SelectEvent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Event"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベントを選択"
           }
         }
       }
@@ -1598,7 +1646,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "For You"
+            "value" : "Profile"
           }
         },
         "ja" : {
@@ -1713,7 +1761,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "For You"
+            "value" : "Profile"
           }
         },
         "ja" : {

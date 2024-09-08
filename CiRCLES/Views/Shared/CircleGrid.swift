@@ -15,6 +15,7 @@ struct CircleGrid: View {
     let gridSpacing: CGFloat = 1.0
 
     var circles: [ComiketCircle]
+    var showsOverlayWhenEmpty: Bool = true
     var namespace: Namespace.ID
     var onSelect: ((ComiketCircle) -> Void)
 
@@ -104,7 +105,7 @@ struct CircleGrid: View {
             }
         }
         .overlay {
-            if circles.isEmpty {
+            if circles.isEmpty && showsOverlayWhenEmpty {
                 ContentUnavailableView(
                     "Circles.NoCircles",
                     systemImage: "questionmark.square.dashed",

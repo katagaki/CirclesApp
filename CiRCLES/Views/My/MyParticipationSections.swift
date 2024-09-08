@@ -10,10 +10,11 @@ import SwiftUI
 
 struct MyParticipationSections: View {
 
-    var latestEvent: ComiketEvent
     var eventDates: [Int: Date]
 
     @State var isInitialLoadCompleted: Bool = false
+
+    @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
 
     @AppStorage(wrappedValue: "", "My.Participation") var participation: String
 
@@ -23,7 +24,7 @@ struct MyParticipationSections: View {
         ForEach(Array(eventDates.keys).sorted(), id: \.self) { dayID in
             Section {
                 HStack {
-                    switch participationState[String(latestEvent.eventNumber)]?[String(dayID)] {
+                    switch participationState[String(activeEventNumber)]?[String(dayID)] {
                     case "Early":
                         ListRow(image: "ListIcon.Ticket.Fami",
                                 title: "Shared.Ticket.Early")
@@ -40,16 +41,16 @@ struct MyParticipationSections: View {
                     Spacer()
                     Menu {
                         Button("My.Ticket.NotParticipating") {
-                            setParticipation(latestEvent.eventNumber, on: dayID, value: "")
+                            setParticipation(activeEventNumber, on: dayID, value: "")
                         }
                         Button("Shared.Ticket.Early", image: .menuIconTicketFami) {
-                            setParticipation(latestEvent.eventNumber, on: dayID, value: "Early")
+                            setParticipation(activeEventNumber, on: dayID, value: "Early")
                         }
                         Button("Shared.Ticket.Wristband", image: .menuIconTicketWristbandAMPM) {
-                            setParticipation(latestEvent.eventNumber, on: dayID, value: "AMPM")
+                            setParticipation(activeEventNumber, on: dayID, value: "AMPM")
                         }
                         Button("Shared.Ticket.Circle", image: .menuIconTicketWristbandCircle) {
-                            setParticipation(latestEvent.eventNumber, on: dayID, value: "Circle")
+                            setParticipation(activeEventNumber, on: dayID, value: "Circle")
                         }
                     } label: {
                         Text("My.Ticket.ChangeType")
@@ -81,6 +82,9 @@ struct MyParticipationSections: View {
             if isInitialLoadCompleted {
                 saveParticipation()
             }
+        }
+        .onChange(of: eventDates) { _, _ in
+            loadParticipation()
         }
     }
 

@@ -50,7 +50,7 @@ actor FavoritesActor {
 
         if let (data, _) = try? await URLSession.shared.data(for: request) {
             debugPrint("Response length after attempting to add favorite: \(data.count)")
-            if let response = try? JSONDecoder().decode(UserFavorite.self, from: data) {
+            if let response = try? JSONDecoder().decode(UserCircleWithFavorite.self, from: data) {
                 debugPrint("Decoded response")
                 if response.status == "success" {
                     debugPrint("Favorite added successfully")

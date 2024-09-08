@@ -11,6 +11,8 @@ import SwiftData
 @ModelActor
 actor DataFetcher {
 
+    // MARK: Fetching
+
     func dates(for eventNumber: Int) -> [Int: Date] {
         let fetchDescriptor = FetchDescriptor<ComiketDate>(
             predicate: #Predicate<ComiketDate> {
@@ -67,6 +69,20 @@ actor DataFetcher {
             debugPrint(error.localizedDescription)
         }
         return []
+    }
+
+    func genre(_ genreID: Int) -> String? {
+        let fetchDescriptor = FetchDescriptor<ComiketGenre>(
+            predicate: #Predicate<ComiketGenre> {
+                $0.id == genreID
+            }
+        )
+        do {
+            return (try modelContext.fetch(fetchDescriptor)).first?.name
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
     }
 
     func circleWebCatalogIDs(

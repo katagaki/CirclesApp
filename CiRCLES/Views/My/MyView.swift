@@ -17,8 +17,7 @@ struct MyView: View {
 
     @Environment(\.colorScheme) private var colorScheme
 
-    @Query(sort: [SortDescriptor(\ComiketEvent.eventNumber, order: .reverse)])
-    var events: [ComiketEvent]
+    @Query var events: [ComiketEvent]
 
     @State var userInfo: UserInfo.Response?
     @State var userEvents: [UserCircle.Response.Circle] = []
@@ -27,8 +26,9 @@ struct MyView: View {
     @State var eventDates: [Int: Date]?
     @State var eventCoverImage: UIImage?
 
-    @State var isInitialLoadCompleted: Bool = false
     @State var isShowingEventCoverImage: Bool = false
+
+    @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
 
     @AppStorage(wrappedValue: "", "My.Participation") var participation: String
 
@@ -38,8 +38,8 @@ struct MyView: View {
         NavigationStack(path: $navigator[.my]) {
             List {
                 MyProfileSection(userInfo: $userInfo)
-                if let latestEvent = events.first, let eventDates, eventDates.count > 0 {
-                    MyParticipationSections(latestEvent: latestEvent, eventDates: eventDates)
+                if let eventDates, eventDates.count > 0 {
+                    MyParticipationSections(eventDates: eventDates)
                 }
                 if let eventData {
                     MyEventPickerSection(eventData: eventData)
@@ -58,8 +58,24 @@ struct MyView: View {
                 }
             }
             .listSectionSpacing(.compact)
-            .navigationTitle(events.first?.name ?? NSLocalizedString("ViewTitle.My", comment: ""))
+            .navigationTitle("ViewTitle.My")
             .navigationBarTitleDisplayMode(.inline)
+            .scrollContentBackground(.hidden)
+            .toolbarBackground(.hidden, for: .navigationBar)
+            .toolbarBackground(.visible, for: .tabBar)
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text(events.first(where: {$0.eventNumber == activeEventNumber})?.name ??
+                         NSLocalizedString("ViewTitle.My", comment: ""))
+                        .fontWeight(.bold)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .onTapGesture {
+                            withAnimation(.smooth.speed(2.0)) {
+                                isShowingEventCoverImage.toggle()
+                            }
+                        }
+                }
+            }
             .background {
                 Group {
                     if let eventCoverImage {
@@ -70,27 +86,13 @@ struct MyView: View {
                                     .ignoresSafeArea()
                                     .scaledToFill()
                                     .opacity(0.1)
+                                    .blur(radius: 10.0)
                             }
                     } else {
                         Color(uiColor: .systemGroupedBackground)
                     }
                 }
                 .animation(.smooth.speed(2.0), value: eventCoverImage)
-            }
-            .scrollContentBackground(.hidden)
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarBackground(.visible, for: .tabBar)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Text(events.first?.name ?? NSLocalizedString("ViewTitle.My", comment: ""))
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .onTapGesture {
-                            withAnimation(.smooth.speed(2.0)) {
-                                isShowingEventCoverImage.toggle()
-                            }
-                        }
-                }
             }
             .safeAreaInset(edge: .top, spacing: 0.0) {
                 BarAccessory(placement: .top) {
@@ -129,17 +131,6 @@ struct MyView: View {
                     }
                 }
             }
-            .onAppear {
-                if !isInitialLoadCompleted {
-                    debugPrint("Restoring My view state")
-                    if let token = authManager.token {
-                        Task.detached {
-                            await reloadData(using: token)
-                        }
-                    }
-                    isInitialLoadCompleted = true
-                }
-            }
             .refreshable {
                 if let token = authManager.token {
                     await reloadData(using: token)
@@ -152,9 +143,26 @@ struct MyView: View {
                     }
                 }
             }
-            .onChange(of: database.commonImages) {_, _ in
+            .onChange(of: database.commonImages) { _, _ in
                 withAnimation(.snappy.speed(2.0)) {
                     eventCoverImage = database.coverImage()
+                }
+            }
+            .onChange(of: events) { _, _ in
+                if let token = authManager.token,
+                   userInfo == nil || userEvents.isEmpty || eventData == nil || eventDates == nil {
+                    Task.detached {
+                        await reloadData(using: token)
+                    }
+                }
+            }
+            .onChange(of: activeEventNumber) { oldValue, _ in
+                if oldValue != -1 {
+                    if let token = authManager.token {
+                        Task.detached {
+                            await reloadData(using: token)
+                        }
+                    }
                 }
             }
         }
@@ -166,9 +174,16 @@ struct MyView: View {
         let eventData = await WebCatalog.events(authToken: token)
 
         var eventDates: [Int: Date]?
-        if let latestEventNumber = eventData?.latestEventNumber {
+        var eventNumber: Int?
+        if activeEventNumber == -1, let eventData {
+            eventNumber = eventData.latestEventNumber
+        } else {
+            eventNumber = activeEventNumber
+        }
+
+        if let eventNumber {
             let actor = DataFetcher(modelContainer: sharedModelContainer)
-            eventDates = await actor.dates(for: latestEventNumber)
+            eventDates = await actor.dates(for: eventNumber)
         }
 
         await MainActor.run {

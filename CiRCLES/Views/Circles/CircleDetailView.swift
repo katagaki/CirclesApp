@@ -15,10 +15,12 @@ struct CircleDetailView: View {
     @Environment(Database.self) var database
 
     var circle: ComiketCircle
+
     @State var circleImage: UIImage?
     @State var extendedInformation: ComiketCircleExtendedInformation?
     @State var webCatalogInformation: WebCatalogCircle?
     @State var circleCutURL: URL?
+    @State var genre: String?
 
     var body: some View {
         List {
@@ -126,7 +128,7 @@ struct CircleDetailView: View {
                     }
                 }
             }
-            if let genre = database.genre(circle.genreID) {
+            if let genre {
                 Section {
                     Text(genre)
                         .textSelection(.enabled)
@@ -210,6 +212,10 @@ struct CircleDetailView: View {
                     self.webCatalogInformation = webCatalogInformation
                 }
             }
+        }
+        let actor = DataFetcher(modelContainer: sharedModelContainer)
+        if let genre = await actor.genre(circle.genreID) {
+            self.genre = genre
         }
     }
 }

@@ -22,6 +22,8 @@ struct MapView: View {
     @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
     var maps: [ComiketMap]
 
+    @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
+
     @AppStorage(wrappedValue: 0, "Map.SelectedDateID") var selectedDateID: Int
     @AppStorage(wrappedValue: 0, "Map.SelectedMapID") var selectedMapID: Int
 
@@ -122,6 +124,12 @@ struct MapView: View {
                 if isInitialLoadCompleted {
                     debugPrint("Updating selected map ID")
                     selectedMapID = selectedMap?.id ?? 0
+                }
+            }
+            .onChange(of: activeEventNumber) { oldValue, _ in
+                if oldValue != -1 {
+                    selectedMap = nil
+                    selectedDate = nil
                 }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in

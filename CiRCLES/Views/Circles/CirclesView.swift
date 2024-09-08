@@ -50,6 +50,8 @@ struct CirclesView: View {
     @State var displayModeState: CircleDisplayMode = .grid
     @State var listDisplayModeState: ListDisplayMode = .regular
 
+    @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
+
     @Namespace var circlesNamespace
 
     var genreMapBlockDate: [Int?] {[
@@ -184,6 +186,11 @@ struct CirclesView: View {
             }
             .onChange(of: listDisplayModeState) { _, _ in
                 listDisplayMode = listDisplayModeState
+            }
+            .onChange(of: activeEventNumber) { oldValue, _ in
+                if oldValue != -1 {
+                    displayedCircles.removeAll()
+                }
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
