@@ -107,9 +107,9 @@ struct CirclesView: View {
                     } label: {
                         switch displayModeState {
                         case .grid:
-                            Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
-                        case .list:
                             Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
+                        case .list:
+                            Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
                         }
                     }
                 }
