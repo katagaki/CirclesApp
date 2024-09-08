@@ -16,11 +16,9 @@ struct FavoriteColorSelector: View {
         ScrollView {
             VStack {
                 Text("Shared.SelectColor")
-                LazyHGrid(
-                    rows: [.init(.fixed(64.0), spacing: 8.0),
-                           .init(.fixed(64.0), spacing: 8.0),
-                           .init(.fixed(64.0), spacing: 8.0)]
-                ) {
+                LazyVGrid(columns: [.init(.fixed(64.0), spacing: 8.0),
+                                    .init(.fixed(64.0), spacing: 8.0),
+                                    .init(.fixed(64.0), spacing: 8.0)]) {
                     ForEach(colors, id: \.self) { color in
                         Button {
                             selectedColor = color
