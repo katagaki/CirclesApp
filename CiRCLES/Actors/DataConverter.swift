@@ -135,7 +135,6 @@ actor DataConverter {
                     modelContext.insert(circle)
                     circle.block = blockMappings[circle.blockID]
                     circle.layout = layoutMappings["\(circle.blockID),\(circle.spaceNumber)"]
-                    debugPrint("Inserted circle \(circle.id) via actor")
                 }
             } catch {
                 debugPrint(error.localizedDescription)

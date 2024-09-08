@@ -137,6 +137,12 @@ struct InteractiveMap: View {
                         Color.clear
                     }
                 }
+            } else {
+                ContentUnavailableView(
+                    "Map.NoMapSelected",
+                    systemImage: "doc.questionmark",
+                    description: Text("Map.NoMapSelected.Description")
+                )
             }
         }
         .onChange(of: database.commonImages) { _, _ in
