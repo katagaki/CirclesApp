@@ -28,7 +28,7 @@ struct InteractiveMapButton: View {
                     .foregroundStyle(.clear)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ForEach(webCatalogIDs.reversed(), id: \.self) { webCatalogID in
+                ForEach(webCatalogIDs, id: \.self) { webCatalogID in
                     Group {
                         if let wcIDMappedItems = favorites.wcIDMappedItems,
                            let favoriteCircle = wcIDMappedItems[webCatalogID] {
