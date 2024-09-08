@@ -179,7 +179,7 @@ struct CircleDetailView: View {
             ToolbarAccessory(placement: .bottom) {
                 if let extendedInformation {
                     VStack(spacing: 12.0) {
-                        CircleToolbar(extendedInformation)
+                        CircleToolbar(extendedInformation, webCatalogInformation)
                     }
                     .padding([.top, .bottom], 12.0)
                 }
