@@ -797,13 +797,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "All Events"
+            "value" : "Participating Event"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "イベント一覧"
+            "value" : "参加中イベント"
           }
         }
       }
@@ -819,7 +819,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "一部のイベントでは、高解像度のマップがご使用できません。"
+            "value" : "一部のイベントは、高解像度のマップに対応できません。"
           }
         }
       }
@@ -1604,7 +1604,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AM・PM入場"
+            "value" : "午前・午後入場"
           }
         }
       }
