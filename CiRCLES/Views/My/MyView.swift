@@ -53,8 +53,6 @@ struct MyView: View {
                             authManager.isAuthenticating = true
                         }
                     }
-                } header: {
-                    Color.clear
                 }
             }
             .listSectionSpacing(.compact)
