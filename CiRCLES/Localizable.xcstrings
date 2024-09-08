@@ -499,13 +499,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comic Market and Circle.ms bear no responsibility for any issues that may arise with this app. For inquiries, please use the below support options."
+            "value" : "Comic Market, Circle.ms, and Tokyo Big Sight bear no responsibility for any issues that may arise with this app. For inquiries, please use the below support options."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "本アプリの不具合について、コミケット及びCircle.msは責任を一切負いません。お問合せは、以下の連絡先までお願いいたします。"
+            "value" : "本アプリの不具合について、コミケット、Circle.ms、東京ビッグサイトは責任を一切負いません。お問い合わせは、以下の連絡先までお願いいたします。"
           }
         }
       }
