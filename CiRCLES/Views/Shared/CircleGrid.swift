@@ -72,9 +72,11 @@ struct CircleGrid: View {
                                     VStack(alignment: .trailing, spacing: 2.0) {
                                         if showDay {
                                             CircleBlockPill("Shared.\(circle.day)th.Day")
+                                                .matchedGeometryEffect(id: "\(circle.id).Day", in: namespace)
                                         }
                                         if showSpaceName, let spaceName = circle.spaceName() {
                                             CircleBlockPill(LocalizedStringKey(spaceName))
+                                                .matchedGeometryEffect(id: "\(circle.id).Space", in: namespace)
                                         }
                                     }
                                     .padding(2.0)

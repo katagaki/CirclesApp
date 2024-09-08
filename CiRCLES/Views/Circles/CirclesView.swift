@@ -45,7 +45,9 @@ struct CirclesView: View {
     @State var isInitialLoadCompleted: Bool = false
 
     @AppStorage(wrappedValue: CircleDisplayMode.grid, "Circles.DisplayMode") var displayMode: CircleDisplayMode
+    @AppStorage(wrappedValue: ListDisplayMode.regular, "Circles.ListSize") var listDisplayMode: ListDisplayMode
     @State var displayModeState: CircleDisplayMode = .grid
+    @State var listDisplayModeState: ListDisplayMode = .regular
 
     @Namespace var circlesNamespace
 
@@ -75,11 +77,13 @@ struct CirclesView: View {
                 case .list:
                     if let searchedCircles {
                         CircleList(circles: searchedCircles,
+                                   displayMode: listDisplayModeState,
                                    namespace: circlesNamespace) { circle in
                             navigator.push(.circlesDetail(circle: circle), for: .circles)
                         }
                     } else {
                         CircleList(circles: displayedCircles,
+                                   displayMode: listDisplayModeState,
                                    namespace: circlesNamespace) { circle in
                             navigator.push(.circlesDetail(circle: circle), for: .circles)
                         }
@@ -97,19 +101,38 @@ struct CirclesView: View {
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        withAnimation(.snappy.speed(2.0)) {
-                            switch displayModeState {
-                            case .grid: displayModeState = .list
-                            case .list: displayModeState = .grid
+                    HStack {
+                        if displayModeState == .list {
+                            Button {
+                                withAnimation(.snappy.speed(2.0)) {
+                                    switch listDisplayModeState {
+                                    case .regular: listDisplayModeState = .compact
+                                    case .compact: listDisplayModeState = .regular
+                                    }
+                                }
+                            } label: {
+                                switch listDisplayMode {
+                                case .regular:
+                                    Label("Shared.DisplayMode.List.Compact", systemImage: "rectangle.compress.vertical")
+                                case .compact:
+                                    Label("Shared.DisplayMode.List.Regular", systemImage: "rectangle.expand.vertical")
+                                }
                             }
                         }
-                    } label: {
-                        switch displayModeState {
-                        case .grid:
-                            Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
-                        case .list:
-                            Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
+                        Button {
+                            withAnimation(.snappy.speed(2.0)) {
+                                switch displayModeState {
+                                case .grid: displayModeState = .list
+                                case .list: displayModeState = .grid
+                                }
+                            }
+                        } label: {
+                            switch displayModeState {
+                            case .grid:
+                                Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
+                            case .list:
+                                Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
+                            }
                         }
                     }
                 }
@@ -131,6 +154,7 @@ struct CirclesView: View {
                 if !isInitialLoadCompleted {
                     debugPrint("Restoring Circles view state")
                     displayModeState = displayMode
+                    listDisplayModeState = listDisplayMode
                     isInitialLoadCompleted = true
                 }
             }
@@ -148,6 +172,9 @@ struct CirclesView: View {
             }
             .onChange(of: displayModeState) { _, _ in
                 displayMode = displayModeState
+            }
+            .onChange(of: listDisplayModeState) { _, _ in
+                listDisplayMode = listDisplayModeState
             }
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {

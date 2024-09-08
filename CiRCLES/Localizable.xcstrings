@@ -889,6 +889,12 @@
         }
       }
     },
+    "Shared.DisplayMode.List.Compact" : {
+
+    },
+    "Shared.DisplayMode.List.Regular" : {
+
+    },
     "Shared.Event.%lld" : {
       "localizations" : {
         "en" : {

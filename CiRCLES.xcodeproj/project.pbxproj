@@ -105,6 +105,9 @@
 		E4D74B862C8C9D850014CD16 /* CircleFilterBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B852C8C9D800014CD16 /* CircleFilterBar.swift */; };
 		E4D74B892C8CAEA70014CD16 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = E4D74B882C8CAEA70014CD16 /* Reachability */; };
 		E4D74B8D2C8CB71F0014CD16 /* OnlineState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B8C2C8CB71D0014CD16 /* OnlineState.swift */; };
+		E4D74B8F2C8D42180014CD16 /* ListDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B8E2C8D42120014CD16 /* ListDisplayMode.swift */; };
+		E4D74B912C8D43070014CD16 /* CircleListRegularRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B902C8D42F60014CD16 /* CircleListRegularRow.swift */; };
+		E4D74B932C8D430C0014CD16 /* CircleListCompactRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B922C8D43090014CD16 /* CircleListCompactRow.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -204,6 +207,9 @@
 		E4D74B832C8C9AF80014CD16 /* CircleToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleToolbar.swift; sourceTree = "<group>"; };
 		E4D74B852C8C9D800014CD16 /* CircleFilterBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleFilterBar.swift; sourceTree = "<group>"; };
 		E4D74B8C2C8CB71D0014CD16 /* OnlineState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnlineState.swift; sourceTree = "<group>"; };
+		E4D74B8E2C8D42120014CD16 /* ListDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDisplayMode.swift; sourceTree = "<group>"; };
+		E4D74B902C8D42F60014CD16 /* CircleListRegularRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleListRegularRow.swift; sourceTree = "<group>"; };
+		E4D74B922C8D43090014CD16 /* CircleListCompactRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleListCompactRow.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -259,14 +265,16 @@
 		E47269052C3D738900D5335D /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				E4D74B7E2C8C17290014CD16 /* SafariLink.swift */,
 				E4755BCD2C84937E0032DA2F /* CircleBlockPill.swift */,
 				E4CA64572C8203A2001F50BB /* CircleGrid.swift */,
 				E4D74B6F2C88859C0014CD16 /* CircleList.swift */,
+				E4D74B922C8D43090014CD16 /* CircleListCompactRow.swift */,
+				E4D74B902C8D42F60014CD16 /* CircleListRegularRow.swift */,
 				E4D74B6B2C85FED80014CD16 /* CirclePreview.swift */,
 				E4D74B7C2C8C16830014CD16 /* ExternalLink.swift */,
 				E4755BD92C84B71B0032DA2F /* FavoriteButton.swift */,
 				E48B629A2C5FCA8D007874AE /* FavoriteColorSelector.swift */,
+				E4D74B7E2C8C17290014CD16 /* SafariLink.swift */,
 				E47269062C3D739500D5335D /* SafariView.swift */,
 				E4755BD52C84B6010032DA2F /* SNSButton.swift */,
 				E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */,
@@ -375,6 +383,7 @@
 				E4D74B6D2C8884310014CD16 /* CircleDisplayMode.swift */,
 				E49352032C4CF49C004CBDA1 /* ComiketHall.swift */,
 				E4755BCB2C848D800032DA2F /* DatabaseType.swift */,
+				E4D74B8E2C8D42120014CD16 /* ListDisplayMode.swift */,
 				E4D74B8C2C8CB71D0014CD16 /* OnlineState.swift */,
 				E4755BD72C84B6210032DA2F /* SNSType.swift */,
 				E480AA8A2C4429B3009C1445 /* TabType.swift */,
@@ -679,6 +688,7 @@
 				E4D74B8D2C8CB71F0014CD16 /* OnlineState.swift in Sources */,
 				E480AAB32C4C9C01009C1445 /* ComiketMap.swift in Sources */,
 				E4D74B752C8BE0040014CD16 /* UIImage.swift in Sources */,
+				E4D74B932C8D430C0014CD16 /* CircleListCompactRow.swift in Sources */,
 				E48B62972C5FC21E007874AE /* WebCatalogFavorite.swift in Sources */,
 				E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */,
 				E4755BCC2C848D810032DA2F /* DatabaseType.swift in Sources */,
@@ -713,6 +723,7 @@
 				E4D74B812C8C8ADB0014CD16 /* LayoutCatalogMapping.swift in Sources */,
 				E4755BD62C84B6060032DA2F /* SNSButton.swift in Sources */,
 				E4755BD82C84B6230032DA2F /* SNSType.swift in Sources */,
+				E4D74B912C8D43070014CD16 /* CircleListRegularRow.swift in Sources */,
 				E4D74B702C88859E0014CD16 /* CircleList.swift in Sources */,
 				E4D74B6A2C84BAA10014CD16 /* TranslateButton.swift in Sources */,
 				E42003CC2C6308B600770992 /* InteractiveMap.swift in Sources */,
@@ -721,6 +732,7 @@
 				E43C74062C6DE8A1003522C8 /* ComiketMapping.swift in Sources */,
 				E480AAAD2C4C9831009C1445 /* Point.swift in Sources */,
 				E480AA962C44A15D009C1445 /* UserCircle.swift in Sources */,
+				E4D74B8F2C8D42180014CD16 /* ListDisplayMode.swift in Sources */,
 				E4755B9F2C8296C30032DA2F /* Downloader.swift in Sources */,
 				E4D74B732C8A02290014CD16 /* MyView.swift in Sources */,
 				E480AA882C442982009C1445 /* Navigator.swift in Sources */,
