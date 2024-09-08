@@ -17,7 +17,6 @@ struct MyParticipationSections: View {
     @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
 
     @AppStorage(wrappedValue: "", "My.Participation") var participation: String
-
     @State var participationState: [String: [String: String]] = [:]
 
     var body: some View {

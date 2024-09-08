@@ -23,6 +23,8 @@ struct InteractiveMap: View {
     @State var isLoadingLayouts: Bool = false
 
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
+    @State var showGenreOverlayState: Bool = false
+
     @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
 
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
@@ -46,7 +48,7 @@ struct InteractiveMap: View {
                         .animation(.smooth.speed(2.0), value: zoomDivisor)
                         .colorInvert(adaptive: true)
                         .overlay {
-                            if showGenreOverlay, let genreImage {
+                            if showGenreOverlayState, let genreImage {
                                 Image(uiImage: genreImage)
                                     .resizable()
                                     .frame(
@@ -102,10 +104,10 @@ struct InteractiveMap: View {
                             VStack(alignment: .center, spacing: 0.0) {
                                 SquareButton {
                                     withAnimation(.smooth.speed(2.0)) {
-                                        showGenreOverlay.toggle()
+                                        showGenreOverlayState.toggle()
                                     }
                                 } label: {
-                                    Image(systemName: showGenreOverlay ?
+                                    Image(systemName: showGenreOverlayState ?
                                           "theatermask.and.paintbrush.fill" :
                                             "theatermask.and.paintbrush")
                                     .font(.title2)
@@ -142,6 +144,9 @@ struct InteractiveMap: View {
                 )
             }
         }
+        .onAppear {
+            showGenreOverlayState = showGenreOverlay
+        }
         .onChange(of: database.commonImages) { _, _ in
             reloadAll()
         }
@@ -154,6 +159,9 @@ struct InteractiveMap: View {
             } else {
                 layoutWebCatalogIDMappings.removeAll()
             }
+        }
+        .onChange(of: showGenreOverlayState) { _, _ in
+            showGenreOverlay = showGenreOverlayState
         }
         .onChange(of: useHighResolutionMaps) { _, _ in
             reloadAll()
