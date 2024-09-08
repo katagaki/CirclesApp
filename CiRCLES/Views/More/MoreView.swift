@@ -59,18 +59,20 @@ struct MoreView: View {
                 Section {
                     switch Locale.current.language.languageCode {
                     case .japanese:
-                        SafariLink("https://www.bigsight.jp/visitor/floormap/",
-                                   title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
                         SafariLink("https://webcatalog.circle.ms",
                                    title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
-                    default:
-                        SafariLink("https://www.bigsight.jp/english/visitor/floormap/",
+                        SafariLink("https://comiket.co.jp",
+                                   title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
+                        SafariLink("https://www.bigsight.jp/visitor/floormap/",
                                    title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
+                    default:
                         SafariLink("https://int.webcatalog.circle.ms/en/catalog",
                                    title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
+                        SafariLink("https://comiket.co.jp",
+                                   title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
+                        SafariLink("https://www.bigsight.jp/english/visitor/floormap/",
+                                   title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
                     }
-                    SafariLink("https://comiket.co.jp",
-                               title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
                 } header: {
                     ListSectionHeader(text: "More.UsefulResources")
                 }
