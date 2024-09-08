@@ -27,6 +27,7 @@ struct MyView: View {
     @State var eventCoverImage: UIImage?
 
     @State var isShowingEventCoverImage: Bool = false
+    @State var isGoingToSignOut: Bool = false
 
     @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
 
@@ -45,7 +46,7 @@ struct MyView: View {
                 }
                 Section {
                     Button("Shared.Logout", role: .destructive) {
-                        authManager.resetAuthentication()
+                        isGoingToSignOut = true
                     }
                     .contextMenu {
                         Button("Shared.LoginAgain", role: .destructive) {
@@ -121,6 +122,32 @@ struct MyView: View {
                         }
                     }
                 }
+            }
+            .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
+                Button("Shared.Logout", role: .destructive) {
+                    database.delete()
+                    let dictionary = UserDefaults.standard.dictionaryRepresentation()
+                    dictionary.keys.forEach { key in
+                        UserDefaults.standard.removeObject(forKey: key)
+                    }
+                    UserDefaults.standard.synchronize()
+                    Task.detached {
+                        let actor = DataConverter(modelContainer: sharedModelContainer)
+                        await actor.deleteAllData()
+                        await MainActor.run {
+                            navigator.popToRoot(for: .map)
+                            navigator.popToRoot(for: .circles)
+                            navigator.popToRoot(for: .more)
+                            navigator.selectedTab = .map
+                            authManager.resetAuthentication()
+                        }
+                    }
+                }
+                Button("Shared.Cancel", role: .cancel) {
+                    isGoingToSignOut = false
+                }
+            } message: {
+                Text("Alerts.Logout.Message")
             }
             .onAppear {
                 if let token = authManager.token,
