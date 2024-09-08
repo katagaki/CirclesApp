@@ -39,7 +39,19 @@ struct SNSButton: View {
                 .tint(.primary)
             case .pixiv:
                 Button {
-                    openURL(url)
+                    var urlToOpen: URL = url
+                    if UIApplication.shared.canOpenURL(URL(string: "pixiv://")!) {
+                        let pixivPrefix = "https://www.pixiv.net/member.php?id="
+                        let urlString = url.absoluteString
+                        if urlString.starts(with: pixivPrefix) {
+                            let userID = urlString.trimmingPrefix(pixivPrefix)
+                            let formattedURL = "pixiv://users/\(userID)"
+                            if let appURL = URL(string: formattedURL) {
+                                urlToOpen = appURL
+                            }
+                        }
+                    }
+                    openURL(urlToOpen)
                 } label: {
                     Image(.snsPixiv)
                         .resizable()
