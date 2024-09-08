@@ -65,6 +65,8 @@ struct MoreView: View {
                         SafariLink("https://int.webcatalog.circle.ms/en/catalog",
                                    title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
                     }
+                    SafariLink("https://comiket.co.jp",
+                               title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
                 } header: {
                     ListSectionHeader(text: "More.UsefulResources")
                 }

@@ -629,6 +629,23 @@
         }
       }
     },
+    "More.UsefulResources.Comiket" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Official Comic Market Site"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コミックマーケット公式サイト"
+          }
+        }
+      }
+    },
     "More.UsefulResources.WebCatalog" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -890,10 +907,36 @@
       }
     },
     "Shared.DisplayMode.List.Compact" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compact List"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リスト（コンパクト）"
+          }
+        }
+      }
     },
     "Shared.DisplayMode.List.Regular" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Regular List"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "リスト（通常サイズ）"
+          }
+        }
+      }
     },
     "Shared.Event.%lld" : {
       "localizations" : {
