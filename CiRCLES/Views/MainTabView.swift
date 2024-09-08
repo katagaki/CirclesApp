@@ -87,8 +87,8 @@ struct MainTabView: View {
             default: break
             }
         }
-        .onChange(of: authManager.token) { _, newValue in
-            if newValue != nil {
+        .onChange(of: authManager.token) { _, _ in
+            if authManager.token != nil {
                 withAnimation(.snappy.speed(2.0)) {
                     self.database.isBusy = true
                 } completion: {
@@ -102,8 +102,8 @@ struct MainTabView: View {
                 }
             }
         }
-        .onChange(of: activeEventNumber) { oldValue, _ in
-            if oldValue != -1 {
+        .onChange(of: activeEventNumber) { oldValue, newValue in
+            if oldValue != -1 && newValue != -1 {
                 UserDefaults.standard.set(false, forKey: databasesInitializedKey)
                 withAnimation(.snappy.speed(2.0)) {
                     self.database.isBusy = true

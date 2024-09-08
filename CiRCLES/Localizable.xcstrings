@@ -33,6 +33,38 @@
         }
       }
     },
+    "Alerts.Logout.Message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When you sign in again, all necessary data will need to be downloaded again."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再度ログインすると、データのダウンロードが行います。"
+          }
+        }
+      }
+    },
+    "Alerts.Logout.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are You Sure You Want To Sign Out?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログアウトしますか？"
+          }
+        }
+      }
+    },
     "Circles.Image.Catalog" : {
       "localizations" : {
         "en" : {
@@ -965,6 +997,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "頒布予定の誌名"
+          }
+        }
+      }
+    },
+    "Shared.Cancel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
           }
         }
       }
