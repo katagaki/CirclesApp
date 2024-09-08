@@ -65,6 +65,54 @@
         }
       }
     },
+    "Circles.Loading" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading circles..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サークルを読み込み中…"
+          }
+        }
+      }
+    },
+    "Circles.NoCircles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Circles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "該当するサークルがありません"
+          }
+        }
+      }
+    },
+    "Circles.NoCircles.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please check the genre and/or hall selection, or try with another search term."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンルおよび棟の設定、または検索キーワードを改めてご確認ください。"
+          }
+        }
+      }
+    },
     "Circles.NoDescription" : {
       "localizations" : {
         "en" : {
@@ -86,13 +134,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No Circles"
+            "value" : "Unable to Display All Circles"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "該当するサークルがありません"
+            "value" : "全サークルの一覧が表示できません"
           }
         }
       }
@@ -102,13 +150,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select a genre or hall to view the list of circles."
+            "value" : "Select a genre or hall to view circles."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サークルの一覧を閲覧するには、ジャンルまたは棟を選択してください。"
+            "value" : "サークルを閲覧するには、ジャンルまたは棟を選択してください。"
           }
         }
       }
