@@ -17,7 +17,6 @@ struct MyProfileSection: View {
     @State var selectedPhotoItem: PhotosPickerItem?
 
     @AppStorage("My.ProfilePicture") var profilePicture: Data?
-
     @State var profilePictureState: Image?
 
     var body: some View {
