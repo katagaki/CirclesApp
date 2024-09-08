@@ -102,13 +102,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select a genre, or hall and block to view the list of circles."
+            "value" : "Select a genre or hall to view the list of circles."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サークルの一覧を閲覧するには、ジャンルまたは棟とブロックを選択してください。"
+            "value" : "サークルの一覧を閲覧するには、ジャンルまたは棟を選択してください。"
           }
         }
       }
@@ -371,7 +371,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "マップ選択なし"
+            "value" : "表示できるマップがありません"
           }
         }
       }
