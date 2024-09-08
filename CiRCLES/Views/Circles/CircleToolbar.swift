@@ -32,7 +32,10 @@ struct CircleToolbar: View {
         ScrollView(.horizontal) {
             HStack(spacing: 10.0) {
                 if isActiveEventLatest {
-                    FavoriteButton {
+                    FavoriteButton(
+                        color: favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?
+                            .favorite.color.swiftUIColor()
+                    ) {
                         favorites.contains(webCatalogID: extendedInformation.webCatalogID)
                     } onAdd: {
                         isAddingToFavorites = true

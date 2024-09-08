@@ -77,7 +77,7 @@ struct SNSButton: View {
                 .tint(.green)
             }
         }
-        .clipShape(showsLabel ? AnyShape(.capsule(style: .continuous)) : AnyShape(.circle))
         .buttonStyle(.borderedProminent)
+        .clipShape(showsLabel ? AnyShape(.capsule(style: .continuous)) : AnyShape(.circle))
     }
 }
