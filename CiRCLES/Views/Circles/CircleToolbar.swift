@@ -17,6 +17,8 @@ struct CircleToolbar: View {
     @State var isAddingToFavorites: Bool = false
     @State var favoriteColorToAddTo: WebCatalogColor?
 
+    @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
+
     init(_ extendedInformation: ComiketCircleExtendedInformation) {
         self.extendedInformation = extendedInformation
     }
@@ -24,17 +26,19 @@ struct CircleToolbar: View {
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 10.0) {
-                FavoriteButton {
-                    favorites.contains(webCatalogID: extendedInformation.webCatalogID)
-                } onAdd: {
-                    isAddingToFavorites = true
-                } onDelete: {
-                    Task.detached {
-                        await deleteFavorite()
+                if isActiveEventLatest {
+                    FavoriteButton {
+                        favorites.contains(webCatalogID: extendedInformation.webCatalogID)
+                    } onAdd: {
+                        isAddingToFavorites = true
+                    } onDelete: {
+                        Task.detached {
+                            await deleteFavorite()
+                        }
                     }
-                }
-                .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
-                    FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
+                    .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
+                        FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
+                    }
                 }
                 HStack(spacing: 5.0) {
                     if let twitterURL = extendedInformation.twitterURL {

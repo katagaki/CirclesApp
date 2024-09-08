@@ -18,8 +18,6 @@ class Database {
     @ObservationIgnored let documentsDirectoryURL: URL?
     @ObservationIgnored var modelContext: ModelContext
 
-    @ObservationIgnored let databasesInitializedKey: String = "Database.Initialized"
-
     @ObservationIgnored var databaseInformation: WebCatalogDatabase?
     @ObservationIgnored var textDatabase: Connection?
     @ObservationIgnored var imageDatabase: Connection?
@@ -144,6 +142,7 @@ class Database {
             imageDatabaseURL = nil
             textDatabase = nil
             imageDatabase = nil
+            imageCache.removeAll()
             try? FileManager.default.removeItem(at: documentsDirectoryURL)
         }
     }
@@ -183,31 +182,6 @@ class Database {
             } catch {
                 debugPrint(error.localizedDescription)
             }
-        }
-    }
-
-    func setInitialLoadCompleted() {
-        UserDefaults.standard.set(true, forKey: databasesInitializedKey)
-    }
-
-    func isInitialLoadCompleted() -> Bool {
-        return UserDefaults.standard.bool(forKey: databasesInitializedKey)
-    }
-
-    // MARK: Pre-optimized Data Fetches
-    // TODO: Move to actor
-
-    func genre(_ genreID: Int) -> String? {
-        let fetchDescriptor = FetchDescriptor<ComiketGenre>(
-            predicate: #Predicate<ComiketGenre> {
-                $0.id == genreID
-            }
-        )
-        do {
-            return (try modelContext.fetch(fetchDescriptor)).first?.name
-        } catch {
-            debugPrint(error.localizedDescription)
-            return nil
         }
     }
 

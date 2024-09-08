@@ -12,8 +12,6 @@ struct InteractiveMap: View {
 
     @Environment(Database.self) var database
 
-    let spaceSize: Int = 40
-
     @Binding var date: ComiketDate?
     @Binding var map: ComiketMap?
 
@@ -26,6 +24,8 @@ struct InteractiveMap: View {
 
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
+
+    @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
 
     var dateMap: [Int?] {[
         date?.id,
@@ -59,6 +59,7 @@ struct InteractiveMap: View {
                         }
                         .overlay {
                             if let date {
+                                let spaceSize: Int = useHighResolutionMaps ? 40 : 20
                                 ZStack(alignment: .topLeading) {
                                     ForEach(Array(layoutWebCatalogIDMappings.keys), id: \.self) { layout in
                                         InteractiveMapButton(
@@ -104,13 +105,9 @@ struct InteractiveMap: View {
                                         showGenreOverlay.toggle()
                                     }
                                 } label: {
-                                    Group {
-                                        if showGenreOverlay {
-                                            Image(systemName: "theatermask.and.paintbrush.fill")
-                                        } else {
-                                            Image(systemName: "theatermask.and.paintbrush")
-                                        }
-                                    }
+                                    Image(systemName: showGenreOverlay ?
+                                          "theatermask.and.paintbrush.fill" :
+                                            "theatermask.and.paintbrush")
                                     .font(.title2)
                                 }
                                 .popoverTip(GenreOverlayTip())
@@ -158,6 +155,9 @@ struct InteractiveMap: View {
                 layoutWebCatalogIDMappings.removeAll()
             }
         }
+        .onChange(of: useHighResolutionMaps) { _, _ in
+            reloadAll()
+        }
     }
 
     func reloadAll() {
@@ -172,13 +172,16 @@ struct InteractiveMap: View {
             mapImage = database.mapImage(
                 for: selectedHall,
                 on: date.id,
-                usingHighDefinition: true
+                usingHighDefinition: useHighResolutionMaps
             )
             genreImage = database.genreImage(
                 for: selectedHall,
                 on: date.id,
-                usingHighDefinition: true
+                usingHighDefinition: useHighResolutionMaps
             )
+        } else {
+            mapImage = nil
+            genreImage = nil
         }
     }
 
@@ -205,8 +208,10 @@ struct InteractiveMap: View {
         if let selectedDate = date?.id {
             let layoutCatalogMappings = layouts.map {
                 LayoutCatalogMapping(
-                    blockID: $0.blockID, spaceNumber: $0.spaceNumber,
-                    positionX: $0.hdPosition.x, positionY: $0.hdPosition.y
+                    blockID: $0.blockID,
+                    spaceNumber: $0.spaceNumber,
+                    positionX: useHighResolutionMaps ? $0.hdPosition.x : $0.position.x,
+                    positionY: useHighResolutionMaps ? $0.hdPosition.y : $0.position.y
                 )
             }
             withAnimation(.smooth.speed(2.0)) {

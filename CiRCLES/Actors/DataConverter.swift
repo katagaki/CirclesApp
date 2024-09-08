@@ -12,58 +12,28 @@ import SwiftData
 @ModelActor
 actor DataConverter {
 
-    func save() {
-        do {
-            debugPrint("Saving data models via actor")
-            try modelContext.save()
-            debugPrint("Saved data models via actor")
-        } catch {
-            debugPrint(error.localizedDescription)
-        }
-    }
-
     // MARK: Loading
 
     func loadAll(from database: Connection?) async {
         loadEvents(from: database)
-        loadDates(from: database)
         loadMaps(from: database)
-        loadAreas(from: database)
-        loadBlocks(from: database)
-        loadMapping(from: database)
         loadLayouts(from: database)
         loadGenres(from: database)
         loadCircles(from: database)
         save()
-        debugPrint("SwiftData models loaded via actor")
+        debugPrint("SwiftData models loaded")
     }
 
     func loadEvents(from database: Connection?) {
         loadTable("ComiketInfoWC", from: database, of: ComiketEvent.self)
-    }
-
-    func loadDates(from database: Connection?) {
         loadTable("ComiketDateWC", from: database, of: ComiketDate.self)
     }
 
     func loadMaps(from database: Connection?) {
         loadTable("ComiketMapWC", from: database, of: ComiketMap.self)
-    }
-
-    func loadAreas(from database: Connection?) {
         loadTable("ComiketAreaWC", from: database, of: ComiketArea.self)
-    }
-
-    func loadBlocks(from database: Connection?) {
         loadTable("ComiketBlockWC", from: database, of: ComiketBlock.self)
-    }
-
-    func loadMapping(from database: Connection?) {
         loadTable("ComiketMappingWC", from: database, of: ComiketMapping.self)
-    }
-
-    func loadGenres(from database: Connection?) {
-        loadTable("ComiketGenreWC", from: database, of: ComiketGenre.self)
     }
 
     func loadLayouts(from database: Connection?) {
@@ -78,7 +48,7 @@ actor DataConverter {
                     partialResult[map.id] = map
                 }
 
-                debugPrint("Selecting from ComiketLayoutWC via actor")
+                debugPrint("Selecting from ComiketLayoutWC")
                 let table = Table("ComiketLayoutWC")
                 for row in try database.prepare(table) {
                     let layout = ComiketLayout(from: row)
@@ -91,10 +61,14 @@ actor DataConverter {
         }
     }
 
+    func loadGenres(from database: Connection?) {
+        loadTable("ComiketGenreWC", from: database, of: ComiketGenre.self)
+    }
+
     func loadCircles(from database: Connection?) {
         if let database {
             do {
-                debugPrint("Selecting from ComiketCircleWC and ComiketCircleExtend via actor")
+                debugPrint("Selecting from ComiketCircleWC and ComiketCircleExtend")
                 let circlesTable = Table("ComiketCircleWC")
                 let circleExtendedInformationTable = Table("ComiketCircleExtend")
                 let id = Expression<Int>("id")
@@ -145,7 +119,7 @@ actor DataConverter {
     func loadTable<T: SQLiteable & PersistentModel>(_ tableName: String, from database: Connection?, of type: T.Type) {
         if let database {
             do {
-                debugPrint("Selecting from \(tableName) via actor")
+                debugPrint("Selecting from \(tableName)")
                 let table = Table("\(tableName)")
                 for row in try database.prepare(table) {
                     let swiftDataObjectFromTableRow = T(from: row)
@@ -157,26 +131,20 @@ actor DataConverter {
         }
     }
 
-    // MARK: Reading
+    // MARK: Maintenance
 
-    func event(for eventNumber: Int) -> PersistentIdentifier? {
-        let fetchDescriptor = FetchDescriptor<ComiketEvent>(
-            predicate: #Predicate<ComiketEvent> {
-                $0.eventNumber == eventNumber
-            }
-        )
+    func save() {
         do {
-            return (try modelContext.fetchIdentifiers(fetchDescriptor)).first
+            debugPrint("Saving data models")
+            try modelContext.save()
+            debugPrint("Saved data models")
         } catch {
             debugPrint(error.localizedDescription)
-            return nil
         }
     }
 
-    // MARK: Maintenance
-
     func deleteAllData() {
-        debugPrint("Deleting all data via actor")
+        debugPrint("Deleting all data")
         do {
             try modelContext.delete(model: ComiketEvent.self)
             try modelContext.delete(model: ComiketDate.self)

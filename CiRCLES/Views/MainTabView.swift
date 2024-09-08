@@ -17,9 +17,14 @@ struct MainTabView: View {
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
 
+    let databasesInitializedKey: String = "Database.Initialized"
+
     @State var isInitialTokenRefreshComplete: Bool = false
     @State var isProgressDeterminate: Bool = false
     @State var progressHeaderText: String?
+
+    @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
+    @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
 
     var body: some View {
         @Bindable var authManager = authManager
@@ -35,11 +40,13 @@ struct MainTabView: View {
                     Label("Tab.Circles", systemImage: "square.grid.3x3.fill")
                 }
                 .tag(TabType.circles)
-            FavoritesView()
-                .tabItem {
-                    Label("Tab.Favorites", systemImage: "star.fill")
-                }
-                .tag(TabType.favorites)
+            if isActiveEventLatest {
+                FavoritesView()
+                    .tabItem {
+                        Label("Tab.Favorites", systemImage: "star.fill")
+                    }
+                    .tag(TabType.favorites)
+            }
             MyView()
                 .tabItem {
                     Label("Tab.My", image: .tabIconMy)
@@ -53,37 +60,7 @@ struct MainTabView: View {
         }
         .overlay {
             if database.isBusy {
-                ZStack {
-                    Color.black.opacity(0.7)
-                    VStack(spacing: 12.0) {
-                        if progressHeaderText != nil || database.progressTextKey != nil {
-                            VStack(spacing: 6.0) {
-                                if let progressHeaderText {
-                                    Text(NSLocalizedString(progressHeaderText, comment: ""))
-                                        .fontWeight(.bold)
-                                }
-                                if let progressTextKey = database.progressTextKey {
-                                    Text(NSLocalizedString(progressTextKey, comment: ""))
-                                        .font(.body)
-                                        .foregroundStyle(.secondary)
-                                }
-                            }
-                        }
-                        if database.isDownloading {
-                            ProgressView(value: database.downloadProgress, total: 1.0)
-                                .progressViewStyle(.linear)
-                        } else {
-                            ProgressView()
-                        }
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Material.regular)
-                    .clipShape(RoundedRectangle(cornerRadius: 16.0))
-                    .padding(32.0)
-                }
-                .ignoresSafeArea()
-                .transition(.opacity.animation(.snappy.speed(2.0)))
+                LoadingOverlay(progressHeaderText: $progressHeaderText)
             }
         }
         .sheet(isPresented: $authManager.isAuthenticating) {
@@ -125,6 +102,21 @@ struct MainTabView: View {
                 }
             }
         }
+        .onChange(of: activeEventNumber) { oldValue, _ in
+            if oldValue != -1 {
+                UserDefaults.standard.set(false, forKey: databasesInitializedKey)
+                withAnimation(.snappy.speed(2.0)) {
+                    self.database.isBusy = true
+                } completion: {
+                    Task.detached {
+                        await loadDataFromDatabase()
+                        await MainActor.run {
+                            closeLoadingOverlay()
+                        }
+                    }
+                }
+            }
+        }
         .onReceive(navigator.$selectedTab, perform: { newValue in
             if newValue == navigator.previouslySelectedTab {
                 navigator.popToRoot(for: newValue)
@@ -136,26 +128,39 @@ struct MainTabView: View {
     func loadDataFromDatabase() async {
         UIApplication.shared.isIdleTimerDisabled = true
 
-        let token = authManager.token ?? OpenIDToken(
-            accessToken: "", tokenType: "", expiresIn: "", refreshToken: ""
-        )
+        let token = authManager.token ?? OpenIDToken()
 
         if let eventData = await WebCatalog.events(authToken: token),
            let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
 
-            await setProgressHeaderKey("Shared.LoadingHeader.Download")
+            var activeEvent: WebCatalogEvent.Response.Event?
+            if activeEventNumber != -1,
+               let eventInList = eventData.list.first(where: {$0.number == activeEventNumber}) {
+                activeEvent = WebCatalogEvent.Response.Event(
+                    id: eventInList.id,
+                    number: activeEventNumber
+                )
+                isActiveEventLatest = activeEventNumber == eventData.latestEventNumber
+            } else {
+                activeEvent = latestEvent
+                activeEventNumber = latestEvent.number
+            }
 
-            await setProgressTextKey("Shared.LoadingText.DownloadTextDatabase")
-            await database.downloadTextDatabase(for: latestEvent, authToken: token)
+            if let activeEvent {
+                await setProgressHeaderKey("Shared.LoadingHeader.Download")
 
-            await setProgressTextKey("Shared.LoadingText.DownloadImageDatabase")
-            await database.downloadImageDatabase(for: latestEvent, authToken: token)
+                await setProgressTextKey("Shared.LoadingText.DownloadTextDatabase")
+                await database.downloadTextDatabase(for: activeEvent, authToken: token)
+
+                await setProgressTextKey("Shared.LoadingText.DownloadImageDatabase")
+                await database.downloadImageDatabase(for: activeEvent, authToken: token)
+            }
         }
 
         await setProgressTextKey("Shared.LoadingText.Database")
         database.connect()
 
-        if !database.isInitialLoadCompleted() {
+        if !UserDefaults.standard.bool(forKey: databasesInitializedKey) {
             await setProgressHeaderKey("Shared.LoadingHeader.Initial")
 
             let actor = DataConverter(modelContainer: sharedModelContainer)
@@ -164,13 +169,9 @@ struct MainTabView: View {
 
             await setProgressTextKey("Shared.LoadingText.Events")
             await actor.loadEvents(from: database.textDatabase)
-            await actor.loadDates(from: database.textDatabase)
 
             await setProgressTextKey("Shared.LoadingText.Maps")
             await actor.loadMaps(from: database.textDatabase)
-            await actor.loadAreas(from: database.textDatabase)
-            await actor.loadBlocks(from: database.textDatabase)
-            await actor.loadMapping(from: database.textDatabase)
             await actor.loadLayouts(from: database.textDatabase)
 
             await setProgressTextKey("Shared.LoadingText.Genres")
@@ -181,12 +182,13 @@ struct MainTabView: View {
 
             await actor.save()
 
-            database.setInitialLoadCompleted()
+            UserDefaults.standard.set(true, forKey: databasesInitializedKey)
         } else {
             debugPrint("Skipped loading database into persistent model cache")
         }
 
         await setProgressTextKey("Shared.LoadingText.Images")
+        database.imageCache.removeAll()
         database.loadCommonImages()
         database.loadCircleImages()
 

@@ -26,6 +26,7 @@ struct FavoritesView: View {
             ZStack(alignment: .center) {
                 if let favoriteCircles {
                     CircleGrid(circles: favoriteCircles,
+                               showsOverlayWhenEmpty: false,
                                namespace: favoritesNamespace) { circle in
                         navigator.push(.circlesDetail(circle: circle), for: .favorites)
                     }

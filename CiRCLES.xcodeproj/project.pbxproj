@@ -87,7 +87,7 @@
 		E49352092C4D1418004CBDA1 /* CircleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352082C4D1414004CBDA1 /* CircleDetailView.swift */; };
 		E493520B2C4D153E004CBDA1 /* ToolbarAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */; };
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
-		E4CA64562C81FCC3001F50BB /* UserFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64552C81FCC1001F50BB /* UserFavorite.swift */; };
+		E4CA64562C81FCC3001F50BB /* UserCircleWithFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64552C81FCC1001F50BB /* UserCircleWithFavorite.swift */; };
 		E4CA64582C8203A4001F50BB /* CircleGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64572C8203A2001F50BB /* CircleGrid.swift */; };
 		E4D74B6A2C84BAA10014CD16 /* TranslateButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B692C84BA9F0014CD16 /* TranslateButton.swift */; };
 		E4D74B6C2C85FEDA0014CD16 /* CirclePreview.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B6B2C85FED80014CD16 /* CirclePreview.swift */; };
@@ -110,6 +110,7 @@
 		E4D74B932C8D430C0014CD16 /* CircleListCompactRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B922C8D43090014CD16 /* CircleListCompactRow.swift */; };
 		E4D74B952C8D465F0014CD16 /* SquareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B942C8D465B0014CD16 /* SquareButton.swift */; };
 		E4D74B972C8D47A30014CD16 /* SquareButtonStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B962C8D47900014CD16 /* SquareButtonStack.swift */; };
+		E4D74B9A2C8DDE230014CD16 /* LoadingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B992C8DDE210014CD16 /* LoadingOverlay.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -192,7 +193,7 @@
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A7694F2C21A20B00BE3491 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		E4CA64552C81FCC1001F50BB /* UserFavorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserFavorite.swift; sourceTree = "<group>"; };
+		E4CA64552C81FCC1001F50BB /* UserCircleWithFavorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCircleWithFavorite.swift; sourceTree = "<group>"; };
 		E4CA64572C8203A2001F50BB /* CircleGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleGrid.swift; sourceTree = "<group>"; };
 		E4D74B692C84BA9F0014CD16 /* TranslateButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateButton.swift; sourceTree = "<group>"; };
 		E4D74B6B2C85FED80014CD16 /* CirclePreview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclePreview.swift; sourceTree = "<group>"; };
@@ -215,6 +216,7 @@
 		E4D74B942C8D465B0014CD16 /* SquareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareButton.swift; sourceTree = "<group>"; };
 		E4D74B962C8D47900014CD16 /* SquareButtonStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareButtonStack.swift; sourceTree = "<group>"; };
 		E4D74B982C8D7D5B0014CD16 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		E4D74B992C8DDE210014CD16 /* LoadingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingOverlay.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -236,9 +238,9 @@
 		E42003CD2C631E4100770992 /* View Modifiers */ = {
 			isa = PBXGroup;
 			children = (
-				E4755BAF2C83535E0032DA2F /* AutomaticNavigationTransition.swift */,
 				E43C74092C6DFA69003522C8 /* AdaptiveInvert.swift */,
 				E4755BAD2C83507D0032DA2F /* AutomaticMatchedTransitionSource.swift */,
+				E4755BAF2C83535E0032DA2F /* AutomaticNavigationTransition.swift */,
 				E42003CE2C631E4900770992 /* ConditionalFit.swift */,
 				E43C74112C702748003522C8 /* Rotation.swift */,
 			);
@@ -279,6 +281,7 @@
 				E4D74B7C2C8C16830014CD16 /* ExternalLink.swift */,
 				E4755BD92C84B71B0032DA2F /* FavoriteButton.swift */,
 				E48B629A2C5FCA8D007874AE /* FavoriteColorSelector.swift */,
+				E4D74B992C8DDE210014CD16 /* LoadingOverlay.swift */,
 				E4D74B7E2C8C17290014CD16 /* SafariLink.swift */,
 				E47269062C3D739500D5335D /* SafariView.swift */,
 				E4755BD52C84B6010032DA2F /* SNSButton.swift */,
@@ -404,7 +407,7 @@
 			isa = PBXGroup;
 			children = (
 				E4755BA92C82BF8E0032DA2F /* UserResponse.swift */,
-				E4CA64552C81FCC1001F50BB /* UserFavorite.swift */,
+				E4CA64552C81FCC1001F50BB /* UserCircleWithFavorite.swift */,
 				E480AA952C44A15A009C1445 /* UserCircle.swift */,
 				E48B62922C5FC1BE007874AE /* UserFavorites.swift */,
 				E480AA822C44278D009C1445 /* UserInfo.swift */,
@@ -665,7 +668,7 @@
 				E4D74B862C8C9D850014CD16 /* CircleFilterBar.swift in Sources */,
 				E43C74122C702750003522C8 /* Rotation.swift in Sources */,
 				E4755BC32C843D7D0032DA2F /* FavoritesActor.swift in Sources */,
-				E4CA64562C81FCC3001F50BB /* UserFavorite.swift in Sources */,
+				E4CA64562C81FCC3001F50BB /* UserCircleWithFavorite.swift in Sources */,
 				E4CA64582C8203A4001F50BB /* CircleGrid.swift in Sources */,
 				E48B629B2C5FCA95007874AE /* FavoriteColorSelector.swift in Sources */,
 				E4755BD42C84A4D50032DA2F /* GenreOverlayTip.swift in Sources */,
@@ -714,6 +717,7 @@
 				E4D74B7F2C8C172B0014CD16 /* SafariLink.swift in Sources */,
 				E43C74102C6EDD85003522C8 /* LoginFeatureHero.swift in Sources */,
 				E4755BAA2C82BF8F0032DA2F /* UserResponse.swift in Sources */,
+				E4D74B9A2C8DDE230014CD16 /* LoadingOverlay.swift in Sources */,
 				E480AA982C44A473009C1445 /* WebCatalog.swift in Sources */,
 				E4755BCE2C8493810032DA2F /* CircleBlockPill.swift in Sources */,
 				E4D74B792C8C02880014CD16 /* MyParticipationSections.swift in Sources */,

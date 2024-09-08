@@ -1,11 +1,11 @@
 //
-//  UserFavorite.swift
+//  UserCircleWithFavorite.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/08/30.
 //
 
-struct UserFavorite: Codable {
+struct UserCircleWithFavorite: Codable {
     let status: String
     let response: Response
 

@@ -30,8 +30,7 @@ class WebCatalog {
         return nil
     }
 
-    // TODO: Figure out a smart way to split UserFavorite and circle details
-    static func circle(with webCatalogID: Int, authToken: OpenIDToken) async -> UserFavorite? {
+    static func circle(with webCatalogID: Int, authToken: OpenIDToken) async -> UserCircleWithFavorite? {
         let request = urlRequestForWebCatalogAPI(
             endpoint: "GetCircle",
             method: "GET",
@@ -42,7 +41,7 @@ class WebCatalog {
         )
         if let (data, _) = try? await URLSession.shared.data(for: request) {
             debugPrint("Web Catalog circle response length: \(data.count)")
-            if let circle = try? JSONDecoder().decode(UserFavorite.self, from: data) {
+            if let circle = try? JSONDecoder().decode(UserCircleWithFavorite.self, from: data) {
                 debugPrint("Decoded circle")
                 return circle
             }

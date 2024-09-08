@@ -11,6 +11,13 @@ struct OpenIDToken: Codable, Equatable {
     let expiresIn: String
     let refreshToken: String
 
+    init() {
+        self.accessToken = ""
+        self.tokenType = ""
+        self.expiresIn = ""
+        self.refreshToken = ""
+    }
+
     enum CodingKeys: String, CodingKey {
         case accessToken = "access_token"
         case tokenType = "token_type"
