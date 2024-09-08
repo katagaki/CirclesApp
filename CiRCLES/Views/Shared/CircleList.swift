@@ -12,6 +12,7 @@ struct CircleList: View {
     @Environment(Database.self) var database
 
     var circles: [ComiketCircle]
+    var showsOverlayWhenEmpty: Bool = true
     var displayMode: ListDisplayMode
     var namespace: Namespace.ID
     var onSelect: ((ComiketCircle) -> Void)
@@ -44,7 +45,7 @@ struct CircleList: View {
         }
         .listStyle(.plain)
         .overlay {
-            if circles.isEmpty {
+            if circles.isEmpty && showsOverlayWhenEmpty {
                 ContentUnavailableView(
                     "Circles.NoCircles",
                     systemImage: "questionmark.square.dashed",
