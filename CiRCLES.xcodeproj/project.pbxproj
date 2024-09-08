@@ -111,6 +111,7 @@
 		E4D74B952C8D465F0014CD16 /* SquareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B942C8D465B0014CD16 /* SquareButton.swift */; };
 		E4D74B972C8D47A30014CD16 /* SquareButtonStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B962C8D47900014CD16 /* SquareButtonStack.swift */; };
 		E4D74B9A2C8DDE230014CD16 /* LoadingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B992C8DDE210014CD16 /* LoadingOverlay.swift */; };
+		E4D74B9C2C8E00320014CD16 /* MapSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B9B2C8E002F0014CD16 /* MapSelector.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -217,6 +218,7 @@
 		E4D74B962C8D47900014CD16 /* SquareButtonStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareButtonStack.swift; sourceTree = "<group>"; };
 		E4D74B982C8D7D5B0014CD16 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		E4D74B992C8DDE210014CD16 /* LoadingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingOverlay.swift; sourceTree = "<group>"; };
+		E4D74B9B2C8E002F0014CD16 /* MapSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSelector.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -443,6 +445,7 @@
 			isa = PBXGroup;
 			children = (
 				E482FFBD2C21BD93009225BD /* MapView.swift */,
+				E4D74B9B2C8E002F0014CD16 /* MapSelector.swift */,
 				E42003CB2C6308AB00770992 /* InteractiveMap.swift */,
 				E43C74072C6DF83D003522C8 /* InteractiveMapButton.swift */,
 				E43C740B2C6DFD15003522C8 /* InteractiveMapDetailPopover.swift */,
@@ -704,6 +707,7 @@
 				E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */,
 				E4755BCC2C848D810032DA2F /* DatabaseType.swift in Sources */,
 				E480AAAF2C4C9834009C1445 /* Size.swift in Sources */,
+				E4D74B9C2C8E00320014CD16 /* MapSelector.swift in Sources */,
 				E480AAB72C4C9FAA009C1445 /* SQLiteable.swift in Sources */,
 				E47269072C3D739700D5335D /* SafariView.swift in Sources */,
 				E49352022C4CF282004CBDA1 /* Type Aliases.swift in Sources */,

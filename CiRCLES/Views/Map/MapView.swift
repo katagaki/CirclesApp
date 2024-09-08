@@ -22,13 +22,12 @@ struct MapView: View {
     @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
     var maps: [ComiketMap]
 
-    @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
-
     @AppStorage(wrappedValue: 0, "Map.SelectedDateID") var selectedDateID: Int
     @AppStorage(wrappedValue: 0, "Map.SelectedMapID") var selectedMapID: Int
-
     @State var selectedDate: ComiketDate?
     @State var selectedMap: ComiketMap?
+
+    @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
 
     @State var isInitialLoadCompleted: Bool = false
 
@@ -60,42 +59,7 @@ struct MapView: View {
                 BarAccessory(placement: .bottom) {
                     Group {
                         if orientation.isPortrait || UIDevice.current.userInterfaceIdiom == .pad {
-                            ScrollView(.horizontal) {
-                                HStack(spacing: 12.0) {
-                                    ForEach(dates, id: \.id) { date in
-                                        VStack(alignment: .leading, spacing: 12.0) {
-                                            HStack {
-                                                Text("Shared.\(date.id)th.Day")
-                                                    .bold()
-                                                Spacer()
-                                                Text(date.date, style: .date)
-                                                    .foregroundStyle(.secondary)
-                                            }
-                                            Divider()
-                                            HStack(spacing: 8.0) {
-                                                ForEach(maps, id: \.id) { map in
-                                                    BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
-                                                                       accentColor: accentColorForMap(map),
-                                                                       isTextLight: true) {
-                                                        withAnimation(.snappy.speed(2.0)) {
-                                                            selectedDate = date
-                                                            selectedMap = map
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                        .padding(12.0)
-                                        .background {
-                                            RoundedRectangle(cornerRadius: 12.0)
-                                                .stroke(Color.primary.opacity(0.1))
-                                        }
-                                    }
-                                }
-                                .padding([.leading, .trailing], 12.0)
-                                .padding([.top, .bottom], 12.0)
-                            }
-                            .scrollIndicators(.hidden)
+                            MapSelector(selectedDate: $selectedDate, selectedMap: $selectedMap)
                         } else {
                             Color.clear
                                 .frame(height: 0.0)
@@ -138,20 +102,6 @@ struct MapView: View {
                 default: Color.clear
                 }
             }
-        }
-    }
-
-    func accentColorForMap(_ map: ComiketMap) -> Color? {
-        if map.name.starts(with: "東") {
-            return Color.red
-        } else if map.name.starts(with: "西") {
-            return Color.blue
-        } else if map.name.starts(with: "南") {
-            return Color.green
-        } else if map.name.starts(with: "会議") || map.name.starts(with: "会") {
-            return Color.gray
-        } else {
-            return nil
         }
     }
 }
