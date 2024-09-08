@@ -214,6 +214,7 @@
 		E4D74B922C8D43090014CD16 /* CircleListCompactRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleListCompactRow.swift; sourceTree = "<group>"; };
 		E4D74B942C8D465B0014CD16 /* SquareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareButton.swift; sourceTree = "<group>"; };
 		E4D74B962C8D47900014CD16 /* SquareButtonStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareButtonStack.swift; sourceTree = "<group>"; };
+		E4D74B982C8D7D5B0014CD16 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -495,6 +496,7 @@
 				E47269112C3D795400D5335D /* ci_scripts */,
 				E480AA782C4422DE009C1445 /* Shared */,
 				E4A769482C21A20A00BE3491 /* CiRCLES */,
+				E4D74B982C8D7D5B0014CD16 /* README.md */,
 				E4A769472C21A20A00BE3491 /* Products */,
 			);
 			sourceTree = "<group>";
