@@ -360,6 +360,38 @@
         }
       }
     },
+    "Map.NoMapSelected" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Map Selected"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マップ選択なし"
+          }
+        }
+      }
+    },
+    "Map.NoMapSelected.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select a hall to view its map."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "会場マップを表示するには、棟を選択してください。"
+          }
+        }
+      }
+    },
     "More.Customization" : {
       "extractionState" : "manual",
       "localizations" : {
