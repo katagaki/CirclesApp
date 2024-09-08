@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2024/09/07.
 //
 
+import Komponents
 import SwiftUI
 
 struct CircleToolbar: View {
@@ -12,15 +13,19 @@ struct CircleToolbar: View {
     @Environment(AuthManager.self) var authManager
     @Environment(Favorites.self) var favorites
 
+    @Environment(\.openURL) var openURL
+
     var extendedInformation: ComiketCircleExtendedInformation
+    var webCatalogInformation: WebCatalogCircle?
 
     @State var isAddingToFavorites: Bool = false
     @State var favoriteColorToAddTo: WebCatalogColor?
 
     @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
 
-    init(_ extendedInformation: ComiketCircleExtendedInformation) {
+    init(_ extendedInformation: ComiketCircleExtendedInformation, _ webCatalogInformation: WebCatalogCircle?) {
         self.extendedInformation = extendedInformation
+        self.webCatalogInformation = webCatalogInformation
     }
 
     var body: some View {
@@ -49,6 +54,15 @@ struct CircleToolbar: View {
                     }
                     if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
                         SNSButton(circleMsPortalURL, showsLabel: false, type: .circleMs)
+                    }
+                }
+                if let webCatalogInformation {
+                    ForEach(webCatalogInformation.onlineStores, id: \.link) { onlineStore in
+                        BarAccessoryButton(LocalizedStringKey(onlineStore.name)) {
+                            if let url = URL(string: onlineStore.link) {
+                                openURL(url)
+                            }
+                        }
                     }
                 }
             }
