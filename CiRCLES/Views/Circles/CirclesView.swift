@@ -77,6 +77,7 @@ struct CirclesView: View {
                             }
                         } else {
                             CircleGrid(circles: displayedCircles,
+                                       showsOverlayWhenEmpty: selectedGenre != nil || selectedMap != nil,
                                        namespace: circlesNamespace) { circle in
                                 navigator.push(.circlesDetail(circle: circle), for: .circles)
                             }
@@ -90,13 +91,14 @@ struct CirclesView: View {
                             }
                         } else {
                             CircleList(circles: displayedCircles,
+                                       showsOverlayWhenEmpty: selectedGenre != nil || selectedMap != nil,
                                        displayMode: listDisplayModeState,
                                        namespace: circlesNamespace) { circle in
                                 navigator.push(.circlesDetail(circle: circle), for: .circles)
                             }
                         }
                     }
-                    if (selectedGenre == nil && selectedMap == nil) && searchedCircles == nil {
+                    if selectedGenre == nil && selectedMap == nil && searchedCircles == nil {
                         ContentUnavailableView(
                             "Circles.NoFilterSelected",
                             systemImage: "questionmark.square.dashed",

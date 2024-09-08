@@ -54,7 +54,7 @@ struct LoginView: View {
             }
             .padding(18.0)
         }
-        .safeAreaInset(edge: .bottom) {
+        .safeAreaInset(edge: .bottom, spacing: 0.0) {
             BarAccessory(placement: .bottom) {
                 VStack {
                     HStack {
