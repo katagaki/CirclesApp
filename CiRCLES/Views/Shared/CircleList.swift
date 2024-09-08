@@ -43,5 +43,14 @@ struct CircleList: View {
             }
         }
         .listStyle(.plain)
+        .overlay {
+            if circles.isEmpty {
+                ContentUnavailableView(
+                    "Circles.NoCircles",
+                    systemImage: "questionmark.square.dashed",
+                    description: Text("Circles.NoCircles.Description")
+                )
+            }
+        }
     }
 }

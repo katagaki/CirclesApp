@@ -43,6 +43,7 @@ struct CirclesView: View {
     @State var searchTerm: String = ""
 
     @State var isInitialLoadCompleted: Bool = false
+    @State var isLoading: Bool = false
 
     @AppStorage(wrappedValue: CircleDisplayMode.grid, "Circles.DisplayMode") var displayMode: CircleDisplayMode
     @AppStorage(wrappedValue: ListDisplayMode.regular, "Circles.ListSize") var listDisplayMode: ListDisplayMode
@@ -61,40 +62,45 @@ struct CirclesView: View {
     var body: some View {
         NavigationStack(path: $navigator[.circles]) {
             ZStack(alignment: .center) {
-                switch displayModeState {
-                case .grid:
-                    if let searchedCircles {
-                        CircleGrid(circles: searchedCircles,
-                                   namespace: circlesNamespace) { circle in
-                            navigator.push(.circlesDetail(circle: circle), for: .circles)
+                if isLoading {
+                    ProgressView("Circles.Loading")
+                    Color.clear
+                } else {
+                    switch displayModeState {
+                    case .grid:
+                        if let searchedCircles {
+                            CircleGrid(circles: searchedCircles,
+                                       namespace: circlesNamespace) { circle in
+                                navigator.push(.circlesDetail(circle: circle), for: .circles)
+                            }
+                        } else {
+                            CircleGrid(circles: displayedCircles,
+                                       namespace: circlesNamespace) { circle in
+                                navigator.push(.circlesDetail(circle: circle), for: .circles)
+                            }
                         }
-                    } else {
-                        CircleGrid(circles: displayedCircles,
-                                   namespace: circlesNamespace) { circle in
-                            navigator.push(.circlesDetail(circle: circle), for: .circles)
+                    case .list:
+                        if let searchedCircles {
+                            CircleList(circles: searchedCircles,
+                                       displayMode: listDisplayModeState,
+                                       namespace: circlesNamespace) { circle in
+                                navigator.push(.circlesDetail(circle: circle), for: .circles)
+                            }
+                        } else {
+                            CircleList(circles: displayedCircles,
+                                       displayMode: listDisplayModeState,
+                                       namespace: circlesNamespace) { circle in
+                                navigator.push(.circlesDetail(circle: circle), for: .circles)
+                            }
                         }
                     }
-                case .list:
-                    if let searchedCircles {
-                        CircleList(circles: searchedCircles,
-                                   displayMode: listDisplayModeState,
-                                   namespace: circlesNamespace) { circle in
-                            navigator.push(.circlesDetail(circle: circle), for: .circles)
-                        }
-                    } else {
-                        CircleList(circles: displayedCircles,
-                                   displayMode: listDisplayModeState,
-                                   namespace: circlesNamespace) { circle in
-                            navigator.push(.circlesDetail(circle: circle), for: .circles)
-                        }
+                    if (selectedGenre == nil && selectedMap == nil) && searchedCircles == nil {
+                        ContentUnavailableView(
+                            "Circles.NoFilterSelected",
+                            systemImage: "questionmark.square.dashed",
+                            description: Text("Circles.NoFilterSelected.Description")
+                        )
                     }
-                }
-                if (selectedGenre == nil && selectedMap == nil) && searchedCircles == nil {
-                    ContentUnavailableView(
-                        "Circles.NoFilterSelected",
-                        systemImage: "questionmark.square.dashed",
-                        description: Text("Circles.NoFilterSelected.Description")
-                    )
                 }
             }
             .navigationTitle("ViewTitle.Circles")
@@ -146,6 +152,7 @@ struct CirclesView: View {
                         selectedDate: $selectedDate
                     )
                 }
+                .disabled(searchTerm.trimmingCharacters(in: .whitespaces).count >= 2)
             }
             .searchable(text: $searchTerm,
                         placement: .navigationBarDrawer(displayMode: .always),
@@ -160,9 +167,11 @@ struct CirclesView: View {
             }
             .onChange(of: genreMapBlockDate) { _, _ in
                 if isInitialLoadCompleted {
-                    Task.detached {
-                        await reloadDisplayedCircles()
-                    }
+                    reloadDisplayedCircles(
+                        genreID: selectedGenre?.id,
+                        mapID: selectedMap?.id,
+                        blockID: selectedBlock?.id
+                    )
                 }
             }
             .onChange(of: searchTerm) { _, _ in
@@ -187,51 +196,58 @@ struct CirclesView: View {
         }
     }
 
-    func reloadDisplayedCircles() async {
+    func reloadDisplayedCircles(genreID: Int?, mapID: Int?, blockID: Int?) {
         debugPrint("Reloading displayed circles")
-        let actor = DataFetcher(modelContainer: sharedModelContainer)
+        withAnimation(.snappy.speed(2.0)) {
+            self.isLoading = true
+        } completion: {
+            Task.detached {
+                let actor = DataFetcher(modelContainer: sharedModelContainer)
 
-        var circleIdentifiersByGenre: [PersistentIdentifier]?
-        var circleIdentifiersByMap: [PersistentIdentifier]?
-        var circleIdentifiersByBlock: [PersistentIdentifier]?
-        var circleIdentifiers: [PersistentIdentifier] = []
+                var circleIdentifiersByGenre: [PersistentIdentifier]?
+                var circleIdentifiersByMap: [PersistentIdentifier]?
+                var circleIdentifiersByBlock: [PersistentIdentifier]?
+                var circleIdentifiers: [PersistentIdentifier] = []
 
-        if let selectedGenre {
-            circleIdentifiersByGenre = await actor.circles(withGenre: selectedGenre.id)
-        }
-        if let selectedMap {
-            circleIdentifiersByMap = await actor.circles(inMap: selectedMap.id)
-            if let selectedBlock {
-                circleIdentifiersByBlock = await actor.circles(inBlock: selectedBlock.id)
-            }
-        }
+                if let genreID {
+                    circleIdentifiersByGenre = await actor.circles(withGenre: genreID)
+                }
+                if let mapID {
+                    circleIdentifiersByMap = await actor.circles(inMap: mapID)
+                    if let blockID {
+                        circleIdentifiersByBlock = await actor.circles(inBlock: blockID)
+                    }
+                }
 
-        if let circleIdentifiersByGenre {
-            circleIdentifiers = circleIdentifiersByGenre
-        }
-        if let circleIdentifiersByMap {
-            if circleIdentifiers.isEmpty {
-                circleIdentifiers = circleIdentifiersByMap
-            } else {
-                circleIdentifiers = Array(
-                    Set(circleIdentifiers).intersection(Set(circleIdentifiersByMap))
-                )
-            }
-        }
-        if let circleIdentifiersByBlock {
-            circleIdentifiers = Array(
-                Set(circleIdentifiers).intersection(Set(circleIdentifiersByBlock))
-            )
-        }
+                if let circleIdentifiersByGenre {
+                    circleIdentifiers = circleIdentifiersByGenre
+                }
+                if let circleIdentifiersByMap {
+                    if circleIdentifiers.isEmpty {
+                        circleIdentifiers = circleIdentifiersByMap
+                    } else {
+                        circleIdentifiers = Array(
+                            Set(circleIdentifiers).intersection(Set(circleIdentifiersByMap))
+                        )
+                    }
+                }
+                if let circleIdentifiersByBlock {
+                    circleIdentifiers = Array(
+                        Set(circleIdentifiers).intersection(Set(circleIdentifiersByBlock))
+                    )
+                }
 
-        await MainActor.run {
-            var displayedCircles: [ComiketCircle] = []
-            displayedCircles = database.circles(circleIdentifiers)
-            if let selectedDate {
-                displayedCircles.removeAll(where: { $0.day != selectedDate.id })
-            }
-            withAnimation(.snappy.speed(2.0)) {
-                self.displayedCircles = displayedCircles
+                await MainActor.run {
+                    var displayedCircles: [ComiketCircle] = []
+                    displayedCircles = database.circles(circleIdentifiers)
+                    if let selectedDate {
+                        displayedCircles.removeAll(where: { $0.day != selectedDate.id })
+                    }
+                    withAnimation(.snappy.speed(2.0)) {
+                        self.displayedCircles = displayedCircles
+                        self.isLoading = false
+                    }
+                }
             }
         }
     }
