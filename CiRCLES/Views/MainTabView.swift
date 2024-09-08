@@ -77,6 +77,7 @@ struct MainTabView: View {
             switch newValue {
             case .online:
                 Task {
+                    authManager.restoreAuthentication()
                     await authManager.refreshAuthenticationToken()
                 }
             case .offline:
