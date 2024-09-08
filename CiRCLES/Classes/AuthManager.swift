@@ -56,12 +56,7 @@ class AuthManager {
             fatalError("OpenID client initialization failed. Did you set up your OpenID.plist file yet?")
         }
 
-        // Read token from keychain
-        if let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),
-           let token = try? JSONDecoder().decode(OpenIDToken.self,
-                                                 from: tokenInKeychain.data(using: .utf8) ?? Data()) {
-            self.token = token
-        }
+        // Set up Internet connectivity tracking
         if let reachability {
             reachability.whenReachable = { _ in
                 debugPrint("Internet is now reachable")
@@ -76,6 +71,14 @@ class AuthManager {
             } catch {
                 debugPrint(error.localizedDescription)
             }
+        }
+    }
+
+    func restoreAuthentication() {
+        if let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),
+           let token = try? JSONDecoder().decode(OpenIDToken.self,
+                                                 from: tokenInKeychain.data(using: .utf8) ?? Data()) {
+            self.token = token
         }
     }
 

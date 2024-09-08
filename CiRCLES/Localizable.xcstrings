@@ -904,6 +904,22 @@
         }
       }
     },
+    "My.User.OfflineMode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline Mode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフラインモード"
+          }
+        }
+      }
+    },
     "Profile.Edit" : {
       "localizations" : {
         "en" : {

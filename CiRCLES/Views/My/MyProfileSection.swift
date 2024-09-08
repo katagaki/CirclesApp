@@ -49,7 +49,8 @@ struct MyProfileSection: View {
                         if let userInfo {
                             Text(userInfo.nickname)
                         } else {
-                            Text(verbatim: "-")
+                            Text("My.User.OfflineMode")
+                                .foregroundStyle(.secondary)
                         }
                     }
                     .fontWeight(.bold)
@@ -64,11 +65,13 @@ struct MyProfileSection: View {
                     }
                 }
                 .padding(.top, 2.0)
-                Link(destination: URL(string: "https://myportal.circle.ms/")!) {
-                    Text("Profile.Edit")
-                        .font(.caption)
-                        .underline()
-                        .foregroundStyle(.accent)
+                if userInfo != nil {
+                    Link(destination: URL(string: "https://myportal.circle.ms/")!) {
+                        Text("Profile.Edit")
+                            .font(.caption)
+                            .underline()
+                            .foregroundStyle(.accent)
+                    }
                 }
             }
             .buttonStyle(.plain)
