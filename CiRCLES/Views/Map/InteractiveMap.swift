@@ -97,52 +97,42 @@ struct InteractiveMap: View {
                 }
                 .overlay {
                     ZStack(alignment: .bottomTrailing) {
-                        VStack(alignment: .trailing, spacing: 12.0) {
-                            Group {
-                                VStack(alignment: .center, spacing: 0.0) {
-                                    Button {
+                        SquareButtonStack {
+                            VStack(alignment: .center, spacing: 0.0) {
+                                SquareButton {
+                                    withAnimation(.smooth.speed(2.0)) {
                                         showGenreOverlay.toggle()
-                                    } label: {
-                                        Group {
-                                            if showGenreOverlay {
-                                                Image(systemName: "theatermask.and.paintbrush.fill")
-                                            } else {
-                                                Image(systemName: "theatermask.and.paintbrush")
-                                            }
+                                    }
+                                } label: {
+                                    Group {
+                                        if showGenreOverlay {
+                                            Image(systemName: "theatermask.and.paintbrush.fill")
+                                        } else {
+                                            Image(systemName: "theatermask.and.paintbrush")
                                         }
-                                        .font(.title2)
                                     }
-                                    .frame(width: 48.0, height: 48.0, alignment: .center)
-                                    .contentShape(.rect)
-                                    .popoverTip(GenreOverlayTip())
+                                    .font(.title2)
                                 }
-                                VStack(alignment: .center, spacing: 0.0) {
-                                    Button {
-                                        zoomDivisor -= 1
-                                    } label: {
-                                        Image(systemName: "plus")
-                                            .font(.title)
-                                    }
-                                    .frame(width: 48.0, height: 48.0, alignment: .center)
-                                    .contentShape(.rect)
-                                    .disabled(zoomDivisor <= 1)
-                                    Divider()
-                                    Button {
-                                        zoomDivisor += 1
-                                    } label: {
-                                        Image(systemName: "minus")
-                                            .font(.title)
-                                    }
-                                    .frame(width: 48.0, height: 48.0, alignment: .center)
-                                    .contentShape(.rect)
-                                    .disabled(zoomDivisor >= 3)
-                                }
+                                .popoverTip(GenreOverlayTip())
                             }
-                            .background(Material.regular)
-                            .clipShape(.rect(cornerRadius: 8.0))
-                            .shadow(color: .black.opacity(0.2), radius: 4.0, y: 2.0)
+                            VStack(alignment: .center, spacing: 0.0) {
+                                SquareButton {
+                                    zoomDivisor -= 1
+                                } label: {
+                                    Image(systemName: "plus")
+                                        .font(.title)
+                                }
+                                .disabled(zoomDivisor <= 1)
+                                Divider()
+                                SquareButton {
+                                    zoomDivisor += 1
+                                } label: {
+                                    Image(systemName: "minus")
+                                        .font(.title)
+                                }
+                                .disabled(zoomDivisor >= 3)
+                            }
                         }
-                        .frame(maxWidth: 48.0)
                         .offset(x: -12.0, y: -12.0)
                         Color.clear
                     }

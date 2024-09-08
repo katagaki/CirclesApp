@@ -108,6 +108,8 @@
 		E4D74B8F2C8D42180014CD16 /* ListDisplayMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B8E2C8D42120014CD16 /* ListDisplayMode.swift */; };
 		E4D74B912C8D43070014CD16 /* CircleListRegularRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B902C8D42F60014CD16 /* CircleListRegularRow.swift */; };
 		E4D74B932C8D430C0014CD16 /* CircleListCompactRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B922C8D43090014CD16 /* CircleListCompactRow.swift */; };
+		E4D74B952C8D465F0014CD16 /* SquareButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B942C8D465B0014CD16 /* SquareButton.swift */; };
+		E4D74B972C8D47A30014CD16 /* SquareButtonStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B962C8D47900014CD16 /* SquareButtonStack.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -210,6 +212,8 @@
 		E4D74B8E2C8D42120014CD16 /* ListDisplayMode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListDisplayMode.swift; sourceTree = "<group>"; };
 		E4D74B902C8D42F60014CD16 /* CircleListRegularRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleListRegularRow.swift; sourceTree = "<group>"; };
 		E4D74B922C8D43090014CD16 /* CircleListCompactRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleListCompactRow.swift; sourceTree = "<group>"; };
+		E4D74B942C8D465B0014CD16 /* SquareButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareButton.swift; sourceTree = "<group>"; };
+		E4D74B962C8D47900014CD16 /* SquareButtonStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SquareButtonStack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -277,6 +281,8 @@
 				E4D74B7E2C8C17290014CD16 /* SafariLink.swift */,
 				E47269062C3D739500D5335D /* SafariView.swift */,
 				E4755BD52C84B6010032DA2F /* SNSButton.swift */,
+				E4D74B942C8D465B0014CD16 /* SquareButton.swift */,
+				E4D74B962C8D47900014CD16 /* SquareButtonStack.swift */,
 				E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */,
 				E4D74B692C84BA9F0014CD16 /* TranslateButton.swift */,
 			);
@@ -700,6 +706,7 @@
 				E4755BB02C8353620032DA2F /* AutomaticNavigationTransition.swift in Sources */,
 				E4D74B772C8C01980014CD16 /* MyProfileSection.swift in Sources */,
 				E480AABB2C4CA2A7009C1445 /* CircleCutConfiguration.swift in Sources */,
+				E4D74B952C8D465F0014CD16 /* SquareButton.swift in Sources */,
 				E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */,
 				E49351F12C4CD0C3004CBDA1 /* ComiketLayout.swift in Sources */,
 				E4D74B7F2C8C172B0014CD16 /* SafariLink.swift in Sources */,
@@ -712,6 +719,7 @@
 				E480AA7B2C442322009C1445 /* SwiftData.swift in Sources */,
 				E49351F32C4CD503004CBDA1 /* ComiketCircle.swift in Sources */,
 				E472690F2C3D767000D5335D /* OpenIDClient.swift in Sources */,
+				E4D74B972C8D47A30014CD16 /* SquareButtonStack.swift in Sources */,
 				E480AAB92C4CA294009C1445 /* MapConfiguration.swift in Sources */,
 				E4D74B842C8C9AFC0014CD16 /* CircleToolbar.swift in Sources */,
 				E48B628F2C5FB14C007874AE /* FavoritesView.swift in Sources */,
