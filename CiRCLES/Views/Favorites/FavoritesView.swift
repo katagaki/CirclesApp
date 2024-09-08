@@ -100,17 +100,19 @@ struct FavoritesView: View {
 
         let actor = DataFetcher(modelContainer: sharedModelContainer)
         var favoriteCircleIdentifiers: [Int: [PersistentIdentifier]] = [:]
-        for colorKey in favoriteItemsSorted.keys.sorted() {
+        for colorKey in favoriteItemsSorted.keys {
             if let favoriteItems = favoriteItemsSorted[colorKey] {
                 favoriteCircleIdentifiers[colorKey] = await actor.circles(forFavorites: favoriteItems)
             }
         }
         await MainActor.run {
             var favoriteCircles: [ComiketCircle] = []
-            for (_, circleIdentifiers) in favoriteCircleIdentifiers {
-                var circles = database.circles(circleIdentifiers)
-                circles.sort(by: {$0.id < $1.id})
-                favoriteCircles.append(contentsOf: circles)
+            for colorKey in favoriteCircleIdentifiers.keys.sorted() {
+                if let circleIdentifiers = favoriteCircleIdentifiers[colorKey] {
+                    var circles = database.circles(circleIdentifiers)
+                    circles.sort(by: {$0.id < $1.id})
+                    favoriteCircles.append(contentsOf: circles)
+                }
             }
             withAnimation(.snappy.speed(2.0)) {
                 self.favoriteCircles = favoriteCircles
