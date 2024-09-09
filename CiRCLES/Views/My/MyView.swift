@@ -208,6 +208,7 @@ struct MyView: View {
         if let eventNumber {
             let actor = DataFetcher(modelContainer: sharedModelContainer)
             eventDates = await actor.dates(for: eventNumber)
+            activeEventNumber = eventNumber
         }
 
         await MainActor.run {
