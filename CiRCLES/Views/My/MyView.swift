@@ -131,7 +131,7 @@ struct MyView: View {
                     UserDefaults.standard.synchronize()
                     Task.detached {
                         let actor = DataConverter(modelContainer: sharedModelContainer)
-                        await actor.deleteAllData()
+                        await actor.deleteAll()
                         await MainActor.run {
                             navigator.popToRoot(for: .map)
                             navigator.popToRoot(for: .circles)

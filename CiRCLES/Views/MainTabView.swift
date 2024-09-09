@@ -89,15 +89,17 @@ struct MainTabView: View {
             }
         }
         .onChange(of: authManager.token) { _, _ in
-            if authManager.token != nil {
-                withAnimation(.snappy.speed(2.0)) {
-                    self.database.isBusy = true
-                } completion: {
-                    Task.detached {
-                        await loadDataFromDatabase()
-                        await loadFavorites()
-                        await MainActor.run {
-                            closeLoadingOverlay()
+            if authManager.token != nil && !authManager.isRestoring {
+                if !database.isBusy {
+                    withAnimation(.snappy.speed(2.0)) {
+                        self.database.isBusy = true
+                    } completion: {
+                        Task.detached {
+                            await loadDataFromDatabase()
+                            await loadFavorites()
+                            await MainActor.run {
+                                closeLoadingOverlay()
+                            }
                         }
                     }
                 }
@@ -166,7 +168,8 @@ struct MainTabView: View {
 
             let actor = DataConverter(modelContainer: sharedModelContainer)
 
-            await actor.deleteAllData()
+            await actor.disableAutoSave()
+            await actor.deleteAll()
 
             await setProgressTextKey("Shared.LoadingText.Events")
             await actor.loadEvents(from: database.textDatabase)
@@ -182,6 +185,7 @@ struct MainTabView: View {
             await actor.loadCircles(from: database.textDatabase)
 
             await actor.save()
+            await actor.enableAutoSave()
 
             UserDefaults.standard.set(true, forKey: databasesInitializedKey)
         } else {
@@ -215,12 +219,14 @@ struct MainTabView: View {
         await MainActor.run {
             progressHeaderText = progressHeaderKey
         }
+        try? await Task.sleep(nanoseconds: 20000000)
     }
 
     func setProgressTextKey(_ progressTextKey: String) async {
         await MainActor.run {
             database.progressTextKey = progressTextKey
         }
+        try? await Task.sleep(nanoseconds: 20000000)
     }
 
     func closeLoadingOverlay() {
