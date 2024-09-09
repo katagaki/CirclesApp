@@ -39,7 +39,6 @@ actor DataConverter {
     func loadLayouts(from database: Connection?) {
         if let database {
             do {
-                debugPrint("Preparing map data for layouts")
                 let mapsFetchDescriptor = FetchDescriptor<ComiketMap>()
                 let maps = try modelContext.fetch(mapsFetchDescriptor)
                 let mapMappings: [Int: ComiketMap] = maps.reduce(
@@ -48,7 +47,6 @@ actor DataConverter {
                     partialResult[map.id] = map
                 }
 
-                debugPrint("Selecting from ComiketLayoutWC")
                 let table = Table("ComiketLayoutWC")
                 for row in try database.prepare(table) {
                     let layout = ComiketLayout(from: row)
@@ -68,7 +66,6 @@ actor DataConverter {
     func loadCircles(from database: Connection?) {
         if let database {
             do {
-                debugPrint("Selecting from ComiketCircleWC and ComiketCircleExtend")
                 let circlesTable = Table("ComiketCircleWC")
                 let circleExtendedInformationTable = Table("ComiketCircleExtend")
                 let id = Expression<Int>("id")
@@ -79,7 +76,6 @@ actor DataConverter {
                     on: circlesTable[id] == circleExtendedInformationTable[id]
                 )
 
-                debugPrint("Preparing block data for circles")
                 let blocksFetchDescriptor = FetchDescriptor<ComiketBlock>()
                 let blocks = try modelContext.fetch(blocksFetchDescriptor)
                 let blockMappings: [Int: ComiketBlock] = blocks.reduce(
@@ -88,7 +84,6 @@ actor DataConverter {
                     partialResult[block.id] = block
                 }
 
-                debugPrint("Preparing layout data for circles")
                 let layoutsFetchDescriptor = FetchDescriptor<ComiketLayout>()
                 let layouts = try modelContext.fetch(layoutsFetchDescriptor)
                 let layoutMappings: [String: ComiketLayout] = layouts.reduce(
@@ -101,7 +96,6 @@ actor DataConverter {
                     rows.append(row)
                 }
 
-                debugPrint("Starting insert of circles")
                 for row in rows {
                     let circle = ComiketCircle(from: row)
                     let extendedInformation = ComiketCircleExtendedInformation(from: row)
@@ -119,7 +113,6 @@ actor DataConverter {
     func loadTable<T: SQLiteable & PersistentModel>(_ tableName: String, from database: Connection?, of type: T.Type) {
         if let database {
             do {
-                debugPrint("Selecting from \(tableName)")
                 let table = Table("\(tableName)")
                 for row in try database.prepare(table) {
                     let swiftDataObjectFromTableRow = T(from: row)
@@ -143,7 +136,15 @@ actor DataConverter {
         }
     }
 
-    func deleteAllData() {
+    func enableAutoSave() {
+        modelContext.autosaveEnabled = true
+    }
+
+    func disableAutoSave() {
+        modelContext.autosaveEnabled = false
+    }
+
+    func deleteAll() {
         debugPrint("Deleting all data")
         do {
             try modelContext.delete(model: ComiketEvent.self)

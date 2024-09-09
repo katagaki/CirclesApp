@@ -58,7 +58,7 @@ struct MoreDatabaseAdministratiion: View {
                                     } completion: {
                                         Task {
                                             let actor = DataConverter(modelContainer: sharedModelContainer)
-                                            await actor.deleteAllData()
+                                            await actor.deleteAll()
                                             await actor.loadAll(from: textDatabase)
                                             await MainActor.run {
                                                 withAnimation(.snappy.speed(2.0)) {

@@ -18,6 +18,7 @@ class AuthManager {
     @ObservationIgnored let reachability = try? Reachability()
 
     var isAuthenticating: Bool = false
+    var isRestoring: Bool = false
     var onlineState: OnlineState = .undetermined
 
     var code: String?
@@ -75,11 +76,13 @@ class AuthManager {
     }
 
     func restoreAuthentication() {
+        isRestoring = true
         if let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),
            let token = try? JSONDecoder().decode(OpenIDToken.self,
                                                  from: tokenInKeychain.data(using: .utf8) ?? Data()) {
             self.token = token
         }
+        isRestoring = false
     }
 
     func resetAuthentication() {
