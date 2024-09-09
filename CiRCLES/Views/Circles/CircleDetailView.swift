@@ -29,7 +29,9 @@ struct CircleDetailView: View {
                     HStack(spacing: 6.0) {
                         Group {
                             Text("Circles.Image.Catalog")
-                            Text("Circles.Image.Web")
+                            if authManager.onlineState == .online {
+                                Text("Circles.Image.Web")
+                            }
                         }
                         .textCase(.uppercase)
                         .font(.caption2)
@@ -48,39 +50,41 @@ struct CircleDetailView: View {
                                         ProgressView()
                                     }
                             }
-                            if webCatalogInformation != nil {
-                                if let circleCutURL {
-                                    AsyncImage(url: circleCutURL,
-                                               transaction: Transaction(animation: .snappy.speed(2.0))
-                                    ) { result in
-                                        switch result {
-                                        case .success(let image):
-                                            image
-                                                .resizable()
-                                        default:
-                                            Rectangle()
-                                                .foregroundStyle(Color.primary.opacity(0.05))
-                                                .overlay {
-                                                    ProgressView()
-                                                }
+                            if authManager.onlineState == .online {
+                                if webCatalogInformation != nil {
+                                    if let circleCutURL {
+                                        AsyncImage(url: circleCutURL,
+                                                   transaction: Transaction(animation: .snappy.speed(2.0))
+                                        ) { result in
+                                            switch result {
+                                            case .success(let image):
+                                                image
+                                                    .resizable()
+                                            default:
+                                                Rectangle()
+                                                    .foregroundStyle(Color.primary.opacity(0.05))
+                                                    .overlay {
+                                                        ProgressView()
+                                                    }
+                                            }
                                         }
+                                    } else {
+                                        Rectangle()
+                                            .foregroundStyle(Color.primary.opacity(0.05))
+                                            .overlay {
+                                                Text("Circles.NoImage")
+                                                    .font(.caption)
+                                                    .foregroundStyle(.secondary)
+                                            }
                                     }
                                 } else {
                                     Rectangle()
                                         .foregroundStyle(Color.primary.opacity(0.05))
-                                        .overlay {
-                                            Text("Circles.NoImage")
-                                                .font(.caption)
-                                                .foregroundStyle(.secondary)
-                                        }
                                 }
-                            } else {
-                                Rectangle()
-                                    .foregroundStyle(Color.primary.opacity(0.05))
                             }
                         }
                         .aspectRatio(180.0 / 256.0, contentMode: .fit)
-                        .frame(maxWidth: .infinity)
+                        .frame(maxWidth: .infinity, maxHeight: 250.0)
                     }
                 }
                 .listRowSeparator(.hidden)
