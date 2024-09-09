@@ -1501,13 +1501,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select Color"
+            "value" : "Select Color for Favorite"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "色を選択"
+            "value" : "お気に入りの色を選択"
           }
         }
       }
