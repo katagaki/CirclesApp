@@ -63,15 +63,18 @@ struct MyView: View {
             .toolbarBackground(.visible, for: .tabBar)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text(events.first(where: {$0.eventNumber == activeEventNumber})?.name ??
-                         NSLocalizedString("ViewTitle.My", comment: ""))
+                    VStack(alignment: .center) {
+                        Text(events.first(where: {$0.eventNumber == activeEventNumber})?.name ??
+                             NSLocalizedString("ViewTitle.My", comment: ""))
                         .fontWeight(.bold)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .onTapGesture {
-                            withAnimation(.smooth.speed(2.0)) {
-                                isShowingEventCoverImage.toggle()
-                            }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .onTapGesture {
+                        withAnimation(.smooth.speed(2.0)) {
+                            isShowingEventCoverImage.toggle()
                         }
+                    }
                 }
             }
             .background {
