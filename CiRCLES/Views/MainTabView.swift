@@ -83,7 +83,7 @@ struct MainTabView: View {
             case .offline:
                 authManager.useOfflineAuthenticationToken()
                 Task.detached {
-                    await loadDataFromDatabase()
+                    await loadDataFromDatabase(for: activeEventNumber)
                 }
             default: break
             }
@@ -95,7 +95,7 @@ struct MainTabView: View {
                         self.database.isBusy = true
                     } completion: {
                         Task.detached {
-                            await loadDataFromDatabase()
+                            await loadDataFromDatabase(for: activeEventNumber)
                             await loadFavorites()
                             await MainActor.run {
                                 closeLoadingOverlay()
@@ -112,7 +112,7 @@ struct MainTabView: View {
                     self.database.isBusy = true
                 } completion: {
                     Task.detached {
-                        await loadDataFromDatabase()
+                        await loadDataFromDatabase(for: newValue)
                         await MainActor.run {
                             closeLoadingOverlay()
                         }
@@ -128,7 +128,7 @@ struct MainTabView: View {
         })
     }
 
-    func loadDataFromDatabase() async {
+    func loadDataFromDatabase(for eventNumber: Int) async {
         UIApplication.shared.isIdleTimerDisabled = true
 
         let token = authManager.token ?? OpenIDToken()
@@ -137,16 +137,16 @@ struct MainTabView: View {
            let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
 
             var activeEvent: WebCatalogEvent.Response.Event?
-            if activeEventNumber != -1,
-               let eventInList = eventData.list.first(where: {$0.number == activeEventNumber}) {
+            if eventNumber != -1,
+               let eventInList = eventData.list.first(where: {$0.number == eventNumber}) {
                 activeEvent = WebCatalogEvent.Response.Event(
                     id: eventInList.id,
-                    number: activeEventNumber
+                    number: eventNumber
                 )
-                isActiveEventLatest = activeEventNumber == eventData.latestEventNumber
+                isActiveEventLatest = eventNumber == eventData.latestEventNumber
             } else {
                 activeEvent = latestEvent
-                activeEventNumber = latestEvent.number
+                activeEventNumber = eventNumber
             }
 
             if let activeEvent {
