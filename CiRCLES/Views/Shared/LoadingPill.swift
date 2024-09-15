@@ -19,17 +19,20 @@ struct LoadingPill: View {
             Color.clear
             HStack(spacing: 4.0) {
                 ProgressView()
+                    .matchedGeometryEffect(id: "LoadingProgressIndicator", in: namespace)
                 if progressHeaderText != nil || database.progressTextKey != nil {
                     VStack(spacing: 2.0) {
                         if let progressHeaderText {
                             Text(NSLocalizedString(progressHeaderText, comment: ""))
                                 .font(.caption)
                                 .fontWeight(.bold)
+                                .matchedGeometryEffect(id: "LoadingProgressHeader", in: namespace)
                         }
                         if let progressTextKey = database.progressTextKey {
                             Text(NSLocalizedString(progressTextKey, comment: ""))
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
+                                .matchedGeometryEffect(id: "LoadingProgressText", in: namespace)
                         }
                     }
                 }
@@ -38,10 +41,10 @@ struct LoadingPill: View {
             .padding([.leading, .trailing], 8.0)
             .background(Color(uiColor: .secondarySystemBackground))
             .clipShape(.capsule(style: .continuous))
+            .matchedGeometryEffect(id: "LoadingWindow", in: namespace)
             .padding(8.0)
             .shadow(radius: 3.0, y: 3.0)
-            .matchedGeometryEffect(id: "LoadingWindow", in: namespace)
         }
-        .transition(.move(edge: .top).animation(.snappy.speed(2.0)))
+        .transition(.move(edge: .top).animation(.smooth.speed(2.0)))
     }
 }
