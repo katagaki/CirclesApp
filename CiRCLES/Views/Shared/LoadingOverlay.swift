@@ -23,11 +23,13 @@ struct LoadingOverlay: View {
                         if let progressHeaderText {
                             Text(NSLocalizedString(progressHeaderText, comment: ""))
                                 .fontWeight(.bold)
+                                .matchedGeometryEffect(id: "LoadingProgressHeader", in: namespace)
                         }
                         if let progressTextKey = database.progressTextKey {
                             Text(NSLocalizedString(progressTextKey, comment: ""))
                                 .font(.body)
                                 .foregroundStyle(.secondary)
+                                .matchedGeometryEffect(id: "LoadingProgressText", in: namespace)
                         }
                     }
                 }
@@ -36,14 +38,15 @@ struct LoadingOverlay: View {
                         .progressViewStyle(.linear)
                 } else {
                     ProgressView()
+                        .matchedGeometryEffect(id: "LoadingProgressIndicator", in: namespace)
                 }
             }
             .padding()
             .frame(maxWidth: .infinity)
             .background(Material.regular)
             .clipShape(RoundedRectangle(cornerRadius: 16.0))
-            .padding(32.0)
             .matchedGeometryEffect(id: "LoadingWindow", in: namespace)
+            .padding(32.0)
         }
         .ignoresSafeArea()
         .transition(.opacity.animation(.snappy.speed(2.0)))
