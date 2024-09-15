@@ -13,6 +13,9 @@ struct MyParticipationSections: View {
     var eventDates: [Int: Date]
 
     @State var isInitialLoadCompleted: Bool = false
+    @Binding var dateForNotifier: Date?
+    @Binding var dayForNotifier: Int?
+    @Binding var participationForNotifier: String?
 
     @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
 
@@ -27,9 +30,12 @@ struct MyParticipationSections: View {
                     case "Early":
                         ListRow(image: "ListIcon.Ticket.Fami",
                                 title: "Shared.Ticket.Early")
-                    case "AMPM":
+                    case "AM":
                         ListRow(image: "ListIcon.Ticket.Wristband.AMPM",
-                                title: "Shared.Ticket.Wristband")
+                                title: "Shared.Ticket.AM")
+                    case "PM":
+                        ListRow(image: "ListIcon.Ticket.Wristband.AMPM",
+                                title: "Shared.Ticket.PM")
                     case "Circle":
                         ListRow(image: "ListIcon.Ticket.Wristband.Circle",
                                 title: "Shared.Ticket.Circle")
@@ -45,8 +51,11 @@ struct MyParticipationSections: View {
                         Button("Shared.Ticket.Early", image: .menuIconTicketFami) {
                             setParticipation(activeEventNumber, on: dayID, value: "Early")
                         }
-                        Button("Shared.Ticket.Wristband", image: .menuIconTicketWristbandAMPM) {
-                            setParticipation(activeEventNumber, on: dayID, value: "AMPM")
+                        Button("Shared.Ticket.AM", image: .menuIconTicketWristbandAMPM) {
+                            setParticipation(activeEventNumber, on: dayID, value: "AM")
+                        }
+                        Button("Shared.Ticket.PM", image: .menuIconTicketWristbandAMPM) {
+                            setParticipation(activeEventNumber, on: dayID, value: "PM")
                         }
                         Button("Shared.Ticket.Circle", image: .menuIconTicketWristbandCircle) {
                             setParticipation(activeEventNumber, on: dayID, value: "Circle")
@@ -60,14 +69,22 @@ struct MyParticipationSections: View {
                 HStack {
                     Text("Shared.\(dayID)th.Day")
                         .fontWeight(.bold)
-                    Spacer()
+                    // This is deprecated, but is used because foregroundStyle does not work
+                        .foregroundColor(.primary)
                     if let date = eventDates[dayID] {
                         Text(date, style: .date)
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Button("Shared.RemindMe", systemImage: "bell") {
+                            participationForNotifier = participationState[String(activeEventNumber)]?[String(dayID)]
+                            dayForNotifier = dayID
+                            dateForNotifier = date
+                        }
+                        .disabled(!isAllowedToSetNotification(date))
                     }
                 }
                 .font(.body)
                 .textCase(nil)
-                .foregroundStyle(.primary)
             }
         }
         .onAppear {
@@ -122,5 +139,25 @@ struct MyParticipationSections: View {
         withAnimation(.snappy.speed(2.0)) {
             participationState[String(eventNumber)] = participationData
         }
+    }
+
+    func isAllowedToSetNotification(_ date: Date) -> Bool {
+        #if DEBUG
+        return true
+        #else
+        var calendar = Calendar.current
+        let dateFormatter = DateFormatter()
+        calendar.timeZone = TimeZone(identifier: "Asia/Tokyo")!
+        dateFormatter.timeZone = TimeZone(identifier: "Asia/Tokyo")
+
+        var components = calendar.dateComponents([.year, .month, .day], from: Date.now)
+        components.hour = 17
+        components.minute = 0
+
+        if let dateToday = calendar.date(from: components) {
+            return dateToday < date
+        }
+        return false
+        #endif
     }
 }

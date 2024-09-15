@@ -29,6 +29,10 @@ struct MyView: View {
     @State var isShowingEventCoverImage: Bool = false
     @State var isGoingToSignOut: Bool = false
 
+    @State var dateForNotifier: Date?
+    @State var dayForNotifier: Int?
+    @State var participationForNotifier: String?
+
     @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
 
     @AppStorage(wrappedValue: "", "My.Participation") var participation: String
@@ -39,7 +43,12 @@ struct MyView: View {
             List {
                 MyProfileSection(userInfo: $userInfo)
                 if let eventDates, eventDates.count > 0 {
-                    MyParticipationSections(eventDates: eventDates)
+                    MyParticipationSections(
+                        eventDates: eventDates,
+                        dateForNotifier: $dateForNotifier,
+                        dayForNotifier: $dayForNotifier,
+                        participationForNotifier: $participationForNotifier
+                    )
                 }
                 if let eventData {
                     MyEventPickerSection(eventData: eventData)
@@ -65,7 +74,7 @@ struct MyView: View {
                 ToolbarItem(placement: .principal) {
                     VStack(alignment: .center) {
                         Text(events.first(where: {$0.eventNumber == activeEventNumber})?.name ??
-                             NSLocalizedString("ViewTitle.My", comment: ""))
+                             String(localized: "ViewTitle.My"))
                         .fontWeight(.bold)
                         .frame(maxWidth: .infinity)
                     }
@@ -191,6 +200,13 @@ struct MyView: View {
                         }
                     }
                 }
+            }
+            .sheet(item: $dateForNotifier) { date in
+                MyEventNotifierSheet(
+                    date: date,
+                    day: $dayForNotifier,
+                    participation: $participationForNotifier
+                )
             }
         }
     }
