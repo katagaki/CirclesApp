@@ -1,39 +1,52 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
-    "Alert.Unavailable.Text" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This feature is currently unavailable.\nStay tuned for updates!"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "この機能は未公開のため、アクセスできません。\n公開するまでしばらくお待ちください。"
-          }
-        }
-      }
+    "" : {
+      "shouldTranslate" : false
     },
-    "Alert.Unavailable.Title" : {
-      "extractionState" : "stale",
+    "%@:%@" : {
       "localizations" : {
-        "en" : {
+        "ja" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "Feature Unavailable"
+            "state" : "new",
+            "value" : "%1$@:%2$@"
           }
-        },
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "10:30" : {
+      "localizations" : {
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "未公開の機能です"
+            "value" : "10:30"
           }
         }
-      }
+      },
+      "shouldTranslate" : false
+    },
+    "16:00" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:00"
+          }
+        }
+      },
+      "shouldTranslate" : false
+    },
+    "17:00" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "17:00"
+          }
+        }
+      },
+      "shouldTranslate" : false
     },
     "Alerts.Logout.Message" : {
       "localizations" : {
@@ -275,9 +288,6 @@
           }
         }
       }
-    },
-    "Hello, world!" : {
-
     },
     "Hero.Circles.Description" : {
       "extractionState" : "manual",
@@ -925,6 +935,388 @@
         }
       }
     },
+    "Notifier.%lld.EndOfEvent.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comiket Day %lld - End Notification"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コミケ%lld日目：閉会のお知らせ"
+          }
+        }
+      }
+    },
+    "Notifier.%lld.Prior.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comiket Day %lld - Pre-Event Reminder"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コミケ%lld日目：開催前のリマインダー"
+          }
+        }
+      }
+    },
+    "Notifier.%lld.StartOfEvent.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comiket Day %lld - Start Notification"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コミケ%lld日目：開催です"
+          }
+        }
+      }
+    },
+    "Notifier.BeforeEvent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Before Event"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開催前"
+          }
+        }
+      }
+    },
+    "Notifier.CircleEnd" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "閉会（サークル）"
+          }
+        }
+      }
+    },
+    "Notifier.CircleEnd.Body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The day has ended for circle booths. See you again soon!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サークルの閉会時間です。また次回お会いしましょう！"
+          }
+        }
+      }
+    },
+    "Notifier.CorporateEnd" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corporate Booths"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "閉会（企業ブース）"
+          }
+        }
+      }
+    },
+    "Notifier.CorporateEnd.Body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The day has ended for corporate booths. See you again soon!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "企業ブースの閉会時間です。また次回お会いしましょう！"
+          }
+        }
+      }
+    },
+    "Notifier.EndOfEvent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End of Event"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "閉会時間"
+          }
+        }
+      }
+    },
+    "Notifier.Entry" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entry into Venue"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "入場"
+          }
+        }
+      }
+    },
+    "Notifier.Explainer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Set notifications before the event starts, when the event starts, and when the event ends. Settings may vary depending on the ticket you selected."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベント開催前、開催時、閉会時の通知が設定できます。設定できる通知は、チケット（参加時間）によって異なります。"
+          }
+        }
+      }
+    },
+    "Notifier.Prior.1H" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 Hour Prior"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1時間前"
+          }
+        }
+      }
+    },
+    "Notifier.Prior.1H.Body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comiket is going to start in an hour."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベント開催まであと1時間です。あと少し！"
+          }
+        }
+      }
+    },
+    "Notifier.Prior.2H" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 Hours Prior"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2時間前"
+          }
+        }
+      }
+    },
+    "Notifier.Prior.2H.Body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comiket is going to start in 2 hours."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベント開催まであと2時間です。"
+          }
+        }
+      }
+    },
+    "Notifier.Prior.3H" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 Hours Prior"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3時間前"
+          }
+        }
+      }
+    },
+    "Notifier.Prior.3H.Body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comiket is going to start in 3 hours."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベント開催まであと3時間です。"
+          }
+        }
+      }
+    },
+    "Notifier.Prior.4H" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4 Hours Prior"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4時間前"
+          }
+        }
+      }
+    },
+    "Notifier.Prior.4H.Body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comiket is going to start in 4 hours."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベント開催まであと4時間です。"
+          }
+        }
+      }
+    },
+    "Notifier.Prior.30Min" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 Minutes Prior"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30分前"
+          }
+        }
+      }
+    },
+    "Notifier.Prior.30Min.Body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comiket is going to start in just 30 minutes."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベント開催まであと30分です。もうすぐです！"
+          }
+        }
+      }
+    },
+    "Notifier.StartOfEvent" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entry Time"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "入場時間"
+          }
+        }
+      }
+    },
+    "Notifier.StartOfEvent.Body" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comiket has started. Good luck and have fun!"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベント開催です。楽しんでいってらっしゃい！"
+          }
+        }
+      }
+    },
     "Profile.Edit" : {
       "localizations" : {
         "en" : {
@@ -1469,19 +1861,18 @@
         }
       }
     },
-    "Shared.OK" : {
-      "extractionState" : "stale",
+    "Shared.RemindMe" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Got it"
+            "value" : "Notify"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "OK"
+            "value" : "通知"
           }
         }
       }
@@ -1498,6 +1889,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "お気に入りから削除"
+          }
+        }
+      }
+    },
+    "Shared.Save" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Save"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "保存"
           }
         }
       }
@@ -1583,6 +1990,22 @@
         }
       }
     },
+    "Shared.Ticket.AM" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AM Entry"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "午前入場"
+          }
+        }
+      }
+    },
     "Shared.Ticket.Circle" : {
       "localizations" : {
         "en" : {
@@ -1615,18 +2038,18 @@
         }
       }
     },
-    "Shared.Ticket.Wristband" : {
+    "Shared.Ticket.PM" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AM/PM Entry"
+            "value" : "PM Entry"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "午前・午後入場"
+            "value" : "午後入場"
           }
         }
       }
