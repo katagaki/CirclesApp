@@ -86,6 +86,8 @@
 		E49352072C4CFBDC004CBDA1 /* CirclesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352062C4CFBDA004CBDA1 /* CirclesView.swift */; };
 		E49352092C4D1418004CBDA1 /* CircleDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49352082C4D1414004CBDA1 /* CircleDetailView.swift */; };
 		E493520B2C4D153E004CBDA1 /* ToolbarAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */; };
+		E49F42872C96994F00ABF424 /* MyEventNotifierSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49F42862C96994C00ABF424 /* MyEventNotifierSheet.swift */; };
+		E49F42892C969A4E00ABF424 /* LoadingPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49F42882C969A4C00ABF424 /* LoadingPill.swift */; };
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
 		E4CA64562C81FCC3001F50BB /* UserCircleWithFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64552C81FCC1001F50BB /* UserCircleWithFavorite.swift */; };
 		E4CA64582C8203A4001F50BB /* CircleGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64572C8203A2001F50BB /* CircleGrid.swift */; };
@@ -191,6 +193,8 @@
 		E49352062C4CFBDA004CBDA1 /* CirclesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclesView.swift; sourceTree = "<group>"; };
 		E49352082C4D1414004CBDA1 /* CircleDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleDetailView.swift; sourceTree = "<group>"; };
 		E493520A2C4D153B004CBDA1 /* ToolbarAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarAccessory.swift; sourceTree = "<group>"; };
+		E49F42862C96994C00ABF424 /* MyEventNotifierSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyEventNotifierSheet.swift; sourceTree = "<group>"; };
+		E49F42882C969A4C00ABF424 /* LoadingPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingPill.swift; sourceTree = "<group>"; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A7694F2C21A20B00BE3491 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -284,6 +288,7 @@
 				E4755BD92C84B71B0032DA2F /* FavoriteButton.swift */,
 				E48B629A2C5FCA8D007874AE /* FavoriteColorSelector.swift */,
 				E4D74B992C8DDE210014CD16 /* LoadingOverlay.swift */,
+				E49F42882C969A4C00ABF424 /* LoadingPill.swift */,
 				E4D74B7E2C8C17290014CD16 /* SafariLink.swift */,
 				E47269062C3D739500D5335D /* SafariView.swift */,
 				E4755BD52C84B6010032DA2F /* SNSButton.swift */,
@@ -542,6 +547,7 @@
 				E4D74B762C8C01930014CD16 /* MyProfileSection.swift */,
 				E4D74B782C8C027F0014CD16 /* MyParticipationSections.swift */,
 				E4D74B7A2C8C03BA0014CD16 /* MyEventPickerSection.swift */,
+				E49F42862C96994C00ABF424 /* MyEventNotifierSheet.swift */,
 			);
 			path = My;
 			sourceTree = "<group>";
@@ -687,6 +693,7 @@
 				E480AAA32C44B723009C1445 /* Database.swift in Sources */,
 				E49351EC2C4CC972004CBDA1 /* ComiketBlock.swift in Sources */,
 				E4755BDA2C84B71D0032DA2F /* FavoriteButton.swift in Sources */,
+				E49F42872C96994F00ABF424 /* MyEventNotifierSheet.swift in Sources */,
 				E480AA8B2C4429B4009C1445 /* TabType.swift in Sources */,
 				E482FFC32C21BD93009225BD /* App.swift in Sources */,
 				E48B62912C5FC023007874AE /* Favorites.swift in Sources */,
@@ -705,6 +712,7 @@
 				E4D74B932C8D430C0014CD16 /* CircleListCompactRow.swift in Sources */,
 				E48B62972C5FC21E007874AE /* WebCatalogFavorite.swift in Sources */,
 				E482FFC42C21BD93009225BD /* MainTabView.swift in Sources */,
+				E49F42892C969A4E00ABF424 /* LoadingPill.swift in Sources */,
 				E4755BCC2C848D810032DA2F /* DatabaseType.swift in Sources */,
 				E480AAAF2C4C9834009C1445 /* Size.swift in Sources */,
 				E4D74B9C2C8E00320014CD16 /* MapSelector.swift in Sources */,

@@ -13,7 +13,6 @@ struct LoginView: View {
     @Environment(AuthManager.self) var authManager
 
     @State var isShowingAuthSafariViewController: Bool = false
-    @State var isShowingDemoAlert: Bool = false
 
     var body: some View {
         ScrollView {
@@ -41,16 +40,6 @@ struct LoginView: View {
                 Text("Login.Subtitle")
                     .font(.subheadline)
                     .frame(maxWidth: .infinity, alignment: .leading)
-//                Button {
-//                    isShowingDemoAlert = true
-//                } label: {
-//                    Text("Shared.Login.Demo")
-//                        .fontWeight(.bold)
-//                        .frame(maxWidth: .infinity)
-//                        .padding([.top, .bottom], 6.0)
-//                }
-//                .buttonStyle(.bordered)
-//                .clipShape(.capsule(style: .continuous))
             }
             .padding(18.0)
         }
@@ -81,13 +70,6 @@ struct LoginView: View {
         .sheet(isPresented: $isShowingAuthSafariViewController) {
             SafariView(url: authManager.authURL)
                 .ignoresSafeArea()
-        }
-        .alert("Alert.Unavailable.Title", isPresented: $isShowingDemoAlert) {
-            Button("Shared.OK") {
-                isShowingDemoAlert = false
-            }
-        } message: {
-            Text("Alert.Unavailable.Text")
         }
     }
 }
