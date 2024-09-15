@@ -76,21 +76,27 @@ struct MoreView: View {
                 } header: {
                     ListSectionHeader(text: "More.UsefulResources")
                 }
+                #if DEBUG
                 Section {
                     NavigationLink(value: ViewPath.moreDBAdmin) {
                         ListRow(image: "ListIcon.MasterDB", title: "More.DBAdmin.ManageDB")
                     }
                 } header: {
                     ListSectionHeader(text: "More.DBAdmin")
-                } footer: {
+                }
+                #endif
+                Section {
                     VStack(alignment: .leading, spacing: 20.0) {
                         Text("More.ProvidedBy")
                         Text("More.Disclaimer")
                     }
                     .font(.body)
+                    .foregroundStyle(.secondary)
                     .padding([.top], 20.0)
+                    .listRowBackground(Color.clear)
                 }
             }
+            .listSectionSpacing(.compact)
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .moreDBAdmin: MoreDatabaseAdministratiion()

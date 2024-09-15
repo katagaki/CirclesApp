@@ -2,6 +2,7 @@
   "sourceLanguage" : "ja",
   "strings" : {
     "Alert.Unavailable.Text" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -18,6 +19,7 @@
       }
     },
     "Alert.Unavailable.Title" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -273,6 +275,9 @@
           }
         }
       }
+    },
+    "Hello, world!" : {
+
     },
     "Hero.Circles.Description" : {
       "extractionState" : "manual",
@@ -1465,6 +1470,7 @@
       }
     },
     "Shared.OK" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

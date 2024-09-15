@@ -20,11 +20,14 @@ struct MainTabView: View {
     let databasesInitializedKey: String = "Database.Initialized"
 
     @State var isInitialTokenRefreshComplete: Bool = false
+    @State var isLoadingModal: Bool = true
     @State var isProgressDeterminate: Bool = false
     @State var progressHeaderText: String?
 
     @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
     @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
+
+    @Namespace var loadingNamespace
 
     var body: some View {
         @Bindable var authManager = authManager
@@ -60,7 +63,11 @@ struct MainTabView: View {
         }
         .overlay {
             if database.isBusy {
-                LoadingOverlay(progressHeaderText: $progressHeaderText)
+                if isLoadingModal {
+                    LoadingOverlay(namespace: loadingNamespace, progressHeaderText: $progressHeaderText)
+                } else {
+                    LoadingPill(namespace: loadingNamespace, progressHeaderText: $progressHeaderText)
+                }
             }
         }
         .sheet(isPresented: $authManager.isAuthenticating) {
@@ -203,6 +210,7 @@ struct MainTabView: View {
     }
 
     func loadFavorites() async {
+        await makeLoadingNonModal()
         await setProgressHeaderKey("Shared.LoadingHeader.Favorites")
         await setProgressTextKey("Shared.LoadingText.Favorites")
         if let token = authManager.token {
@@ -213,6 +221,15 @@ struct MainTabView: View {
                 favorites.wcIDMappedItems = wcIDMappedItems
             }
         }
+    }
+
+    func makeLoadingNonModal() async {
+        await MainActor.run {
+            withAnimation(.smooth.speed(2.0)) {
+                isLoadingModal = false
+            }
+        }
+        try? await Task.sleep(nanoseconds: 20000000)
     }
 
     func setProgressHeaderKey(_ progressHeaderKey: String?) async {
@@ -230,10 +247,12 @@ struct MainTabView: View {
     }
 
     func closeLoadingOverlay() {
-        withAnimation(.snappy.speed(2.0)) {
+        withAnimation(.smooth.speed(2.0)) {
             self.database.isBusy = false
             progressHeaderText = nil
             database.progressTextKey = nil
+        } completion: {
+            isLoadingModal = true
         }
     }
 }
