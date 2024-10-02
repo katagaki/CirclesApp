@@ -636,6 +636,22 @@
         }
       }
     },
+    "More.DeleteAccount" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete Account"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウントを削除"
+          }
+        }
+      }
+    },
     "More.Disclaimer" : {
       "extractionState" : "manual",
       "localizations" : {
