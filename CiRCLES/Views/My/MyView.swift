@@ -33,6 +33,8 @@ struct MyView: View {
     @State var dayForNotifier: Int?
     @State var participationForNotifier: String?
 
+    @State var isShowingDeleteAccountSafariViewController: Bool = false
+
     @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
 
     @AppStorage(wrappedValue: "", "My.Participation") var participation: String
@@ -54,13 +56,18 @@ struct MyView: View {
                     MyEventPickerSection(eventData: eventData)
                 }
                 Section {
-                    Button("Shared.Logout", role: .destructive) {
+                    Button("Shared.Logout") {
                         isGoingToSignOut = true
                     }
                     .contextMenu {
                         Button("Shared.LoginAgain", role: .destructive) {
                             authManager.isAuthenticating = true
                         }
+                    }
+                }
+                Section {
+                    Button("More.DeleteAccount", role: .destructive) {
+                        isShowingDeleteAccountSafariViewController = true
                     }
                 }
             }
@@ -132,6 +139,10 @@ struct MyView: View {
                         }
                     }
                 }
+            }
+            .sheet(isPresented: $isShowingDeleteAccountSafariViewController) {
+                SafariView(url: URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
+                    .ignoresSafeArea()
             }
             .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
                 Button("Shared.Logout", role: .destructive) {

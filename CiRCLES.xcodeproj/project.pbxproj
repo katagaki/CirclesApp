@@ -125,6 +125,7 @@
 		E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		E42003CB2C6308AB00770992 /* InteractiveMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveMap.swift; sourceTree = "<group>"; };
 		E42003CE2C631E4900770992 /* ConditionalFit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionalFit.swift; sourceTree = "<group>"; };
+		E4225B072C9AD00000FD62B4 /* CiRCLES.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CiRCLES.entitlements; sourceTree = "<group>"; };
 		E43C74052C6DE89F003522C8 /* ComiketMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComiketMapping.swift; sourceTree = "<group>"; };
 		E43C74072C6DF83D003522C8 /* InteractiveMapButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveMapButton.swift; sourceTree = "<group>"; };
 		E43C74092C6DFA69003522C8 /* AdaptiveInvert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveInvert.swift; sourceTree = "<group>"; };
@@ -535,6 +536,7 @@
 		E4A769482C21A20A00BE3491 /* CiRCLES */ = {
 			isa = PBXGroup;
 			children = (
+				E4225B072C9AD00000FD62B4 /* CiRCLES.entitlements */,
 				E4A769592C21A2A000BE3491 /* Info.plist */,
 				E4A7694F2C21A20B00BE3491 /* Assets.xcassets */,
 				E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */,
@@ -918,6 +920,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CiRCLES/CiRCLES.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
@@ -938,6 +941,9 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
@@ -950,6 +956,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = CiRCLES/CiRCLES.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = YYM4Z6MU8F;
@@ -970,6 +977,9 @@
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_STRICT_CONCURRENCY = complete;
 				SWIFT_VERSION = 6.0;
