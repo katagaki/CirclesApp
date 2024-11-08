@@ -18,29 +18,35 @@ struct InteractiveMapButton: View {
     var selectedEventDateID: Int
     var layoutBlockID: Int
     var layoutSpaceNumber: Int
+    var layoutType: ComiketLayout.LayoutType
     var webCatalogIDs: [Int] = []
 
     @State var isCircleDetailPopoverPresented: Bool = false
 
     var body: some View {
-        VStack(spacing: 0.0) {
+        Group {
             if webCatalogIDs.count == 0 {
                 Rectangle()
                     .foregroundStyle(.clear)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else {
-                ForEach(webCatalogIDs, id: \.self) { webCatalogID in
-                    Group {
-                        if let wcIDMappedItems = favorites.wcIDMappedItems,
-                           let favoriteCircle = wcIDMappedItems[webCatalogID] {
-                            Rectangle()
-                                .foregroundStyle(highlightColor(favoriteCircle))
-                        } else {
-                            Rectangle()
-                                .foregroundStyle(.clear)
-                        }
+                switch layoutType {
+                case .aOnLeft, .unknown:
+                    HStack(spacing: 0.0) {
+                        visibleLayout(webCatalogIDs)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                case .aOnBottom:
+                    VStack(spacing: 0.0) {
+                        visibleLayout(webCatalogIDs.reversed())
+                    }
+                case .aOnRight:
+                    HStack(spacing: 0.0) {
+                        visibleLayout(webCatalogIDs.reversed())
+                    }
+                case .aOnTop:
+                    VStack(spacing: 0.0) {
+                        visibleLayout(webCatalogIDs)
+                    }
                 }
             }
         }
@@ -63,6 +69,37 @@ struct InteractiveMapButton: View {
                 isPresented: $isCircleDetailPopoverPresented,
                 webCatalogIDs: webCatalogIDs
             )
+        }
+    }
+
+    @ViewBuilder
+    func visibleLayout(_ webCatalogIDs: [Int]) -> some View {
+        ForEach(webCatalogIDs, id: \.self) { webCatalogID in
+            Group {
+                #if DEBUG
+                Rectangle()
+                    .foregroundStyle(Color(red: Double.random(in: 0.0..<1.0),
+                                           green: Double.random(in: 0.0..<1.0),
+                                           blue: Double.random(in: 0.0..<1.0),
+                                           opacity: 0.5))
+                    .overlay {
+                        if webCatalogID == webCatalogIDs.first {
+                            Text(verbatim: "a")
+                                .font(.system(size: 12.0, weight: .black))
+                        }
+                    }
+                #else
+                if let wcIDMappedItems = favorites.wcIDMappedItems,
+                   let favoriteCircle = wcIDMappedItems[webCatalogID] {
+                    Rectangle()
+                        .foregroundStyle(highlightColor(favoriteCircle))
+                } else {
+                    Rectangle()
+                        .foregroundStyle(.clear)
+                }
+                #endif
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
     }
 
