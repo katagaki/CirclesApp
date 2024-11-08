@@ -68,6 +68,7 @@ struct InteractiveMap: View {
                                             selectedEventDateID: date.id,
                                             layoutBlockID: layout.blockID,
                                             layoutSpaceNumber: layout.spaceNumber,
+                                            layoutType: layout.layoutType,
                                             webCatalogIDs: layoutWebCatalogIDMappings[layout] ?? []
                                         )
                                         .id(layout.viewID())
@@ -219,7 +220,8 @@ struct InteractiveMap: View {
                     blockID: $0.blockID,
                     spaceNumber: $0.spaceNumber,
                     positionX: useHighResolutionMaps ? $0.hdPosition.x : $0.position.x,
-                    positionY: useHighResolutionMaps ? $0.hdPosition.y : $0.position.y
+                    positionY: useHighResolutionMaps ? $0.hdPosition.y : $0.position.y,
+                    layoutType: $0.layout
                 )
             }
             withAnimation(.smooth.speed(2.0)) {
