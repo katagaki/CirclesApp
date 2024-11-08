@@ -53,7 +53,10 @@ struct MyView: View {
                     )
                 }
                 if let eventData {
-                    MyEventPickerSection(eventData: eventData)
+                    MyEventPickerSection(
+                        eventData: eventData,
+                        activeEventNumber: $activeEventNumber
+                    )
                 }
                 Section {
                     Button("Shared.Logout") {

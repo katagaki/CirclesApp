@@ -154,7 +154,6 @@ class AuthManager {
         }
     }
 
-    // swiftlint:disable non_optional_string_data_conversion
     func decodeAuthenticationToken(data: Data) {
         debugPrint("Authentication token length: \(data.count)")
         if let token = try? JSONDecoder().decode(OpenIDToken.self, from: data) {
@@ -171,7 +170,6 @@ class AuthManager {
             self.isAuthenticating = true
         }
     }
-    // swiftlint:enable non_optional_string_data_conversion
 
     func urlRequestForToken(parameters: [String: String]) -> URLRequest {
         let endpoint = URL(string: "\(circleMsAuthEndpoint)/OAuth2/Token")!
