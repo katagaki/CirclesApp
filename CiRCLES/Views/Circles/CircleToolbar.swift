@@ -88,11 +88,13 @@ struct CircleToolbar: View {
                 authToken: token
             )
             if favoritesAddResult {
+                await MainActor.run {
+                    isAddingToFavorites = false
+                }
                 let (items, wcIDMappedItems) = await actor.all(authToken: token)
                 await MainActor.run {
                     favorites.items = items
                     favorites.wcIDMappedItems = wcIDMappedItems
-                    isAddingToFavorites = false
                 }
             }
         }
@@ -110,7 +112,6 @@ struct CircleToolbar: View {
                 await MainActor.run {
                     favorites.items = items
                     favorites.wcIDMappedItems = wcIDMappedItems
-                    isAddingToFavorites = false
                 }
             }
         }
