@@ -109,6 +109,7 @@ struct MyEventNotifierSheet: View {
                             .frame(width: 52.0, height: 52.0, alignment: .center)
                             .foregroundStyle(.red)
                         Text("Notifier.Explainer")
+                            .frame(maxWidth: .infinity)
                     }
                     .padding(8.0)
                 }
