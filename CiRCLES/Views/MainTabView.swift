@@ -145,13 +145,16 @@ struct MainTabView: View {
            let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
 
             var activeEvent: WebCatalogEvent.Response.Event?
-            if eventNumber != -1,
-               let eventInList = eventData.list.first(where: {$0.number == eventNumber}) {
-                activeEvent = WebCatalogEvent.Response.Event(
-                    id: eventInList.id,
-                    number: eventNumber
-                )
-                isActiveEventLatest = eventNumber == eventData.latestEventNumber
+            if eventNumber != -1 {
+                if let eventInList = eventData.list.first(where: {$0.number == eventNumber}) {
+                    activeEvent = WebCatalogEvent.Response.Event(
+                        id: eventInList.id,
+                        number: eventNumber
+                    )
+                    isActiveEventLatest = eventNumber == eventData.latestEventNumber
+                } else {
+                    isActiveEventLatest = false
+                }
             } else {
                 activeEvent = latestEvent
                 activeEventNumber = eventNumber
