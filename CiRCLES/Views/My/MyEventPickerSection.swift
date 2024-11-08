@@ -14,7 +14,7 @@ struct MyEventPickerSection: View {
 
     var eventData: WebCatalogEvent.Response
 
-    @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
+    @Binding var activeEventNumber: Int
     @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
 
     var body: some View {

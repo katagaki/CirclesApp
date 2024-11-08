@@ -72,6 +72,7 @@ struct MainTabView: View {
         }
         .sheet(isPresented: $authManager.isAuthenticating) {
             LoginView()
+                .environment(authManager)
                 .interactiveDismissDisabled()
         }
         .task {
