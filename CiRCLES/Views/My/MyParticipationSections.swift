@@ -80,7 +80,8 @@ struct MyParticipationSections: View {
                             dayForNotifier = dayID
                             dateForNotifier = date
                         }
-                        .disabled(!isAllowedToSetNotification(date))
+                        .disabled(!isAllowedToSetNotification(date) ||
+                                  participationState[String(activeEventNumber)]?[String(dayID)] == "")
                     }
                 }
                 .font(.body)
@@ -140,9 +141,6 @@ struct MyParticipationSections: View {
     }
 
     func isAllowedToSetNotification(_ date: Date) -> Bool {
-        #if DEBUG
-        return true
-        #else
         var calendar = Calendar.current
         let dateFormatter = DateFormatter()
         calendar.timeZone = TimeZone(identifier: "Asia/Tokyo")!
@@ -156,6 +154,5 @@ struct MyParticipationSections: View {
             return dateToday < date
         }
         return false
-        #endif
     }
 }
