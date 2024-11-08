@@ -18,11 +18,7 @@ struct NotificationItem: Identifiable {
 
     init(day: Int, eventDate: Date, participation: String, time: Time) {
         self.day = day
-        #if DEBUG
-        self.eventDate = Date.now.advanced(by: TimeInterval(21600))
-        #else
         self.eventDate = eventDate
-        #endif
         self.participation = participation
         self.time = time
     }
