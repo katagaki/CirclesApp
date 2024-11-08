@@ -49,7 +49,8 @@ struct MyView: View {
                         eventDates: eventDates,
                         dateForNotifier: $dateForNotifier,
                         dayForNotifier: $dayForNotifier,
-                        participationForNotifier: $participationForNotifier
+                        participationForNotifier: $participationForNotifier,
+                        activeEventNumber: $activeEventNumber
                     )
                 }
                 if let eventData {

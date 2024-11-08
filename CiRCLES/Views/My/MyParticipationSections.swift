@@ -17,7 +17,7 @@ struct MyParticipationSections: View {
     @Binding var dayForNotifier: Int?
     @Binding var participationForNotifier: String?
 
-    @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
+    @Binding var activeEventNumber: Int
 
     @AppStorage(wrappedValue: "", "My.Participation") var participation: String
     @State var participationState: [String: [String: String]] = [:]
