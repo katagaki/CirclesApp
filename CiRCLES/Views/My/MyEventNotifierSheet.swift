@@ -172,28 +172,7 @@ struct MyEventNotifierSheet: View {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Shared.Save") {
                         Task {
-                            do {
-                                let center = UNUserNotificationCenter.current()
-                                let authorized = try await center.requestAuthorization(
-                                    options: [.alert, .sound]
-                                )
-                                if authorized {
-                                    debugPrint("Notification permissions granted")
-                                    // TODO: Only cancel pending notifications for this date
-                                    center.removeAllPendingNotificationRequests()
-                                    for notification in notificationsToUpdate[dateString] ?? [] {
-                                        if let notificationRequest = notification.requestObject() {
-                                            try await center.add(notificationRequest)
-                                        }
-                                    }
-                                    dismiss()
-                                } else {
-                                    // TODO: Show message guiding user to Settings app
-                                    debugPrint("Notification permissions denied")
-                                }
-                            } catch {
-                                debugPrint(error.localizedDescription)
-                            }
+                            await saveNotifications()
                         }
                     }
                 }
@@ -212,9 +191,39 @@ struct MyEventNotifierSheet: View {
             notificationsToUpdate[dateString] = []
         }
         notifications.forEach { notification in
-            notificationsToUpdate[dateString]?.append(
-                NotificationItem(notification.content.userInfo)
+            let notificationItem = NotificationItem(notification.content.userInfo)
+            if notificationItem.eventDate == self.date {
+                notificationsToUpdate[dateString]?.append(notificationItem)
+            }
+        }
+    }
+
+    func saveNotifications() async {
+        do {
+            let center = UNUserNotificationCenter.current()
+            let authorized = try await center.requestAuthorization(
+                options: [.alert, .sound]
             )
+            if authorized {
+                let notifications = await center.pendingNotificationRequests()
+                for notification in notifications {
+                    let notificationItem = NotificationItem(notification.content.userInfo)
+                    if notificationItem.eventDate == self.date {
+                        center.removePendingNotificationRequests(withIdentifiers: [notification.identifier])
+                    }
+                }
+                for notification in notificationsToUpdate[dateString] ?? [] {
+                    if let notificationRequest = notification.requestObject() {
+                        try await center.add(notificationRequest)
+                    }
+                }
+                dismiss()
+            } else {
+                // TODO: Show message guiding user to Settings app
+                debugPrint("Notification permissions denied")
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
         }
     }
 
