@@ -12,6 +12,7 @@ import SwiftUI
 struct MyView: View {
 
     @EnvironmentObject var navigator: Navigator
+    @EnvironmentObject var imageCache: ImageCache
     @Environment(AuthManager.self) var authManager
     @Environment(Database.self) var database
 
@@ -250,6 +251,7 @@ struct MyView: View {
 
     func logout() {
         database.delete()
+        imageCache.clear()
         let dictionary = UserDefaults.standard.dictionaryRepresentation()
         dictionary.keys.forEach { key in
             UserDefaults.standard.removeObject(forKey: key)
