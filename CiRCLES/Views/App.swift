@@ -15,6 +15,7 @@ struct CirclesApp: App {
     @State var authManager = AuthManager()
     @State var favorites = Favorites()
     @State var database = Database()
+    @State var oasis = OasisManager()
 
     var body: some Scene {
         WindowGroup {
@@ -36,6 +37,7 @@ struct CirclesApp: App {
         .environment(authManager)
         .environment(favorites)
         .environment(database)
+        .environment(oasis)
         .onChange(of: navigator.selectedTab) { _, _ in
             navigator.saveToDefaults()
         }

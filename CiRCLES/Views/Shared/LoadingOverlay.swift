@@ -8,33 +8,32 @@
 import SwiftUI
 
 struct LoadingOverlay: View {
-
-    @Environment(Database.self) var database
-
     var namespace: Namespace.ID
-    @Binding var progressHeaderText: String?
+    @Binding var headerText: String?
+    @Binding var bodyText: String?
+    @Binding var progress: Double?
 
     var body: some View {
         ZStack {
             Color.black.opacity(0.7)
             VStack(spacing: 12.0) {
-                if progressHeaderText != nil || database.progressTextKey != nil {
+                if headerText != nil || bodyText != nil {
                     VStack(spacing: 6.0) {
-                        if let progressHeaderText {
-                            Text(NSLocalizedString(progressHeaderText, comment: ""))
+                        if let headerText {
+                            Text(NSLocalizedString(headerText, comment: ""))
                                 .fontWeight(.bold)
                                 .matchedGeometryEffect(id: "LoadingProgressHeader", in: namespace)
                         }
-                        if let progressTextKey = database.progressTextKey {
-                            Text(NSLocalizedString(progressTextKey, comment: ""))
+                        if let bodyText {
+                            Text(NSLocalizedString(bodyText, comment: ""))
                                 .font(.body)
                                 .foregroundStyle(.secondary)
                                 .matchedGeometryEffect(id: "LoadingProgressText", in: namespace)
                         }
                     }
                 }
-                if database.isDownloading {
-                    ProgressView(value: database.downloadProgress, total: 1.0)
+                if let progress {
+                    ProgressView(value: progress, total: 1.0)
                         .progressViewStyle(.linear)
                 } else {
                     ProgressView()

@@ -9,7 +9,7 @@ import Foundation
 
 class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelegate {
 
-    var progressCallback: ((Double) -> Void)?
+    var progressCallback: ((Double) async -> Void)?
     var continuation: CheckedContinuation<URL, Error>?
     var session: URLSession?
     var destinationURL: URL?
@@ -27,7 +27,7 @@ class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelegate {
     func download(
         from sourceURL: URL,
         to destinationURL: URL,
-        onBytesReceived: @escaping (Double) -> Void
+        onBytesReceived: @escaping (Double) async -> Void
     ) async throws -> URL {
         self.progressCallback = onBytesReceived
         self.destinationURL = destinationURL
@@ -46,7 +46,9 @@ class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelegate {
         totalBytesWritten: Int64,
         totalBytesExpectedToWrite: Int64
     ) {
-        progressCallback?(Double(totalBytesWritten) / Double(totalBytesExpectedToWrite))
+        Task {
+            await progressCallback?(Double(totalBytesWritten) / Double(totalBytesExpectedToWrite))
+        }
     }
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
