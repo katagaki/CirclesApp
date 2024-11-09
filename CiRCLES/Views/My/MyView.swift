@@ -34,6 +34,7 @@ struct MyView: View {
     @State var dayForNotifier: Int?
     @State var participationForNotifier: String?
 
+    @State var isInitialLoadCompleted: Bool = false
     @State var isDeletingAccount: Bool = false
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
@@ -48,7 +49,9 @@ struct MyView: View {
                 Group {
                     if UIDevice.current.userInterfaceIdiom == .pad {
                         List {
-                            MyProfileSection(userInfo: $userInfo)
+                            if isInitialLoadCompleted {
+                                MyProfileSection(userInfo: $userInfo)
+                            }
                             Section {
                                 Button("Shared.Logout") {
                                     isGoingToSignOut = true
@@ -67,20 +70,22 @@ struct MyView: View {
                         }
                     }
                     List {
-                        if UIDevice.current.userInterfaceIdiom != .pad {
-                            MyProfileSection(userInfo: $userInfo)
+                        if isInitialLoadCompleted {
+                            if UIDevice.current.userInterfaceIdiom != .pad {
+                                MyProfileSection(userInfo: $userInfo)
+                            }
+                            MyParticipationSections(
+                                eventDates: $eventDates,
+                                dateForNotifier: $dateForNotifier,
+                                dayForNotifier: $dayForNotifier,
+                                participationForNotifier: $participationForNotifier,
+                                activeEventNumber: $activeEventNumber
+                            )
+                            MyEventPickerSection(
+                                eventData: $eventData,
+                                activeEventNumber: $activeEventNumber
+                            )
                         }
-                        MyParticipationSections(
-                            eventDates: $eventDates,
-                            dateForNotifier: $dateForNotifier,
-                            dayForNotifier: $dayForNotifier,
-                            participationForNotifier: $participationForNotifier,
-                            activeEventNumber: $activeEventNumber
-                        )
-                        MyEventPickerSection(
-                            eventData: $eventData,
-                            activeEventNumber: $activeEventNumber
-                        )
                         if UIDevice.current.userInterfaceIdiom != .pad {
                             Section {
                                 Button("Shared.Logout") {
@@ -173,10 +178,15 @@ struct MyView: View {
                 Text("Alerts.Logout.Message")
             }
             .onAppear {
-                reloadDataInBackground()
+                if !isInitialLoadCompleted {
+                    reloadDataInBackground()
+                }
             }
             .onChange(of: authManager.token) { _, _ in
                 userInfo = nil
+                reloadDataInBackground()
+            }
+            .onChange(of: authManager.onlineState) { _, _ in
                 reloadDataInBackground()
             }
             .onChange(of: isDatabaseInitialized) { _, newValue in
@@ -200,9 +210,12 @@ struct MyView: View {
                 await MainActor.run {
                      withAnimation(.snappy.speed(2.0)) {
                          eventTitle = events.first(where: {$0.eventNumber == activeEventNumber})?.name
+                         isInitialLoadCompleted = true
                      }
                 }
             }
+        } else if authManager.onlineState == .offline {
+            isInitialLoadCompleted = true
         }
     }
 
