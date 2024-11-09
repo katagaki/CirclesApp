@@ -11,26 +11,23 @@ struct FavoriteButton: View {
 
     var color: Color?
     var isFavorited: () -> Bool
-    var addToFavorites: () -> Void
-    var deleteFromFavorites: () -> Void
+    var onSelect: () -> Void
 
     init(
         color: Color?,
         isFavorited: @escaping () -> Bool,
-        onAdd addToFavorites: @escaping () -> Void,
-        onDelete deleteFromFavorites: @escaping () -> Void
+        onSelect: @escaping () -> Void
     ) {
         self.color = color
         self.isFavorited = isFavorited
-        self.addToFavorites = addToFavorites
-        self.deleteFromFavorites = deleteFromFavorites
+        self.onSelect = onSelect
     }
 
     var body: some View {
         Group {
             if isFavorited() {
                 Button {
-                    deleteFromFavorites()
+                    onSelect()
                 } label: {
                     HStack(alignment: .center) {
                         if let color {
@@ -42,17 +39,17 @@ struct FavoriteButton: View {
                                         .stroke(Color.white, lineWidth: 1.5)
                                 }
                         }
-                        Image(systemName: "star.slash.fill")
+                        Image(systemName: "star.fill")
                             .resizable()
                             .padding(2.0)
                             .frame(width: 28.0, height: 28.0)
                             .scaledToFit()
-                        Text("Shared.RemoveFromFavorites")
+                        Text("Shared.EditFavorites")
                     }
                 }
             } else {
                 Button {
-                    addToFavorites()
+                    onSelect()
                 } label: {
                     Image(systemName: "star.fill")
                         .resizable()
