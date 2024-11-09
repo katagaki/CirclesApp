@@ -177,7 +177,7 @@ struct MyView: View {
                     reloadDataInBackground(forceReload: true)
                 }
             }
-            .onChange(of: database.commonImages) {_, _ in
+            .onChange(of: database.commonImages) { _, _ in
                 withAnimation(.snappy.speed(2.0)) {
                     eventCoverImage = database.coverImage()
                 }

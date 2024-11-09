@@ -150,6 +150,7 @@ struct CirclesView: View {
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 BarAccessory(placement: .bottom) {
                     CircleFilterBar(
+                        displayedCircles: $displayedCircles,
                         selectedGenre: $selectedGenre,
                         selectedMap: $selectedMap,
                         selectedBlock: $selectedBlock,
