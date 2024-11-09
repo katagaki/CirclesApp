@@ -15,7 +15,6 @@ import ZIPFoundation
 @MainActor
 class Database {
 
-    @ObservationIgnored let documentsDirectoryURL: URL?
     @ObservationIgnored var modelContext: ModelContext
 
     @ObservationIgnored var databaseInformation: WebCatalogDatabase?
@@ -30,10 +29,6 @@ class Database {
     @ObservationIgnored var actor: DataConverter = DataConverter(modelContainer: sharedModelContainer)
 
     init() {
-        documentsDirectoryURL = FileManager.default.urls(
-            for: .documentDirectory,
-            in: .userDomainMask
-        ).first
         modelContext = sharedModelContainer.mainContext
     }
 
