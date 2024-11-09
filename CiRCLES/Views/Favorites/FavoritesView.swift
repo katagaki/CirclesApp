@@ -46,6 +46,7 @@ struct FavoritesView: View {
                 }
             }
             .navigationTitle("ViewTitle.Favorites")
+            .toolbarBackground(.automatic, for: .navigationBar)
             .toolbarBackground(.automatic, for: .tabBar)
             .refreshable {
                 await reloadFavorites()

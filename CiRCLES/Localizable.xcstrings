@@ -1058,6 +1058,22 @@
         }
       }
     },
+    "My.Events.OfflineMode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switching events is not supported in offline mode."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在オフラインモードのため、イベントの切り替えができません。"
+          }
+        }
+      }
+    },
     "My.Events.SelectEvent" : {
       "localizations" : {
         "en" : {

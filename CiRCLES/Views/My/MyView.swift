@@ -155,6 +155,13 @@ struct MyView: View {
                 SafariView(url: URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
                     .ignoresSafeArea()
             }
+            .sheet(item: $dateForNotifier) { date in
+                MyEventNotifierSheet(
+                    date: date,
+                    day: $dayForNotifier,
+                    participation: $participationForNotifier
+                )
+            }
             .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
                 Button("Shared.Logout", role: .destructive) {
                     logout()

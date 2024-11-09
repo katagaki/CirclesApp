@@ -17,19 +17,22 @@ struct MyEventPickerSection: View {
 
     var body: some View {
         Section {
-            Picker(selection: $activeEventNumber) {
-                if let eventData {
+            if let eventData {
+                Picker(selection: $activeEventNumber) {
                     ForEach(eventData.list.sorted(by: {$0.number > $1.number}), id: \.id) { event in
                         Text("Shared.Event.\(event.number)")
                             .tag(event.number)
                     }
+                } label: {
+                    Text("My.Events.SelectEvent")
                 }
-            } label: {
-                Text("My.Events.SelectEvent")
+                .pickerStyle(.menu)
+                .disabled(authManager.onlineState == .offline ||
+                          authManager.onlineState == .undetermined)
+            } else {
+                Text("My.Events.OfflineMode")
+                    .foregroundStyle(.secondary)
             }
-            .pickerStyle(.menu)
-            .disabled(authManager.onlineState == .offline ||
-                      authManager.onlineState == .undetermined)
         } header: {
             ListSectionHeader(text: "My.Events")
         } footer: {

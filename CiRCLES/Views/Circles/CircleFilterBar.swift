@@ -115,6 +115,11 @@ struct CircleFilterBar: View {
         .onChange(of: selectedGenre) { _, _ in
             if isInitialLoadCompleted {
                 selectedGenreID = selectedGenre?.id ?? 0
+                isInitialLoadCompleted = false
+                selectedMap = nil
+                selectedBlock = nil
+                selectedDate = nil
+                isInitialLoadCompleted = true
             }
         }
         .onChange(of: selectedMap) { oldValue, newValue in
