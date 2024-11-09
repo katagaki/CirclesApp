@@ -17,7 +17,7 @@ struct FavoritesView: View {
 
     @Environment(\.modelContext) var modelContext
 
-    @State var favoriteCircles: [ComiketCircle]?
+    @State var favoriteCircles: [String: [ComiketCircle]]?
 
     @Namespace var favoritesNamespace
 
@@ -25,9 +25,11 @@ struct FavoritesView: View {
         NavigationStack(path: $navigator[.favorites]) {
             ZStack(alignment: .center) {
                 if let favoriteCircles {
-                    CircleGrid(circles: favoriteCircles,
-                               showsOverlayWhenEmpty: false,
-                               namespace: favoritesNamespace) { circle in
+                    ColorGroupedCircleGrid(
+                        groups: favoriteCircles,
+                        showsOverlayWhenEmpty: false,
+                        namespace: favoritesNamespace
+                    ) { circle in
                         navigator.push(.circlesDetail(circle: circle), for: .favorites)
                     }
                        .overlay {
@@ -49,7 +51,7 @@ struct FavoritesView: View {
             }
             .onAppear {
                 if authManager.onlineState == .offline {
-                    favoriteCircles = []
+                    favoriteCircles = [:]
                 } else {
                     if favoriteCircles == nil, let favoriteItems = favorites.items {
                         Task.detached {
@@ -107,12 +109,12 @@ struct FavoritesView: View {
             }
         }
         await MainActor.run {
-            var favoriteCircles: [ComiketCircle] = []
+            var favoriteCircles: [String: [ComiketCircle]] = [:]
             for colorKey in favoriteCircleIdentifiers.keys.sorted() {
                 if let circleIdentifiers = favoriteCircleIdentifiers[colorKey] {
                     var circles = database.circles(circleIdentifiers)
                     circles.sort(by: {$0.id < $1.id})
-                    favoriteCircles.append(contentsOf: circles)
+                    favoriteCircles[String(colorKey)] = circles
                 }
             }
             withAnimation(.snappy.speed(2.0)) {

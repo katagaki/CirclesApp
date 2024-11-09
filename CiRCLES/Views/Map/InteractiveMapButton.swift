@@ -106,12 +106,12 @@ struct InteractiveMapButton: View {
     func highlightColor(_ favoriteCircle: UserFavorites.Response.FavoriteItem) -> Color {
         switch colorScheme {
         case .light:
-            return favoriteCircle.favorite.color.swiftUIColor().opacity(0.5)
+            return favoriteCircle.favorite.color.backgroundColor().opacity(0.5)
         case .dark:
-            return favoriteCircle.favorite.color.swiftUIColor().brightness(0.1).opacity(0.5) as? Color ??
-            favoriteCircle.favorite.color.swiftUIColor().opacity(0.5)
+            return favoriteCircle.favorite.color.backgroundColor().brightness(0.1).opacity(0.5) as? Color ??
+            favoriteCircle.favorite.color.backgroundColor().opacity(0.5)
         @unknown default:
-            return favoriteCircle.favorite.color.swiftUIColor().opacity(0.5)
+            return favoriteCircle.favorite.color.backgroundColor().opacity(0.5)
         }
     }
 }

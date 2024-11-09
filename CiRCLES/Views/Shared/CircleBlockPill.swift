@@ -27,7 +27,7 @@ struct CircleBlockPill: View {
                 .padding([.top, .bottom], 2.0)
                 .padding([.leading, .trailing], 10.0)
                 .background(.background.opacity(0.8))
-                .clipShape(.capsule)
+                .clipShape(.capsule(style: .continuous))
                 .overlay {
                     Capsule()
                         .stroke(lineWidth: 1)
@@ -41,7 +41,7 @@ struct CircleBlockPill: View {
                 .padding([.top, .bottom], 2.0)
                 .padding([.leading, .trailing], 6.0)
                 .background(.background.opacity(0.8))
-                .clipShape(.capsule)
+                .clipShape(.capsule(style: .continuous))
                 .overlay {
                     Capsule()
                         .stroke(lineWidth: 1)

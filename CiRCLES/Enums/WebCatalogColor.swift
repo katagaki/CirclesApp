@@ -18,7 +18,7 @@ enum WebCatalogColor: Int, CaseIterable, Codable {
     case lime = 8
     case red = 9
 
-    func swiftUIColor() -> Color {
+    func backgroundColor() -> Color {
         switch self {
         case .orange: return Color(red: 1.0, green: 0.58, blue: 0.29)
         case .pink: return Color(red: 1.0, green: 0.0, blue: 1.0)
@@ -29,6 +29,27 @@ enum WebCatalogColor: Int, CaseIterable, Codable {
         case .blue: return Color(red: 0.0, green: 0.0, blue: 1.0)
         case .lime: return Color(red: 0.0, green: 1.0, blue: 0.0)
         case .red: return Color(red: 1.0, green: 0.0, blue: 0.0)
+        }
+    }
+
+    func foregroundColor() -> Color {
+        switch self {
+        case .orange, .pink, .green, .purple, .blue, .red: return .white
+        case .yellow, .cyan, .lime: return .black
+        }
+    }
+
+    func name() -> String {
+        switch self {
+        case .orange: return String(localized: "Color.Orange")
+        case .pink: return String(localized: "Color.Pink")
+        case .yellow: return String(localized: "Color.Yellow")
+        case .green: return String(localized: "Color.Green")
+        case .cyan: return String(localized: "Color.LightBlue")
+        case .purple: return String(localized: "Color.Purple")
+        case .blue: return String(localized: "Color.Blue")
+        case .lime: return String(localized: "Color.LightGreen")
+        case .red: return String(localized: "Color.Red")
         }
     }
 }

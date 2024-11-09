@@ -30,7 +30,7 @@ struct CircleListCompactRow: View {
                                     if let favorites = favorites.wcIDMappedItems,
                                         let extendedInformation = circle.extendedInformation,
                                        let favorite = favorites[extendedInformation.webCatalogID] {
-                                        favorite.favorite.color.swiftUIColor()
+                                        favorite.favorite.color.backgroundColor()
                                             .frame(width: 0.23 * proxy.size.width,
                                                    height: 0.23 * proxy.size.width)
                                             .offset(x: 0.03 * proxy.size.width,

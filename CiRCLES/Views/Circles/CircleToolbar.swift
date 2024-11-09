@@ -34,7 +34,7 @@ struct CircleToolbar: View {
                 if isActiveEventLatest {
                     FavoriteButton(
                         color: favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?
-                            .favorite.color.swiftUIColor()
+                            .favorite.color.backgroundColor()
                     ) {
                         favorites.contains(webCatalogID: extendedInformation.webCatalogID)
                     } onAdd: {
