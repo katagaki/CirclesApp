@@ -24,23 +24,48 @@ struct MapSelector: View {
         ScrollView(.horizontal) {
             HStack(spacing: 12.0) {
                 ForEach(dates, id: \.id) { date in
-                    VStack(alignment: .leading, spacing: 12.0) {
-                        HStack {
-                            Text("Shared.\(date.id)th.Day")
-                                .bold()
-                            Spacer()
-                            Text(date.date, style: .date)
-                                .foregroundStyle(.secondary)
-                        }
-                        Divider()
-                        HStack(spacing: 8.0) {
-                            ForEach(maps, id: \.id) { map in
-                                BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
-                                                   accentColor: accentColorForMap(map),
-                                                   isTextLight: true) {
-                                    withAnimation(.snappy.speed(2.0)) {
-                                        selectedDate = date
-                                        selectedMap = map
+                    Group {
+                        if UIDevice.current.userInterfaceIdiom != .pad {
+                            VStack(alignment: .leading, spacing: 12.0) {
+                                HStack {
+                                    Text("Shared.\(date.id)th.Day")
+                                        .bold()
+                                    Spacer()
+                                    Text(date.date, style: .date)
+                                        .foregroundStyle(.secondary)
+                                }
+                                Divider()
+                                HStack(spacing: 8.0) {
+                                    ForEach(maps, id: \.id) { map in
+                                        BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
+                                                           accentColor: accentColorForMap(map),
+                                                           isTextLight: true) {
+                                            withAnimation(.snappy.speed(2.0)) {
+                                                selectedDate = date
+                                                selectedMap = map
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            HStack(alignment: .center, spacing: 12.0) {
+                                VStack(alignment: .leading) {
+                                    Text("Shared.\(date.id)th.Day")
+                                        .bold()
+                                    Text(date.date, style: .date)
+                                        .foregroundStyle(.secondary)
+                                }
+                                HStack(spacing: 8.0) {
+                                    ForEach(maps, id: \.id) { map in
+                                        BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
+                                                           accentColor: accentColorForMap(map),
+                                                           isTextLight: true) {
+                                            withAnimation(.snappy.speed(2.0)) {
+                                                selectedDate = date
+                                                selectedMap = map
+                                            }
+                                        }
                                     }
                                 }
                             }

@@ -40,17 +40,19 @@ struct MapView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle("ViewTitle.Map")
-            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbarBackground(UIDevice.current.userInterfaceIdiom == .pad ? .hidden : .visible, for: .navigationBar)
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
-                ToolbarItem(placement: .principal) {
-                    VStack(spacing: 2.0) {
-                        if let selectedDate, let selectedMap {
-                            Text(selectedMap.name)
-                                .bold()
-                            Text("Shared.\(selectedDate.id)th.Day")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
+                if UIDevice.current.userInterfaceIdiom != .pad {
+                    ToolbarItem(placement: .principal) {
+                        VStack(spacing: 2.0) {
+                            if let selectedDate, let selectedMap {
+                                Text(selectedMap.name)
+                                    .bold()
+                                Text("Shared.\(selectedDate.id)th.Day")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                 }
