@@ -111,11 +111,14 @@ struct CircleCutImage: View {
                 if let circleResponse = await WebCatalog.circle(
                     with: extendedInformation.webCatalogID, authToken: token
                 ),
-                   let webCatalogInformation = circleResponse.response.circle,
-                   let webCutURL = URL(string: webCatalogInformation.cutWebURL) {
-                    return await imageCache.download(id: circle.id, url: webCutURL)
-                } else {
-                    imageCache.saveImage(Data(), named: String(circle.id))
+                   let webCatalogInformation = circleResponse.response.circle {
+                    if webCatalogInformation.cutWebURL != "" {
+                        if let webCutURL = URL(string: webCatalogInformation.cutWebURL) {
+                            return await imageCache.download(id: circle.id, url: webCutURL)
+                        }
+                    } else {
+                        imageCache.saveImage(Data(), named: String(circle.id))
+                    }
                 }
             }
         }
