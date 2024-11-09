@@ -38,53 +38,9 @@ struct CircleGrid: View {
                     Button {
                         onSelect(circle)
                     } label: {
-                        Group {
-                            if let image = database.circleImage(for: circle.id) {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFit()
-                            } else {
-                                ZStack(alignment: .center) {
-                                    ProgressView()
-                                    Color.clear
-                                }
-                                .aspectRatio(0.7, contentMode: .fit)
-                            }
-                        }
-                        .overlay {
-                            GeometryReader { proxy in
-                                ZStack(alignment: .topLeading) {
-                                    if let favorites = favorites.wcIDMappedItems,
-                                       let extendedInformation = circle.extendedInformation,
-                                       let favorite = favorites[extendedInformation.webCatalogID] {
-                                        favorite.favorite.color.backgroundColor()
-                                            .frame(width: 0.23 * proxy.size.width,
-                                                   height: 0.23 * proxy.size.width)
-                                            .offset(x: 0.03 * proxy.size.width,
-                                                    y: 0.03 * proxy.size.width)
-                                    }
-                                    Color.clear
-                                }
-                            }
-                        }
-                        .overlay {
-                            if showSpaceName || showDay {
-                                ZStack(alignment: .bottomTrailing) {
-                                    VStack(alignment: .trailing, spacing: 2.0) {
-                                        if showDay {
-                                            CircleBlockPill("Shared.\(circle.day)th.Day")
-                                                .matchedGeometryEffect(id: "\(circle.id).Day", in: namespace)
-                                        }
-                                        if showSpaceName, let spaceName = circle.spaceName() {
-                                            CircleBlockPill(LocalizedStringKey(spaceName))
-                                                .matchedGeometryEffect(id: "\(circle.id).Space", in: namespace)
-                                        }
-                                    }
-                                    .padding(2.0)
-                                    Color.clear
-                                }
-                            }
-                        }
+                        CircleCutImage(
+                            circle, in: namespace, showSpaceName: $showSpaceName, showDay: $showDay
+                        )
                         .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
                     }
                     .contextMenu {

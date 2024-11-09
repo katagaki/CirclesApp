@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		E402957B2CDF15A700CB2377 /* Oasis.swift in Sources */ = {isa = PBXBuildFile; fileRef = E402957A2CDF158E00CB2377 /* Oasis.swift */; };
 		E402957E2CDF3D3600CB2377 /* EventCoverImageAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E402957D2CDF3D3600CB2377 /* EventCoverImageAccessory.swift */; };
+		E40295802CDF4B4600CB2377 /* CircleCutImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E402957F2CDF4B4300CB2377 /* CircleCutImage.swift */; };
 		E405A48A2C21B0A1006FE791 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A4892C21B0A1006FE791 /* Localizable.xcstrings */; };
 		E405A48C2C21B0AF006FE791 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */; };
 		E405A48F2C21B157006FE791 /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E405A48E2C21B157006FE791 /* Komponents */; };
@@ -126,6 +127,7 @@
 /* Begin PBXFileReference section */
 		E402957A2CDF158E00CB2377 /* Oasis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Oasis.swift; sourceTree = "<group>"; };
 		E402957D2CDF3D3600CB2377 /* EventCoverImageAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCoverImageAccessory.swift; sourceTree = "<group>"; };
+		E402957F2CDF4B4300CB2377 /* CircleCutImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleCutImage.swift; sourceTree = "<group>"; };
 		E405A4892C21B0A1006FE791 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		E42003CB2C6308AB00770992 /* InteractiveMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveMap.swift; sourceTree = "<group>"; };
@@ -294,18 +296,19 @@
 		E47269052C3D738900D5335D /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				E402957D2CDF3D3600CB2377 /* EventCoverImageAccessory.swift */,
-				E4C0E5592CDF03460068ABDA /* ColorGroupedCircleGrid.swift */,
-				E49F428C2C96AC3100ABF424 /* ListCheckbox.swift */,
+				E402957F2CDF4B4300CB2377 /* CircleCutImage.swift */,
 				E4755BCD2C84937E0032DA2F /* CircleBlockPill.swift */,
 				E4CA64572C8203A2001F50BB /* CircleGrid.swift */,
 				E4D74B6F2C88859C0014CD16 /* CircleList.swift */,
 				E4D74B922C8D43090014CD16 /* CircleListCompactRow.swift */,
 				E4D74B902C8D42F60014CD16 /* CircleListRegularRow.swift */,
 				E4D74B6B2C85FED80014CD16 /* CirclePreview.swift */,
+				E4C0E5592CDF03460068ABDA /* ColorGroupedCircleGrid.swift */,
+				E402957D2CDF3D3600CB2377 /* EventCoverImageAccessory.swift */,
 				E4D74B7C2C8C16830014CD16 /* ExternalLink.swift */,
 				E4755BD92C84B71B0032DA2F /* FavoriteButton.swift */,
 				E48B629A2C5FCA8D007874AE /* FavoriteColorSelector.swift */,
+				E49F428C2C96AC3100ABF424 /* ListCheckbox.swift */,
 				E4D74B992C8DDE210014CD16 /* LoadingOverlay.swift */,
 				E49F42882C969A4C00ABF424 /* LoadingPill.swift */,
 				E4D74B7E2C8C17290014CD16 /* SafariLink.swift */,
@@ -741,6 +744,7 @@
 				E49F42892C969A4E00ABF424 /* LoadingPill.swift in Sources */,
 				E4755BCC2C848D810032DA2F /* DatabaseType.swift in Sources */,
 				E480AAAF2C4C9834009C1445 /* Size.swift in Sources */,
+				E40295802CDF4B4600CB2377 /* CircleCutImage.swift in Sources */,
 				E4D74B9C2C8E00320014CD16 /* MapSelector.swift in Sources */,
 				E480AAB72C4C9FAA009C1445 /* SQLiteable.swift in Sources */,
 				E47269072C3D739700D5335D /* SafariView.swift in Sources */,
