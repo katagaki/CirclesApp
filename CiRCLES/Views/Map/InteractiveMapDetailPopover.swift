@@ -20,6 +20,10 @@ struct InteractiveMapDetailPopover: View {
 
     @State var circles: [ComiketCircle]?
 
+    @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
+
+    @Namespace var namespace
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 8.0) {
@@ -30,12 +34,11 @@ struct InteractiveMapDetailPopover: View {
                             navigator.push(.circlesDetail(circle: circle), for: .map)
                         } label: {
                             HStack {
-                                if let circleImage = database.circleImage(for: circle.id) {
-                                    Image(uiImage: circleImage)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 70.0, height: 100.0, alignment: .center)
-                                }
+                                CircleCutImage(
+                                    circle, in: namespace, shouldFetchWebCut: showWebCut,
+                                    showSpaceName: .constant(false), showDay: .constant(false)
+                                )
+                                    .frame(width: 70.0, height: 100.0, alignment: .center)
                                 Text(circle.circleName)
                                 Spacer(minLength: 0.0)
                             }
