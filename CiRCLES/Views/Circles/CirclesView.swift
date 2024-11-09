@@ -50,7 +50,7 @@ struct CirclesView: View {
     @State var displayModeState: CircleDisplayMode = .grid
     @State var listDisplayModeState: ListDisplayMode = .regular
 
-    @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
+    @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
 
     @Namespace var circlesNamespace
 
@@ -188,8 +188,8 @@ struct CirclesView: View {
             .onChange(of: listDisplayModeState) { _, _ in
                 listDisplayMode = listDisplayModeState
             }
-            .onChange(of: activeEventNumber) { oldValue, _ in
-                if oldValue != -1 {
+            .onChange(of: isDatabaseInitialized) { _, newValue in
+                if !newValue {
                     displayedCircles.removeAll()
                 }
             }

@@ -10,20 +10,19 @@ import SwiftUI
 
 struct MyParticipationSections: View {
 
-    var eventDates: [Int: Date]
-
-    @State var isInitialLoadCompleted: Bool = false
+    @Binding var eventDates: [Int: Date]?
     @Binding var dateForNotifier: Date?
     @Binding var dayForNotifier: Int?
     @Binding var participationForNotifier: String?
-
     @Binding var activeEventNumber: Int
+
+    @State var isInitialLoadCompleted: Bool = false
 
     @AppStorage(wrappedValue: "", "My.Participation") var participation: String
     @State var participationState: [String: [String: String]] = [:]
 
     var body: some View {
-        ForEach(Array(eventDates.keys).sorted(), id: \.self) { dayID in
+        ForEach(Array((eventDates ?? [:]).keys).sorted(), id: \.self) { dayID in
             Section {
                 HStack {
                     switch participationState[String(activeEventNumber)]?[String(dayID)] {
@@ -71,7 +70,7 @@ struct MyParticipationSections: View {
                         .fontWeight(.bold)
                     // This is deprecated, but is used because foregroundStyle does not work
                         .foregroundColor(.primary)
-                    if let date = eventDates[dayID] {
+                    if let eventDates, let date = eventDates[dayID] {
                         Text(date, style: .date)
                             .foregroundColor(.secondary)
                         Spacer()
@@ -99,9 +98,6 @@ struct MyParticipationSections: View {
                 saveParticipation()
             }
         }
-        .onChange(of: eventDates) { _, _ in
-            loadParticipation()
-        }
     }
 
     func loadParticipation() {
@@ -117,8 +113,7 @@ struct MyParticipationSections: View {
 
     func saveParticipation() {
         if let participationJSONData = try? JSONSerialization.data(
-            withJSONObject: participationState,
-            options: []
+            withJSONObject: participationState, options: []
         ) {
             if let participationJSONString = String(data: participationJSONData, encoding: .utf8) {
                 participation = participationJSONString

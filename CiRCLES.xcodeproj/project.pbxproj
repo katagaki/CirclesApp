@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		E402957B2CDF15A700CB2377 /* OasisManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E402957A2CDF158E00CB2377 /* OasisManager.swift */; };
+		E402957B2CDF15A700CB2377 /* Oasis.swift in Sources */ = {isa = PBXBuildFile; fileRef = E402957A2CDF158E00CB2377 /* Oasis.swift */; };
+		E402957E2CDF3D3600CB2377 /* EventCoverImageAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E402957D2CDF3D3600CB2377 /* EventCoverImageAccessory.swift */; };
 		E405A48A2C21B0A1006FE791 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A4892C21B0A1006FE791 /* Localizable.xcstrings */; };
 		E405A48C2C21B0AF006FE791 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */; };
 		E405A48F2C21B157006FE791 /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E405A48E2C21B157006FE791 /* Komponents */; };
@@ -123,7 +124,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		E402957A2CDF158E00CB2377 /* OasisManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OasisManager.swift; sourceTree = "<group>"; };
+		E402957A2CDF158E00CB2377 /* Oasis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Oasis.swift; sourceTree = "<group>"; };
+		E402957D2CDF3D3600CB2377 /* EventCoverImageAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCoverImageAccessory.swift; sourceTree = "<group>"; };
 		E405A4892C21B0A1006FE791 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		E42003CB2C6308AB00770992 /* InteractiveMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveMap.swift; sourceTree = "<group>"; };
@@ -284,7 +286,7 @@
 				E4755B9E2C8296BE0032DA2F /* Downloader.swift */,
 				E48B62902C5FC01E007874AE /* Favorites.swift */,
 				E480AA872C442980009C1445 /* Navigator.swift */,
-				E402957A2CDF158E00CB2377 /* OasisManager.swift */,
+				E402957A2CDF158E00CB2377 /* Oasis.swift */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -292,6 +294,7 @@
 		E47269052C3D738900D5335D /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				E402957D2CDF3D3600CB2377 /* EventCoverImageAccessory.swift */,
 				E4C0E5592CDF03460068ABDA /* ColorGroupedCircleGrid.swift */,
 				E49F428C2C96AC3100ABF424 /* ListCheckbox.swift */,
 				E4755BCD2C84937E0032DA2F /* CircleBlockPill.swift */,
@@ -699,7 +702,7 @@
 				E4755BC32C843D7D0032DA2F /* FavoritesActor.swift in Sources */,
 				E4CA64562C81FCC3001F50BB /* UserCircleWithFavorite.swift in Sources */,
 				E4CA64582C8203A4001F50BB /* CircleGrid.swift in Sources */,
-				E402957B2CDF15A700CB2377 /* OasisManager.swift in Sources */,
+				E402957B2CDF15A700CB2377 /* Oasis.swift in Sources */,
 				E48B629B2C5FCA95007874AE /* FavoriteColorSelector.swift in Sources */,
 				E4755BD42C84A4D50032DA2F /* GenreOverlayTip.swift in Sources */,
 				E43C740A2C6DFA6F003522C8 /* AdaptiveInvert.swift in Sources */,
@@ -792,6 +795,7 @@
 				E49351F72C4CD91F004CBDA1 /* ComiketCircleExtendedInformation.swift in Sources */,
 				E4D74B6C2C85FEDA0014CD16 /* CirclePreview.swift in Sources */,
 				E42003CF2C631E4E00770992 /* ConditionalFit.swift in Sources */,
+				E402957E2CDF3D3600CB2377 /* EventCoverImageAccessory.swift in Sources */,
 				E4755BAE2C8350820032DA2F /* AutomaticMatchedTransitionSource.swift in Sources */,
 				E480AA8D2C4429CD009C1445 /* ViewPath.swift in Sources */,
 			);

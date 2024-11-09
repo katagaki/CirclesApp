@@ -1,5 +1,5 @@
 //
-//  OasisManager.swift
+//  Oasis.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/11/09.
@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 @Observable
-class OasisManager {
+class Oasis {
 
     var isModal: Bool = true
     var isProgressDeterminate: Bool = false

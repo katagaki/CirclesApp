@@ -16,12 +16,11 @@ struct MainTabView: View {
     @Environment(AuthManager.self) var authManager
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
-    @Environment(OasisManager.self) var oasis
-
-    let databasesInitializedKey: String = "Database.Initialized"
+    @Environment(Oasis.self) var oasis
 
     @State var isDownloading: Bool = false
 
+    @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
     @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
     @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
 
@@ -114,7 +113,7 @@ struct MainTabView: View {
             if oldValue != -1 && newValue != -1 {
                 if !isDownloading {
                     isDownloading = true
-                    UserDefaults.standard.set(false, forKey: databasesInitializedKey)
+                    isDatabaseInitialized = false
                     oasis.open {
                         Task.detached {
                             await loadDataFromDatabase(for: newValue)
@@ -158,6 +157,7 @@ struct MainTabView: View {
                 activeEvent = latestEvent
                 activeEventNumber = eventNumber
             }
+            isActiveEventLatest = activeEventNumber == eventData.latestEventNumber
 
             if let activeEvent {
                 await oasis.setHeaderText("Shared.LoadingHeader.Download")
@@ -177,7 +177,7 @@ struct MainTabView: View {
         await oasis.setBodyText("Shared.LoadingText.Database")
         database.connect()
 
-        if !UserDefaults.standard.bool(forKey: databasesInitializedKey) {
+        if !isDatabaseInitialized {
             await oasis.setHeaderText("Shared.LoadingHeader.Initial")
 
             let actor = DataConverter(modelContainer: sharedModelContainer)
@@ -201,7 +201,7 @@ struct MainTabView: View {
             await actor.save()
             await actor.enableAutoSave()
 
-            UserDefaults.standard.set(true, forKey: databasesInitializedKey)
+            isDatabaseInitialized = true
         }
 
         await oasis.setBodyText("Shared.LoadingText.Images")

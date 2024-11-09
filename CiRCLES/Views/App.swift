@@ -15,7 +15,7 @@ struct CirclesApp: App {
     @State var authManager = AuthManager()
     @State var favorites = Favorites()
     @State var database = Database()
-    @State var oasis = OasisManager()
+    @State var oasis = Oasis()
 
     var body: some Scene {
         WindowGroup {

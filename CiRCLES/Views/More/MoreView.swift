@@ -90,7 +90,7 @@ struct MoreView: View {
                     }
                     .font(.body)
                     .foregroundStyle(.secondary)
-                    .padding([.top], 20.0)
+                    .padding(.top, 20.0)
                     .listRowBackground(Color.clear)
                 }
             }
