@@ -1696,6 +1696,22 @@
         }
       }
     },
+    "Shared.EditFavorites" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit Favorite"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お気に入りを編集"
+          }
+        }
+      }
+    },
     "Shared.Event.%lld" : {
       "localizations" : {
         "en" : {

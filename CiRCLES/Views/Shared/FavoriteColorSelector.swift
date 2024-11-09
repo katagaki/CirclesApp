@@ -14,8 +14,9 @@ struct FavoriteColorSelector: View {
 
     var body: some View {
         ScrollView {
-            VStack {
+            VStack(alignment: .center, spacing: 16.0) {
                 Text("Shared.SelectColor")
+                    .fontWeight(.semibold)
                 LazyVGrid(columns: [.init(.fixed(64.0), spacing: 8.0),
                                     .init(.fixed(64.0), spacing: 8.0),
                                     .init(.fixed(64.0), spacing: 8.0)]) {
@@ -39,6 +40,9 @@ struct FavoriteColorSelector: View {
                                 }
                         }
                     }
+                }
+                Button("Shared.RemoveFromFavorites", role: .destructive) {
+                    selectedColor = nil
                 }
             }
             .padding()
