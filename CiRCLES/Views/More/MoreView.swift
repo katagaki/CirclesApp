@@ -76,7 +76,6 @@ struct MoreView: View {
                 } header: {
                     ListSectionHeader(text: "More.UsefulResources")
                 }
-                #if DEBUG
                 Section {
                     NavigationLink(value: ViewPath.moreDBAdmin) {
                         ListRow(image: "ListIcon.MasterDB", title: "More.DBAdmin.ManageDB")
@@ -84,7 +83,6 @@ struct MoreView: View {
                 } header: {
                     ListSectionHeader(text: "More.DBAdmin")
                 }
-                #endif
                 Section {
                     VStack(alignment: .leading, spacing: 20.0) {
                         Text("More.ProvidedBy")
