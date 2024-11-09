@@ -222,9 +222,9 @@ struct CirclesView: View {
                 }
                 if let mapID {
                     circleIdentifiersByMap = await actor.circles(inMap: mapID)
-                    if let blockID {
-                        circleIdentifiersByBlock = await actor.circles(inBlock: blockID)
-                    }
+                }
+                if let blockID {
+                    circleIdentifiersByBlock = await actor.circles(inBlock: blockID)
                 }
 
                 if let circleIdentifiersByGenre {
