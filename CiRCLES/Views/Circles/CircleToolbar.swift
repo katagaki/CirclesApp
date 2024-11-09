@@ -19,7 +19,8 @@ struct CircleToolbar: View {
     var webCatalogInformation: WebCatalogCircle?
 
     @State var isAddingToFavorites: Bool = false
-    @State var favoriteColorToAddTo: WebCatalogColor?
+    @State var selectedFavoriteColor: WebCatalogColor?
+    @State var shouldCallAPIToUpdateFavorites: Bool = true
 
     @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
 
@@ -33,15 +34,14 @@ struct CircleToolbar: View {
             HStack(spacing: 10.0) {
                 if isActiveEventLatest {
                     FavoriteButton(
-                        color: favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?
-                            .favorite.color.backgroundColor()
+                        color: selectedFavoriteColor?.backgroundColor()
                     ) {
                         favorites.contains(webCatalogID: extendedInformation.webCatalogID)
                     } onSelect: {
                         isAddingToFavorites = true
                     }
                     .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
-                        FavoriteColorSelector(selectedColor: $favoriteColorToAddTo)
+                        FavoriteColorSelector(selectedColor: $selectedFavoriteColor)
                     }
                 }
                 HStack(spacing: 5.0) {
@@ -68,15 +68,22 @@ struct CircleToolbar: View {
             .padding([.leading, .trailing], 12.0)
         }
         .scrollIndicators(.hidden)
-        .onChange(of: favoriteColorToAddTo) { oldValue, newValue in
-            Task.detached {
-                if oldValue != nil && newValue == nil {
-                    await deleteFavorite()
-                } else {
-                    await addToFavorites(with: newValue)
+        .onAppear {
+            shouldCallAPIToUpdateFavorites = false
+            selectedFavoriteColor = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.color
+            shouldCallAPIToUpdateFavorites = true
+        }
+        .onChange(of: selectedFavoriteColor) { oldValue, newValue in
+            if shouldCallAPIToUpdateFavorites {
+                Task.detached {
+                    if oldValue != nil && newValue == nil {
+                        await deleteFavorite()
+                    } else {
+                        await addToFavorites(with: newValue)
+                    }
                 }
+                isAddingToFavorites = false
             }
-            isAddingToFavorites = false
         }
     }
 
