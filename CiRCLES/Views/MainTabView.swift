@@ -16,12 +16,11 @@ struct MainTabView: View {
     @Environment(AuthManager.self) var authManager
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
+    @Environment(OasisManager.self) var oasis
 
     let databasesInitializedKey: String = "Database.Initialized"
 
     @State var isInitialTokenRefreshComplete: Bool = false
-    @State var isLoadingModal: Bool = true
-    @State var isProgressDeterminate: Bool = false
     @State var progressHeaderText: String?
 
     @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
@@ -62,12 +61,8 @@ struct MainTabView: View {
                 .tag(TabType.more)
         }
         .overlay {
-            if database.isBusy {
-                if isLoadingModal {
-                    LoadingOverlay(namespace: loadingNamespace, progressHeaderText: $progressHeaderText)
-                } else {
-                    LoadingPill(namespace: loadingNamespace, progressHeaderText: $progressHeaderText)
-                }
+            if oasis.isShowing {
+                oasis.progressView(loadingNamespace)
             }
         }
         .sheet(isPresented: $authManager.isAuthenticating) {
@@ -98,16 +93,12 @@ struct MainTabView: View {
         }
         .onChange(of: authManager.token) { _, _ in
             if authManager.token != nil && !authManager.isRestoring {
-                if !database.isBusy {
-                    withAnimation(.snappy.speed(2.0)) {
-                        self.database.isBusy = true
-                    } completion: {
-                        Task.detached {
-                            await loadDataFromDatabase(for: activeEventNumber)
-                            await loadFavorites()
-                            await MainActor.run {
-                                closeLoadingOverlay()
-                            }
+                oasis.open {
+                    Task.detached {
+                        await loadDataFromDatabase(for: activeEventNumber)
+                        await loadFavorites()
+                        await MainActor.run {
+                            oasis.close()
                         }
                     }
                 }
@@ -116,13 +107,11 @@ struct MainTabView: View {
         .onChange(of: activeEventNumber) { oldValue, newValue in
             if oldValue != -1 && newValue != -1 {
                 UserDefaults.standard.set(false, forKey: databasesInitializedKey)
-                withAnimation(.snappy.speed(2.0)) {
-                    self.database.isBusy = true
-                } completion: {
+                oasis.open {
                     Task.detached {
                         await loadDataFromDatabase(for: newValue)
                         await MainActor.run {
-                            closeLoadingOverlay()
+                            oasis.close()
                         }
                     }
                 }
@@ -161,38 +150,42 @@ struct MainTabView: View {
             }
 
             if let activeEvent {
-                await setProgressHeaderKey("Shared.LoadingHeader.Download")
+                await oasis.setHeaderText("Shared.LoadingHeader.Download")
 
-                await setProgressTextKey("Shared.LoadingText.DownloadTextDatabase")
-                await database.downloadTextDatabase(for: activeEvent, authToken: token)
+                await oasis.setBodyText("Shared.LoadingText.DownloadTextDatabase")
+                await database.downloadTextDatabase(for: activeEvent, authToken: token) { progress in
+                    await oasis.setProgress(progress)
+                }
 
-                await setProgressTextKey("Shared.LoadingText.DownloadImageDatabase")
-                await database.downloadImageDatabase(for: activeEvent, authToken: token)
+                await oasis.setBodyText("Shared.LoadingText.DownloadImageDatabase")
+                await database.downloadImageDatabase(for: activeEvent, authToken: token) { progress in
+                    await oasis.setProgress(progress)
+                }
             }
         }
 
-        await setProgressTextKey("Shared.LoadingText.Database")
+        await oasis.setBodyText("Shared.LoadingText.Database")
         database.connect()
 
         if !UserDefaults.standard.bool(forKey: databasesInitializedKey) {
-            await setProgressHeaderKey("Shared.LoadingHeader.Initial")
+            await oasis.setHeaderText("Shared.LoadingHeader.Initial")
 
             let actor = DataConverter(modelContainer: sharedModelContainer)
 
             await actor.disableAutoSave()
             await actor.deleteAll()
 
-            await setProgressTextKey("Shared.LoadingText.Events")
+            await oasis.setBodyText("Shared.LoadingText.Events")
             await actor.loadEvents(from: database.textDatabase)
 
-            await setProgressTextKey("Shared.LoadingText.Maps")
+            await oasis.setBodyText("Shared.LoadingText.Maps")
             await actor.loadMaps(from: database.textDatabase)
             await actor.loadLayouts(from: database.textDatabase)
 
-            await setProgressTextKey("Shared.LoadingText.Genres")
+            await oasis.setBodyText("Shared.LoadingText.Genres")
             await actor.loadGenres(from: database.textDatabase)
 
-            await setProgressTextKey("Shared.LoadingText.Circles")
+            await oasis.setBodyText("Shared.LoadingText.Circles")
             await actor.loadCircles(from: database.textDatabase)
 
             await actor.save()
@@ -203,7 +196,7 @@ struct MainTabView: View {
             debugPrint("Skipped loading database into persistent model cache")
         }
 
-        await setProgressTextKey("Shared.LoadingText.Images")
+        await oasis.setBodyText("Shared.LoadingText.Images")
         database.imageCache.removeAll()
         database.loadCommonImages()
         database.loadCircleImages()
@@ -214,9 +207,9 @@ struct MainTabView: View {
     }
 
     func loadFavorites() async {
-        await makeLoadingNonModal()
-        await setProgressHeaderKey("Shared.LoadingHeader.Favorites")
-        await setProgressTextKey("Shared.LoadingText.Favorites")
+        await oasis.setModality(false)
+        await oasis.setHeaderText("Shared.LoadingHeader.Favorites")
+        await oasis.setBodyText("Shared.LoadingText.Favorites")
         if let token = authManager.token {
             let actor = FavoritesActor()
             let (items, wcIDMappedItems) = await actor.all(authToken: token)
@@ -224,39 +217,6 @@ struct MainTabView: View {
                 favorites.items = items
                 favorites.wcIDMappedItems = wcIDMappedItems
             }
-        }
-    }
-
-    func makeLoadingNonModal() async {
-        await MainActor.run {
-            withAnimation(.smooth.speed(2.0)) {
-                isLoadingModal = false
-            }
-        }
-        try? await Task.sleep(nanoseconds: 20000000)
-    }
-
-    func setProgressHeaderKey(_ progressHeaderKey: String?) async {
-        await MainActor.run {
-            progressHeaderText = progressHeaderKey
-        }
-        try? await Task.sleep(nanoseconds: 20000000)
-    }
-
-    func setProgressTextKey(_ progressTextKey: String) async {
-        await MainActor.run {
-            database.progressTextKey = progressTextKey
-        }
-        try? await Task.sleep(nanoseconds: 20000000)
-    }
-
-    func closeLoadingOverlay() {
-        withAnimation(.smooth.speed(2.0)) {
-            self.database.isBusy = false
-            progressHeaderText = nil
-            database.progressTextKey = nil
-        } completion: {
-            isLoadingModal = true
         }
     }
 }

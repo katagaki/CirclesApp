@@ -27,11 +27,6 @@ class Database {
     var circleImages: [Int: Data] = [:]
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
 
-    var isBusy: Bool = false
-    var progressTextKey: String?
-    var isDownloading: Bool = false
-    var downloadProgress: Double = .zero
-
     @ObservationIgnored var actor: DataConverter = DataConverter(modelContainer: sharedModelContainer)
 
     init() {
@@ -62,17 +57,28 @@ class Database {
 
     // MARK: Database Download
 
-    func downloadTextDatabase(for event: WebCatalogEvent.Response.Event, authToken: OpenIDToken) async {
-        self.textDatabaseURL = await download(for: event, of: .text, authToken: authToken)
+    func downloadTextDatabase(
+        for event: WebCatalogEvent.Response.Event,
+        authToken: OpenIDToken,
+        updateProgress: @escaping (Double?) async -> Void
+    ) async {
+        self.textDatabaseURL = await download(for: event, of: .text, authToken: authToken, updateProgress: updateProgress)
     }
 
-    func downloadImageDatabase(for event: WebCatalogEvent.Response.Event, authToken: OpenIDToken) async {
-        self.imageDatabaseURL = await download(for: event, of: .images, authToken: authToken)
+    func downloadImageDatabase(
+        for event: WebCatalogEvent.Response.Event,
+        authToken: OpenIDToken,
+        updateProgress: @escaping (Double?) async -> Void
+    ) async {
+        self.imageDatabaseURL = await download(for: event, of: .images, authToken: authToken, updateProgress: updateProgress)
     }
 
     // swiftlint:disable cyclomatic_complexity function_body_length
     func download(
-        for event: WebCatalogEvent.Response.Event, of type: DatabaseType, authToken: OpenIDToken
+        for event: WebCatalogEvent.Response.Event,
+        of type: DatabaseType,
+        authToken: OpenIDToken,
+        updateProgress: @escaping (Double?) async -> Void
     ) async -> URL? {
         var databaseNameSuffix: String = ""
         switch type {
@@ -124,9 +130,8 @@ class Database {
             }
         }
 
-        self.isDownloading = true
-        let databaseZippedURL = await download(downloadedDatabaseURL)
-        self.isDownloading = false
+        let databaseZippedURL = await download(downloadedDatabaseURL, updateProgress: updateProgress)
+        await updateProgress(nil)
 
         if let databaseZippedURL {
             return unzip(databaseZippedURL)
@@ -256,13 +261,13 @@ class Database {
 
     // MARK: Others
 
-    func download(_ url: URL?) async -> URL? {
+    func download(_ url: URL?, updateProgress: @escaping (Double?) async -> Void) async -> URL? {
         if let url = url, let documentsDirectoryURL {
             do {
                 debugPrint("Downloading \(url.path())")
                 let downloader: Downloader = Downloader()
                 return try await downloader.download(from: url, to: documentsDirectoryURL) { progress in
-                    self.downloadProgress = progress
+                    await updateProgress(progress)
                 }
             } catch {
                 debugPrint(error.localizedDescription)

@@ -8,11 +8,9 @@
 import SwiftUI
 
 struct LoadingPill: View {
-
-    @Environment(Database.self) var database
-
     var namespace: Namespace.ID
-    @Binding var progressHeaderText: String?
+    @Binding var headerText: String?
+    @Binding var bodyText: String?
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -20,16 +18,16 @@ struct LoadingPill: View {
             HStack(spacing: 4.0) {
                 ProgressView()
                     .matchedGeometryEffect(id: "LoadingProgressIndicator", in: namespace)
-                if progressHeaderText != nil || database.progressTextKey != nil {
+                if headerText != nil || bodyText != nil {
                     VStack(spacing: 2.0) {
-                        if let progressHeaderText {
-                            Text(NSLocalizedString(progressHeaderText, comment: ""))
+                        if let headerText {
+                            Text(NSLocalizedString(headerText, comment: ""))
                                 .font(.caption)
                                 .fontWeight(.bold)
                                 .matchedGeometryEffect(id: "LoadingProgressHeader", in: namespace)
                         }
-                        if let progressTextKey = database.progressTextKey {
-                            Text(NSLocalizedString(progressTextKey, comment: ""))
+                        if let bodyText {
+                            Text(NSLocalizedString(bodyText, comment: ""))
                                 .font(.caption2)
                                 .foregroundStyle(.secondary)
                                 .matchedGeometryEffect(id: "LoadingProgressText", in: namespace)
