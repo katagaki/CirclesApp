@@ -1622,13 +1622,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "All"
+            "value" : "Reset Filter"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "すべて"
+            "value" : "リセット"
           }
         }
       }
