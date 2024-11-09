@@ -77,5 +77,6 @@ struct ColorGroupedCircleGrid: View {
                 )
             }
         }
+        .frame(maxHeight: .infinity)
     }
 }
