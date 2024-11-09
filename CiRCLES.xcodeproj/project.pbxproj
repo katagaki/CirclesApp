@@ -93,6 +93,7 @@
 		E49F428F2C96BEF300ABF424 /* NotificationItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49F428E2C96BEEA00ABF424 /* NotificationItem.swift */; };
 		E49F42932C96E7E800ABF424 /* UNNotificationRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = E49F42922C96E7E700ABF424 /* UNNotificationRequest.swift */; };
 		E4A769502C21A20B00BE3491 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E4A7694F2C21A20B00BE3491 /* Assets.xcassets */; };
+		E4C0E55A2CDF03460068ABDA /* ColorGroupedCircleGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C0E5592CDF03460068ABDA /* ColorGroupedCircleGrid.swift */; };
 		E4CA64562C81FCC3001F50BB /* UserCircleWithFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64552C81FCC1001F50BB /* UserCircleWithFavorite.swift */; };
 		E4CA64582C8203A4001F50BB /* CircleGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4CA64572C8203A2001F50BB /* CircleGrid.swift */; };
 		E4D74B6A2C84BAA10014CD16 /* TranslateButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B692C84BA9F0014CD16 /* TranslateButton.swift */; };
@@ -207,6 +208,7 @@
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A7694F2C21A20B00BE3491 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E4A769592C21A2A000BE3491 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		E4C0E5592CDF03460068ABDA /* ColorGroupedCircleGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorGroupedCircleGrid.swift; sourceTree = "<group>"; };
 		E4CA64552C81FCC1001F50BB /* UserCircleWithFavorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserCircleWithFavorite.swift; sourceTree = "<group>"; };
 		E4CA64572C8203A2001F50BB /* CircleGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleGrid.swift; sourceTree = "<group>"; };
 		E4D74B692C84BA9F0014CD16 /* TranslateButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateButton.swift; sourceTree = "<group>"; };
@@ -287,6 +289,7 @@
 		E47269052C3D738900D5335D /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				E4C0E5592CDF03460068ABDA /* ColorGroupedCircleGrid.swift */,
 				E49F428C2C96AC3100ABF424 /* ListCheckbox.swift */,
 				E4755BCD2C84937E0032DA2F /* CircleBlockPill.swift */,
 				E4CA64572C8203A2001F50BB /* CircleGrid.swift */,
@@ -780,6 +783,7 @@
 				E4D74B732C8A02290014CD16 /* MyView.swift in Sources */,
 				E49F428D2C96AC3B00ABF424 /* ListCheckbox.swift in Sources */,
 				E480AA882C442982009C1445 /* Navigator.swift in Sources */,
+				E4C0E55A2CDF03460068ABDA /* ColorGroupedCircleGrid.swift in Sources */,
 				E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */,
 				E49351F72C4CD91F004CBDA1 /* ComiketCircleExtendedInformation.swift in Sources */,
 				E4D74B6C2C85FEDA0014CD16 /* CirclePreview.swift in Sources */,

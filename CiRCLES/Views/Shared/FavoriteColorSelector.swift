@@ -23,7 +23,7 @@ struct FavoriteColorSelector: View {
                         Button {
                             selectedColor = color
                         } label: {
-                            color.swiftUIColor()
+                            color.backgroundColor()
                                 .aspectRatio(1.0, contentMode: .fit)
                                 .clipShape(.rect(cornerRadius: 6.0))
                                 .overlay {
