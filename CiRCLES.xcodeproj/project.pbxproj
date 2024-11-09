@@ -123,6 +123,7 @@
 		E4D74B972C8D47A30014CD16 /* SquareButtonStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B962C8D47900014CD16 /* SquareButtonStack.swift */; };
 		E4D74B9A2C8DDE230014CD16 /* LoadingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B992C8DDE210014CD16 /* LoadingOverlay.swift */; };
 		E4D74B9C2C8E00320014CD16 /* MapSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B9B2C8E002F0014CD16 /* MapSelector.swift */; };
+		E4D845D12CDFA509004CAFE8 /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D845D02CDFA506004CAFE8 /* FileManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -242,6 +243,7 @@
 		E4D74B982C8D7D5B0014CD16 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		E4D74B992C8DDE210014CD16 /* LoadingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingOverlay.swift; sourceTree = "<group>"; };
 		E4D74B9B2C8E002F0014CD16 /* MapSelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapSelector.swift; sourceTree = "<group>"; };
+		E4D845D02CDFA506004CAFE8 /* FileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -400,6 +402,7 @@
 				E480AAAB2C4C9822009C1445 /* Structs */,
 				E49351ED2C4CC986004CBDA1 /* Protocols */,
 				E480AA7A2C44230B009C1445 /* SwiftData.swift */,
+				E4D845D02CDFA506004CAFE8 /* FileManager.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -802,6 +805,7 @@
 				E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */,
 				E49351F72C4CD91F004CBDA1 /* ComiketCircleExtendedInformation.swift in Sources */,
 				E4D74B6C2C85FEDA0014CD16 /* CirclePreview.swift in Sources */,
+				E4D845D12CDFA509004CAFE8 /* FileManager.swift in Sources */,
 				E42003CF2C631E4E00770992 /* ConditionalFit.swift in Sources */,
 				E402957E2CDF3D3600CB2377 /* EventCoverImageAccessory.swift in Sources */,
 				E4755BAE2C8350820032DA2F /* AutomaticMatchedTransitionSource.swift in Sources */,

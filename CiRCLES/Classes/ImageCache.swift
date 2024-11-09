@@ -15,10 +15,6 @@ class ImageCache: ObservableObject {
     @ObservationIgnored var images: [Int: Data] = [:]
 
     init() {
-        let documentsDirectoryURL = FileManager.default.urls(
-            for: .documentDirectory,
-            in: .userDomainMask
-        ).first
         cacheURL = documentsDirectoryURL?.appendingPathComponent("ImageCache", conformingTo: .folder)
         if let cacheURL {
             if !FileManager.default.fileExists(atPath: cacheURL.path()) {

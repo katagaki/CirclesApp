@@ -772,6 +772,23 @@
         }
       }
     },
+    "More.DBAdmin.DownloadedData" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloaded Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダウンロード済み"
+          }
+        }
+      }
+    },
     "More.DBAdmin.ManageDB" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1677,6 +1694,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "開催日"
+          }
+        }
+      }
+    },
+    "Shared.Delete" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除"
           }
         }
       }
