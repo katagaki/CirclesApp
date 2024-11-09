@@ -201,7 +201,6 @@ struct CircleDetailView: View {
             }
         }
         if let extendedInformation = circle.extendedInformation {
-            debugPrint("Extended information found for circle with ID \(circle.id)")
             withAnimation(.snappy.speed(2.0)) {
                 self.extendedInformation = extendedInformation
             }

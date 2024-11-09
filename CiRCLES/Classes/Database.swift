@@ -41,11 +41,9 @@ class Database {
 
     func connect() {
         if let textDatabaseURL {
-            debugPrint("Opening text database")
             textDatabase = try? Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
         }
         if let imageDatabaseURL {
-            debugPrint("Opening image database")
             imageDatabase = try? Connection(imageDatabaseURL.path(percentEncoded: false), readonly: true)
         }
     }
@@ -62,7 +60,9 @@ class Database {
         authToken: OpenIDToken,
         updateProgress: @escaping (Double?) async -> Void
     ) async {
-        self.textDatabaseURL = await download(for: event, of: .text, authToken: authToken, updateProgress: updateProgress)
+        self.textDatabaseURL = await download(
+            for: event, of: .text, authToken: authToken, updateProgress: updateProgress
+        )
     }
 
     func downloadImageDatabase(
@@ -70,10 +70,12 @@ class Database {
         authToken: OpenIDToken,
         updateProgress: @escaping (Double?) async -> Void
     ) async {
-        self.imageDatabaseURL = await download(for: event, of: .images, authToken: authToken, updateProgress: updateProgress)
+        self.imageDatabaseURL = await download(
+            for: event, of: .images, authToken: authToken, updateProgress: updateProgress
+        )
     }
 
-    // swiftlint:disable cyclomatic_complexity function_body_length
+    // swiftlint:disable cyclomatic_complexity
     func download(
         for event: WebCatalogEvent.Response.Event,
         of type: DatabaseType,
@@ -101,10 +103,7 @@ class Database {
 
         var downloadedDatabaseURL: URL?
         var request = urlRequestForWebCatalogAPI("All", authToken: authToken)
-        let parameters: [String: String] = [
-            "event_id": String(event.id),
-            "event_no": String(event.number)
-        ]
+        let parameters: [String: String] = ["event_id": String(event.id), "event_no": String(event.number)]
 
         request.httpBody = parameters
             .map { "\($0.key)=\($0.value)" }
@@ -113,9 +112,7 @@ class Database {
 
         if self.databaseInformation == nil {
             if let (data, _) = try? await URLSession.shared.data(for: request) {
-                debugPrint("Web Catalog databases response length: \(data.count)")
                 if let databaseInformation = try? JSONDecoder().decode(WebCatalogDatabase.self, from: data) {
-                    debugPrint("Decoded databases")
                     self.databaseInformation = databaseInformation
                 }
             }
@@ -123,10 +120,8 @@ class Database {
 
         if let databaseInformation = self.databaseInformation {
             switch type {
-            case .text:
-                downloadedDatabaseURL = databaseInformation.response.databaseForText()
-            case .images:
-                downloadedDatabaseURL = databaseInformation.response.databaseFor211By300Images()
+            case .text: downloadedDatabaseURL = databaseInformation.response.databaseForText()
+            case .images: downloadedDatabaseURL = databaseInformation.response.databaseFor211By300Images()
             }
         }
 
@@ -139,7 +134,7 @@ class Database {
 
         return nil
     }
-    // swiftlint:enable cyclomatic_complexity function_body_length
+    // swiftlint:enable cyclomatic_complexity
 
     func delete() {
         if let documentsDirectoryURL {
@@ -156,7 +151,6 @@ class Database {
 
     func loadCommonImages() {
         if let imageDatabase {
-            debugPrint("Loading common images")
             do {
                 let table = Table("ComiketCommonImage")
                 let colName = Expression<String>("name")
@@ -174,7 +168,6 @@ class Database {
 
     func loadCircleImages() {
         if let imageDatabase {
-            debugPrint("Loading circle images")
             do {
                 let table = Table("ComiketCircleImage")
                 let colID = Expression<Int>("id")
@@ -264,7 +257,6 @@ class Database {
     func download(_ url: URL?, updateProgress: @escaping (Double?) async -> Void) async -> URL? {
         if let url = url, let documentsDirectoryURL {
             do {
-                debugPrint("Downloading \(url.path())")
                 let downloader: Downloader = Downloader()
                 return try await downloader.download(from: url, to: documentsDirectoryURL) { progress in
                     await updateProgress(progress)
@@ -280,7 +272,6 @@ class Database {
     func unzip(_ url: URL?) -> URL? {
         if let url, let documentsDirectoryURL {
             do {
-                debugPrint("Unzipping \(url.path())")
                 let unzipDestinationURL = documentsDirectoryURL
                 try? FileManager.default.removeItem(at: unzipDestinationURL
                     .appendingPathComponent(url.deletingPathExtension().lastPathComponent))

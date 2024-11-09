@@ -221,7 +221,6 @@ struct MyEventNotifierSheet: View {
                 dismiss()
             } else {
                 // TODO: Show message guiding user to Settings app
-                debugPrint("Notification permissions denied")
             }
         } catch {
             debugPrint(error.localizedDescription)

@@ -21,7 +21,6 @@ struct CirclesApp: App {
         WindowGroup {
             MainTabView()
                 .onOpenURL { url in
-                    debugPrint("URL scheme invoked: \(url)")
                     authManager.getAuthenticationCode(from: url)
                 }
                 .onChange(of: authManager.code) { _, newValue in

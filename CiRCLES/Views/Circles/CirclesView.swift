@@ -163,7 +163,6 @@ struct CirclesView: View {
                         prompt: "Circles.Search.Prompt")
             .onAppear {
                 if !isInitialLoadCompleted {
-                    debugPrint("Restoring Circles view state")
                     displayModeState = displayMode
                     listDisplayModeState = listDisplayMode
                     isInitialLoadCompleted = true
@@ -206,7 +205,6 @@ struct CirclesView: View {
     }
 
     func reloadDisplayedCircles(genreID: Int?, mapID: Int?, blockID: Int?) {
-        debugPrint("Reloading displayed circles")
         withAnimation(.snappy.speed(2.0)) {
             self.isLoading = true
         } completion: {
@@ -262,7 +260,6 @@ struct CirclesView: View {
     }
 
     func searchCircles() async {
-        debugPrint("Reloading searched circles")
         let actor = DataFetcher(modelContainer: sharedModelContainer)
 
         if searchTerm.trimmingCharacters(in: .whitespaces).count >= 2 {

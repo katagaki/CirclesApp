@@ -14,16 +14,13 @@ class WebCatalog {
     static func events(authToken: OpenIDToken) async -> WebCatalogEvent.Response? {
         let request = urlRequestForWebCatalogAPI(endpoint: "GetEventList", authToken: authToken)
         if let (data, _) = try? await URLSession.shared.data(for: request) {
-            debugPrint("Web Catalog event list response length: \(data.count)")
             if let events = try? JSONDecoder().decode(WebCatalogEvent.self, from: data) {
-                debugPrint("Decoded event list")
                 UserDefaults.standard.set(data, forKey: eventCacheKey)
                 return events.response
             }
         }
         if let data = UserDefaults.standard.data(forKey: eventCacheKey) {
             if let events = try? JSONDecoder().decode(WebCatalogEvent.self, from: data) {
-                debugPrint("Decoded event list from cache")
                 return events.response
             }
         }
@@ -40,9 +37,7 @@ class WebCatalog {
             authToken: authToken
         )
         if let (data, _) = try? await URLSession.shared.data(for: request) {
-            debugPrint("Web Catalog circle response length: \(data.count)")
             if let circle = try? JSONDecoder().decode(UserCircleWithFavorite.self, from: data) {
-                debugPrint("Decoded circle")
                 return circle
             }
         }

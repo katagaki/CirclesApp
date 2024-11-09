@@ -61,7 +61,6 @@ struct FavoritesView: View {
                 }
             }
             .onChange(of: favorites.items) { _, _ in
-                debugPrint("Preparing favorites")
                 if let favoriteItems = favorites.items {
                     Task.detached {
                         await prepareCircles(using: favoriteItems)

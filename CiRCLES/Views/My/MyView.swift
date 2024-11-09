@@ -33,7 +33,7 @@ struct MyView: View {
     @State var dayForNotifier: Int?
     @State var participationForNotifier: String?
 
-    @State var isShowingDeleteAccountSafariViewController: Bool = false
+    @State var isDeletingAccount: Bool = false
 
     @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
 
@@ -58,7 +58,7 @@ struct MyView: View {
                         }
                         Section {
                             Button("More.DeleteAccount", role: .destructive) {
-                                isShowingDeleteAccountSafariViewController = true
+                                isDeletingAccount = true
                             }
                         }
                     }
@@ -97,7 +97,7 @@ struct MyView: View {
                         }
                         Section {
                             Button("More.DeleteAccount", role: .destructive) {
-                                isShowingDeleteAccountSafariViewController = true
+                                isDeletingAccount = true
                             }
                         }
                     }
@@ -172,7 +172,7 @@ struct MyView: View {
                     }
                 }
             }
-            .sheet(isPresented: $isShowingDeleteAccountSafariViewController) {
+            .sheet(isPresented: $isDeletingAccount) {
                 SafariView(url: URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
                     .ignoresSafeArea()
             }
