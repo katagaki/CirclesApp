@@ -42,43 +42,71 @@ struct MyView: View {
 
     var body: some View {
         NavigationStack(path: $navigator[.my]) {
-            List {
-                MyProfileSection(userInfo: $userInfo)
-                if let eventDates, eventDates.count > 0 {
-                    MyParticipationSections(
-                        eventDates: eventDates,
-                        dateForNotifier: $dateForNotifier,
-                        dayForNotifier: $dayForNotifier,
-                        participationForNotifier: $participationForNotifier,
-                        activeEventNumber: $activeEventNumber
-                    )
-                }
-                if let eventData {
-                    MyEventPickerSection(
-                        eventData: eventData,
-                        activeEventNumber: $activeEventNumber
-                    )
-                }
-                Section {
-                    Button("Shared.Logout") {
-                        isGoingToSignOut = true
+            HStack {
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    List {
+                        MyProfileSection(userInfo: $userInfo)
+                        Section {
+                            Button("Shared.Logout") {
+                                isGoingToSignOut = true
+                            }
+                            .contextMenu {
+                                Button("Shared.LoginAgain", role: .destructive) {
+                                    authManager.isAuthenticating = true
+                                }
+                            }
+                        }
+                        Section {
+                            Button("More.DeleteAccount", role: .destructive) {
+                                isShowingDeleteAccountSafariViewController = true
+                            }
+                        }
                     }
-                    .contextMenu {
-                        Button("Shared.LoginAgain", role: .destructive) {
-                            authManager.isAuthenticating = true
+                    .listSectionSpacing(.compact)
+                    .scrollContentBackground(.hidden)
+                }
+                List {
+                    if UIDevice.current.userInterfaceIdiom != .pad {
+                        MyProfileSection(userInfo: $userInfo)
+                    }
+                    if let eventDates, eventDates.count > 0 {
+                        MyParticipationSections(
+                            eventDates: eventDates,
+                            dateForNotifier: $dateForNotifier,
+                            dayForNotifier: $dayForNotifier,
+                            participationForNotifier: $participationForNotifier,
+                            activeEventNumber: $activeEventNumber
+                        )
+                    }
+                    if let eventData {
+                        MyEventPickerSection(
+                            eventData: eventData,
+                            activeEventNumber: $activeEventNumber
+                        )
+                    }
+                    if UIDevice.current.userInterfaceIdiom != .pad {
+                        Section {
+                            Button("Shared.Logout") {
+                                isGoingToSignOut = true
+                            }
+                            .contextMenu {
+                                Button("Shared.LoginAgain", role: .destructive) {
+                                    authManager.isAuthenticating = true
+                                }
+                            }
+                        }
+                        Section {
+                            Button("More.DeleteAccount", role: .destructive) {
+                                isShowingDeleteAccountSafariViewController = true
+                            }
                         }
                     }
                 }
-                Section {
-                    Button("More.DeleteAccount", role: .destructive) {
-                        isShowingDeleteAccountSafariViewController = true
-                    }
-                }
+                .listSectionSpacing(.compact)
+                .scrollContentBackground(.hidden)
             }
-            .listSectionSpacing(.compact)
             .navigationTitle("ViewTitle.My")
             .navigationBarTitleDisplayMode(.inline)
-            .scrollContentBackground(.hidden)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarBackground(.visible, for: .tabBar)
             .toolbar {
