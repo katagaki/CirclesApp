@@ -192,8 +192,6 @@ struct MainTabView: View {
             await actor.enableAutoSave()
 
             UserDefaults.standard.set(true, forKey: databasesInitializedKey)
-        } else {
-            debugPrint("Skipped loading database into persistent model cache")
         }
 
         await oasis.setBodyText("Shared.LoadingText.Images")

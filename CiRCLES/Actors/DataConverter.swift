@@ -21,7 +21,6 @@ actor DataConverter {
         loadGenres(from: database)
         loadCircles(from: database)
         save()
-        debugPrint("SwiftData models loaded")
     }
 
     func loadEvents(from database: Connection?) {
@@ -128,9 +127,7 @@ actor DataConverter {
 
     func save() {
         do {
-            debugPrint("Saving data models")
             try modelContext.save()
-            debugPrint("Saved data models")
         } catch {
             debugPrint(error.localizedDescription)
         }
@@ -145,7 +142,6 @@ actor DataConverter {
     }
 
     func deleteAll() {
-        debugPrint("Deleting all data")
         do {
             try modelContext.delete(model: ComiketEvent.self)
             try modelContext.delete(model: ComiketDate.self)

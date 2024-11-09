@@ -56,7 +56,6 @@ struct MoreDatabaseAdministratiion: View {
         }
         if let textDatabaseURL = database.textDatabaseURL {
             do {
-                debugPrint("Opening text database")
                 let textDatabase = try Connection(
                     textDatabaseURL.path(percentEncoded: false),
                     readonly: true

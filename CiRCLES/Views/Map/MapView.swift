@@ -74,7 +74,6 @@ struct MapView: View {
             }
             .onAppear {
                 if !isInitialLoadCompleted {
-                    debugPrint("Restoring Maps view state")
                     selectedDate = dates.first(where: {$0.id == selectedDateID})
                     selectedMap = maps.first(where: {$0.id == selectedMapID})
                     isInitialLoadCompleted = true
@@ -82,13 +81,11 @@ struct MapView: View {
             }
             .onChange(of: selectedDate) { _, _ in
                 if isInitialLoadCompleted {
-                    debugPrint("Updating selected date ID")
                     selectedDateID = selectedDate?.id ?? 0
                 }
             }
             .onChange(of: selectedMap) { _, _ in
                 if isInitialLoadCompleted {
-                    debugPrint("Updating selected map ID")
                     selectedMapID = selectedMap?.id ?? 0
                 }
             }

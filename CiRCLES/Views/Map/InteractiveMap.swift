@@ -213,7 +213,6 @@ struct InteractiveMap: View {
     }
 
     func reloadWebCatalogIDs() {
-        debugPrint("Reloading web catalog ID mappings")
         if let selectedDate = date?.id {
             let layoutCatalogMappings = layouts.map {
                 LayoutCatalogMapping(

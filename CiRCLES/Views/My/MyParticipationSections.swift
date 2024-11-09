@@ -89,7 +89,6 @@ struct MyParticipationSections: View {
             }
         }
         .onAppear {
-            debugPrint("Restoring My participation")
             if !isInitialLoadCompleted {
                 loadParticipation()
                 isInitialLoadCompleted = true

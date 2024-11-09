@@ -60,11 +60,9 @@ class AuthManager {
         // Set up Internet connectivity tracking
         if let reachability {
             reachability.whenReachable = { _ in
-                debugPrint("Internet is now reachable")
                 self.onlineState = .online
             }
             reachability.whenUnreachable = { _ in
-                debugPrint("Internet is no longer reachable")
                 self.onlineState = .offline
             }
             do {
@@ -89,12 +87,10 @@ class AuthManager {
         code = nil
         token = nil
         try? keychain.removeAll()
-        debugPrint("Signed out and deleted authentication token from local device.")
         isAuthenticating = true
     }
 
     func getAuthenticationCode(from url: URL) {
-        debugPrint("Getting authentication code")
         if let components = URLComponents(url: url, resolvingAgainstBaseURL: true) {
             if let queryItems = components.queryItems {
                 var parameters: [String: String] = [:]
@@ -106,7 +102,6 @@ class AuthManager {
                 if let code = parameters["code"],
                     let state = parameters ["state"] {
                     if state == "auth" {
-                        debugPrint("Authentication code length: \(code.count)")
                         self.code = code
                         self.isAuthenticating = false
                     }
@@ -116,7 +111,6 @@ class AuthManager {
     }
 
     func getAuthenticationToken() async {
-        debugPrint("Getting authentication token")
         let request = urlRequestForToken(parameters: [
             "grant_type": "authorization_code",
             "code": code ?? ""
@@ -136,7 +130,6 @@ class AuthManager {
 
     func refreshAuthenticationToken() async {
         if let refreshToken = token?.refreshToken {
-            debugPrint("Refreshing authentication token")
             let request = urlRequestForToken(parameters: [
                 "grant_type": "refresh_token",
                 "refresh_token": refreshToken
@@ -149,19 +142,15 @@ class AuthManager {
                 self.isAuthenticating = true
             }
         } else {
-            debugPrint("No refresh token to use!")
             self.isAuthenticating = true
         }
     }
 
     func decodeAuthenticationToken(data: Data) {
-        debugPrint("Authentication token length: \(data.count)")
         if let token = try? JSONDecoder().decode(OpenIDToken.self, from: data) {
-            debugPrint("Decoded authentication token")
             self.token = token
             if let tokenEncoded = try? JSONEncoder().encode(token),
                let tokenString = String(data: tokenEncoded, encoding: .utf8) {
-                debugPrint("Saving authentication token to keychain")
                 try? keychain.set(tokenString, key: keychainAuthTokenKey)
             }
         } else {
