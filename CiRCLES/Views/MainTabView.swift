@@ -20,8 +20,7 @@ struct MainTabView: View {
 
     let databasesInitializedKey: String = "Database.Initialized"
 
-    @State var isInitialTokenRefreshComplete: Bool = false
-    @State var progressHeaderText: String?
+    @State var isDownloading: Bool = false
 
     @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
     @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
@@ -85,20 +84,27 @@ struct MainTabView: View {
                 }
             case .offline:
                 authManager.useOfflineAuthenticationToken()
-                Task.detached {
-                    await loadDataFromDatabase(for: activeEventNumber)
+                if !isDownloading {
+                    isDownloading = true
+                    Task.detached {
+                        await loadDataFromDatabase(for: activeEventNumber)
+                    }
                 }
             default: break
             }
         }
         .onChange(of: authManager.token) { _, _ in
             if authManager.token != nil && !authManager.isRestoring {
-                oasis.open {
-                    Task.detached {
-                        await loadDataFromDatabase(for: activeEventNumber)
-                        await loadFavorites()
-                        await MainActor.run {
-                            oasis.close()
+                if !isDownloading {
+                    isDownloading = true
+                    oasis.open {
+                        Task.detached {
+                            await loadDataFromDatabase(for: activeEventNumber)
+                            await loadFavorites()
+                            await MainActor.run {
+                                oasis.close()
+                                isDownloading = false
+                            }
                         }
                     }
                 }
@@ -106,12 +112,16 @@ struct MainTabView: View {
         }
         .onChange(of: activeEventNumber) { oldValue, newValue in
             if oldValue != -1 && newValue != -1 {
-                UserDefaults.standard.set(false, forKey: databasesInitializedKey)
-                oasis.open {
-                    Task.detached {
-                        await loadDataFromDatabase(for: newValue)
-                        await MainActor.run {
-                            oasis.close()
+                if !isDownloading {
+                    isDownloading = true
+                    UserDefaults.standard.set(false, forKey: databasesInitializedKey)
+                    oasis.open {
+                        Task.detached {
+                            await loadDataFromDatabase(for: newValue)
+                            await MainActor.run {
+                                oasis.close()
+                                isDownloading = false
+                            }
                         }
                     }
                 }
