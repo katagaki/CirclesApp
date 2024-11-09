@@ -12,6 +12,7 @@ import SwiftData
 struct CirclesApp: App {
 
     @StateObject var navigator = Navigator()
+    @StateObject var imageCache = ImageCache()
     @State var authManager = AuthManager()
     @State var favorites = Favorites()
     @State var database = Database()
@@ -33,6 +34,7 @@ struct CirclesApp: App {
         }
         .modelContainer(sharedModelContainer)
         .environmentObject(navigator)
+        .environmentObject(imageCache)
         .environment(authManager)
         .environment(favorites)
         .environment(database)

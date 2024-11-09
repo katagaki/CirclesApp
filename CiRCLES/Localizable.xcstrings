@@ -657,7 +657,24 @@
         }
       }
     },
-    "More.Customization.ShowDay" : {
+    "More.Customization.Circles" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circles"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サークル表示"
+          }
+        }
+      }
+    },
+    "More.Customization.Circles.ShowDay" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -673,7 +690,7 @@
         }
       }
     },
-    "More.Customization.ShowHallAndBlock" : {
+    "More.Customization.Circles.ShowHallAndBlock" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -689,7 +706,40 @@
         }
       }
     },
-    "More.Customization.UseHighDefinitionMap" : {
+    "More.Customization.Circles.ShowWebCut" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Image from WebCatalog"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ウェブ版画像を表示"
+          }
+        }
+      }
+    },
+    "More.Customization.Map" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Map Display"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マップ表示"
+          }
+        }
+      }
+    },
+    "More.Customization.Map.UseHighDefinitionMap" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
