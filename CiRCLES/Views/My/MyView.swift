@@ -25,6 +25,7 @@ struct MyView: View {
     @State var eventData: WebCatalogEvent.Response?
     @State var eventDates: [Int: Date]?
     @State var eventCoverImage: UIImage?
+    @State var eventTitle: String?
 
     @State var isShowingEventCoverImage: Bool = false
     @State var isGoingToSignOut: Bool = false
@@ -35,6 +36,7 @@ struct MyView: View {
 
     @State var isDeletingAccount: Bool = false
 
+    @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
     @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
 
     @AppStorage(wrappedValue: "", "My.Participation") var participation: String
@@ -43,61 +45,57 @@ struct MyView: View {
     var body: some View {
         NavigationStack(path: $navigator[.my]) {
             HStack {
-                if UIDevice.current.userInterfaceIdiom == .pad {
-                    List {
-                        MyProfileSection(userInfo: $userInfo)
-                        Section {
-                            Button("Shared.Logout") {
-                                isGoingToSignOut = true
+                Group {
+                    if UIDevice.current.userInterfaceIdiom == .pad {
+                        List {
+                            MyProfileSection(userInfo: $userInfo)
+                            Section {
+                                Button("Shared.Logout") {
+                                    isGoingToSignOut = true
+                                }
+                                .contextMenu {
+                                    Button("Shared.LoginAgain", role: .destructive) {
+                                        authManager.isAuthenticating = true
+                                    }
+                                }
                             }
-                            .contextMenu {
-                                Button("Shared.LoginAgain", role: .destructive) {
-                                    authManager.isAuthenticating = true
+                            Section {
+                                Button("More.DeleteAccount", role: .destructive) {
+                                    isDeletingAccount = true
                                 }
                             }
                         }
-                        Section {
-                            Button("More.DeleteAccount", role: .destructive) {
-                                isDeletingAccount = true
-                            }
+                    }
+                    List {
+                        if UIDevice.current.userInterfaceIdiom != .pad {
+                            MyProfileSection(userInfo: $userInfo)
                         }
-                    }
-                    .listSectionSpacing(.compact)
-                    .scrollContentBackground(.hidden)
-                }
-                List {
-                    if UIDevice.current.userInterfaceIdiom != .pad {
-                        MyProfileSection(userInfo: $userInfo)
-                    }
-                    if let eventDates, eventDates.count > 0 {
                         MyParticipationSections(
-                            eventDates: eventDates,
+                            eventDates: $eventDates,
                             dateForNotifier: $dateForNotifier,
                             dayForNotifier: $dayForNotifier,
                             participationForNotifier: $participationForNotifier,
                             activeEventNumber: $activeEventNumber
                         )
-                    }
-                    if let eventData {
                         MyEventPickerSection(
-                            eventData: eventData,
+                            eventData: $eventData,
                             activeEventNumber: $activeEventNumber
                         )
-                    }
-                    if UIDevice.current.userInterfaceIdiom != .pad {
-                        Section {
-                            Button("Shared.Logout") {
-                                isGoingToSignOut = true
-                            }
-                            .contextMenu {
-                                Button("Shared.LoginAgain", role: .destructive) {
-                                    authManager.isAuthenticating = true
+                        if UIDevice.current.userInterfaceIdiom != .pad {
+                            Section {
+                                Button("Shared.Logout") {
+                                    isGoingToSignOut = true
+                                }
+                                .contextMenu {
+                                    Button("Shared.LoginAgain", role: .destructive) {
+                                        authManager.isAuthenticating = true
+                                    }
                                 }
                             }
-                        }
-                        Section {
-                            Button("More.DeleteAccount", role: .destructive) {
-                                isDeletingAccount = true
+                            Section {
+                                Button("More.DeleteAccount", role: .destructive) {
+                                    isDeletingAccount = true
+                                }
                             }
                         }
                     }
@@ -110,17 +108,19 @@ struct MyView: View {
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarBackground(.visible, for: .tabBar)
             .toolbar {
-                ToolbarItem(placement: .principal) {
-                    VStack(alignment: .center) {
-                        Text(events.first(where: {$0.eventNumber == activeEventNumber})?.name ??
-                             String(localized: "ViewTitle.My"))
-                        .fontWeight(.bold)
-                        .frame(maxWidth: .infinity)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .onTapGesture {
-                        withAnimation(.smooth.speed(2.0)) {
-                            isShowingEventCoverImage.toggle()
+                if UIDevice.current.userInterfaceIdiom != .pad {
+                    ToolbarItem(placement: .principal) {
+                        VStack(alignment: .center) {
+                            Text(eventTitle ?? String(localized: "ViewTitle.My"))
+                                .fontWeight(.bold)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .contentShape(.rect)
+                        .onTapGesture {
+                            withAnimation(.smooth.speed(2.0)) {
+                                isShowingEventCoverImage.toggle()
+                            }
                         }
                     }
                 }
@@ -145,31 +145,10 @@ struct MyView: View {
             }
             .safeAreaInset(edge: .top, spacing: 0.0) {
                 BarAccessory(placement: .top) {
-                    VStack {
-                        if isShowingEventCoverImage, let eventCoverImage {
-                            Image(uiImage: eventCoverImage)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .clipShape(RoundedRectangle(cornerRadius: 8.0))
-                                .overlay {
-                                    RoundedRectangle(cornerRadius: 8.0)
-                                        .stroke(Color.primary.opacity(0.5), lineWidth: 1/3)
-                                }
-                                .frame(maxWidth: .infinity, maxHeight: 300.0, alignment: .center)
-                        }
-                        Image(.arrow)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(maxWidth: .infinity, maxHeight: 10.0, alignment: .center)
-                            .rotationEffect(isShowingEventCoverImage ? Angle.degrees(180.0) : Angle.degrees(0.0))
-                    }
-                    .padding(.bottom, 6.0)
-                    .contentShape(.rect)
-                    .onTapGesture {
-                        withAnimation(.smooth.speed(2.0)) {
-                            isShowingEventCoverImage.toggle()
-                        }
-                    }
+                    EventCoverImageAccessory(
+                        isShowing: $isShowingEventCoverImage,
+                        image: $eventCoverImage
+                    )
                 }
             }
             .sheet(isPresented: $isDeletingAccount) {
@@ -178,23 +157,7 @@ struct MyView: View {
             }
             .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
                 Button("Shared.Logout", role: .destructive) {
-                    database.delete()
-                    let dictionary = UserDefaults.standard.dictionaryRepresentation()
-                    dictionary.keys.forEach { key in
-                        UserDefaults.standard.removeObject(forKey: key)
-                    }
-                    UserDefaults.standard.synchronize()
-                    Task.detached {
-                        let actor = DataConverter(modelContainer: sharedModelContainer)
-                        await actor.deleteAll()
-                        await MainActor.run {
-                            navigator.popToRoot(for: .map)
-                            navigator.popToRoot(for: .circles)
-                            navigator.popToRoot(for: .more)
-                            navigator.selectedTab = .map
-                            authManager.resetAuthentication()
-                        }
-                    }
+                    logout()
                 }
                 Button("Shared.Cancel", role: .cancel) {
                     isGoingToSignOut = false
@@ -203,53 +166,35 @@ struct MyView: View {
                 Text("Alerts.Logout.Message")
             }
             .onAppear {
-                if let token = authManager.token,
-                   userInfo == nil || userEvents.isEmpty || eventData == nil || eventDates == nil {
-                    Task.detached {
-                        await reloadData(using: token)
-                    }
-                }
-            }
-            .refreshable {
-                if let token = authManager.token {
-                    await reloadData(using: token)
-                }
+                reloadDataInBackground()
             }
             .onChange(of: authManager.token) { _, _ in
-                if let token = authManager.token {
-                    Task.detached {
-                        await reloadData(using: token)
-                    }
+                userInfo = nil
+                reloadDataInBackground()
+            }
+            .onChange(of: isDatabaseInitialized) { _, newValue in
+                if newValue {
+                    reloadDataInBackground(forceReload: true)
                 }
             }
-            .onChange(of: database.commonImages) { _, _ in
+            .onChange(of: database.commonImages) {_, _ in
                 withAnimation(.snappy.speed(2.0)) {
                     eventCoverImage = database.coverImage()
                 }
             }
-            .onChange(of: events) { _, _ in
-                if let token = authManager.token,
-                   userInfo == nil || userEvents.isEmpty || eventData == nil || eventDates == nil {
-                    Task.detached {
-                        await reloadData(using: token)
-                    }
+        }
+    }
+
+    func reloadDataInBackground(forceReload: Bool = false) {
+        if let token = authManager.token,
+           forceReload || userInfo == nil || userEvents.isEmpty || eventData == nil || eventDates == nil {
+            Task.detached {
+                await reloadData(using: token)
+                await MainActor.run {
+                     withAnimation(.snappy.speed(2.0)) {
+                         eventTitle = events.first(where: {$0.eventNumber == activeEventNumber})?.name
+                     }
                 }
-            }
-            .onChange(of: activeEventNumber) { oldValue, _ in
-                if oldValue != -1 {
-                    if let token = authManager.token {
-                        Task.detached {
-                            await reloadData(using: token)
-                        }
-                    }
-                }
-            }
-            .sheet(item: $dateForNotifier) { date in
-                MyEventNotifierSheet(
-                    date: date,
-                    day: $dayForNotifier,
-                    participation: $participationForNotifier
-                )
             }
         }
     }
@@ -270,7 +215,6 @@ struct MyView: View {
         if let eventNumber {
             let actor = DataFetcher(modelContainer: sharedModelContainer)
             eventDates = await actor.dates(for: eventNumber)
-            activeEventNumber = eventNumber
         }
 
         await MainActor.run {
@@ -280,6 +224,26 @@ struct MyView: View {
                 self.eventData = eventData
                 self.eventDates = eventDates
                 self.eventCoverImage = database.coverImage()
+            }
+        }
+    }
+
+    func logout() {
+        database.delete()
+        let dictionary = UserDefaults.standard.dictionaryRepresentation()
+        dictionary.keys.forEach { key in
+            UserDefaults.standard.removeObject(forKey: key)
+        }
+        UserDefaults.standard.synchronize()
+        Task.detached {
+            let actor = DataConverter(modelContainer: sharedModelContainer)
+            await actor.deleteAll()
+            await MainActor.run {
+                navigator.popToRoot(for: .map)
+                navigator.popToRoot(for: .circles)
+                navigator.popToRoot(for: .more)
+                navigator.selectedTab = .map
+                authManager.resetAuthentication()
             }
         }
     }

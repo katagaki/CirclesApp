@@ -15,7 +15,7 @@ struct MoreDatabaseAdministratiion: View {
 
     @Environment(AuthManager.self) var authManager
     @Environment(Database.self) var database
-    @Environment(OasisManager.self) var oasis
+    @Environment(Oasis.self) var oasis
 
     @AppStorage(wrappedValue: false, "More.DBAdmin.SkipDownload") var willSkipDownload: Bool
 

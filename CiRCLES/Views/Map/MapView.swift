@@ -27,7 +27,7 @@ struct MapView: View {
     @State var selectedDate: ComiketDate?
     @State var selectedMap: ComiketMap?
 
-    @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
+    @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
 
     @State var isInitialLoadCompleted: Bool = false
 
@@ -81,8 +81,8 @@ struct MapView: View {
                     selectedMapID = selectedMap?.id ?? 0
                 }
             }
-            .onChange(of: activeEventNumber) { oldValue, _ in
-                if oldValue != -1 {
+            .onChange(of: isDatabaseInitialized) { _, newValue in
+                if !newValue {
                     selectedMap = nil
                     selectedDate = nil
                 }
