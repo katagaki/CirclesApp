@@ -17,16 +17,22 @@ struct MoreView: View {
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
+    @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 
     var body: some View {
         NavigationStack(path: $navigator[.more]) {
             MoreList(repoName: "katagaki/CirclesApp", viewPath: ViewPath.moreAttributions) {
                 Section {
-                    Toggle("More.Customization.UseHighDefinitionMap", isOn: $useHighResolutionMaps)
-                    Toggle("More.Customization.ShowHallAndBlock", isOn: $showSpaceName)
-                    Toggle("More.Customization.ShowDay", isOn: $showDay)
+                    Toggle("More.Customization.Map.UseHighDefinitionMap", isOn: $useHighResolutionMaps)
                 } header: {
-                    ListSectionHeader(text: "More.Customization")
+                    ListSectionHeader(text: "More.Customization.Map")
+                }
+                Section {
+                    Toggle("More.Customization.Circles.ShowWebCut", isOn: $showWebCut)
+                    Toggle("More.Customization.Circles.ShowHallAndBlock", isOn: $showSpaceName)
+                    Toggle("More.Customization.Circles.ShowDay", isOn: $showDay)
+                } header: {
+                    ListSectionHeader(text: "More.Customization.Circles")
                 }
                 Section {
                     switch Locale.current.language.languageCode {

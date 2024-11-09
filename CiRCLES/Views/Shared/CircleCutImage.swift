@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CircleCutImage: View {
+    @EnvironmentObject var imageCache: ImageCache
     @Environment(AuthManager.self) var authManager
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
@@ -20,7 +21,7 @@ struct CircleCutImage: View {
     var shouldFetchWebCut: Bool
 
     @State var isWebCutURLFetched: Bool = false
-    @State var webCutURL: URL?
+    @State var webCutImage: UIImage?
 
     init(
         _ circle: ComiketCircle,
@@ -39,24 +40,9 @@ struct CircleCutImage: View {
     var body: some View {
         Group {
             if let image = database.circleImage(for: circle.id) {
-                Image(uiImage: image)
+                Image(uiImage: shouldFetchWebCut ? webCutImage ?? image : image)
                     .resizable()
                     .scaledToFit()
-                    .overlay {
-                        if let webCutURL {
-                            AsyncImage(url: webCutURL,
-                                       transaction: Transaction(animation: .snappy.speed(2.0))
-                            ) { result in
-                                switch result {
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                        .scaledToFit()
-                                default: Color.clear
-                                }
-                            }
-                        }
-                    }
             } else {
                 ZStack(alignment: .center) {
                     ProgressView()
@@ -105,19 +91,32 @@ struct CircleCutImage: View {
         }
         .task {
             if shouldFetchWebCut && !isWebCutURLFetched {
-                webCutURL = try? await fetchWebCutURL(for: circle)
+                let webCutImage = try? await fetchWebCut(for: circle)
                 isWebCutURLFetched = true
+                await MainActor.run {
+                    withAnimation(.smooth.speed(2.0)) {
+                        self.webCutImage = webCutImage
+                    }
+                }
             }
         }
     }
 
-    func fetchWebCutURL(for circle: ComiketCircle) async throws -> URL? {
-        if let token = authManager.token, let extendedInformation = circle.extendedInformation {
-            if let circleResponse = await WebCatalog.circle(
-                with: extendedInformation.webCatalogID, authToken: token
-            ),
-               let webCatalogInformation = circleResponse.response.circle {
-                return URL(string: webCatalogInformation.cutWebURL)
+    func fetchWebCut(for circle: ComiketCircle) async throws -> UIImage? {
+        let (isWebCutFetched, image) = imageCache.image(circle.id)
+        if isWebCutFetched {
+            return image
+        } else {
+            if let token = authManager.token, let extendedInformation = circle.extendedInformation {
+                if let circleResponse = await WebCatalog.circle(
+                    with: extendedInformation.webCatalogID, authToken: token
+                ),
+                   let webCatalogInformation = circleResponse.response.circle,
+                   let webCutURL = URL(string: webCatalogInformation.cutWebURL) {
+                    return await imageCache.download(id: circle.id, url: webCutURL)
+                } else {
+                    imageCache.saveImage(Data(), named: String(circle.id))
+                }
             }
         }
         return nil

@@ -21,6 +21,7 @@ struct CircleGrid: View {
 
     @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
+    @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 
     var body: some View {
         let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 70.0), spacing: gridSpacing)]
@@ -39,7 +40,8 @@ struct CircleGrid: View {
                         onSelect(circle)
                     } label: {
                         CircleCutImage(
-                            circle, in: namespace, showSpaceName: $showSpaceName, showDay: $showDay
+                            circle, in: namespace, shouldFetchWebCut: showWebCut,
+                            showSpaceName: $showSpaceName, showDay: $showDay
                         )
                         .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
                     }

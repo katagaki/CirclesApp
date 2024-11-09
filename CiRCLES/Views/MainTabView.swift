@@ -13,6 +13,7 @@ struct MainTabView: View {
 
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigator: Navigator
+    @EnvironmentObject var imageCache: ImageCache
     @Environment(AuthManager.self) var authManager
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
@@ -184,6 +185,7 @@ struct MainTabView: View {
 
             await actor.disableAutoSave()
             await actor.deleteAll()
+            imageCache.clear()
 
             await oasis.setBodyText("Shared.LoadingText.Events")
             await actor.loadEvents(from: database.textDatabase)

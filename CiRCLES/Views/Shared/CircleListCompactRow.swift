@@ -16,11 +16,13 @@ struct CircleListCompactRow: View {
 
     @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
+    @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 
     var body: some View {
         HStack(spacing: 10.0) {
             CircleCutImage(
-                circle, in: namespace, showSpaceName: .constant(false), showDay: .constant(false)
+                circle, in: namespace, shouldFetchWebCut: showWebCut,
+                showSpaceName: .constant(false), showDay: .constant(false)
             )
             .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
             .automaticMatchedTransitionSource(id: circle.id, in: namespace)

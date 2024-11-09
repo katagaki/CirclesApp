@@ -10,6 +10,7 @@
 		E402957B2CDF15A700CB2377 /* Oasis.swift in Sources */ = {isa = PBXBuildFile; fileRef = E402957A2CDF158E00CB2377 /* Oasis.swift */; };
 		E402957E2CDF3D3600CB2377 /* EventCoverImageAccessory.swift in Sources */ = {isa = PBXBuildFile; fileRef = E402957D2CDF3D3600CB2377 /* EventCoverImageAccessory.swift */; };
 		E40295802CDF4B4600CB2377 /* CircleCutImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = E402957F2CDF4B4300CB2377 /* CircleCutImage.swift */; };
+		E40295832CDF50D000CB2377 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = E40295822CDF50CF00CB2377 /* ImageCache.swift */; };
 		E405A48A2C21B0A1006FE791 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A4892C21B0A1006FE791 /* Localizable.xcstrings */; };
 		E405A48C2C21B0AF006FE791 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */; };
 		E405A48F2C21B157006FE791 /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E405A48E2C21B157006FE791 /* Komponents */; };
@@ -128,6 +129,7 @@
 		E402957A2CDF158E00CB2377 /* Oasis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Oasis.swift; sourceTree = "<group>"; };
 		E402957D2CDF3D3600CB2377 /* EventCoverImageAccessory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventCoverImageAccessory.swift; sourceTree = "<group>"; };
 		E402957F2CDF4B4300CB2377 /* CircleCutImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleCutImage.swift; sourceTree = "<group>"; };
+		E40295822CDF50CF00CB2377 /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		E405A4892C21B0A1006FE791 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
 		E42003CB2C6308AB00770992 /* InteractiveMap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveMap.swift; sourceTree = "<group>"; };
@@ -287,6 +289,7 @@
 				E480AAA22C44B71E009C1445 /* Database.swift */,
 				E4755B9E2C8296BE0032DA2F /* Downloader.swift */,
 				E48B62902C5FC01E007874AE /* Favorites.swift */,
+				E40295822CDF50CF00CB2377 /* ImageCache.swift */,
 				E480AA872C442980009C1445 /* Navigator.swift */,
 				E402957A2CDF158E00CB2377 /* Oasis.swift */,
 			);
@@ -737,6 +740,7 @@
 				E4D74B8D2C8CB71F0014CD16 /* OnlineState.swift in Sources */,
 				E480AAB32C4C9C01009C1445 /* ComiketMap.swift in Sources */,
 				E49F428B2C96A6FE00ABF424 /* Date.swift in Sources */,
+				E40295832CDF50D000CB2377 /* ImageCache.swift in Sources */,
 				E4D74B752C8BE0040014CD16 /* UIImage.swift in Sources */,
 				E4D74B932C8D430C0014CD16 /* CircleListCompactRow.swift in Sources */,
 				E48B62972C5FC21E007874AE /* WebCatalogFavorite.swift in Sources */,
