@@ -31,6 +31,7 @@ struct LoadingOverlay: View {
                                 .matchedGeometryEffect(id: "LoadingProgressText", in: namespace)
                         }
                     }
+                    .frame(maxWidth: .infinity)
                 }
                 if let progress {
                     ProgressView(value: progress, total: 1.0)
@@ -41,7 +42,7 @@ struct LoadingOverlay: View {
                 }
             }
             .padding()
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: 350.0)
             .background(Material.regular)
             .clipShape(RoundedRectangle(cornerRadius: 16.0))
             .matchedGeometryEffect(id: "LoadingWindow", in: namespace)

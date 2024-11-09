@@ -45,6 +45,7 @@ struct MapSelector: View {
                                                 selectedMap = map
                                             }
                                         }
+                                        .disabled(selectedDate == date && selectedMap == map)
                                     }
                                 }
                             }
@@ -66,6 +67,7 @@ struct MapSelector: View {
                                                 selectedMap = map
                                             }
                                         }
+                                        .disabled(selectedDate == date && selectedMap == map)
                                     }
                                 }
                             }
