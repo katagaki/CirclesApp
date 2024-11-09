@@ -19,36 +19,11 @@ struct CircleListCompactRow: View {
 
     var body: some View {
         HStack(spacing: 10.0) {
-            Group {
-                if let image = database.circleImage(for: circle.id) {
-                    Image(uiImage: image)
-                        .resizable()
-                        .scaledToFit()
-                        .overlay {
-                            GeometryReader { proxy in
-                                ZStack(alignment: .topLeading) {
-                                    if let favorites = favorites.wcIDMappedItems,
-                                        let extendedInformation = circle.extendedInformation,
-                                       let favorite = favorites[extendedInformation.webCatalogID] {
-                                        favorite.favorite.color.backgroundColor()
-                                            .frame(width: 0.23 * proxy.size.width,
-                                                   height: 0.23 * proxy.size.width)
-                                            .offset(x: 0.03 * proxy.size.width,
-                                                    y: 0.03 * proxy.size.width)
-                                    }
-                                    Color.clear
-                                }
-                            }
-                        }
-                        .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
-                } else {
-                    ZStack(alignment: .center) {
-                        ProgressView()
-                        Color.clear
-                    }
-                    .aspectRatio(0.7, contentMode: .fit)
-                }
-            }
+            CircleCutImage(
+                circle, in: namespace, showSpaceName: .constant(false), showDay: .constant(false)
+            )
+            .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
+            .automaticMatchedTransitionSource(id: circle.id, in: namespace)
             .frame(width: 28.0, height: 40.0, alignment: .center)
             Text(circle.circleName)
             Spacer()
