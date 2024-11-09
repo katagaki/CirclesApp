@@ -25,6 +25,7 @@ struct CircleFilterBar: View {
     @Query(sort: [SortDescriptor(\ComiketBlock.id, order: .forward)])
     var blocks: [ComiketBlock]
 
+    @Binding var displayedCircles: [ComiketCircle]
     @Binding var selectedGenre: ComiketGenre?
     @Binding var selectedMap: ComiketMap?
     @Binding var selectedBlock: ComiketBlock?
@@ -35,7 +36,9 @@ struct CircleFilterBar: View {
     @AppStorage(wrappedValue: 0, "Circles.SelectedBlockID") var selectedBlockID: Int
     @AppStorage(wrappedValue: 0, "Circles.SelectedDateID") var selectedDateID: Int
 
-    @State var blocksInMap: [ComiketBlock] = []
+    @State var selectableMaps: [ComiketMap]?
+    @State var selectableBlocks: [ComiketBlock]?
+    @State var selectableDates: [ComiketDate]?
 
     @State var isInitialLoadCompleted: Bool = false
 
@@ -61,7 +64,7 @@ struct CircleFilterBar: View {
                     Picker(selection: $selectedMap.animation(.snappy.speed(2.0))) {
                         Text("Shared.All")
                             .tag(nil as ComiketMap?)
-                        ForEach(maps) { map in
+                        ForEach(selectableMaps ?? maps) { map in
                             Text(map.name)
                                 .tag(map)
                         }
@@ -69,19 +72,17 @@ struct CircleFilterBar: View {
                         Text("Shared.Map")
                     }
                 }
-                if selectedMap != nil {
-                    BarAccessoryMenu(LocalizedStringKey(selectedBlock?.name ?? "Shared.Block"),
-                                     icon: "table.furniture") {
-                        Picker(selection: $selectedBlock.animation(.snappy.speed(2.0))) {
-                            Text("Shared.All")
-                                .tag(nil as ComiketBlock?)
-                            ForEach(blocksInMap, id: \.id) { block in
-                                Text(block.name)
-                                    .tag(block)
-                            }
-                        } label: {
-                            Text("Shared.Block")
+                BarAccessoryMenu(LocalizedStringKey(selectedBlock?.name ?? "Shared.Block"),
+                                 icon: "table.furniture") {
+                    Picker(selection: $selectedBlock.animation(.snappy.speed(2.0))) {
+                        Text("Shared.All")
+                            .tag(nil as ComiketBlock?)
+                        ForEach(selectableBlocks ?? blocks, id: \.id) { block in
+                            Text(block.name)
+                                .tag(block)
                         }
+                    } label: {
+                        Text("Shared.Block")
                     }
                 }
                 BarAccessoryMenu((selectedDate != nil ? "Shared.\(selectedDate!.id)th.Day" : "Shared.Day"),
@@ -89,7 +90,7 @@ struct CircleFilterBar: View {
                     Picker(selection: $selectedDate.animation(.snappy.speed(2.0))) {
                         Text("Shared.All")
                             .tag(nil as ComiketDate?)
-                        ForEach(dates) { date in
+                        ForEach(selectableDates ?? dates) { date in
                             Text("Shared.\(date.id)th.Day")
                                 .tag(date)
                         }
@@ -137,13 +138,58 @@ struct CircleFilterBar: View {
                 selectedDateID = selectedDate?.id ?? 0
             }
         }
+        .onChange(of: displayedCircles) { _, _ in
+            Task.detached {
+                await reloadSelectableMapsBlocksAndDates()
+            }
+        }
+    }
+
+    func reloadSelectableMapsBlocksAndDates() async {
+        if displayedCircles.isEmpty {
+            await MainActor.run {
+                selectableMaps = nil
+                selectableBlocks = nil
+                selectableDates = nil
+            }
+        } else {
+            var selectableMaps: [ComiketMap] = []
+            var selectableBlocks: [ComiketBlock] = []
+            var selectableDates: [ComiketDate] = []
+            maps.forEach { map in
+                if displayedCircles.contains(where: {
+                    $0.layout?.mapID == map.id
+                }) {
+                    selectableMaps.append(map)
+                }
+            }
+            blocks.forEach { block in
+                if displayedCircles.contains(where: {
+                    $0.layout?.blockID == block.id
+                }) {
+                    selectableBlocks.append(block)
+                }
+            }
+            dates.forEach { date in
+                if displayedCircles.contains(where: {
+                    $0.day == date.id
+                }) {
+                    selectableDates.append(date)
+                }
+            }
+            await MainActor.run {
+                self.selectableMaps = selectableMaps
+                self.selectableBlocks = selectableBlocks
+                self.selectableDates = selectableDates
+            }
+        }
     }
 
     func reloadBlocksInMap() async {
         let actor = DataFetcher(modelContainer: sharedModelContainer)
         let blockIdentifiers = await actor.blocks(inMap: selectedMapID)
         await MainActor.run {
-            self.blocksInMap = database.blocks(blockIdentifiers)
+            self.selectableBlocks = database.blocks(blockIdentifiers)
         }
     }
 }
