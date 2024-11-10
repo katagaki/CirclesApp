@@ -95,11 +95,7 @@ struct FavoritesView: View {
         let favoriteItemsSorted: [Int: [UserFavorites.Response.FavoriteItem]] = favoriteItems.reduce(
             into: [Int: [UserFavorites.Response.FavoriteItem]]()
         ) { partialResult, favoriteItem in
-            if partialResult[favoriteItem.favorite.color.rawValue] != nil {
-                partialResult[favoriteItem.favorite.color.rawValue]?.append(favoriteItem)
-            } else {
-                partialResult[favoriteItem.favorite.color.rawValue] = [favoriteItem]
-            }
+            partialResult[favoriteItem.favorite.color.rawValue, default: []].append(favoriteItem)
         }
 
         let actor = DataFetcher(modelContainer: sharedModelContainer)

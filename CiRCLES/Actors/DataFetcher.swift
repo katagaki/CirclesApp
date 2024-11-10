@@ -91,11 +91,11 @@ actor DataFetcher {
     ) -> [LayoutCatalogMapping: [Int]] {
         do {
             var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
-            let blockIDs: [Int] = Array(Set(mappings.map({$0.blockID})))
-            let spaceNumbers: [Int] = Array(Set(mappings.map({$0.spaceNumber})))
+            let blockIDs = Set(mappings.map { $0.blockID })
+            let spaceNumbers = Set(mappings.map { $0.spaceNumber })
             let fetchDescriptor = FetchDescriptor<ComiketCircle>(
                 predicate: #Predicate<ComiketCircle> { circle in
-                    return blockIDs.contains(circle.blockID) &&
+                    blockIDs.contains(circle.blockID) &&
                     spaceNumbers.contains(circle.spaceNumber) &&
                     circle.day == dateID
                 },
@@ -103,18 +103,12 @@ actor DataFetcher {
             )
             let circles = try modelContext.fetch(fetchDescriptor)
             let circleWebCatalogIDMapping = circles.reduce(
-                into: [LayoutCatalogMapping: [Int]]()
-            ) { partialResult, circle in
-                if let extendedInformation = circle.extendedInformation {
-                    let mapping = LayoutCatalogMapping(blockID: circle.blockID, spaceNumber: circle.spaceNumber)
-                    if partialResult[mapping] != nil {
-                        partialResult[mapping]?
-                            .append(extendedInformation.webCatalogID)
-                    } else {
-                        partialResult[mapping] = [extendedInformation.webCatalogID]
+                into: [LayoutCatalogMapping: [Int]]()) { partialResult, circle in
+                    if let extendedInformation = circle.extendedInformation {
+                        let mapping = LayoutCatalogMapping(blockID: circle.blockID, spaceNumber: circle.spaceNumber)
+                        partialResult[mapping, default: []].append(extendedInformation.webCatalogID)
                     }
                 }
-            }
             for (blockIDAndSpaceNumber, webCatalogIDs) in circleWebCatalogIDMapping {
                 if let originalMapping = mappings.first(where: {
                     $0.blockID == blockIDAndSpaceNumber.blockID &&

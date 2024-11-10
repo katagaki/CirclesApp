@@ -40,7 +40,6 @@ struct InteractiveMap: View {
         useHighResolutionMaps ? 40 : 20
     }
 
-
     var namespace: Namespace.ID
 
     var body: some View {
