@@ -16,6 +16,8 @@ struct InteractiveMap: View {
     @Binding var map: ComiketMap?
 
     @State var mapImage: UIImage?
+    @State var mapImageWidth: Int = 0
+    @State var mapImageHeight: Int = 0
     @State var genreImage: UIImage?
 
     @State var layouts: [ComiketLayout] = []
@@ -34,61 +36,60 @@ struct InteractiveMap: View {
         map?.id
     ]}
 
+    var spaceSize: Int {
+        useHighResolutionMaps ? 40 : 20
+    }
+
+
     var namespace: Namespace.ID
 
     var body: some View {
         VStack(alignment: .leading) {
             if let mapImage {
                 ScrollView([.horizontal, .vertical]) {
-                    Image(uiImage: mapImage)
-                        .resizable()
-                        .frame(
-                            width: CGFloat(Int(mapImage.size.width) / zoomDivisor),
-                            height: CGFloat(Int(mapImage.size.height) / zoomDivisor)
-                        )
-                        .padding(.trailing, 72.0)
-                        .animation(.smooth.speed(2.0), value: zoomDivisor)
-                        .colorInvert(adaptive: true)
-                        .overlay {
-                            if showGenreOverlayState, let genreImage {
-                                Image(uiImage: genreImage)
-                                    .resizable()
-                                    .frame(
-                                        width: CGFloat(Int(mapImage.size.width) / zoomDivisor),
-                                        height: CGFloat(Int(mapImage.size.height) / zoomDivisor)
-                                    )
-                                    .animation(.smooth.speed(2.0), value: zoomDivisor)
-                                    .allowsHitTesting(false)
+                    ZStack(alignment: .topLeading) {
+                        Image(uiImage: mapImage)
+                            .resizable()
+                            .frame(
+                                width: CGFloat(mapImageWidth / zoomDivisor),
+                                height: CGFloat(mapImageHeight / zoomDivisor)
+                            )
+                            .padding(.trailing, 72.0)
+                            .animation(.smooth.speed(2.0), value: zoomDivisor)
+                            .colorInvert(adaptive: true)
+                        if showGenreOverlayState, let genreImage {
+                            Image(uiImage: genreImage)
+                                .resizable()
+                                .frame(
+                                    width: CGFloat(mapImageWidth / zoomDivisor),
+                                    height: CGFloat(mapImageHeight / zoomDivisor)
+                                )
+                                .animation(.smooth.speed(2.0), value: zoomDivisor)
+                                .allowsHitTesting(false)
+                        }
+                        if let date {
+                            ForEach(Array(layoutWebCatalogIDMappings.keys), id: \.self) { layout in
+                                InteractiveMapButton(
+                                    selectedEventDateID: date.id,
+                                    layoutBlockID: layout.blockID,
+                                    layoutSpaceNumber: layout.spaceNumber,
+                                    layoutType: layout.layoutType,
+                                    webCatalogIDs: layoutWebCatalogIDMappings[layout] ?? [],
+                                    namespace: namespace
+                                )
+                                .id(layout.viewID())
+                                .position(
+                                    x: CGFloat((layout.positionX + Int(spaceSize / 2)) / zoomDivisor),
+                                    y: CGFloat((layout.positionY + Int(spaceSize / 2)) / zoomDivisor)
+                                )
+                                .frame(
+                                    width: CGFloat(spaceSize / zoomDivisor),
+                                    height: CGFloat(spaceSize / zoomDivisor),
+                                    alignment: .topLeading
+                                )
                             }
                         }
-                        .overlay {
-                            if let date {
-                                let spaceSize: Int = useHighResolutionMaps ? 40 : 20
-                                ZStack(alignment: .topLeading) {
-                                    ForEach(Array(layoutWebCatalogIDMappings.keys), id: \.self) { layout in
-                                        InteractiveMapButton(
-                                            selectedEventDateID: date.id,
-                                            layoutBlockID: layout.blockID,
-                                            layoutSpaceNumber: layout.spaceNumber,
-                                            layoutType: layout.layoutType,
-                                            webCatalogIDs: layoutWebCatalogIDMappings[layout] ?? [],
-                                            namespace: namespace
-                                        )
-                                        .id(layout.viewID())
-                                        .position(
-                                            x: CGFloat((layout.positionX + Int(spaceSize / 2)) / zoomDivisor),
-                                            y: CGFloat((layout.positionY + Int(spaceSize / 2)) / zoomDivisor)
-                                        )
-                                        .frame(
-                                            width: CGFloat(spaceSize / zoomDivisor),
-                                            height: CGFloat(spaceSize / zoomDivisor),
-                                            alignment: .topLeading
-                                        )
-                                    }
-                                    Color.clear
-                                }
-                            }
-                        }
+                    }
                 }
                 .scrollIndicators(.hidden)
                 .overlay {
@@ -133,7 +134,7 @@ struct InteractiveMap: View {
                                     Image(systemName: "minus")
                                         .font(.title)
                                 }
-                                .disabled(zoomDivisor >= 3)
+                                .disabled(zoomDivisor >= 4)
                             }
                         }
                         .offset(x: -12.0, y: -12.0)
@@ -157,6 +158,15 @@ struct InteractiveMap: View {
         .onChange(of: dateMap) { _, _ in
             reloadAll()
         }
+        .onChange(of: useHighResolutionMaps) { _, _ in
+            reloadAll()
+        }
+        .onChange(of: mapImage) { _, newValue in
+            if let newValue {
+                mapImageWidth = Int(newValue.size.width)
+                mapImageHeight = Int(newValue.size.height)
+            }
+        }
         .onChange(of: layouts) { _, newValue in
             if newValue.count > 0 {
                 reloadWebCatalogIDs()
@@ -166,9 +176,6 @@ struct InteractiveMap: View {
         }
         .onChange(of: showGenreOverlayState) { _, _ in
             showGenreOverlay = showGenreOverlayState
-        }
-        .onChange(of: useHighResolutionMaps) { _, _ in
-            reloadAll()
         }
     }
 
@@ -229,7 +236,7 @@ struct InteractiveMap: View {
             withAnimation(.smooth.speed(2.0)) {
                 isLoadingLayouts = true
             } completion: {
-                Task.detached {
+                Task.detached(priority: .high) {
                     let actor = DataFetcher(modelContainer: sharedModelContainer)
                     let layoutWebCatalogIDMappings = await actor.circleWebCatalogIDs(
                         forMappings: layoutCatalogMappings, on: selectedDate
