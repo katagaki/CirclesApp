@@ -31,11 +31,14 @@ struct MapView: View {
 
     @State var isInitialLoadCompleted: Bool = false
 
+    @Namespace var mapNamespace
+
     var body: some View {
         NavigationStack(path: $navigator[.map]) {
             InteractiveMap(
                 date: $selectedDate,
-                map: $selectedMap
+                map: $selectedMap,
+                namespace: mapNamespace
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationBarTitleDisplayMode(.inline)
@@ -90,6 +93,10 @@ struct MapView: View {
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .circlesDetail(let circle): CircleDetailView(circle: circle)
+                        .automaticNavigationTransition(
+                            id: "Layout.\(circle.blockID).\(circle.spaceNumber)",
+                            in: mapNamespace
+                        )
                 default: Color.clear
                 }
             }

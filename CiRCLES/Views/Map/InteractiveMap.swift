@@ -34,6 +34,8 @@ struct InteractiveMap: View {
         map?.id
     ]}
 
+    var namespace: Namespace.ID
+
     var body: some View {
         VStack(alignment: .leading) {
             if let mapImage {
@@ -69,7 +71,8 @@ struct InteractiveMap: View {
                                             layoutBlockID: layout.blockID,
                                             layoutSpaceNumber: layout.spaceNumber,
                                             layoutType: layout.layoutType,
-                                            webCatalogIDs: layoutWebCatalogIDMappings[layout] ?? []
+                                            webCatalogIDs: layoutWebCatalogIDMappings[layout] ?? [],
+                                            namespace: namespace
                                         )
                                         .id(layout.viewID())
                                         .position(

@@ -22,7 +22,7 @@ struct InteractiveMapDetailPopover: View {
 
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 
-    @Namespace var namespace
+    @Namespace var popoverNamespace
 
     var body: some View {
         ScrollView {
@@ -30,12 +30,15 @@ struct InteractiveMapDetailPopover: View {
                 if let circles {
                     ForEach(circles, id: \.id) { circle in
                         Button {
-                            isPresented = false
-                            navigator.push(.circlesDetail(circle: circle), for: .map)
+                            Task {
+                                isPresented = false
+                                try? await Task.sleep(for: .milliseconds(50))
+                                navigator.push(.circlesDetail(circle: circle), for: .map)
+                            }
                         } label: {
                             HStack {
                                 CircleCutImage(
-                                    circle, in: namespace, shouldFetchWebCut: showWebCut,
+                                    circle, in: popoverNamespace, shouldFetchWebCut: showWebCut,
                                     showSpaceName: .constant(false), showDay: .constant(false)
                                 )
                                     .frame(width: 70.0, height: 100.0, alignment: .center)

@@ -23,6 +23,8 @@ struct InteractiveMapButton: View {
 
     @State var isCircleDetailPopoverPresented: Bool = false
 
+    var namespace: Namespace.ID
+
     var body: some View {
         Group {
             if webCatalogIDs.count == 0 {
@@ -57,6 +59,10 @@ struct InteractiveMapButton: View {
                 Color.accent.opacity(0.3)
             }
         }
+        .automaticMatchedTransitionSource(
+            id: "Layout.\(layoutBlockID).\(layoutSpaceNumber)",
+            in: namespace
+        )
         .onTapGesture {
             if webCatalogIDs.count > 0 {
                 withAnimation(.smooth.speed(2.0)) {
@@ -95,7 +101,7 @@ struct InteractiveMapButton: View {
                         .foregroundStyle(highlightColor(favoriteCircle))
                 } else {
                     Rectangle()
-                        .foregroundStyle(.clear)
+                        .foregroundStyle(.primary.opacity(0.001))
                 }
                 #endif
             }
