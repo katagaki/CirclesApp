@@ -10,6 +10,7 @@ import SwiftUI
 
 struct LoginView: View {
 
+    @Environment(\.openURL) var openURL
     @Environment(AuthManager.self) var authManager
 
     @State var isShowingAuthSafariViewController: Bool = false
@@ -54,7 +55,11 @@ struct LoginView: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     Button {
+                        #if !targetEnvironment(macCatalyst) && !os(visionOS)
                         isShowingAuthSafariViewController = true
+                        #else
+                        openURL(authManager.authURL)
+                        #endif
                     } label: {
                         Text("Shared.Login")
                             .fontWeight(.bold)
@@ -67,9 +72,11 @@ struct LoginView: View {
                 .padding()
             }
         }
+        #if !os(visionOS)
         .sheet(isPresented: $isShowingAuthSafariViewController) {
             SafariView(url: authManager.authURL)
                 .ignoresSafeArea()
         }
+        #endif
     }
 }

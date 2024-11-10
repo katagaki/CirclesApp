@@ -41,8 +41,10 @@ struct MapView: View {
                 namespace: mapNamespace
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            #if !targetEnvironment(macCatalyst)
             .navigationBarTitleDisplayMode(.inline)
             .navigationTitle("ViewTitle.Map")
+            #endif
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
@@ -55,12 +57,16 @@ struct MapView: View {
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 BarAccessory(placement: .bottom) {
                     Group {
+                        #if !os(visionOS)
                         if orientation.isPortrait || UIDevice.current.userInterfaceIdiom == .pad {
                             MapSelector(selectedDate: $selectedDate, selectedMap: $selectedMap)
                         } else {
                             Color.clear
                                 .frame(height: 0.0)
                         }
+                        #else
+                        MapSelector(selectedDate: $selectedDate, selectedMap: $selectedMap)
+                        #endif
                     }
                     .onRotate { newOrientation in
                         orientation = newOrientation

@@ -9,6 +9,7 @@ import SafariServices
 import SwiftUI
 import UIKit
 
+#if !os(visionOS)
 struct SafariView: UIViewControllerRepresentable {
     let url: URL
 
@@ -30,3 +31,4 @@ struct SafariView: UIViewControllerRepresentable {
 
     }
 }
+#endif

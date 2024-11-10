@@ -13,6 +13,7 @@ struct MyView: View {
 
     @EnvironmentObject var navigator: Navigator
     @EnvironmentObject var imageCache: ImageCache
+    @Environment(\.openURL) var openURL
     @Environment(AuthManager.self) var authManager
     @Environment(Database.self) var database
 
@@ -65,7 +66,11 @@ struct MyView: View {
                             }
                             Section {
                                 Button("More.DeleteAccount", role: .destructive) {
+                                    #if !os(visionOS)
                                     isDeletingAccount = true
+                                    #else
+                                    openURL(URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
+                                    #endif
                                 }
                             }
                         }
@@ -100,7 +105,11 @@ struct MyView: View {
                             }
                             Section {
                                 Button("More.DeleteAccount", role: .destructive) {
+                                    #if !os(visionOS)
                                     isDeletingAccount = true
+                                    #else
+                                    openURL(URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
+                                    #endif
                                 }
                             }
                         }
@@ -157,10 +166,12 @@ struct MyView: View {
                     )
                 }
             }
+            #if !os(visionOS)
             .sheet(isPresented: $isDeletingAccount) {
                 SafariView(url: URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
                     .ignoresSafeArea()
             }
+            #endif
             .sheet(item: $dateForNotifier) { date in
                 MyEventNotifierSheet(
                     date: date,
