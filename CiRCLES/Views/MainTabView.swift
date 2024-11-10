@@ -31,33 +31,23 @@ struct MainTabView: View {
         @Bindable var authManager = authManager
         @Bindable var database = database
         TabView(selection: $navigator.selectedTab) {
-            MapView()
-                .tabItem {
-                    Label("Tab.Map", systemImage: "map.fill")
-                }
-                .tag(TabType.map)
-            CirclesView()
-                .tabItem {
-                    Label("Tab.Circles", systemImage: "square.grid.3x3.fill")
-                }
-                .tag(TabType.circles)
-            if isActiveEventLatest {
-                FavoritesView()
-                    .tabItem {
-                        Label("Tab.Favorites", systemImage: "star.fill")
-                    }
-                    .tag(TabType.favorites)
+            Tab("Tab.Map", systemImage: "map.fill", value: .map) {
+                MapView()
             }
-            MyView()
-                .tabItem {
-                    Label("Tab.My", image: .tabIconMy)
+            Tab("Tab.Circles", systemImage: "square.grid.3x3.fill", value: .circles) {
+                CirclesView()
+            }
+            if isActiveEventLatest {
+                Tab("Tab.Favorites", systemImage: "star.fill", value: .favorites) {
+                    FavoritesView()
                 }
-                .tag(TabType.my)
-            MoreView()
-                .tabItem {
-                    Label("Tab.More", systemImage: "ellipsis")
-                }
-                .tag(TabType.more)
+            }
+            Tab("Tab.My", image: "TabIcon.My", value: .my) {
+                MyView()
+            }
+            Tab("Tab.More", systemImage: "ellipsis", value: .more) {
+                MoreView()
+            }
         }
         .overlay {
             if oasis.isShowing {

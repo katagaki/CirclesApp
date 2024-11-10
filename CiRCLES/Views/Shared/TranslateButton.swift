@@ -18,6 +18,7 @@ struct TranslateButton: View {
     }
 
     var body: some View {
+        #if !targetEnvironment(macCatalyst) && !os(visionOS)
         Button("Shared.Translate", systemImage: "character.bubble") {
             isShowingTranslationPopover = true
         }
@@ -27,5 +28,8 @@ struct TranslateButton: View {
             isPresented: $isShowingTranslationPopover,
             text: textToTranslate
         )
+        #else
+        Color.clear
+        #endif
     }
 }

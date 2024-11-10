@@ -80,6 +80,7 @@ struct MyParticipationSections: View {
                             dateForNotifier = date
                         }
                         .disabled(!isAllowedToSetNotification(date) ||
+                                  participationState[String(activeEventNumber)]?[String(dayID)] == nil ||
                                   participationState[String(activeEventNumber)]?[String(dayID)] == "")
                     }
                 }
