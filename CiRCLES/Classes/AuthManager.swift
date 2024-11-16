@@ -18,6 +18,7 @@ class AuthManager {
     @ObservationIgnored let reachability = try? Reachability()
 
     var isAuthenticating: Bool = false
+    var isWaitingForAuthenticationCode: Bool = false
     var isRestoring: Bool = false
     var onlineState: OnlineState = .undetermined
 

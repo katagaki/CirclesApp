@@ -22,7 +22,11 @@ struct CirclesApp: App {
         WindowGroup {
             MainTabView()
                 .onOpenURL { url in
-                    authManager.getAuthenticationCode(from: url)
+                    if url.absoluteString == circleMsCancelURLSchema {
+                        authManager.isWaitingForAuthenticationCode = false
+                    } else {
+                        authManager.getAuthenticationCode(from: url)
+                    }
                 }
                 .onChange(of: authManager.code) { _, newValue in
                     if newValue != nil {
