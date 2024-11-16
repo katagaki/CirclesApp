@@ -32,13 +32,22 @@ struct EventCoverImageAccessory: View {
                     .rotationEffect(isShowing ? Angle.degrees(180.0) : Angle.degrees(0.0))
             }
         }
-        .padding(.bottom, UIDevice.current.userInterfaceIdiom != .pad ? 6.0 : 12.0)
+        .padding(.bottom, bottomPadding())
         .contentShape(.rect)
         .onTapGesture {
-            withAnimation(.smooth.speed(2.0)) {
-                isShowing.toggle()
+            if image != nil {
+                withAnimation(.smooth.speed(2.0)) {
+                    isShowing.toggle()
+                }
             }
         }
+    }
 
+    func bottomPadding() -> CGFloat {
+        if image != nil {
+            return UIDevice.current.userInterfaceIdiom != .pad ? 6.0 : 12.0
+        } else {
+            return 0.0
+        }
     }
 }
