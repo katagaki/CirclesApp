@@ -13,9 +13,8 @@ struct LoginView: View {
     @Environment(\.openURL) var openURL
     @Environment(AuthManager.self) var authManager
 
-    @State var isShowingAuthSafariViewController: Bool = false
-
     var body: some View {
+        @Bindable var authManager = authManager
         ScrollView {
             VStack(alignment: .leading, spacing: 16.0) {
                 Text("Login.Title")
@@ -56,7 +55,7 @@ struct LoginView: View {
                     .foregroundStyle(.secondary)
                     Button {
                         #if !targetEnvironment(macCatalyst) && !os(visionOS)
-                        isShowingAuthSafariViewController = true
+                        authManager.isWaitingForAuthenticationCode = true
                         #else
                         openURL(authManager.authURL)
                         #endif
@@ -73,7 +72,7 @@ struct LoginView: View {
             }
         }
         #if !os(visionOS)
-        .sheet(isPresented: $isShowingAuthSafariViewController) {
+        .sheet(isPresented: $authManager.isWaitingForAuthenticationCode) {
             SafariView(url: authManager.authURL)
                 .ignoresSafeArea()
         }
