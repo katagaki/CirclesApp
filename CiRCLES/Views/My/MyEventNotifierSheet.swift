@@ -111,6 +111,7 @@ struct MyEventNotifierSheet: View {
                         Text("Notifier.Explainer")
                             .frame(maxWidth: .infinity)
                     }
+                    .frame(maxWidth: .infinity, alignment: .center)
                     .padding(8.0)
                 }
                 if let participation, participation != "" {

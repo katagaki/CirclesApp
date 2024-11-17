@@ -22,6 +22,8 @@ struct CircleDetailView: View {
     @State var circleCutURL: URL?
     @State var genre: String?
 
+    @Namespace var namespace
+
     var body: some View {
         List {
             Section {
@@ -40,50 +42,24 @@ struct CircleDetailView: View {
                     }
                     HStack(spacing: 6.0) {
                         Group {
-                            if let circleImage {
-                                Image(uiImage: circleImage)
-                                    .resizable()
-                            } else {
-                                Rectangle()
-                                    .foregroundStyle(Color.primary.opacity(0.05))
-                                    .overlay {
-                                        ProgressView()
-                                    }
-                            }
+                            CircleCutImage(
+                                circle,
+                                in: namespace,
+                                showSpaceName: .constant(false),
+                                showDay: .constant(false)
+                            )
                             if authenticator.onlineState == .online {
-                                if webCatalogInformation != nil {
-                                    if let circleCutURL {
-                                        AsyncImage(url: circleCutURL,
-                                                   transaction: Transaction(animation: .snappy.speed(2.0))
-                                        ) { result in
-                                            switch result {
-                                            case .success(let image):
-                                                image
-                                                    .resizable()
-                                            default:
-                                                Rectangle()
-                                                    .foregroundStyle(Color.primary.opacity(0.05))
-                                                    .overlay {
-                                                        ProgressView()
-                                                    }
-                                            }
-                                        }
-                                    } else {
-                                        Rectangle()
-                                            .foregroundStyle(Color.primary.opacity(0.05))
-                                            .overlay {
-                                                Text("Circles.NoImage")
-                                                    .font(.caption)
-                                                    .foregroundStyle(.secondary)
-                                            }
-                                    }
-                                } else {
-                                    Rectangle()
-                                        .foregroundStyle(Color.primary.opacity(0.05))
-                                }
+                                CircleCutImage(
+                                    circle,
+                                    in: namespace,
+                                    shouldFetchWebCut: true,
+                                    showCatalogCut: false,
+                                    forceWebCutUpdate: true,
+                                    showSpaceName: .constant(false),
+                                    showDay: .constant(false)
+                                )
                             }
                         }
-                        .aspectRatio(180.0 / 256.0, contentMode: .fit)
                         .frame(maxWidth: .infinity, maxHeight: 250.0)
                     }
                 }
