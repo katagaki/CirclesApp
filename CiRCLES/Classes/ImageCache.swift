@@ -6,12 +6,13 @@
 //
 
 import Foundation
+import SwiftUI
 import UIKit
 
-class ImageCache: ObservableObject {
+@Observable
+class ImageCache {
 
     @ObservationIgnored let cacheURL: URL?
-
     @ObservationIgnored var images: [Int: Data] = [:]
 
     init() {

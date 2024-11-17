@@ -1,5 +1,5 @@
 //
-//  CircleToolbar.swift
+//  CircleDetailToolbar.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/09/07.
@@ -8,9 +8,9 @@
 import Komponents
 import SwiftUI
 
-struct CircleToolbar: View {
+struct CircleDetailToolbar: View {
 
-    @Environment(AuthManager.self) var authManager
+    @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
 
     @Environment(\.openURL) var openURL
@@ -88,7 +88,7 @@ struct CircleToolbar: View {
     }
 
     func addToFavorites(with color: WebCatalogColor?) async {
-        if let color, let token = authManager.token {
+        if let color, let token = authenticator.token {
             let actor = FavoritesActor()
             let favoritesAddResult = await actor.add(
                 extendedInformation.webCatalogID,
@@ -106,7 +106,7 @@ struct CircleToolbar: View {
     }
 
     func deleteFavorite() async {
-        if let token = authManager.token {
+        if let token = authenticator.token {
             let actor = FavoritesActor()
             let favoritesDeleteResult = await actor.delete(
                 extendedInformation.webCatalogID,

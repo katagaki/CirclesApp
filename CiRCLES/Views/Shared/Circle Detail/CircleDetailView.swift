@@ -11,7 +11,7 @@ import Translation
 
 struct CircleDetailView: View {
 
-    @Environment(AuthManager.self) var authManager
+    @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
 
     var circle: ComiketCircle
@@ -29,7 +29,7 @@ struct CircleDetailView: View {
                     HStack(spacing: 6.0) {
                         Group {
                             Text("Circles.Image.Catalog")
-                            if authManager.onlineState == .online {
+                            if authenticator.onlineState == .online {
                                 Text("Circles.Image.Web")
                             }
                         }
@@ -50,7 +50,7 @@ struct CircleDetailView: View {
                                         ProgressView()
                                     }
                             }
-                            if authManager.onlineState == .online {
+                            if authenticator.onlineState == .online {
                                 if webCatalogInformation != nil {
                                     if let circleCutURL {
                                         AsyncImage(url: circleCutURL,
@@ -183,7 +183,7 @@ struct CircleDetailView: View {
             ToolbarAccessory(placement: .bottom) {
                 if let extendedInformation {
                     VStack(spacing: 12.0) {
-                        CircleToolbar(extendedInformation, webCatalogInformation)
+                        CircleDetailToolbar(extendedInformation, webCatalogInformation)
                     }
                     .padding([.top, .bottom], 12.0)
                 }
@@ -205,7 +205,7 @@ struct CircleDetailView: View {
                 self.extendedInformation = extendedInformation
             }
         }
-        if let token = authManager.token, let extendedInformation {
+        if let token = authenticator.token, let extendedInformation {
             if let circleResponse = await WebCatalog.circle(
                 with: extendedInformation.webCatalogID, authToken: token
             ),

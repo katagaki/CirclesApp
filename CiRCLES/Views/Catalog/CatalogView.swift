@@ -1,5 +1,5 @@
 //
-//  CirclesView.swift
+//  CatalogView.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/07/21.
@@ -9,10 +9,10 @@ import Komponents
 import SwiftData
 import SwiftUI
 
-struct CirclesView: View {
+struct CatalogView: View {
 
     @EnvironmentObject var navigator: Navigator
-    @Environment(AuthManager.self) var authManager
+    @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
 
@@ -149,7 +149,7 @@ struct CirclesView: View {
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 BarAccessory(placement: .bottom) {
-                    CircleFilterBar(
+                    CatalogToolbar(
                         displayedCircles: $displayedCircles,
                         selectedGenre: $selectedGenre,
                         selectedMap: $selectedMap,

@@ -12,10 +12,11 @@ import SwiftUI
 struct MyView: View {
 
     @EnvironmentObject var navigator: Navigator
-    @EnvironmentObject var imageCache: ImageCache
     @Environment(\.openURL) var openURL
-    @Environment(AuthManager.self) var authManager
+    @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
+    @Environment(ImageCache.self) var imageCache
+    @Environment(Planner.self) var planner
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -40,10 +41,6 @@ struct MyView: View {
     @State var isDeletingAccount: Bool = false
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
-    @AppStorage(wrappedValue: -1, "Events.Active.Number") var activeEventNumber: Int
-
-    @AppStorage(wrappedValue: "", "My.Participation") var participation: String
-    @State var participationState: [String: [String: String]] = [:]
 
     var body: some View {
         NavigationStack(path: $navigator[.my]) {
@@ -60,7 +57,7 @@ struct MyView: View {
                                 }
                                 .contextMenu {
                                     Button("Shared.LoginAgain", role: .destructive) {
-                                        authManager.isAuthenticating = true
+                                        authenticator.isAuthenticating = true
                                     }
                                 }
                             }
@@ -84,13 +81,9 @@ struct MyView: View {
                                 eventDates: $eventDates,
                                 dateForNotifier: $dateForNotifier,
                                 dayForNotifier: $dayForNotifier,
-                                participationForNotifier: $participationForNotifier,
-                                activeEventNumber: $activeEventNumber
+                                participationForNotifier: $participationForNotifier
                             )
-                            MyEventPickerSection(
-                                eventData: $eventData,
-                                activeEventNumber: $activeEventNumber
-                            )
+                            MyEventPickerSection()
                         }
                         if UIDevice.current.userInterfaceIdiom != .pad {
                             Section {
@@ -99,7 +92,7 @@ struct MyView: View {
                                 }
                                 .contextMenu {
                                     Button("Shared.LoginAgain", role: .destructive) {
-                                        authManager.isAuthenticating = true
+                                        authenticator.isAuthenticating = true
                                     }
                                 }
                             }
@@ -194,11 +187,11 @@ struct MyView: View {
                     reloadDataInBackground()
                 }
             }
-            .onChange(of: authManager.token) { _, _ in
+            .onChange(of: authenticator.token) { _, _ in
                 userInfo = nil
                 reloadDataInBackground()
             }
-            .onChange(of: authManager.onlineState) { _, _ in
+            .onChange(of: authenticator.onlineState) { _, _ in
                 reloadDataInBackground()
             }
             .onChange(of: isDatabaseInitialized) { _, newValue in
@@ -207,6 +200,10 @@ struct MyView: View {
                 }
             }
             .onChange(of: database.commonImages) { _, _ in
+                // TODO: Improve race condition when My tab is the startup tab
+                if eventDates == nil {
+                    reloadDataInBackground()
+                }
                 withAnimation(.snappy.speed(2.0)) {
                     eventCoverImage = database.coverImage()
                 }
@@ -215,18 +212,20 @@ struct MyView: View {
     }
 
     func reloadDataInBackground(forceReload: Bool = false) {
-        if let token = authManager.token,
+        if let token = authenticator.token,
            forceReload || userInfo == nil || userEvents.isEmpty || eventData == nil || eventDates == nil {
             Task.detached {
                 await reloadData(using: token)
                 await MainActor.run {
                      withAnimation(.snappy.speed(2.0)) {
-                         eventTitle = events.first(where: {$0.eventNumber == activeEventNumber})?.name
+                         eventTitle = events.first(where: {
+                             $0.eventNumber == planner.activeEventNumber
+                         })?.name
                          isInitialLoadCompleted = true
                      }
                 }
             }
-        } else if authManager.onlineState == .offline {
+        } else if authenticator.onlineState == .offline {
             isInitialLoadCompleted = true
         }
     }
@@ -234,17 +233,10 @@ struct MyView: View {
     func reloadData(using token: OpenIDToken) async {
         let userInfo = await User.info(authToken: token)
         let userEvents = await User.events(authToken: token)
-        let eventData = await WebCatalog.events(authToken: token)
 
         var eventDates: [Int: Date]?
-        var eventNumber: Int?
-        if activeEventNumber == -1, let eventData {
-            eventNumber = eventData.latestEventNumber
-        } else {
-            eventNumber = activeEventNumber
-        }
 
-        if let eventNumber {
+        if let eventNumber = planner.activeEvent?.number {
             let actor = DataFetcher(modelContainer: sharedModelContainer)
             eventDates = await actor.dates(for: eventNumber)
         }
@@ -276,7 +268,7 @@ struct MyView: View {
                 navigator.popToRoot(for: .circles)
                 navigator.popToRoot(for: .more)
                 navigator.selectedTab = .map
-                authManager.resetAuthentication()
+                authenticator.resetAuthentication()
             }
         }
     }

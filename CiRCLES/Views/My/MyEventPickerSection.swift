@@ -10,14 +10,14 @@ import SwiftUI
 
 struct MyEventPickerSection: View {
 
-    @Environment(AuthManager.self) var authManager
+    @Environment(Authenticator.self) var authenticator
+    @Environment(Planner.self) var planner
 
-    @Binding var eventData: WebCatalogEvent.Response?
-    @Binding var activeEventNumber: Int
+    @State var activeEventNumber: Int = -1
 
     var body: some View {
         Section {
-            if let eventData {
+            if let eventData = planner.eventData {
                 Picker(selection: $activeEventNumber) {
                     ForEach(eventData.list.sorted(by: {$0.number > $1.number}), id: \.id) { event in
                         Text("Shared.Event.\(event.number)")
@@ -27,8 +27,8 @@ struct MyEventPickerSection: View {
                     Text("My.Events.SelectEvent")
                 }
                 .pickerStyle(.menu)
-                .disabled(authManager.onlineState == .offline ||
-                          authManager.onlineState == .undetermined)
+                .disabled(authenticator.onlineState == .offline ||
+                          authenticator.onlineState == .undetermined)
             } else {
                 Text("My.Events.OfflineMode")
                     .foregroundStyle(.secondary)
@@ -38,6 +38,14 @@ struct MyEventPickerSection: View {
         } footer: {
             Text("My.Events.Disclaimer")
                 .font(.body)
+        }
+        .onAppear {
+            activeEventNumber = planner.activeEventNumber
+        }
+        .onChange(of: activeEventNumber) { oldValue, _ in
+            if oldValue != -1 {
+                planner.activeEventNumber = activeEventNumber
+            }
         }
     }
 }

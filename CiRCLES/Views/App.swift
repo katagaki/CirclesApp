@@ -12,10 +12,11 @@ import SwiftData
 struct CirclesApp: App {
 
     @StateObject var navigator = Navigator()
-    @StateObject var imageCache = ImageCache()
-    @State var authManager = AuthManager()
+    @State var authenticator = Authenticator()
     @State var favorites = Favorites()
     @State var database = Database()
+    @State var imageCache = ImageCache()
+    @State var planner = Planner()
     @State var oasis = Oasis()
 
     var body: some Scene {
@@ -23,25 +24,26 @@ struct CirclesApp: App {
             MainTabView()
                 .onOpenURL { url in
                     if url.absoluteString == circleMsCancelURLSchema {
-                        authManager.isWaitingForAuthenticationCode = false
+                        authenticator.isWaitingForAuthenticationCode = false
                     } else {
-                        authManager.getAuthenticationCode(from: url)
+                        authenticator.getAuthenticationCode(from: url)
                     }
                 }
-                .onChange(of: authManager.code) { _, newValue in
+                .onChange(of: authenticator.code) { _, newValue in
                     if newValue != nil {
                         Task {
-                            await authManager.getAuthenticationToken()
+                            await authenticator.getAuthenticationToken()
                         }
                     }
                 }
         }
         .modelContainer(sharedModelContainer)
         .environmentObject(navigator)
-        .environmentObject(imageCache)
-        .environment(authManager)
+        .environment(authenticator)
         .environment(favorites)
         .environment(database)
+        .environment(imageCache)
+        .environment(planner)
         .environment(oasis)
         .onChange(of: navigator.selectedTab) { _, _ in
             navigator.saveToDefaults()

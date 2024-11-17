@@ -13,7 +13,7 @@ typealias View = SwiftUI.View
 
 struct MoreDatabaseAdministratiion: View {
 
-    @Environment(AuthManager.self) var authManager
+    @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
     @Environment(Oasis.self) var oasis
 
@@ -104,7 +104,7 @@ struct MoreDatabaseAdministratiion: View {
         UIApplication.shared.isIdleTimerDisabled = true
         oasis.open()
         if !willSkipDownload {
-            if let token = authManager.token,
+            if let token = authenticator.token,
                let eventData = await WebCatalog.events(authToken: token),
                let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
                 database.delete()

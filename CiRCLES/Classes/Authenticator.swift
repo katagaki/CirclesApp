@@ -1,5 +1,5 @@
 //
-//  AuthManager.swift
+//  Authenticator.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/07/09.
@@ -11,7 +11,7 @@ import Reachability
 
 @Observable
 @MainActor
-class AuthManager {
+class Authenticator {
 
     @ObservationIgnored let keychain = Keychain(service: "com.tsubuzaki.CiRCLES")
     @ObservationIgnored let keychainAuthTokenKey: String = "CircleMsAuthToken"
