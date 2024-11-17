@@ -19,7 +19,6 @@ class Authenticator {
 
     var isAuthenticating: Bool = false
     var isWaitingForAuthenticationCode: Bool = false
-    var isRestoring: Bool = false
     var onlineState: OnlineState = .undetermined
 
     var code: String?
@@ -73,10 +72,8 @@ class Authenticator {
                 debugPrint(error.localizedDescription)
             }
         }
-    }
 
-    func restoreAuthentication() {
-        isRestoring = true
+        // Restore previous authentication token
         if let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),
            let token = try? JSONDecoder().decode(
             OpenIDToken.self,
@@ -84,7 +81,6 @@ class Authenticator {
            ) {
             self.token = token
         }
-        isRestoring = false
     }
 
     func resetAuthentication() {
@@ -142,7 +138,6 @@ class Authenticator {
             if let (data, _) = try? await URLSession.shared.data(for: request) {
                 decodeAuthenticationToken(data: data)
             } else {
-                self.token = nil
                 self.isAuthenticating = true
             }
         } else {
