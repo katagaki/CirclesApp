@@ -15,6 +15,7 @@ struct MoreDatabaseAdministratiion: View {
 
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
+    @Environment(ImageCache.self) var imageCache
     @Environment(Oasis.self) var oasis
 
     @State var files: [String: URL] = [:]
@@ -34,6 +35,22 @@ struct MoreDatabaseAdministratiion: View {
                 }
             }
             Section {
+                if let imageCacheDirectory = imageCache.cacheURL,
+                   FileManager.default.fileExists(atPath: imageCacheDirectory.path()) {
+                    HStack {
+                        Text("More.DBAdmin.ImageCache")
+                        Spacer()
+                        if let folderSizeString = folderSize(of: imageCacheDirectory) {
+                            Text(folderSizeString)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button("Shared.Clear", role: .destructive) {
+                            imageCache.clear()
+                        }
+                    }
+                }
                 ForEach(files.keys.sorted(), id: \.self) { fileName in
                     HStack {
                         Text(fileName)
@@ -96,6 +113,29 @@ struct MoreDatabaseAdministratiion: View {
             }
         } catch {
             debugPrint(error.localizedDescription)
+        }
+        return nil
+    }
+
+    func folderSize(of url: URL) -> String? {
+        if let files = try? FileManager.default.contentsOfDirectory(
+            at: url,
+            includingPropertiesForKeys: nil,
+            options: .skipsHiddenFiles
+        ) {
+            var totalSize: UInt64 = 0
+            for file in files {
+                debugPrint(file)
+                do {
+                    let attributes = try FileManager.default.attributesOfItem(atPath: file.path())
+                    if let size = attributes[.size] as? UInt64 {
+                        totalSize += size
+                    }
+                } catch {
+                    debugPrint(error.localizedDescription)
+                }
+            }
+            return ByteCountFormatter.string(fromByteCount: Int64(totalSize), countStyle: .file)
         }
         return nil
     }

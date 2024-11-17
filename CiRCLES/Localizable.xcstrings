@@ -789,6 +789,22 @@
         }
       }
     },
+    "More.DBAdmin.ImageCache" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Image Cache"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画像キャッシュ"
+          }
+        }
+      }
+    },
     "More.DBAdmin.ManageDB" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1682,6 +1698,9 @@
         }
       }
     },
+    "Shared.Clear" : {
+
+    },
     "Shared.Day" : {
       "localizations" : {
         "en" : {
@@ -2258,7 +2277,20 @@
       }
     },
     "Shared.Sort" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sort"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "並べ替え"
+          }
+        }
+      }
     },
     "Shared.Tags" : {
       "extractionState" : "manual",
