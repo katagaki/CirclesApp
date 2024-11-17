@@ -13,20 +13,24 @@ struct CirclePreview: View {
 
     var circle: ComiketCircle
 
-    @State var circleImage: UIImage?
+    @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
+    @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
+    @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
+
+    @Namespace var namespace
 
     var body: some View {
         VStack(alignment: .center, spacing: 6.0) {
-            if let circleImage {
-                Image(uiImage: circleImage)
-            }
+            CircleCutImage(
+                circle,
+                in: namespace,
+                shouldFetchWebCut: showWebCut,
+                showCatalogCut: true,
+                showSpaceName: .constant(showSpaceName),
+                showDay: .constant(showDay)
+            )
             Text(circle.circleName)
         }
         .padding()
-        .onAppear {
-            if let circleImage = database.circleImage(for: circle.id) {
-                self.circleImage = circleImage
-            }
-        }
     }
 }

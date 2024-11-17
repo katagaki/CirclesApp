@@ -9,7 +9,10 @@ import SwiftUI
 
 struct CircleList: View {
 
+    @Environment(Authenticator.self) var authenticator
+    @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
+    @Environment(ImageCache.self) var imageCache
 
     var circles: [ComiketCircle]
     var showsOverlayWhenEmpty: Bool = true
@@ -41,6 +44,10 @@ struct CircleList: View {
                 }
             } preview: {
                 CirclePreview(database: database, circle: circle)
+                    .environment(authenticator)
+                    .environment(favorites)
+                    .environment(database)
+                    .environment(imageCache)
             }
         }
         .listStyle(.plain)
