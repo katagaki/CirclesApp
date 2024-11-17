@@ -68,7 +68,6 @@ struct MainTabView: View {
             switch newValue {
             case .online:
                 Task {
-                    authenticator.restoreAuthentication()
                     await authenticator.refreshAuthenticationToken()
                 }
             case .offline:
@@ -77,8 +76,8 @@ struct MainTabView: View {
             case .undetermined: break
             }
         }
-        .onChange(of: authenticator.token) { oldValue, newValue in
-            if !authenticator.isRestoring, oldValue == nil && newValue != nil {
+        .onChange(of: authenticator.token) { _, newValue in
+            if newValue != nil {
                 reloadData()
             }
         }

@@ -22,6 +22,8 @@ struct CirclesApp: App {
     @State var planner = Planner()
     @State var oasis = Oasis()
 
+    @State var hasAppLaunchedForTheFirstTime: Bool = false
+
     var body: some Scene {
         WindowGroup {
             MainTabView()
@@ -49,28 +51,33 @@ struct CirclesApp: App {
         .environment(planner)
         .environment(oasis)
         .onChange(of: scenePhase) { _, newValue in
-            switch newValue {
-            case .active:
-                if authenticator.token != nil {
-                    if authenticator.onlineState == .online {
-                        if authenticator.tokenExpiryDate > .now {
+            if !hasAppLaunchedForTheFirstTime {
+                hasAppLaunchedForTheFirstTime = true
+            } else {
+                switch newValue {
+                case .active:
+                    if authenticator.token != nil && authenticator.onlineState == .online {
+                        // Require authentication when token expires
+                        if authenticator.tokenExpiryDate < .now {
+                            authenticator.isAuthenticating = true
+                        // Refresh authentication token 1 hour before expiry
+                        } else if authenticator.tokenExpiryDate.addingTimeInterval(-3600) < .now {
                             Task {
                                 await authenticator.refreshAuthenticationToken()
                             }
-                        } else {
-                            authenticator.isAuthenticating = true
                         }
+                        // Do nothing in any other case
                     }
+                case .background:
+                    let request = BGAppRefreshTaskRequest(identifier: "RefreshAuthToken")
+                    #if DEBUG
+                    request.earliestBeginDate = .now.addingTimeInterval(15)
+                    #else
+                    request.earliestBeginDate = .now.addingTimeInterval(12 * 3600)
+                    #endif
+                    try? BGTaskScheduler.shared.submit(request)
+                default: break
                 }
-            case .background:
-                let request = BGAppRefreshTaskRequest(identifier: "RefreshAuthToken")
-                #if DEBUG
-                request.earliestBeginDate = .now.addingTimeInterval(15)
-                #else
-                request.earliestBeginDate = .now.addingTimeInterval(12 * 3600)
-                #endif
-                try? BGTaskScheduler.shared.submit(request)
-            default: break
             }
         }
         .backgroundTask(.appRefresh("RefreshAuthToken")) {
