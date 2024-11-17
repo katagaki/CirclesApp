@@ -102,6 +102,7 @@ class Planner {
             // Set active event to latest event if active event number is not specified
             if activeEventNumber == -1 {
                 activeEventNumber = latestEvent.number
+                activeEventNumberUserDefault = activeEventNumber
                 isActiveEventLatest = true
             }
             isActiveEventLatest = activeEventNumber == eventData.latestEventNumber
@@ -155,6 +156,7 @@ class Planner {
         withAnimation(.snappy.speed(2.0)) {
             participation[String(activeEventNumber)] = participationData
         }
+        participationUserDefault = participation
     }
 
 }
