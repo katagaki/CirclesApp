@@ -78,7 +78,7 @@ struct MainTabView: View {
             }
         }
         .onChange(of: authenticator.token) { oldValue, newValue in
-            if oldValue == nil && newValue != nil, !authenticator.isRestoring {
+            if !authenticator.isRestoring, oldValue == nil && newValue != nil {
                 reloadData()
             }
         }

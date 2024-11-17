@@ -5,25 +5,35 @@
 //  Created by シン・ジャスティン on 2024/11/09.
 //
 
+import SwiftData
 import SwiftUI
 
 struct CircleCutImage: View {
+
+    @Environment(\.modelContext) var modelContext
+
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
     @Environment(ImageCache.self) var imageCache
+    @Environment(Planner.self) var planner
 
     @Binding var showSpaceName: Bool
     @Binding var showDay: Bool
+
+    @Query var visits: [CirclesVisitEntry]
 
     var circle: ComiketCircle
     var namespace: Namespace.ID
     var shouldFetchWebCut: Bool
     var showCatalogCut: Bool
     var forceWebCutUpdate: Bool
+    var showVisitStatus: Bool
 
     @State var isWebCutURLFetched: Bool = false
     @State var webCutImage: UIImage?
+
+    @State var isVisited: Bool = false
 
     init(
         _ circle: ComiketCircle,
@@ -31,6 +41,7 @@ struct CircleCutImage: View {
         shouldFetchWebCut: Bool = false,
         showCatalogCut: Bool = true,
         forceWebCutUpdate: Bool = false,
+        showVisitStatus: Bool = true,
         showSpaceName: Binding<Bool>,
         showDay: Binding<Bool>
     ) {
@@ -39,51 +50,58 @@ struct CircleCutImage: View {
         self.shouldFetchWebCut = shouldFetchWebCut
         self.showCatalogCut = showCatalogCut
         self.forceWebCutUpdate = forceWebCutUpdate
+        self.showVisitStatus = showVisitStatus
         self._showSpaceName = showSpaceName
         self._showDay = showDay
+        let circleID = circle.id
+        self._visits = Query(
+            filter: #Predicate {
+                $0.circleID == circleID
+            }
+        )
     }
 
     var body: some View {
-        Group {
-            if let image = database.circleImage(for: circle.id) {
-                if let webCutImage {
-                    Image(uiImage: webCutImage)
-                        .resizable()
-                        .scaledToFit()
-                } else {
-                    if showCatalogCut {
-                        Image(uiImage: image)
+        ZStack(alignment: .topLeading) {
+            Group {
+                if let image = database.circleImage(for: circle.id) {
+                    if let webCutImage {
+                        Image(uiImage: webCutImage)
                             .resizable()
                             .scaledToFit()
                     } else {
-                        if shouldFetchWebCut && !isWebCutURLFetched {
-                            ZStack(alignment: .center) {
-                                ProgressView()
-                                Color.clear
-                            }
-                            .aspectRatio(180.0 / 256.0, contentMode: .fit)
+                        if showCatalogCut {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFit()
                         } else {
-                            Rectangle()
-                                .foregroundStyle(Color.primary.opacity(0.05))
-                                .overlay {
-                                    Text("Circles.NoImage")
-                                        .font(.caption)
-                                        .foregroundStyle(.secondary)
+                            if shouldFetchWebCut && !isWebCutURLFetched {
+                                ZStack(alignment: .center) {
+                                    ProgressView()
+                                    Color.clear
                                 }
+                                .aspectRatio(180.0 / 256.0, contentMode: .fit)
+                            } else {
+                                Rectangle()
+                                    .foregroundStyle(Color.primary.opacity(0.05))
+                                    .overlay {
+                                        Text("Circles.NoImage")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                    }
+                            }
                         }
                     }
+                } else {
+                    ZStack(alignment: .center) {
+                        ProgressView()
+                        Color.clear
+                    }
+                    .aspectRatio(180.0 / 256.0, contentMode: .fit)
                 }
-            } else {
-                ZStack(alignment: .center) {
-                    ProgressView()
-                    Color.clear
-                }
-                .aspectRatio(180.0 / 256.0, contentMode: .fit)
             }
-        }
-        .overlay {
-            if showCatalogCut || (shouldFetchWebCut && isWebCutURLFetched && webCutImage != nil) {
-                GeometryReader { proxy in
+            GeometryReader { proxy in
+                if showCatalogCut || (shouldFetchWebCut && isWebCutURLFetched && webCutImage != nil) {
                     ZStack(alignment: .topLeading) {
                         if let favorites = favorites.wcIDMappedItems,
                            let extendedInformation = circle.extendedInformation,
@@ -93,6 +111,17 @@ struct CircleCutImage: View {
                                        height: 0.23 * proxy.size.width)
                                 .offset(x: 0.03 * proxy.size.width,
                                         y: 0.03 * proxy.size.width)
+                        }
+                        if showVisitStatus, !visits.filter({$0.eventNumber == planner.activeEventNumber}).isEmpty {
+                            Image(systemName: "checkmark")
+                                .resizable()
+                                .scaledToFit()
+                                .fontWeight(.black)
+                                .foregroundStyle(checkmarkColor())
+                                .frame(width: 0.20 * proxy.size.width,
+                                       height: 0.20 * proxy.size.width)
+                                .offset(x: 0.045 * proxy.size.width,
+                                        y: 0.045 * proxy.size.width)
                         }
                         Color.clear
                     }
@@ -121,44 +150,71 @@ struct CircleCutImage: View {
                 }
             }
         }
-        .task {
+        .onAppear {
             if shouldFetchWebCut && !isWebCutURLFetched {
-                let webCutImage = try? await updateWebCut(for: circle)
-                isWebCutURLFetched = true
-                await MainActor.run {
-                    withAnimation(.smooth.speed(2.0)) {
-                        self.webCutImage = webCutImage
+                if let extendedInformation = circle.extendedInformation {
+                    let circleID = circle.id
+                    let webCatalogID = extendedInformation.webCatalogID
+                    Task.detached {
+                        let webCutImage = try? await webCut(for: circleID, webCatalogID: webCatalogID)
+                        await MainActor.run {
+                            withAnimation(.smooth.speed(2.0)) {
+                                self.webCutImage = webCutImage
+                                isWebCutURLFetched = true
+                            }
+                        }
                     }
+                }
+            }
+            if showVisitStatus {
+                Task.detached {
+                    await updateVisitStatus()
                 }
             }
         }
     }
 
-    func updateWebCut(for circle: ComiketCircle) async throws -> UIImage? {
+    func webCut(for circleID: Int, webCatalogID: Int) async throws -> UIImage? {
         if !forceWebCutUpdate {
-            let (isWebCutFetched, image) = imageCache.image(circle.id)
+            let (isWebCutFetched, image) = imageCache.image(circleID)
             if isWebCutFetched {
                 return image
             }
         }
-        return await fetchWebCut(for: circle)
-    }
-
-    func fetchWebCut(for circle: ComiketCircle) async -> UIImage? {
-        if let token = authenticator.token, let extendedInformation = circle.extendedInformation {
+        if let token = authenticator.token {
             if let circleResponse = await WebCatalog.circle(
-                with: extendedInformation.webCatalogID, authToken: token
+                with: webCatalogID, authToken: token
             ),
                let webCatalogInformation = circleResponse.response.circle {
                 if webCatalogInformation.cutWebURL != "" {
                     if let webCutURL = URL(string: webCatalogInformation.cutWebURL) {
-                        return await imageCache.download(id: circle.id, url: webCutURL)
+                        return await imageCache.download(id: circleID, url: webCutURL)
                     }
                 } else {
-                    imageCache.saveImage(Data(), named: String(circle.id))
+                    imageCache.saveImage(Data(), named: String(circleID))
                 }
             }
         }
         return nil
+    }
+
+    func updateVisitStatus() async {
+        let eventNumber = planner.activeEventNumber
+        let circleID = circle.id
+        let actor = Secretary(modelContainer: sharedModelContainer)
+        let isVisited = await actor.hasVisitEntry(in: eventNumber, for: circleID)
+        await MainActor.run {
+            self.isVisited = isVisited
+        }
+    }
+
+    func checkmarkColor() -> Color {
+        if let favorites = favorites.wcIDMappedItems,
+           let extendedInformation = circle.extendedInformation,
+           let favorite = favorites[extendedInformation.webCatalogID] {
+            return favorite.favorite.color.foregroundColor()
+        } else {
+            return .black.opacity(0.9)
+        }
     }
 }
