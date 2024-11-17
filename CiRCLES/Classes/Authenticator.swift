@@ -24,6 +24,7 @@ class Authenticator {
 
     var code: String?
     var token: OpenIDToken?
+    var tokenExpiryDate: Date = .distantFuture
 
     @ObservationIgnored let client: OpenIDClient
 
@@ -77,8 +78,10 @@ class Authenticator {
     func restoreAuthentication() {
         isRestoring = true
         if let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),
-           let token = try? JSONDecoder().decode(OpenIDToken.self,
-                                                 from: tokenInKeychain.data(using: .utf8) ?? Data()) {
+           let token = try? JSONDecoder().decode(
+            OpenIDToken.self,
+            from: tokenInKeychain.data(using: .utf8) ?? Data()
+           ) {
             self.token = token
         }
         isRestoring = false
@@ -150,6 +153,8 @@ class Authenticator {
     func decodeAuthenticationToken(data: Data) {
         if let token = try? JSONDecoder().decode(OpenIDToken.self, from: data) {
             self.token = token
+            let expiresIn = max(0, (Int(token.expiresIn) ?? 0) - 3600)
+            tokenExpiryDate = Calendar.current.date(byAdding: .second, value: expiresIn, to: .now) ?? .distantFuture
             if let tokenEncoded = try? JSONEncoder().encode(token),
                let tokenString = String(data: tokenEncoded, encoding: .utf8) {
                 try? keychain.set(tokenString, key: keychainAuthTokenKey)
