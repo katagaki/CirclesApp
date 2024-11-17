@@ -91,6 +91,9 @@ struct MainTabView: View {
                 .displayFrequency(.immediate),
                 .datastoreLocation(.applicationDefault)
             ])
+            if authenticator.onlineState == .online {
+                reloadData()
+            }
         }
         .onChange(of: authenticator.onlineState) { _, newValue in
             switch newValue {
