@@ -48,6 +48,10 @@ struct CircleGrid: View {
                         .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
                     }
                     .contextMenu {
+                        Button("Shared.Open") {
+                            onSelect(circle)
+                        }
+                        Divider()
                         if let twitterURL = circle.extendedInformation?.twitterURL {
                             SNSButton(twitterURL, type: .twitter)
                         }
