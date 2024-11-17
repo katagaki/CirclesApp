@@ -10,12 +10,12 @@ import SwiftData
 
 @Model
 final class CirclesVisitEntry {
-    var eventID: Int
+    var eventNumber: Int
     var circleID: Int
     var visitDate: Date?
 
-    init(eventID: Int, circleID: Int, visitDate: Date? = nil) {
-        self.eventID = eventID
+    init(eventNumber: Int, circleID: Int, visitDate: Date? = nil) {
+        self.eventNumber = eventNumber
         self.circleID = circleID
         self.visitDate = visitDate
     }

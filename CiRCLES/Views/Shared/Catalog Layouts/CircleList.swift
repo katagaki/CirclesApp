@@ -9,11 +9,6 @@ import SwiftUI
 
 struct CircleList: View {
 
-    @Environment(Authenticator.self) var authenticator
-    @Environment(Favorites.self) var favorites
-    @Environment(Database.self) var database
-    @Environment(ImageCache.self) var imageCache
-
     var circles: [ComiketCircle]
     var showsOverlayWhenEmpty: Bool = true
     var displayMode: ListDisplayMode
@@ -32,26 +27,8 @@ struct CircleList: View {
                     CircleListCompactRow(circle: circle, namespace: namespace)
                 }
             }
-            .contextMenu {
-                Button("Shared.Open") {
-                    onSelect(circle)
-                }
-                Divider()
-                if let twitterURL = circle.extendedInformation?.twitterURL {
-                    SNSButton(twitterURL, type: .twitter)
-                }
-                if let pixivURL = circle.extendedInformation?.pixivURL {
-                    SNSButton(pixivURL, type: .pixiv)
-                }
-                if let circleMsPortalURL = circle.extendedInformation?.circleMsPortalURL {
-                    SNSButton(circleMsPortalURL, type: .circleMs)
-                }
-            } preview: {
-                CirclePreview(database: database, circle: circle)
-                    .environment(authenticator)
-                    .environment(favorites)
-                    .environment(database)
-                    .environment(imageCache)
+            .contextMenu(circle: circle) {
+                onSelect(circle)
             }
         }
         .listStyle(.plain)

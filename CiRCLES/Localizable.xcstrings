@@ -2164,6 +2164,38 @@
         }
       }
     },
+    "Shared.MarkNotVisited" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark Not Visited"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未訪問とする"
+          }
+        }
+      }
+    },
+    "Shared.MarkVisited" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mark Visited"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "訪問済みとする"
+          }
+        }
+      }
+    },
     "Shared.Open" : {
       "localizations" : {
         "en" : {
