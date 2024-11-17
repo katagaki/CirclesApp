@@ -19,8 +19,6 @@ struct CircleContextMenu: ViewModifier {
 
     @Query var visits: [CirclesVisitEntry]
 
-    let actor = Secretary(modelContainer: sharedModelContainer)
-
     var circle: ComiketCircle
     var open: () -> Void
 
