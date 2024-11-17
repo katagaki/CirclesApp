@@ -80,6 +80,8 @@ class Authenticator {
             from: tokenInKeychain.data(using: .utf8) ?? Data()
            ) {
             self.token = token
+            let expiresIn = max(0, (Int(token.expiresIn) ?? 0) - 3600)
+            self.tokenExpiryDate = Calendar.current.date(byAdding: .second, value: expiresIn, to: .now) ?? .distantFuture
         }
     }
 
