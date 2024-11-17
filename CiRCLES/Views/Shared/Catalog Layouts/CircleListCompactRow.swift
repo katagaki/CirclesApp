@@ -28,6 +28,7 @@ struct CircleListCompactRow: View {
             .automaticMatchedTransitionSource(id: circle.id, in: namespace)
             .frame(width: 28.0, height: 40.0, alignment: .center)
             Text(circle.circleName)
+                .strikethrough(circle: circle)
             Spacer()
             if showSpaceName || showDay {
                 HStack(alignment: .center) {

@@ -29,6 +29,7 @@ struct CircleListRegularRow: View {
             .frame(width: 70.0, height: 100.0, alignment: .center)
             VStack(alignment: .leading, spacing: 5.0) {
                 Text(circle.circleName)
+                    .strikethrough(circle: circle)
                 if circle.penName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
                     Text(circle.penName)
                         .foregroundStyle(.secondary)

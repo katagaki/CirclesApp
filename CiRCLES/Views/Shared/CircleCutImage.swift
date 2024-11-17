@@ -33,8 +33,6 @@ struct CircleCutImage: View {
     @State var isWebCutURLFetched: Bool = false
     @State var webCutImage: UIImage?
 
-    @State var isVisited: Bool = false
-
     init(
         _ circle: ComiketCircle,
         in namespace: Namespace.ID,
@@ -166,11 +164,6 @@ struct CircleCutImage: View {
                     }
                 }
             }
-            if showVisitStatus {
-                Task.detached {
-                    await updateVisitStatus()
-                }
-            }
         }
     }
 
@@ -196,16 +189,6 @@ struct CircleCutImage: View {
             }
         }
         return nil
-    }
-
-    func updateVisitStatus() async {
-        let eventNumber = planner.activeEventNumber
-        let circleID = circle.id
-        let actor = Secretary(modelContainer: sharedModelContainer)
-        let isVisited = await actor.hasVisitEntry(in: eventNumber, for: circleID)
-        await MainActor.run {
-            self.isVisited = isVisited
-        }
     }
 
     func checkmarkColor() -> Color {

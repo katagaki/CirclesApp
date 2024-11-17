@@ -27,7 +27,7 @@
 		E47192132CE8E17300B9F35F /* FavoritesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47192122CE8E16C00B9F35F /* FavoritesToolbar.swift */; };
 		E47192192CE9A49600B9F35F /* Planner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47192182CE9A47C00B9F35F /* Planner.swift */; };
 		E471921B2CEA068500B9F35F /* CircleContextMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = E471921A2CEA067E00B9F35F /* CircleContextMenu.swift */; };
-		E471921F2CEA0CA500B9F35F /* Secretary.swift in Sources */ = {isa = PBXBuildFile; fileRef = E471921E2CEA0CA200B9F35F /* Secretary.swift */; };
+		E47192212CEA1CD400B9F35F /* CircleStrikethrough.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47192202CEA1CC200B9F35F /* CircleStrikethrough.swift */; };
 		E47268F42C38EACD00D5335D /* Endpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47268F32C38EACB00D5335D /* Endpoints.swift */; };
 		E47269042C3D716500D5335D /* Authenticator.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47269032C3D716300D5335D /* Authenticator.swift */; };
 		E47269072C3D739700D5335D /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47269062C3D739500D5335D /* SafariView.swift */; };
@@ -152,7 +152,7 @@
 		E47192122CE8E16C00B9F35F /* FavoritesToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesToolbar.swift; sourceTree = "<group>"; };
 		E47192182CE9A47C00B9F35F /* Planner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Planner.swift; sourceTree = "<group>"; };
 		E471921A2CEA067E00B9F35F /* CircleContextMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleContextMenu.swift; sourceTree = "<group>"; };
-		E471921E2CEA0CA200B9F35F /* Secretary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secretary.swift; sourceTree = "<group>"; };
+		E47192202CEA1CC200B9F35F /* CircleStrikethrough.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleStrikethrough.swift; sourceTree = "<group>"; };
 		E47268F32C38EACB00D5335D /* Endpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Endpoints.swift; sourceTree = "<group>"; };
 		E47269032C3D716300D5335D /* Authenticator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Authenticator.swift; sourceTree = "<group>"; };
 		E47269062C3D739500D5335D /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
@@ -275,10 +275,11 @@
 		E42003CD2C631E4100770992 /* View Modifiers */ = {
 			isa = PBXGroup;
 			children = (
-				E471921A2CEA067E00B9F35F /* CircleContextMenu.swift */,
 				E43C74092C6DFA69003522C8 /* AdaptiveInvert.swift */,
 				E4755BAD2C83507D0032DA2F /* AutomaticMatchedTransitionSource.swift */,
 				E4755BAF2C83535E0032DA2F /* AutomaticNavigationTransition.swift */,
+				E471921A2CEA067E00B9F35F /* CircleContextMenu.swift */,
+				E47192202CEA1CC200B9F35F /* CircleStrikethrough.swift */,
 				E42003CE2C631E4900770992 /* ConditionalFit.swift */,
 				E43C74112C702748003522C8 /* Rotation.swift */,
 			);
@@ -389,7 +390,6 @@
 				E4755BBD2C8419BF0032DA2F /* DataConverter.swift */,
 				E4755BC42C8456EF0032DA2F /* DataFetcher.swift */,
 				E4755BC22C843D7B0032DA2F /* FavoritesActor.swift */,
-				E471921E2CEA0CA200B9F35F /* Secretary.swift */,
 			);
 			path = Actors;
 			sourceTree = "<group>";
@@ -764,6 +764,7 @@
 				E48B62912C5FC023007874AE /* Favorites.swift in Sources */,
 				E46D51A92C22390E000524B9 /* LoginView.swift in Sources */,
 				E480AAAA2C4C93A5009C1445 /* ComiketEvent.swift in Sources */,
+				E47192212CEA1CD400B9F35F /* CircleStrikethrough.swift in Sources */,
 				E480AAB52C4C9C84009C1445 /* ComiketDate.swift in Sources */,
 				E48B62932C5FC1C0007874AE /* UserFavorites.swift in Sources */,
 				E48B62952C5FC218007874AE /* WebCatalogCircle.swift in Sources */,
@@ -782,7 +783,6 @@
 				E49F42892C969A4E00ABF424 /* LoadingPill.swift in Sources */,
 				E4755BCC2C848D810032DA2F /* DatabaseType.swift in Sources */,
 				E480AAAF2C4C9834009C1445 /* Size.swift in Sources */,
-				E471921F2CEA0CA500B9F35F /* Secretary.swift in Sources */,
 				E47192132CE8E17300B9F35F /* FavoritesToolbar.swift in Sources */,
 				E40295802CDF4B4600CB2377 /* CircleCutImage.swift in Sources */,
 				E4D74B9C2C8E00320014CD16 /* MapToolbar.swift in Sources */,
