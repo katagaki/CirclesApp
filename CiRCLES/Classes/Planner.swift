@@ -15,7 +15,7 @@ class Planner {
     @ObservationIgnored let participationKey = "My.Participation"
 
     var eventData: WebCatalogEvent.Response?
-    var latestEvent: WebCatalogEvent.Response.Event?
+    @ObservationIgnored var latestEvent: WebCatalogEvent.Response.Event?
 
     var activeEvent: WebCatalogEvent.Response.Event?
     @ObservationIgnored var activeEventNumberUserDefault: Int {

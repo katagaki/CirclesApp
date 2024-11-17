@@ -101,6 +101,8 @@ struct MainTabView: View {
             }
             oasis.open {
                 Task {
+                    await oasis.setHeaderText("Shared.LoadingHeader.Event")
+                    await oasis.setBodyText("Shared.LoadingText.FetchEventData")
                     if let authToken = authenticator.token {
                         await planner.prepare(authToken: authToken)
                     }

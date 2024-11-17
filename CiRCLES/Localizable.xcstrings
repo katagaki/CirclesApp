@@ -1909,6 +1909,23 @@
         }
       }
     },
+    "Shared.LoadingHeader.Event" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Updating Event Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベントデータ更新中"
+          }
+        }
+      }
+    },
     "Shared.LoadingHeader.Favorites" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2041,6 +2058,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "お気に入りの情報を取得中…"
+          }
+        }
+      }
+    },
+    "Shared.LoadingText.FetchEventData" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Getting event data..."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベントデータを取得中…"
           }
         }
       }
