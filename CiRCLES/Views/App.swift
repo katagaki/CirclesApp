@@ -5,11 +5,14 @@
 //  Created by シン・ジャスティン on 2024/06/18.
 //
 
+import BackgroundTasks
 import SwiftUI
 import SwiftData
 
 @main
 struct CirclesApp: App {
+
+    @Environment(\.scenePhase) private var scenePhase
 
     @StateObject var navigator = Navigator()
     @State var authenticator = Authenticator()
@@ -45,6 +48,34 @@ struct CirclesApp: App {
         .environment(imageCache)
         .environment(planner)
         .environment(oasis)
+        .onChange(of: scenePhase) { _, newValue in
+            switch newValue {
+            case .active:
+                if authenticator.token != nil {
+                    if authenticator.onlineState == .online {
+                        if authenticator.tokenExpiryDate > .now {
+                            Task {
+                                await authenticator.refreshAuthenticationToken()
+                            }
+                        } else {
+                            authenticator.isAuthenticating = true
+                        }
+                    }
+                }
+            case .background:
+                let request = BGAppRefreshTaskRequest(identifier: "RefreshAuthToken")
+                #if DEBUG
+                request.earliestBeginDate = .now.addingTimeInterval(15)
+                #else
+                request.earliestBeginDate = .now.addingTimeInterval(12 * 3600)
+                #endif
+                try? BGTaskScheduler.shared.submit(request)
+            default: break
+            }
+        }
+        .backgroundTask(.appRefresh("RefreshAuthToken")) {
+            await authenticator.refreshAuthenticationToken()
+        }
         .onChange(of: navigator.selectedTab) { _, _ in
             navigator.saveToDefaults()
         }
