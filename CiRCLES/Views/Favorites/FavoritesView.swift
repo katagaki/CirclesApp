@@ -11,14 +11,18 @@ import SwiftUI
 
 struct FavoritesView: View {
 
+    @Environment(\.modelContext) var modelContext
+
     @EnvironmentObject var navigator: Navigator
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
+    @Environment(Planner.self) var planner
 
-    @Environment(\.modelContext) var modelContext
+    @Query var visits: [CirclesVisitEntry]
 
     @State var favoriteCircles: [String: [ComiketCircle]]?
+    @State var isVisitMode: Bool = false
 
     @Namespace var favoritesNamespace
 
@@ -31,7 +35,24 @@ struct FavoritesView: View {
                         showsOverlayWhenEmpty: false,
                         namespace: favoritesNamespace
                     ) { circle in
-                        navigator.push(.circlesDetail(circle: circle), for: .favorites)
+                        if !isVisitMode {
+                            navigator.push(.circlesDetail(circle: circle), for: .favorites)
+                        } else {
+                            let existingVisits = visits.filter({
+                                $0.circleID == circle.id && $0.eventNumber == planner.activeEventNumber
+                            })
+                            if existingVisits.isEmpty {
+                                modelContext.insert(
+                                    CirclesVisitEntry(eventNumber: planner.activeEventNumber,
+                                                      circleID: circle.id,
+                                                      visitDate: .now)
+                                )
+                            } else {
+                                for visit in existingVisits {
+                                    modelContext.delete(visit)
+                                }
+                            }
+                        }
                     }
                        .overlay {
                            if favoriteCircles.isEmpty {
@@ -52,7 +73,7 @@ struct FavoritesView: View {
             .toolbarBackground(.hidden, for: .tabBar)
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 BarAccessory(placement: .bottom) {
-                    FavoritesToolbar()
+                    FavoritesToolbar(isVisitMode: $isVisitMode)
                 }
             }
             .refreshable {

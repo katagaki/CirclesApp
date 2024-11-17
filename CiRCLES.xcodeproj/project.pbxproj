@@ -22,6 +22,7 @@
 		E43C740C2C6DFD1B003522C8 /* InteractiveMapDetailPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C740B2C6DFD15003522C8 /* InteractiveMapDetailPopover.swift */; };
 		E43C74102C6EDD85003522C8 /* LoginFeatureHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C740F2C6EDD85003522C8 /* LoginFeatureHero.swift */; };
 		E43C74122C702750003522C8 /* Rotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C74112C702748003522C8 /* Rotation.swift */; };
+		E447F8BF2CEA225A0023BCD3 /* VisitModeTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447F8BE2CEA22570023BCD3 /* VisitModeTip.swift */; };
 		E46D51A92C22390E000524B9 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51A82C22390E000524B9 /* LoginView.swift */; };
 		E47192112CE8DA9000B9F35F /* CirclesVisitEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47192102CE8DA8A00B9F35F /* CirclesVisitEntry.swift */; };
 		E47192132CE8E17300B9F35F /* FavoritesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47192122CE8E16C00B9F35F /* FavoritesToolbar.swift */; };
@@ -147,6 +148,7 @@
 		E43C740B2C6DFD15003522C8 /* InteractiveMapDetailPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InteractiveMapDetailPopover.swift; sourceTree = "<group>"; };
 		E43C740F2C6EDD85003522C8 /* LoginFeatureHero.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginFeatureHero.swift; sourceTree = "<group>"; };
 		E43C74112C702748003522C8 /* Rotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rotation.swift; sourceTree = "<group>"; };
+		E447F8BE2CEA22570023BCD3 /* VisitModeTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitModeTip.swift; sourceTree = "<group>"; };
 		E46D51A82C22390E000524B9 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		E47192102CE8DA8A00B9F35F /* CirclesVisitEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclesVisitEntry.swift; sourceTree = "<group>"; };
 		E47192122CE8E16C00B9F35F /* FavoritesToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesToolbar.swift; sourceTree = "<group>"; };
@@ -419,6 +421,7 @@
 			isa = PBXGroup;
 			children = (
 				E4755BD32C84A4D20032DA2F /* GenreOverlayTip.swift */,
+				E447F8BE2CEA22570023BCD3 /* VisitModeTip.swift */,
 			);
 			path = Tips;
 			sourceTree = "<group>";
@@ -757,6 +760,7 @@
 				E480AA9A2C44A49F009C1445 /* WebCatalogEvent.swift in Sources */,
 				E480AAA32C44B723009C1445 /* Database.swift in Sources */,
 				E49351EC2C4CC972004CBDA1 /* ComiketBlock.swift in Sources */,
+				E447F8BF2CEA225A0023BCD3 /* VisitModeTip.swift in Sources */,
 				E4755BDA2C84B71D0032DA2F /* FavoriteButton.swift in Sources */,
 				E49F42872C96994F00ABF424 /* MyEventNotifierSheet.swift in Sources */,
 				E480AA8B2C4429B4009C1445 /* TabType.swift in Sources */,

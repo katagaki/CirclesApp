@@ -1699,7 +1699,20 @@
       }
     },
     "Shared.Clear" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clear"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "クリア"
+          }
+        }
+      }
     },
     "Shared.Day" : {
       "localizations" : {
@@ -2437,6 +2450,22 @@
         }
       }
     },
+    "Shared.VisitMode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visit Mode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "訪問モード"
+          }
+        }
+      }
+    },
     "Tab.Circles" : {
       "localizations" : {
         "en" : {
@@ -2547,6 +2576,62 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ジャンルをマップに表示"
+          }
+        }
+      }
+    },
+    "Tip.VisitMode.Description" : {
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "device" : {
+              "mac" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Turning on Visit Mode will let you easily mark circles as visited by simply clicking on them.\nTo turn off Visit Mode, click ‘Visit Mode’ again."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Turning on Visit Mode will let you easily mark circles as visited by simply tapping on them.\nTo turn off Visit Mode, tap ‘Visit Mode’ again."
+                }
+              }
+            }
+          }
+        },
+        "ja" : {
+          "variations" : {
+            "device" : {
+              "mac" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "訪問モードをオンにすると、サークルをクリックすると訪問済みとされます。\n訪問モードをオフにするには、再度「訪問モード」をクリックします。"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "訪問モードをオンにすると、サークルをタッチすると訪問済みとされます。\n訪問モードをオフにするには、再度「訪問モード」をタッチします。"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Tip.VisitMode.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Visit Mode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "訪問モードについて"
           }
         }
       }
