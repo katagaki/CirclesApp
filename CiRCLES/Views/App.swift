@@ -34,13 +34,6 @@ struct CirclesApp: App {
                         authenticator.getAuthenticationCode(from: url)
                     }
                 }
-                .onChange(of: authenticator.code) { _, newValue in
-                    if newValue != nil {
-                        Task {
-                            await authenticator.getAuthenticationToken()
-                        }
-                    }
-                }
         }
         .modelContainer(sharedModelContainer)
         .environmentObject(navigator)
@@ -80,11 +73,21 @@ struct CirclesApp: App {
                 }
             }
         }
-        .backgroundTask(.appRefresh("RefreshAuthToken")) {
-            await authenticator.refreshAuthenticationToken()
+        .onChange(of: authenticator.code) { _, newValue in
+            if newValue != nil {
+                Task {
+                    await authenticator.getAuthenticationToken()
+                }
+            }
+        }
+        .onChange(of: planner.participation) { _, _ in
+            planner.participationUserDefault = planner.participation
         }
         .onChange(of: navigator.selectedTab) { _, _ in
             navigator.saveToDefaults()
+        }
+        .backgroundTask(.appRefresh("RefreshAuthToken")) {
+            await authenticator.refreshAuthenticationToken()
         }
     }
 }

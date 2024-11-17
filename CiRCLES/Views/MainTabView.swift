@@ -20,7 +20,7 @@ struct MainTabView: View {
     @Environment(Oasis.self) var oasis
     @Environment(Planner.self) var planner
 
-    @State var isDownloading: Bool = false
+    @State var isReloadingData: Bool = false
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
 
@@ -49,7 +49,35 @@ struct MainTabView: View {
             }
         }
         .overlay {
-            if oasis.isShowing {
+            ZStack(alignment: .topLeading) {
+                Color.clear
+                VStack(alignment: .leading) {
+                    Group {
+                        switch authenticator.onlineState {
+                        case .online:
+                            RoundedRectangle(cornerRadius: 6.0)
+                                .fill(Color.green)
+                        case .offline:
+                            RoundedRectangle(cornerRadius: 6.0)
+                                .fill(Color.red)
+                        case .undetermined:
+                            RoundedRectangle(cornerRadius: 6.0)
+                                .fill(Color.gray)
+                        }
+                    }
+                    .frame(width: 8.0, height: 8.0)
+                    Group {
+                        Text(verbatim: "Token expiry: \(authenticator.tokenExpiryDate)")
+                        Text(verbatim: "Token string: \((authenticator.token?.accessToken ?? "").prefix(5))")
+                        Text(verbatim: "Active event number: \(planner.activeEventNumber)")
+                        Text(verbatim: "Event count: \(planner.eventData?.list.count)")
+                    }
+                    .font(.system(size: 10.0))
+                }
+            }
+        }
+        .overlay {
+            if oasis.isShowing || authenticator.onlineState == .undetermined {
                 oasis.progressView(loadingNamespace)
             }
         }
@@ -88,14 +116,11 @@ struct MainTabView: View {
                 reloadData(forceDownload: true)
             }
         }
-        .onChange(of: planner.participation) { _, _ in
-            planner.participationUserDefault = planner.participation
-        }
     }
 
     func reloadData(forceDownload: Bool = false) {
-        if !isDownloading {
-            isDownloading = true
+        if !isReloadingData {
+            isReloadingData = true
             if forceDownload {
                 isDatabaseInitialized = false
             }
@@ -113,7 +138,7 @@ struct MainTabView: View {
                         await loadFavorites()
                         await MainActor.run {
                             oasis.close()
-                            isDownloading = false
+                            isReloadingData = false
                         }
                     }
                 }
