@@ -15,7 +15,7 @@ struct WebCatalogEvent: Codable {
         let latestEventID: Int
         let latestEventNumber: Int
 
-        struct Event: Codable {
+        struct Event: Codable, Equatable {
             let id: Int
             let number: Int
 

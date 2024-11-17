@@ -11,10 +11,10 @@ import SwiftUI
 struct LoginView: View {
 
     @Environment(\.openURL) var openURL
-    @Environment(AuthManager.self) var authManager
+    @Environment(Authenticator.self) var authenticator
 
     var body: some View {
-        @Bindable var authManager = authManager
+        @Bindable var authenticator = authenticator
         ScrollView {
             VStack(alignment: .leading, spacing: 16.0) {
                 Text("Login.Title")
@@ -55,9 +55,9 @@ struct LoginView: View {
                     .foregroundStyle(.secondary)
                     Button {
                         #if !targetEnvironment(macCatalyst) && !os(visionOS)
-                        authManager.isWaitingForAuthenticationCode = true
+                        authenticator.isWaitingForAuthenticationCode = true
                         #else
-                        openURL(authManager.authURL)
+                        openURL(authenticator.authURL)
                         #endif
                     } label: {
                         Text("Shared.Login")
@@ -72,8 +72,8 @@ struct LoginView: View {
             }
         }
         #if !os(visionOS)
-        .sheet(isPresented: $authManager.isWaitingForAuthenticationCode) {
-            SafariView(url: authManager.authURL)
+        .sheet(isPresented: $authenticator.isWaitingForAuthenticationCode) {
+            SafariView(url: authenticator.authURL)
                 .ignoresSafeArea()
         }
         #endif

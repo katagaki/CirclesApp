@@ -8,10 +8,10 @@
 import SwiftUI
 
 struct CircleCutImage: View {
-    @EnvironmentObject var imageCache: ImageCache
-    @Environment(AuthManager.self) var authManager
+    @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
+    @Environment(ImageCache.self) var imageCache
 
     @Binding var showSpaceName: Bool
     @Binding var showDay: Bool
@@ -107,7 +107,7 @@ struct CircleCutImage: View {
         if isWebCutFetched {
             return image
         } else {
-            if let token = authManager.token, let extendedInformation = circle.extendedInformation {
+            if let token = authenticator.token, let extendedInformation = circle.extendedInformation {
                 if let circleResponse = await WebCatalog.circle(
                     with: extendedInformation.webCatalogID, authToken: token
                 ),

@@ -11,7 +11,7 @@ import SwiftUI
 
 struct MoreView: View {
     @EnvironmentObject var navigator: Navigator
-    @Environment(AuthManager.self) var authManager
+    @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
 
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool

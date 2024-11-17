@@ -59,13 +59,13 @@ struct MapView: View {
                     Group {
                         #if !os(visionOS)
                         if orientation.isPortrait || UIDevice.current.userInterfaceIdiom == .pad {
-                            MapSelector(selectedDate: $selectedDate, selectedMap: $selectedMap)
+                            MapToolbar(selectedDate: $selectedDate, selectedMap: $selectedMap)
                         } else {
                             Color.clear
                                 .frame(height: 0.0)
                         }
                         #else
-                        MapSelector(selectedDate: $selectedDate, selectedMap: $selectedMap)
+                        MapToolbar(selectedDate: $selectedDate, selectedMap: $selectedMap)
                         #endif
                     }
                     .onRotate { newOrientation in

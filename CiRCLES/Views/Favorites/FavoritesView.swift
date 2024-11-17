@@ -5,13 +5,14 @@
 //  Created by シン・ジャスティン on 2024/08/04.
 //
 
+import Komponents
 import SwiftData
 import SwiftUI
 
 struct FavoritesView: View {
 
     @EnvironmentObject var navigator: Navigator
-    @Environment(AuthManager.self) var authManager
+    @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
 
@@ -43,16 +44,22 @@ struct FavoritesView: View {
                        }
                 } else {
                     ProgressView("Favorites.Loading")
+                        .frame(maxHeight: .infinity)
                 }
             }
             .navigationTitle("ViewTitle.Favorites")
             .toolbarBackground(.automatic, for: .navigationBar)
-            .toolbarBackground(.automatic, for: .tabBar)
+            .toolbarBackground(.hidden, for: .tabBar)
+            .safeAreaInset(edge: .bottom, spacing: 0.0) {
+                BarAccessory(placement: .bottom) {
+                    FavoritesToolbar()
+                }
+            }
             .refreshable {
                 await reloadFavorites()
             }
             .onAppear {
-                if authManager.onlineState == .offline {
+                if authenticator.onlineState == .offline {
                     favoriteCircles = [:]
                 } else {
                     if favoriteCircles == nil, let favoriteItems = favorites.items {
@@ -81,7 +88,7 @@ struct FavoritesView: View {
     }
 
     func reloadFavorites() async {
-        if let token = authManager.token {
+        if let token = authenticator.token {
             let actor = FavoritesActor()
             let (items, wcIDMappedItems) = await actor.all(authToken: token)
             await MainActor.run {

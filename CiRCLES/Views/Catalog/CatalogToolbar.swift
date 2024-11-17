@@ -1,5 +1,5 @@
 //
-//  CircleFilterBar.swift
+//  CatalogToolbar.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/09/07.
@@ -9,7 +9,7 @@ import Komponents
 import SwiftData
 import SwiftUI
 
-struct CircleFilterBar: View {
+struct CatalogToolbar: View {
 
     @Environment(Database.self) var database
 

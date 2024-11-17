@@ -10,22 +10,20 @@ import SwiftUI
 
 struct MyParticipationSections: View {
 
+    @Environment(Planner.self) var planner
+
     @Binding var eventDates: [Int: Date]?
     @Binding var dateForNotifier: Date?
     @Binding var dayForNotifier: Int?
     @Binding var participationForNotifier: String?
-    @Binding var activeEventNumber: Int
 
     @State var isInitialLoadCompleted: Bool = false
-
-    @AppStorage(wrappedValue: "", "My.Participation") var participation: String
-    @State var participationState: [String: [String: String]] = [:]
 
     var body: some View {
         ForEach(Array((eventDates ?? [:]).keys).sorted(), id: \.self) { dayID in
             Section {
                 HStack {
-                    switch participationState[String(activeEventNumber)]?[String(dayID)] {
+                    switch planner.participationInfo(for: dayID) {
                     case "Early":
                         ListRow(image: "ListIcon.Ticket.Fami",
                                 title: "Shared.Ticket.Early")
@@ -45,25 +43,25 @@ struct MyParticipationSections: View {
                     Spacer()
                     Menu {
                         Button("My.Ticket.NotParticipating") {
-                            setParticipation(activeEventNumber, on: dayID, value: "")
+                            planner.setParticipation(for: dayID, value: "")
                         }
                         Button("Shared.Ticket.Early", image: .menuIconTicketFami) {
-                            setParticipation(activeEventNumber, on: dayID, value: "Early")
+                            planner.setParticipation(for: dayID, value: "Early")
                         }
                         Button("Shared.Ticket.AM", image: .menuIconTicketWristbandAMPM) {
-                            setParticipation(activeEventNumber, on: dayID, value: "AM")
+                            planner.setParticipation(for: dayID, value: "AM")
                         }
                         Button("Shared.Ticket.PM", image: .menuIconTicketWristbandAMPM) {
-                            setParticipation(activeEventNumber, on: dayID, value: "PM")
+                            planner.setParticipation(for: dayID, value: "PM")
                         }
                         Button("Shared.Ticket.Circle", image: .menuIconTicketWristbandCircle) {
-                            setParticipation(activeEventNumber, on: dayID, value: "Circle")
+                            planner.setParticipation(for: dayID, value: "Circle")
                         }
                     } label: {
                         Text("My.Ticket.ChangeType")
                     }
                 }
-                .animation(.snappy.speed(2.0), value: participationState)
+                .animation(.snappy.speed(2.0), value: planner.participation)
             } header: {
                 HStack {
                     Text("Shared.\(dayID)th.Day")
@@ -75,13 +73,13 @@ struct MyParticipationSections: View {
                             .foregroundColor(.secondary)
                         Spacer()
                         Button("Shared.RemindMe", systemImage: "bell") {
-                            participationForNotifier = participationState[String(activeEventNumber)]?[String(dayID)]
+                            participationForNotifier = planner.participationInfo(for: dayID)
                             dayForNotifier = dayID
                             dateForNotifier = date
                         }
                         .disabled(!isAllowedToSetNotification(date) ||
-                                  participationState[String(activeEventNumber)]?[String(dayID)] == nil ||
-                                  participationState[String(activeEventNumber)]?[String(dayID)] == "")
+                                  planner.participationInfo(for: dayID) == nil ||
+                                  planner.participationInfo(for: dayID) == "")
                     }
                 }
                 .font(.body)
@@ -90,48 +88,8 @@ struct MyParticipationSections: View {
         }
         .onAppear {
             if !isInitialLoadCompleted {
-                loadParticipation()
                 isInitialLoadCompleted = true
             }
-        }
-        .onChange(of: participationState) { _, _ in
-            if isInitialLoadCompleted {
-                saveParticipation()
-            }
-        }
-    }
-
-    func loadParticipation() {
-        if let participationJSONData = participation.data(using: .utf8) {
-            if let participationJSONDictionary = try? JSONSerialization.jsonObject(
-                with: participationJSONData,
-                options: []
-            ) as? [String: [String: String]] {
-                participationState = participationJSONDictionary
-            }
-        }
-    }
-
-    func saveParticipation() {
-        if let participationJSONData = try? JSONSerialization.data(
-            withJSONObject: participationState, options: []
-        ) {
-            if let participationJSONString = String(data: participationJSONData, encoding: .utf8) {
-                participation = participationJSONString
-            }
-        }
-    }
-
-    func setParticipation(_ eventNumber: Int, on day: Int, value: String) {
-        var participationData: [String: String] = [:]
-        if let existingParticipationData = participationState[String(eventNumber)] {
-            participationData = existingParticipationData
-        } else {
-            participationState[String(eventNumber)] = participationData
-        }
-        participationData[String(day)] = value
-        withAnimation(.snappy.speed(2.0)) {
-            participationState[String(eventNumber)] = participationData
         }
     }
 

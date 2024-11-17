@@ -1,5 +1,5 @@
 //
-//  MapSelector.swift
+//  MapToolbar.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/09/09.
@@ -9,7 +9,7 @@ import Komponents
 import SwiftData
 import SwiftUI
 
-struct MapSelector: View {
+struct MapToolbar: View {
 
     @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
     var dates: [ComiketDate]
