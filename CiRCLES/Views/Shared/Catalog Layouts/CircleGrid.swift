@@ -9,8 +9,10 @@ import SwiftUI
 
 struct CircleGrid: View {
 
-    @Environment(Database.self) var database
+    @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
+    @Environment(Database.self) var database
+    @Environment(ImageCache.self) var imageCache
 
     let gridSpacing: CGFloat = 1.0
 
@@ -57,6 +59,10 @@ struct CircleGrid: View {
                         }
                     } preview: {
                         CirclePreview(database: database, circle: circle)
+                            .environment(authenticator)
+                            .environment(favorites)
+                            .environment(database)
+                            .environment(imageCache)
                     }
                     .automaticMatchedTransitionSource(id: circle.id, in: namespace)
                 }

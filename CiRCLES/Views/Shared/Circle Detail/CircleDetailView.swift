@@ -16,10 +16,8 @@ struct CircleDetailView: View {
 
     var circle: ComiketCircle
 
-    @State var circleImage: UIImage?
     @State var extendedInformation: ComiketCircleExtendedInformation?
     @State var webCatalogInformation: WebCatalogCircle?
-    @State var circleCutURL: URL?
     @State var genre: String?
 
     @Namespace var namespace
@@ -171,11 +169,6 @@ struct CircleDetailView: View {
     }
 
     func prepareCircle() async {
-        if let circleImage = database.circleImage(for: circle.id) {
-            withAnimation(.snappy.speed(2.0)) {
-                self.circleImage = circleImage
-            }
-        }
         if let extendedInformation = circle.extendedInformation {
             withAnimation(.snappy.speed(2.0)) {
                 self.extendedInformation = extendedInformation
@@ -187,7 +180,6 @@ struct CircleDetailView: View {
             ),
                let webCatalogInformation = circleResponse.response.circle {
                 withAnimation(.snappy.speed(2.0)) {
-                    self.circleCutURL = URL(string: webCatalogInformation.cutWebURL)
                     self.webCatalogInformation = webCatalogInformation
                 }
             }

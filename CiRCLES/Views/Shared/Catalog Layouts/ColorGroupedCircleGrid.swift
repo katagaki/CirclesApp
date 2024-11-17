@@ -9,7 +9,10 @@ import SwiftUI
 
 struct ColorGroupedCircleGrid: View {
 
+    @Environment(Authenticator.self) var authenticator
+    @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
+    @Environment(ImageCache.self) var imageCache
 
     let gridSpacing: CGFloat = 1.0
 
@@ -59,6 +62,10 @@ struct ColorGroupedCircleGrid: View {
                                     }
                                 } preview: {
                                     CirclePreview(database: database, circle: circle)
+                                        .environment(authenticator)
+                                        .environment(favorites)
+                                        .environment(database)
+                                        .environment(imageCache)
                                 }
                                 .automaticMatchedTransitionSource(id: circle.id, in: namespace)
                             }
