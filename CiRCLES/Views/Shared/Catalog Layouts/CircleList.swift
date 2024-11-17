@@ -33,6 +33,10 @@ struct CircleList: View {
                 }
             }
             .contextMenu {
+                Button("Shared.Open") {
+                    onSelect(circle)
+                }
+                Divider()
                 if let twitterURL = circle.extendedInformation?.twitterURL {
                     SNSButton(twitterURL, type: .twitter)
                 }

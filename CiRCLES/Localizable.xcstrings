@@ -2164,6 +2164,22 @@
         }
       }
     },
+    "Shared.Open" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開く"
+          }
+        }
+      }
+    },
     "Shared.RemindMe" : {
       "localizations" : {
         "en" : {
