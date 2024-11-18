@@ -73,31 +73,7 @@ struct FavoritesView: View {
             .toolbarBackground(.hidden, for: .tabBar)
             .overlay {
                 if isVisitMode {
-                    Rectangle()
-                        .fill(
-                            MeshGradient(
-                                width: 6,
-                                height: 6,
-                                points: [
-                                    [0.0, 0.0], [0.2, 0.0], [0.4, 0.0], [0.6, 0.0], [0.8, 0.0], [1.0, 0.0],
-                                    [0.0, 0.1], [0.1, 0.09], [0.15, 0.08], [0.85, 0.08], [0.9, 0.09], [1.0, 0.1],
-                                    [0.0, 0.15], [0.1, 0.15], [0.15, 0.15], [0.85, 0.15], [0.9, 0.15], [1.0, 0.15],
-                                    [0.0, 0.85], [0.1, 0.85], [0.15, 0.85], [0.85, 0.85], [0.9, 0.85], [1.0, 0.85],
-                                    [0.0, 0.9], [0.1, 0.91], [0.15, 0.92], [0.85, 0.92], [0.9, 0.91], [1.0, 0.9],
-                                    [0.0, 1.0], [0.2, 1.0], [0.4, 1.0], [0.6, 1.0], [0.8, 1.0], [1.0, 1.0]
-                                ],
-                                colors: [
-                                    .accent, .accent, .accent, .accent, .accent, .accent,
-                                    .accent, .clear, .clear, .clear, .clear, .accent,
-                                    .accent, .clear, .clear, .clear, .clear, .accent,
-                                    .accent, .clear, .clear, .clear, .clear, .accent,
-                                    .accent, .clear, .clear, .clear, .clear, .accent,
-                                    .accent, .accent, .accent, .accent, .accent, .accent
-                                ],
-                                background: .clear
-                            )
-                        )
-                        .allowsHitTesting(false)
+                    GradientBorder()
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {

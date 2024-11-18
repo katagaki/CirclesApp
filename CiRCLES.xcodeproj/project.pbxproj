@@ -23,6 +23,7 @@
 		E43C74102C6EDD85003522C8 /* LoginFeatureHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C740F2C6EDD85003522C8 /* LoginFeatureHero.swift */; };
 		E43C74122C702750003522C8 /* Rotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C74112C702748003522C8 /* Rotation.swift */; };
 		E447F8BF2CEA225A0023BCD3 /* VisitModeTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447F8BE2CEA22570023BCD3 /* VisitModeTip.swift */; };
+		E46CB5052CEB712B00620141 /* GradientBorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46CB5042CEB712700620141 /* GradientBorder.swift */; };
 		E46D51A92C22390E000524B9 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51A82C22390E000524B9 /* LoginView.swift */; };
 		E47192112CE8DA9000B9F35F /* CirclesVisitEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47192102CE8DA8A00B9F35F /* CirclesVisitEntry.swift */; };
 		E47192132CE8E17300B9F35F /* FavoritesToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47192122CE8E16C00B9F35F /* FavoritesToolbar.swift */; };
@@ -149,6 +150,7 @@
 		E43C740F2C6EDD85003522C8 /* LoginFeatureHero.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginFeatureHero.swift; sourceTree = "<group>"; };
 		E43C74112C702748003522C8 /* Rotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rotation.swift; sourceTree = "<group>"; };
 		E447F8BE2CEA22570023BCD3 /* VisitModeTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitModeTip.swift; sourceTree = "<group>"; };
+		E46CB5042CEB712700620141 /* GradientBorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientBorder.swift; sourceTree = "<group>"; };
 		E46D51A82C22390E000524B9 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		E47192102CE8DA8A00B9F35F /* CirclesVisitEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclesVisitEntry.swift; sourceTree = "<group>"; };
 		E47192122CE8E16C00B9F35F /* FavoritesToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoritesToolbar.swift; sourceTree = "<group>"; };
@@ -345,6 +347,7 @@
 				E4D74B7C2C8C16830014CD16 /* ExternalLink.swift */,
 				E4755BD92C84B71B0032DA2F /* FavoriteButton.swift */,
 				E48B629A2C5FCA8D007874AE /* FavoriteColorSelector.swift */,
+				E46CB5042CEB712700620141 /* GradientBorder.swift */,
 				E49F428C2C96AC3100ABF424 /* ListCheckbox.swift */,
 				E4D74B992C8DDE210014CD16 /* LoadingOverlay.swift */,
 				E49F42882C969A4C00ABF424 /* LoadingPill.swift */,
@@ -814,6 +817,7 @@
 				E472690F2C3D767000D5335D /* OpenIDClient.swift in Sources */,
 				E4D74B972C8D47A30014CD16 /* SquareButtonStack.swift in Sources */,
 				E480AAB92C4CA294009C1445 /* MapConfiguration.swift in Sources */,
+				E46CB5052CEB712B00620141 /* GradientBorder.swift in Sources */,
 				E4D74B842C8C9AFC0014CD16 /* CircleDetailToolbar.swift in Sources */,
 				E48B628F2C5FB14C007874AE /* FavoritesView.swift in Sources */,
 				E480AAA12C44AA77009C1445 /* WebCatalogDatabase.swift in Sources */,
