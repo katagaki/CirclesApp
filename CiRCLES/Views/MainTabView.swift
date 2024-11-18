@@ -48,6 +48,7 @@ struct MainTabView: View {
                 MoreView()
             }
         }
+        #if DEBUG
         .overlay {
             ZStack(alignment: .topLeading) {
                 Color.clear
@@ -70,12 +71,13 @@ struct MainTabView: View {
                         Text(verbatim: "Token expiry: \(authenticator.tokenExpiryDate)")
                         Text(verbatim: "Token string: \((authenticator.token?.accessToken ?? "").prefix(5))")
                         Text(verbatim: "Active event number: \(planner.activeEventNumber)")
-                        Text(verbatim: "Event count: \(planner.eventData?.list.count)")
+                        Text(verbatim: "Event count: \(String(describing: planner.eventData?.list.count))")
                     }
                     .font(.system(size: 10.0))
                 }
             }
         }
+        #endif
         .overlay {
             if oasis.isShowing || authenticator.onlineState == .undetermined {
                 oasis.progressView(loadingNamespace)
