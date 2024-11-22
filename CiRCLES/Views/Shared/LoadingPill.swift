@@ -35,8 +35,8 @@ struct LoadingPill: View {
                     }
                 }
             }
-            .padding([.top, .bottom], 4.0)
-            .padding([.leading, .trailing], 8.0)
+            .padding(.vertical, 4.0)
+            .padding(.horizontal, 8.0)
             .background(Color(uiColor: .secondarySystemBackground))
             .clipShape(.capsule(style: .continuous))
             .matchedGeometryEffect(id: "LoadingWindow", in: namespace)

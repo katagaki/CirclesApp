@@ -34,6 +34,18 @@ struct CirclesApp: App {
                         authenticator.getAuthenticationCode(from: url)
                     }
                 }
+                .overlay {
+                    if authenticator.onlineState == .offline {
+                        ZStack(alignment: .top) {
+                            Color.clear
+                            LinearGradient(colors: [.pink.opacity(0.3), .clear], startPoint: .top, endPoint: .bottom)
+                                .frame(height: 24.0)
+                                .frame(maxWidth: .infinity)
+                                .ignoresSafeArea()
+                                .transition(.move(edge: .top).animation(.smooth.speed(2.0)))
+                        }
+                    }
+                }
         }
         .modelContainer(sharedModelContainer)
         .environmentObject(navigator)

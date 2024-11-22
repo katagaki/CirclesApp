@@ -210,9 +210,15 @@ struct MainTabView: View {
         await oasis.setModality(false)
         await oasis.setHeaderText("Shared.LoadingHeader.Favorites")
         await oasis.setBodyText("Shared.LoadingText.Favorites")
+        let actor = FavoritesActor(modelContainer: sharedModelContainer)
         if let token = authenticator.token {
-            let actor = FavoritesActor()
             let (items, wcIDMappedItems) = await actor.all(authToken: token)
+            await MainActor.run {
+                favorites.items = items
+                favorites.wcIDMappedItems = wcIDMappedItems
+            }
+        } else {
+            let (items, wcIDMappedItems) = await actor.all(authToken: OpenIDToken())
             await MainActor.run {
                 favorites.items = items
                 favorites.wcIDMappedItems = wcIDMappedItems

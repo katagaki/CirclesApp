@@ -21,7 +21,7 @@ struct WebCatalogCircle: Codable, Hashable {
     let clipStudioURL: String
     let niconicoURL: String
     let tag: String
-    let description: String
+    let circleDescription: String
     let onlineStores: [OnlineStore]
     let updateID: String
     let updateDate: String
@@ -47,7 +47,7 @@ struct WebCatalogCircle: Codable, Hashable {
         case clipStudioURL = "clipstudio_url"
         case niconicoURL = "niconico_url"
         case tag
-        case description
+        case circleDescription = "description"
         case onlineStores = "onlinestore"
         case updateID = "updateId"
         case updateDate = "update_date"

@@ -24,8 +24,8 @@ struct CircleBlockPill: View {
                 .font(.title3)
                 .fontWeight(.semibold)
                 .foregroundStyle(Color(uiColor: UIColor.label))
-                .padding([.top, .bottom], 2.0)
-                .padding([.leading, .trailing], 10.0)
+                .padding(.vertical, 2.0)
+                .padding(.horizontal, 10.0)
                 .background(.background.opacity(0.8))
                 .clipShape(.capsule(style: .continuous))
                 .overlay {
@@ -38,8 +38,8 @@ struct CircleBlockPill: View {
                 .font(.caption)
                 .fontWeight(.semibold)
                 .foregroundStyle(Color(uiColor: UIColor.label))
-                .padding([.top, .bottom], 2.0)
-                .padding([.leading, .trailing], 6.0)
+                .padding(.vertical, 2.0)
+                .padding(.horizontal, 6.0)
                 .background(.background.opacity(0.8))
                 .clipShape(.capsule(style: .continuous))
                 .overlay {

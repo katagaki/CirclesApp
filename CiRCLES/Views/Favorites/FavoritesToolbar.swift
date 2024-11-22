@@ -23,7 +23,7 @@ struct FavoritesToolbar: View {
                 }
                 BarAccessoryButton(
                     "Shared.VisitMode",
-                    icon: "checkmark.rectangle.stack",
+                    icon: isVisitMode ? "checkmark.rectangle.stack.fill" : "checkmark.rectangle.stack",
                     isSecondary: !isVisitMode
                 ) {
                     withAnimation(.snappy.speed(2.0)) {
@@ -32,8 +32,8 @@ struct FavoritesToolbar: View {
                 }
                 .popoverTip(VisitModeTip())
             }
-            .padding([.leading, .trailing], 12.0)
-            .padding([.top, .bottom], 12.0)
+            .padding(.horizontal, 12.0)
+            .padding(.vertical, 12.0)
         }
         .scrollIndicators(.hidden)
     }

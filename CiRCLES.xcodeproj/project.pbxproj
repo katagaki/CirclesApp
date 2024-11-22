@@ -131,6 +131,7 @@
 		E4D74B9A2C8DDE230014CD16 /* LoadingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B992C8DDE210014CD16 /* LoadingOverlay.swift */; };
 		E4D74B9C2C8E00320014CD16 /* MapToolbar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D74B9B2C8E002F0014CD16 /* MapToolbar.swift */; };
 		E4D845D12CDFA509004CAFE8 /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D845D02CDFA506004CAFE8 /* FileManager.swift */; };
+		E4F2CF632CF001C800ED1919 /* CirclesFavorite.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F2CF622CF001C400ED1919 /* CirclesFavorite.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -258,6 +259,7 @@
 		E4D74B992C8DDE210014CD16 /* LoadingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingOverlay.swift; sourceTree = "<group>"; };
 		E4D74B9B2C8E002F0014CD16 /* MapToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapToolbar.swift; sourceTree = "<group>"; };
 		E4D845D02CDFA506004CAFE8 /* FileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManager.swift; sourceTree = "<group>"; };
+		E4F2CF622CF001C400ED1919 /* CirclesFavorite.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclesFavorite.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -324,7 +326,6 @@
 		E47269022C3D715500D5335D /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				E4D74B822C8C98380014CD16 /* API */,
 				E47269032C3D716300D5335D /* Authenticator.swift */,
 				E480AAA22C44B71E009C1445 /* Database.swift */,
 				E4755B9E2C8296BE0032DA2F /* Downloader.swift */,
@@ -446,6 +447,7 @@
 		E480AA792C4422E8009C1445 /* Data Models */ = {
 			isa = PBXGroup;
 			children = (
+				E4F2CF622CF001C400ED1919 /* CirclesFavorite.swift */,
 				E47192102CE8DA8A00B9F35F /* CirclesVisitEntry.swift */,
 				E49351E92C4CC62C004CBDA1 /* ComiketArea.swift */,
 				E49351EB2C4CC970004CBDA1 /* ComiketBlock.swift */,
@@ -481,11 +483,13 @@
 		E480AA8E2C442CAA009C1445 /* Catalog */ = {
 			isa = PBXGroup;
 			children = (
+				E480AA7E2C4423AD009C1445 /* User.swift */,
 				E4755BA92C82BF8E0032DA2F /* UserResponse.swift */,
 				E4CA64552C81FCC1001F50BB /* UserCircleWithFavorite.swift */,
 				E480AA952C44A15A009C1445 /* UserCircle.swift */,
 				E48B62922C5FC1BE007874AE /* UserFavorites.swift */,
 				E480AA822C44278D009C1445 /* UserInfo.swift */,
+				E480AA972C44A471009C1445 /* WebCatalog.swift */,
 				E48B62942C5FC217007874AE /* WebCatalogCircle.swift */,
 				E480AAA02C44AA74009C1445 /* WebCatalogDatabase.swift */,
 				E480AA992C44A497009C1445 /* WebCatalogEvent.swift */,
@@ -619,15 +623,6 @@
 				E402957D2CDF3D3600CB2377 /* EventCoverImageAccessory.swift */,
 			);
 			path = My;
-			sourceTree = "<group>";
-		};
-		E4D74B822C8C98380014CD16 /* API */ = {
-			isa = PBXGroup;
-			children = (
-				E480AA7E2C4423AD009C1445 /* User.swift */,
-				E480AA972C44A471009C1445 /* WebCatalog.swift */,
-			);
-			path = API;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -780,6 +775,7 @@
 				E4755BC52C8456F30032DA2F /* DataFetcher.swift in Sources */,
 				E43C740C2C6DFD1B003522C8 /* InteractiveMapDetailPopover.swift in Sources */,
 				E4D74B8D2C8CB71F0014CD16 /* OnlineState.swift in Sources */,
+				E4F2CF632CF001C800ED1919 /* CirclesFavorite.swift in Sources */,
 				E480AAB32C4C9C01009C1445 /* ComiketMap.swift in Sources */,
 				E49F428B2C96A6FE00ABF424 /* Date.swift in Sources */,
 				E40295832CDF50D000CB2377 /* ImageCache.swift in Sources */,
