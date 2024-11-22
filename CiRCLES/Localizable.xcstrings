@@ -80,6 +80,38 @@
         }
       }
     },
+    "Circles.GoNext" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next Circle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "次のサークルへ"
+          }
+        }
+      }
+    },
+    "Circles.GoPrevious" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous Circle"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "前のサークルへ"
+          }
+        }
+      }
+    },
     "Circles.Image.Catalog" : {
       "localizations" : {
         "en" : {
