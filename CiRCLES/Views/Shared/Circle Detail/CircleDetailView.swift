@@ -22,6 +22,8 @@ struct CircleDetailView: View {
     @State var webCatalogInformation: WebCatalogCircle?
     @State var genre: String?
 
+    @State var isLastCircleAlertShowing: Bool = false
+
     @Namespace var namespace
 
     var body: some View {
@@ -167,6 +169,9 @@ struct CircleDetailView: View {
                         let circles = try? modelContext.fetch(fetchDescriptor)
                         if let circles, circles.count == 1 {
                             self.circle = circles.first ?? self.circle
+                            Task {
+                                await prepareCircle()
+                            }
                         }
                     }
                     .disabled(circle.id == 1)
@@ -181,9 +186,13 @@ struct CircleDetailView: View {
                         let circles = try? modelContext.fetch(fetchDescriptor)
                         if let circles, circles.count == 1 {
                             self.circle = circles.first ?? self.circle
+                            Task {
+                                await prepareCircle()
+                            }
+                        } else {
+                            isLastCircleAlertShowing = true
                         }
                     }
-                    // TODO: .disabled(circle.id == ???)
                 }
             }
         }
@@ -197,8 +206,18 @@ struct CircleDetailView: View {
                 }
             }
         }
+        .alert("Alerts.LastCircle.Title", isPresented: $isLastCircleAlertShowing) {
+            Button("Shared.OK", role: .cancel) {
+                isLastCircleAlertShowing = false
+            }
+        }
         .task {
             await prepareCircle()
+        }
+        .onChange(of: circle.id) { _, _ in
+            Task {
+                await prepareCircle()
+            }
         }
     }
 

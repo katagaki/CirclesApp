@@ -31,6 +31,7 @@ struct SNSButton: View {
                     Image(.snsTwitter)
                         .resizable()
                         .frame(width: 28.0, height: 28.0)
+                        .padding(1.0)
                     if showsLabel {
                         Text("Shared.SNS.Twitter")
                     }
@@ -56,6 +57,7 @@ struct SNSButton: View {
                     Image(.snsPixiv)
                         .resizable()
                         .frame(width: 28.0, height: 28.0)
+                        .padding(1.0)
                     if showsLabel {
                         Text("Shared.SNS.Pixiv")
                     }
@@ -69,6 +71,7 @@ struct SNSButton: View {
                     Image(.snsCircleMs)
                         .resizable()
                         .frame(width: 28.0, height: 28.0)
+                        .padding(1.0)
                     if showsLabel {
                         Text("Shared.SNS.CircleMsPortal")
                     }

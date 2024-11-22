@@ -75,6 +75,7 @@ struct FavoritesView: View {
             .overlay {
                 if isVisitMode {
                     GradientBorder()
+                        .ignoresSafeArea(edges: .horizontal)
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
