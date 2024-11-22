@@ -159,7 +159,7 @@ struct CircleDetailView: View {
                     VStack(spacing: 12.0) {
                         CircleDetailToolbar(extendedInformation, webCatalogInformation)
                     }
-                    .padding([.top, .bottom], 12.0)
+                    .padding(.vertical, 12.0)
                 }
             }
         }

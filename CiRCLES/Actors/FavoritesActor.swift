@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import SwiftData
 
+@ModelActor
 actor FavoritesActor {
 
     func all(authToken: OpenIDToken) async -> (
@@ -15,19 +17,37 @@ actor FavoritesActor {
     ) {
         let request = urlRequestForReadersAPI(endpoint: "FavoriteCircles", authToken: authToken)
 
+        var wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
+        var items: [UserFavorites.Response.FavoriteItem] = []
         if let (data, _) = try? await URLSession.shared.data(for: request) {
             if let favorites = try? JSONDecoder().decode(UserFavorites.self, from: data) {
-                let items = favorites.response.list.sorted(by: {
+                items = favorites.response.list.sorted(by: {
                     $0.favorite.color.rawValue < $1.favorite.color.rawValue
                 })
-                var wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
                 for favorite in items {
                     wcIDMappedItems[favorite.circle.webCatalogID] = favorite
                 }
-                return (items, wcIDMappedItems)
+                try? modelContext.transaction {
+                    try? modelContext.delete(model: CirclesFavorite.self)
+                    wcIDMappedItems.keys.forEach { webCatalogID in
+                        if let favoriteItem = wcIDMappedItems[webCatalogID] {
+                            let favorite = CirclesFavorite(
+                                webCatalogID: webCatalogID,
+                                favoriteItem: favoriteItem
+                            )
+                            modelContext.insert(favorite)
+                        }
+                    }
+                    try? modelContext.save()
+                }
+            }
+        } else if let cachedFavorites: [CirclesFavorite] = try? modelContext.fetch(FetchDescriptor<CirclesFavorite>()) {
+            items = cachedFavorites.map({ $0.favoriteItem() })
+            for favorite in cachedFavorites {
+                wcIDMappedItems[favorite.webCatalogID] = favorite.favoriteItem()
             }
         }
-        return ([], [:])
+        return (items, wcIDMappedItems)
     }
 
     func add(
@@ -49,6 +69,18 @@ actor FavoritesActor {
         if let (data, _) = try? await URLSession.shared.data(for: request) {
             if let response = try? JSONDecoder().decode(UserCircleWithFavorite.self, from: data) {
                 if response.status == "success" {
+                    if let circle = response.response.circle,
+                       let favorite = response.response.favorite {
+                        let favoriteItem = UserFavorites.Response.FavoriteItem(
+                            circle: circle, favorite: favorite
+                        )
+                        modelContext.insert(
+                            CirclesFavorite(
+                                webCatalogID: webCatalogID,
+                                favoriteItem: favoriteItem
+                            )
+                        )
+                    }
                     return true
                 }
             }
@@ -73,6 +105,19 @@ actor FavoritesActor {
         if let (data, _) = try? await URLSession.shared.data(for: request) {
             if let response = try? JSONDecoder().decode(UserResponse.self, from: data) {
                 if response.status == "success" {
+                    let fetchDescriptor = FetchDescriptor<CirclesFavorite>(
+                        predicate: #Predicate<CirclesFavorite> {
+                            $0.webCatalogID == webCatalogID
+                        }
+                    )
+                    if let matchedFavorites = try? modelContext.fetch(fetchDescriptor) {
+                        try? modelContext.transaction {
+                            matchedFavorites.forEach {
+                                modelContext.delete($0)
+                            }
+                            try? modelContext.save()
+                        }
+                    }
                     return true
                 }
             }

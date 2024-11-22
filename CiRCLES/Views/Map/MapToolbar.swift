@@ -85,8 +85,8 @@ struct MapToolbar: View {
                     }
                 }
             }
-            .padding([.leading, .trailing], 12.0)
-            .padding([.top, .bottom], 12.0)
+            .padding(.horizontal, 12.0)
+            .padding(.vertical, 12.0)
         }
         .scrollIndicators(.hidden)
     }

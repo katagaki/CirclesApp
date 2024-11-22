@@ -32,7 +32,7 @@ struct CircleDetailToolbar: View {
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 10.0) {
-                if isActiveEventLatest {
+                if isActiveEventLatest && authenticator.onlineState == .online {
                     FavoriteButton(
                         color: selectedFavoriteColor?.backgroundColor()
                     ) {
@@ -65,7 +65,7 @@ struct CircleDetailToolbar: View {
                     }
                 }
             }
-            .padding([.leading, .trailing], 12.0)
+            .padding(.horizontal, 12.0)
         }
         .scrollIndicators(.hidden)
         .onAppear {
@@ -89,7 +89,7 @@ struct CircleDetailToolbar: View {
 
     func addToFavorites(with color: WebCatalogColor?) async {
         if let color, let token = authenticator.token {
-            let actor = FavoritesActor()
+            let actor = FavoritesActor(modelContainer: sharedModelContainer)
             let favoritesAddResult = await actor.add(
                 extendedInformation.webCatalogID,
                 to: color,
@@ -107,7 +107,7 @@ struct CircleDetailToolbar: View {
 
     func deleteFavorite() async {
         if let token = authenticator.token {
-            let actor = FavoritesActor()
+            let actor = FavoritesActor(modelContainer: sharedModelContainer)
             let favoritesDeleteResult = await actor.delete(
                 extendedInformation.webCatalogID,
                 authToken: token

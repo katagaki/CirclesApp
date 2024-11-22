@@ -63,7 +63,7 @@ struct LoginView: View {
                         Text("Shared.Login")
                             .fontWeight(.bold)
                             .frame(maxWidth: .infinity)
-                            .padding([.top, .bottom], 6.0)
+                            .padding(.vertical, 6.0)
                     }
                     .buttonStyle(.borderedProminent)
                     .clipShape(.capsule(style: .continuous))

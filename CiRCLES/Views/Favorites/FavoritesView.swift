@@ -68,6 +68,7 @@ struct FavoritesView: View {
                         .frame(maxHeight: .infinity)
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationTitle("ViewTitle.Favorites")
             .toolbarBackground(.automatic, for: .navigationBar)
             .toolbarBackground(.hidden, for: .tabBar)
@@ -85,13 +86,9 @@ struct FavoritesView: View {
                 await reloadFavorites()
             }
             .onAppear {
-                if authenticator.onlineState == .offline {
-                    favoriteCircles = [:]
-                } else {
-                    if favoriteCircles == nil, let favoriteItems = favorites.items {
-                        Task.detached {
-                            await prepareCircles(using: favoriteItems)
-                        }
+                if favoriteCircles == nil, let favoriteItems = favorites.items {
+                    Task.detached {
+                        await prepareCircles(using: favoriteItems)
                     }
                 }
             }
@@ -115,7 +112,7 @@ struct FavoritesView: View {
 
     func reloadFavorites() async {
         if let token = authenticator.token {
-            let actor = FavoritesActor()
+            let actor = FavoritesActor(modelContainer: sharedModelContainer)
             let (items, wcIDMappedItems) = await actor.all(authToken: token)
             await MainActor.run {
                 favorites.items = items

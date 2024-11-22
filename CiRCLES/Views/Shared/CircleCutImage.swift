@@ -125,6 +125,7 @@ struct CircleCutImage: View {
                     }
                 }
             }
+            .aspectRatio(180.0 / 256.0, contentMode: .fit)
         }
         .overlay {
             if showSpaceName || showDay {
