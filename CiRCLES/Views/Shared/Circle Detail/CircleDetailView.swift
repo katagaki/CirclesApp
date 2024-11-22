@@ -6,15 +6,17 @@
 //
 
 import Komponents
+import SwiftData
 import SwiftUI
 import Translation
 
 struct CircleDetailView: View {
 
+    @Environment(\.modelContext) var modelContext
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
 
-    var circle: ComiketCircle
+    @State var circle: ComiketCircle
 
     @State var extendedInformation: ComiketCircleExtendedInformation?
     @State var webCatalogInformation: WebCatalogCircle?
@@ -150,6 +152,38 @@ struct CircleDetailView: View {
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
+                }
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                HStack {
+                    Button("Circles.GoPrevious", systemImage: "chevron.left") {
+                        // Go to circle with previous ID
+                        let circleID = circle.id - 1
+                        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+                            predicate: #Predicate<ComiketCircle> {
+                                $0.id == circleID
+                            }
+                        )
+                        let circles = try? modelContext.fetch(fetchDescriptor)
+                        if let circles, circles.count == 1 {
+                            self.circle = circles.first ?? self.circle
+                        }
+                    }
+                    .disabled(circle.id == 1)
+                    Button("Circles.GoNext", systemImage: "chevron.right") {
+                        // Go to circle with next ID
+                        let circleID = circle.id + 1
+                        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+                            predicate: #Predicate<ComiketCircle> {
+                                $0.id == circleID
+                            }
+                        )
+                        let circles = try? modelContext.fetch(fetchDescriptor)
+                        if let circles, circles.count == 1 {
+                            self.circle = circles.first ?? self.circle
+                        }
+                    }
+                    // TODO: .disabled(circle.id == ???)
                 }
             }
         }
