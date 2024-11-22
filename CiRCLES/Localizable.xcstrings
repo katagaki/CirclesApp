@@ -48,6 +48,22 @@
       },
       "shouldTranslate" : false
     },
+    "Alerts.LastCircle.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This is the last circle."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最後のサークルです。"
+          }
+        }
+      }
+    },
     "Alerts.Logout.Message" : {
       "localizations" : {
         "en" : {
@@ -2271,6 +2287,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "訪問済みとする"
+          }
+        }
+      }
+    },
+    "Shared.OK" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
           }
         }
       }

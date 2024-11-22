@@ -45,18 +45,24 @@ struct FavoriteButton: View {
                             .frame(width: 28.0, height: 28.0)
                             .scaledToFit()
                         Text("Shared.EditFavorites")
+                            .fontWeight(.medium)
+                            .padding(.vertical, 5.0)
                     }
                 }
             } else {
                 Button {
                     onSelect()
                 } label: {
-                    Image(systemName: "star.fill")
-                        .resizable()
-                        .padding(2.0)
-                        .frame(width: 28.0, height: 28.0)
-                        .scaledToFit()
-                    Text("Shared.AddToFavorites")
+                    HStack(alignment: .center) {
+                        Image(systemName: "star.fill")
+                            .resizable()
+                            .padding(2.0)
+                            .frame(width: 28.0, height: 28.0)
+                            .scaledToFit()
+                        Text("Shared.AddToFavorites")
+                            .fontWeight(.medium)
+                            .padding(.vertical, 5.0)
+                    }
                 }
             }
         }

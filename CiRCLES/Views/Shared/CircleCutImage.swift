@@ -87,6 +87,7 @@ struct CircleCutImage: View {
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
                                     }
+                                    .aspectRatio(180.0 / 256.0, contentMode: .fit)
                             }
                         }
                     }
@@ -150,17 +151,26 @@ struct CircleCutImage: View {
             }
         }
         .onAppear {
-            if shouldFetchWebCut && !isWebCutURLFetched {
-                if let extendedInformation = circle.extendedInformation {
-                    let circleID = circle.id
-                    let webCatalogID = extendedInformation.webCatalogID
-                    Task.detached {
-                        let webCutImage = try? await webCut(for: circleID, webCatalogID: webCatalogID)
-                        await MainActor.run {
-                            withAnimation(.smooth.speed(2.0)) {
-                                self.webCutImage = webCutImage
-                                isWebCutURLFetched = true
-                            }
+            prepareCutImage()
+        }
+        .onChange(of: circle.id) { _, _ in
+            self.webCutImage = nil
+            isWebCutURLFetched = false
+            prepareCutImage()
+        }
+    }
+
+    func prepareCutImage() {
+        if shouldFetchWebCut && !isWebCutURLFetched {
+            if let extendedInformation = circle.extendedInformation {
+                let circleID = circle.id
+                let webCatalogID = extendedInformation.webCatalogID
+                Task.detached {
+                    let webCutImage = try? await webCut(for: circleID, webCatalogID: webCatalogID)
+                    await MainActor.run {
+                        withAnimation(.smooth.speed(2.0)) {
+                            self.webCutImage = webCutImage
+                            isWebCutURLFetched = true
                         }
                     }
                 }
