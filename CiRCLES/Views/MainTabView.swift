@@ -166,42 +166,42 @@ struct MainTabView: View {
             await database.downloadImageDatabase(for: activeEvent, authToken: token) { progress in
                 await oasis.setProgress(progress)
             }
+
+            await oasis.setBodyText("Shared.LoadingText.Database")
+            database.connect()
+
+            if !isDatabaseInitialized {
+                await oasis.setHeaderText("Shared.LoadingHeader.Initial")
+
+                let actor = DataConverter(modelContainer: sharedModelContainer)
+
+                await actor.disableAutoSave()
+                await actor.deleteAll()
+                imageCache.clear()
+
+                await oasis.setBodyText("Shared.LoadingText.Events")
+                await actor.loadEvents(from: database.textDatabase)
+                await oasis.setBodyText("Shared.LoadingText.Maps")
+                await actor.loadMaps(from: database.textDatabase)
+                await actor.loadLayouts(from: database.textDatabase)
+                await oasis.setBodyText("Shared.LoadingText.Genres")
+                await actor.loadGenres(from: database.textDatabase)
+                await oasis.setBodyText("Shared.LoadingText.Circles")
+                await actor.loadCircles(from: database.textDatabase)
+
+                await actor.save()
+                await actor.enableAutoSave()
+
+                isDatabaseInitialized = true
+            }
+
+            await oasis.setBodyText("Shared.LoadingText.Images")
+            database.imageCache.removeAll()
+            database.loadCommonImages()
+            database.loadCircleImages()
+
+            database.disconnect()
         }
-
-        await oasis.setBodyText("Shared.LoadingText.Database")
-        database.connect()
-
-        if !isDatabaseInitialized {
-            await oasis.setHeaderText("Shared.LoadingHeader.Initial")
-
-            let actor = DataConverter(modelContainer: sharedModelContainer)
-
-            await actor.disableAutoSave()
-            await actor.deleteAll()
-            imageCache.clear()
-
-            await oasis.setBodyText("Shared.LoadingText.Events")
-            await actor.loadEvents(from: database.textDatabase)
-            await oasis.setBodyText("Shared.LoadingText.Maps")
-            await actor.loadMaps(from: database.textDatabase)
-            await actor.loadLayouts(from: database.textDatabase)
-            await oasis.setBodyText("Shared.LoadingText.Genres")
-            await actor.loadGenres(from: database.textDatabase)
-            await oasis.setBodyText("Shared.LoadingText.Circles")
-            await actor.loadCircles(from: database.textDatabase)
-
-            await actor.save()
-            await actor.enableAutoSave()
-
-            isDatabaseInitialized = true
-        }
-
-        await oasis.setBodyText("Shared.LoadingText.Images")
-        database.imageCache.removeAll()
-        database.loadCommonImages()
-        database.loadCircleImages()
-
-        database.disconnect()
 
         UIApplication.shared.isIdleTimerDisabled = false
     }
