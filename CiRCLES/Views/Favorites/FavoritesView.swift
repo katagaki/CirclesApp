@@ -20,7 +20,17 @@ struct FavoritesView: View {
     @Environment(Planner.self) var planner
 
     @State var favoriteCircles: [String: [ComiketCircle]]?
-    @State var isVisitMode: Bool = false
+
+    @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
+    var dates: [ComiketDate]
+
+    @State var selectedDate: ComiketDate?
+    @AppStorage(wrappedValue: 0, "Favorites.SelectedDateID") var selectedDateID: Int
+
+    @State var isVisitModeOn: Bool = false
+    @AppStorage(wrappedValue: false, "Favorites.VisitModeOn") var isVisitModeOnDefault: Bool
+
+    @State var isInitialLoadCompleted: Bool = false
 
     @Namespace var favoritesNamespace
 
@@ -33,7 +43,7 @@ struct FavoritesView: View {
                         showsOverlayWhenEmpty: false,
                         namespace: favoritesNamespace
                     ) { circle in
-                        if !isVisitMode {
+                        if !isVisitModeOn {
                             navigator.push(.circlesDetail(circle: circle), for: .favorites)
                         } else {
                             let circleID = circle.id
@@ -63,24 +73,42 @@ struct FavoritesView: View {
             .toolbarBackground(.automatic, for: .navigationBar)
             .toolbarBackground(.hidden, for: .tabBar)
             .overlay {
-                if isVisitMode {
+                if isVisitModeOn {
                     GradientBorder()
                         .ignoresSafeArea(edges: .horizontal)
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 BarAccessory(placement: .bottom) {
-                    FavoritesToolbar(isVisitMode: $isVisitMode)
+                    FavoritesToolbar(
+                        selectedDate: $selectedDate,
+                        isVisitModeOn: $isVisitModeOn
+                    )
                 }
             }
             .refreshable {
                 await reloadFavorites()
             }
             .onAppear {
-                if favoriteCircles == nil, let favoriteItems = favorites.items {
-                    Task.detached {
-                        await prepareCircles(using: favoriteItems)
+                if !isInitialLoadCompleted {
+                    if favoriteCircles == nil, let favoriteItems = favorites.items {
+                        Task.detached {
+                            await prepareCircles(using: favoriteItems)
+                        }
                     }
+                    selectedDate = dates.first(where: {$0.id == selectedDateID})
+                    isVisitModeOn = isVisitModeOnDefault
+                    isInitialLoadCompleted = true
+                }
+            }
+            .onChange(of: selectedDate) { _, _ in
+                if isInitialLoadCompleted {
+                    selectedDateID = selectedDate?.id ?? 0
+                }
+            }
+            .onChange(of: isVisitModeOn) { _, _ in
+                if isInitialLoadCompleted {
+                    isVisitModeOnDefault = isVisitModeOn
                 }
             }
             .onChange(of: favorites.items) { _, _ in

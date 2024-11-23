@@ -24,6 +24,7 @@
 		E43C74122C702750003522C8 /* Rotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C74112C702748003522C8 /* Rotation.swift */; };
 		E447F8BF2CEA225A0023BCD3 /* VisitModeTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447F8BE2CEA22570023BCD3 /* VisitModeTip.swift */; };
 		E46758072CF1534700D5FB6A /* VisitActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46758062CF1534500D5FB6A /* VisitActor.swift */; };
+		E46758092CF1692500D5FB6A /* CircleGroupType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46758082CF1692100D5FB6A /* CircleGroupType.swift */; };
 		E46CB5052CEB712B00620141 /* GradientBorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46CB5042CEB712700620141 /* GradientBorder.swift */; };
 		E46D51A92C22390E000524B9 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51A82C22390E000524B9 /* LoginView.swift */; };
 		E47192112CE8DA9000B9F35F /* CirclesVisitEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47192102CE8DA8A00B9F35F /* CirclesVisitEntry.swift */; };
@@ -153,6 +154,7 @@
 		E43C74112C702748003522C8 /* Rotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rotation.swift; sourceTree = "<group>"; };
 		E447F8BE2CEA22570023BCD3 /* VisitModeTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitModeTip.swift; sourceTree = "<group>"; };
 		E46758062CF1534500D5FB6A /* VisitActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitActor.swift; sourceTree = "<group>"; };
+		E46758082CF1692100D5FB6A /* CircleGroupType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleGroupType.swift; sourceTree = "<group>"; };
 		E46CB5042CEB712700620141 /* GradientBorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientBorder.swift; sourceTree = "<group>"; };
 		E46D51A82C22390E000524B9 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		E47192102CE8DA8A00B9F35F /* CirclesVisitEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclesVisitEntry.swift; sourceTree = "<group>"; };
@@ -471,6 +473,7 @@
 			children = (
 				E4755BCF2C8494280032DA2F /* CircleBlockPillSize.swift */,
 				E4D74B6D2C8884310014CD16 /* CircleDisplayMode.swift */,
+				E46758082CF1692100D5FB6A /* CircleGroupType.swift */,
 				E49352032C4CF49C004CBDA1 /* ComiketHall.swift */,
 				E4755BCB2C848D800032DA2F /* DatabaseType.swift */,
 				E4D74B8E2C8D42120014CD16 /* ListDisplayMode.swift */,
@@ -840,6 +843,7 @@
 				E480AA962C44A15D009C1445 /* UserCircle.swift in Sources */,
 				E4D74B8F2C8D42180014CD16 /* ListDisplayMode.swift in Sources */,
 				E4755B9F2C8296C30032DA2F /* Downloader.swift in Sources */,
+				E46758092CF1692500D5FB6A /* CircleGroupType.swift in Sources */,
 				E47192192CE9A49600B9F35F /* Planner.swift in Sources */,
 				E4D74B732C8A02290014CD16 /* MyView.swift in Sources */,
 				E49F428D2C96AC3B00ABF424 /* ListCheckbox.swift in Sources */,
