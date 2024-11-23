@@ -19,8 +19,6 @@ struct FavoritesView: View {
     @Environment(Database.self) var database
     @Environment(Planner.self) var planner
 
-    @Query var visits: [CirclesVisitEntry]
-
     @State var favoriteCircles: [String: [ComiketCircle]]?
     @State var isVisitMode: Bool = false
 
@@ -38,19 +36,11 @@ struct FavoritesView: View {
                         if !isVisitMode {
                             navigator.push(.circlesDetail(circle: circle), for: .favorites)
                         } else {
-                            let existingVisits = visits.filter({
-                                $0.circleID == circle.id && $0.eventNumber == planner.activeEventNumber
-                            })
-                            if existingVisits.isEmpty {
-                                modelContext.insert(
-                                    CirclesVisitEntry(eventNumber: planner.activeEventNumber,
-                                                      circleID: circle.id,
-                                                      visitDate: .now)
-                                )
-                            } else {
-                                for visit in existingVisits {
-                                    modelContext.delete(visit)
-                                }
+                            let circleID = circle.id
+                            let eventNumber = planner.activeEventNumber
+                            Task.detached {
+                                let actor = VisitActor(modelContainer: sharedModelContainer)
+                                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
                             }
                         }
                     }

@@ -23,6 +23,7 @@
 		E43C74102C6EDD85003522C8 /* LoginFeatureHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C740F2C6EDD85003522C8 /* LoginFeatureHero.swift */; };
 		E43C74122C702750003522C8 /* Rotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C74112C702748003522C8 /* Rotation.swift */; };
 		E447F8BF2CEA225A0023BCD3 /* VisitModeTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447F8BE2CEA22570023BCD3 /* VisitModeTip.swift */; };
+		E46758072CF1534700D5FB6A /* VisitActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46758062CF1534500D5FB6A /* VisitActor.swift */; };
 		E46CB5052CEB712B00620141 /* GradientBorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46CB5042CEB712700620141 /* GradientBorder.swift */; };
 		E46D51A92C22390E000524B9 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46D51A82C22390E000524B9 /* LoginView.swift */; };
 		E47192112CE8DA9000B9F35F /* CirclesVisitEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = E47192102CE8DA8A00B9F35F /* CirclesVisitEntry.swift */; };
@@ -151,6 +152,7 @@
 		E43C740F2C6EDD85003522C8 /* LoginFeatureHero.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginFeatureHero.swift; sourceTree = "<group>"; };
 		E43C74112C702748003522C8 /* Rotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rotation.swift; sourceTree = "<group>"; };
 		E447F8BE2CEA22570023BCD3 /* VisitModeTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitModeTip.swift; sourceTree = "<group>"; };
+		E46758062CF1534500D5FB6A /* VisitActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitActor.swift; sourceTree = "<group>"; };
 		E46CB5042CEB712700620141 /* GradientBorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientBorder.swift; sourceTree = "<group>"; };
 		E46D51A82C22390E000524B9 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		E47192102CE8DA8A00B9F35F /* CirclesVisitEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CirclesVisitEntry.swift; sourceTree = "<group>"; };
@@ -396,6 +398,7 @@
 				E4755BBD2C8419BF0032DA2F /* DataConverter.swift */,
 				E4755BC42C8456EF0032DA2F /* DataFetcher.swift */,
 				E4755BC22C843D7B0032DA2F /* FavoritesActor.swift */,
+				E46758062CF1534500D5FB6A /* VisitActor.swift */,
 			);
 			path = Actors;
 			sourceTree = "<group>";
@@ -766,6 +769,7 @@
 				E48B62912C5FC023007874AE /* Favorites.swift in Sources */,
 				E46D51A92C22390E000524B9 /* LoginView.swift in Sources */,
 				E480AAAA2C4C93A5009C1445 /* ComiketEvent.swift in Sources */,
+				E46758072CF1534700D5FB6A /* VisitActor.swift in Sources */,
 				E47192212CEA1CD400B9F35F /* CircleStrikethrough.swift in Sources */,
 				E480AAB52C4C9C84009C1445 /* ComiketDate.swift in Sources */,
 				E48B62932C5FC1C0007874AE /* UserFavorites.swift in Sources */,

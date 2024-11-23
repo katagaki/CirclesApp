@@ -15,6 +15,7 @@ struct CircleDetailView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
+    @Environment(Planner.self) var planner
 
     @State var circle: ComiketCircle
 
@@ -63,6 +64,14 @@ struct CircleDetailView: View {
                             }
                         }
                         .frame(maxWidth: .infinity, maxHeight: 250.0)
+                    }
+                    .onTapGesture {
+                        let circleID = circle.id
+                        let eventNumber = planner.activeEventNumber
+                        Task.detached {
+                            let actor = VisitActor(modelContainer: sharedModelContainer)
+                            await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
+                        }
                     }
                 }
                 .listRowSeparator(.hidden)
