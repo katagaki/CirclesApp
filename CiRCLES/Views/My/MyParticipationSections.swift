@@ -27,6 +27,9 @@ struct MyParticipationSections: View {
                     case "Early":
                         ListRow(image: "ListIcon.Ticket.Fami",
                                 title: "Shared.Ticket.Early")
+                    case "ChangingRoom":
+                        ListRow(image: "ListIcon.Ticket.Fami",
+                                title: "Shared.Ticket.ChangingRoom")
                     case "AM":
                         ListRow(image: "ListIcon.Ticket.Wristband.AMPM",
                                 title: "Shared.Ticket.AM")
@@ -47,6 +50,9 @@ struct MyParticipationSections: View {
                         }
                         Button("Shared.Ticket.Early", image: .menuIconTicketFami) {
                             planner.setParticipation(for: dayID, value: "Early")
+                        }
+                        Button("Shared.Ticket.ChangingRoom", image: .menuIconTicketFami) {
+                            planner.setParticipation(for: dayID, value: "ChangingRoom")
                         }
                         Button("Shared.Ticket.AM", image: .menuIconTicketWristbandAMPM) {
                             planner.setParticipation(for: dayID, value: "AM")

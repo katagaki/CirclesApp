@@ -2485,6 +2485,23 @@
         }
       }
     },
+    "Shared.Ticket.ChangingRoom" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changing Room Entry"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更衣室先行入場"
+          }
+        }
+      }
+    },
     "Shared.Ticket.Circle" : {
       "localizations" : {
         "en" : {
