@@ -2436,6 +2436,7 @@
       }
     },
     "Shared.Sort" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
