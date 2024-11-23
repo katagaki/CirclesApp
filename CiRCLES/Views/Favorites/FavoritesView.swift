@@ -104,6 +104,11 @@ struct FavoritesView: View {
             .onChange(of: selectedDate) { _, _ in
                 if isInitialLoadCompleted {
                     selectedDateID = selectedDate?.id ?? 0
+                    if let favoriteItems = favorites.items {
+                        Task.detached {
+                            await prepareCircles(using: favoriteItems)
+                        }
+                    }
                 }
             }
             .onChange(of: isVisitModeOn) { _, _ in
@@ -160,7 +165,13 @@ struct FavoritesView: View {
                 if let circleIdentifiers = favoriteCircleIdentifiers[colorKey] {
                     var circles = database.circles(circleIdentifiers)
                     circles.sort(by: {$0.id < $1.id})
-                    favoriteCircles[String(colorKey)] = circles
+                    if let selectedDate {
+                        favoriteCircles[String(colorKey)] = circles.filter({
+                            $0.day == selectedDate.id
+                        })
+                    } else {
+                        favoriteCircles[String(colorKey)] = circles
+                    }
                 }
             }
             withAnimation(.snappy.speed(2.0)) {

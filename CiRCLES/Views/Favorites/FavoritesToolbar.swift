@@ -33,12 +33,12 @@ struct FavoritesToolbar: View {
                     }
                 }
                 .popoverTip(VisitModeTip())
-                BarAccessoryMenu(
-                    "Shared.Sort",
-                    icon: "arrow.up.arrow.down"
-                ) {
-                    // TODO: Do sort
-                }
+//                BarAccessoryMenu(
+//                    "Shared.Sort",
+//                    icon: "arrow.up.arrow.down"
+//                ) {
+//                    
+//                }
                 BarAccessoryMenu((selectedDate != nil ? "Shared.\(selectedDate!.id)th.Day" : "Shared.Day"),
                                  icon: "calendar") {
                     Button("Shared.All") {
