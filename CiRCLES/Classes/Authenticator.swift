@@ -75,22 +75,23 @@ class Authenticator {
         }
 
         // Restore previous authentication token
-        if let tokenExpiryDate = UserDefaults.standard.object(forKey: tokenExpiryDateKey) as? Date {
-            if tokenExpiryDate < .now {
-                self.resetAuthentication()
-            } else {
-                if let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),
-                   let token = try? JSONDecoder().decode(
-                    OpenIDToken.self,
-                    from: tokenInKeychain.data(using: .utf8) ?? Data()
-                   ) {
-                    self.token = token
-                    self.tokenExpiryDate = tokenExpiryDate
-                }
-            }
-        } else {
+        if !restoreAuthenticationFromKeychainAndDefaults() {
             self.resetAuthentication()
         }
+    }
+
+    func restoreAuthenticationFromKeychainAndDefaults() -> Bool {
+        // Returns Bool: Whether authentication is still fresh enough
+        if let tokenExpiryDate = UserDefaults.standard.object(forKey: tokenExpiryDateKey) as? Date,
+           tokenExpiryDate > .now,
+           let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),
+           let tokenData = tokenInKeychain.data(using: .utf8),
+           let token = try? JSONDecoder().decode(OpenIDToken.self, from: tokenData) {
+            self.token = token
+            self.tokenExpiryDate = tokenExpiryDate
+            return true
+        }
+        return false
     }
 
     func resetAuthentication() {
