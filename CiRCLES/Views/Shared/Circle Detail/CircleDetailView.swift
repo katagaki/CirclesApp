@@ -168,39 +168,11 @@ struct CircleDetailView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
                     Button("Circles.GoPrevious", systemImage: "chevron.left") {
-                        // Go to circle with previous ID
-                        let circleID = circle.id - 1
-                        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-                            predicate: #Predicate<ComiketCircle> {
-                                $0.id == circleID
-                            }
-                        )
-                        let circles = try? modelContext.fetch(fetchDescriptor)
-                        if let circles, circles.count == 1 {
-                            self.circle = circles.first ?? self.circle
-                            Task {
-                                await prepareCircle()
-                            }
-                        }
+                        goToPreviousCircle()
                     }
                     .disabled(circle.id == 1)
                     Button("Circles.GoNext", systemImage: "chevron.right") {
-                        // Go to circle with next ID
-                        let circleID = circle.id + 1
-                        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-                            predicate: #Predicate<ComiketCircle> {
-                                $0.id == circleID
-                            }
-                        )
-                        let circles = try? modelContext.fetch(fetchDescriptor)
-                        if let circles, circles.count == 1 {
-                            self.circle = circles.first ?? self.circle
-                            Task {
-                                await prepareCircle()
-                            }
-                        } else {
-                            isLastCircleAlertShowing = true
-                        }
+                        goToNextCircle()
                     }
                 }
             }
@@ -249,6 +221,40 @@ struct CircleDetailView: View {
         let actor = DataFetcher(modelContainer: sharedModelContainer)
         if let genre = await actor.genre(circle.genreID) {
             self.genre = genre
+        }
+    }
+
+    func goToNextCircle() {
+        let circleID = circle.id + 1
+        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+            predicate: #Predicate<ComiketCircle> {
+                $0.id == circleID
+            }
+        )
+        let circles = try? modelContext.fetch(fetchDescriptor)
+        if let circles, circles.count == 1 {
+            self.circle = circles.first ?? self.circle
+            Task {
+                await prepareCircle()
+            }
+        } else {
+            isLastCircleAlertShowing = true
+        }
+    }
+
+    func goToPreviousCircle() {
+        let circleID = circle.id - 1
+        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+            predicate: #Predicate<ComiketCircle> {
+                $0.id == circleID
+            }
+        )
+        let circles = try? modelContext.fetch(fetchDescriptor)
+        if let circles, circles.count == 1 {
+            self.circle = circles.first ?? self.circle
+            Task {
+                await prepareCircle()
+            }
         }
     }
 }

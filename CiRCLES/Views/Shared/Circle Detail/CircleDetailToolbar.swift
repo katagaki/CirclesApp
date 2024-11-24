@@ -16,7 +16,7 @@ struct CircleDetailToolbar: View {
     @Environment(\.openURL) var openURL
 
     var extendedInformation: ComiketCircleExtendedInformation
-    var webCatalogInformation: WebCatalogCircle?
+    @State var webCatalogInformation: WebCatalogCircle?
 
     @State var isAddingToFavorites: Bool = false
     @State var selectedFavoriteColor: WebCatalogColor?
@@ -24,7 +24,8 @@ struct CircleDetailToolbar: View {
 
     @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
 
-    init(_ extendedInformation: ComiketCircleExtendedInformation, _ webCatalogInformation: WebCatalogCircle?) {
+    init(_ extendedInformation: ComiketCircleExtendedInformation,
+         _ webCatalogInformation: WebCatalogCircle?) {
         self.extendedInformation = extendedInformation
         self.webCatalogInformation = webCatalogInformation
     }
@@ -69,11 +70,13 @@ struct CircleDetailToolbar: View {
         }
         .scrollIndicators(.hidden)
         .onAppear {
-            shouldCallAPIToUpdateFavorites = false
-            selectedFavoriteColor = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.color
-            shouldCallAPIToUpdateFavorites = true
+            reloadFavoriteColor()
+        }
+        .onChange(of: extendedInformation.webCatalogID) { _, _ in
+            reloadFavoriteColor()
         }
         .onChange(of: selectedFavoriteColor) { oldValue, newValue in
+            // TODO: Potential race condition may happen here when switching quickly between circles
             if shouldCallAPIToUpdateFavorites {
                 Task.detached {
                     if oldValue != nil && newValue == nil {
@@ -83,8 +86,15 @@ struct CircleDetailToolbar: View {
                     }
                 }
                 isAddingToFavorites = false
+            } else {
+                shouldCallAPIToUpdateFavorites = true
             }
         }
+    }
+
+    func reloadFavoriteColor() {
+        shouldCallAPIToUpdateFavorites = false
+        selectedFavoriteColor = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.color
     }
 
     func addToFavorites(with color: WebCatalogColor?) async {
