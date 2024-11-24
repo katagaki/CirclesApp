@@ -24,5 +24,7 @@
 		<string>maps</string>
 		<string>comgooglemaps</string>
 	</array>
+	<key>NSCalendarsWriteOnlyAccessUsageDescription</key>
+	<string>CiRCLES can add events to your calendar based on the type of ticket you select.</string>
 </dict>
 </plist>

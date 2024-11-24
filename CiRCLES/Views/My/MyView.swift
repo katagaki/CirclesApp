@@ -78,6 +78,7 @@ struct MyView: View {
                                 MyProfileSection(userInfo: $userInfo)
                             }
                             MyParticipationSections(
+                                eventTitle: $eventTitle,
                                 eventDates: $eventDates,
                                 dateForNotifier: $dateForNotifier,
                                 dayForNotifier: $dayForNotifier,

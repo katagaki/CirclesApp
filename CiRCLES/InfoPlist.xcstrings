@@ -34,6 +34,23 @@
           }
         }
       }
+    },
+    "NSCalendarsWriteOnlyAccessUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CiRCLES can add events to your calendar based on the type of ticket you select."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択したチケットの種類に基づいてカレンダーにイベントを追加できます。"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
