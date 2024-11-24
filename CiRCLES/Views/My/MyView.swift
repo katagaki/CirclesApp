@@ -11,7 +11,7 @@ import SwiftUI
 
 struct MyView: View {
 
-    @EnvironmentObject var navigator: Navigator
+    @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
     @Environment(\.openURL) var openURL
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
@@ -267,6 +267,8 @@ struct MyView: View {
             await MainActor.run {
                 navigator.popToRoot(for: .map)
                 navigator.popToRoot(for: .circles)
+                navigator.popToRoot(for: .favorites)
+                navigator.popToRoot(for: .my)
                 navigator.popToRoot(for: .more)
                 navigator.selectedTab = .map
                 authenticator.resetAuthentication()

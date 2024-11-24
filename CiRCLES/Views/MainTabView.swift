@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2024/06/18.
 //
 
+import Komponents
 import SwiftUI
 import SwiftData
 import TipKit
@@ -12,7 +13,7 @@ import TipKit
 struct MainTabView: View {
 
     @Environment(\.modelContext) var modelContext
-    @EnvironmentObject var navigator: Navigator
+    @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
@@ -29,6 +30,7 @@ struct MainTabView: View {
     var body: some View {
         @Bindable var authenticator = authenticator
         @Bindable var database = database
+        @Bindable var oasis = oasis
         TabView(selection: $navigator.selectedTab) {
             Tab("Tab.Map", systemImage: "map.fill", value: .map) {
                 MapView()
@@ -78,11 +80,6 @@ struct MainTabView: View {
             }
         }
         #endif
-        .overlay {
-            if oasis.isShowing || authenticator.onlineState == .undetermined {
-                oasis.progressView(loadingNamespace)
-            }
-        }
         .sheet(isPresented: $authenticator.isAuthenticating) {
             LoginView()
                 .environment(authenticator)

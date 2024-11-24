@@ -11,7 +11,7 @@ import SwiftUI
 
 struct CatalogView: View {
 
-    @EnvironmentObject var navigator: Navigator
+    @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database

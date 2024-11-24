@@ -11,7 +11,7 @@ import SwiftUI
 
 struct MapView: View {
 
-    @EnvironmentObject var navigator: Navigator
+    @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
     @Environment(Database.self) var database
 
     @State var orientation = UIDeviceOrientation.portrait

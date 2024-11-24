@@ -6,6 +6,7 @@
 //
 
 import BackgroundTasks
+import Komponents
 import SwiftUI
 import SwiftData
 
@@ -14,7 +15,7 @@ struct CirclesApp: App {
 
     @Environment(\.scenePhase) private var scenePhase
 
-    @StateObject var navigator = Navigator()
+    @StateObject var navigator = Navigator<TabType, ViewPath>()
     @State var authenticator = Authenticator()
     @State var favorites = Favorites()
     @State var database = Database()
@@ -46,6 +47,13 @@ struct CirclesApp: App {
                         }
                     }
                 }
+                .progressAlert(
+                    isModal: $oasis.isModal,
+                    isShowing: $oasis.isShowing,
+                    headerText: $oasis.headerText,
+                    bodyText: $oasis.bodyText,
+                    progress: $oasis.progress
+                )
         }
         .modelContainer(sharedModelContainer)
         .environmentObject(navigator)

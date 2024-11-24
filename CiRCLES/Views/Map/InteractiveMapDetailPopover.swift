@@ -5,11 +5,12 @@
 //  Created by シン・ジャスティン on 2024/08/15.
 //
 
+import Komponents
 import SwiftUI
 
 struct InteractiveMapDetailPopover: View {
 
-    @EnvironmentObject var navigator: Navigator
+    @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
     @Environment(Database.self) var database
 
     @Environment(\.modelContext) var modelContext
