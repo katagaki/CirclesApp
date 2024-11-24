@@ -70,6 +70,9 @@ struct NotificationItem: Identifiable {
         case "Early":
             hour = 10
             minutes = 30
+        case "ChangingRoom":
+            hour = 11
+            minutes = 0
         case "AM":
             hour = 11
             minutes = 0
@@ -98,7 +101,7 @@ struct NotificationItem: Identifiable {
                     return "\(String(format: "%02d", hour - 1)):\(String(format: "%02d", minutes + 60 - 30))"
                 }
             case .start:
-                return "10:30"
+                return "\(String(format: "%02d", hour)):\(String(format: "%02d", minutes))"
             case .endCircles:
                 return "16:00"
             case .endCorporate:

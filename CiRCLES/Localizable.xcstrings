@@ -16,6 +16,7 @@
       "shouldTranslate" : false
     },
     "10:30" : {
+      "extractionState" : "stale",
       "localizations" : {
         "ja" : {
           "stringUnit" : {
@@ -1102,6 +1103,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "コミケWebカタログ"
+          }
+        }
+      }
+    },
+    "My.AddToCalendar" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add to Calendar"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "カレンダーに登録"
           }
         }
       }
@@ -2452,87 +2469,6 @@
         }
       }
     },
-    "Shared.Ticket.AM" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "AM Entry"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "午前入場"
-          }
-        }
-      }
-    },
-    "Shared.Ticket.ChangingRoom" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Changing Room Entry"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "更衣室先行入場"
-          }
-        }
-      }
-    },
-    "Shared.Ticket.Circle" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Circle Entry"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サークル入場"
-          }
-        }
-      }
-    },
-    "Shared.Ticket.Early" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Early Entry"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "アーリー入場"
-          }
-        }
-      }
-    },
-    "Shared.Ticket.PM" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PM Entry"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "午後入場"
-          }
-        }
-      }
-    },
     "Shared.Translate" : {
       "localizations" : {
         "en" : {
@@ -2641,6 +2577,87 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "マイコミケ"
+          }
+        }
+      }
+    },
+    "Ticket.AM" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AM Entry"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "午前入場"
+          }
+        }
+      }
+    },
+    "Ticket.ChangingRoom" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changing Room Entry"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更衣室先行入場"
+          }
+        }
+      }
+    },
+    "Ticket.Circle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Circle Entry"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "サークル入場"
+          }
+        }
+      }
+    },
+    "Ticket.Early" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Early Entry"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アーリー入場"
+          }
+        }
+      }
+    },
+    "Ticket.PM" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PM Entry"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "午後入場"
           }
         }
       }

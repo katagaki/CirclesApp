@@ -38,6 +38,11 @@ struct MyEventNotifierSheet: View {
                     NotificationItem(day: day, eventDate: date, participation: "AM", time: .hoursPrior2),
                     NotificationItem(day: day, eventDate: date, participation: "AM", time: .hoursPrior1)
                 ],
+                "ChangingRoom": [
+                    NotificationItem(day: day, eventDate: date, participation: "AM", time: .hoursPrior3),
+                    NotificationItem(day: day, eventDate: date, participation: "AM", time: .hoursPrior2),
+                    NotificationItem(day: day, eventDate: date, participation: "AM", time: .hoursPrior1)
+                ],
                 "PM": [
                     NotificationItem(day: day, eventDate: date, participation: "PM", time: .hoursPrior3),
                     NotificationItem(day: day, eventDate: date, participation: "PM", time: .hoursPrior2),
@@ -62,6 +67,9 @@ struct MyEventNotifierSheet: View {
                 "AM": [
                     NotificationItem(day: day, eventDate: date, participation: "AM", time: .start)
                 ],
+                "ChangingRoom": [
+                    NotificationItem(day: day, eventDate: date, participation: "AM", time: .start)
+                ],
                 "PM": [
                     NotificationItem(day: day, eventDate: date, participation: "PM", time: .start)
                 ],
@@ -81,6 +89,10 @@ struct MyEventNotifierSheet: View {
                     NotificationItem(day: day, eventDate: date, participation: "Early", time: .endCorporate)
                 ],
                 "AM": [
+                    NotificationItem(day: day, eventDate: date, participation: "AM", time: .endCircles),
+                    NotificationItem(day: day, eventDate: date, participation: "AM", time: .endCorporate)
+                ],
+                "ChangingRoom": [
                     NotificationItem(day: day, eventDate: date, participation: "AM", time: .endCircles),
                     NotificationItem(day: day, eventDate: date, participation: "AM", time: .endCorporate)
                 ],
