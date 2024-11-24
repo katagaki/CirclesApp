@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 struct MoreView: View {
-    @EnvironmentObject var navigator: Navigator
+    @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
 

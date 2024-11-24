@@ -65,23 +65,4 @@ class Oasis {
             self.isModal = true
         }
     }
-
-    @ViewBuilder
-    func progressView(_ namespace: Namespace.ID) -> some View {
-        @Bindable var oasis = self
-        if self.isModal {
-            LoadingOverlay(
-                namespace: namespace,
-                headerText: $oasis.headerText,
-                bodyText: $oasis.bodyText,
-                progress: $oasis.progress
-            )
-        } else {
-            LoadingPill(
-                namespace: namespace,
-                headerText: $oasis.headerText,
-                bodyText: $oasis.bodyText
-            )
-        }
-    }
 }
