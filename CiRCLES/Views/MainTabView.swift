@@ -97,11 +97,20 @@ struct MainTabView: View {
                 reloadData()
             }
         }
-        .onChange(of: authenticator.onlineState) { _, newValue in
+        .onChange(of: authenticator.onlineState) { oldValue, newValue in
             switch newValue {
             case .online:
-                Task {
-                    await authenticator.refreshAuthenticationToken()
+                if oldValue == .offline && newValue == .online {
+                    let isAuthFresh = authenticator.restoreAuthenticationFromKeychainAndDefaults()
+                    if isAuthFresh {
+                        Task {
+                            await authenticator.refreshAuthenticationToken()
+                        }
+                    }
+                } else {
+                    Task {
+                        await authenticator.refreshAuthenticationToken()
+                    }
                 }
             case .offline:
                 authenticator.useOfflineAuthenticationToken()
