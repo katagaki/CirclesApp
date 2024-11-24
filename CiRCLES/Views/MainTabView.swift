@@ -141,7 +141,7 @@ struct MainTabView: View {
             oasis.open {
                 Task {
                     await oasis.setHeaderText("Shared.LoadingHeader.Event")
-                    await oasis.setBodyText("Shared.LoadingText.FetchEventData")
+                    await oasis.setBodyText("Loading.FetchEventData")
                     if let authToken = authenticator.token {
                         await planner.prepare(authToken: authToken)
                     }
@@ -167,16 +167,16 @@ struct MainTabView: View {
 
         if let activeEvent {
             await oasis.setHeaderText("Shared.LoadingHeader.Download")
-            await oasis.setBodyText("Shared.LoadingText.DownloadTextDatabase")
+            await oasis.setBodyText("Loading.DownloadTextDatabase")
             await database.downloadTextDatabase(for: activeEvent, authToken: token) { progress in
                 await oasis.setProgress(progress)
             }
-            await oasis.setBodyText("Shared.LoadingText.DownloadImageDatabase")
+            await oasis.setBodyText("Loading.DownloadImageDatabase")
             await database.downloadImageDatabase(for: activeEvent, authToken: token) { progress in
                 await oasis.setProgress(progress)
             }
 
-            await oasis.setBodyText("Shared.LoadingText.Database")
+            await oasis.setBodyText("Loading.Database")
             database.connect()
 
             if !isDatabaseInitialized {
@@ -188,14 +188,14 @@ struct MainTabView: View {
                 await actor.deleteAll()
                 imageCache.clear()
 
-                await oasis.setBodyText("Shared.LoadingText.Events")
+                await oasis.setBodyText("Loading.Events")
                 await actor.loadEvents(from: database.textDatabase)
-                await oasis.setBodyText("Shared.LoadingText.Maps")
+                await oasis.setBodyText("Loading.Maps")
                 await actor.loadMaps(from: database.textDatabase)
                 await actor.loadLayouts(from: database.textDatabase)
-                await oasis.setBodyText("Shared.LoadingText.Genres")
+                await oasis.setBodyText("Loading.Genres")
                 await actor.loadGenres(from: database.textDatabase)
-                await oasis.setBodyText("Shared.LoadingText.Circles")
+                await oasis.setBodyText("Loading.Circles")
                 await actor.loadCircles(from: database.textDatabase)
 
                 await actor.save()
@@ -204,7 +204,7 @@ struct MainTabView: View {
                 isDatabaseInitialized = true
             }
 
-            await oasis.setBodyText("Shared.LoadingText.Images")
+            await oasis.setBodyText("Loading.Images")
             database.imageCache.removeAll()
             database.loadCommonImages()
             database.loadCircleImages()
@@ -218,7 +218,7 @@ struct MainTabView: View {
     func loadFavorites() async {
         await oasis.setModality(false)
         await oasis.setHeaderText("Shared.LoadingHeader.Favorites")
-        await oasis.setBodyText("Shared.LoadingText.Favorites")
+        await oasis.setBodyText("Loading.Favorites")
         let actor = FavoritesActor(modelContainer: sharedModelContainer)
         if let token = authenticator.token {
             let (items, wcIDMappedItems) = await actor.all(authToken: token)

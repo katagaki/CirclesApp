@@ -148,11 +148,11 @@ struct MoreDatabaseAdministratiion: View {
                let eventData = await WebCatalog.events(authToken: token),
                let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
                 database.delete()
-                await oasis.setBodyText("Shared.LoadingText.DownloadTextDatabase")
+                await oasis.setBodyText("Loading.DownloadTextDatabase")
                 await database.downloadTextDatabase(for: latestEvent, authToken: token) { progress in
                     await oasis.setProgress(progress)
                 }
-                await oasis.setBodyText("Shared.LoadingText.DownloadImageDatabase")
+                await oasis.setBodyText("Loading.DownloadImageDatabase")
                 await database.downloadImageDatabase(for: latestEvent, authToken: token) { progress in
                     await oasis.setProgress(progress)
                 }
@@ -164,7 +164,7 @@ struct MoreDatabaseAdministratiion: View {
                     textDatabaseURL.path(percentEncoded: false),
                     readonly: true
                 )
-                await oasis.setBodyText("Shared.LoadingText.RepairingData")
+                await oasis.setBodyText("Loading.RepairingData")
                 let actor = DataConverter(modelContainer: sharedModelContainer)
                 await actor.deleteAll()
                 await actor.loadAll(from: textDatabase)

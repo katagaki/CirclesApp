@@ -2025,7 +2025,7 @@
         }
       }
     },
-    "Shared.LoadingText.Circles" : {
+    "Loading.Circles" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2042,7 +2042,7 @@
         }
       }
     },
-    "Shared.LoadingText.Database" : {
+    "Loading.Database" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2059,7 +2059,7 @@
         }
       }
     },
-    "Shared.LoadingText.DownloadImageDatabase" : {
+    "Loading.DownloadImageDatabase" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2076,7 +2076,7 @@
         }
       }
     },
-    "Shared.LoadingText.DownloadTextDatabase" : {
+    "Loading.DownloadTextDatabase" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2093,7 +2093,7 @@
         }
       }
     },
-    "Shared.LoadingText.Events" : {
+    "Loading.Events" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2110,7 +2110,7 @@
         }
       }
     },
-    "Shared.LoadingText.Favorites" : {
+    "Loading.Favorites" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2127,7 +2127,7 @@
         }
       }
     },
-    "Shared.LoadingText.FetchEventData" : {
+    "Loading.FetchEventData" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2144,7 +2144,7 @@
         }
       }
     },
-    "Shared.LoadingText.Genres" : {
+    "Loading.Genres" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2161,7 +2161,7 @@
         }
       }
     },
-    "Shared.LoadingText.Images" : {
+    "Loading.Images" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2178,7 +2178,7 @@
         }
       }
     },
-    "Shared.LoadingText.Maps" : {
+    "Loading.Maps" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
@@ -2195,7 +2195,7 @@
         }
       }
     },
-    "Shared.LoadingText.RepairingData" : {
+    "Loading.RepairingData" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
