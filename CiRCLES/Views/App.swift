@@ -74,13 +74,7 @@ struct CirclesApp: App {
                         // Do nothing in any other case
                     }
                 case .background:
-                    let request = BGAppRefreshTaskRequest(identifier: "RefreshAuthToken")
-                    #if DEBUG
-                    request.earliestBeginDate = .now.addingTimeInterval(15)
-                    #else
-                    request.earliestBeginDate = .now.addingTimeInterval(12 * 3600)
-                    #endif
-                    try? BGTaskScheduler.shared.submit(request)
+                    registerBackgroundRefreshTask()
                 default: break
                 }
             }
@@ -100,6 +94,17 @@ struct CirclesApp: App {
         }
         .backgroundTask(.appRefresh("RefreshAuthToken")) {
             await authenticator.refreshAuthenticationToken()
+            await registerBackgroundRefreshTask()
         }
+    }
+
+    func registerBackgroundRefreshTask() {
+        let request = BGAppRefreshTaskRequest(identifier: "RefreshAuthToken")
+        #if DEBUG
+        request.earliestBeginDate = .now.addingTimeInterval(15)
+        #else
+        request.earliestBeginDate = .now.addingTimeInterval(12 * 3600)
+        #endif
+        try? BGTaskScheduler.shared.submit(request)
     }
 }

@@ -2435,23 +2435,6 @@
         }
       }
     },
-    "Shared.Sort" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sort"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "並べ替え"
-          }
-        }
-      }
-    },
     "Shared.Tags" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -15,6 +15,7 @@ class Authenticator {
 
     @ObservationIgnored let keychain = Keychain(service: "com.tsubuzaki.CiRCLES")
     @ObservationIgnored let keychainAuthTokenKey: String = "CircleMsAuthToken"
+    @ObservationIgnored let tokenExpiryDateKey: String = "Auth.TokenExpiryDate"
     @ObservationIgnored let reachability = try? Reachability()
 
     var isAuthenticating: Bool = false
@@ -74,16 +75,21 @@ class Authenticator {
         }
 
         // Restore previous authentication token
-        if let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),
-           let token = try? JSONDecoder().decode(
-            OpenIDToken.self,
-            from: tokenInKeychain.data(using: .utf8) ?? Data()
-           ) {
-            self.token = token
-            let expiresIn = max(0, (Int(token.expiresIn) ?? 0) - 3600)
-            self.tokenExpiryDate = Calendar.current.date(
-                byAdding: .second, value: expiresIn, to: .now
-            ) ?? .distantFuture
+        if let tokenExpiryDate = UserDefaults.standard.object(forKey: tokenExpiryDateKey) as? Date {
+            if tokenExpiryDate < .now {
+                self.resetAuthentication()
+            } else {
+                if let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),
+                   let token = try? JSONDecoder().decode(
+                    OpenIDToken.self,
+                    from: tokenInKeychain.data(using: .utf8) ?? Data()
+                   ) {
+                    self.token = token
+                    self.tokenExpiryDate = tokenExpiryDate
+                }
+            }
+        } else {
+            self.resetAuthentication()
         }
     }
 
@@ -91,6 +97,7 @@ class Authenticator {
         code = nil
         token = nil
         try? keychain.removeAll()
+        UserDefaults.standard.removeObject(forKey: keychainAuthTokenKey)
         isAuthenticating = true
     }
 
@@ -152,8 +159,7 @@ class Authenticator {
     func decodeAuthenticationToken(data: Data) {
         if let token = try? JSONDecoder().decode(OpenIDToken.self, from: data) {
             self.token = token
-            let expiresIn = max(0, (Int(token.expiresIn) ?? 0) - 3600)
-            tokenExpiryDate = Calendar.current.date(byAdding: .second, value: expiresIn, to: .now) ?? .distantFuture
+            self.updateTokenExpiryDate(from: token)
             if let tokenEncoded = try? JSONEncoder().encode(token),
                let tokenString = String(data: tokenEncoded, encoding: .utf8) {
                 try? keychain.set(tokenString, key: keychainAuthTokenKey)
@@ -163,6 +169,13 @@ class Authenticator {
             self.token = nil
             self.isAuthenticating = true
         }
+    }
+
+    func updateTokenExpiryDate(from token: OpenIDToken) {
+        let expiresIn = max(0, (Int(token.expiresIn) ?? 0) - 3600)
+        let tokenExpiryDate = Calendar.current.date(byAdding: .second, value: expiresIn, to: .now) ?? .distantFuture
+        UserDefaults.standard.set(tokenExpiryDate, forKey: tokenExpiryDateKey)
+        self.tokenExpiryDate = tokenExpiryDate
     }
 
     func urlRequestForToken(parameters: [String: String]) -> URLRequest {
