@@ -9,6 +9,7 @@ import Komponents
 import SwiftUI
 import UserNotifications
 
+// swiftlint:disable type_body_length
 struct MyEventNotifierSheet: View {
 
     @Environment(\.dismiss) var dismiss
@@ -275,3 +276,4 @@ struct MyEventNotifierSheet: View {
         return nil
     }
 }
+// swiftlint:enable type_body_length

@@ -71,73 +71,6 @@ struct MyParticipationSections: View {
                     }
                 }
                 .animation(.snappy.speed(2.0), value: planner.participation)
-                if let eventTitle, let eventDates, let date = eventDates[dayID],
-                   let participationInfo = planner.participationInfo(for: dayID),
-                   participationInfo != "" {
-                    Button("My.AddToCalendar") {
-                        Task {
-                            let eventStore = EKEventStore()
-                            do {
-                                // NOTE: Must use async/await function, using completion handler will crash SwiftUI app
-                                let isEventStoreAccessGranted = try await eventStore.requestWriteOnlyAccessToEvents()
-
-                                if isEventStoreAccessGranted {
-                                    let event: EKEvent = EKEvent(eventStore: eventStore)
-
-                                    let nthDay = String(localized: "Shared.\(dayID)th.Day")
-                                    switch Locale.current.language.languageCode {
-                                    case .japanese: event.title = "\(eventTitle)（\(nthDay)）"
-                                    default: event.title = "\(eventTitle) (\(nthDay))"
-                                    }
-
-                                    var eventNotes: String = ""
-                                    switch participationInfo {
-                                    case "Early":
-                                        event.startDate = Calendar.current.date(
-                                            bySettingHour: 10, minute: 30, second: 0, of: date
-                                        )
-                                        eventNotes += String(localized: "Ticket.Early")
-                                    case "ChangingRoom":
-                                        event.startDate = Calendar.current.date(
-                                            bySettingHour: 11, minute: 0, second: 0, of: date
-                                        )
-                                        eventNotes += String(localized: "Ticket.ChangingRoom")
-                                    case "AM":
-                                        event.startDate = Calendar.current.date(
-                                            bySettingHour: 11, minute: 0, second: 0, of: date
-                                        )
-                                        eventNotes += String(localized: "Ticket.AM")
-                                    case "PM":
-                                        event.startDate = Calendar.current.date(
-                                            bySettingHour: 12, minute: 30, second: 0, of: date
-                                        )
-                                        eventNotes += String(localized: "Ticket.PM")
-                                    case "Circle":
-                                        event.startDate = Calendar.current.date(
-                                            bySettingHour: 8, minute: 0, second: 0, of: date
-                                        )
-                                        eventNotes += String(localized: "Ticket.Circle")
-                                    default: break
-                                    }
-                                    eventNotes += "\n\nhttps://www.comiket.co.jp/"
-                                    event.notes = eventNotes
-
-                                    event.endDate = Calendar.current.date(
-                                        bySettingHour: 17, minute: 0, second: 0, of: date
-                                    )
-
-                                    event.url = URL(string: "circles-app://")
-                                    event.calendar = eventStore.defaultCalendarForNewEvents
-                                    try eventStore.save(event, span: .thisEvent)
-                                    try eventStore.commit()
-                                    openURL(URL(string: "calshow:\(date.timeIntervalSinceReferenceDate)")!)
-                                }
-                            } catch {
-                                debugPrint(error.localizedDescription)
-                            }
-                        }
-                    }
-                }
             } header: {
                 HStack {
                     Text("Shared.\(dayID)th.Day")
@@ -148,18 +81,25 @@ struct MyParticipationSections: View {
                         Text(date, style: .date)
                             .foregroundColor(.secondary)
                         Spacer()
-                        Button("Shared.RemindMe", systemImage: "bell") {
-                            participationForNotifier = planner.participationInfo(for: dayID)
-                            dayForNotifier = dayID
-                            dateForNotifier = date
-                        }
-                        .disabled(!isAllowedToSetNotification(date) ||
-                                  planner.participationInfo(for: dayID) == nil ||
-                                  planner.participationInfo(for: dayID) == "")
                     }
                 }
                 .font(.body)
                 .textCase(nil)
+            } footer: {
+                HStack(alignment: .center) {
+                    Button("My.AddToCalendar", systemImage: "calendar") {
+                        Task {
+                            await addToCalendar(dayID: dayID)
+                        }
+                    }
+                    .disabled(!isAllowedToAddToCalendar(dayID: dayID))
+                    Spacer(minLength: 0.0)
+                    Button("Shared.RemindMe", systemImage: "bell") {
+                        openNotifierSheet(dayID: dayID)
+                    }
+                    .disabled(!isAllowedToSetNotification(dayID: dayID))
+                }
+                .font(.subheadline)
             }
         }
         .onAppear {
@@ -169,7 +109,7 @@ struct MyParticipationSections: View {
         }
     }
 
-    func isAllowedToSetNotification(_ date: Date) -> Bool {
+    func isNotificationPossible(_ date: Date) -> Bool {
         var calendar = Calendar.current
         let dateFormatter = DateFormatter()
         calendar.timeZone = TimeZone(identifier: "Asia/Tokyo")!
@@ -184,4 +124,99 @@ struct MyParticipationSections: View {
         }
         return false
     }
+
+    func isAllowedToSetNotification(dayID: Int) -> Bool {
+        if let eventDates, let date = eventDates[dayID] {
+            return isNotificationPossible(date) &&
+            planner.participationInfo(for: dayID) != nil &&
+            planner.participationInfo(for: dayID) != ""
+        } else {
+            return false
+        }
+    }
+
+    func openNotifierSheet(dayID: Int) {
+        if let eventDates, let date = eventDates[dayID] {
+            participationForNotifier = planner.participationInfo(for: dayID)
+            dayForNotifier = dayID
+            dateForNotifier = date
+        }
+    }
+
+    func isAllowedToAddToCalendar(dayID: Int) -> Bool {
+        if let eventDates, let date = eventDates[dayID] {
+            return planner.participationInfo(for: dayID) != nil &&
+            planner.participationInfo(for: dayID) != ""
+        } else {
+            return false
+        }
+    }
+
+    // swiftlint:disable function_body_length
+    func addToCalendar(dayID: Int) async {
+        if let eventTitle, let eventDates, let date = eventDates[dayID],
+           let participationInfo = planner.participationInfo(for: dayID),
+           participationInfo != "" {
+            let eventStore = EKEventStore()
+            do {
+                // NOTE: Must use async/await function, using completion handler will crash SwiftUI app
+                let isEventStoreAccessGranted = try await eventStore.requestWriteOnlyAccessToEvents()
+
+                if isEventStoreAccessGranted {
+                    let event: EKEvent = EKEvent(eventStore: eventStore)
+
+                    let nthDay = String(localized: "Shared.\(dayID)th.Day")
+                    switch Locale.current.language.languageCode {
+                    case .japanese: event.title = "\(eventTitle)（\(nthDay)）"
+                    default: event.title = "\(eventTitle) (\(nthDay))"
+                    }
+
+                    var eventNotes: String = ""
+                    switch participationInfo {
+                    case "Early":
+                        event.startDate = Calendar.current.date(
+                            bySettingHour: 10, minute: 30, second: 0, of: date
+                        )
+                        eventNotes += String(localized: "Ticket.Early")
+                    case "ChangingRoom":
+                        event.startDate = Calendar.current.date(
+                            bySettingHour: 11, minute: 0, second: 0, of: date
+                        )
+                        eventNotes += String(localized: "Ticket.ChangingRoom")
+                    case "AM":
+                        event.startDate = Calendar.current.date(
+                            bySettingHour: 11, minute: 0, second: 0, of: date
+                        )
+                        eventNotes += String(localized: "Ticket.AM")
+                    case "PM":
+                        event.startDate = Calendar.current.date(
+                            bySettingHour: 12, minute: 30, second: 0, of: date
+                        )
+                        eventNotes += String(localized: "Ticket.PM")
+                    case "Circle":
+                        event.startDate = Calendar.current.date(
+                            bySettingHour: 8, minute: 0, second: 0, of: date
+                        )
+                        eventNotes += String(localized: "Ticket.Circle")
+                    default: break
+                    }
+                    eventNotes += "\n\nhttps://www.comiket.co.jp/"
+                    event.notes = eventNotes
+
+                    event.endDate = Calendar.current.date(
+                        bySettingHour: 17, minute: 0, second: 0, of: date
+                    )
+
+                    event.url = URL(string: "circles-app://")
+                    event.calendar = eventStore.defaultCalendarForNewEvents
+                    try eventStore.save(event, span: .thisEvent)
+                    try eventStore.commit()
+                    openURL(URL(string: "calshow:\(date.timeIntervalSinceReferenceDate)")!)
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+    }
+    // swiftlint:enable function_body_length
 }
