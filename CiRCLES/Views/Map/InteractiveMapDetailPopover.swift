@@ -31,11 +31,8 @@ struct InteractiveMapDetailPopover: View {
                 if let circles {
                     ForEach(circles, id: \.id) { circle in
                         Button {
-                            Task {
-                                isPresented = false
-                                try? await Task.sleep(for: .milliseconds(50))
-                                navigator.push(.circlesDetail(circle: circle), for: .map)
-                            }
+                            isPresented = false
+                            navigator.push(.circlesDetail(circle: circle), for: .map)
                         } label: {
                             HStack {
                                 CircleCutImage(
