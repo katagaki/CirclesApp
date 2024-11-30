@@ -59,7 +59,7 @@ class Authenticator {
             fatalError("OpenID client initialization failed. Did you set up your OpenID.plist file yet?")
         }
     }
-    
+
     func setupReachability() {
         if let reachability {
             reachability.whenReachable = { _ in

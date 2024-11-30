@@ -126,7 +126,11 @@ struct FavoritesView: View {
             .navigationDestination(for: ViewPath.self) { viewPath in
                 switch viewPath {
                 case .circlesDetail(let circle):
-                    CircleDetailView(circle: circle)
+                    CircleDetailView(
+                        circle: circle,
+                        previousCircle: { previousCircle(for: $0) },
+                        nextCircle: { nextCircle(for: $0) }
+                    )
                         .automaticNavigationTransition(id: circle.id, in: favoritesNamespace)
                 default: Color.clear
                 }
@@ -178,5 +182,39 @@ struct FavoritesView: View {
                 self.favoriteCircles = favoriteCircles
             }
         }
+    }
+
+    func previousCircle(for circle: ComiketCircle) -> ComiketCircle? {
+        if let favoriteCircles {
+            let colors = WebCatalogColor.allCases.map({String($0.rawValue)})
+            for colorIndex in 0..<colors.count {
+                if let circles = favoriteCircles[colors[colorIndex]],
+                   let index = circles.firstIndex(of: circle) {
+                    if index > 0 {
+                        return circles[index - 1]
+                    } else {
+                        return nil
+                    }
+                }
+            }
+        }
+        return nil
+    }
+
+    func nextCircle(for circle: ComiketCircle) -> ComiketCircle? {
+        if let favoriteCircles {
+            let colors = WebCatalogColor.allCases.map({String($0.rawValue)})
+            for colorIndex in 0..<colors.count {
+                if let circles = favoriteCircles[colors[colorIndex]],
+                   let index = circles.firstIndex(of: circle) {
+                    if index < circles.count - 1 {
+                        return circles[index + 1]
+                    } else {
+                        return nil
+                    }
+                }
+            }
+        }
+        return nil
     }
 }

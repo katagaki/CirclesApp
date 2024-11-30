@@ -23,6 +23,9 @@ struct CircleDetailView: View {
     @State var webCatalogInformation: WebCatalogCircle?
     @State var genre: String?
 
+    @State var previousCircle: ((ComiketCircle) -> ComiketCircle?)?
+    @State var nextCircle: ((ComiketCircle) -> ComiketCircle?)?
+    @State var isFirstCircleAlertShowing: Bool = false
     @State var isLastCircleAlertShowing: Bool = false
 
     @Namespace var namespace
@@ -89,65 +92,27 @@ struct CircleDetailView: View {
                 .listRowBackground(Color.clear)
                 .listRowInsets(.init(top: 10.0, leading: 20.0, bottom: 0.0, trailing: 20.0))
             }
-            Section {
-                if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
-                    Text(circle.supplementaryDescription)
-                        .textSelection(.enabled)
-                } else {
+            if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
+                ListSectionWithTranslateButton(title: "Shared.Description", text: circle.supplementaryDescription)
+            } else {
+                Section {
                     Text("Circles.NoDescription")
                         .foregroundStyle(.secondary)
-                }
-            } header: {
-                HStack {
+                } header: {
                     ListSectionHeader(text: "Shared.Description")
-                    Spacer()
-                    if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
-                        TranslateButton(translating: circle.supplementaryDescription)
-                    }
                 }
             }
             if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
-                Section {
-                    Text(circle.bookName)
-                } header: {
-                    HStack {
-                        ListSectionHeader(text: "Shared.BookName")
-                        Spacer()
-                        if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
-                            TranslateButton(translating: circle.bookName)
-                        }
-                    }
-                }
+                ListSectionWithTranslateButton(title: "Shared.BookName", text: circle.bookName)
             }
             if let genre {
-                Section {
-                    Text(genre)
-                        .textSelection(.enabled)
-                } header: {
-                    HStack {
-                        ListSectionHeader(text: "Shared.Genre")
-                        Spacer()
-                        TranslateButton(translating: genre)
-                    }
-                }
+                ListSectionWithTranslateButton(title: "Shared.Genre", text: genre)
             }
             if let tags = webCatalogInformation?.tag, tags.trimmingCharacters(in: .whitespaces).count > 0 {
-                Section {
-                    Text(tags)
-                        .textSelection(.enabled)
-                } header: {
-                    HStack {
-                        ListSectionHeader(text: "Shared.Tags")
-                        Spacer()
-                        TranslateButton(translating: tags)
-                    }
-                }
+                ListSectionWithTranslateButton(title: "Shared.Tags", text: tags)
             }
             if circle.memo.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
-                Section {
-                    Text(circle.memo)
-                        .textSelection(.enabled)
-                }
+                ListSectionWithTranslateButton(title: "Shared.Memo", text: circle.memo)
             }
         }
         .navigationTitle(circle.circleName)
@@ -170,7 +135,6 @@ struct CircleDetailView: View {
                     Button("Circles.GoPrevious", systemImage: "chevron.left") {
                         goToPreviousCircle()
                     }
-                    .disabled(circle.id == 1)
                     Button("Circles.GoNext", systemImage: "chevron.right") {
                         goToNextCircle()
                     }
@@ -185,6 +149,11 @@ struct CircleDetailView: View {
                     }
                     .padding(.vertical, 12.0)
                 }
+            }
+        }
+        .alert("Alerts.FirstCircle.Title", isPresented: $isFirstCircleAlertShowing) {
+            Button("Shared.OK", role: .cancel) {
+                isFirstCircleAlertShowing = false
             }
         }
         .alert("Alerts.LastCircle.Title", isPresented: $isLastCircleAlertShowing) {
@@ -224,29 +193,46 @@ struct CircleDetailView: View {
         }
     }
 
-    func goToNextCircle() {
-        let circleID = circle.id + 1
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.id == circleID
-            }
-        )
-        let circles = try? modelContext.fetch(fetchDescriptor)
-        if let circles, circles.count == 1 {
-            self.circle = circles.first ?? self.circle
-            Task {
-                await prepareCircle()
+    func goToPreviousCircle() {
+        if let previousCircle {
+            if let circle = previousCircle(circle) {
+                self.circle = circle
+                Task {
+                    await prepareCircle()
+                }
+            } else {
+                isFirstCircleAlertShowing = true
             }
         } else {
-            isLastCircleAlertShowing = true
+            let circleID = circle.id - 1
+            if !goToCircle(with: circleID) {
+                isFirstCircleAlertShowing = true
+            }
         }
     }
 
-    func goToPreviousCircle() {
-        let circleID = circle.id - 1
+    func goToNextCircle() {
+        if let nextCircle {
+            if let circle = nextCircle(circle) {
+                self.circle = circle
+                Task {
+                    await prepareCircle()
+                }
+            } else {
+                isLastCircleAlertShowing = true
+            }
+        } else {
+            let circleID = circle.id + 1
+            if !goToCircle(with: circleID) {
+                isLastCircleAlertShowing = true
+            }
+        }
+    }
+
+    func goToCircle(with id: Int) -> Bool {
         let fetchDescriptor = FetchDescriptor<ComiketCircle>(
             predicate: #Predicate<ComiketCircle> {
-                $0.id == circleID
+                $0.id == id
             }
         )
         let circles = try? modelContext.fetch(fetchDescriptor)
@@ -255,6 +241,9 @@ struct CircleDetailView: View {
             Task {
                 await prepareCircle()
             }
+            return true
+        } else {
+            return false
         }
     }
 }
