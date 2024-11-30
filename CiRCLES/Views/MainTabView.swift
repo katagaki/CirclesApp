@@ -90,27 +90,11 @@ struct MainTabView: View {
                 .displayFrequency(.immediate),
                 .datastoreLocation(.applicationDefault)
             ])
-            if authenticator.onlineState == .online {
-                reloadData()
-            }
+            authenticator.setupReachability()
         }
-        .onChange(of: authenticator.onlineState) { oldValue, newValue in
+        .onChange(of: authenticator.onlineState) { _, newValue in
             switch newValue {
-            case .online:
-                if oldValue == .offline && newValue == .online {
-                    let isAuthFresh = authenticator.restoreAuthenticationFromKeychainAndDefaults()
-                    if isAuthFresh {
-                        Task {
-                            await authenticator.refreshAuthenticationToken()
-                        }
-                    }
-                } else {
-                    Task {
-                        await authenticator.refreshAuthenticationToken()
-                    }
-                }
-            case .offline:
-                authenticator.useOfflineAuthenticationToken()
+            case .online, .offline:
                 reloadData()
             case .undetermined: break
             }

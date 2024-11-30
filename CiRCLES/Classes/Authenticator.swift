@@ -58,25 +58,31 @@ class Authenticator {
         } catch {
             fatalError("OpenID client initialization failed. Did you set up your OpenID.plist file yet?")
         }
-
-        // Set up Internet connectivity tracking
+    }
+    
+    func setupReachability() {
         if let reachability {
             reachability.whenReachable = { _ in
                 self.onlineState = .online
+                // Restore previous authentication token
+                if !self.restoreAuthenticationFromKeychainAndDefaults() {
+                    self.resetAuthentication()
+                } else {
+                    // Refresh authentication token if not expired
+                    Task {
+                        await self.refreshAuthenticationToken()
+                    }
+                }
             }
             reachability.whenUnreachable = { _ in
                 self.onlineState = .offline
+                self.useOfflineAuthenticationToken()
             }
             do {
                 try reachability.startNotifier()
             } catch {
                 debugPrint(error.localizedDescription)
             }
-        }
-
-        // Restore previous authentication token
-        if !restoreAuthenticationFromKeychainAndDefaults() {
-            self.resetAuthentication()
         }
     }
 
@@ -137,7 +143,7 @@ class Authenticator {
     }
 
     func useOfflineAuthenticationToken() {
-        self.token = nil
+        self.token = OpenIDToken()
     }
 
     func refreshAuthenticationToken() async {
