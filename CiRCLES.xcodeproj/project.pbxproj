@@ -23,6 +23,7 @@
 		E43C74102C6EDD85003522C8 /* LoginFeatureHero.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C740F2C6EDD85003522C8 /* LoginFeatureHero.swift */; };
 		E43C74122C702750003522C8 /* Rotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C74112C702748003522C8 /* Rotation.swift */; };
 		E447F8BF2CEA225A0023BCD3 /* VisitModeTip.swift in Sources */ = {isa = PBXBuildFile; fileRef = E447F8BE2CEA22570023BCD3 /* VisitModeTip.swift */; };
+		E44DF05F2CFAD3FC0094E2EB /* ListSectionWithTranslateButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44DF05E2CFAD3F70094E2EB /* ListSectionWithTranslateButton.swift */; };
 		E46758072CF1534700D5FB6A /* VisitActor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46758062CF1534500D5FB6A /* VisitActor.swift */; };
 		E46758092CF1692500D5FB6A /* CircleGroupType.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46758082CF1692100D5FB6A /* CircleGroupType.swift */; };
 		E46CB5052CEB712B00620141 /* GradientBorder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E46CB5042CEB712700620141 /* GradientBorder.swift */; };
@@ -150,6 +151,7 @@
 		E43C740F2C6EDD85003522C8 /* LoginFeatureHero.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginFeatureHero.swift; sourceTree = "<group>"; };
 		E43C74112C702748003522C8 /* Rotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Rotation.swift; sourceTree = "<group>"; };
 		E447F8BE2CEA22570023BCD3 /* VisitModeTip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitModeTip.swift; sourceTree = "<group>"; };
+		E44DF05E2CFAD3F70094E2EB /* ListSectionWithTranslateButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListSectionWithTranslateButton.swift; sourceTree = "<group>"; };
 		E46758062CF1534500D5FB6A /* VisitActor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisitActor.swift; sourceTree = "<group>"; };
 		E46758082CF1692100D5FB6A /* CircleGroupType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircleGroupType.swift; sourceTree = "<group>"; };
 		E46CB5042CEB712700620141 /* GradientBorder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientBorder.swift; sourceTree = "<group>"; };
@@ -347,6 +349,7 @@
 				E48B629A2C5FCA8D007874AE /* FavoriteColorSelector.swift */,
 				E46CB5042CEB712700620141 /* GradientBorder.swift */,
 				E49F428C2C96AC3100ABF424 /* ListCheckbox.swift */,
+				E44DF05E2CFAD3F70094E2EB /* ListSectionWithTranslateButton.swift */,
 				E4D74B7E2C8C17290014CD16 /* SafariLink.swift */,
 				E47269062C3D739500D5335D /* SafariView.swift */,
 				E4755BD52C84B6010032DA2F /* SNSButton.swift */,
@@ -840,6 +843,7 @@
 				E49351EF2C4CCD0D004CBDA1 /* ComiketGenre.swift in Sources */,
 				E49351F72C4CD91F004CBDA1 /* ComiketCircleExtendedInformation.swift in Sources */,
 				E4D74B6C2C85FEDA0014CD16 /* CirclePreview.swift in Sources */,
+				E44DF05F2CFAD3FC0094E2EB /* ListSectionWithTranslateButton.swift in Sources */,
 				E4D845D12CDFA509004CAFE8 /* FileManager.swift in Sources */,
 				E42003CF2C631E4E00770992 /* ConditionalFit.swift in Sources */,
 				E47192112CE8DA9000B9F35F /* CirclesVisitEntry.swift in Sources */,

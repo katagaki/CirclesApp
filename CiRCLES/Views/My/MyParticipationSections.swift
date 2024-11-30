@@ -144,7 +144,7 @@ struct MyParticipationSections: View {
     }
 
     func isAllowedToAddToCalendar(dayID: Int) -> Bool {
-        if let eventDates, let date = eventDates[dayID] {
+        if let eventDates, eventDates[dayID] != nil {
             return planner.participationInfo(for: dayID) != nil &&
             planner.participationInfo(for: dayID) != ""
         } else {
@@ -152,7 +152,7 @@ struct MyParticipationSections: View {
         }
     }
 
-    // swiftlint:disable function_body_length
+    // swiftlint:disable function_body_length cyclomatic_complexity
     func addToCalendar(dayID: Int) async {
         if let eventTitle, let eventDates, let date = eventDates[dayID],
            let participationInfo = planner.participationInfo(for: dayID),
@@ -218,5 +218,5 @@ struct MyParticipationSections: View {
             }
         }
     }
-    // swiftlint:enable function_body_length
+    // swiftlint:enable function_body_length cyclomatic_complexity
 }
