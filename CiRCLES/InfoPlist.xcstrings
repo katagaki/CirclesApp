@@ -1,6 +1,40 @@
 {
   "sourceLanguage" : "ja",
   "strings" : {
+    "CCAppNameSynonym1" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CiRCLES"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "さーくるず"
+          }
+        }
+      }
+    },
+    "CCAppNameSynonym2" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CiRCLE"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "さーくる"
+          }
+        }
+      }
+    },
     "CFBundleDisplayName" : {
       "extractionState" : "manual",
       "localizations" : {
