@@ -71,6 +71,7 @@ struct CircleDetailToolbar: View {
         .scrollIndicators(.hidden)
         .onAppear {
             reloadFavoriteColor()
+            shouldCallAPIToUpdateFavorites = true
         }
         .onChange(of: extendedInformation.webCatalogID) { _, _ in
             reloadFavoriteColor()
