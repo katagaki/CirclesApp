@@ -17,8 +17,14 @@
 	</array>
 	<key>INAlternativeAppNames</key>
 	<array>
-		<string>CCAppNameSynonym1</string>
-		<string>CCAppNameSynonym2</string>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>CCAppNameSynonym1</string>
+		</dict>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>CCAppNameSynonym2</string>
+		</dict>
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
