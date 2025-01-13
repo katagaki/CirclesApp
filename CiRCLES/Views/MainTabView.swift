@@ -6,12 +6,14 @@
 //
 
 import Komponents
+import StoreKit
 import SwiftUI
 import SwiftData
 import TipKit
 
 struct MainTabView: View {
 
+    @Environment(\.requestReview) var requestReview
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
     @Environment(Authenticator.self) var authenticator
@@ -24,6 +26,8 @@ struct MainTabView: View {
     @State var isReloadingData: Bool = false
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
+    @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
+    @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
 
     @Namespace var loadingNamespace
 
@@ -96,6 +100,11 @@ struct MainTabView: View {
             switch newValue {
             case .online, .offline:
                 reloadData()
+                launchCount += 1
+                if launchCount > 2 && !hasReviewBeenPrompted {
+                    requestReview()
+                    hasReviewBeenPrompted = true
+                }
             case .undetermined: break
             }
         }
