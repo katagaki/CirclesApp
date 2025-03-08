@@ -115,6 +115,7 @@ struct CircleDetailView: View {
                 ListSectionWithTranslateButton(title: "Shared.Memo", text: circle.memo)
             }
         }
+        .listSectionSpacing(.compact)
         .navigationTitle(circle.circleName)
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .tabBar)
