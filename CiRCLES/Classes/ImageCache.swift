@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 import UIKit
+import WebP
 
 @Observable
 class ImageCache {
@@ -55,11 +56,31 @@ class ImageCache {
     func download(id: Int, url: URL) async -> UIImage? {
         do {
             let (data, _) = try await URLSession.shared.data(from: url)
+            var finalImage: UIImage?
             if let image = UIImage(data: data) {
+                // PNG, JPEG
                 saveImage(data, named: String(id))
                 images[id] = data
-                return image
+                finalImage = image
+            } else if let cgImage = try? WebPDecoder().decode(data, options: WebPDecoderOptions()) {
+                // WebP
+                let image = UIImage(cgImage: cgImage)
+                var nonWebpData: Data?
+                if let convertedData = image.pngData() {
+                    nonWebpData = convertedData
+                } else if let convertedData = image.jpegData(compressionQuality: 1.0) {
+                    nonWebpData = convertedData
+                }
+                if let nonWebpData {
+                    saveImage(nonWebpData, named: String(id))
+                    images[id] = nonWebpData
+                    finalImage = UIImage(cgImage: cgImage)
+                }
+            }
+            if let finalImage {
+                return finalImage
             } else {
+                // Others (unsupported formats)
                 let placeholderData = Data()
                 saveImage(placeholderData, named: String(id))
                 images[id] = data

@@ -14,6 +14,7 @@
 		E405A48A2C21B0A1006FE791 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A4892C21B0A1006FE791 /* Localizable.xcstrings */; };
 		E405A48C2C21B0AF006FE791 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = E405A48B2C21B0AF006FE791 /* InfoPlist.xcstrings */; };
 		E405A48F2C21B157006FE791 /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E405A48E2C21B157006FE791 /* Komponents */; };
+		E40623022DEBE238002D3E28 /* WebP in Frameworks */ = {isa = PBXBuildFile; productRef = E40623012DEBE238002D3E28 /* WebP */; };
 		E42003CC2C6308B600770992 /* InteractiveMap.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42003CB2C6308AB00770992 /* InteractiveMap.swift */; };
 		E42003CF2C631E4E00770992 /* ConditionalFit.swift in Sources */ = {isa = PBXBuildFile; fileRef = E42003CE2C631E4900770992 /* ConditionalFit.swift */; };
 		E43C74062C6DE8A1003522C8 /* ComiketMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = E43C74052C6DE89F003522C8 /* ComiketMapping.swift */; };
@@ -271,6 +272,7 @@
 				E480AA772C441DD1009C1445 /* KeychainAccess in Frameworks */,
 				E4D74B892C8CAEA70014CD16 /* Reachability in Frameworks */,
 				E405A48F2C21B157006FE791 /* Komponents in Frameworks */,
+				E40623022DEBE238002D3E28 /* WebP in Frameworks */,
 				E480AAA62C44BB77009C1445 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -648,6 +650,7 @@
 				E480AA9C2C44A6F1009C1445 /* SQLite */,
 				E480AAA52C44BB77009C1445 /* ZIPFoundation */,
 				E4D74B882C8CAEA70014CD16 /* Reachability */,
+				E40623012DEBE238002D3E28 /* WebP */,
 			);
 			productName = CiRCLES;
 			productReference = E4A769462C21A20A00BE3491 /* CiRCLES.app */;
@@ -684,6 +687,7 @@
 				E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */,
 				E480AAA42C44BB77009C1445 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
 				E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability" */,
+				E40623002DEBE238002D3E28 /* XCRemoteSwiftPackageReference "Swift-WebP" */,
 			);
 			productRefGroup = E4A769472C21A20A00BE3491 /* Products */;
 			projectDirPath = "";
@@ -1085,6 +1089,14 @@
 				kind = branch;
 			};
 		};
+		E40623002DEBE238002D3E28 /* XCRemoteSwiftPackageReference "Swift-WebP" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ainame/Swift-WebP";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
 		E480AA752C441DD1009C1445 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess.git";
@@ -1124,6 +1136,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E405A48D2C21B157006FE791 /* XCRemoteSwiftPackageReference "Komponents" */;
 			productName = Komponents;
+		};
+		E40623012DEBE238002D3E28 /* WebP */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E40623002DEBE238002D3E28 /* XCRemoteSwiftPackageReference "Swift-WebP" */;
+			productName = WebP;
 		};
 		E480AA762C441DD1009C1445 /* KeychainAccess */ = {
 			isa = XCSwiftPackageProductDependency;
