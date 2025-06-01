@@ -30,6 +30,9 @@ struct FavoritesView: View {
     @State var isVisitModeOn: Bool = false
     @AppStorage(wrappedValue: false, "Favorites.VisitModeOn") var isVisitModeOnDefault: Bool
 
+    @State var isGroupedByColor: Bool = true
+    @AppStorage(wrappedValue: true, "Favorites.GroupByColor") var isGroupedByColorDefault: Bool
+
     @State var isInitialLoadCompleted: Bool = false
 
     @Namespace var favoritesNamespace
@@ -38,31 +41,43 @@ struct FavoritesView: View {
         NavigationStack(path: $navigator[.favorites]) {
             ZStack(alignment: .center) {
                 if let favoriteCircles {
-                    ColorGroupedCircleGrid(
-                        groups: favoriteCircles,
-                        showsOverlayWhenEmpty: false,
-                        namespace: favoritesNamespace
-                    ) { circle in
-                        if !isVisitModeOn {
-                            navigator.push(.circlesDetail(circle: circle), for: .favorites)
+                    Group {
+                        if isGroupedByColor {
+                            ColorGroupedCircleGrid(
+                                groups: favoriteCircles,
+                                showsOverlayWhenEmpty: false,
+                                namespace: favoritesNamespace
+                            ) { circle in
+                                if !isVisitModeOn {
+                                    navigator.push(.circlesDetail(circle: circle), for: .favorites)
+                                } else {
+                                    let circleID = circle.id
+                                    let eventNumber = planner.activeEventNumber
+                                    Task.detached {
+                                        let actor = VisitActor(modelContainer: sharedModelContainer)
+                                        await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
+                                    }
+                                }
+                            }
                         } else {
-                            let circleID = circle.id
-                            let eventNumber = planner.activeEventNumber
-                            Task.detached {
-                                let actor = VisitActor(modelContainer: sharedModelContainer)
-                                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
+                            CircleGrid(
+                                circles: favoriteCircles.values.flatMap({ $0 }).sorted(by: { $0.id < $1.id }),
+                                showsOverlayWhenEmpty: false,
+                                namespace: favoritesNamespace
+                            ) { circle in
+                                navigator.push(.circlesDetail(circle: circle), for: .circles)
                             }
                         }
                     }
-                       .overlay {
-                           if favoriteCircles.isEmpty {
-                               ContentUnavailableView(
-                                   "Favorites.NoFavorites",
-                                   systemImage: "star.leadinghalf.filled",
-                                   description: Text("Favorites.NoFavorites.Description")
-                               )
-                           }
-                       }
+                    .overlay {
+                        if favoriteCircles.isEmpty {
+                            ContentUnavailableView(
+                                "Favorites.NoFavorites",
+                                systemImage: "star.leadinghalf.filled",
+                                description: Text("Favorites.NoFavorites.Description")
+                            )
+                        }
+                    }
                 } else {
                     ProgressView("Favorites.Loading")
                         .frame(maxHeight: .infinity)
@@ -82,7 +97,8 @@ struct FavoritesView: View {
                 BarAccessory(placement: .bottom) {
                     FavoritesToolbar(
                         selectedDate: $selectedDate,
-                        isVisitModeOn: $isVisitModeOn
+                        isVisitModeOn: $isVisitModeOn,
+                        isGroupedByColor: $isGroupedByColor
                     )
                 }
             }
@@ -114,6 +130,11 @@ struct FavoritesView: View {
             .onChange(of: isVisitModeOn) { _, _ in
                 if isInitialLoadCompleted {
                     isVisitModeOnDefault = isVisitModeOn
+                }
+            }
+            .onChange(of: isGroupedByColor) { _, _ in
+                if (isInitialLoadCompleted) {
+                    isGroupedByColorDefault = isGroupedByColor
                 }
             }
             .onChange(of: favorites.items) { _, _ in

@@ -17,6 +17,7 @@ struct FavoritesToolbar: View {
     @Binding var selectedDate: ComiketDate?
 
     @Binding var isVisitModeOn: Bool
+    @Binding var isGroupedByColor: Bool
 
     @State var isInitialLoadCompleted: Bool = false
 
@@ -33,6 +34,15 @@ struct FavoritesToolbar: View {
                     }
                 }
                 .popoverTip(VisitModeTip())
+                BarAccessoryButton(
+                    "Shared.GroupByColor",
+                    icon: isGroupedByColor ? "paintpalette.fill" : "paintpalette",
+                    isSecondary: !isGroupedByColor
+                ) {
+                    withAnimation(.snappy.speed(2.0)) {
+                        isGroupedByColor.toggle()
+                    }
+                }
 //                BarAccessoryMenu(
 //                    "Shared.Sort",
 //                    icon: "arrow.up.arrow.down"
