@@ -1,5 +1,5 @@
 {
-  "originHash" : "919b8a6a334cacfd7462daf6a3f2593189544a4bf38954dc7c8efaa9c76a1d10",
+  "originHash" : "051e79d6c58267616e0a3ee7b7e7191281ff99c876dfafa4aa2062140fde3477",
   "pins" : [
     {
       "identity" : "keychainaccess",
@@ -16,7 +16,16 @@
       "location" : "https://github.com/katagaki/Komponents",
       "state" : {
         "branch" : "main",
-        "revision" : "ac1ef7aefb1c4b5a0af65251cb8f14dd42bd1eb6"
+        "revision" : "2431ce046638dc3b86fa187ddcab0f1ed00b321d"
+      }
+    },
+    {
+      "identity" : "libwebp-xcode",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SDWebImage/libwebp-Xcode.git",
+      "state" : {
+        "revision" : "0d60654eeefd5d7d2bef3835804892c40225e8b2",
+        "version" : "1.5.0"
       }
     },
     {
@@ -35,6 +44,15 @@
       "state" : {
         "revision" : "a95fc6df17d108bd99210db5e8a9bac90fe984b8",
         "version" : "0.15.3"
+      }
+    },
+    {
+      "identity" : "swift-webp",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/ainame/Swift-WebP",
+      "state" : {
+        "branch" : "main",
+        "revision" : "c7c0adebb374493a665136d98198b11437045fb4"
       }
     },
     {
