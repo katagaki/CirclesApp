@@ -151,6 +151,7 @@ struct MyView: View {
                     }
                 }
                 .animation(.smooth.speed(2.0), value: eventCoverImage)
+                .ignoresSafeArea()
             }
             .safeAreaInset(edge: .top, spacing: 0.0) {
                 BarAccessory(placement: .top) {
