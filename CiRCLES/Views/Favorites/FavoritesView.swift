@@ -114,6 +114,7 @@ struct FavoritesView: View {
                     }
                     selectedDate = dates.first(where: {$0.id == selectedDateID})
                     isVisitModeOn = isVisitModeOnDefault
+                    isGroupedByColor = isGroupedByColorDefault
                     isInitialLoadCompleted = true
                 }
             }
