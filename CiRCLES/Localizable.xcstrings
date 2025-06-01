@@ -1939,6 +1939,23 @@
         }
       }
     },
+    "Shared.Building" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hall"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "棟"
+          }
+        }
+      }
+    },
     "Shared.Cancel" : {
       "localizations" : {
         "en" : {
@@ -2277,22 +2294,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ログアウト"
-          }
-        }
-      }
-    },
-    "Shared.Map" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hall"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "棟"
           }
         }
       }

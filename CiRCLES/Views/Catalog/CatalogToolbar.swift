@@ -60,8 +60,8 @@ struct CatalogToolbar: View {
                         Text("Shared.Genre")
                     }
                 }
-                BarAccessoryMenu(LocalizedStringKey(selectedMap?.name ?? "Shared.Map"),
-                                 icon: "map") {
+                BarAccessoryMenu(LocalizedStringKey(selectedMap?.name ?? "Shared.Building"),
+                                 icon: "building") {
                     Button("Shared.All") {
                         selectedMap = nil
                     }
@@ -71,7 +71,7 @@ struct CatalogToolbar: View {
                                 .tag(map)
                         }
                     } label: {
-                        Text("Shared.Map")
+                        Text("Shared.Building")
                     }
                 }
                 BarAccessoryMenu(LocalizedStringKey(selectedBlock?.name ?? "Shared.Block"),

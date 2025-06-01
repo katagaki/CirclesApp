@@ -54,11 +54,52 @@ struct MapView: View {
                     }
                 }
             }
+            .overlay {
+                #if !os(visionOS)
+                if orientation != .portrait {
+                    ZStack(alignment: .bottomLeading) {
+                        SquareButtonStack {
+                            Menu {
+                                ForEach(dates, id: \.id) { date in
+                                    Section("Shared.\(date.id)th.Day") {
+                                        ForEach(maps, id: \.id) { map in
+                                            Button {
+                                                withAnimation(.snappy.speed(2.0)) {
+                                                    selectedDate = date
+                                                    selectedMap = map
+                                                }
+                                            } label: {
+                                                if selectedDate == date && selectedMap == map {
+                                                    Label(LocalizedStringKey(stringLiteral: map.name),
+                                                          systemImage: "checkmark")
+                                                } else {
+                                                    Text(LocalizedStringKey(stringLiteral: map.name))
+                                                }
+                                            }
+                                            .disabled(selectedDate == date && selectedMap == map)
+                                        }
+                                    }
+                                }
+                            } label: {
+                                SquareButton {
+                                    // Intentionally left blank
+                                } label: {
+                                    Image(systemName: "building")
+                                        .font(.title2)
+                                }
+                            }
+                        }
+                        .offset(x: -12.0, y: -12.0)
+                        Color.clear
+                    }
+                }
+                #endif
+            }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 BarAccessory(placement: .bottom) {
                     Group {
                         #if !os(visionOS)
-                        if orientation.isPortrait || UIDevice.current.userInterfaceIdiom == .pad {
+                        if orientation == .portrait || UIDevice.current.userInterfaceIdiom == .pad {
                             MapToolbar(selectedDate: $selectedDate, selectedMap: $selectedMap)
                         } else {
                             Color.clear
@@ -68,10 +109,10 @@ struct MapView: View {
                         MapToolbar(selectedDate: $selectedDate, selectedMap: $selectedMap)
                         #endif
                     }
-                    .onRotate { newOrientation in
-                        orientation = newOrientation
-                    }
                 }
+            }
+            .onRotate { newOrientation in
+                orientation = newOrientation
             }
             .onAppear {
                 if !isInitialLoadCompleted {
