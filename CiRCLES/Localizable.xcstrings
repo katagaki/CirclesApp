@@ -2149,6 +2149,22 @@
         }
       }
     },
+    "Shared.GroupByColor" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Group By Color"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "色でグループ"
+          }
+        }
+      }
+    },
     "Shared.LoadingHeader.Download" : {
       "extractionState" : "manual",
       "localizations" : {
