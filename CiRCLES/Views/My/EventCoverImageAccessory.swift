@@ -23,7 +23,8 @@ struct EventCoverImageAccessory: View {
                             RoundedRectangle(cornerRadius: 8.0)
                                 .stroke(Color.primary.opacity(0.5), lineWidth: 1/3)
                         }
-                        .frame(maxWidth: .infinity, maxHeight: 300.0, alignment: .center)
+                        .padding()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 }
                 Image(.arrow)
                     .resizable()
