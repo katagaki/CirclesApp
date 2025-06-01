@@ -55,6 +55,7 @@ struct ColorGroupedCircleGrid: View {
                     }
                 }
             }
+            .frame(maxWidth: .infinity)
         }
         .overlay {
             if groups.isEmpty && showsOverlayWhenEmpty {
