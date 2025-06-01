@@ -65,7 +65,7 @@ struct FavoritesView: View {
                                 showsOverlayWhenEmpty: false,
                                 namespace: favoritesNamespace
                             ) { circle in
-                                navigator.push(.circlesDetail(circle: circle), for: .circles)
+                                navigator.push(.circlesDetail(circle: circle), for: .favorites)
                             }
                         }
                     }
@@ -133,7 +133,7 @@ struct FavoritesView: View {
                 }
             }
             .onChange(of: isGroupedByColor) { _, _ in
-                if (isInitialLoadCompleted) {
+                if isInitialLoadCompleted {
                     isGroupedByColorDefault = isGroupedByColor
                 }
             }
