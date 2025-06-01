@@ -16,6 +16,8 @@ struct CirclesApp: App {
     @Environment(\.scenePhase) private var scenePhase
 
     @StateObject var navigator = Navigator<TabType, ViewPath>()
+    @State var orientation = Orientation()
+
     @State var authenticator = Authenticator()
     @State var favorites = Favorites()
     @State var database = Database()
@@ -54,9 +56,16 @@ struct CirclesApp: App {
                     bodyText: $oasis.bodyText,
                     progress: $oasis.progress
                 )
+                .onAppear {
+                    orientation.update()
+                }
+                .onRotate { newOrientation in
+                    orientation.update(to: newOrientation)
+                }
         }
         .modelContainer(sharedModelContainer)
         .environmentObject(navigator)
+        .environment(orientation)
         .environment(authenticator)
         .environment(favorites)
         .environment(database)

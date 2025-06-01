@@ -169,8 +169,9 @@ struct MainTabView: View {
             await oasis.setBodyText("Loading.Database")
             database.connect()
 
+            await oasis.setHeaderText("Shared.LoadingHeader.Initial")
+
             if !isDatabaseInitialized {
-                await oasis.setHeaderText("Shared.LoadingHeader.Initial")
 
                 let actor = DataConverter(modelContainer: sharedModelContainer)
 

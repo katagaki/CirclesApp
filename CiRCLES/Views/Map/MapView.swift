@@ -12,9 +12,8 @@ import SwiftUI
 struct MapView: View {
 
     @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
+    @Environment(Orientation.self) var orientation
     @Environment(Database.self) var database
-
-    @State var orientation = UIDeviceOrientation.portrait
 
     @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
     var dates: [ComiketDate]
@@ -56,7 +55,7 @@ struct MapView: View {
             }
             .overlay {
                 #if !os(visionOS)
-                if orientation != .portrait {
+                if orientation.isLandscapeOrUpsideDown() {
                     ZStack(alignment: .bottomLeading) {
                         SquareButtonStack {
                             Menu {
@@ -99,7 +98,7 @@ struct MapView: View {
                 BarAccessory(placement: .bottom) {
                     Group {
                         #if !os(visionOS)
-                        if orientation == .portrait || UIDevice.current.userInterfaceIdiom == .pad {
+                        if orientation.isPortrait() || orientation.isOniPad() {
                             MapToolbar(selectedDate: $selectedDate, selectedMap: $selectedMap)
                         } else {
                             Color.clear
@@ -111,12 +110,8 @@ struct MapView: View {
                     }
                 }
             }
-            .onRotate { newOrientation in
-                orientation = newOrientation
-            }
             .onAppear {
                 if !isInitialLoadCompleted {
-                    orientation = UIDevice.current.orientation
                     selectedDate = dates.first(where: {$0.id == selectedDateID})
                     selectedMap = maps.first(where: {$0.id == selectedMapID})
                     isInitialLoadCompleted = true
