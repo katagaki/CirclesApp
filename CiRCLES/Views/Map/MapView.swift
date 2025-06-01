@@ -75,6 +75,7 @@ struct MapView: View {
             }
             .onAppear {
                 if !isInitialLoadCompleted {
+                    orientation = UIDevice.current.orientation
                     selectedDate = dates.first(where: {$0.id == selectedDateID})
                     selectedMap = maps.first(where: {$0.id == selectedMapID})
                     isInitialLoadCompleted = true
