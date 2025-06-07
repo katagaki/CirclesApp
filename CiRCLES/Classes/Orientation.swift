@@ -14,12 +14,20 @@ class Orientation {
 
     @MainActor
     init() {
-        self.orientation = UIDevice.current.orientation
+        if UIDevice.current.orientation.isPortrait {
+            self.orientation = .portrait
+        } else {
+            self.orientation = UIDevice.current.orientation
+        }
     }
 
     @MainActor
     func update() {
-        self.orientation = UIDevice.current.orientation
+        if UIDevice.current.orientation == .portrait ||
+            UIDevice.current.orientation == .landscapeLeft ||
+            UIDevice.current.orientation == .landscapeRight {
+            self.orientation = UIDevice.current.orientation
+        }
     }
 
     @MainActor
