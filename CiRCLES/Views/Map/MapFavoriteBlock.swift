@@ -17,7 +17,7 @@ struct MapFavoriteBlock: View {
     var zoomDivisor: Int
 
     var webCatalogIDs: [Int] {
-        Array(colorMap.keys)
+        Array(colorMap.keys).sorted()
     }
 
     var body: some View {

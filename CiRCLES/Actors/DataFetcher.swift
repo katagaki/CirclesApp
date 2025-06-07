@@ -8,6 +8,7 @@
 import Foundation
 import SwiftData
 
+// swiftline:disable type_body_length
 @ModelActor
 actor DataFetcher {
 
@@ -110,7 +111,7 @@ actor DataFetcher {
         }
     }
 
-    func circleWebCatalogIDs(
+    func layoutCatalogMappingToWebCatalogIDs(
         forMappings mappings: [LayoutCatalogMapping],
         on dateID: Int
     ) -> [LayoutCatalogMapping: [Int]] {
@@ -253,4 +254,39 @@ actor DataFetcher {
             return []
         }
     }
+
+    func spaceNumberSuffixes(forWebCatalogIDs webCatalogIDs: [Int]) -> [Int: Int] {
+        do {
+            let extendedInformationFetchDescriptor = FetchDescriptor<ComiketCircleExtendedInformation>(
+                predicate: #Predicate<ComiketCircleExtendedInformation> {
+                    webCatalogIDs.contains($0.webCatalogID)
+                }
+            )
+            let extendedInformation = try modelContext.fetch(extendedInformationFetchDescriptor)
+            let webCatalogIDMappedToSpaceSubNo: [Int: Int] = extendedInformation
+                .reduce(into: [:]) { result, extendedInformation in
+                    do {
+                        let circleID = extendedInformation.id
+                        let circlesFetchDescriptor = FetchDescriptor<ComiketCircle>(
+                            predicate: #Predicate<ComiketCircle> {
+                                $0.id == circleID
+                            }
+                        )
+                        let circles = try modelContext.fetch(circlesFetchDescriptor)
+                        if let firstCircle = circles.first {
+                            result[extendedInformation.webCatalogID] = firstCircle.spaceNumberSuffix
+                        }
+                    } catch {
+                        // Intentionally left blank
+                    }
+                }
+            return webCatalogIDMappedToSpaceSubNo
+        } catch {
+            debugPrint(error.localizedDescription)
+            return webCatalogIDs.reduce(into: [:]) { result, webCatalogID in
+                result[webCatalogID] = 0
+            }
+        }
+    }
 }
+// swiftline:enable type_body_length
