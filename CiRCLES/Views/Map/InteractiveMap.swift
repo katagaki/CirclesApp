@@ -140,9 +140,15 @@ struct InteractiveMap: View {
 
     func reloadAll() {
         withAnimation(.snappy.speed(2.0)) {
+            removeAllMappings()
             reloadMapImage()
             reloadMapLayouts()
         }
+    }
+
+    func removeAllMappings() {
+        layoutWebCatalogIDMappings.removeAll()
+        layoutFavoriteWebCatalogIDMappings.removeAll()
     }
 
     func reloadMapImage() {
