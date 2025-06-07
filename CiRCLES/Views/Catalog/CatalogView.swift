@@ -114,7 +114,7 @@ struct CatalogView: View {
                     HStack {
                         if displayModeState == .list {
                             Button {
-                                withAnimation(.snappy.speed(2.0)) {
+                                withAnimation(.smooth.speed(2.0)) {
                                     switch listDisplayModeState {
                                     case .regular: listDisplayModeState = .compact
                                     case .compact: listDisplayModeState = .regular
@@ -130,7 +130,7 @@ struct CatalogView: View {
                             }
                         }
                         Button {
-                            withAnimation(.snappy.speed(2.0)) {
+                            withAnimation(.smooth.speed(2.0)) {
                                 switch displayModeState {
                                 case .grid: displayModeState = .list
                                 case .list: displayModeState = .grid
@@ -206,7 +206,7 @@ struct CatalogView: View {
     }
 
     func reloadDisplayedCircles(genreID: Int?, mapID: Int?, blockID: Int?) {
-        withAnimation(.snappy.speed(2.0)) {
+        withAnimation(.smooth.speed(2.0)) {
             self.isLoading = true
         } completion: {
             Task.detached {
@@ -251,7 +251,7 @@ struct CatalogView: View {
                     if let selectedDate {
                         displayedCircles.removeAll(where: { $0.day != selectedDate.id })
                     }
-                    withAnimation(.snappy.speed(2.0)) {
+                    withAnimation(.smooth.speed(2.0)) {
                         self.displayedCircles = displayedCircles
                         self.isLoading = false
                     }
@@ -267,13 +267,13 @@ struct CatalogView: View {
             let circleIdentifiers = await actor.circles(containing: searchTerm)
             await MainActor.run {
                 let searchedCircles = database.circles(circleIdentifiers)
-                withAnimation(.snappy.speed(2.0)) {
+                withAnimation(.smooth.speed(2.0)) {
                     self.searchedCircles = searchedCircles
                 }
             }
         } else {
             await MainActor.run {
-                withAnimation(.snappy.speed(2.0)) {
+                withAnimation(.smooth.speed(2.0)) {
                     searchedCircles = nil
                 }
             }

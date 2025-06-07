@@ -153,7 +153,7 @@ class Planner {
             participation[String(activeEventNumber)] = participationData
         }
         participationData[String(day)] = value
-        withAnimation(.snappy.speed(2.0)) {
+        withAnimation(.smooth.speed(2.0)) {
             participation[String(activeEventNumber)] = participationData
         }
         participationUserDefault = participation

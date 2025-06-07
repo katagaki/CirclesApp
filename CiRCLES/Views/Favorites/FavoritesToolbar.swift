@@ -29,7 +29,7 @@ struct FavoritesToolbar: View {
                     icon: isVisitModeOn ? "checkmark.rectangle.stack.fill" : "checkmark.rectangle.stack",
                     isSecondary: !isVisitModeOn
                 ) {
-                    withAnimation(.snappy.speed(2.0)) {
+                    withAnimation(.smooth.speed(2.0)) {
                         isVisitModeOn.toggle()
                     }
                 }
@@ -39,7 +39,7 @@ struct FavoritesToolbar: View {
                     icon: isGroupedByColor ? "paintpalette.fill" : "paintpalette",
                     isSecondary: !isGroupedByColor
                 ) {
-                    withAnimation(.snappy.speed(2.0)) {
+                    withAnimation(.smooth.speed(2.0)) {
                         isGroupedByColor.toggle()
                     }
                 }
@@ -54,7 +54,7 @@ struct FavoritesToolbar: View {
                     Button("Shared.All") {
                         selectedDate = nil
                     }
-                    Picker(selection: $selectedDate.animation(.snappy.speed(2.0))) {
+                    Picker(selection: $selectedDate.animation(.smooth.speed(2.0))) {
                         ForEach(dates) { date in
                             Text("Shared.\(date.id)th.Day")
                                 .tag(date)

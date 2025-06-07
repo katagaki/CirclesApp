@@ -27,7 +27,7 @@ struct MapHallMenu: View {
                         Section("Shared.\(date.id)th.Day") {
                             ForEach(maps, id: \.id) { map in
                                 Button {
-                                    withAnimation(.snappy.speed(2.0)) {
+                                    withAnimation(.smooth.speed(2.0)) {
                                         selectedDate = date
                                         selectedMap = map
                                     }
