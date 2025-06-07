@@ -16,7 +16,6 @@ struct InteractiveMapDetailPopover: View {
     @Environment(\.modelContext) var modelContext
 
     @Binding var webCatalogIDSet: WebCatalogIDSet?
-    @Binding var anchorRect: CGRect
 
     @State var circles: [ComiketCircle]?
 
@@ -31,7 +30,6 @@ struct InteractiveMapDetailPopover: View {
                     ForEach(circles, id: \.id) { circle in
                         Button {
                             webCatalogIDSet = nil
-                            anchorRect = .null
                             navigator.push(.circlesDetail(circle: circle), for: .map)
                         } label: {
                             HStack {

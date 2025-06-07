@@ -11,6 +11,7 @@ import TipKit
 struct InteractiveMap: View {
 
     @Environment(Database.self) var database
+    @Environment(Favorites.self) var favorites
 
     @Binding var date: ComiketDate?
     @Binding var map: ComiketMap?
@@ -21,8 +22,10 @@ struct InteractiveMap: View {
     @State var genreImage: UIImage?
 
     @State var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
+    @State var layoutFavoriteWebCatalogIDMappings: [LayoutCatalogMapping: [Int: WebCatalogColor?]] = [:]
     @State var isLoadingLayouts: Bool = false
 
+    @State var popoverLayoutMapping: LayoutCatalogMapping?
     @State var popoverWebCatalogIDSet: WebCatalogIDSet?
     @State var popoverSourceRect: CGRect = .null
 
@@ -50,51 +53,32 @@ struct InteractiveMap: View {
                 ScrollView([.horizontal, .vertical]) {
                     ZStack(alignment: .topLeading) {
                         // Map Layer
-                        Image(uiImage: mapImage)
-                            .resizable()
-                            .frame(
-                                width: CGFloat(mapImageWidth / zoomDivisor),
-                                height: CGFloat(mapImageHeight / zoomDivisor)
-                            )
-                            .padding(.trailing, 72.0)
-                            .animation(.smooth.speed(2.0), value: zoomDivisor)
-                            .colorInvert(adaptive: true)
-                            .onTapGesture { location in
-                                if popoverWebCatalogIDSet == nil {
-                                    openMapPopoverIn(x: Int(location.x), y: Int(location.y))
-                                }
-                            }
-                            .popover(
-                                item: $popoverWebCatalogIDSet,
-                                attachmentAnchor: .rect(.rect(popoverSourceRect))
-                            ) { _ in
-                                InteractiveMapDetailPopover(
-                                    webCatalogIDSet: $popoverWebCatalogIDSet,
-                                    anchorRect: $popoverSourceRect
-                                )
-                            }
-                            .overlay {
-                                if popoverWebCatalogIDSet != nil {
-                                    Rectangle()
-                                        .foregroundStyle(Color.accent.opacity(0.3))
-                                        .frame(
-                                            width: popoverSourceRect.width,
-                                            height: popoverSourceRect.height
-                                        )
-                                        .position(x: popoverSourceRect.midX, y: popoverSourceRect.midY)
-                                        .transition(.opacity.animation(.smooth.speed(2.0)))
-                                }
-                            }
+                        HallMap(
+                            image: mapImage,
+                            mappings: $layoutWebCatalogIDMappings,
+                            spaceSize: spaceSize,
+                            width: $mapImageWidth,
+                            height: $mapImageHeight,
+                            zoomDivisor: $zoomDivisor,
+                            namespace: namespace
+                        )
+                        // Favorites Layer
+                        HallFavoritesOverlay(
+                            mappings: $layoutFavoriteWebCatalogIDMappings,
+                            spaceSize: spaceSize,
+                            width: $mapImageWidth,
+                            height: $mapImageHeight,
+                            zoomDivisor: $zoomDivisor
+                        )
                         // Genre Layer
                         if showGenreOverlayState, let genreImage {
-                            Image(uiImage: genreImage)
-                                .resizable()
-                                .frame(
-                                    width: CGFloat(mapImageWidth / zoomDivisor),
-                                    height: CGFloat(mapImageHeight / zoomDivisor)
-                                )
-                                .animation(.smooth.speed(2.0), value: zoomDivisor)
-                                .allowsHitTesting(false)
+                            HallOverlay(
+                                image: genreImage,
+                                width: $mapImageWidth,
+                                height: $mapImageHeight,
+                                zoomDivisor: $zoomDivisor
+                            )
+                            .transition(.opacity.animation(.smooth.speed(2.0)))
                         }
                     }
                 }
@@ -112,38 +96,10 @@ struct InteractiveMap: View {
                 }
                 .overlay {
                     ZStack(alignment: .bottomTrailing) {
-                        SquareButtonStack {
-                            VStack(alignment: .center, spacing: 0.0) {
-                                SquareButton {
-                                    withAnimation(.smooth.speed(2.0)) {
-                                        showGenreOverlayState.toggle()
-                                    }
-                                } label: {
-                                    Image(systemName: showGenreOverlayState ?
-                                          "theatermask.and.paintbrush.fill" :
-                                            "theatermask.and.paintbrush")
-                                    .font(.title2)
-                                }
-                                .popoverTip(GenreOverlayTip())
-                            }
-                            VStack(alignment: .center, spacing: 0.0) {
-                                SquareButton {
-                                    zoomDivisor -= 1
-                                } label: {
-                                    Image(systemName: "plus")
-                                        .font(.title)
-                                }
-                                .disabled(zoomDivisor <= 1)
-                                Divider()
-                                SquareButton {
-                                    zoomDivisor += 1
-                                } label: {
-                                    Image(systemName: "minus")
-                                        .font(.title)
-                                }
-                                .disabled(zoomDivisor >= 4)
-                            }
-                        }
+                        MapControlStack(
+                            showGenreOverlay: $showGenreOverlayState,
+                            zoomDivisor: $zoomDivisor
+                        )
                         .offset(x: -12.0, y: -12.0)
                         Color.clear
                     }
@@ -166,7 +122,10 @@ struct InteractiveMap: View {
             reloadAll()
         }
         .onChange(of: useHighResolutionMaps) { _, _ in
-            reloadAll()
+            reloadMapImage()
+        }
+        .onChange(of: favorites.items) { _, _ in
+            self.layoutFavoriteWebCatalogIDMappings = mapFavoriteMappings(layoutWebCatalogIDMappings)
         }
         .onChange(of: mapImage) { _, newValue in
             if let newValue {
@@ -205,46 +164,47 @@ struct InteractiveMap: View {
     }
 
     func reloadMapLayouts() {
-        if let map {
-            let mapID = map.id
-            Task.detached {
-                let actor = DataFetcher(modelContainer: sharedModelContainer)
-                let layoutIdentifiers = await actor.layouts(inMap: mapID)
-                await MainActor.run {
-                    let mapLayouts = database.layouts(layoutIdentifiers)
-                    if mapLayouts.count > 0 {
-                        reloadWebCatalogIDs(mapLayouts)
-                    } else {
-                        layoutWebCatalogIDMappings.removeAll()
-                    }
-                }
-            }
-        }
-    }
+        withAnimation(.smooth.speed(2.0)) {
+            isLoadingLayouts = true
+        } completion: {
+            if let map {
+                let mapID = map.id
+                let selectedDate = date?.id
+                let useHighResolutionMaps = useHighResolutionMaps
+                if let selectedDate {
+                    Task.detached {
+                        // Fetch map layouts
+                        let actor = DataFetcher(modelContainer: sharedModelContainer)
+                        let layoutCatalogMappings = await actor.layoutMappings(
+                            inMap: mapID,
+                            useHighResolutionMaps: useHighResolutionMaps
+                        )
 
-    func reloadWebCatalogIDs(_ layouts: [ComiketLayout]) {
-        if let selectedDate = date?.id {
-            let layoutCatalogMappings = layouts.map {
-                LayoutCatalogMapping(
-                    blockID: $0.blockID,
-                    spaceNumber: $0.spaceNumber,
-                    positionX: useHighResolutionMaps ? $0.hdPosition.x : $0.position.x,
-                    positionY: useHighResolutionMaps ? $0.hdPosition.y : $0.position.y,
-                    layoutType: $0.layout
-                )
-            }
-            withAnimation(.smooth.speed(2.0)) {
-                isLoadingLayouts = true
-            } completion: {
-                Task.detached(priority: .high) {
-                    let actor = DataFetcher(modelContainer: sharedModelContainer)
-                    let layoutWebCatalogIDMappings = await actor.circleWebCatalogIDs(
-                        forMappings: layoutCatalogMappings, on: selectedDate
-                    )
-                    await MainActor.run {
-                        withAnimation(.smooth.speed(2.0)) {
-                            self.layoutWebCatalogIDMappings = layoutWebCatalogIDMappings
-                            self.isLoadingLayouts = false
+                        if layoutCatalogMappings.count > 0 {
+                            // Mappings returned, create Layout Mapping <> Web Catalog ID mapping data
+                            let actor = DataFetcher(modelContainer: sharedModelContainer)
+                            let layoutWebCatalogIDMappings = await actor.circleWebCatalogIDs(
+                                forMappings: layoutCatalogMappings, on: selectedDate
+                            )
+
+                            await MainActor.run {
+                                withAnimation(.smooth.speed(2.0)) {
+                                    self.layoutWebCatalogIDMappings = layoutWebCatalogIDMappings
+                                    self.layoutFavoriteWebCatalogIDMappings = mapFavoriteMappings(
+                                        layoutWebCatalogIDMappings
+                                    )
+                                    self.isLoadingLayouts = false
+                                }
+                            }
+
+                        } else {
+                            // No mappings, clear all existing mapping
+                            await MainActor.run {
+                                withAnimation(.smooth.speed(2.0)) {
+                                    layoutWebCatalogIDMappings.removeAll()
+                                    self.isLoadingLayouts = false
+                                }
+                            }
                         }
                     }
                 }
@@ -252,20 +212,33 @@ struct InteractiveMap: View {
         }
     }
 
-    // swiftlint:disable identifier_name
-    func openMapPopoverIn(x: Int, y: Int) {
-        for (layout, webCatalogIDs) in layoutWebCatalogIDMappings {
-            let xMin: Int = layout.positionX / zoomDivisor
-            let xMax: Int = (layout.positionX + spaceSize) / zoomDivisor
-            let yMin: Int = layout.positionY / zoomDivisor
-            let yMax: Int = (layout.positionY + spaceSize) / zoomDivisor
-            if x >= xMin && x < xMax && y >= yMin && y < yMax {
-                let spaceSize = spaceSize / zoomDivisor
-                popoverSourceRect = CGRect(x: xMin, y: yMin, width: spaceSize, height: spaceSize)
-                popoverWebCatalogIDSet = WebCatalogIDSet(ids: webCatalogIDs)
-                break
+    func mapFavoriteMappings(
+        _ layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]]
+    ) -> [LayoutCatalogMapping: [Int: WebCatalogColor?]] {
+        var layoutFavoriteWebCatalogIDMappings: [LayoutCatalogMapping: [Int: WebCatalogColor?]] = [:]
+        if let webCatalogIDMappedItems = favorites.wcIDMappedItems {
+            for (webCatalogID, favoriteItem) in webCatalogIDMappedItems {
+                // 1. Find the layout catalog mapping that matches the Web Catalog ID
+                let matchingLayoutMaps: [LayoutCatalogMapping: [Int]] = layoutWebCatalogIDMappings
+                    .filter { $1.contains(webCatalogID) }
+
+                // 2. Ensure that only one layout is selected
+                if let (matchedLayoutMap, _) = matchingLayoutMaps.first {
+                    // 3. Set up the sub-dictionary for the favorites mapping
+                    if layoutFavoriteWebCatalogIDMappings[matchedLayoutMap] == nil {
+                        let webCatalogIDs = layoutWebCatalogIDMappings[matchedLayoutMap] ?? []
+                        layoutFavoriteWebCatalogIDMappings[matchedLayoutMap] = webCatalogIDs
+                            .reduce(into: [:]) { partialResult, webCatalogID in
+                                let nilColor: WebCatalogColor? = nil
+                                partialResult[webCatalogID] = nilColor
+                            }
+                    }
+
+                    // 4. Set the color for the Web Catalog ID in the favorites mapping
+                    layoutFavoriteWebCatalogIDMappings[matchedLayoutMap]?[webCatalogID] = favoriteItem.favorite.color
+                }
             }
         }
+        return layoutFavoriteWebCatalogIDMappings
     }
-    // swiftlint:enable identifier_name
 }
