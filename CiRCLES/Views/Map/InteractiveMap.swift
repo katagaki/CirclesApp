@@ -189,16 +189,39 @@ struct InteractiveMap: View {
                         if layoutCatalogMappings.count > 0 {
                             // Mappings returned, create Layout Mapping <> Web Catalog ID mapping data
                             let actor = DataFetcher(modelContainer: sharedModelContainer)
-                            let layoutWebCatalogIDMappings = await actor.circleWebCatalogIDs(
+                            let layoutWebCatalogIDMappings = await actor.layoutCatalogMappingToWebCatalogIDs(
                                 forMappings: layoutCatalogMappings, on: selectedDate
                             )
-
+                            // Create favorites mapping for Web Catalog IDs
+                            let layoutFavoriteWebCatalogIDMappings = await mapFavoriteMappings(
+                                layoutWebCatalogIDMappings
+                            )
+                            // Create favorites mapping for Web Catalog IDs
+                            let webCatalogIDs: [Int] = Array(Set(
+                                layoutFavoriteWebCatalogIDMappings.values
+                                    .reduce(into: [] as [Int]) { result, webCatalogIDs in
+                                        result.append(contentsOf: webCatalogIDs.keys)
+                                    }
+                            ))
+                            let spaceNumberSuffixes = await actor.spaceNumberSuffixes(
+                                forWebCatalogIDs: webCatalogIDs
+                            )
+                            // Replace Web Catalog IDs with space number suffixes
+                            let layoutFavoriteWebCatalogIDSorted = layoutFavoriteWebCatalogIDMappings
+                                .reduce(into: [LayoutCatalogMapping: [Int: WebCatalogColor?]]()) { result, keyValue in
+                                    let mapping = keyValue.key
+                                    let colorMapping = keyValue.value
+                                    result[mapping] = colorMapping
+                                        .reduce(into: [Int: WebCatalogColor?]()) { result, keyValue in
+                                            let webCatalogID = keyValue.key
+                                            let color = keyValue.value
+                                            result[spaceNumberSuffixes[webCatalogID] ?? webCatalogID] = color
+                                        }
+                            }
                             await MainActor.run {
                                 withAnimation(.smooth.speed(2.0)) {
                                     self.layoutWebCatalogIDMappings = layoutWebCatalogIDMappings
-                                    self.layoutFavoriteWebCatalogIDMappings = mapFavoriteMappings(
-                                        layoutWebCatalogIDMappings
-                                    )
+                                    self.layoutFavoriteWebCatalogIDMappings = layoutFavoriteWebCatalogIDSorted
                                     self.isLoadingLayouts = false
                                 }
                             }
@@ -244,6 +267,8 @@ struct InteractiveMap: View {
                     layoutFavoriteWebCatalogIDMappings[matchedLayoutMap]?[webCatalogID] = favoriteItem.favorite.color
                 }
             }
+            // 5. Change keys to space sub number to force MapFavoriteBlock to sort correctly
+            // TODO
         }
         return layoutFavoriteWebCatalogIDMappings
     }
