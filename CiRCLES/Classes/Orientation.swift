@@ -14,11 +14,7 @@ class Orientation {
 
     @MainActor
     init() {
-        if UIDevice.current.orientation.isPortrait {
-            self.orientation = .portrait
-        } else {
-            self.orientation = UIDevice.current.orientation
-        }
+        self.orientation = UIDevice.current.orientation
     }
 
     @MainActor
@@ -35,16 +31,18 @@ class Orientation {
         self.orientation = orientation
     }
 
+    @MainActor
     func isPortrait() -> Bool {
-        return orientation == .portrait
-    }
-
-    func isLandscape() -> Bool {
-        return orientation == .landscapeLeft || orientation == .landscapeRight
+        return orientation.isPortrait || UIDevice.current.userInterfaceIdiom != .phone
     }
 
     @MainActor
-    func isOniPad() -> Bool {
-        return UIDevice.current.userInterfaceIdiom == .pad
+    func isLandscape() -> Bool {
+        return orientation.isLandscape && UIDevice.current.userInterfaceIdiom == .phone
+    }
+
+    @MainActor
+    func isFaceUpOrDown() -> Bool {
+        return orientation.isFlat
     }
 }

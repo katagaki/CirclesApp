@@ -11,6 +11,8 @@ import SwiftUI
 
 struct MapView: View {
 
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
+    @Environment(\.verticalSizeClass) var verticalSizeClass
     @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
     @Environment(Orientation.self) var orientation
     @Environment(Database.self) var database
@@ -55,7 +57,8 @@ struct MapView: View {
             }
             .overlay {
                 #if !os(visionOS)
-                if orientation.isLandscape() && !orientation.isOniPad() {
+                if orientation.isLandscape() ||
+                    (horizontalSizeClass == .regular && verticalSizeClass == .compact) {
                     MapHallMenu(
                         selectedDate: $selectedDate,
                         selectedMap: $selectedMap
@@ -68,7 +71,8 @@ struct MapView: View {
                 BarAccessory(placement: .bottom) {
                     Group {
                         #if !os(visionOS)
-                        if orientation.isPortrait() || orientation.isOniPad() {
+                        if orientation.isPortrait() ||
+                            (horizontalSizeClass == .compact && verticalSizeClass == .regular) {
                             MapToolbar(selectedDate: $selectedDate, selectedMap: $selectedMap)
                         } else {
                             Color.clear
