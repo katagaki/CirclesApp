@@ -200,7 +200,7 @@ struct FavoritesView: View {
                     }
                 }
             }
-            withAnimation(.snappy.speed(2.0)) {
+            withAnimation(.smooth.speed(2.0)) {
                 self.favoriteCircles = favoriteCircles
             }
         }

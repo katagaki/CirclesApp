@@ -51,7 +51,7 @@ struct CatalogToolbar: View {
                     Button("Shared.All") {
                         selectedGenre = nil
                     }
-                    Picker(selection: $selectedGenre.animation(.snappy.speed(2.0))) {
+                    Picker(selection: $selectedGenre.animation(.smooth.speed(2.0))) {
                         ForEach(genres) { genre in
                             Text(genre.name)
                                 .tag(genre)
@@ -65,7 +65,7 @@ struct CatalogToolbar: View {
                     Button("Shared.All") {
                         selectedMap = nil
                     }
-                    Picker(selection: $selectedMap.animation(.snappy.speed(2.0))) {
+                    Picker(selection: $selectedMap.animation(.smooth.speed(2.0))) {
                         ForEach(selectableMaps ?? maps) { map in
                             Text(map.name)
                                 .tag(map)
@@ -79,7 +79,7 @@ struct CatalogToolbar: View {
                     Button("Shared.All") {
                         selectedBlock = nil
                     }
-                    Picker(selection: $selectedBlock.animation(.snappy.speed(2.0))) {
+                    Picker(selection: $selectedBlock.animation(.smooth.speed(2.0))) {
                         ForEach(selectableBlocks ?? blocks, id: \.id) { block in
                             Text(block.name)
                                 .tag(block)
@@ -93,7 +93,7 @@ struct CatalogToolbar: View {
                     Button("Shared.All") {
                         selectedDate = nil
                     }
-                    Picker(selection: $selectedDate.animation(.snappy.speed(2.0))) {
+                    Picker(selection: $selectedDate.animation(.smooth.speed(2.0))) {
                         ForEach(selectableDates ?? dates) { date in
                             Text("Shared.\(date.id)th.Day")
                                 .tag(date)

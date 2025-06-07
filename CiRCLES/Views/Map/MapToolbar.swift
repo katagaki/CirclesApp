@@ -40,7 +40,7 @@ struct MapToolbar: View {
                                         BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
                                                            accentColor: accentColorForMap(map),
                                                            isTextLight: true) {
-                                            withAnimation(.snappy.speed(2.0)) {
+                                            withAnimation(.smooth.speed(2.0)) {
                                                 selectedDate = date
                                                 selectedMap = map
                                             }
@@ -62,7 +62,7 @@ struct MapToolbar: View {
                                         BarAccessoryButton(LocalizedStringKey(stringLiteral: map.name),
                                                            accentColor: accentColorForMap(map),
                                                            isTextLight: true) {
-                                            withAnimation(.snappy.speed(2.0)) {
+                                            withAnimation(.smooth.speed(2.0)) {
                                                 selectedDate = date
                                                 selectedMap = map
                                             }

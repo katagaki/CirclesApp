@@ -206,7 +206,7 @@ struct MyView: View {
                 if eventDates == nil {
                     reloadDataInBackground()
                 }
-                withAnimation(.snappy.speed(2.0)) {
+                withAnimation(.smooth.speed(2.0)) {
                     eventCoverImage = database.coverImage()
                 }
             }
@@ -219,7 +219,7 @@ struct MyView: View {
             Task.detached {
                 await reloadData(using: token)
                 await MainActor.run {
-                     withAnimation(.snappy.speed(2.0)) {
+                     withAnimation(.smooth.speed(2.0)) {
                          eventTitle = events.first(where: {
                              $0.eventNumber == planner.activeEventNumber
                          })?.name
@@ -244,7 +244,7 @@ struct MyView: View {
         }
 
         await MainActor.run {
-            withAnimation(.snappy.speed(2.0)) {
+            withAnimation(.smooth.speed(2.0)) {
                 self.userInfo = userInfo
                 self.userEvents = userEvents
                 self.eventData = eventData

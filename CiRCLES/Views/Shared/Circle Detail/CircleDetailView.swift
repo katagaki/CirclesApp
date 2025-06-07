@@ -174,7 +174,7 @@ struct CircleDetailView: View {
 
     func prepareCircle() async {
         if let extendedInformation = circle.extendedInformation {
-            withAnimation(.snappy.speed(2.0)) {
+            withAnimation(.smooth.speed(2.0)) {
                 self.extendedInformation = extendedInformation
             }
         }
@@ -183,7 +183,7 @@ struct CircleDetailView: View {
                 with: extendedInformation.webCatalogID, authToken: token
             ),
                let webCatalogInformation = circleResponse.response.circle {
-                withAnimation(.snappy.speed(2.0)) {
+                withAnimation(.smooth.speed(2.0)) {
                     self.webCatalogInformation = webCatalogInformation
                 }
             }

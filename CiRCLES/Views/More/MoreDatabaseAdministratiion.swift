@@ -100,7 +100,7 @@ struct MoreDatabaseAdministratiion: View {
                 files[fileName] = file
             }
         }
-        withAnimation(.snappy.speed(2.0)) {
+        withAnimation(.smooth.speed(2.0)) {
             self.files = files
         }
     }
