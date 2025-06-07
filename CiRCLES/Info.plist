@@ -26,8 +26,6 @@
 			<string>CCAppNameSynonym2</string>
 		</dict>
 	</array>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>yjmap</string>
