@@ -17,7 +17,11 @@ struct DeviceRotationViewModifier: ViewModifier {
         #if !os(visionOS)
             .onAppear()
             .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
-                action(UIDevice.current.orientation)
+                if UIDevice.current.orientation == .portrait ||
+                    UIDevice.current.orientation == .landscapeLeft ||
+                    UIDevice.current.orientation == .landscapeRight {
+                    action(UIDevice.current.orientation)
+                }
             }
         #endif
     }
