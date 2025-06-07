@@ -55,42 +55,12 @@ struct MapView: View {
             }
             .overlay {
                 #if !os(visionOS)
-                if orientation.isLandscapeOrUpsideDown() {
-                    ZStack(alignment: .bottomLeading) {
-                        SquareButtonStack {
-                            Menu {
-                                ForEach(dates, id: \.id) { date in
-                                    Section("Shared.\(date.id)th.Day") {
-                                        ForEach(maps, id: \.id) { map in
-                                            Button {
-                                                withAnimation(.snappy.speed(2.0)) {
-                                                    selectedDate = date
-                                                    selectedMap = map
-                                                }
-                                            } label: {
-                                                if selectedDate == date && selectedMap == map {
-                                                    Label(LocalizedStringKey(stringLiteral: map.name),
-                                                          systemImage: "checkmark")
-                                                } else {
-                                                    Text(LocalizedStringKey(stringLiteral: map.name))
-                                                }
-                                            }
-                                            .disabled(selectedDate == date && selectedMap == map)
-                                        }
-                                    }
-                                }
-                            } label: {
-                                SquareButton {
-                                    // Intentionally left blank
-                                } label: {
-                                    Image(systemName: "building")
-                                        .font(.title2)
-                                }
-                            }
-                        }
-                        .offset(x: -12.0, y: -12.0)
-                        Color.clear
-                    }
+                if orientation.isLandscape() && !orientation.isOniPad() {
+                    MapHallMenu(
+                        selectedDate: $selectedDate,
+                        selectedMap: $selectedMap
+                    )
+                    .transition(.push(from: .leading).animation(.smooth.speed(2.0)))
                 }
                 #endif
             }
@@ -109,6 +79,7 @@ struct MapView: View {
                         #endif
                     }
                 }
+                .transition(.push(from: .bottom).animation(.smooth.speed(2.0)))
             }
             .onAppear {
                 if !isInitialLoadCompleted {
