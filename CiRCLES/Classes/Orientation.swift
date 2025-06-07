@@ -39,8 +39,8 @@ class Orientation {
         return orientation == .portrait
     }
 
-    func isLandscapeOrUpsideDown() -> Bool {
-        return orientation != .portrait
+    func isLandscape() -> Bool {
+        return orientation == .landscapeLeft || orientation == .landscapeRight
     }
 
     @MainActor
