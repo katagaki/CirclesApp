@@ -71,6 +71,31 @@ actor DataFetcher {
         return []
     }
 
+    func layoutMappings(inMap mapID: Int, useHighResolutionMaps: Bool) -> [LayoutCatalogMapping] {
+        do {
+            let mapFetchDescriptor = FetchDescriptor<ComiketMap>(
+                predicate: #Predicate<ComiketMap> {
+                    $0.id == mapID
+                }
+            )
+            if let map = try modelContext.fetch(mapFetchDescriptor).first,
+               let layouts = map.layouts {
+                return layouts.map {
+                    LayoutCatalogMapping(
+                        blockID: $0.blockID,
+                        spaceNumber: $0.spaceNumber,
+                        positionX: useHighResolutionMaps ? $0.hdPosition.x : $0.position.x,
+                        positionY: useHighResolutionMaps ? $0.hdPosition.y : $0.position.y,
+                        layoutType: $0.layout
+                    )
+                }
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
+        }
+        return []
+    }
+
     func genre(_ genreID: Int) -> String? {
         let fetchDescriptor = FetchDescriptor<ComiketGenre>(
             predicate: #Predicate<ComiketGenre> {
