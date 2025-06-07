@@ -20,9 +20,11 @@ struct InteractiveMap: View {
     @State var mapImageHeight: Int = 0
     @State var genreImage: UIImage?
 
-    @State var layouts: [ComiketLayout] = []
     @State var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
     @State var isLoadingLayouts: Bool = false
+
+    @State var popoverWebCatalogIDSet: WebCatalogIDSet?
+    @State var popoverSourceRect: CGRect = .null
 
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @State var showGenreOverlayState: Bool = false
@@ -47,6 +49,7 @@ struct InteractiveMap: View {
             if let mapImage {
                 ScrollView([.horizontal, .vertical]) {
                     ZStack(alignment: .topLeading) {
+                        // Map Layer
                         Image(uiImage: mapImage)
                             .resizable()
                             .frame(
@@ -56,6 +59,33 @@ struct InteractiveMap: View {
                             .padding(.trailing, 72.0)
                             .animation(.smooth.speed(2.0), value: zoomDivisor)
                             .colorInvert(adaptive: true)
+                            .onTapGesture { location in
+                                if popoverWebCatalogIDSet == nil {
+                                    openMapPopoverIn(x: Int(location.x), y: Int(location.y))
+                                }
+                            }
+                            .popover(
+                                item: $popoverWebCatalogIDSet,
+                                attachmentAnchor: .rect(.rect(popoverSourceRect))
+                            ) { _ in
+                                InteractiveMapDetailPopover(
+                                    webCatalogIDSet: $popoverWebCatalogIDSet,
+                                    anchorRect: $popoverSourceRect
+                                )
+                            }
+                            .overlay {
+                                if popoverWebCatalogIDSet != nil {
+                                    Rectangle()
+                                        .foregroundStyle(Color.accent.opacity(0.3))
+                                        .frame(
+                                            width: popoverSourceRect.width,
+                                            height: popoverSourceRect.height
+                                        )
+                                        .position(x: popoverSourceRect.midX, y: popoverSourceRect.midY)
+                                        .transition(.opacity.animation(.smooth.speed(2.0)))
+                                }
+                            }
+                        // Genre Layer
                         if showGenreOverlayState, let genreImage {
                             Image(uiImage: genreImage)
                                 .resizable()
@@ -65,28 +95,6 @@ struct InteractiveMap: View {
                                 )
                                 .animation(.smooth.speed(2.0), value: zoomDivisor)
                                 .allowsHitTesting(false)
-                        }
-                        if let date {
-                            ForEach(Array(layoutWebCatalogIDMappings.keys), id: \.self) { layout in
-                                InteractiveMapButton(
-                                    selectedEventDateID: date.id,
-                                    layoutBlockID: layout.blockID,
-                                    layoutSpaceNumber: layout.spaceNumber,
-                                    layoutType: layout.layoutType,
-                                    webCatalogIDs: layoutWebCatalogIDMappings[layout] ?? [],
-                                    namespace: namespace
-                                )
-                                .id(layout.viewID())
-                                .position(
-                                    x: CGFloat((layout.positionX + Int(spaceSize / 2)) / zoomDivisor),
-                                    y: CGFloat((layout.positionY + Int(spaceSize / 2)) / zoomDivisor)
-                                )
-                                .frame(
-                                    width: CGFloat(spaceSize / zoomDivisor),
-                                    height: CGFloat(spaceSize / zoomDivisor),
-                                    alignment: .topLeading
-                                )
-                            }
                         }
                     }
                 }
@@ -166,13 +174,6 @@ struct InteractiveMap: View {
                 mapImageHeight = Int(newValue.size.height)
             }
         }
-        .onChange(of: layouts) { _, newValue in
-            if newValue.count > 0 {
-                reloadWebCatalogIDs()
-            } else {
-                layoutWebCatalogIDMappings.removeAll()
-            }
-        }
         .onChange(of: showGenreOverlayState) { _, _ in
             showGenreOverlay = showGenreOverlayState
         }
@@ -204,24 +205,24 @@ struct InteractiveMap: View {
     }
 
     func reloadMapLayouts() {
-        withAnimation(.snappy.speed(2.0)) {
-            layouts.removeAll()
-        } completion: {
-            if let map {
-                let mapID = map.id
-                Task.detached {
-                    let actor = DataFetcher(modelContainer: sharedModelContainer)
-                    let layoutIdentifiers = await actor.layouts(inMap: mapID)
-                    await MainActor.run {
-                        let mapLayouts = database.layouts(layoutIdentifiers)
-                        self.layouts = mapLayouts
+        if let map {
+            let mapID = map.id
+            Task.detached {
+                let actor = DataFetcher(modelContainer: sharedModelContainer)
+                let layoutIdentifiers = await actor.layouts(inMap: mapID)
+                await MainActor.run {
+                    let mapLayouts = database.layouts(layoutIdentifiers)
+                    if mapLayouts.count > 0 {
+                        reloadWebCatalogIDs(mapLayouts)
+                    } else {
+                        layoutWebCatalogIDMappings.removeAll()
                     }
                 }
             }
         }
     }
 
-    func reloadWebCatalogIDs() {
+    func reloadWebCatalogIDs(_ layouts: [ComiketLayout]) {
         if let selectedDate = date?.id {
             let layoutCatalogMappings = layouts.map {
                 LayoutCatalogMapping(
@@ -250,4 +251,21 @@ struct InteractiveMap: View {
             }
         }
     }
+
+    // swiftlint:disable identifier_name
+    func openMapPopoverIn(x: Int, y: Int) {
+        for (layout, webCatalogIDs) in layoutWebCatalogIDMappings {
+            let xMin: Int = layout.positionX / zoomDivisor
+            let xMax: Int = (layout.positionX + spaceSize) / zoomDivisor
+            let yMin: Int = layout.positionY / zoomDivisor
+            let yMax: Int = (layout.positionY + spaceSize) / zoomDivisor
+            if x >= xMin && x < xMax && y >= yMin && y < yMax {
+                let spaceSize = spaceSize / zoomDivisor
+                popoverSourceRect = CGRect(x: xMin, y: yMin, width: spaceSize, height: spaceSize)
+                popoverWebCatalogIDSet = WebCatalogIDSet(ids: webCatalogIDs)
+                break
+            }
+        }
+    }
+    // swiftlint:enable identifier_name
 }

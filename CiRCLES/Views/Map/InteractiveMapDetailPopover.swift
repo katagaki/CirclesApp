@@ -15,9 +15,8 @@ struct InteractiveMapDetailPopover: View {
 
     @Environment(\.modelContext) var modelContext
 
-    @Binding var isPresented: Bool
-
-    var webCatalogIDs: [Int]
+    @Binding var webCatalogIDSet: WebCatalogIDSet?
+    @Binding var anchorRect: CGRect
 
     @State var circles: [ComiketCircle]?
 
@@ -31,7 +30,8 @@ struct InteractiveMapDetailPopover: View {
                 if let circles {
                     ForEach(circles, id: \.id) { circle in
                         Button {
-                            isPresented = false
+                            webCatalogIDSet = nil
+                            anchorRect = .null
                             navigator.push(.circlesDetail(circle: circle), for: .map)
                         } label: {
                             HStack {
@@ -62,12 +62,14 @@ struct InteractiveMapDetailPopover: View {
     }
 
     func fetchCircles() {
-        Task.detached {
-            let actor = DataFetcher(modelContainer: sharedModelContainer)
-            let circleIdentifiers = await actor.circles(withWebCatalogIDs: webCatalogIDs)
-            await MainActor.run {
-                let circles = database.circles(circleIdentifiers)
-                self.circles = circles
+        if let webCatalogIDSet {
+            Task.detached {
+                let actor = DataFetcher(modelContainer: sharedModelContainer)
+                let circleIdentifiers = await actor.circles(withWebCatalogIDs: webCatalogIDSet.ids)
+                await MainActor.run {
+                    let circles = database.circles(circleIdentifiers)
+                    self.circles = circles
+                }
             }
         }
     }
