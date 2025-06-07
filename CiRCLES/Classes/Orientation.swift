@@ -40,9 +40,4 @@ class Orientation {
     func isLandscape() -> Bool {
         return orientation.isLandscape && UIDevice.current.userInterfaceIdiom == .phone
     }
-
-    @MainActor
-    func isFaceUpOrDown() -> Bool {
-        return orientation.isFlat
-    }
 }
