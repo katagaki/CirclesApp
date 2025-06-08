@@ -11,27 +11,32 @@ struct AdaptiveInvert: ViewModifier {
     @Environment(\.colorScheme) var colorScheme
 
     var adaptive: Bool
+    var enabled: Binding<Bool>
 
     func body(content: Content) -> some View {
-        if adaptive {
-            switch colorScheme {
-            case .dark:
+        if enabled.wrappedValue {
+            if adaptive {
+                switch colorScheme {
+                case .dark:
+                    content
+                        .colorInvert()
+                case .light:
+                    content
+                @unknown default:
+                    content
+                }
+            } else {
                 content
                     .colorInvert()
-            case .light:
-                content
-            @unknown default:
-                content
             }
         } else {
             content
-                .colorInvert()
         }
     }
 }
 
 extension View {
-    func colorInvert(adaptive: Bool) -> some View {
-        self.modifier(AdaptiveInvert(adaptive: adaptive))
+    func colorInvert(adaptive: Bool, enabled: Binding<Bool>) -> some View {
+        self.modifier(AdaptiveInvert(adaptive: adaptive, enabled: enabled))
     }
 }

@@ -16,6 +16,8 @@ struct MapFavoriteBlock: View {
     var spaceSize: Int
     var zoomDivisor: Int
 
+    @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
+
     var webCatalogIDs: [Int] {
         Array(colorMap.keys).sorted()
     }
@@ -74,8 +76,12 @@ struct MapFavoriteBlock: View {
         case .light:
             return color.backgroundColor().opacity(0.5)
         case .dark:
-            return color.backgroundColor().brightness(0.1).opacity(0.5) as? Color ??
-            color.backgroundColor().opacity(0.5)
+            if useDarkModeMaps {
+                return color.backgroundColor().brightness(0.1).opacity(0.5) as? Color ??
+                color.backgroundColor().opacity(0.5)
+            } else {
+                return color.backgroundColor().opacity(0.5)
+            }
         @unknown default:
             return color.backgroundColor().opacity(0.5)
         }

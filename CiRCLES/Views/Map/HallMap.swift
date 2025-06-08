@@ -21,6 +21,8 @@ struct HallMap: View {
     @State var popoverWebCatalogIDSet: WebCatalogIDSet?
     @State var popoverSourceRect: CGRect = .null
 
+    @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
+
     var namespace: Namespace.ID
 
     var body: some View {
@@ -32,7 +34,7 @@ struct HallMap: View {
             )
             .padding(.trailing, 72.0)
             .animation(.smooth.speed(2.0), value: zoomDivisor)
-            .colorInvert(adaptive: true)
+            .colorInvert(adaptive: true, enabled: $useDarkModeMaps)
             .onTapGesture { location in
                 if popoverWebCatalogIDSet == nil {
                     openMapPopoverIn(x: Int(location.x), y: Int(location.y))

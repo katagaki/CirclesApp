@@ -42,10 +42,10 @@ struct MapView: View {
                 namespace: mapNamespace
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            #if !targetEnvironment(macCatalyst)
-            .navigationBarTitleDisplayMode(.inline)
+            #if targetEnvironment(macCatalyst)
             .navigationTitle("ViewTitle.Map")
             #endif
+            .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
