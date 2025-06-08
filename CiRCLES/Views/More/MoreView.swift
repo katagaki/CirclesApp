@@ -15,6 +15,7 @@ struct MoreView: View {
     @Environment(Database.self) var database
 
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
+    @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
@@ -24,6 +25,7 @@ struct MoreView: View {
             MoreList(repoName: "katagaki/CirclesApp", viewPath: ViewPath.moreAttributions) {
                 Section {
                     Toggle("More.Customization.Map.UseHighDefinitionMap", isOn: $useHighResolutionMaps)
+                    Toggle("More.Customization.Map.UseDarkModeMap", isOn: $useDarkModeMaps)
                 } header: {
                     ListSectionHeader(text: "More.Customization.Map")
                 }

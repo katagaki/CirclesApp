@@ -980,6 +980,22 @@
         }
       }
     },
+    "More.Customization.Map.UseDarkModeMap" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Darken Map in Dark Mode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダークモードではマップを暗くする"
+          }
+        }
+      }
+    },
     "More.Customization.Map.UseHighDefinitionMap" : {
       "localizations" : {
         "en" : {
@@ -2824,6 +2840,7 @@
       }
     },
     "ViewTitle.Map" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

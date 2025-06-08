@@ -29,9 +29,11 @@ struct MapToolbar: View {
                             VStack(alignment: .leading, spacing: 12.0) {
                                 HStack {
                                     Text("Shared.\(date.id)th.Day")
+                                        .font(.caption)
                                         .bold()
                                     Spacer()
                                     Text(date.date, style: .date)
+                                        .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }
                                 Divider()
