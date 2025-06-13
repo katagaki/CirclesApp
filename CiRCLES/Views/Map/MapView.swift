@@ -42,19 +42,10 @@ struct MapView: View {
                 namespace: mapNamespace
             )
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            #if targetEnvironment(macCatalyst)
             .navigationTitle("ViewTitle.Map")
-            #endif
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbarBackground(.hidden, for: .tabBar)
-            .toolbar {
-                if UIDevice.current.userInterfaceIdiom != .pad {
-                    ToolbarItem(placement: .principal) {
-                        Color.clear
-                    }
-                }
-            }
             .overlay {
                 #if !os(visionOS)
                 if orientation.isLandscape() ||
@@ -68,22 +59,18 @@ struct MapView: View {
                 #endif
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                BarAccessory(placement: .bottom) {
-                    Group {
-                        #if !os(visionOS)
-                        if orientation.isPortrait() ||
-                            (horizontalSizeClass == .compact && verticalSizeClass == .regular) {
-                            MapToolbar(selectedDate: $selectedDate, selectedMap: $selectedMap)
-                        } else {
-                            Color.clear
-                                .frame(height: 0.0)
-                        }
-                        #else
-                        MapToolbar(selectedDate: $selectedDate, selectedMap: $selectedMap)
-                        #endif
-                    }
+                #if !os(visionOS)
+                if orientation.isPortrait() ||
+                    (horizontalSizeClass == .compact && verticalSizeClass == .regular) {
+                    MapToolbar(selectedDate: $selectedDate, selectedMap: $selectedMap)
+                        .frame(maxWidth: .infinity)
+                } else {
+                    Color.clear
+                        .frame(height: 0.0)
                 }
-                .transition(.push(from: .bottom).animation(.smooth.speed(2.0)))
+                #else
+                MapToolbar(selectedDate: $selectedDate, selectedMap: $selectedMap)
+                #endif
             }
             .onAppear {
                 if !isInitialLoadCompleted {

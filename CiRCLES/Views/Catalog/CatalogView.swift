@@ -110,53 +110,51 @@ struct CatalogView: View {
             .navigationTitle("ViewTitle.Circles")
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    HStack {
-                        if displayModeState == .list {
-                            Button {
-                                withAnimation(.smooth.speed(2.0)) {
-                                    switch listDisplayModeState {
-                                    case .regular: listDisplayModeState = .compact
-                                    case .compact: listDisplayModeState = .regular
-                                    }
-                                }
-                            } label: {
-                                switch listDisplayMode {
-                                case .regular:
-                                    Label("Shared.DisplayMode.List.Compact", systemImage: "rectangle.compress.vertical")
-                                case .compact:
-                                    Label("Shared.DisplayMode.List.Regular", systemImage: "rectangle.expand.vertical")
-                                }
+                ToolbarItemGroup(placement: .primaryAction) {
+                    Button {
+                        withAnimation(.smooth.speed(2.0)) {
+                            switch displayModeState {
+                            case .grid: displayModeState = .list
+                            case .list: displayModeState = .grid
                             }
                         }
+                    } label: {
+                        switch displayModeState {
+                        case .grid:
+                            Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
+                        case .list:
+                            Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
+                        }
+                    }
+                }
+                if displayModeState == .list {
+                    ToolbarItemGroup(placement: .navigation) {
                         Button {
                             withAnimation(.smooth.speed(2.0)) {
-                                switch displayModeState {
-                                case .grid: displayModeState = .list
-                                case .list: displayModeState = .grid
+                                switch listDisplayModeState {
+                                case .regular: listDisplayModeState = .compact
+                                case .compact: listDisplayModeState = .regular
                                 }
                             }
                         } label: {
-                            switch displayModeState {
-                            case .grid:
-                                Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
-                            case .list:
-                                Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
+                            switch listDisplayMode {
+                            case .regular:
+                                Label("Shared.DisplayMode.List.Compact", systemImage: "rectangle.compress.vertical")
+                            case .compact:
+                                Label("Shared.DisplayMode.List.Regular", systemImage: "rectangle.expand.vertical")
                             }
                         }
                     }
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                BarAccessory(placement: .bottom) {
-                    CatalogToolbar(
-                        displayedCircles: $displayedCircles,
-                        selectedGenre: $selectedGenre,
-                        selectedMap: $selectedMap,
-                        selectedBlock: $selectedBlock,
-                        selectedDate: $selectedDate
-                    )
-                }
+                CatalogToolbar(
+                    displayedCircles: $displayedCircles,
+                    selectedGenre: $selectedGenre,
+                    selectedMap: $selectedMap,
+                    selectedBlock: $selectedBlock,
+                    selectedDate: $selectedDate
+                )
                 .disabled(searchTerm.trimmingCharacters(in: .whitespaces).count >= 2)
             }
             .searchable(text: $searchTerm,

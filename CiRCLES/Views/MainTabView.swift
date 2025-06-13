@@ -39,14 +39,13 @@ struct MainTabView: View {
             Tab("Tab.Map", systemImage: "map.fill", value: .map) {
                 MapView()
             }
-            Tab("Tab.Circles", systemImage: "square.grid.3x3.fill", value: .circles) {
+            Tab("Tab.Circles", systemImage: "square.grid.3x3.fill", value: .circles, role: .search) {
                 CatalogView()
             }
-            if planner.isActiveEventLatest {
-                Tab("Tab.Favorites", systemImage: "star.fill", value: .favorites) {
-                    FavoritesView()
-                }
+            Tab("Tab.Favorites", systemImage: "star.fill", value: .favorites) {
+                FavoritesView()
             }
+            .hidden(!planner.isActiveEventLatest)
             Tab("Tab.My", image: "TabIcon.My", value: .my) {
                 MyView()
             }

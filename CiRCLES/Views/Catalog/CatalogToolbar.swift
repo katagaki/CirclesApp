@@ -45,63 +45,66 @@ struct CatalogToolbar: View {
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 12.0) {
-                BarAccessoryMenu(LocalizedStringKey(selectedGenre?.name ?? "Shared.Genre"),
-                                 icon: (selectedGenre?.name == "ブルーアーカイブ" ?
-                                        "scope" : "theatermask.and.paintbrush")) {
-                    Button("Shared.All") {
-                        selectedGenre = nil
-                    }
-                    Picker(selection: $selectedGenre.animation(.smooth.speed(2.0))) {
-                        ForEach(genres) { genre in
-                            Text(genre.name)
-                                .tag(genre)
+                Group {
+                    BarAccessoryMenu(LocalizedStringKey(selectedGenre?.name ?? "Shared.Genre"),
+                                     icon: (selectedGenre?.name == "ブルーアーカイブ" ?
+                                            "scope" : "theatermask.and.paintbrush")) {
+                        Button("Shared.All") {
+                            selectedGenre = nil
                         }
-                    } label: {
-                        Text("Shared.Genre")
+                        Picker(selection: $selectedGenre.animation(.smooth.speed(2.0))) {
+                            ForEach(genres) { genre in
+                                Text(genre.name)
+                                    .tag(genre)
+                            }
+                        } label: {
+                            Text("Shared.Genre")
+                        }
+                    }
+                    BarAccessoryMenu(LocalizedStringKey(selectedMap?.name ?? "Shared.Building"),
+                                     icon: "building") {
+                        Button("Shared.All") {
+                            selectedMap = nil
+                        }
+                        Picker(selection: $selectedMap.animation(.smooth.speed(2.0))) {
+                            ForEach(selectableMaps ?? maps) { map in
+                                Text(map.name)
+                                    .tag(map)
+                            }
+                        } label: {
+                            Text("Shared.Building")
+                        }
+                    }
+                    BarAccessoryMenu(LocalizedStringKey(selectedBlock?.name ?? "Shared.Block"),
+                                     icon: "table.furniture") {
+                        Button("Shared.All") {
+                            selectedBlock = nil
+                        }
+                        Picker(selection: $selectedBlock.animation(.smooth.speed(2.0))) {
+                            ForEach(selectableBlocks ?? blocks, id: \.id) { block in
+                                Text(block.name)
+                                    .tag(block)
+                            }
+                        } label: {
+                            Text("Shared.Block")
+                        }
+                    }
+                    BarAccessoryMenu((selectedDate != nil ? "Shared.\(selectedDate!.id)th.Day" : "Shared.Day"),
+                                     icon: "calendar") {
+                        Button("Shared.All") {
+                            selectedDate = nil
+                        }
+                        Picker(selection: $selectedDate.animation(.smooth.speed(2.0))) {
+                            ForEach(selectableDates ?? dates) { date in
+                                Text("Shared.\(date.id)th.Day")
+                                    .tag(date)
+                            }
+                        } label: {
+                            Text("Shared.Day")
+                        }
                     }
                 }
-                BarAccessoryMenu(LocalizedStringKey(selectedMap?.name ?? "Shared.Building"),
-                                 icon: "building") {
-                    Button("Shared.All") {
-                        selectedMap = nil
-                    }
-                    Picker(selection: $selectedMap.animation(.smooth.speed(2.0))) {
-                        ForEach(selectableMaps ?? maps) { map in
-                            Text(map.name)
-                                .tag(map)
-                        }
-                    } label: {
-                        Text("Shared.Building")
-                    }
-                }
-                BarAccessoryMenu(LocalizedStringKey(selectedBlock?.name ?? "Shared.Block"),
-                                 icon: "table.furniture") {
-                    Button("Shared.All") {
-                        selectedBlock = nil
-                    }
-                    Picker(selection: $selectedBlock.animation(.smooth.speed(2.0))) {
-                        ForEach(selectableBlocks ?? blocks, id: \.id) { block in
-                            Text(block.name)
-                                .tag(block)
-                        }
-                    } label: {
-                        Text("Shared.Block")
-                    }
-                }
-                BarAccessoryMenu((selectedDate != nil ? "Shared.\(selectedDate!.id)th.Day" : "Shared.Day"),
-                                 icon: "calendar") {
-                    Button("Shared.All") {
-                        selectedDate = nil
-                    }
-                    Picker(selection: $selectedDate.animation(.smooth.speed(2.0))) {
-                        ForEach(selectableDates ?? dates) { date in
-                            Text("Shared.\(date.id)th.Day")
-                                .tag(date)
-                        }
-                    } label: {
-                        Text("Shared.Day")
-                    }
-                }
+                .glassEffect()
             }
             .padding(.horizontal, 12.0)
             .padding(.vertical, 12.0)
