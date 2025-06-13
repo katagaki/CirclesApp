@@ -51,6 +51,7 @@ struct MapHallMenu: View {
                             .font(.title2)
                     }
                 }
+                .glassEffect()
             }
             .offset(x: -12.0, y: -12.0)
             Color.clear

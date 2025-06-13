@@ -27,6 +27,8 @@ struct MapControlStack: View {
                 }
                 .popoverTip(GenreOverlayTip())
             }
+            .clipShape(.capsule)
+            .glassEffect()
             VStack(alignment: .center, spacing: 0.0) {
                 SquareButton {
                     zoomDivisor -= 1
@@ -35,7 +37,6 @@ struct MapControlStack: View {
                         .font(.title)
                 }
                 .disabled(zoomDivisor <= 1)
-                Divider()
                 SquareButton {
                     zoomDivisor += 1
                 } label: {
@@ -44,6 +45,8 @@ struct MapControlStack: View {
                 }
                 .disabled(zoomDivisor >= 4)
             }
+            .clipShape(.capsule)
+            .glassEffect()
         }
     }
 }

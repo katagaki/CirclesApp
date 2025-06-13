@@ -2840,7 +2840,6 @@
       }
     },
     "ViewTitle.Map" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

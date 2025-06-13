@@ -76,15 +76,16 @@ struct MapToolbar: View {
                         }
                     }
                     .padding(12.0)
-                    .background {
-                        if date.id == selectedDate?.id {
-                            RoundedRectangle(cornerRadius: 12.0)
-                                .foregroundStyle(Color.primary.opacity(0.1))
-                        } else {
-                            RoundedRectangle(cornerRadius: 12.0)
-                                .stroke(Color.primary.opacity(0.1))
-                        }
-                    }
+                    .glassEffect(.regular, in: .rect(cornerRadius: 22.0))
+//                    .background {
+//                        if date.id == selectedDate?.id {
+//                            RoundedRectangle(cornerRadius: 12.0)
+//                                .foregroundStyle(Color.primary.opacity(0.1))
+//                        } else {
+//                            RoundedRectangle(cornerRadius: 12.0)
+//                                .stroke(Color.primary.opacity(0.1))
+//                        }
+//                    }
                 }
             }
             .padding(.horizontal, 12.0)
