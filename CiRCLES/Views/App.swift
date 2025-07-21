@@ -24,6 +24,7 @@ struct CirclesApp: App {
     @State var imageCache = ImageCache()
     @State var planner = Planner()
     @State var oasis = Oasis()
+    @State var selections = UserSelections()
 
     @State var hasAppLaunchedForTheFirstTime: Bool = false
 
@@ -72,6 +73,7 @@ struct CirclesApp: App {
         .environment(imageCache)
         .environment(planner)
         .environment(oasis)
+        .environment(selections)
         .onChange(of: scenePhase) { _, newValue in
             if !hasAppLaunchedForTheFirstTime {
                 hasAppLaunchedForTheFirstTime = true

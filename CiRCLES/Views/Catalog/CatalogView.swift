@@ -15,6 +15,7 @@ struct CatalogView: View {
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
+    @Environment(UserSelections.self) var selections
 
     @Environment(\.modelContext) var modelContext
 
@@ -33,11 +34,6 @@ struct CatalogView: View {
     @State var displayedCircles: [ComiketCircle] = []
     @State var searchedCircles: [ComiketCircle]?
 
-    @State var selectedGenre: ComiketGenre?
-    @State var selectedMap: ComiketMap?
-    @State var selectedBlock: ComiketBlock?
-    @State var selectedDate: ComiketDate?
-
     @State var blocksInMap: [ComiketBlock] = []
 
     @State var searchTerm: String = ""
@@ -53,13 +49,6 @@ struct CatalogView: View {
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
 
     @Namespace var circlesNamespace
-
-    var genreMapBlockDate: [Int?] {[
-        selectedGenre?.id,
-        selectedMap?.id,
-        selectedBlock?.id,
-        selectedDate?.id
-    ]}
 
     var body: some View {
         NavigationStack(path: $navigator[.circles]) {
@@ -77,7 +66,7 @@ struct CatalogView: View {
                             }
                         } else {
                             CircleGrid(circles: displayedCircles,
-                                       showsOverlayWhenEmpty: selectedGenre != nil || selectedMap != nil,
+                                       showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
                                        namespace: circlesNamespace) { circle in
                                 navigator.push(.circlesDetail(circle: circle), for: .circles)
                             }
@@ -91,14 +80,14 @@ struct CatalogView: View {
                             }
                         } else {
                             CircleList(circles: displayedCircles,
-                                       showsOverlayWhenEmpty: selectedGenre != nil || selectedMap != nil,
+                                       showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
                                        displayMode: listDisplayModeState,
                                        namespace: circlesNamespace) { circle in
                                 navigator.push(.circlesDetail(circle: circle), for: .circles)
                             }
                         }
                     }
-                    if selectedGenre == nil && selectedMap == nil && searchedCircles == nil {
+                    if selections.genre == nil && selections.map == nil && searchedCircles == nil {
                         ContentUnavailableView(
                             "Circles.NoFilterSelected",
                             systemImage: "questionmark.square.dashed",
@@ -110,25 +99,8 @@ struct CatalogView: View {
             .navigationTitle("ViewTitle.Circles")
             .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
-                ToolbarItemGroup(placement: .primaryAction) {
-                    Button {
-                        withAnimation(.smooth.speed(2.0)) {
-                            switch displayModeState {
-                            case .grid: displayModeState = .list
-                            case .list: displayModeState = .grid
-                            }
-                        }
-                    } label: {
-                        switch displayModeState {
-                        case .grid:
-                            Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
-                        case .list:
-                            Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
-                        }
-                    }
-                }
                 if displayModeState == .list {
-                    ToolbarItemGroup(placement: .navigation) {
+                    ToolbarItem {
                         Button {
                             withAnimation(.smooth.speed(2.0)) {
                                 switch listDisplayModeState {
@@ -145,17 +117,29 @@ struct CatalogView: View {
                             }
                         }
                     }
+                    ToolbarSpacer()
+                }
+                ToolbarItem {
+                    Button {
+                        withAnimation(.smooth.speed(2.0)) {
+                            switch displayModeState {
+                            case .grid: displayModeState = .list
+                            case .list: displayModeState = .grid
+                            }
+                        }
+                    } label: {
+                        switch displayModeState {
+                        case .grid:
+                            Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
+                        case .list:
+                            Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
+                        }
+                    }
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                CatalogToolbar(
-                    displayedCircles: $displayedCircles,
-                    selectedGenre: $selectedGenre,
-                    selectedMap: $selectedMap,
-                    selectedBlock: $selectedBlock,
-                    selectedDate: $selectedDate
-                )
-                .disabled(searchTerm.trimmingCharacters(in: .whitespaces).count >= 2)
+                CatalogToolbar(displayedCircles: $displayedCircles)
+                    .disabled(searchTerm.trimmingCharacters(in: .whitespaces).count >= 2)
             }
             .searchable(text: $searchTerm,
                         placement: .navigationBarDrawer(displayMode: .always),
@@ -167,12 +151,12 @@ struct CatalogView: View {
                     isInitialLoadCompleted = true
                 }
             }
-            .onChange(of: genreMapBlockDate) { _, _ in
+            .onChange(of: selections.idMap) { _, _ in
                 if isInitialLoadCompleted {
                     reloadDisplayedCircles(
-                        genreID: selectedGenre?.id,
-                        mapID: selectedMap?.id,
-                        blockID: selectedBlock?.id
+                        genreID: selections.genre?.id,
+                        mapID: selections.map?.id,
+                        blockID: selections.block?.id
                     )
                 }
             }
@@ -246,7 +230,7 @@ struct CatalogView: View {
                 await MainActor.run {
                     var displayedCircles: [ComiketCircle] = []
                     displayedCircles = database.circles(circleIdentifiers)
-                    if let selectedDate {
+                    if let selectedDate = selections.date {
                         displayedCircles.removeAll(where: { $0.day != selectedDate.id })
                     }
                     withAnimation(.smooth.speed(2.0)) {

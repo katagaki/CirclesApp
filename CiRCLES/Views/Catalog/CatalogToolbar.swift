@@ -12,6 +12,7 @@ import SwiftUI
 struct CatalogToolbar: View {
 
     @Environment(Database.self) var database
+    @Environment(UserSelections.self) var selections
 
     @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
     var dates: [ComiketDate]
@@ -25,34 +26,24 @@ struct CatalogToolbar: View {
     @Query(sort: [SortDescriptor(\ComiketBlock.id, order: .forward)])
     var blocks: [ComiketBlock]
 
-    @Binding var displayedCircles: [ComiketCircle]
-    @Binding var selectedGenre: ComiketGenre?
-    @Binding var selectedMap: ComiketMap?
-    @Binding var selectedBlock: ComiketBlock?
-    @Binding var selectedDate: ComiketDate?
-
-    @AppStorage(wrappedValue: 0, "Circles.SelectedGenreID") var selectedGenreID: Int
-    @AppStorage(wrappedValue: 0, "Circles.SelectedMapID") var selectedMapID: Int
-    @AppStorage(wrappedValue: 0, "Circles.SelectedBlockID") var selectedBlockID: Int
-    @AppStorage(wrappedValue: 0, "Circles.SelectedDateID") var selectedDateID: Int
-
     @State var selectableMaps: [ComiketMap]?
     @State var selectableBlocks: [ComiketBlock]?
     @State var selectableDates: [ComiketDate]?
 
-    @State var isInitialLoadCompleted: Bool = false
+    @Binding var displayedCircles: [ComiketCircle]
 
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 12.0) {
+                @Bindable var selections = selections
                 Group {
-                    BarAccessoryMenu(LocalizedStringKey(selectedGenre?.name ?? "Shared.Genre"),
-                                     icon: (selectedGenre?.name == "ブルーアーカイブ" ?
+                    BarAccessoryMenu(LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                                     icon: (selections.genre?.name == "ブルーアーカイブ" ?
                                             "scope" : "theatermask.and.paintbrush")) {
                         Button("Shared.All") {
-                            selectedGenre = nil
+                            selections.genre = nil
                         }
-                        Picker(selection: $selectedGenre.animation(.smooth.speed(2.0))) {
+                        Picker(selection: $selections.genre.animation(.smooth.speed(2.0))) {
                             ForEach(genres) { genre in
                                 Text(genre.name)
                                     .tag(genre)
@@ -61,12 +52,12 @@ struct CatalogToolbar: View {
                             Text("Shared.Genre")
                         }
                     }
-                    BarAccessoryMenu(LocalizedStringKey(selectedMap?.name ?? "Shared.Building"),
+                    BarAccessoryMenu(LocalizedStringKey(selections.map?.name ?? "Shared.Building"),
                                      icon: "building") {
                         Button("Shared.All") {
-                            selectedMap = nil
+                            selections.map = nil
                         }
-                        Picker(selection: $selectedMap.animation(.smooth.speed(2.0))) {
+                        Picker(selection: $selections.map.animation(.smooth.speed(2.0))) {
                             ForEach(selectableMaps ?? maps) { map in
                                 Text(map.name)
                                     .tag(map)
@@ -75,12 +66,12 @@ struct CatalogToolbar: View {
                             Text("Shared.Building")
                         }
                     }
-                    BarAccessoryMenu(LocalizedStringKey(selectedBlock?.name ?? "Shared.Block"),
+                    BarAccessoryMenu(LocalizedStringKey(selections.block?.name ?? "Shared.Block"),
                                      icon: "table.furniture") {
                         Button("Shared.All") {
-                            selectedBlock = nil
+                            selections.block = nil
                         }
-                        Picker(selection: $selectedBlock.animation(.smooth.speed(2.0))) {
+                        Picker(selection: $selections.block.animation(.smooth.speed(2.0))) {
                             ForEach(selectableBlocks ?? blocks, id: \.id) { block in
                                 Text(block.name)
                                     .tag(block)
@@ -89,12 +80,12 @@ struct CatalogToolbar: View {
                             Text("Shared.Block")
                         }
                     }
-                    BarAccessoryMenu((selectedDate != nil ? "Shared.\(selectedDate!.id)th.Day" : "Shared.Day"),
+                    BarAccessoryMenu((selections.date != nil ? "Shared.\(selections.date!.id)th.Day" : "Shared.Day"),
                                      icon: "calendar") {
                         Button("Shared.All") {
-                            selectedDate = nil
+                            selections.date = nil
                         }
-                        Picker(selection: $selectedDate.animation(.smooth.speed(2.0))) {
+                        Picker(selection: $selections.date.animation(.smooth.speed(2.0))) {
                             ForEach(selectableDates ?? dates) { date in
                                 Text("Shared.\(date.id)th.Day")
                                     .tag(date)
@@ -110,44 +101,9 @@ struct CatalogToolbar: View {
             .padding(.vertical, 12.0)
         }
         .scrollIndicators(.hidden)
-        .onAppear {
-            if !isInitialLoadCompleted {
-                selectedGenre = genres.first(where: {$0.id == selectedGenreID})
-                selectedMap = maps.first(where: {$0.id == selectedMapID})
-                selectedBlock = blocks.first(where: {$0.id == selectedBlockID})
-                selectedDate = dates.first(where: {$0.id == selectedDateID})
-                isInitialLoadCompleted = true
-            }
-        }
-        .onChange(of: selectedGenre) { _, _ in
-            if isInitialLoadCompleted {
-                selectedGenreID = selectedGenre?.id ?? 0
-                isInitialLoadCompleted = false
-                selectedMap = nil
-                selectedBlock = nil
-                selectedDate = nil
-                isInitialLoadCompleted = true
-            }
-        }
-        .onChange(of: selectedMap) { oldValue, newValue in
-            if isInitialLoadCompleted {
-                selectedMapID = selectedMap?.id ?? 0
-                if oldValue != newValue && oldValue != nil {
-                    selectedBlock = nil
-                }
-                Task.detached {
-                    await reloadBlocksInMap()
-                }
-            }
-        }
-        .onChange(of: selectedBlock) { _, _ in
-            if isInitialLoadCompleted {
-                selectedBlockID = selectedBlock?.id ?? 0
-            }
-        }
-        .onChange(of: selectedDate) { _, _ in
-            if isInitialLoadCompleted {
-                selectedDateID = selectedDate?.id ?? 0
+        .onChange(of: selections.map) { _, _ in
+            Task.detached {
+                await reloadBlocksInMap()
             }
         }
         .onChange(of: displayedCircles) { _, _ in
@@ -199,9 +155,13 @@ struct CatalogToolbar: View {
 
     func reloadBlocksInMap() async {
         let actor = DataFetcher(modelContainer: sharedModelContainer)
-        let blockIdentifiers = await actor.blocks(inMap: selectedMapID)
-        await MainActor.run {
-            self.selectableBlocks = database.blocks(blockIdentifiers)
+        if let selectedMap = selections.map {
+            let blockIdentifiers = await actor.blocks(inMap: selectedMap.id)
+            await MainActor.run {
+                self.selectableBlocks = database.blocks(blockIdentifiers)
+            }
+        } else {
+            self.selectableBlocks = []
         }
     }
 }

@@ -10,11 +10,22 @@ import SwiftUI
 struct MapControlStack: View {
 
     @Binding var showGenreOverlay: Bool
+    @Binding var useDarkModeMaps: Bool
     @Binding var zoomDivisor: Int
 
     var body: some View {
         SquareButtonStack {
             VStack(alignment: .center, spacing: 0.0) {
+                SquareButton {
+                    withAnimation(.smooth.speed(2.0)) {
+                        useDarkModeMaps.toggle()
+                    }
+                } label: {
+                    Image(systemName: useDarkModeMaps ?
+                          "moon.fill" :
+                            "sun.max")
+                    .font(.title2)
+                }
                 SquareButton {
                     withAnimation(.smooth.speed(2.0)) {
                         showGenreOverlay.toggle()
