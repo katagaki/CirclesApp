@@ -11,11 +11,6 @@ import SwiftUI
 
 struct FavoritesToolbar: View {
 
-    @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
-    var dates: [ComiketDate]
-
-    @Binding var selectedDate: ComiketDate?
-
     @Binding var isVisitModeOn: Bool
     @Binding var isGroupedByColor: Bool
 
@@ -49,20 +44,6 @@ struct FavoritesToolbar: View {
 //                ) {
 //                    
 //                }
-                BarAccessoryMenu((selectedDate != nil ? "Shared.\(selectedDate!.id)th.Day" : "Shared.Day"),
-                                 icon: "calendar") {
-                    Button("Shared.All") {
-                        selectedDate = nil
-                    }
-                    Picker(selection: $selectedDate.animation(.smooth.speed(2.0))) {
-                        ForEach(dates) { date in
-                            Text("Shared.\(date.id)th.Day")
-                                .tag(date)
-                        }
-                    } label: {
-                        Text("Shared.Day")
-                    }
-                }
             }
             .padding(.horizontal, 12.0)
             .padding(.vertical, 12.0)

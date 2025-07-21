@@ -9,15 +9,13 @@ import SwiftData
 import SwiftUI
 
 struct MapHallMenu: View {
+    @Environment(UserSelections.self) var selections
 
     @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
     var dates: [ComiketDate]
 
     @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
     var maps: [ComiketMap]
-
-    @Binding var selectedDate: ComiketDate?
-    @Binding var selectedMap: ComiketMap?
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
@@ -28,18 +26,18 @@ struct MapHallMenu: View {
                             ForEach(maps, id: \.id) { map in
                                 Button {
                                     withAnimation(.smooth.speed(2.0)) {
-                                        selectedDate = date
-                                        selectedMap = map
+                                        selections.date = date
+                                        selections.map = map
                                     }
                                 } label: {
-                                    if selectedDate == date && selectedMap == map {
+                                    if selections.date == date && selections.map == map {
                                         Label(LocalizedStringKey(stringLiteral: map.name),
                                               systemImage: "checkmark")
                                     } else {
                                         Text(LocalizedStringKey(stringLiteral: map.name))
                                     }
                                 }
-                                .disabled(selectedDate == date && selectedMap == map)
+                                .disabled(selections.date == date && selections.map == map)
                             }
                         }
                     }

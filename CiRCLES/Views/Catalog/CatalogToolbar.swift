@@ -14,21 +14,13 @@ struct CatalogToolbar: View {
     @Environment(Database.self) var database
     @Environment(UserSelections.self) var selections
 
-    @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
-    var dates: [ComiketDate]
-
-    @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
-    var maps: [ComiketMap]
-
     @Query(sort: [SortDescriptor(\ComiketGenre.id, order: .forward)])
     var genres: [ComiketGenre]
 
     @Query(sort: [SortDescriptor(\ComiketBlock.id, order: .forward)])
     var blocks: [ComiketBlock]
 
-    @State var selectableMaps: [ComiketMap]?
     @State var selectableBlocks: [ComiketBlock]?
-    @State var selectableDates: [ComiketDate]?
 
     @Binding var displayedCircles: [ComiketCircle]
 
@@ -52,20 +44,6 @@ struct CatalogToolbar: View {
                             Text("Shared.Genre")
                         }
                     }
-                    BarAccessoryMenu(LocalizedStringKey(selections.map?.name ?? "Shared.Building"),
-                                     icon: "building") {
-                        Button("Shared.All") {
-                            selections.map = nil
-                        }
-                        Picker(selection: $selections.map.animation(.smooth.speed(2.0))) {
-                            ForEach(selectableMaps ?? maps) { map in
-                                Text(map.name)
-                                    .tag(map)
-                            }
-                        } label: {
-                            Text("Shared.Building")
-                        }
-                    }
                     BarAccessoryMenu(LocalizedStringKey(selections.block?.name ?? "Shared.Block"),
                                      icon: "table.furniture") {
                         Button("Shared.All") {
@@ -80,20 +58,6 @@ struct CatalogToolbar: View {
                             Text("Shared.Block")
                         }
                     }
-                    BarAccessoryMenu((selections.date != nil ? "Shared.\(selections.date!.id)th.Day" : "Shared.Day"),
-                                     icon: "calendar") {
-                        Button("Shared.All") {
-                            selections.date = nil
-                        }
-                        Picker(selection: $selections.date.animation(.smooth.speed(2.0))) {
-                            ForEach(selectableDates ?? dates) { date in
-                                Text("Shared.\(date.id)th.Day")
-                                    .tag(date)
-                            }
-                        } label: {
-                            Text("Shared.Day")
-                        }
-                    }
                 }
                 .glassEffect()
             }
@@ -101,7 +65,7 @@ struct CatalogToolbar: View {
             .padding(.vertical, 12.0)
         }
         .scrollIndicators(.hidden)
-        .onChange(of: selections.map) { _, _ in
+        .onChange(of: selections.idMap) { _, _ in
             Task.detached {
                 await reloadBlocksInMap()
             }
@@ -116,21 +80,10 @@ struct CatalogToolbar: View {
     func reloadSelectableMapsBlocksAndDates() async {
         if displayedCircles.isEmpty {
             await MainActor.run {
-                selectableMaps = nil
                 selectableBlocks = nil
-                selectableDates = nil
             }
         } else {
-            var selectableMaps: [ComiketMap] = []
             var selectableBlocks: [ComiketBlock] = []
-            var selectableDates: [ComiketDate] = []
-            maps.forEach { map in
-                if displayedCircles.contains(where: {
-                    $0.layout?.mapID == map.id
-                }) {
-                    selectableMaps.append(map)
-                }
-            }
             blocks.forEach { block in
                 if displayedCircles.contains(where: {
                     $0.layout?.blockID == block.id
@@ -138,17 +91,8 @@ struct CatalogToolbar: View {
                     selectableBlocks.append(block)
                 }
             }
-            dates.forEach { date in
-                if displayedCircles.contains(where: {
-                    $0.day == date.id
-                }) {
-                    selectableDates.append(date)
-                }
-            }
             await MainActor.run {
-                self.selectableMaps = selectableMaps
                 self.selectableBlocks = selectableBlocks
-                self.selectableDates = selectableDates
             }
         }
     }

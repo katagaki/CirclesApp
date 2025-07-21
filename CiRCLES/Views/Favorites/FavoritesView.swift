@@ -18,14 +18,12 @@ struct FavoritesView: View {
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
     @Environment(Planner.self) var planner
+    @Environment(UserSelections.self) var selections
 
     @State var favoriteCircles: [String: [ComiketCircle]]?
 
     @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
     var dates: [ComiketDate]
-
-    @State var selectedDate: ComiketDate?
-    @AppStorage(wrappedValue: 0, "Favorites.SelectedDateID") var selectedDateID: Int
 
     @State var isVisitModeOn: Bool = false
     @AppStorage(wrappedValue: false, "Favorites.VisitModeOn") var isVisitModeOnDefault: Bool
@@ -96,7 +94,6 @@ struct FavoritesView: View {
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
                 BarAccessory(placement: .bottom) {
                     FavoritesToolbar(
-                        selectedDate: $selectedDate,
                         isVisitModeOn: $isVisitModeOn,
                         isGroupedByColor: $isGroupedByColor
                     )
@@ -112,15 +109,13 @@ struct FavoritesView: View {
                             await prepareCircles(using: favoriteItems)
                         }
                     }
-                    selectedDate = dates.first(where: {$0.id == selectedDateID})
                     isVisitModeOn = isVisitModeOnDefault
                     isGroupedByColor = isGroupedByColorDefault
                     isInitialLoadCompleted = true
                 }
             }
-            .onChange(of: selectedDate) { _, _ in
+            .onChange(of: selections.date) { _, _ in
                 if isInitialLoadCompleted {
-                    selectedDateID = selectedDate?.id ?? 0
                     if let favoriteItems = favorites.items {
                         Task.detached {
                             await prepareCircles(using: favoriteItems)
@@ -191,7 +186,7 @@ struct FavoritesView: View {
                 if let circleIdentifiers = favoriteCircleIdentifiers[colorKey] {
                     var circles = database.circles(circleIdentifiers)
                     circles.sort(by: {$0.id < $1.id})
-                    if let selectedDate {
+                    if let selectedDate = selections.date {
                         favoriteCircles[String(colorKey)] = circles.filter({
                             $0.day == selectedDate.id
                         })

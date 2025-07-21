@@ -54,8 +54,9 @@ struct MainTabView: View {
                 MoreView()
             }
         }
+        .tabBarMinimizeBehavior(.automatic)
         .tabViewBottomAccessory {
-            
+            UnifiedControl()
         }
         #if DEBUG
         .debugOverlay()

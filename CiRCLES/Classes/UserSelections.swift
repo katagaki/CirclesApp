@@ -15,43 +15,43 @@ let selectedBlockKey = "Circles.SelectedBlockID"
 let selectedDateKey = "Circles.SelectedDateID"
 
 @Observable
-class UserSelections: Equatable {
+class UserSelections {
     @ObservationIgnored let defaults: UserDefaults
     @ObservationIgnored let modelContext: ModelContext
 
     // swiftlint:disable identifier_name
-    @ObservationIgnored var _date: ComiketDate?
+    var _date: ComiketDate?
     var date: ComiketDate? {
         get { return _date }
         set(value) {
-            defaults.set(value?.id, forKey: selectedDateKey)
             _date = value
+            defaults.set(value?.id, forKey: selectedDateKey)
         }
     }
-    @ObservationIgnored var _map: ComiketMap?
+    var _map: ComiketMap?
     var map: ComiketMap? {
         get { return _map }
         set(value) {
-            defaults.set(value?.id, forKey: selectedMapKey)
-            defaults.set(nil, forKey: selectedBlockKey)
             _map = value
+            defaults.set(value?.id, forKey: selectedMapKey)
             _block = nil
+            defaults.set(nil, forKey: selectedBlockKey)
         }
     }
-    @ObservationIgnored var _block: ComiketBlock?
+    var _block: ComiketBlock?
     var block: ComiketBlock? {
         get { return _block }
         set(value) {
-            defaults.set(value?.id, forKey: selectedBlockKey)
             _block = value
+            defaults.set(value?.id, forKey: selectedBlockKey)
         }
     }
-    @ObservationIgnored var _genre: ComiketGenre?
+    var _genre: ComiketGenre?
     var genre: ComiketGenre? {
         get { return _genre }
         set(value) {
-            defaults.set(value?.id, forKey: selectedGenreKey)
             _genre = value
+            defaults.set(value?.id, forKey: selectedGenreKey)
         }
     }
     // swiftlint:enable identifier_name
@@ -64,9 +64,9 @@ class UserSelections: Equatable {
     }
 
     func reloadData() {
-        let dateID = defaults.integer(forKey: selectedGenreKey)
+        let dateID = defaults.integer(forKey: selectedDateKey)
         let mapID = defaults.integer(forKey: selectedMapKey)
-        let blockID = defaults.integer(forKey: selectedGenreKey)
+        let blockID = defaults.integer(forKey: selectedBlockKey)
         let genreID = defaults.integer(forKey: selectedGenreKey)
         _date = fetchDateSelection(with: dateID)
         _map = fetchMapSelection(with: mapID)
@@ -102,9 +102,7 @@ class UserSelections: Equatable {
         return try? modelContext.fetch(fetchDescriptor).first
     }
 
-    var idMap: [Int?] { [genre?.id, map?.id, block?.id, date?.id] }
-
-    static func == (lhs: UserSelections, rhs: UserSelections) -> Bool {
-        return lhs.idMap == rhs.idMap
+    var idMap: String {
+        return "G\(_genre?.id ?? 0),M\(_map?.id ?? 0),B\(_block?.id ?? 0),D\(_date?.id ?? 0)"
     }
 }
