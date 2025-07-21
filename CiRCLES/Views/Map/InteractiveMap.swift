@@ -12,9 +12,7 @@ struct InteractiveMap: View {
 
     @Environment(Database.self) var database
     @Environment(Favorites.self) var favorites
-
-    @Binding var date: ComiketDate?
-    @Binding var map: ComiketMap?
+    @Environment(UserSelections.self) var selections
 
     @State var mapImage: UIImage?
     @State var mapImageWidth: Int = 0
@@ -35,11 +33,6 @@ struct InteractiveMap: View {
     @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
 
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
-
-    var dateMap: [Int?] {[
-        date?.id,
-        map?.id
-    ]}
 
     var spaceSize: Int {
         useHighResolutionMaps ? 40 : 20
@@ -115,7 +108,7 @@ struct InteractiveMap: View {
         .onChange(of: database.commonImages) { _, _ in
             reloadAll()
         }
-        .onChange(of: dateMap) { _, _ in
+        .onChange(of: selections.idMap) { _, _ in
             reloadAll()
         }
         .onChange(of: useHighResolutionMaps) { _, _ in
@@ -140,9 +133,9 @@ struct InteractiveMap: View {
             removeAllMappings()
             reloadMapImage()
         } completion: {
-            if let map {
+            if let map = selections.map {
                 let mapID = map.id
-                let selectedDate = date?.id
+                let selectedDate = selections.date?.id
                 let useHighResolutionMaps = useHighResolutionMaps
                 Task.detached(priority: .high) {
                     await reloadMapLayouts(
@@ -162,7 +155,9 @@ struct InteractiveMap: View {
     }
 
     func reloadMapImage() {
-        if let date, let map, let selectedHall = ComiketHall(rawValue: map.filename) {
+        if let date = selections.date,
+           let map = selections.map,
+           let selectedHall = ComiketHall(rawValue: map.filename) {
             mapImage = database.mapImage(
                 for: selectedHall,
                 on: date.id,

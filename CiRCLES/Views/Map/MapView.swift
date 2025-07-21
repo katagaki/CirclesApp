@@ -23,88 +23,24 @@ struct MapView: View {
     @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
     var maps: [ComiketMap]
 
-    @AppStorage(wrappedValue: 0, "Map.SelectedDateID") var selectedDateID: Int
-    @AppStorage(wrappedValue: 0, "Map.SelectedMapID") var selectedMapID: Int
-    @State var selectedDate: ComiketDate?
-    @State var selectedMap: ComiketMap?
-
-    @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
-
-    @State var isInitialLoadCompleted: Bool = false
-
     @Namespace var mapNamespace
 
     var body: some View {
         NavigationStack(path: $navigator[.map]) {
-            InteractiveMap(
-                date: $selectedDate,
-                map: $selectedMap,
-                namespace: mapNamespace
-            )
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .navigationTitle("ViewTitle.Map")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarBackground(.hidden, for: .tabBar)
-            .overlay {
-                #if !os(visionOS)
-                if orientation.isLandscape() ||
-                    (horizontalSizeClass == .regular && verticalSizeClass == .compact) {
-                    MapHallMenu(
-                        selectedDate: $selectedDate,
-                        selectedMap: $selectedMap
-                    )
-                    .transition(.push(from: .leading).animation(.smooth.speed(2.0)))
+            InteractiveMap(namespace: mapNamespace)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .navigationTitle("ViewTitle.Map")
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationDestination(for: ViewPath.self) { viewPath in
+                    switch viewPath {
+                    case .circlesDetail(let circle): CircleDetailView(circle: circle)
+                            .automaticNavigationTransition(
+                                id: "Layout.\(circle.blockID).\(circle.spaceNumber)",
+                                in: mapNamespace
+                            )
+                    default: Color.clear
+                    }
                 }
-                #endif
-            }
-            .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                #if !os(visionOS)
-                if orientation.isPortrait() ||
-                    (horizontalSizeClass == .compact && verticalSizeClass == .regular) {
-                    MapToolbar(selectedDate: $selectedDate, selectedMap: $selectedMap)
-                        .frame(maxWidth: .infinity)
-                } else {
-                    Color.clear
-                        .frame(height: 0.0)
-                }
-                #else
-                MapToolbar(selectedDate: $selectedDate, selectedMap: $selectedMap)
-                #endif
-            }
-            .onAppear {
-                if !isInitialLoadCompleted {
-                    selectedDate = dates.first(where: {$0.id == selectedDateID})
-                    selectedMap = maps.first(where: {$0.id == selectedMapID})
-                    isInitialLoadCompleted = true
-                }
-            }
-            .onChange(of: selectedDate) { _, _ in
-                if isInitialLoadCompleted {
-                    selectedDateID = selectedDate?.id ?? 0
-                }
-            }
-            .onChange(of: selectedMap) { _, _ in
-                if isInitialLoadCompleted {
-                    selectedMapID = selectedMap?.id ?? 0
-                }
-            }
-            .onChange(of: isDatabaseInitialized) { _, newValue in
-                if !newValue {
-                    selectedMap = nil
-                    selectedDate = nil
-                }
-            }
-            .navigationDestination(for: ViewPath.self) { viewPath in
-                switch viewPath {
-                case .circlesDetail(let circle): CircleDetailView(circle: circle)
-                        .automaticNavigationTransition(
-                            id: "Layout.\(circle.blockID).\(circle.spaceNumber)",
-                            in: mapNamespace
-                        )
-                default: Color.clear
-                }
-            }
         }
     }
 }

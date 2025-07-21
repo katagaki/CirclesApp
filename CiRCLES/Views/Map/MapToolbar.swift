@@ -10,15 +10,13 @@ import SwiftData
 import SwiftUI
 
 struct MapToolbar: View {
+    @Environment(UserSelections.self) var selections
 
     @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
     var dates: [ComiketDate]
 
     @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
     var maps: [ComiketMap]
-
-    @Binding var selectedDate: ComiketDate?
-    @Binding var selectedMap: ComiketMap?
 
     var body: some View {
         ScrollView(.horizontal) {
@@ -43,11 +41,11 @@ struct MapToolbar: View {
                                                            accentColor: accentColorForMap(map),
                                                            isTextLight: true) {
                                             withAnimation(.smooth.speed(2.0)) {
-                                                selectedDate = date
-                                                selectedMap = map
+                                                selections.date = date
+                                                selections.map = map
                                             }
                                         }
-                                        .disabled(selectedDate == date && selectedMap == map)
+                                                           .disabled(selections.date == date && selections.map == map)
                                     }
                                 }
                             }
@@ -65,11 +63,11 @@ struct MapToolbar: View {
                                                            accentColor: accentColorForMap(map),
                                                            isTextLight: true) {
                                             withAnimation(.smooth.speed(2.0)) {
-                                                selectedDate = date
-                                                selectedMap = map
+                                                selections.date = date
+                                                selections.map = map
                                             }
                                         }
-                                        .disabled(selectedDate == date && selectedMap == map)
+                                        .disabled(selections.date == date && selections.map == map)
                                     }
                                 }
                             }
@@ -77,15 +75,6 @@ struct MapToolbar: View {
                     }
                     .padding(12.0)
                     .glassEffect(.regular, in: .rect(cornerRadius: 22.0))
-//                    .background {
-//                        if date.id == selectedDate?.id {
-//                            RoundedRectangle(cornerRadius: 12.0)
-//                                .foregroundStyle(Color.primary.opacity(0.1))
-//                        } else {
-//                            RoundedRectangle(cornerRadius: 12.0)
-//                                .stroke(Color.primary.opacity(0.1))
-//                        }
-//                    }
                 }
             }
             .padding(.horizontal, 12.0)
