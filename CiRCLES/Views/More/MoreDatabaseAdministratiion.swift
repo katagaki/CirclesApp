@@ -125,7 +125,6 @@ struct MoreDatabaseAdministratiion: View {
         ) {
             var totalSize: UInt64 = 0
             for file in files {
-                debugPrint(file)
                 do {
                     let attributes = try FileManager.default.attributesOfItem(atPath: file.path())
                     if let size = attributes[.size] as? UInt64 {

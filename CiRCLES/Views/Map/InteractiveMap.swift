@@ -30,7 +30,7 @@ struct InteractiveMap: View {
     @State var popoverSourceRect: CGRect = .null
 
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
-    @State var showGenreOverlayState: Bool = false
+    @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
 
@@ -71,7 +71,7 @@ struct InteractiveMap: View {
                             zoomDivisor: $zoomDivisor
                         )
                         // Genre Layer
-                        if showGenreOverlayState, let genreImage {
+                        if showGenreOverlay, let genreImage {
                             HallOverlay(
                                 image: genreImage,
                                 width: $mapImageWidth,
@@ -96,7 +96,8 @@ struct InteractiveMap: View {
                 .overlay {
                     ZStack(alignment: .bottomTrailing) {
                         MapControlStack(
-                            showGenreOverlay: $showGenreOverlayState,
+                            showGenreOverlay: $showGenreOverlay,
+                            useDarkModeMaps: $useDarkModeMaps,
                             zoomDivisor: $zoomDivisor
                         )
                         .offset(x: -12.0, y: -12.0)
@@ -110,9 +111,6 @@ struct InteractiveMap: View {
                     description: Text("Map.NoMapSelected.Description")
                 )
             }
-        }
-        .onAppear {
-            showGenreOverlayState = showGenreOverlay
         }
         .onChange(of: database.commonImages) { _, _ in
             reloadAll()
@@ -133,9 +131,6 @@ struct InteractiveMap: View {
                 mapImageWidth = Int(newValue.size.width)
                 mapImageHeight = Int(newValue.size.height)
             }
-        }
-        .onChange(of: showGenreOverlayState) { _, _ in
-            showGenreOverlay = showGenreOverlayState
         }
     }
 

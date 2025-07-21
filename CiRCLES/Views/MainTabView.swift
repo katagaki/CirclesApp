@@ -22,6 +22,7 @@ struct MainTabView: View {
     @Environment(ImageCache.self) var imageCache
     @Environment(Oasis.self) var oasis
     @Environment(Planner.self) var planner
+    @Environment(UserSelections.self) var selections
 
     @State var isReloadingData: Bool = false
 
@@ -53,35 +54,11 @@ struct MainTabView: View {
                 MoreView()
             }
         }
-        #if DEBUG
-        .overlay {
-            ZStack(alignment: .topLeading) {
-                Color.clear
-                VStack(alignment: .leading) {
-                    Group {
-                        switch authenticator.onlineState {
-                        case .online:
-                            RoundedRectangle(cornerRadius: 6.0)
-                                .fill(Color.green)
-                        case .offline:
-                            RoundedRectangle(cornerRadius: 6.0)
-                                .fill(Color.red)
-                        case .undetermined:
-                            RoundedRectangle(cornerRadius: 6.0)
-                                .fill(Color.gray)
-                        }
-                    }
-                    .frame(width: 8.0, height: 8.0)
-                    Group {
-                        Text(verbatim: "Token expiry: \(authenticator.tokenExpiryDate)")
-                        Text(verbatim: "Token string: \((authenticator.token?.accessToken ?? "").prefix(5))")
-                        Text(verbatim: "Active event number: \(planner.activeEventNumber)")
-                        Text(verbatim: "Event count: \(String(describing: planner.eventData?.list.count))")
-                    }
-                    .font(.system(size: 10.0))
-                }
-            }
+        .tabViewBottomAccessory {
+            
         }
+        #if DEBUG
+        .debugOverlay()
         #endif
         .sheet(isPresented: $authenticator.isAuthenticating) {
             LoginView()
