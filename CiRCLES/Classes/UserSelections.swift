@@ -15,12 +15,11 @@ let selectedBlockKey = "Circles.SelectedBlockID"
 let selectedDateKey = "Circles.SelectedDateID"
 
 @Observable
-class UserSelections {
+class UserSelections: Equatable {
     @ObservationIgnored let defaults: UserDefaults
     @ObservationIgnored let modelContext: ModelContext
 
-    // swiftlint:disable identifier_name
-    var _date: ComiketDate?
+    private var _date: ComiketDate?
     var date: ComiketDate? {
         get { return _date }
         set(value) {
@@ -28,7 +27,7 @@ class UserSelections {
             defaults.set(value?.id, forKey: selectedDateKey)
         }
     }
-    var _map: ComiketMap?
+    private var _map: ComiketMap?
     var map: ComiketMap? {
         get { return _map }
         set(value) {
@@ -38,7 +37,7 @@ class UserSelections {
             defaults.set(nil, forKey: selectedBlockKey)
         }
     }
-    var _block: ComiketBlock?
+    private var _block: ComiketBlock?
     var block: ComiketBlock? {
         get { return _block }
         set(value) {
@@ -46,7 +45,7 @@ class UserSelections {
             defaults.set(value?.id, forKey: selectedBlockKey)
         }
     }
-    var _genre: ComiketGenre?
+    private var _genre: ComiketGenre?
     var genre: ComiketGenre? {
         get { return _genre }
         set(value) {
@@ -54,7 +53,6 @@ class UserSelections {
             defaults.set(value?.id, forKey: selectedGenreKey)
         }
     }
-    // swiftlint:enable identifier_name
 
     @MainActor
     init() {
@@ -63,6 +61,7 @@ class UserSelections {
         reloadData()
     }
 
+    @MainActor
     func reloadData() {
         let dateID = defaults.integer(forKey: selectedDateKey)
         let mapID = defaults.integer(forKey: selectedMapKey)
@@ -104,5 +103,9 @@ class UserSelections {
 
     var idMap: String {
         return "G\(_genre?.id ?? 0),M\(_map?.id ?? 0),B\(_block?.id ?? 0),D\(_date?.id ?? 0)"
+    }
+
+    static func == (lhs: UserSelections, rhs: UserSelections) -> Bool {
+        return lhs.idMap == rhs.idMap
     }
 }
