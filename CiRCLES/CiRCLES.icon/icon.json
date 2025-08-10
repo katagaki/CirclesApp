@@ -4,17 +4,28 @@
   },
   "groups" : [
     {
-      "blend-mode" : "normal",
+      "blend-mode-specializations" : [
+        {
+          "value" : "normal"
+        },
+        {
+          "appearance" : "tinted",
+          "value" : "normal"
+        }
+      ],
       "blur-material" : 1,
       "layers" : [
         {
           "blend-mode" : "normal",
           "fill-specializations" : [
             {
-              "appearance" : "tinted",
               "value" : {
-                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+                "automatic-gradient" : "extended-gray:1.00000,1.00000"
               }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "automatic"
             }
           ],
           "glass" : true,
@@ -22,16 +33,28 @@
           "name" : "Cloud3"
         },
         {
+          "fill" : {
+            "automatic-gradient" : "extended-gray:1.00000,1.00000"
+          },
           "image-name" : "Cloud2.svg",
           "name" : "Cloud2"
         },
         {
+          "fill" : {
+            "automatic-gradient" : "extended-gray:1.00000,1.00000"
+          },
           "image-name" : "Cloud1.svg",
           "name" : "Cloud1"
         }
       ],
       "lighting" : "combined",
       "name" : "Clouds",
+      "opacity-specializations" : [
+        {
+          "appearance" : "tinted",
+          "value" : 0.65
+        }
+      ],
       "shadow" : {
         "kind" : "neutral",
         "opacity" : 1
