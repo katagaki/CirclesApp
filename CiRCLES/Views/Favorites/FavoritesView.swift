@@ -83,8 +83,6 @@ struct FavoritesView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .navigationTitle("ViewTitle.Favorites")
-            .toolbarBackground(.automatic, for: .navigationBar)
-            .toolbarBackground(.hidden, for: .tabBar)
             .overlay {
                 if isVisitModeOn {
                     GradientBorder()
