@@ -19,33 +19,30 @@ struct FavoritesToolbar: View {
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: 12.0) {
-                BarAccessoryButton(
-                    "Shared.VisitMode",
-                    icon: isVisitModeOn ? "checkmark.rectangle.stack.fill" : "checkmark.rectangle.stack",
-                    isSecondary: !isVisitModeOn
-                ) {
-                    withAnimation(.smooth.speed(2.0)) {
-                        isVisitModeOn.toggle()
+                Group {
+                    BarAccessoryButton(
+                        "Shared.VisitMode",
+                        icon: isVisitModeOn ? "checkmark.rectangle.stack.fill" : "checkmark.rectangle.stack",
+                        isSecondary: !isVisitModeOn
+                    ) {
+                        withAnimation(.smooth.speed(2.0)) {
+                            isVisitModeOn.toggle()
+                        }
+                    }
+                    .popoverTip(VisitModeTip())
+                    BarAccessoryButton(
+                        "Shared.GroupByColor",
+                        icon: isGroupedByColor ? "paintpalette.fill" : "paintpalette",
+                        isSecondary: !isGroupedByColor
+                    ) {
+                        withAnimation(.smooth.speed(2.0)) {
+                            isGroupedByColor.toggle()
+                        }
                     }
                 }
-                .popoverTip(VisitModeTip())
-                BarAccessoryButton(
-                    "Shared.GroupByColor",
-                    icon: isGroupedByColor ? "paintpalette.fill" : "paintpalette",
-                    isSecondary: !isGroupedByColor
-                ) {
-                    withAnimation(.smooth.speed(2.0)) {
-                        isGroupedByColor.toggle()
-                    }
-                }
-//                BarAccessoryMenu(
-//                    "Shared.Sort",
-//                    icon: "arrow.up.arrow.down"
-//                ) {
-//                    
-//                }
+                .glassEffect()
             }
-            .padding(.horizontal, 12.0)
+            .padding(.horizontal)
             .padding(.vertical, 12.0)
         }
         .scrollIndicators(.hidden)
