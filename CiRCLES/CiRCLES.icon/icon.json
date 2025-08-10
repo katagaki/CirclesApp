@@ -1,0 +1,84 @@
+{
+  "fill" : {
+    "automatic-gradient" : "srgb:0.41961,0.64314,0.93725,1.00000"
+  },
+  "groups" : [
+    {
+      "blend-mode" : "normal",
+      "blur-material" : 1,
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "fill-specializations" : [
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+              }
+            }
+          ],
+          "glass" : true,
+          "image-name" : "Cloud3.svg",
+          "name" : "Cloud3"
+        },
+        {
+          "image-name" : "Cloud2.svg",
+          "name" : "Cloud2"
+        },
+        {
+          "image-name" : "Cloud1.svg",
+          "name" : "Cloud1"
+        }
+      ],
+      "lighting" : "combined",
+      "name" : "Clouds",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blend-mode-specializations" : [
+        {
+          "value" : "normal"
+        },
+        {
+          "appearance" : "dark",
+          "value" : "hard-light"
+        }
+      ],
+      "blur-material" : null,
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "CiRCLES.011 2.png",
+          "name" : "Graphic"
+        }
+      ],
+      "lighting" : "combined",
+      "name" : "Tokyo Big Sight",
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 0.3
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

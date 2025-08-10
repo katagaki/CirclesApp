@@ -28,18 +28,29 @@ struct UnifiedControl: View {
                     }
                 }
             } label: {
-                if let selectedDate = selections.date {
-                    VStack(alignment: .leading) {
-                        Text("Shared.\(selectedDate.id)th.Day")
-                            .font(.caption)
-                            .bold()
-                        Text(selectedDate.date, style: .date)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                HStack(spacing: 10.0) {
+                    if let selectedDateDate = selections.date?.date {
+                        let calendarDate = Calendar.current.dateComponents(
+                            [.day, .year, .month],
+                            from: selectedDateDate
+                        )
+                        Image(systemName: "\(calendarDate.day?.description ?? "ellipsis").calendar")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(height: 20.0)
                     }
-                    .id(selectedDate.id)
-                } else {
-                    Text("Shared.\(0)th.Day")
+                    if let selectedDate = selections.date {
+                        VStack(alignment: .leading) {
+                            Text("Shared.\(selectedDate.id)th.Day")
+                                .font(.caption)
+                                .bold()
+                            Text(selectedDate.date, style: .date)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } else {
+                        // TODO
+                    }
                 }
             }
             .padding([.leading], 12.0)
@@ -65,11 +76,13 @@ struct UnifiedControl: View {
                 }
                 .padding([.top, .bottom], 12.0)
                 .padding([.leading, .trailing], 16.0)
+                .foregroundStyle(.white)
             }
             .background(accentColorForMap(selections.map))
             .clipShape(.capsule)
         }
         .padding(6.0)
+        .id(selections.idMap)
     }
 
     func accentColorForMap(_ map: ComiketMap?) -> Color? {

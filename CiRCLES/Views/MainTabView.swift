@@ -119,6 +119,13 @@ struct MainTabView: View {
                         await loadFavorites()
                         await MainActor.run {
                             oasis.close()
+                            // Set initial selections
+                            if selections.date == nil {
+                                selections.date = selections.fetchDateSelection(with: 1)
+                            }
+                            if selections.map == nil {
+                                selections.map = selections.fetchMapSelection(with: 0)
+                            }
                             isReloadingData = false
                         }
                     }
