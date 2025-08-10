@@ -16,7 +16,15 @@
       "blur-material" : 1,
       "layers" : [
         {
-          "blend-mode" : "normal",
+          "blend-mode-specializations" : [
+            {
+              "value" : "normal"
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "lighten"
+            }
+          ],
           "fill-specializations" : [
             {
               "value" : {
@@ -25,7 +33,12 @@
             },
             {
               "appearance" : "tinted",
-              "value" : "automatic"
+              "value" : {
+                "linear-gradient" : [
+                  "extended-gray:1.00000,1.00000",
+                  "srgb:0.52157,0.52157,0.52157,1.00000"
+                ]
+              }
             }
           ],
           "glass" : true,
@@ -33,16 +46,36 @@
           "name" : "Cloud3"
         },
         {
-          "fill" : {
-            "automatic-gradient" : "extended-gray:1.00000,1.00000"
-          },
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-gray:1.00000,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "srgb:0.52157,0.52157,0.52157,1.00000"
+              }
+            }
+          ],
           "image-name" : "Cloud2.svg",
           "name" : "Cloud2"
         },
         {
-          "fill" : {
-            "automatic-gradient" : "extended-gray:1.00000,1.00000"
-          },
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-gray:1.00000,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "srgb:0.52157,0.52157,0.52157,1.00000"
+              }
+            }
+          ],
           "image-name" : "Cloud1.svg",
           "name" : "Cloud1"
         }
