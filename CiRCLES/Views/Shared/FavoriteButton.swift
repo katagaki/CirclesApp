@@ -66,7 +66,7 @@ struct FavoriteButton: View {
                 }
             }
         }
-        .clipShape(.capsule(style: .continuous))
-        .buttonStyle(.borderedProminent)
+        .clipShape(.capsule)
+        .buttonStyle(.glassProminent)
     }
 }

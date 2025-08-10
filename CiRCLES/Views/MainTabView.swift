@@ -54,7 +54,7 @@ struct MainTabView: View {
                 MoreView()
             }
         }
-        .tabBarMinimizeBehavior(.automatic)
+        .tabBarMinimizeBehavior(.onScrollDown)
         .tabViewBottomAccessory {
             UnifiedControl()
         }

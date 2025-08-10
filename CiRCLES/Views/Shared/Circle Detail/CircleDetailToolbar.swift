@@ -46,14 +46,16 @@ struct CircleDetailToolbar: View {
                     }
                 }
                 HStack(spacing: 5.0) {
-                    if let twitterURL = extendedInformation.twitterURL {
-                        SNSButton(twitterURL, showsLabel: false, type: .twitter)
-                    }
-                    if let pixivURL = extendedInformation.pixivURL {
-                        SNSButton(pixivURL, showsLabel: false, type: .pixiv)
-                    }
-                    if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
-                        SNSButton(circleMsPortalURL, showsLabel: false, type: .circleMs)
+                    Group {
+                        if let twitterURL = extendedInformation.twitterURL {
+                            SNSButton(twitterURL, showsLabel: false, type: .twitter)
+                        }
+                        if let pixivURL = extendedInformation.pixivURL {
+                            SNSButton(pixivURL, showsLabel: false, type: .pixiv)
+                        }
+                        if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
+                            SNSButton(circleMsPortalURL, showsLabel: false, type: .circleMs)
+                        }
                     }
                 }
                 if let webCatalogInformation {
@@ -63,6 +65,7 @@ struct CircleDetailToolbar: View {
                                 openURL(url)
                             }
                         }
+                        .glassEffect()
                     }
                 }
             }

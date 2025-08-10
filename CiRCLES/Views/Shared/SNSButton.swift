@@ -37,7 +37,7 @@ struct SNSButton: View {
                     }
                 }
                 .foregroundStyle(.background)
-                .tint(.primary)
+                .glassEffect(.regular.tint(.primary))
             case .pixiv:
                 Button {
                     var urlToOpen: URL = url
@@ -63,7 +63,7 @@ struct SNSButton: View {
                     }
                 }
                 .foregroundStyle(.white)
-                .tint(.blue)
+                .glassEffect(.regular.tint(.blue))
             case .circleMs:
                 Button {
                     openURL(url)
@@ -77,10 +77,10 @@ struct SNSButton: View {
                     }
                 }
                 .foregroundStyle(.white)
-                .tint(.green)
+                .glassEffect(.regular.tint(.green))
             }
         }
-        .buttonStyle(.borderedProminent)
+        .buttonStyle(.glass)
         .clipShape(showsLabel ? AnyShape(.capsule(style: .continuous)) : AnyShape(.circle))
     }
 }
