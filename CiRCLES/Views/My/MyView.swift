@@ -112,21 +112,12 @@ struct MyView: View {
                 .listSectionSpacing(.compact)
                 .scrollContentBackground(.hidden)
             }
-            .navigationTitle("ViewTitle.My")
+            .navigationTitle(eventTitle ?? String(localized: "ViewTitle.My"))
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbarBackground(.visible, for: .tabBar)
             .toolbar {
                 if UIDevice.current.userInterfaceIdiom != .pad {
-                    ToolbarItem(placement: .principal) {
-                        VStack(alignment: .center) {
-                            Text(eventTitle ?? String(localized: "ViewTitle.My"))
-                                .fontWeight(.bold)
-                                .frame(maxWidth: .infinity)
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .contentShape(.rect)
-                        .onTapGesture {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button(eventTitle ?? String(localized: "ViewTitle.My"), systemImage: "photo") {
                             withAnimation(.smooth.speed(2.0)) {
                                 isShowingEventCoverImage.toggle()
                             }
@@ -154,12 +145,10 @@ struct MyView: View {
                 .ignoresSafeArea()
             }
             .safeAreaInset(edge: .top, spacing: 0.0) {
-                BarAccessory(placement: .top) {
-                    EventCoverImageAccessory(
-                        isShowing: $isShowingEventCoverImage,
-                        image: $eventCoverImage
-                    )
-                }
+                EventCoverImageAccessory(
+                    isShowing: $isShowingEventCoverImage,
+                    image: $eventCoverImage
+                )
             }
             #if !os(visionOS)
             .sheet(isPresented: $isDeletingAccount) {

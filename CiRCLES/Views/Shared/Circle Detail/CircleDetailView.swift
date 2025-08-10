@@ -118,7 +118,6 @@ struct CircleDetailView: View {
         .listSectionSpacing(.compact)
         .navigationTitle(circle.circleName)
         .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.hidden, for: .tabBar)
         .toolbar {
             ToolbarItem(placement: .principal) {
                 VStack(spacing: 0.0) {

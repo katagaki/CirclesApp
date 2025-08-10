@@ -25,40 +25,20 @@ struct FavoriteButton: View {
 
     var body: some View {
         Group {
-            if isFavorited() {
-                Button {
-                    onSelect()
-                } label: {
-                    HStack(alignment: .center) {
-                        if let color {
-                            Circle()
-                                .frame(width: 16.0, height: 16.0)
-                                .foregroundStyle(color)
-                                .overlay {
-                                    Circle()
-                                        .stroke(Color.white, lineWidth: 1.5)
-                                }
-                        }
-                        Image(systemName: "star.fill")
-                            .resizable()
-                            .padding(2.0)
-                            .frame(width: 28.0, height: 28.0)
-                            .scaledToFit()
+            Button {
+                onSelect()
+            } label: {
+                HStack(alignment: .center) {
+                    Image(systemName: "star.fill")
+                        .resizable()
+                        .padding(2.0)
+                        .frame(width: 28.0, height: 28.0)
+                        .scaledToFit()
+                    if isFavorited() {
                         Text("Shared.EditFavorites")
                             .fontWeight(.medium)
                             .padding(.vertical, 5.0)
-                    }
-                }
-            } else {
-                Button {
-                    onSelect()
-                } label: {
-                    HStack(alignment: .center) {
-                        Image(systemName: "star.fill")
-                            .resizable()
-                            .padding(2.0)
-                            .frame(width: 28.0, height: 28.0)
-                            .scaledToFit()
+                    } else {
                         Text("Shared.AddToFavorites")
                             .fontWeight(.medium)
                             .padding(.vertical, 5.0)
@@ -68,5 +48,6 @@ struct FavoriteButton: View {
         }
         .clipShape(.capsule)
         .buttonStyle(.glassProminent)
+        .tint(color?.secondary)
     }
 }

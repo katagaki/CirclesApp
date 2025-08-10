@@ -97,7 +97,6 @@ struct CatalogView: View {
                 }
             }
             .navigationTitle("ViewTitle.Circles")
-            .toolbarBackground(.hidden, for: .tabBar)
             .toolbar {
                 if displayModeState == .list {
                     ToolbarItem {

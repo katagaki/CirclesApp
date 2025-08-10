@@ -105,6 +105,9 @@ struct InteractiveMap: View {
                 )
             }
         }
+        .onAppear {
+            reloadAll()
+        }
         .onChange(of: database.commonImages) { _, _ in
             reloadAll()
         }

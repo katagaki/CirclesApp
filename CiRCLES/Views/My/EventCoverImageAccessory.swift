@@ -25,15 +25,15 @@ struct EventCoverImageAccessory: View {
                         }
                         .padding()
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    Image(.arrow)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: .infinity, maxHeight: 10.0, alignment: .center)
+                        .rotationEffect(isShowing ? Angle.degrees(180.0) : Angle.degrees(0.0))
                 }
-                Image(.arrow)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity, maxHeight: 10.0, alignment: .center)
-                    .rotationEffect(isShowing ? Angle.degrees(180.0) : Angle.degrees(0.0))
             }
         }
-        .padding(.bottom, bottomPadding())
+        .padding(.bottom)
         .contentShape(.rect)
         .onTapGesture {
             if image != nil {
