@@ -18,35 +18,25 @@ struct CircleBlockPill: View {
     }
 
     var body: some View {
-        switch size {
-        case .large:
-            Text(text)
-                .font(.title3)
-                .fontWeight(.semibold)
-                .foregroundStyle(Color(uiColor: UIColor.label))
-                .padding(.vertical, 2.0)
-                .padding(.horizontal, 10.0)
-                .background(.background.opacity(0.8))
-                .clipShape(.capsule(style: .continuous))
-                .overlay {
-                    Capsule()
-                        .stroke(lineWidth: 1)
-                        .foregroundColor(.secondary)
-                }
-        case .small:
-            Text(text)
-                .font(.caption)
-                .fontWeight(.semibold)
-                .foregroundStyle(Color(uiColor: UIColor.label))
-                .padding(.vertical, 2.0)
-                .padding(.horizontal, 6.0)
-                .background(.background.opacity(0.8))
-                .clipShape(.capsule(style: .continuous))
-                .overlay {
-                    Capsule()
-                        .stroke(lineWidth: 1)
-                        .foregroundColor(.secondary)
-                }
+        Group {
+            switch size {
+            case .large:
+                Text(text)
+                    .font(.title3)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color(uiColor: UIColor.label))
+                    .padding(.vertical, 2.0)
+                    .padding(.horizontal, 10.0)
+            case .small:
+                Text(text)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(Color(uiColor: UIColor.label))
+                    .padding(.vertical, 2.0)
+                    .padding(.horizontal, 6.0)
+            }
         }
+        .clipShape(.capsule)
+        .glassEffect()
     }
 }
