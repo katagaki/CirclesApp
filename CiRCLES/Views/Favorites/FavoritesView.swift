@@ -92,12 +92,10 @@ struct FavoritesView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                BarAccessory(placement: .bottom) {
-                    FavoritesToolbar(
-                        isVisitModeOn: $isVisitModeOn,
-                        isGroupedByColor: $isGroupedByColor
-                    )
-                }
+                FavoritesToolbar(
+                    isVisitModeOn: $isVisitModeOn,
+                    isGroupedByColor: $isGroupedByColor
+                )
             }
             .refreshable {
                 await reloadFavorites()

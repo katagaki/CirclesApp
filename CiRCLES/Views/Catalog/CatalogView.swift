@@ -138,8 +138,10 @@ struct CatalogView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                CatalogToolbar(displayedCircles: $displayedCircles)
-                    .disabled(searchTerm.trimmingCharacters(in: .whitespaces).count >= 2)
+                if searchTerm.trimmingCharacters(in: .whitespaces).count < 2 {
+                    CatalogToolbar(displayedCircles: $displayedCircles)
+                        .transition(.opacity.animation(.snappy.speed(2.0)))
+                }
             }
             .searchable(text: $searchTerm,
                         placement: .navigationBarDrawer(displayMode: .always),
@@ -148,6 +150,11 @@ struct CatalogView: View {
                 if !isInitialLoadCompleted {
                     displayModeState = displayMode
                     listDisplayModeState = listDisplayMode
+                    reloadDisplayedCircles(
+                        genreID: selections.genre?.id,
+                        mapID: selections.map?.id,
+                        blockID: selections.block?.id
+                    )
                     isInitialLoadCompleted = true
                 }
             }

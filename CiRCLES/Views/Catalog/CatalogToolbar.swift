@@ -61,7 +61,7 @@ struct CatalogToolbar: View {
                 }
                 .glassEffect()
             }
-            .padding(.horizontal, 12.0)
+            .padding(.horizontal)
             .padding(.vertical, 12.0)
         }
         .scrollIndicators(.hidden)
