@@ -19,7 +19,7 @@ struct UnifiedControl: View {
     var maps: [ComiketMap]
 
     var body: some View {
-        HStack(spacing: 12.0) {
+        HStack {
             Menu {
                 ForEach(dates, id: \.id) { date in
                     Button("Shared.\(date.id)th.Day",
@@ -29,16 +29,6 @@ struct UnifiedControl: View {
                 }
             } label: {
                 HStack(spacing: 10.0) {
-                    if let selectedDateDate = selections.date?.date {
-                        let calendarDate = Calendar.current.dateComponents(
-                            [.day, .year, .month],
-                            from: selectedDateDate
-                        )
-                        Image(systemName: "\(calendarDate.day?.description ?? "ellipsis").calendar")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 20.0)
-                    }
                     if let selectedDate = selections.date {
                         VStack(alignment: .leading) {
                             Text("Shared.\(selectedDate.id)th.Day")
