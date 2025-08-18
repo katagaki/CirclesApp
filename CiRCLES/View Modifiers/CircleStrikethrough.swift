@@ -10,7 +10,7 @@ import SwiftUI
 
 struct CircleStrikethrough: ViewModifier {
 
-    @Environment(Planner.self) var planner
+    @Environment(Events.self) var planner
 
     @Query var visits: [CirclesVisitEntry]
 

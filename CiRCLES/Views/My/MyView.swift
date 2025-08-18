@@ -11,12 +11,12 @@ import SwiftUI
 
 struct MyView: View {
 
-    @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
     @Environment(\.openURL) var openURL
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
     @Environment(ImageCache.self) var imageCache
-    @Environment(Planner.self) var planner
+    @Environment(Events.self) var planner
+    @Environment(Sheets.self) var sheets
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -43,161 +43,159 @@ struct MyView: View {
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
 
     var body: some View {
-        NavigationStack(path: $navigator[.my]) {
-            HStack {
-                Group {
-                    if UIDevice.current.userInterfaceIdiom == .pad {
-                        List {
-                            if isInitialLoadCompleted {
-                                MyProfileSection(userInfo: $userInfo)
-                            }
-                            Section {
-                                Button("Shared.Logout") {
-                                    isGoingToSignOut = true
-                                }
-                                .contextMenu {
-                                    Button("Shared.LoginAgain", role: .destructive) {
-                                        authenticator.isAuthenticating = true
-                                    }
-                                }
-                            }
-                            Section {
-                                Button("More.DeleteAccount", role: .destructive) {
-                                    #if !os(visionOS)
-                                    isDeletingAccount = true
-                                    #else
-                                    openURL(URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
-                                    #endif
-                                }
-                            }
-                        }
-                    }
+        HStack {
+            Group {
+                if UIDevice.current.userInterfaceIdiom == .pad {
                     List {
                         if isInitialLoadCompleted {
-                            if UIDevice.current.userInterfaceIdiom != .pad {
-                                MyProfileSection(userInfo: $userInfo)
-                            }
-                            MyParticipationSections(
-                                eventTitle: $eventTitle,
-                                eventDates: $eventDates,
-                                dateForNotifier: $dateForNotifier,
-                                dayForNotifier: $dayForNotifier,
-                                participationForNotifier: $participationForNotifier
-                            )
-                            MyEventPickerSection()
+                            MyProfileSection(userInfo: $userInfo)
                         }
+                        Section {
+                            Button("Shared.Logout") {
+                                isGoingToSignOut = true
+                            }
+                            .contextMenu {
+                                Button("Shared.LoginAgain", role: .destructive) {
+                                    authenticator.isAuthenticating = true
+                                }
+                            }
+                        }
+                        Section {
+                            Button("More.DeleteAccount", role: .destructive) {
+                                #if !os(visionOS)
+                                isDeletingAccount = true
+                                #else
+                                openURL(URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
+                                #endif
+                            }
+                        }
+                    }
+                }
+                List {
+                    if isInitialLoadCompleted {
                         if UIDevice.current.userInterfaceIdiom != .pad {
-                            Section {
-                                Button("Shared.Logout") {
-                                    isGoingToSignOut = true
-                                }
-                                .contextMenu {
-                                    Button("Shared.LoginAgain", role: .destructive) {
-                                        authenticator.isAuthenticating = true
-                                    }
-                                }
+                            MyProfileSection(userInfo: $userInfo)
+                        }
+                        MyParticipationSections(
+                            eventTitle: $eventTitle,
+                            eventDates: $eventDates,
+                            dateForNotifier: $dateForNotifier,
+                            dayForNotifier: $dayForNotifier,
+                            participationForNotifier: $participationForNotifier
+                        )
+                        MyEventPickerSection()
+                    }
+                    if UIDevice.current.userInterfaceIdiom != .pad {
+                        Section {
+                            Button("Shared.Logout") {
+                                isGoingToSignOut = true
                             }
-                            Section {
-                                Button("More.DeleteAccount", role: .destructive) {
-                                    #if !os(visionOS)
-                                    isDeletingAccount = true
-                                    #else
-                                    openURL(URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
-                                    #endif
+                            .contextMenu {
+                                Button("Shared.LoginAgain", role: .destructive) {
+                                    authenticator.isAuthenticating = true
                                 }
                             }
                         }
-                    }
-                }
-                .listSectionSpacing(.compact)
-                .scrollContentBackground(.hidden)
-            }
-            .navigationTitle(eventTitle ?? String(localized: "ViewTitle.My"))
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                if UIDevice.current.userInterfaceIdiom != .pad {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button(eventTitle ?? String(localized: "ViewTitle.My"), systemImage: "photo") {
-                            withAnimation(.smooth.speed(2.0)) {
-                                isShowingEventCoverImage.toggle()
+                        Section {
+                            Button("More.DeleteAccount", role: .destructive) {
+                                #if !os(visionOS)
+                                isDeletingAccount = true
+                                #else
+                                openURL(URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
+                                #endif
                             }
                         }
                     }
                 }
             }
-            .background {
-                Group {
-                    if let eventCoverImage {
-                        Color(uiColor: eventCoverImage.accentColor)
-                            .opacity(0.2)
-                            .overlay {
-                                Image(uiImage: eventCoverImage)
-                                    .ignoresSafeArea()
-                                    .scaledToFill()
-                                    .opacity(0.1)
-                                    .blur(radius: 10.0)
-                            }
-                    } else {
-                        Color(uiColor: .systemGroupedBackground)
+            .listSectionSpacing(.compact)
+            .scrollContentBackground(.hidden)
+        }
+        .navigationTitle(eventTitle ?? String(localized: "ViewTitle.My"))
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if UIDevice.current.userInterfaceIdiom != .pad {
+                ToolbarItem(placement: .primaryAction) {
+                    Button(eventTitle ?? String(localized: "ViewTitle.My"), systemImage: "photo") {
+                        withAnimation(.smooth.speed(2.0)) {
+                            isShowingEventCoverImage.toggle()
+                        }
                     }
                 }
-                .animation(.smooth.speed(2.0), value: eventCoverImage)
+            }
+        }
+        .background {
+            Group {
+                if let eventCoverImage {
+                    Color(uiColor: eventCoverImage.accentColor)
+                        .opacity(0.2)
+                        .overlay {
+                            Image(uiImage: eventCoverImage)
+                                .ignoresSafeArea()
+                                .scaledToFill()
+                                .opacity(0.1)
+                                .blur(radius: 10.0)
+                        }
+                } else {
+                    Color(uiColor: .systemGroupedBackground)
+                }
+            }
+            .animation(.smooth.speed(2.0), value: eventCoverImage)
+            .ignoresSafeArea()
+        }
+        .safeAreaInset(edge: .top, spacing: 0.0) {
+            EventCoverImageAccessory(
+                isShowing: $isShowingEventCoverImage,
+                image: $eventCoverImage
+            )
+        }
+        #if !os(visionOS)
+        .sheet(isPresented: $isDeletingAccount) {
+            SafariView(url: URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
                 .ignoresSafeArea()
+        }
+        #endif
+        .sheet(item: $dateForNotifier) { date in
+            MyEventNotifierSheet(
+                date: date,
+                day: $dayForNotifier,
+                participation: $participationForNotifier
+            )
+        }
+        .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
+            Button("Shared.Logout", role: .destructive) {
+                logout()
             }
-            .safeAreaInset(edge: .top, spacing: 0.0) {
-                EventCoverImageAccessory(
-                    isShowing: $isShowingEventCoverImage,
-                    image: $eventCoverImage
-                )
+            Button("Shared.Cancel", role: .cancel) {
+                isGoingToSignOut = false
             }
-            #if !os(visionOS)
-            .sheet(isPresented: $isDeletingAccount) {
-                SafariView(url: URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
-                    .ignoresSafeArea()
-            }
-            #endif
-            .sheet(item: $dateForNotifier) { date in
-                MyEventNotifierSheet(
-                    date: date,
-                    day: $dayForNotifier,
-                    participation: $participationForNotifier
-                )
-            }
-            .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
-                Button("Shared.Logout", role: .destructive) {
-                    logout()
-                }
-                Button("Shared.Cancel", role: .cancel) {
-                    isGoingToSignOut = false
-                }
-            } message: {
-                Text("Alerts.Logout.Message")
-            }
-            .onAppear {
-                if !isInitialLoadCompleted {
-                    reloadDataInBackground()
-                }
-            }
-            .onChange(of: authenticator.token) { _, _ in
-                userInfo = nil
+        } message: {
+            Text("Alerts.Logout.Message")
+        }
+        .onAppear {
+            if !isInitialLoadCompleted {
                 reloadDataInBackground()
             }
-            .onChange(of: authenticator.onlineState) { _, _ in
+        }
+        .onChange(of: authenticator.token) { _, _ in
+            userInfo = nil
+            reloadDataInBackground()
+        }
+        .onChange(of: authenticator.onlineState) { _, _ in
+            reloadDataInBackground()
+        }
+        .onChange(of: isDatabaseInitialized) { _, newValue in
+            if newValue {
+                reloadDataInBackground(forceReload: true)
+            }
+        }
+        .onChange(of: database.commonImages) { _, _ in
+            // TODO: Improve race condition when My tab is the startup tab
+            if eventDates == nil {
                 reloadDataInBackground()
             }
-            .onChange(of: isDatabaseInitialized) { _, newValue in
-                if newValue {
-                    reloadDataInBackground(forceReload: true)
-                }
-            }
-            .onChange(of: database.commonImages) { _, _ in
-                // TODO: Improve race condition when My tab is the startup tab
-                if eventDates == nil {
-                    reloadDataInBackground()
-                }
-                withAnimation(.smooth.speed(2.0)) {
-                    eventCoverImage = database.coverImage()
-                }
+            withAnimation(.smooth.speed(2.0)) {
+                eventCoverImage = database.coverImage()
             }
         }
     }
@@ -255,12 +253,7 @@ struct MyView: View {
             let actor = DataConverter(modelContainer: sharedModelContainer)
             await actor.deleteAll()
             await MainActor.run {
-                navigator.popToRoot(for: .map)
-                navigator.popToRoot(for: .circles)
-                navigator.popToRoot(for: .favorites)
-                navigator.popToRoot(for: .my)
-                navigator.popToRoot(for: .more)
-                navigator.selectedTab = .map
+                sheets.close()
                 authenticator.resetAuthentication()
             }
         }

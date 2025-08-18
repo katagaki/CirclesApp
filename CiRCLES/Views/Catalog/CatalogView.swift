@@ -11,11 +11,11 @@ import SwiftUI
 
 struct CatalogView: View {
 
-    @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
     @Environment(UserSelections.self) var selections
+    @Environment(Sheets.self) var sheets
 
     @Environment(\.modelContext) var modelContext
 
@@ -48,147 +48,137 @@ struct CatalogView: View {
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
 
-    @Namespace var circlesNamespace
+    @Namespace var namespace
 
     var body: some View {
-        NavigationStack(path: $navigator[.circles]) {
-            ZStack(alignment: .center) {
-                if isLoading {
-                    ProgressView("Circles.Loading")
-                    Color.clear
-                } else {
-                    switch displayModeState {
-                    case .grid:
-                        if let searchedCircles {
-                            CircleGrid(circles: searchedCircles,
-                                       namespace: circlesNamespace) { circle in
-                                navigator.push(.circlesDetail(circle: circle), for: .circles)
-                            }
-                        } else {
-                            CircleGrid(circles: displayedCircles,
-                                       showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
-                                       namespace: circlesNamespace) { circle in
-                                navigator.push(.circlesDetail(circle: circle), for: .circles)
-                            }
+        ZStack(alignment: .center) {
+            if isLoading {
+                ProgressView("Circles.Loading")
+                Color.clear
+            } else {
+                switch displayModeState {
+                case .grid:
+                    if let searchedCircles {
+                        CircleGrid(circles: searchedCircles, namespace: namespace) { circle in
+                            sheets.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
-                    case .list:
-                        if let searchedCircles {
-                            CircleList(circles: searchedCircles,
-                                       displayMode: listDisplayModeState,
-                                       namespace: circlesNamespace) { circle in
-                                navigator.push(.circlesDetail(circle: circle), for: .circles)
-                            }
-                        } else {
-                            CircleList(circles: displayedCircles,
-                                       showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
-                                       displayMode: listDisplayModeState,
-                                       namespace: circlesNamespace) { circle in
-                                navigator.push(.circlesDetail(circle: circle), for: .circles)
-                            }
+                    } else {
+                        CircleGrid(circles: displayedCircles,
+                                   showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
+                                   namespace: namespace) { circle in
+                            sheets.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
                     }
-                    if selections.genre == nil && selections.map == nil && searchedCircles == nil {
-                        ContentUnavailableView(
-                            "Circles.NoFilterSelected",
-                            systemImage: "questionmark.square.dashed",
-                            description: Text("Circles.NoFilterSelected.Description")
-                        )
+                case .list:
+                    if let searchedCircles {
+                        CircleList(circles: searchedCircles,
+                                   displayMode: listDisplayModeState,
+                                   namespace: namespace) { circle in
+                            sheets.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
+                        }
+                    } else {
+                        CircleList(circles: displayedCircles,
+                                   showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
+                                   displayMode: listDisplayModeState,
+                                   namespace: namespace) { circle in
+                            sheets.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
+                        }
                     }
+                }
+                if selections.genre == nil && selections.map == nil && searchedCircles == nil {
+                    ContentUnavailableView(
+                        "Circles.NoFilterSelected",
+                        systemImage: "questionmark.square.dashed",
+                        description: Text("Circles.NoFilterSelected.Description")
+                    )
                 }
             }
-            .navigationTitle("ViewTitle.Circles")
-            .toolbar {
-                if displayModeState == .list {
-                    ToolbarItem {
-                        Button {
-                            withAnimation(.smooth.speed(2.0)) {
-                                switch listDisplayModeState {
-                                case .regular: listDisplayModeState = .compact
-                                case .compact: listDisplayModeState = .regular
-                                }
-                            }
-                        } label: {
-                            switch listDisplayMode {
-                            case .regular:
-                                Label("Shared.DisplayMode.List.Compact", systemImage: "rectangle.compress.vertical")
-                            case .compact:
-                                Label("Shared.DisplayMode.List.Regular", systemImage: "rectangle.expand.vertical")
-                            }
-                        }
-                    }
-                    ToolbarSpacer()
-                }
+        }
+        .navigationTitle("ViewTitle.Circles")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            if displayModeState == .list {
                 ToolbarItem {
                     Button {
                         withAnimation(.smooth.speed(2.0)) {
-                            switch displayModeState {
-                            case .grid: displayModeState = .list
-                            case .list: displayModeState = .grid
+                            switch listDisplayModeState {
+                            case .regular: listDisplayModeState = .compact
+                            case .compact: listDisplayModeState = .regular
                             }
                         }
                     } label: {
-                        switch displayModeState {
-                        case .grid:
-                            Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
-                        case .list:
-                            Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
+                        switch listDisplayMode {
+                        case .regular:
+                            Label("Shared.DisplayMode.List.Compact", systemImage: "rectangle.compress.vertical")
+                        case .compact:
+                            Label("Shared.DisplayMode.List.Regular", systemImage: "rectangle.expand.vertical")
                         }
                     }
                 }
+                ToolbarSpacer()
             }
-            .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                if searchTerm.trimmingCharacters(in: .whitespaces).count < 2 {
-                    CatalogToolbar(displayedCircles: $displayedCircles)
-                        .transition(.opacity.animation(.snappy.speed(2.0)))
+            ToolbarItem {
+                Button {
+                    withAnimation(.smooth.speed(2.0)) {
+                        switch displayModeState {
+                        case .grid: displayModeState = .list
+                        case .list: displayModeState = .grid
+                        }
+                    }
+                } label: {
+                    switch displayModeState {
+                    case .grid:
+                        Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
+                    case .list:
+                        Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
+                    }
                 }
             }
-            .searchable(text: $searchTerm,
-                        placement: .navigationBarDrawer(displayMode: .always),
-                        prompt: "Circles.Search.Prompt")
-            .onAppear {
-                if !isInitialLoadCompleted {
-                    displayModeState = displayMode
-                    listDisplayModeState = listDisplayMode
-                    reloadDisplayedCircles(
-                        genreID: selections.genre?.id,
-                        mapID: selections.map?.id,
-                        blockID: selections.block?.id
-                    )
-                    isInitialLoadCompleted = true
-                }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0.0) {
+            if searchTerm.trimmingCharacters(in: .whitespaces).count < 2 {
+                CatalogToolbar(displayedCircles: $displayedCircles)
+                    .transition(.opacity.animation(.snappy.speed(2.0)))
             }
-            .onChange(of: selections.idMap) { _, _ in
-                if isInitialLoadCompleted {
-                    reloadDisplayedCircles(
-                        genreID: selections.genre?.id,
-                        mapID: selections.map?.id,
-                        blockID: selections.block?.id
-                    )
-                }
+        }
+        .searchable(text: $searchTerm,
+                    placement: .navigationBarDrawer(displayMode: .always),
+                    prompt: "Circles.Search.Prompt")
+        .onAppear {
+            if !isInitialLoadCompleted {
+                displayModeState = displayMode
+                listDisplayModeState = listDisplayMode
+                reloadDisplayedCircles(
+                    genreID: selections.genre?.id,
+                    mapID: selections.map?.id,
+                    blockID: selections.block?.id
+                )
+                isInitialLoadCompleted = true
             }
-            .onChange(of: searchTerm) { _, _ in
-                Task.detached {
-                    await searchCircles()
-                }
+        }
+        .onChange(of: selections.idMap) { _, _ in
+            if isInitialLoadCompleted {
+                reloadDisplayedCircles(
+                    genreID: selections.genre?.id,
+                    mapID: selections.map?.id,
+                    blockID: selections.block?.id
+                )
             }
-            .onChange(of: displayModeState) { _, _ in
-                displayMode = displayModeState
+        }
+        .onChange(of: searchTerm) { _, _ in
+            Task.detached {
+                await searchCircles()
             }
-            .onChange(of: listDisplayModeState) { _, _ in
-                listDisplayMode = listDisplayModeState
-            }
-            .onChange(of: isDatabaseInitialized) { _, newValue in
-                if !newValue {
-                    displayedCircles.removeAll()
-                }
-            }
-            .navigationDestination(for: ViewPath.self) { viewPath in
-                switch viewPath {
-                case .circlesDetail(let circle):
-                    CircleDetailView(circle: circle)
-                        .automaticNavigationTransition(id: circle.id, in: circlesNamespace)
-                default: Color.clear
-                }
+        }
+        .onChange(of: displayModeState) { _, _ in
+            displayMode = displayModeState
+        }
+        .onChange(of: listDisplayModeState) { _, _ in
+            listDisplayMode = listDisplayModeState
+        }
+        .onChange(of: isDatabaseInitialized) { _, newValue in
+            if !newValue {
+                displayedCircles.removeAll()
             }
         }
     }

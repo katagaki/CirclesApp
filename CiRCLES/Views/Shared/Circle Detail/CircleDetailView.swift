@@ -15,7 +15,7 @@ struct CircleDetailView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
-    @Environment(Planner.self) var planner
+    @Environment(Events.self) var planner
 
     @State var circle: ComiketCircle
 

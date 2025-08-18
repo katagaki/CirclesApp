@@ -10,7 +10,6 @@ import SwiftData
 import SwiftUI
 
 struct MoreView: View {
-    @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
 
@@ -21,94 +20,93 @@ struct MoreView: View {
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 
     var body: some View {
-        NavigationStack(path: $navigator[.more]) {
-            MoreList(repoName: "katagaki/CirclesApp", viewPath: ViewPath.moreAttributions) {
-                Section {
-                    Toggle("More.Customization.Map.UseHighDefinitionMap", isOn: $useHighResolutionMaps)
-                    Toggle("More.Customization.Map.UseDarkModeMap", isOn: $useDarkModeMaps)
-                } header: {
-                    ListSectionHeader(text: "More.Customization.Map")
-                }
-                Section {
-                    Toggle("More.Customization.Circles.ShowWebCut", isOn: $showWebCut)
-                    Toggle("More.Customization.Circles.ShowHallAndBlock", isOn: $showSpaceName)
-                    Toggle("More.Customization.Circles.ShowDay", isOn: $showDay)
-                } header: {
-                    ListSectionHeader(text: "More.Customization.Circles")
-                }
-                Section {
-                    switch Locale.current.language.languageCode {
-                    case .japanese:
-                        if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
-                            ExternalLink("maps://?saddr=現在地&daddr=東京ビッグサイト",
-                                         title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
-                        }
-                        if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
-                            ExternalLink("comgooglemaps://?saddr=現在地&daddr=東京ビッグサイト",
-                                         title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
-                        }
-                        if UIApplication.shared.canOpenURL(URL(string: "yjmap://")!) {
-                            ExternalLink("yjmap://route/train?from=現在地&to=東京ビッグサイト",
-                                         title: "More.Navigate.YahooMap", image: "ListIcon.YahooMap")
-                        }
-                    default:
-                        if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
-                            ExternalLink("maps://?saddr=Current+Location&daddr=Tokyo+Big+Sight",
-                                         title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
-                        }
-                        if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
-                            ExternalLink("comgooglemaps://?saddr=My+Location&daddr=Tokyo+Big+Sight",
-                                         title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
-                        }
-                    }
-                } header: {
-                    ListSectionHeader(text: "More.Navigate")
-                }
-                Section {
-                    switch Locale.current.language.languageCode {
-                    case .japanese:
-                        SafariLink("https://webcatalog.circle.ms",
-                                   title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
-                        SafariLink("https://comiket.co.jp",
-                                   title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
-                        SafariLink("https://www.bigsight.jp/visitor/floormap/",
-                                   title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
-                    default:
-                        SafariLink("https://int.webcatalog.circle.ms/en/catalog",
-                                   title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
-                        SafariLink("https://comiket.co.jp",
-                                   title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
-                        SafariLink("https://www.bigsight.jp/english/visitor/floormap/",
-                                   title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
-                    }
-                } header: {
-                    ListSectionHeader(text: "More.UsefulResources")
-                }
-                Section {
-                    NavigationLink(value: ViewPath.moreDBAdmin) {
-                        ListRow(image: "ListIcon.MasterDB", title: "More.DBAdmin.ManageDB")
-                    }
-                } header: {
-                    ListSectionHeader(text: "More.DBAdmin")
-                }
-                Section {
-                    VStack(alignment: .leading, spacing: 20.0) {
-                        Text("More.ProvidedBy")
-                        Text("More.Disclaimer")
-                    }
-                    .font(.body)
-                    .foregroundStyle(.secondary)
-                    .padding(.top, 20.0)
-                    .listRowBackground(Color.clear)
-                }
+        MoreList(repoName: "katagaki/CirclesApp", viewPath: UnifiedPath.moreAttributions) {
+            Section {
+                Toggle("More.Customization.Map.UseHighDefinitionMap", isOn: $useHighResolutionMaps)
+                Toggle("More.Customization.Map.UseDarkModeMap", isOn: $useDarkModeMaps)
+            } header: {
+                ListSectionHeader(text: "More.Customization.Map")
             }
-            .listSectionSpacing(.compact)
-            .navigationDestination(for: ViewPath.self) { viewPath in
-                switch viewPath {
-                case .moreDBAdmin: MoreDatabaseAdministratiion()
-                case .moreAttributions:
-                    LicensesView(licenses: [
-                        License(libraryName: "KeychainAccess", text: """
+            Section {
+                Toggle("More.Customization.Circles.ShowWebCut", isOn: $showWebCut)
+                Toggle("More.Customization.Circles.ShowHallAndBlock", isOn: $showSpaceName)
+                Toggle("More.Customization.Circles.ShowDay", isOn: $showDay)
+            } header: {
+                ListSectionHeader(text: "More.Customization.Circles")
+            }
+            Section {
+                switch Locale.current.language.languageCode {
+                case .japanese:
+                    if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
+                        ExternalLink("maps://?saddr=現在地&daddr=東京ビッグサイト",
+                                     title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
+                    }
+                    if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
+                        ExternalLink("comgooglemaps://?saddr=現在地&daddr=東京ビッグサイト",
+                                     title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
+                    }
+                    if UIApplication.shared.canOpenURL(URL(string: "yjmap://")!) {
+                        ExternalLink("yjmap://route/train?from=現在地&to=東京ビッグサイト",
+                                     title: "More.Navigate.YahooMap", image: "ListIcon.YahooMap")
+                    }
+                default:
+                    if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
+                        ExternalLink("maps://?saddr=Current+Location&daddr=Tokyo+Big+Sight",
+                                     title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
+                    }
+                    if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
+                        ExternalLink("comgooglemaps://?saddr=My+Location&daddr=Tokyo+Big+Sight",
+                                     title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
+                    }
+                }
+            } header: {
+                ListSectionHeader(text: "More.Navigate")
+            }
+            Section {
+                switch Locale.current.language.languageCode {
+                case .japanese:
+                    SafariLink("https://webcatalog.circle.ms",
+                               title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
+                    SafariLink("https://comiket.co.jp",
+                               title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
+                    SafariLink("https://www.bigsight.jp/visitor/floormap/",
+                               title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
+                default:
+                    SafariLink("https://int.webcatalog.circle.ms/en/catalog",
+                               title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
+                    SafariLink("https://comiket.co.jp",
+                               title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
+                    SafariLink("https://www.bigsight.jp/english/visitor/floormap/",
+                               title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
+                }
+            } header: {
+                ListSectionHeader(text: "More.UsefulResources")
+            }
+            Section {
+                NavigationLink(value: UnifiedPath.moreDBAdmin) {
+                    ListRow(image: "ListIcon.MasterDB", title: "More.DBAdmin.ManageDB")
+                }
+            } header: {
+                ListSectionHeader(text: "More.DBAdmin")
+            }
+            Section {
+                VStack(alignment: .leading, spacing: 20.0) {
+                    Text("More.ProvidedBy")
+                    Text("More.Disclaimer")
+                }
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .padding(.top, 20.0)
+                .listRowBackground(Color.clear)
+            }
+        }
+        .listSectionSpacing(.compact)
+        .navigationDestination(for: UnifiedPath.self) { path in
+            switch path {
+            case .moreDBAdmin: MoreDatabaseAdministratiion()
+            case .moreAttributions:
+                LicensesView(licenses: [
+                    License(libraryName: "KeychainAccess", text: """
 The MIT License (MIT)
 
 Copyright (c) 2014 kishikawa katsumi
@@ -131,24 +129,24 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """),
-                        License(libraryName: "libwebp", text: """
+                    License(libraryName: "libwebp", text: """
 Copyright (c) 2010, Google Inc. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
 
-  * Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
+* Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
 
-  * Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in
-    the documentation and/or other materials provided with the
-    distribution.
+* Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in
+the documentation and/or other materials provided with the
+distribution.
 
-  * Neither the name of Google nor the names of its contributors may
-    be used to endorse or promote products derived from this software
-    without specific prior written permission.
+* Neither the name of Google nor the names of its contributors may
+be used to endorse or promote products derived from this software
+without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -162,7 +160,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """),
-                        License(libraryName: "Reachability.swift", text: """
+                    License(libraryName: "Reachability.swift", text: """
 Copyright (c) 2016 Ashley Mills
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -183,7 +181,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """),
-                        License(libraryName: "SQlite.swift", text: """
+                    License(libraryName: "SQlite.swift", text: """
 (The MIT License)
 
 Copyright (c) 2014-2015 Stephen Celis (<stephen@stephencelis.com>)
@@ -206,7 +204,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """),
-                        License(libraryName: "Swift-WebP", text: """
+                    License(libraryName: "Swift-WebP", text: """
 MIT License
 
 Copyright (c) 2016 Satoshi Namai
@@ -229,7 +227,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """),
-                        License(libraryName: "ZIPFoundation", text: """
+                    License(libraryName: "ZIPFoundation", text: """
 MIT License
 
 Copyright (c) 2017-2024 Thomas Zoechling (https://www.peakstep.com)
@@ -252,9 +250,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """)
-                    ])
-                default: Color.clear
-                }
+                ])
+            default: Color.clear
             }
         }
     }

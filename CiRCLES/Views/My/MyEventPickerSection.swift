@@ -11,7 +11,7 @@ import SwiftUI
 struct MyEventPickerSection: View {
 
     @Environment(Authenticator.self) var authenticator
-    @Environment(Planner.self) var planner
+    @Environment(Events.self) var planner
 
     @State var activeEventNumber: Int = -1
 

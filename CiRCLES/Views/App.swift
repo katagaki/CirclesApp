@@ -15,57 +15,51 @@ struct CirclesApp: App {
 
     @Environment(\.scenePhase) private var scenePhase
 
-    @StateObject var navigator = Navigator<TabType, ViewPath>()
     @State var orientation = Orientation()
-
     @State var authenticator = Authenticator()
     @State var favorites = Favorites()
     @State var database = Database()
     @State var imageCache = ImageCache()
-    @State var planner = Planner()
+    @State var planner = Events()
     @State var oasis = Oasis()
     @State var selections = UserSelections()
+    @State var sheets = Sheets()
 
     @State var hasAppLaunchedForTheFirstTime: Bool = false
 
     var body: some Scene {
         WindowGroup {
-            MainTabView()
-                .onOpenURL { url in
-                    if url.absoluteString == circleMsCancelURLSchema {
-                        authenticator.isWaitingForAuthenticationCode = false
-                    } else {
-                        authenticator.getAuthenticationCode(from: url)
+            Group {
+                UnifiedView()
+                // MainTabView()
+            }
+            .overlay {
+                if authenticator.onlineState == .offline {
+                    ZStack(alignment: .top) {
+                        Color.clear
+                        LinearGradient(colors: [.pink.opacity(0.3), .clear], startPoint: .top, endPoint: .bottom)
+                            .frame(height: 24.0)
+                            .frame(maxWidth: .infinity)
+                            .ignoresSafeArea()
+                            .transition(.move(edge: .top).animation(.smooth.speed(2.0)))
                     }
                 }
-                .overlay {
-                    if authenticator.onlineState == .offline {
-                        ZStack(alignment: .top) {
-                            Color.clear
-                            LinearGradient(colors: [.pink.opacity(0.3), .clear], startPoint: .top, endPoint: .bottom)
-                                .frame(height: 24.0)
-                                .frame(maxWidth: .infinity)
-                                .ignoresSafeArea()
-                                .transition(.move(edge: .top).animation(.smooth.speed(2.0)))
-                        }
-                    }
-                }
-                .progressAlert(
-                    isModal: $oasis.isModal,
-                    isShowing: $oasis.isShowing,
-                    headerText: $oasis.headerText,
-                    bodyText: $oasis.bodyText,
-                    progress: $oasis.progress
-                )
-                .onAppear {
-                    orientation.update()
-                }
-                .onRotate { newOrientation in
-                    orientation.update(to: newOrientation)
-                }
+            }
+            .progressAlert(
+                isModal: $oasis.isModal,
+                isShowing: $oasis.isShowing,
+                headerText: $oasis.headerText,
+                bodyText: $oasis.bodyText,
+                progress: $oasis.progress
+            )
+            .onAppear {
+                orientation.update()
+            }
+            .onRotate { newOrientation in
+                orientation.update(to: newOrientation)
+            }
         }
         .modelContainer(sharedModelContainer)
-        .environmentObject(navigator)
         .environment(orientation)
         .environment(authenticator)
         .environment(favorites)
@@ -74,6 +68,7 @@ struct CirclesApp: App {
         .environment(planner)
         .environment(oasis)
         .environment(selections)
+        .environment(sheets)
         .onChange(of: scenePhase) { _, newValue in
             if !hasAppLaunchedForTheFirstTime {
                 hasAppLaunchedForTheFirstTime = true
@@ -107,9 +102,6 @@ struct CirclesApp: App {
         }
         .onChange(of: planner.participation) { _, _ in
             planner.participationUserDefault = planner.participation
-        }
-        .onChange(of: navigator.selectedTab) { _, _ in
-            navigator.saveToDefaults()
         }
         .backgroundTask(.appRefresh("RefreshAuthToken")) {
             await authenticator.refreshAuthenticationToken()

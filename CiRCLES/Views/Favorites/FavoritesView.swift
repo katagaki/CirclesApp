@@ -13,12 +13,12 @@ struct FavoritesView: View {
 
     @Environment(\.modelContext) var modelContext
 
-    @EnvironmentObject var navigator: Navigator<TabType, ViewPath>
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
-    @Environment(Planner.self) var planner
+    @Environment(Events.self) var planner
     @Environment(UserSelections.self) var selections
+    @Environment(Sheets.self) var sheets
 
     @State var favoriteCircles: [String: [ComiketCircle]]?
 
@@ -33,119 +33,116 @@ struct FavoritesView: View {
 
     @State var isInitialLoadCompleted: Bool = false
 
-    @Namespace var favoritesNamespace
+    @Namespace var namespace
 
     var body: some View {
-        NavigationStack(path: $navigator[.favorites]) {
-            ZStack(alignment: .center) {
-                if let favoriteCircles {
-                    Group {
-                        if isGroupedByColor {
-                            ColorGroupedCircleGrid(
-                                groups: favoriteCircles,
-                                showsOverlayWhenEmpty: false,
-                                namespace: favoritesNamespace
-                            ) { circle in
-                                if !isVisitModeOn {
-                                    navigator.push(.circlesDetail(circle: circle), for: .favorites)
-                                } else {
-                                    let circleID = circle.id
-                                    let eventNumber = planner.activeEventNumber
-                                    Task.detached {
-                                        let actor = VisitActor(modelContainer: sharedModelContainer)
-                                        await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
-                                    }
+        ZStack(alignment: .center) {
+            if let favoriteCircles {
+                Group {
+                    if isGroupedByColor {
+                        ColorGroupedCircleGrid(
+                            groups: favoriteCircles,
+                            showsOverlayWhenEmpty: false,
+                            namespace: namespace
+                        ) { circle in
+                            if !isVisitModeOn {
+                                sheets.append(.namespacedCircleDetail(
+                                    circle: circle,
+                                    previousCircle: { previousCircle(for: $0) },
+                                    nextCircle: { nextCircle(for: $0) },
+                                    namespace: namespace
+                                ))
+                            } else {
+                                let circleID = circle.id
+                                let eventNumber = planner.activeEventNumber
+                                Task.detached {
+                                    let actor = VisitActor(modelContainer: sharedModelContainer)
+                                    await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
                                 }
                             }
-                        } else {
-                            CircleGrid(
-                                circles: favoriteCircles.values.flatMap({ $0 }).sorted(by: { $0.id < $1.id }),
-                                showsOverlayWhenEmpty: false,
-                                namespace: favoritesNamespace
-                            ) { circle in
-                                navigator.push(.circlesDetail(circle: circle), for: .favorites)
-                            }
                         }
-                    }
-                    .overlay {
-                        if favoriteCircles.isEmpty {
-                            ContentUnavailableView(
-                                "Favorites.NoFavorites",
-                                systemImage: "star.leadinghalf.filled",
-                                description: Text("Favorites.NoFavorites.Description")
-                            )
-                        }
-                    }
-                } else {
-                    ProgressView("Favorites.Loading")
-                        .frame(maxHeight: .infinity)
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .navigationTitle("ViewTitle.Favorites")
-            .overlay {
-                if isVisitModeOn {
-                    GradientBorder()
-                        .ignoresSafeArea(edges: .horizontal)
-                }
-            }
-            .safeAreaInset(edge: .bottom, spacing: 0.0) {
-                FavoritesToolbar(
-                    isVisitModeOn: $isVisitModeOn,
-                    isGroupedByColor: $isGroupedByColor
-                )
-            }
-            .refreshable {
-                await reloadFavorites()
-            }
-            .onAppear {
-                if !isInitialLoadCompleted {
-                    if favoriteCircles == nil, let favoriteItems = favorites.items {
-                        Task.detached {
-                            await prepareCircles(using: favoriteItems)
-                        }
-                    }
-                    isVisitModeOn = isVisitModeOnDefault
-                    isGroupedByColor = isGroupedByColorDefault
-                    isInitialLoadCompleted = true
-                }
-            }
-            .onChange(of: selections.date) { _, _ in
-                if isInitialLoadCompleted {
-                    if let favoriteItems = favorites.items {
-                        Task.detached {
-                            await prepareCircles(using: favoriteItems)
+                    } else {
+                        CircleGrid(
+                            circles: favoriteCircles.values.flatMap({ $0 }).sorted(by: { $0.id < $1.id }),
+                            showsOverlayWhenEmpty: false,
+                            namespace: namespace
+                        ) { circle in
+                            sheets.append(.namespacedCircleDetail(
+                                circle: circle,
+                                previousCircle: { previousCircle(for: $0) },
+                                nextCircle: { nextCircle(for: $0) },
+                                namespace: namespace
+                            ))
                         }
                     }
                 }
-            }
-            .onChange(of: isVisitModeOn) { _, _ in
-                if isInitialLoadCompleted {
-                    isVisitModeOnDefault = isVisitModeOn
+                .overlay {
+                    if favoriteCircles.isEmpty {
+                        ContentUnavailableView(
+                            "Favorites.NoFavorites",
+                            systemImage: "star.leadinghalf.filled",
+                            description: Text("Favorites.NoFavorites.Description")
+                        )
+                    }
                 }
+            } else {
+                ProgressView("Favorites.Loading")
+                    .frame(maxHeight: .infinity)
             }
-            .onChange(of: isGroupedByColor) { _, _ in
-                if isInitialLoadCompleted {
-                    isGroupedByColorDefault = isGroupedByColor
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .navigationTitle("ViewTitle.Favorites")
+        .navigationBarTitleDisplayMode(.inline)
+        .overlay {
+            if isVisitModeOn {
+                GradientBorder()
+                    .ignoresSafeArea(edges: .horizontal)
+            }
+        }
+        .safeAreaInset(edge: .bottom, spacing: 0.0) {
+            FavoritesToolbar(
+                isVisitModeOn: $isVisitModeOn,
+                isGroupedByColor: $isGroupedByColor
+            )
+        }
+        .refreshable {
+            await reloadFavorites()
+        }
+        .onAppear {
+            if !isInitialLoadCompleted {
+                if favoriteCircles == nil, let favoriteItems = favorites.items {
+                    Task.detached {
+                        await prepareCircles(using: favoriteItems)
+                    }
                 }
+                isVisitModeOn = isVisitModeOnDefault
+                isGroupedByColor = isGroupedByColorDefault
+                isInitialLoadCompleted = true
             }
-            .onChange(of: favorites.items) { _, _ in
+        }
+        .onChange(of: selections.date) { _, _ in
+            if isInitialLoadCompleted {
                 if let favoriteItems = favorites.items {
                     Task.detached {
                         await prepareCircles(using: favoriteItems)
                     }
                 }
             }
-            .navigationDestination(for: ViewPath.self) { viewPath in
-                switch viewPath {
-                case .circlesDetail(let circle):
-                    CircleDetailView(
-                        circle: circle,
-                        previousCircle: { previousCircle(for: $0) },
-                        nextCircle: { nextCircle(for: $0) }
-                    )
-                        .automaticNavigationTransition(id: circle.id, in: favoritesNamespace)
-                default: Color.clear
+        }
+        .onChange(of: isVisitModeOn) { _, _ in
+            if isInitialLoadCompleted {
+                isVisitModeOnDefault = isVisitModeOn
+            }
+        }
+        .onChange(of: isGroupedByColor) { _, _ in
+            if isInitialLoadCompleted {
+                isGroupedByColorDefault = isGroupedByColor
+            }
+        }
+        .onChange(of: favorites.items) { _, _ in
+            if let favoriteItems = favorites.items {
+                Task.detached {
+                    await prepareCircles(using: favoriteItems)
                 }
             }
         }

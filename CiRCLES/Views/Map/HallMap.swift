@@ -9,6 +9,9 @@ import SwiftUI
 
 struct HallMap: View {
 
+    @Environment(Database.self) var database
+    @Environment(Sheets.self) var sheets
+
     var image: UIImage
     @Binding var mappings: [LayoutCatalogMapping: [Int]]
     var spaceSize: Int
@@ -45,6 +48,8 @@ struct HallMap: View {
                 attachmentAnchor: .rect(.rect(popoverSourceRect))
             ) { _ in
                 InteractiveMapDetailPopover(webCatalogIDSet: $popoverWebCatalogIDSet)
+                    .environment(database)
+                    .environment(sheets)
             }
             .overlay {
                 // Selection highlight

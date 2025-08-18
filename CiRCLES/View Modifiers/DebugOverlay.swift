@@ -10,7 +10,7 @@ import SwiftUI
 #if DEBUG
 struct DebugOverlayModifier: ViewModifier {
     @Environment(Authenticator.self) var authenticator
-    @Environment(Planner.self) var planner
+    @Environment(Events.self) var planner
 
     func body(content: Content) -> some View {
         content
