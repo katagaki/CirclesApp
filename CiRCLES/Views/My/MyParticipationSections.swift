@@ -12,7 +12,7 @@ import SwiftUI
 struct MyParticipationSections: View {
 
     @Environment(\.openURL) var openURL
-    @Environment(Planner.self) var planner
+    @Environment(Events.self) var planner
 
     @Binding var eventTitle: String?
     @Binding var eventDates: [Int: Date]?

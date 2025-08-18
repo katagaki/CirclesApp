@@ -34,6 +34,7 @@ struct UnifiedControl: View {
                             Text("Shared.\(selectedDate.id)th.Day")
                                 .font(.caption)
                                 .bold()
+                                .foregroundStyle(.primary)
                             Text(selectedDate.date, style: .date)
                                 .font(.caption)
                                 .foregroundStyle(.secondary)

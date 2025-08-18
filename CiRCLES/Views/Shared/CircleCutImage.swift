@@ -16,7 +16,7 @@ struct CircleCutImage: View {
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
     @Environment(ImageCache.self) var imageCache
-    @Environment(Planner.self) var planner
+    @Environment(Events.self) var planner
 
     @Binding var showSpaceName: Bool
     @Binding var showDay: Bool

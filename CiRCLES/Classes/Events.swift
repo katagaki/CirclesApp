@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 @Observable
-class Planner {
+class Events {
 
     @ObservationIgnored let activeEventNumberKey = "Events.Active.Number"
     @ObservationIgnored let participationKey = "My.Participation"

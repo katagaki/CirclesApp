@@ -15,7 +15,7 @@ struct CircleContextMenu: ViewModifier {
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
     @Environment(ImageCache.self) var imageCache
-    @Environment(Planner.self) var planner
+    @Environment(Events.self) var planner
 
     @Query var visits: [CirclesVisitEntry]
 
