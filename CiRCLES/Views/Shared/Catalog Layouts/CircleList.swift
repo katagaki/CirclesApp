@@ -30,6 +30,7 @@ struct CircleList: View {
             .contextMenu(circle: circle) {
                 onSelect(circle)
             }
+            .listRowBackground(Color.clear)
         }
         .listStyle(.plain)
         .overlay {
