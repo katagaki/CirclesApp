@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2024/06/19.
 //
 
-import Komponents
 import SwiftUI
 
 struct LoginView: View {
@@ -44,32 +43,30 @@ struct LoginView: View {
             .padding(18.0)
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
-            BarAccessory(placement: .bottom) {
-                VStack {
-                    HStack {
-                        Image(systemName: "info.circle")
-                        Text("Login.Disclaimer")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    Button {
-                        #if !targetEnvironment(macCatalyst) && !os(visionOS)
-                        authenticator.isWaitingForAuthenticationCode = true
-                        #else
-                        openURL(authenticator.authURL)
-                        #endif
-                    } label: {
-                        Text("Shared.Login")
-                            .fontWeight(.bold)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 6.0)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .clipShape(.capsule(style: .continuous))
+            VStack {
+                HStack {
+                    Image(systemName: "info.circle")
+                    Text("Login.Disclaimer")
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding()
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                Button {
+                    #if !targetEnvironment(macCatalyst) && !os(visionOS)
+                    authenticator.isWaitingForAuthenticationCode = true
+                    #else
+                    openURL(authenticator.authURL)
+                    #endif
+                } label: {
+                    Text("Shared.Login")
+                        .fontWeight(.bold)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 6.0)
+                }
+                .clipShape(.capsule)
+                .buttonStyle(.glassProminent)
             }
+            .padding()
         }
         #if !os(visionOS)
         .sheet(isPresented: $authenticator.isWaitingForAuthenticationCode) {

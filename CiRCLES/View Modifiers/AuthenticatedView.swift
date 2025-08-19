@@ -82,10 +82,10 @@ struct AuthenticatedView: ViewModifier {
                             oasis.close()
                             // Set initial selections
                             if selections.date == nil {
-                                selections.date = selections.fetchDateSelection(with: 1)
+                                selections.date = selections.fetchDefaultDateSelection()
                             }
                             if selections.map == nil {
-                                selections.map = selections.fetchMapSelection(with: 0)
+                                selections.map = selections.fetchDefaultMapSelection()
                             }
                             isReloadingData = false
                         }

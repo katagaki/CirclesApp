@@ -2396,6 +2396,38 @@
         }
       }
     },
+    "Shared.Placeholder.NoBlock" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "-"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "棟なし"
+          }
+        }
+      }
+    },
+    "Shared.Placeholder.NoDay" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Date"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開催日なし"
+          }
+        }
+      }
+    },
     "Shared.RemindMe" : {
       "localizations" : {
         "en" : {

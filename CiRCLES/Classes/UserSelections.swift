@@ -80,9 +80,23 @@ class UserSelections: Equatable {
         return try? modelContext.fetch(fetchDescriptor).first
     }
 
+    func fetchDefaultDateSelection() -> ComiketDate? {
+        let fetchDescriptor = FetchDescriptor<ComiketDate>(
+            sortBy: [SortDescriptor(\.id)]
+        )
+        return try? modelContext.fetch(fetchDescriptor).first
+    }
+
     func fetchMapSelection(with id: Int) -> ComiketMap? {
         let fetchDescriptor = FetchDescriptor<ComiketMap>(
             predicate: #Predicate<ComiketMap> { $0.id == id }
+        )
+        return try? modelContext.fetch(fetchDescriptor).first
+    }
+
+    func fetchDefaultMapSelection() -> ComiketMap? {
+        let fetchDescriptor = FetchDescriptor<ComiketMap>(
+            sortBy: [SortDescriptor(\.id)]
         )
         return try? modelContext.fetch(fetchDescriptor).first
     }

@@ -23,6 +23,10 @@ class Sheets {
         self.isPresented = true
     }
 
+    func hide() {
+        self.isPresented = false
+    }
+
     func close() {
         self.isPresented = false
         self.current = nil

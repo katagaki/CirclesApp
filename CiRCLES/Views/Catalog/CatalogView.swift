@@ -97,8 +97,25 @@ struct CatalogView: View {
         .navigationTitle("ViewTitle.Circles")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    withAnimation(.smooth.speed(2.0)) {
+                        switch displayModeState {
+                        case .grid: displayModeState = .list
+                        case .list: displayModeState = .grid
+                        }
+                    }
+                } label: {
+                    switch displayModeState {
+                    case .grid:
+                        Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
+                    case .list:
+                        Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
+                    }
+                }
+            }
             if displayModeState == .list {
-                ToolbarItem {
+                ToolbarItem(placement: .topBarLeading) {
                     Button {
                         withAnimation(.smooth.speed(2.0)) {
                             switch listDisplayModeState {
@@ -113,24 +130,6 @@ struct CatalogView: View {
                         case .compact:
                             Label("Shared.DisplayMode.List.Regular", systemImage: "rectangle.expand.vertical")
                         }
-                    }
-                }
-                ToolbarSpacer()
-            }
-            ToolbarItem {
-                Button {
-                    withAnimation(.smooth.speed(2.0)) {
-                        switch displayModeState {
-                        case .grid: displayModeState = .list
-                        case .list: displayModeState = .grid
-                        }
-                    }
-                } label: {
-                    switch displayModeState {
-                    case .grid:
-                        Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
-                    case .list:
-                        Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
                     }
                 }
             }

@@ -40,7 +40,7 @@ struct UnifiedControl: View {
                                 .foregroundStyle(.secondary)
                         }
                     } else {
-                        // TODO
+                        Text("Shared.Placeholder.NoDay")
                     }
                 }
             }
@@ -62,7 +62,7 @@ struct UnifiedControl: View {
                     if let selectedMap = selections.map {
                         Text(selectedMap.name)
                     } else {
-                        // TODO
+                        Text("Shared.Placeholder.NoBlock")
                     }
                 }
                 .padding([.top, .bottom], 12.0)
@@ -88,6 +88,6 @@ struct UnifiedControl: View {
                 return Color.gray
             }
         }
-        return nil
+        return Color.accentColor
     }
 }
