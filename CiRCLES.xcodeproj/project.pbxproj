@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 77;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -21,7 +21,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		E4065E192DECA30200AB7E20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+		E4065E192DECA30200AB7E20 /* Exceptions for "CiRCLES" folder in "CiRCLES" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -31,9 +31,24 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		E4065D312DECA2FF00AB7E20 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
-		E4065DC02DECA30200AB7E20 /* CiRCLES */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (E4065E192DECA30200AB7E20 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = CiRCLES; sourceTree = "<group>"; };
-		E4065E1B2DECA30700AB7E20 /* ci_scripts */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ci_scripts; sourceTree = "<group>"; };
+		E4065D312DECA2FF00AB7E20 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		E4065DC02DECA30200AB7E20 /* CiRCLES */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E4065E192DECA30200AB7E20 /* Exceptions for "CiRCLES" folder in "CiRCLES" target */,
+			);
+			path = CiRCLES;
+			sourceTree = "<group>";
+		};
+		E4065E1B2DECA30700AB7E20 /* ci_scripts */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ci_scripts;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,7 +136,6 @@
 				};
 			};
 			buildConfigurationList = E4A769412C21A20A00BE3491 /* Build configuration list for PBXProject "CiRCLES" */;
-			compatibilityVersion = "Xcode 15.0";
 			developmentRegion = ja;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -138,6 +152,7 @@
 				E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability" */,
 				E40623002DEBE238002D3E28 /* XCRemoteSwiftPackageReference "Swift-WebP" */,
 			);
+			preferredProjectObjectVersion = 77;
 			productRefGroup = E4A769472C21A20A00BE3491 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -321,6 +336,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = CiRCLES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = CiRCLES/CiRCLES.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -362,6 +378,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = CiRCLES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = CiRCLES/CiRCLES.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
