@@ -21,7 +21,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		E4065E192DECA30200AB7E20 /* Exceptions for "CiRCLES" folder in "CiRCLES" target */ = {
+		E4030C162E5953410000DDC2 /* Exceptions for "CiRCLES" folder in "CiRCLES" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -39,7 +39,7 @@
 		E4065DC02DECA30200AB7E20 /* CiRCLES */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				E4065E192DECA30200AB7E20 /* Exceptions for "CiRCLES" folder in "CiRCLES" target */,
+				E4030C162E5953410000DDC2 /* Exceptions for "CiRCLES" folder in "CiRCLES" target */,
 			);
 			path = CiRCLES;
 			sourceTree = "<group>";
