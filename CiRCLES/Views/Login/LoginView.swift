@@ -44,13 +44,6 @@ struct LoginView: View {
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             VStack {
-                HStack {
-                    Image(systemName: "info.circle")
-                    Text("Login.Disclaimer")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
                 Button {
                     #if !targetEnvironment(macCatalyst) && !os(visionOS)
                     authenticator.isWaitingForAuthenticationCode = true
