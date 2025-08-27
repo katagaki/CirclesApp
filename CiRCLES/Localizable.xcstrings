@@ -785,22 +785,6 @@
         }
       }
     },
-    "Login.Disclaimer" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your credentials are never sent to another server."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "認証情報はこの端末外に送信することはありません。"
-          }
-        }
-      }
-    },
     "Login.Subtitle" : {
       "localizations" : {
         "en" : {

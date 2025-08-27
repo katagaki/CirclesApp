@@ -1,6 +1,9 @@
 {
   "fill" : {
-    "automatic-gradient" : "srgb:0.41961,0.64314,0.93725,1.00000"
+    "linear-gradient" : [
+      "display-p3:0.52941,0.83922,0.98039,1.00000",
+      "srgb:0.41961,0.60000,0.93725,1.00000"
+    ]
   },
   "groups" : [
     {
@@ -13,7 +16,7 @@
           "value" : "normal"
         }
       ],
-      "blur-material" : 1,
+      "blur-material" : null,
       "layers" : [
         {
           "blend-mode-specializations" : [
@@ -43,7 +46,16 @@
           ],
           "glass" : true,
           "image-name" : "Cloud3.svg",
-          "name" : "Cloud3"
+          "name" : "Cloud3",
+          "opacity-specializations" : [
+            {
+              "value" : 0.9
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 1
+            }
+          ]
         },
         {
           "fill-specializations" : [
@@ -60,7 +72,16 @@
             }
           ],
           "image-name" : "Cloud2.svg",
-          "name" : "Cloud2"
+          "name" : "Cloud2",
+          "opacity-specializations" : [
+            {
+              "value" : 0.7
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 0.95
+            }
+          ]
         },
         {
           "fill-specializations" : [
@@ -77,7 +98,16 @@
             }
           ],
           "image-name" : "Cloud1.svg",
-          "name" : "Cloud1"
+          "name" : "Cloud1",
+          "opacity-specializations" : [
+            {
+              "value" : 0.5
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 0.9
+            }
+          ]
         }
       ],
       "lighting" : "combined",
