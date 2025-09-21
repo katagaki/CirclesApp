@@ -36,7 +36,11 @@ struct CircleBlockPill: View {
                     .padding(.horizontal, 6.0)
             }
         }
-        .glassEffectIfSupported()
+        .background(Material.thin)
         .clipShape(.capsule)
+        .overlay {
+            Capsule()
+                .stroke(Color(uiColor: .label).opacity(0.5), lineWidth: 1 / 3)
+        }
     }
 }
