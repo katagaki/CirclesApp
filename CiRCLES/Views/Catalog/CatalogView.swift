@@ -19,18 +19,6 @@ struct CatalogView: View {
 
     @Environment(\.modelContext) var modelContext
 
-    @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
-    var dates: [ComiketDate]
-
-    @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
-    var maps: [ComiketMap]
-
-    @Query(sort: [SortDescriptor(\ComiketGenre.id, order: .forward)])
-    var genres: [ComiketGenre]
-
-    @Query(sort: [SortDescriptor(\ComiketBlock.id, order: .forward)])
-    var blocks: [ComiketBlock]
-
     @State var displayedCircles: [ComiketCircle] = []
     @State var searchedCircles: [ComiketCircle]?
 
@@ -136,8 +124,15 @@ struct CatalogView: View {
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             if searchTerm.trimmingCharacters(in: .whitespaces).count < 2 {
-                CatalogToolbar(displayedCircles: $displayedCircles)
-                    .transition(.opacity.animation(.snappy.speed(2.0)))
+                if #available(iOS 26.0, *) {
+                    CatalogToolbar(displayedCircles: $displayedCircles)
+                        .transition(.opacity.animation(.snappy.speed(2.0)))
+                } else {
+                    BarAccessory(placement: .bottom) {
+                        CatalogToolbar(displayedCircles: $displayedCircles)
+                            .transition(.opacity.animation(.snappy.speed(2.0)))
+                    }
+                }
             }
         }
         .searchable(text: $searchTerm,

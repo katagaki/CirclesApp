@@ -40,7 +40,7 @@ struct FavoritesToolbar: View {
                         }
                     }
                 }
-                .glassEffect()
+                .glassEffectIfSupported()
             }
             .padding(.horizontal)
             .padding(.vertical, 12.0)

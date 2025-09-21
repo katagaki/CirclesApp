@@ -25,7 +25,7 @@ struct CircleListRegularRow: View {
                 showSpaceName: .constant(false), showDay: .constant(false)
             )
             .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
-            .automaticMatchedTransitionSource(id: circle.id, in: namespace)
+            .matchedTransitionSource(id: circle.id, in: namespace)
             .frame(width: 70.0, height: 100.0, alignment: .center)
             VStack(alignment: .leading, spacing: 5.0) {
                 Text(circle.circleName)

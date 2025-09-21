@@ -143,10 +143,16 @@ struct CircleDetailView: View {
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             if let extendedInformation {
-                VStack(spacing: 12.0) {
+                if #available(iOS 26.0, *) {
                     CircleDetailToolbar(extendedInformation, webCatalogInformation)
+                } else {
+                    BarAccessory(placement: .bottom) {
+                        VStack(spacing: 12.0) {
+                            CircleDetailToolbar(extendedInformation, webCatalogInformation)
+                        }
+                        .padding(.vertical, 12.0)
+                    }
                 }
-                .padding(.vertical, 12.0)
             }
         }
         .alert("Alerts.FirstCircle.Title", isPresented: $isFirstCircleAlertShowing) {

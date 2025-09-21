@@ -69,7 +69,7 @@ struct HallMap: View {
                 if let popoverLayoutMapping {
                     Rectangle()
                         .foregroundStyle(.primary.opacity(0.001))
-                        .automaticMatchedTransitionSource(
+                        .matchedTransitionSource(
                             id: "Layout.\(popoverLayoutMapping.blockID).\(popoverLayoutMapping.spaceNumber)",
                             in: namespace
                         )

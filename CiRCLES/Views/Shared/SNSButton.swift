@@ -81,7 +81,6 @@ struct SNSButton: View {
             }
         }
         .clipShape(showsLabel ? AnyShape(.capsule) : AnyShape(.circle))
-        .buttonStyle(.glassProminent)
-        .glassEffect(in: Circle())
+        .buttonStyleGlassProminentCircularIfSupported()
     }
 }

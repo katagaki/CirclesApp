@@ -12,65 +12,34 @@ import SwiftUI
 struct UnifiedControl: View {
     @Environment(UserSelections.self) var selections
 
-    @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
-    var dates: [ComiketDate]
-
-    @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
-    var maps: [ComiketMap]
-
     var body: some View {
-        HStack {
-            Menu {
-                ForEach(dates, id: \.id) { date in
-                    Button("Shared.\(date.id)th.Day",
-                           systemImage: selections.date == date ? "checkmark" : "") {
-                        selections.date = date
-                    }
+        Group {
+            if #available(iOS 26.0, *) {
+                HStack {
+                    DatePicker()
+                        .padding([.leading], 12.0)
+                    Spacer()
+                    HallPicker()
+                        .background(accentColorForMap(selections.map))
+                        .clipShape(.capsule)
                 }
-            } label: {
-                HStack(spacing: 10.0) {
-                    if let selectedDate = selections.date {
-                        VStack(alignment: .leading) {
-                            Text("Shared.\(selectedDate.id)th.Day")
-                                .font(.caption)
-                                .bold()
-                                .foregroundStyle(.primary)
-                            Text(selectedDate.date, style: .date)
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                    } else {
-                        Text("Shared.Placeholder.NoDay")
-                    }
+            } else {
+                HStack {
+                    DatePicker()
+                        .padding([.leading], 12.0)
+                    Spacer()
+                    HallPicker()
+                        .background(accentColorForMap(selections.map))
+                        .clipShape(.capsule)
+                }
+                .padding(.horizontal, 1.5)
+                .background(Material.bar)
+                .clipShape(.capsule)
+                .overlay {
+                    Capsule()
+                        .stroke(.primary.opacity(0.2), lineWidth: 1 / 3)
                 }
             }
-            .padding([.leading], 12.0)
-            Spacer()
-            Menu {
-                ForEach(maps, id: \.id) { map in
-                    Button(map.name,
-                           systemImage: selections.map == map ? "checkmark" : "") {
-                        selections.map = map
-                    }
-                }
-            } label: {
-                HStack(spacing: 10.0) {
-                    Image(systemName: "building")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(height: 20.0)
-                    if let selectedMap = selections.map {
-                        Text(selectedMap.name)
-                    } else {
-                        Text("Shared.Placeholder.NoBlock")
-                    }
-                }
-                .padding([.top, .bottom], 12.0)
-                .padding([.leading, .trailing], 16.0)
-                .foregroundStyle(.white)
-            }
-            .background(accentColorForMap(selections.map))
-            .clipShape(.capsule)
         }
         .padding(6.0)
         .id(selections.idMap)

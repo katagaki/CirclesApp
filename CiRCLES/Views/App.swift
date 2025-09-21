@@ -31,7 +31,6 @@ struct CirclesApp: App {
         WindowGroup {
             Group {
                 UnifiedView()
-                // MainTabView()
             }
             .overlay {
                 if authenticator.onlineState == .offline {

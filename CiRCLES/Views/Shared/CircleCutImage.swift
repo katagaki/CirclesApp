@@ -10,8 +10,6 @@ import SwiftUI
 
 struct CircleCutImage: View {
 
-    @Environment(\.modelContext) var modelContext
-
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database

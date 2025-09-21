@@ -22,9 +22,6 @@ struct FavoritesView: View {
 
     @State var favoriteCircles: [String: [ComiketCircle]]?
 
-    @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
-    var dates: [ComiketDate]
-
     @State var isVisitModeOn: Bool = false
     @AppStorage(wrappedValue: false, "Favorites.VisitModeOn") var isVisitModeOnDefault: Bool
 
@@ -100,10 +97,19 @@ struct FavoritesView: View {
             }
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
-            FavoritesToolbar(
-                isVisitModeOn: $isVisitModeOn,
-                isGroupedByColor: $isGroupedByColor
-            )
+            if #available(iOS 26.0, *) {
+                FavoritesToolbar(
+                    isVisitModeOn: $isVisitModeOn,
+                    isGroupedByColor: $isGroupedByColor
+                )
+            } else {
+                BarAccessory(placement: .bottom) {
+                    FavoritesToolbar(
+                        isVisitModeOn: $isVisitModeOn,
+                        isGroupedByColor: $isGroupedByColor
+                    )
+                }
+            }
         }
         .refreshable {
             await reloadFavorites()
