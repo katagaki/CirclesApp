@@ -65,7 +65,7 @@ struct CircleDetailToolbar: View {
                                 openURL(url)
                             }
                         }
-                        .glassEffect()
+                        .glassEffectIfSupported()
                     }
                 }
             }

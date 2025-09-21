@@ -15,49 +15,53 @@ struct MapControlStack: View {
 
     var body: some View {
         SquareButtonStack {
-            VStack(alignment: .center, spacing: 0.0) {
-                SquareButton {
-                    withAnimation(.smooth.speed(2.0)) {
-                        useDarkModeMaps.toggle()
+            Group {
+                VStack(alignment: .center, spacing: 0.0) {
+                    SquareButton {
+                        withAnimation(.smooth.speed(2.0)) {
+                            useDarkModeMaps.toggle()
+                        }
+                    } label: {
+                        Image(systemName: useDarkModeMaps ?
+                              "moon.fill" :
+                                "sun.max")
+                        .font(.title2)
                     }
-                } label: {
-                    Image(systemName: useDarkModeMaps ?
-                          "moon.fill" :
-                            "sun.max")
-                    .font(.title2)
-                }
-                SquareButton {
-                    withAnimation(.smooth.speed(2.0)) {
-                        showGenreOverlay.toggle()
+                    SquareButton {
+                        withAnimation(.smooth.speed(2.0)) {
+                            showGenreOverlay.toggle()
+                        }
+                    } label: {
+                        Image(systemName: showGenreOverlay ?
+                              "theatermask.and.paintbrush.fill" :
+                                "theatermask.and.paintbrush")
+                        .font(.title2)
                     }
-                } label: {
-                    Image(systemName: showGenreOverlay ?
-                          "theatermask.and.paintbrush.fill" :
-                            "theatermask.and.paintbrush")
-                    .font(.title2)
+                    .popoverTip(GenreOverlayTip())
                 }
-                .popoverTip(GenreOverlayTip())
+                VStack(alignment: .center, spacing: 0.0) {
+                    SquareButton {
+                        zoomDivisor -= 1
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.title)
+                    }
+                    .disabled(zoomDivisor <= 1)
+                    SquareButton {
+                        zoomDivisor += 1
+                    } label: {
+                        Image(systemName: "minus")
+                            .font(.title)
+                    }
+                    .disabled(zoomDivisor >= 4)
+                }
             }
             .clipShape(.capsule)
-            .glassEffect()
-            VStack(alignment: .center, spacing: 0.0) {
-                SquareButton {
-                    zoomDivisor -= 1
-                } label: {
-                    Image(systemName: "plus")
-                        .font(.title)
-                }
-                .disabled(zoomDivisor <= 1)
-                SquareButton {
-                    zoomDivisor += 1
-                } label: {
-                    Image(systemName: "minus")
-                        .font(.title)
-                }
-                .disabled(zoomDivisor >= 4)
+            .glassEffectIfSupported(bordered: true)
+            .overlay {
+                Capsule()
+                    .stroke(.primary.opacity(0.2), lineWidth: 1 / 3)
             }
-            .clipShape(.capsule)
-            .glassEffect()
         }
     }
 }

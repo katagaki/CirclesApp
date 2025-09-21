@@ -45,7 +45,7 @@ struct CircleGrid: View {
                     .contextMenu(circle: circle) {
                         onSelect(circle)
                     }
-                    .automaticMatchedTransitionSource(id: circle.id, in: namespace)
+                    .matchedTransitionSource(id: circle.id, in: namespace)
                 }
             }
         }

@@ -18,8 +18,6 @@ struct MyView: View {
     @Environment(Events.self) var planner
     @Environment(Sheets.self) var sheets
 
-    @Environment(\.colorScheme) private var colorScheme
-
     @Query var events: [ComiketEvent]
 
     @State var userInfo: UserInfo.Response?

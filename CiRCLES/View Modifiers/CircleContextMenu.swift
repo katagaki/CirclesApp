@@ -22,8 +22,6 @@ struct CircleContextMenu: ViewModifier {
     var circle: ComiketCircle
     var open: () -> Void
 
-    @State var isVisited: Bool?
-
     init(circle: ComiketCircle, open: @escaping () -> Void) {
         self.circle = circle
         self.open = open

@@ -21,6 +21,7 @@ struct InteractiveMap: View {
 
     @State var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
     @State var layoutFavoriteWebCatalogIDMappings: [LayoutCatalogMapping: [Int: WebCatalogColor?]] = [:]
+    @State var isInitialLoadCompleted: Bool = false
     @State var isLoadingLayouts: Bool = false
 
     @State var popoverLayoutMapping: LayoutCatalogMapping?
@@ -106,7 +107,10 @@ struct InteractiveMap: View {
             }
         }
         .onAppear {
-            reloadAll()
+            if !isInitialLoadCompleted {
+                isInitialLoadCompleted = true
+                reloadAll()
+            }
         }
         .onChange(of: database.commonImages) { _, _ in
             reloadAll()

@@ -36,7 +36,7 @@ struct CircleBlockPill: View {
                     .padding(.horizontal, 6.0)
             }
         }
-        .glassEffect()
+        .glassEffectIfSupported()
         .clipShape(.capsule)
     }
 }

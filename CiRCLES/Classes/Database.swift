@@ -26,8 +26,6 @@ class Database {
     var circleImages: [Int: Data] = [:]
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
 
-    @ObservationIgnored var actor: DataConverter = DataConverter(modelContainer: sharedModelContainer)
-
     init() {
         modelContext = sharedModelContainer.mainContext
     }

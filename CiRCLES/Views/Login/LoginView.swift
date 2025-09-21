@@ -57,7 +57,7 @@ struct LoginView: View {
                         .padding(.vertical, 6.0)
                 }
                 .clipShape(.capsule)
-                .buttonStyle(.glassProminent)
+                .buttonStyleGlassProminentIfSupported()
             }
             .padding()
         }

@@ -47,7 +47,7 @@ struct FavoriteButton: View {
             }
         }
         .clipShape(.capsule)
-        .buttonStyle(.glassProminent)
+        .buttonStyleGlassProminentIfSupported()
         .tint(color?.secondary)
     }
 }
