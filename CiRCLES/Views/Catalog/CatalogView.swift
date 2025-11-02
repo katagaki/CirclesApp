@@ -15,7 +15,7 @@ struct CatalogView: View {
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
     @Environment(UserSelections.self) var selections
-    @Environment(Sheets.self) var sheets
+    @Environment(Unifier.self) var unifier
 
     @Environment(\.modelContext) var modelContext
 
@@ -24,13 +24,13 @@ struct CatalogView: View {
 
     @State var blocksInMap: [ComiketBlock] = []
 
+    // Search
+    @State var isSearchActive: Bool = false
     @State var searchTerm: String = ""
 
     @State var isInitialLoadCompleted: Bool = false
     @State var isLoading: Bool = false
 
-    @AppStorage(wrappedValue: CircleDisplayMode.grid, "Circles.DisplayMode") var displayMode: CircleDisplayMode
-    @AppStorage(wrappedValue: ListDisplayMode.regular, "Circles.ListSize") var listDisplayMode: ListDisplayMode
     @State var displayModeState: CircleDisplayMode = .grid
     @State var listDisplayModeState: ListDisplayMode = .regular
 
@@ -48,13 +48,13 @@ struct CatalogView: View {
                 case .grid:
                     if let searchedCircles {
                         CircleGrid(circles: searchedCircles, namespace: namespace) { circle in
-                            sheets.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
+                            unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
                     } else {
                         CircleGrid(circles: displayedCircles,
                                    showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
                                    namespace: namespace) { circle in
-                            sheets.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
+                            unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
                     }
                 case .list:
@@ -62,14 +62,14 @@ struct CatalogView: View {
                         CircleList(circles: searchedCircles,
                                    displayMode: listDisplayModeState,
                                    namespace: namespace) { circle in
-                            sheets.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
+                            unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
                     } else {
                         CircleList(circles: displayedCircles,
                                    showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
                                    displayMode: listDisplayModeState,
                                    namespace: namespace) { circle in
-                            sheets.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
+                            unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
                     }
                 }
@@ -86,39 +86,11 @@ struct CatalogView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    withAnimation(.smooth.speed(2.0)) {
-                        switch displayModeState {
-                        case .grid: displayModeState = .list
-                        case .list: displayModeState = .grid
-                        }
-                    }
-                } label: {
-                    switch displayModeState {
-                    case .grid:
-                        Label("Shared.DisplayMode.List", systemImage: "rectangle.grid.1x2")
-                    case .list:
-                        Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
-                    }
-                }
+                DisplayModeSwitcher($displayModeState)
             }
             if displayModeState == .list {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button {
-                        withAnimation(.smooth.speed(2.0)) {
-                            switch listDisplayModeState {
-                            case .regular: listDisplayModeState = .compact
-                            case .compact: listDisplayModeState = .regular
-                            }
-                        }
-                    } label: {
-                        switch listDisplayMode {
-                        case .regular:
-                            Label("Shared.DisplayMode.List.Compact", systemImage: "rectangle.compress.vertical")
-                        case .compact:
-                            Label("Shared.DisplayMode.List.Regular", systemImage: "rectangle.expand.vertical")
-                        }
-                    }
+                    ListModeSwitcher($listDisplayModeState)
                 }
             }
         }
@@ -136,12 +108,11 @@ struct CatalogView: View {
             }
         }
         .searchable(text: $searchTerm,
+                    isPresented: $isSearchActive,
                     placement: .navigationBarDrawer(displayMode: .always),
                     prompt: "Circles.Search.Prompt")
         .onAppear {
             if !isInitialLoadCompleted {
-                displayModeState = displayMode
-                listDisplayModeState = listDisplayMode
                 reloadDisplayedCircles(
                     genreID: selections.genre?.id,
                     mapID: selections.map?.id,
@@ -159,16 +130,15 @@ struct CatalogView: View {
                 )
             }
         }
+        .onChange(of: isSearchActive) { _, _ in
+            if isSearchActive && unifier.isMinimized {
+                unifier.selectedDetent = .medium
+            }
+        }
         .onChange(of: searchTerm) { _, _ in
             Task.detached {
                 await searchCircles()
             }
-        }
-        .onChange(of: displayModeState) { _, _ in
-            displayMode = displayModeState
-        }
-        .onChange(of: listDisplayModeState) { _, _ in
-            listDisplayMode = listDisplayModeState
         }
         .onChange(of: isDatabaseInitialized) { _, newValue in
             if !newValue {

@@ -13,75 +13,8 @@ struct MoreView: View {
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
 
-    @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
-    @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
-    @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
-    @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
-    @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
-
     var body: some View {
         MoreList(repoName: "katagaki/CirclesApp", viewPath: UnifiedPath.moreAttributions) {
-            Section {
-                Toggle("More.Customization.Map.UseHighDefinitionMap", isOn: $useHighResolutionMaps)
-                Toggle("More.Customization.Map.UseDarkModeMap", isOn: $useDarkModeMaps)
-            } header: {
-                ListSectionHeader(text: "More.Customization.Map")
-            }
-            Section {
-                Toggle("More.Customization.Circles.ShowWebCut", isOn: $showWebCut)
-                Toggle("More.Customization.Circles.ShowHallAndBlock", isOn: $showSpaceName)
-                Toggle("More.Customization.Circles.ShowDay", isOn: $showDay)
-            } header: {
-                ListSectionHeader(text: "More.Customization.Circles")
-            }
-            Section {
-                switch Locale.current.language.languageCode {
-                case .japanese:
-                    if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
-                        ExternalLink("maps://?saddr=現在地&daddr=東京ビッグサイト",
-                                     title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
-                    }
-                    if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
-                        ExternalLink("comgooglemaps://?saddr=現在地&daddr=東京ビッグサイト",
-                                     title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
-                    }
-                    if UIApplication.shared.canOpenURL(URL(string: "yjmap://")!) {
-                        ExternalLink("yjmap://route/train?from=現在地&to=東京ビッグサイト",
-                                     title: "More.Navigate.YahooMap", image: "ListIcon.YahooMap")
-                    }
-                default:
-                    if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
-                        ExternalLink("maps://?saddr=Current+Location&daddr=Tokyo+Big+Sight",
-                                     title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
-                    }
-                    if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
-                        ExternalLink("comgooglemaps://?saddr=My+Location&daddr=Tokyo+Big+Sight",
-                                     title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
-                    }
-                }
-            } header: {
-                ListSectionHeader(text: "More.Navigate")
-            }
-            Section {
-                switch Locale.current.language.languageCode {
-                case .japanese:
-                    SafariLink("https://webcatalog.circle.ms",
-                               title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
-                    SafariLink("https://comiket.co.jp",
-                               title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
-                    SafariLink("https://www.bigsight.jp/visitor/floormap/",
-                               title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
-                default:
-                    SafariLink("https://int.webcatalog.circle.ms/en/catalog",
-                               title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
-                    SafariLink("https://comiket.co.jp",
-                               title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
-                    SafariLink("https://www.bigsight.jp/english/visitor/floormap/",
-                               title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
-                }
-            } header: {
-                ListSectionHeader(text: "More.UsefulResources")
-            }
             Section {
                 NavigationLink(value: UnifiedPath.moreDBAdmin) {
                     ListRow(image: "ListIcon.MasterDB", title: "More.DBAdmin.ManageDB")

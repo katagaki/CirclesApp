@@ -16,6 +16,7 @@ struct AuthenticatedView: ViewModifier {
     @Environment(Oasis.self) var oasis
     @Environment(Events.self) var planner
     @Environment(UserSelections.self) var selections
+    @Environment(Unifier.self) var unifier
 
     @State var isReloadingData: Bool = false
 
@@ -66,6 +67,7 @@ struct AuthenticatedView: ViewModifier {
             if forceDownload {
                 isDatabaseInitialized = false
             }
+            unifier.isPresented = false
             oasis.open {
                 Task {
                     await oasis.setHeaderText("Shared.LoadingHeader.Event")
@@ -87,6 +89,7 @@ struct AuthenticatedView: ViewModifier {
                             if selections.map == nil {
                                 selections.map = selections.fetchDefaultMapSelection()
                             }
+                            unifier.isPresented = true
                             isReloadingData = false
                         }
                     }

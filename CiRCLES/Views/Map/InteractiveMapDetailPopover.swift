@@ -11,7 +11,7 @@ import SwiftUI
 struct InteractiveMapDetailPopover: View {
 
     @Environment(Database.self) var database
-    @Environment(Sheets.self) var sheets
+    @Environment(Unifier.self) var unifier
 
     @Environment(\.modelContext) var modelContext
 
@@ -30,7 +30,7 @@ struct InteractiveMapDetailPopover: View {
                     ForEach(circles, id: \.id) { circle in
                         Button {
                             webCatalogIDSet = nil
-                            sheets.append(.circleDetail(circle: circle))
+                            unifier.append(.circleDetail(circle: circle))
                         } label: {
                             HStack {
                                 CircleCutImage(
