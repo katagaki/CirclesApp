@@ -5,10 +5,14 @@
 //  Created by シン・ジャスティン on 2025/06/07.
 //
 
-struct WebCatalogIDSet: Identifiable {
+struct WebCatalogIDSet: Identifiable, Equatable {
     var ids: [Int]
 
     var id: String {
         ids.description
+    }
+
+    static func == (lhs: WebCatalogIDSet, rhs: WebCatalogIDSet) -> Bool {
+        lhs.ids.description == rhs.ids.description
     }
 }

@@ -1,5 +1,5 @@
 //
-//  MapFavoriteBlock.swift
+//  MapFavoriteLayerBlock.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2025/06/07.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MapFavoriteBlock: View {
+struct MapFavoriteLayerBlock: View {
 
     @Environment(\.colorScheme) var colorScheme
 

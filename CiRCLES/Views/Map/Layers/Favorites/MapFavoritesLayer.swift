@@ -1,5 +1,5 @@
 //
-//  HallFavoritesOverlay.swift
+//  MapFavoritesLayer.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2025/06/07.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct HallFavoritesOverlay: View {
+struct MapFavoritesLayer: View {
 
     @Binding var mappings: [LayoutCatalogMapping: [Int: WebCatalogColor?]]
     var spaceSize: Int
@@ -19,7 +19,7 @@ struct HallFavoritesOverlay: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             ForEach(Array(mappings.keys), id: \.hashValue) { layout in
-                MapFavoriteBlock(
+                MapFavoriteLayerBlock(
                     layout: layout,
                     colorMap: mappings[layout] ?? [:],
                     spaceSize: spaceSize,

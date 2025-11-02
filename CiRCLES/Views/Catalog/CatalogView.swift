@@ -121,7 +121,7 @@ struct CatalogView: View {
                 isInitialLoadCompleted = true
             }
         }
-        .onChange(of: selections.idMap) { _, _ in
+        .onChange(of: selections.idMap) {
             if isInitialLoadCompleted {
                 reloadDisplayedCircles(
                     genreID: selections.genre?.id,
@@ -130,12 +130,12 @@ struct CatalogView: View {
                 )
             }
         }
-        .onChange(of: isSearchActive) { _, _ in
+        .onChange(of: isSearchActive) {
             if isSearchActive && unifier.isMinimized {
-                unifier.selectedDetent = .medium
+                unifier.selectedDetent = .height(360)
             }
         }
-        .onChange(of: searchTerm) { _, _ in
+        .onChange(of: searchTerm) {
             Task.detached {
                 await searchCircles()
             }

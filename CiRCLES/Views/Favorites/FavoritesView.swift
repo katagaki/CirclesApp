@@ -126,7 +126,7 @@ struct FavoritesView: View {
                 isInitialLoadCompleted = true
             }
         }
-        .onChange(of: selections.date) { _, _ in
+        .onChange(of: selections.date) {
             if isInitialLoadCompleted {
                 if let favoriteItems = favorites.items {
                     Task.detached {
@@ -135,17 +135,17 @@ struct FavoritesView: View {
                 }
             }
         }
-        .onChange(of: isVisitModeOn) { _, _ in
+        .onChange(of: isVisitModeOn) {
             if isInitialLoadCompleted {
                 isVisitModeOnDefault = isVisitModeOn
             }
         }
-        .onChange(of: isGroupedByColor) { _, _ in
+        .onChange(of: isGroupedByColor) {
             if isInitialLoadCompleted {
                 isGroupedByColorDefault = isGroupedByColor
             }
         }
-        .onChange(of: favorites.items) { _, _ in
+        .onChange(of: favorites.items) {
             if let favoriteItems = favorites.items {
                 Task.detached {
                     await prepareCircles(using: favoriteItems)

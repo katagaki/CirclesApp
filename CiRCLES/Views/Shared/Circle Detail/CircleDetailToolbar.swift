@@ -76,7 +76,7 @@ struct CircleDetailToolbar: View {
             reloadFavoriteColor()
             shouldCallAPIToUpdateFavorites = true
         }
-        .onChange(of: extendedInformation.webCatalogID) { _, _ in
+        .onChange(of: extendedInformation.webCatalogID) {
             reloadFavoriteColor()
         }
         .onChange(of: selectedFavoriteColor) { oldValue, newValue in

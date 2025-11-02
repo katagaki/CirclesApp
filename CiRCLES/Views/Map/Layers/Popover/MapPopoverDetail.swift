@@ -1,5 +1,5 @@
 //
-//  InteractiveMapDetailPopover.swift
+//  MapPopoverDetail.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/08/15.
@@ -8,14 +8,14 @@
 import Komponents
 import SwiftUI
 
-struct InteractiveMapDetailPopover: View {
+struct MapPopoverDetail: View {
 
     @Environment(Database.self) var database
     @Environment(Unifier.self) var unifier
 
     @Environment(\.modelContext) var modelContext
 
-    @Binding var webCatalogIDSet: WebCatalogIDSet?
+    @State var webCatalogIDSet: WebCatalogIDSet?
 
     @State var circles: [ComiketCircle]?
 
@@ -29,7 +29,9 @@ struct InteractiveMapDetailPopover: View {
                 if let circles {
                     ForEach(circles, id: \.id) { circle in
                         Button {
-                            webCatalogIDSet = nil
+                            if unifier.isMinimized {
+                                unifier.selectedDetent = .height(360)
+                            }
                             unifier.append(.circleDetail(circle: circle))
                         } label: {
                             HStack {
@@ -37,8 +39,10 @@ struct InteractiveMapDetailPopover: View {
                                     circle, in: popoverNamespace, shouldFetchWebCut: showWebCut,
                                     showSpaceName: .constant(false), showDay: .constant(false)
                                 )
-                                    .frame(width: 70.0, height: 100.0, alignment: .center)
+                                .frame(width: 35.0, height: 50.0, alignment: .center)
                                 Text(circle.circleName)
+                                    .font(.subheadline)
+                                    .lineLimit(2)
                                 Spacer(minLength: 0.0)
                             }
                             .contentShape(.rect)
@@ -50,8 +54,6 @@ struct InteractiveMapDetailPopover: View {
                         .padding()
                 }
             }
-            .frame(minWidth: 210.0, minHeight: 208.0)
-            .padding()
             .presentationCompactAdaptation(.popover)
             .onAppear {
                 fetchCircles()

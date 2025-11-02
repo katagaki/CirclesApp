@@ -1,5 +1,5 @@
 //
-//  HallMap.swift
+//  MapLayoutLayer.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2025/06/07.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct HallMap: View {
+struct MapLayoutLayer: View {
 
     @Environment(Database.self) var database
     @Environment(Unifier.self) var unifier
@@ -20,9 +20,9 @@ struct HallMap: View {
     @Binding var height: Int
     @Binding var zoomDivisor: Int
 
-    @State var popoverLayoutMapping: LayoutCatalogMapping?
-    @State var popoverWebCatalogIDSet: WebCatalogIDSet?
-    @State var popoverSourceRect: CGRect = .null
+    @Binding var popoverLayoutMapping: LayoutCatalogMapping?
+    @Binding var popoverWebCatalogIDSet: WebCatalogIDSet?
+    @Binding var popoverSourceRect: CGRect
 
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
@@ -35,22 +35,12 @@ struct HallMap: View {
                 width: CGFloat(width / zoomDivisor),
                 height: CGFloat(height / zoomDivisor)
             )
-            .padding(.trailing, 72.0)
+            .padding(.trailing, 120.0)
             .padding(.bottom, 72.0)
             .animation(.smooth.speed(2.0), value: zoomDivisor)
             .colorInvert(adaptive: true, enabled: $useDarkModeMaps)
             .onTapGesture { location in
-                if popoverWebCatalogIDSet == nil {
-                    openMapPopoverIn(x: Int(location.x), y: Int(location.y))
-                }
-            }
-            .popover(
-                item: $popoverWebCatalogIDSet,
-                attachmentAnchor: .rect(.rect(popoverSourceRect))
-            ) { _ in
-                InteractiveMapDetailPopover(webCatalogIDSet: $popoverWebCatalogIDSet)
-                    .environment(database)
-                    .environment(unifier)
+                openMapPopoverIn(x: Int(location.x), y: Int(location.y))
             }
             .overlay {
                 // Selection highlight
@@ -66,7 +56,7 @@ struct HallMap: View {
                 }
             }
             .overlay {
-                // Selection highlight
+                // Selection source rectangle
                 if let popoverLayoutMapping {
                     ZStack {}
                         .contentShape(.rect)
@@ -95,9 +85,12 @@ struct HallMap: View {
                 popoverSourceRect = CGRect(x: xMin, y: yMin, width: spaceSize, height: spaceSize)
                 popoverLayoutMapping = layout
                 popoverWebCatalogIDSet = WebCatalogIDSet(ids: webCatalogIDs)
-                break
+                return
             }
         }
+        popoverSourceRect = .null
+        popoverLayoutMapping = nil
+        popoverWebCatalogIDSet = nil
     }
     // swiftlint:enable identifier_name
 }
