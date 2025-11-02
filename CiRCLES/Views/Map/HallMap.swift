@@ -55,7 +55,7 @@ struct HallMap: View {
                 // Selection highlight
                 if popoverWebCatalogIDSet != nil {
                     Rectangle()
-                        .foregroundStyle(Color.accent.opacity(0.3))
+                        .foregroundStyle(.primary.opacity(0.3))
                         .frame(
                             width: popoverSourceRect.width,
                             height: popoverSourceRect.height
@@ -67,8 +67,8 @@ struct HallMap: View {
             .overlay {
                 // Selection highlight
                 if let popoverLayoutMapping {
-                    Rectangle()
-                        .foregroundStyle(.primary.opacity(0.001))
+                    ZStack {}
+                        .contentShape(.rect)
                         .matchedTransitionSource(
                             id: "Layout.\(popoverLayoutMapping.blockID).\(popoverLayoutMapping.spaceNumber)",
                             in: namespace
