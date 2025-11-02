@@ -11,7 +11,7 @@ import SwiftUI
 @Observable
 class Unifier {
 
-    var isPresented: Bool = true
+    var isPresented: Bool = false
 
     // Currently displayed sheet's data representation
     var current: UnifiedPath? = .circles
