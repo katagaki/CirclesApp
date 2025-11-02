@@ -39,7 +39,7 @@ struct MapPopoverDetail: View {
                                     circle, in: popoverNamespace, shouldFetchWebCut: showWebCut,
                                     showSpaceName: .constant(false), showDay: .constant(false)
                                 )
-                                .frame(width: 35.0, height: 50.0, alignment: .center)
+                                .frame(width: 42.0, height: 60.0, alignment: .center)
                                 Text(circle.circleName)
                                     .font(.subheadline)
                                     .lineLimit(2)
