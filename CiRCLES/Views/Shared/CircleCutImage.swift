@@ -151,7 +151,7 @@ struct CircleCutImage: View {
         .onAppear {
             prepareCutImage()
         }
-        .onChange(of: circle.id) { _, _ in
+        .onChange(of: circle.id) {
             self.webCutImage = nil
             isWebCutURLFetched = false
             prepareCutImage()

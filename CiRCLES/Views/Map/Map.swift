@@ -1,5 +1,5 @@
 //
-//  InteractiveMap.swift
+//  Map.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/08/07.
@@ -8,7 +8,7 @@
 import SwiftUI
 import TipKit
 
-struct InteractiveMap: View {
+struct Map: View {
 
     @Environment(Database.self) var database
     @Environment(Favorites.self) var favorites
@@ -28,74 +28,88 @@ struct InteractiveMap: View {
     @State var popoverWebCatalogIDSet: WebCatalogIDSet?
     @State var popoverSourceRect: CGRect = .null
 
-    @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
-    @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
-
     @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
-
+    @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
+
+    @Namespace var namespace
 
     var spaceSize: Int {
         useHighResolutionMaps ? 40 : 20
     }
 
-    var namespace: Namespace.ID
-
     var body: some View {
         VStack(alignment: .leading) {
             if let mapImage {
-                ScrollView([.horizontal, .vertical]) {
-                    ZStack(alignment: .topLeading) {
-                        // Map Layer
-                        HallMap(
-                            image: mapImage,
-                            mappings: $layoutWebCatalogIDMappings,
-                            spaceSize: spaceSize,
-                            width: $mapImageWidth,
-                            height: $mapImageHeight,
-                            zoomDivisor: $zoomDivisor,
-                            namespace: namespace
-                        )
-                        // Favorites Layer
-                        HallFavoritesOverlay(
-                            mappings: $layoutFavoriteWebCatalogIDMappings,
-                            spaceSize: spaceSize,
-                            width: $mapImageWidth,
-                            height: $mapImageHeight,
-                            zoomDivisor: $zoomDivisor
-                        )
-                        // Genre Layer
-                        if showGenreOverlay, let genreImage {
-                            HallOverlay(
-                                image: genreImage,
+                ScrollViewReader { reader in
+                    ScrollView([.horizontal, .vertical]) {
+                        ZStack(alignment: .topLeading) {
+                            // Layout layer
+                            MapLayoutLayer(
+                                image: mapImage,
+                                mappings: $layoutWebCatalogIDMappings,
+                                spaceSize: spaceSize,
+                                width: $mapImageWidth,
+                                height: $mapImageHeight,
+                                zoomDivisor: $zoomDivisor,
+                                popoverLayoutMapping: $popoverLayoutMapping,
+                                popoverWebCatalogIDSet: $popoverWebCatalogIDSet,
+                                popoverSourceRect: $popoverSourceRect,
+                                namespace: namespace
+                            )
+                            // Favorites layer
+                            MapFavoritesLayer(
+                                mappings: $layoutFavoriteWebCatalogIDMappings,
+                                spaceSize: spaceSize,
                                 width: $mapImageWidth,
                                 height: $mapImageHeight,
                                 zoomDivisor: $zoomDivisor
                             )
+                            // Genre layer
+                            if showGenreOverlay, let genreImage {
+                                MapLayer(
+                                    image: genreImage,
+                                    width: $mapImageWidth,
+                                    height: $mapImageHeight,
+                                    zoomDivisor: $zoomDivisor
+                                )
+                            }
+                            // Popover layer
+                            MapPopoverLayer(
+                                sourceRect: $popoverSourceRect,
+                                selection: $popoverWebCatalogIDSet,
+                            ) { idSet, isDismissing in
+                                MapPopoverDetail(webCatalogIDSet: idSet)
+                                    .id("\(isDismissing ? "!" : "")\(idSet.id)")
+                            }
                         }
                     }
-                }
-                .scrollIndicators(.hidden)
-                .overlay {
-                    if isLoadingLayouts {
-                        ZStack(alignment: .center) {
-                            ProgressView("Map.LoadingLayouts")
-                                .padding()
-                                .background(Material.regular)
-                                .clipShape(.rect(cornerRadius: 8.0))
+                    .scrollIndicators(.hidden)
+                    .overlay {
+                        if isLoadingLayouts {
+                            ZStack(alignment: .center) {
+                                ProgressView("Map.LoadingLayouts")
+                                    .padding()
+                                    .background(Material.regular)
+                                    .clipShape(.rect(cornerRadius: 8.0))
+                                Color.clear
+                            }
+                        }
+                    }
+                    .overlay {
+                        ZStack(alignment: .topTrailing) {
                             Color.clear
+                            MapControlStack(
+                                showGenreOverlay: $showGenreOverlay,
+                                zoomDivisor: $zoomDivisor
+                            )
+                            .offset(x: -12.0, y: 12.0)
                         }
                     }
-                }
-                .overlay {
-                    ZStack(alignment: .topTrailing) {
-                        MapControlStack(
-                            showGenreOverlay: $showGenreOverlay,
-                            useDarkModeMaps: $useDarkModeMaps,
-                            zoomDivisor: $zoomDivisor
-                        )
-                        .offset(x: -12.0, y: 12.0)
-                        Color.clear
+                    .onChange(of: popoverWebCatalogIDSet) {
+                        if let popoverWebCatalogIDSet {
+                            reader.scrollTo(popoverWebCatalogIDSet.id, anchor: .center)
+                        }
                     }
                 }
             } else {
@@ -112,16 +126,16 @@ struct InteractiveMap: View {
                 reloadAll()
             }
         }
-        .onChange(of: database.commonImages) { _, _ in
+        .onChange(of: database.commonImages) {
             reloadAll()
         }
-        .onChange(of: selections.idMap) { _, _ in
+        .onChange(of: selections.idMap) {
             reloadAll()
         }
-        .onChange(of: useHighResolutionMaps) { _, _ in
+        .onChange(of: useHighResolutionMaps) {
             reloadMapImage()
         }
-        .onChange(of: favorites.items) { _, _ in
+        .onChange(of: favorites.items) {
             Task.detached(priority: .high) {
                 await reloadFavorites()
             }
@@ -271,7 +285,7 @@ struct InteractiveMap: View {
                     layoutFavoriteWebCatalogIDMappings[matchedLayoutMap]?[webCatalogID] = favoriteItem.favorite.color
                 }
             }
-            // 5. Change keys to space sub number to force MapFavoriteBlock to sort correctly
+            // 5. Change keys to space sub number to force MapFavoriteLayerBlock to sort correctly
             // TODO
         }
         return layoutFavoriteWebCatalogIDMappings

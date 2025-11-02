@@ -15,9 +15,9 @@ class Unifier {
 
     // Currently displayed sheet's data representation
     var current: UnifiedPath? = .circles
-    var selectedDetent: PresentationDetent = .medium
+    var selectedDetent: PresentationDetent = .height(360)
     var isMinimized: Bool {
-        selectedDetent != .medium && selectedDetent != .large
+        selectedDetent != .height(360) && selectedDetent != .large
     }
 
     // Currently displayed sheet's navigation stack's view path

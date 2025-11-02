@@ -175,11 +175,11 @@ struct MyView: View {
                 reloadDataInBackground()
             }
         }
-        .onChange(of: authenticator.token) { _, _ in
+        .onChange(of: authenticator.token) {
             userInfo = nil
             reloadDataInBackground()
         }
-        .onChange(of: authenticator.onlineState) { _, _ in
+        .onChange(of: authenticator.onlineState) {
             reloadDataInBackground()
         }
         .onChange(of: isDatabaseInitialized) { _, newValue in
@@ -187,7 +187,7 @@ struct MyView: View {
                 reloadDataInBackground(forceReload: true)
             }
         }
-        .onChange(of: database.commonImages) { _, _ in
+        .onChange(of: database.commonImages) {
             // TODO: Improve race condition when My tab is the startup tab
             if eventDates == nil {
                 reloadDataInBackground()

@@ -964,6 +964,22 @@
         }
       }
     },
+    "More.Customization.Map.ShowsGenreOverlays" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show Genre Overlay"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ジャンルを表示"
+          }
+        }
+      }
+    },
     "More.Customization.Map.UseDarkModeMap" : {
       "localizations" : {
         "en" : {
@@ -975,7 +991,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "ダークモードではマップを暗くする"
+            "value" : "ダークモードに従う"
           }
         }
       }
@@ -1988,23 +2004,6 @@
         }
       }
     },
-    "Shared.Day" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Date"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "開催日"
-          }
-        }
-      }
-    },
     "Shared.Delete" : {
       "localizations" : {
         "en" : {
@@ -2601,23 +2600,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "お気に入り"
-          }
-        }
-      }
-    },
-    "Tab.Map" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Map"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "マップ"
           }
         }
       }

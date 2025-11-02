@@ -1,0 +1,129 @@
+//
+//  MapPopover.swift
+//  CiRCLES
+//
+//  Created by シン・ジャスティン on 2025/11/02.
+//
+
+import SwiftUI
+
+struct MapPopover<Content: View>: View {
+
+    var sourceRect: CGRect
+    var canvasSize: CGSize
+    var popoverWidth: CGFloat = 200.0
+    var popoverHeight: CGFloat = (16.0 * 2) + (50.0 * 2) + 8.0
+    var edgePadding: CGFloat = 16.0
+    var isDismissing: Bool
+    var content: () -> Content
+
+    @State var animationProgress: CGFloat = 0
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            content()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16.0)
+        }
+        .frame(width: popoverWidth, height: popoverHeight)
+        .adaptiveGlass(.regular, cornerRadius: 16.0)
+        .scaleEffect(0.3 + (0.7 * animationProgress))
+        .opacity(animationProgress)
+        .position(animatedPosition())
+        .onAppear {
+            if isDismissing {
+                animationProgress = 1
+                withAnimation(.snappy.speed(2.5)) {
+                    animationProgress = 0
+                }
+            } else {
+                withAnimation(.snappy.speed(2.5)) {
+                    animationProgress = 1
+                }
+            }
+        }
+    }
+
+    func animatedPosition() -> CGPoint {
+        let finalPosition = calculatePopoverPosition()
+        let startPosition = CGPoint(x: sourceRect.midX, y: sourceRect.midY)
+
+        return CGPoint(
+            x: startPosition.x + (finalPosition.x - startPosition.x) * animationProgress,
+            y: startPosition.y + (finalPosition.y - startPosition.y) * animationProgress
+        )
+    }
+
+    func calculatePopoverPosition() -> CGPoint {
+        let gapFromSquare: CGFloat = 8
+        let effectiveHeight = max(popoverHeight, 150)
+        let itemCenterX = sourceRect.midX
+        let itemCenterY = sourceRect.midY
+        let itemHalfWidth = sourceRect.width / 2
+        let itemHalfHeight = sourceRect.height / 2
+        let minOffsetX = itemHalfWidth + gapFromSquare + (popoverWidth / 2)
+        let minOffsetY = itemHalfHeight + gapFromSquare + (effectiveHeight / 2)
+
+        let spaceRight = canvasSize.width - edgePadding - (itemCenterX + minOffsetX + popoverWidth / 2)
+        let spaceLeft = (itemCenterX - minOffsetX - popoverWidth / 2) - edgePadding
+        let spaceBottom = canvasSize.height - edgePadding - (itemCenterY + minOffsetY + effectiveHeight / 2)
+        let spaceTop = (itemCenterY - minOffsetY - effectiveHeight / 2) - edgePadding
+
+        var positionX: CGFloat
+        var positionY: CGFloat
+
+        let canFitRight = spaceRight >= 0
+        let canFitLeft = spaceLeft >= 0
+        let canFitBelow = spaceBottom >= 0
+        let canFitAbove = spaceTop >= 0
+
+        let nearTopEdge = itemCenterY < canvasSize.height * 0.3
+        let nearBottomEdge = itemCenterY > canvasSize.height * 0.7
+
+        if nearTopEdge && canFitBelow {
+            positionX = itemCenterX
+            positionY = itemCenterY + minOffsetY
+        } else if nearBottomEdge && canFitAbove {
+            positionX = itemCenterX
+            positionY = itemCenterY - minOffsetY
+        } else if canFitRight {
+            positionX = itemCenterX + minOffsetX
+            positionY = itemCenterY
+
+            if positionY + effectiveHeight / 2 > canvasSize.height - edgePadding {
+                positionY = canvasSize.height - edgePadding - effectiveHeight / 2
+            } else if positionY - effectiveHeight / 2 < edgePadding {
+                positionY = edgePadding + effectiveHeight / 2
+            }
+        } else if canFitLeft {
+            positionX = itemCenterX - minOffsetX
+            positionY = itemCenterY
+
+            if positionY + effectiveHeight / 2 > canvasSize.height - edgePadding {
+                positionY = canvasSize.height - edgePadding - effectiveHeight / 2
+            } else if positionY - effectiveHeight / 2 < edgePadding {
+                positionY = edgePadding + effectiveHeight / 2
+            }
+        } else if canFitBelow {
+            positionX = itemCenterX
+            positionY = itemCenterY + minOffsetY
+        } else if canFitAbove {
+            positionX = itemCenterX
+            positionY = itemCenterY - minOffsetY
+        } else {
+            positionX = itemCenterX + minOffsetX
+            positionY = itemCenterY
+        }
+
+        positionX = max(
+            edgePadding + popoverWidth / 2,
+            min(canvasSize.width - edgePadding - popoverWidth / 2, positionX)
+        )
+        positionY = max(
+            edgePadding + effectiveHeight / 2,
+            min(canvasSize.height - edgePadding - effectiveHeight / 2, positionY)
+        )
+
+        return CGPoint(x: positionX, y: positionY)
+    }
+}

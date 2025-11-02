@@ -99,7 +99,7 @@ struct CirclesApp: App {
                 }
             }
         }
-        .onChange(of: planner.participation) { _, _ in
+        .onChange(of: planner.participation) {
             planner.participationUserDefault = planner.participation
         }
         .backgroundTask(.appRefresh("RefreshAuthToken")) {

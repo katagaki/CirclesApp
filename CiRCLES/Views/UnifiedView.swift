@@ -21,12 +21,10 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
 
-    @Namespace var namespace
-
     var body: some View {
         NavigationStack(path: $viewPath) {
             @Bindable var unifier = unifier
-            InteractiveMap(namespace: namespace)
+            Map()
                 .navigationBarTitleDisplayMode(.inline)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .toolbar {
@@ -43,6 +41,7 @@ struct UnifiedView: View {
                     }
                     ToolbarItem(placement: .topBarTrailing) {
                         MoreMenu(viewPath: $viewPath)
+                            .popoverTip(GenreOverlayTip())
                     }
                 }
                 .sheet(isPresented: $unifier.isPresented) {
@@ -99,7 +98,7 @@ struct UnifiedView: View {
         }
         .presentationContentInteraction(.scrolls)
         .presentationBackgroundInteraction(.enabled)
-        .presentationDetents([.height(72.0), .medium, .large], selection: $unifier.selectedDetent)
+        .presentationDetents([.height(72.0), .height(360), .large], selection: $unifier.selectedDetent)
         .interactiveDismissDisabled()
     }
 

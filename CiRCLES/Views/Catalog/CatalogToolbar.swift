@@ -65,12 +65,12 @@ struct CatalogToolbar: View {
             .padding(.vertical, 12.0)
         }
         .scrollIndicators(.hidden)
-        .onChange(of: selections.idMap) { _, _ in
+        .onChange(of: selections.idMap) {
             Task.detached {
                 await reloadBlocksInMap()
             }
         }
-        .onChange(of: displayedCircles) { _, _ in
+        .onChange(of: displayedCircles) {
             Task.detached {
                 await reloadSelectableMapsBlocksAndDates()
             }

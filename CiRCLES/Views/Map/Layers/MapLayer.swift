@@ -1,5 +1,5 @@
 //
-//  HallGenreOverlay.swift
+//  MapLayer.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2025/06/07.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct HallOverlay: View {
+struct MapLayer: View {
 
     var image: UIImage
 

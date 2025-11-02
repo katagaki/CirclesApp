@@ -168,7 +168,7 @@ struct CircleDetailView: View {
         .task {
             await prepareCircle()
         }
-        .onChange(of: circle.id) { _, _ in
+        .onChange(of: circle.id) {
             Task {
                 await prepareCircle()
             }

@@ -36,7 +36,7 @@ struct ListModeSwitcher: View {
         .onAppear {
             self.modeState = mode
         }
-        .onChange(of: modeState) { _, _ in
+        .onChange(of: modeState) {
             mode = modeState
         }
     }
