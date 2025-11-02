@@ -29,7 +29,7 @@ struct MapPopoverLayer<Content: View>: View {
                     .onChange(of: reader.size) { _, newValue in
                         canvasSize = newValue
                     }
-                if let currentItem {
+                if let currentItem, !currentRect.isNull {
                     MapPopover(
                         sourceRect: currentRect,
                         canvasSize: canvasSize,
@@ -40,7 +40,7 @@ struct MapPopoverLayer<Content: View>: View {
                     .id(currentItem.id)
                 }
 
-                if let dismissingItem {
+                if let dismissingItem, !dismissingRect.isNull {
                     MapPopover(
                         sourceRect: dismissingRect,
                         canvasSize: canvasSize,
