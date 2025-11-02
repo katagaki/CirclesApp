@@ -13,6 +13,7 @@ struct Map: View {
     @Environment(Database.self) var database
     @Environment(Favorites.self) var favorites
     @Environment(UserSelections.self) var selections
+    @Environment(Unifier.self) var unifier
 
     @State var mapImage: UIImage?
     @State var mapImageWidth: Int = 0
@@ -36,6 +37,22 @@ struct Map: View {
 
     var spaceSize: Int {
         useHighResolutionMaps ? 40 : 20
+    }
+    
+    var mapBottomPadding: CGFloat {
+        // Don't apply padding when detent is .large
+        if unifier.selectedDetent == .large {
+            return 0
+        }
+        // For .height(72.0) and .height(360), apply padding equal to the detent height
+        switch unifier.selectedDetent {
+        case .height(72.0):
+            return 72.0
+        case .height(360):
+            return 360.0
+        default:
+            return 0
+        }
     }
 
     var body: some View {
@@ -83,6 +100,7 @@ struct Map: View {
                                     .id("\(isDismissing ? "!" : "")\(idSet.id)")
                             }
                         }
+                        .padding(.bottom, mapBottomPadding)
                     }
                     .scrollIndicators(.hidden)
                     .overlay {
