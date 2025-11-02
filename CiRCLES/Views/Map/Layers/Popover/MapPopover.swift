@@ -11,8 +11,8 @@ struct MapPopover<Content: View>: View {
 
     var sourceRect: CGRect
     var canvasSize: CGSize
-    var popoverWidth: CGFloat = 200.0
-    var popoverHeight: CGFloat = (16.0 * 2) + (50.0 * 2) + 8.0
+    var popoverWidth: CGFloat = 220.0
+    var popoverHeight: CGFloat = (16.0 * 2) + (60.0 * 2) + 8.0
     var edgePadding: CGFloat = 16.0
     var isDismissing: Bool
     var content: () -> Content

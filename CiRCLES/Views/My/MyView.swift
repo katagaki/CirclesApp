@@ -12,6 +12,7 @@ import SwiftUI
 struct MyView: View {
 
     @Environment(\.openURL) var openURL
+    @Environment(\.dismiss) var dismiss
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
     @Environment(ImageCache.self) var imageCache
@@ -121,6 +122,25 @@ struct MyView: View {
                     }
                 }
             }
+            ToolbarItem(placement: .topBarLeading) {
+                if #available(iOS 26.0, *) {
+                    Button(role: .close) {
+                        dismiss()
+                        Task {
+                            try? await Task.sleep(nanoseconds: 300000000)
+                            unifier.isPresented = true
+                        }
+                    }
+                } else {
+                    CloseButton {
+                        dismiss()
+                        Task {
+                            try? await Task.sleep(nanoseconds: 300000000)
+                            unifier.isPresented = true
+                        }
+                    }
+                }
+            }
         }
         .background {
             Group {
@@ -132,7 +152,7 @@ struct MyView: View {
                                 .ignoresSafeArea()
                                 .scaledToFill()
                                 .opacity(0.1)
-                                .blur(radius: 10.0)
+                                .blur(radius: 5.0)
                         }
                 } else {
                     Color(uiColor: .systemGroupedBackground)

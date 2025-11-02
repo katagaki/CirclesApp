@@ -146,6 +146,11 @@ struct Map: View {
                 mapImageHeight = Int(newValue.size.height)
             }
         }
+        .onChange(of: zoomDivisor) {
+            popoverSourceRect = .null
+            popoverLayoutMapping = nil
+            popoverWebCatalogIDSet = nil
+        }
     }
 
     func reloadAll() {

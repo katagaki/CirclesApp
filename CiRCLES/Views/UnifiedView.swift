@@ -18,6 +18,10 @@ struct UnifiedView: View {
 
     @State var viewPath: [UnifiedPath] = []
 
+    @State var isMyComiketPresenting: Bool = false
+
+    @Namespace var namespace
+
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
 
@@ -30,8 +34,11 @@ struct UnifiedView: View {
                 .toolbar {
                     ToolbarItem(placement: .topBarLeading) {
                         Button("Tab.My", image: .tabIconMy) {
-                            self.viewPath.append(.my)
+                            unifier.isPresented = false
+                            isMyComiketPresenting = true
                         }
+                        .aspectRatio(1.0, contentMode: .fit)
+                        .matchedTransitionSource(id: "My.View", in: namespace)
                     }
                     ToolbarItem(placement: .principal) {
                         UnifiedControl()
@@ -46,6 +53,18 @@ struct UnifiedView: View {
                 }
                 .sheet(isPresented: $unifier.isPresented) {
                     bottomPanel()
+                }
+                .fullScreenCover(isPresented: $isMyComiketPresenting) {
+                    if #available(iOS 26.0, *) {
+                        NavigationStack {
+                            MyView()
+                        }
+                        .navigationTransition(.zoom(sourceID: "My.View", in: namespace))
+                    } else {
+                        NavigationStack {
+                            MyView()
+                        }
+                    }
                 }
                 .navigationDestination(for: UnifiedPath.self) { path in
                     path.view()
@@ -80,21 +99,24 @@ struct UnifiedView: View {
     func bottomPanel() -> some View {
         @Bindable var unifier = unifier
         NavigationStack(path: $unifier.path) {
-            self.unifier.view()
-                .toolbar {
-                    ToolbarItem(placement: .principal) {
-                        Picker(selection: $unifier.current) {
-                            Text("ViewTitle.Circles")
-                                .tag(UnifiedPath.circles)
-                            Text("ViewTitle.Favorites")
-                                .tag(UnifiedPath.favorites)
-                        } label: { }
+            ZStack {
+                self.unifier.view()
+            }
+            .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Picker(selection: $unifier.current) {
+                        Text("ViewTitle.Circles")
+                            .tag(UnifiedPath.circles)
+                        Text("ViewTitle.Favorites")
+                            .tag(UnifiedPath.favorites)
+                    } label: { }
+                        .id("Unifier.Picker")
                         .pickerStyle(.segmented)
-                    }
                 }
-                .navigationDestination(for: UnifiedPath.self) { path in
-                    path.view()
-                }
+            }
+            .navigationDestination(for: UnifiedPath.self) { path in
+                path.view()
+            }
         }
         .presentationContentInteraction(.scrolls)
         .presentationBackgroundInteraction(.enabled)
