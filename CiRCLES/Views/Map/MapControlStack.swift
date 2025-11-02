@@ -59,8 +59,10 @@ struct MapControlStack: View {
             .clipShape(.capsule)
             .glassEffectIfSupported(bordered: true)
             .overlay {
-                Capsule()
-                    .stroke(.primary.opacity(0.2), lineWidth: 1 / 3)
+                if #unavailable(iOS 26.0) {
+                    Capsule()
+                        .stroke(.primary.opacity(0.2), lineWidth: 1 / 3)
+                }
             }
         }
     }

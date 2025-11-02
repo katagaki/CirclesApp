@@ -89,9 +89,7 @@ struct UnifiedView: View {
                                 .tag(UnifiedPath.circles)
                             Text("ViewTitle.Favorites")
                                 .tag(UnifiedPath.favorites)
-                        } label: {
-
-                        }
+                        } label: { }
                         .pickerStyle(.segmented)
                     }
                 }
