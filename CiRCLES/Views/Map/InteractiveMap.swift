@@ -88,13 +88,13 @@ struct InteractiveMap: View {
                     }
                 }
                 .overlay {
-                    ZStack(alignment: .bottomTrailing) {
+                    ZStack(alignment: .topTrailing) {
                         MapControlStack(
                             showGenreOverlay: $showGenreOverlay,
                             useDarkModeMaps: $useDarkModeMaps,
                             zoomDivisor: $zoomDivisor
                         )
-                        .offset(x: -12.0, y: -12.0)
+                        .offset(x: -12.0, y: 12.0)
                         Color.clear
                     }
                 }

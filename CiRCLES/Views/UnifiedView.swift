@@ -14,19 +14,18 @@ struct UnifiedView: View {
 
     @Environment(\.requestReview) var requestReview
     @Environment(Events.self) var planner
-    @Environment(Sheets.self) var sheets
+    @Environment(Unifier.self) var unifier
 
     @State var viewPath: [UnifiedPath] = []
 
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
 
-    let unifiedSheetTransitionId = "Unified.Sheet"
     @Namespace var namespace
 
     var body: some View {
         NavigationStack(path: $viewPath) {
-            @Bindable var sheets = sheets
+            @Bindable var unifier = unifier
             InteractiveMap(namespace: namespace)
                 .navigationBarTitleDisplayMode(.inline)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -43,23 +42,11 @@ struct UnifiedView: View {
                             .adaptiveShadow()
                     }
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button("Tab.More", systemImage: "ellipsis") {
-                            self.viewPath.append(.more)
-                        }
+                        MoreMenu(viewPath: $viewPath)
                     }
-                    // ToolbarItemGroup(placement: .bottomBar) { ...
-                    bottomToolbar()
-//                    ToolbarItemGroup(placement: .bottomBar) {
-//                        // TODO: Map controls
-//                    }
                 }
-                .sheet(isPresented: $sheets.isPresented) {
-                    if #available(iOS 26.0, *) {
-                        bottomPanel()
-                            .navigationTransition(.zoom(sourceID: unifiedSheetTransitionId, in: namespace))
-                    } else {
-                        bottomPanel()
-                    }
+                .sheet(isPresented: $unifier.isPresented) {
+                    bottomPanel()
                 }
                 .navigationDestination(for: UnifiedPath.self) { path in
                     path.view()
@@ -92,20 +79,20 @@ struct UnifiedView: View {
 
     @ViewBuilder
     func bottomPanel() -> some View {
-        @Bindable var sheets = sheets
-        NavigationStack(path: $sheets.path) {
-            self.sheets.current?.view()
+        @Bindable var unifier = unifier
+        NavigationStack(path: $unifier.path) {
+            self.unifier.view()
                 .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        if #available(iOS 26.0, *) {
-                            Button(role: .close) {
-                                self.sheets.hide()
-                            }
-                        } else {
-                            CloseButton {
-                                self.sheets.hide()
-                            }
+                    ToolbarItem(placement: .principal) {
+                        Picker(selection: $unifier.current) {
+                            Text("ViewTitle.Circles")
+                                .tag(UnifiedPath.circles)
+                            Text("ViewTitle.Favorites")
+                                .tag(UnifiedPath.favorites)
+                        } label: {
+
                         }
+                        .pickerStyle(.segmented)
                     }
                 }
                 .navigationDestination(for: UnifiedPath.self) { path in
@@ -114,33 +101,19 @@ struct UnifiedView: View {
         }
         .presentationContentInteraction(.scrolls)
         .presentationBackgroundInteraction(.enabled)
-        .presentationDetents([.medium, .large])
-    }
-
-    @ToolbarContentBuilder
-    func bottomToolbar() -> some ToolbarContent {
-        if #available(iOS 26.0, *) {
-            ToolbarItem(placement: .bottomBar) {
-                bottomToolbarContent()
-            }
-            .matchedTransitionSource(id: unifiedSheetTransitionId, in: namespace)
-            ToolbarSpacer(placement: .bottomBar)
-        } else {
-            ToolbarItem(placement: .bottomBar) {
-                bottomToolbarContent()
-            }
-        }
+        .presentationDetents([.height(72.0), .medium, .large], selection: $unifier.selectedDetent)
+        .interactiveDismissDisabled()
     }
 
     @ViewBuilder
     func bottomToolbarContent() -> some View {
         HStack(spacing: 18.0) {
             Button("Tab.Circles", systemImage: "square.grid.3x3.fill") {
-                self.sheets.show(.circles)
+                self.unifier.show(.circles)
             }
             if planner.isActiveEventLatest {
                 Button("Tab.Favorites", systemImage: "star.fill") {
-                    self.sheets.show(.favorites)
+                    self.unifier.show(.favorites)
                 }
             }
         }

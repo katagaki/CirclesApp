@@ -10,7 +10,7 @@ import SwiftUI
 struct HallMap: View {
 
     @Environment(Database.self) var database
-    @Environment(Sheets.self) var sheets
+    @Environment(Unifier.self) var unifier
 
     var image: UIImage
     @Binding var mappings: [LayoutCatalogMapping: [Int]]
@@ -36,6 +36,7 @@ struct HallMap: View {
                 height: CGFloat(height / zoomDivisor)
             )
             .padding(.trailing, 72.0)
+            .padding(.bottom, 72.0)
             .animation(.smooth.speed(2.0), value: zoomDivisor)
             .colorInvert(adaptive: true, enabled: $useDarkModeMaps)
             .onTapGesture { location in
@@ -49,7 +50,7 @@ struct HallMap: View {
             ) { _ in
                 InteractiveMapDetailPopover(webCatalogIDSet: $popoverWebCatalogIDSet)
                     .environment(database)
-                    .environment(sheets)
+                    .environment(unifier)
             }
             .overlay {
                 // Selection highlight

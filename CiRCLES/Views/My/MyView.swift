@@ -16,7 +16,7 @@ struct MyView: View {
     @Environment(Database.self) var database
     @Environment(ImageCache.self) var imageCache
     @Environment(Events.self) var planner
-    @Environment(Sheets.self) var sheets
+    @Environment(Unifier.self) var unifier
 
     @Query var events: [ComiketEvent]
 
@@ -251,7 +251,7 @@ struct MyView: View {
             let actor = DataConverter(modelContainer: sharedModelContainer)
             await actor.deleteAll()
             await MainActor.run {
-                sheets.close()
+                unifier.close()
                 authenticator.resetAuthentication()
             }
         }

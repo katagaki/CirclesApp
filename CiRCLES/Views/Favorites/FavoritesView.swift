@@ -18,7 +18,7 @@ struct FavoritesView: View {
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
     @Environment(UserSelections.self) var selections
-    @Environment(Sheets.self) var sheets
+    @Environment(Unifier.self) var unifier
 
     @State var favoriteCircles: [String: [ComiketCircle]]?
 
@@ -43,7 +43,7 @@ struct FavoritesView: View {
                             namespace: namespace
                         ) { circle in
                             if !isVisitModeOn {
-                                sheets.append(.namespacedCircleDetail(
+                                unifier.append(.namespacedCircleDetail(
                                     circle: circle,
                                     previousCircle: { previousCircle(for: $0) },
                                     nextCircle: { nextCircle(for: $0) },
@@ -64,7 +64,7 @@ struct FavoritesView: View {
                             showsOverlayWhenEmpty: false,
                             namespace: namespace
                         ) { circle in
-                            sheets.append(.namespacedCircleDetail(
+                            unifier.append(.namespacedCircleDetail(
                                 circle: circle,
                                 previousCircle: { previousCircle(for: $0) },
                                 nextCircle: { nextCircle(for: $0) },
