@@ -44,6 +44,7 @@ struct CirclesApp: App {
                     }
                 }
                 
+                // Keep progress overlay for manual operations (e.g., database repair)
                 if oasis.isShowing {
                     @Bindable var oasis = oasis
                     ProgressOverlay(

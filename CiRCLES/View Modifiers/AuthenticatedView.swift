@@ -67,37 +67,32 @@ struct AuthenticatedView: ViewModifier {
             if forceDownload {
                 isDatabaseInitialized = false
             }
-            unifier.isPresented = false
-            oasis.open {
-                Task {
-                    await oasis.setHeaderText("Shared.LoadingHeader.Event")
-                    await oasis.setBodyText("Loading.FetchEventData")
-                    if let authToken = authenticator.token {
-                        await planner.prepare(authToken: authToken)
+            // Don't close unifier - let user continue interacting
+            Task {
+                // Prepare event data
+                if let authToken = authenticator.token {
+                    await planner.prepare(authToken: authToken)
+                }
+                planner.updateActiveEvent(onlineState: authenticator.onlineState)
+                let activeEvent = planner.activeEvent
+                
+                // Load data in background without blocking UI
+                await loadDataFromDatabase(for: activeEvent)
+                await loadFavorites()
+                
+                // Only update selections after loading completes
+                await MainActor.run {
+                    // Set initial selections if needed
+                    if selections.date == nil {
+                        selections.date = selections.fetchDefaultDateSelection()
                     }
-                    planner.updateActiveEvent(onlineState: authenticator.onlineState)
-                    let activeEvent = planner.activeEvent
-                    
-                    // Load data from database first (modal phase)
-                    await loadDataFromDatabase(for: activeEvent)
-                    
-                    // Then load favorites in background (non-modal)
-                    await oasis.setModality(false)
-                    await loadFavorites()
-                    
-                    // Only update UI and close progress after everything is done
-                    await MainActor.run {
-                        oasis.close()
-                        // Set initial selections
-                        if selections.date == nil {
-                            selections.date = selections.fetchDefaultDateSelection()
-                        }
-                        if selections.map == nil {
-                            selections.map = selections.fetchDefaultMapSelection()
-                        }
+                    if selections.map == nil {
+                        selections.map = selections.fetchDefaultMapSelection()
+                    }
+                    if !unifier.isPresented {
                         unifier.isPresented = true
-                        isReloadingData = false
                     }
+                    isReloadingData = false
                 }
             }
         }
@@ -112,44 +107,26 @@ struct AuthenticatedView: ViewModifier {
         let token = authenticator.token ?? OpenIDToken()
 
         if let activeEvent {
-            await oasis.setHeaderText("Shared.LoadingHeader.Download")
-            await oasis.setBodyText("Loading.DownloadTextDatabase")
-            await database.downloadTextDatabase(for: activeEvent, authToken: token) { progress in
-                await oasis.setProgress(progress)
-                await oasis.checkAndShowOfflineOption()
-            }
-            await oasis.setBodyText("Loading.DownloadImageDatabase")
-            await database.downloadImageDatabase(for: activeEvent, authToken: token) { progress in
-                await oasis.setProgress(progress)
-                await oasis.checkAndShowOfflineOption()
-            }
+            // Download databases
+            await database.downloadTextDatabase(for: activeEvent, authToken: token) { _ in }
+            await database.downloadImageDatabase(for: activeEvent, authToken: token) { _ in }
 
-            await oasis.setBodyText("Loading.Database")
+            // Connect to databases
             database.connect()
 
-            await oasis.setHeaderText("Shared.LoadingHeader.Initial")
-
             if !isDatabaseInitialized {
-
                 let actor = DataConverter(modelContainer: sharedModelContainer)
 
                 await actor.disableAutoSave()
                 await actor.deleteAll()
                 imageCache.clear()
 
-                await oasis.setBodyText("Loading.Events")
+                // Load data from databases
                 await actor.loadEvents(from: database.textDatabase)
-                await oasis.checkAndShowOfflineOption()
-                await oasis.setBodyText("Loading.Maps")
                 await actor.loadMaps(from: database.textDatabase)
-                await oasis.checkAndShowOfflineOption()
                 await actor.loadLayouts(from: database.textDatabase)
-                await oasis.setBodyText("Loading.Genres")
                 await actor.loadGenres(from: database.textDatabase)
-                await oasis.checkAndShowOfflineOption()
-                await oasis.setBodyText("Loading.Circles")
                 await actor.loadCircles(from: database.textDatabase)
-                await oasis.checkAndShowOfflineOption()
 
                 await actor.save()
                 await actor.enableAutoSave()
@@ -157,7 +134,7 @@ struct AuthenticatedView: ViewModifier {
                 isDatabaseInitialized = true
             }
 
-            await oasis.setBodyText("Loading.Images")
+            // Load images into memory
             database.imageCache.removeAll()
             database.loadCommonImages()
             database.loadCircleImages()
@@ -172,9 +149,6 @@ struct AuthenticatedView: ViewModifier {
     }
 
     func loadFavorites() async {
-        await oasis.setModality(false)
-        await oasis.setHeaderText("Shared.LoadingHeader.Favorites")
-        await oasis.setBodyText("Loading.Favorites")
         let actor = FavoritesActor(modelContainer: sharedModelContainer)
         if let token = authenticator.token {
             let (items, wcIDMappedItems) = await actor.all(authToken: token)
