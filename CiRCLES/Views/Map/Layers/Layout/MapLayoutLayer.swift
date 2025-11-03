@@ -35,8 +35,6 @@ struct MapLayoutLayer: View {
                 width: CGFloat(width / zoomDivisor),
                 height: CGFloat(height / zoomDivisor)
             )
-            .padding(.trailing, 120.0)
-            .padding(.bottom, 72.0)
             .animation(.smooth.speed(2.0), value: zoomDivisor)
             .colorInvert(adaptive: true, enabled: $useDarkModeMaps)
             .onTapGesture { location in

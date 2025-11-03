@@ -38,10 +38,8 @@ struct Map: View {
     var spaceSize: Int {
         useHighResolutionMaps ? 40 : 20
     }
-    
+
     var mapBottomPadding: CGFloat {
-        // For .height(72.0) and .height(360), apply padding equal to the detent height
-        // Don't apply padding when detent is .large or any other value
         switch unifier.selectedDetent {
         case .height(72.0):
             return 72.0
@@ -97,8 +95,9 @@ struct Map: View {
                                     .id("\(isDismissing ? "!" : "")\(idSet.id)")
                             }
                         }
-                        .padding(.bottom, mapBottomPadding)
                     }
+                    .contentMargins(.bottom, mapBottomPadding + 12.0, for: .scrollContent)
+                    .contentMargins(.trailing, 120.0, for: .scrollContent)
                     .scrollIndicators(.hidden)
                     .overlay {
                         if isLoadingLayouts {
