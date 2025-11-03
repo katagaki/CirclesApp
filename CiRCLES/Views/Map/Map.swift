@@ -13,6 +13,7 @@ struct Map: View {
     @Environment(Database.self) var database
     @Environment(Favorites.self) var favorites
     @Environment(UserSelections.self) var selections
+    @Environment(Unifier.self) var unifier
 
     @State var mapImage: UIImage?
     @State var mapImageWidth: Int = 0
@@ -36,6 +37,17 @@ struct Map: View {
 
     var spaceSize: Int {
         useHighResolutionMaps ? 40 : 20
+    }
+
+    var mapBottomPadding: CGFloat {
+        switch unifier.selectedDetent {
+        case .height(72.0):
+            return 72.0
+        case .height(360):
+            return 360.0
+        default:
+            return 0
+        }
     }
 
     var body: some View {
@@ -84,6 +96,8 @@ struct Map: View {
                             }
                         }
                     }
+                    .contentMargins(.bottom, mapBottomPadding + 12.0, for: .scrollContent)
+                    .contentMargins(.trailing, 120.0, for: .scrollContent)
                     .scrollIndicators(.hidden)
                     .overlay {
                         if isLoadingLayouts {
