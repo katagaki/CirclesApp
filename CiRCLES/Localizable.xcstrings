@@ -2572,6 +2572,23 @@
         }
       }
     },
+    "Shared.UseOfflineMode" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Offline Mode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフラインモードを使用"
+          }
+        }
+      }
+    },
     "Tab.Circles" : {
       "localizations" : {
         "en" : {

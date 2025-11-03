@@ -43,14 +43,23 @@ struct CirclesApp: App {
                             .transition(.move(edge: .top).animation(.smooth.speed(2.0)))
                     }
                 }
+                
+                if oasis.isShowing {
+                    @Bindable var oasis = oasis
+                    ProgressOverlay(
+                        headerText: $oasis.headerText,
+                        bodyText: $oasis.bodyText,
+                        progress: $oasis.progress,
+                        showOfflineOption: $oasis.showOfflineOption,
+                        onUseOfflineMode: {
+                            Task { @MainActor in
+                                authenticator.useOfflineAuthenticationToken()
+                                authenticator.onlineState = .offline
+                            }
+                        }
+                    )
+                }
             }
-            .progressAlert(
-                isModal: $oasis.isModal,
-                isShowing: $oasis.isShowing,
-                headerText: $oasis.headerText,
-                bodyText: $oasis.bodyText,
-                progress: $oasis.progress
-            )
             .onAppear {
                 orientation.update()
             }

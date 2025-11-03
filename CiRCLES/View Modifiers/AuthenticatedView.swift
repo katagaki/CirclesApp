@@ -77,21 +77,26 @@ struct AuthenticatedView: ViewModifier {
                     }
                     planner.updateActiveEvent(onlineState: authenticator.onlineState)
                     let activeEvent = planner.activeEvent
-                    Task.detached {
-                        await loadDataFromDatabase(for: activeEvent)
-                        await loadFavorites()
-                        await MainActor.run {
-                            oasis.close()
-                            // Set initial selections
-                            if selections.date == nil {
-                                selections.date = selections.fetchDefaultDateSelection()
-                            }
-                            if selections.map == nil {
-                                selections.map = selections.fetchDefaultMapSelection()
-                            }
-                            unifier.isPresented = true
-                            isReloadingData = false
+                    
+                    // Load data from database first (modal phase)
+                    await loadDataFromDatabase(for: activeEvent)
+                    
+                    // Then load favorites in background (non-modal)
+                    await oasis.setModality(false)
+                    await loadFavorites()
+                    
+                    // Only update UI and close progress after everything is done
+                    await MainActor.run {
+                        oasis.close()
+                        // Set initial selections
+                        if selections.date == nil {
+                            selections.date = selections.fetchDefaultDateSelection()
                         }
+                        if selections.map == nil {
+                            selections.map = selections.fetchDefaultMapSelection()
+                        }
+                        unifier.isPresented = true
+                        isReloadingData = false
                     }
                 }
             }
@@ -99,7 +104,10 @@ struct AuthenticatedView: ViewModifier {
     }
 
     func loadDataFromDatabase(for activeEvent: WebCatalogEvent.Response.Event? = nil) async {
-        UIApplication.shared.isIdleTimerDisabled = true
+        // Keep screen on for iOS 18 and below during downloads
+        if #unavailable(iOS 26.0) {
+            UIApplication.shared.isIdleTimerDisabled = true
+        }
 
         let token = authenticator.token ?? OpenIDToken()
 
@@ -108,10 +116,12 @@ struct AuthenticatedView: ViewModifier {
             await oasis.setBodyText("Loading.DownloadTextDatabase")
             await database.downloadTextDatabase(for: activeEvent, authToken: token) { progress in
                 await oasis.setProgress(progress)
+                await oasis.checkAndShowOfflineOption()
             }
             await oasis.setBodyText("Loading.DownloadImageDatabase")
             await database.downloadImageDatabase(for: activeEvent, authToken: token) { progress in
                 await oasis.setProgress(progress)
+                await oasis.checkAndShowOfflineOption()
             }
 
             await oasis.setBodyText("Loading.Database")
@@ -129,13 +139,17 @@ struct AuthenticatedView: ViewModifier {
 
                 await oasis.setBodyText("Loading.Events")
                 await actor.loadEvents(from: database.textDatabase)
+                await oasis.checkAndShowOfflineOption()
                 await oasis.setBodyText("Loading.Maps")
                 await actor.loadMaps(from: database.textDatabase)
+                await oasis.checkAndShowOfflineOption()
                 await actor.loadLayouts(from: database.textDatabase)
                 await oasis.setBodyText("Loading.Genres")
                 await actor.loadGenres(from: database.textDatabase)
+                await oasis.checkAndShowOfflineOption()
                 await oasis.setBodyText("Loading.Circles")
                 await actor.loadCircles(from: database.textDatabase)
+                await oasis.checkAndShowOfflineOption()
 
                 await actor.save()
                 await actor.enableAutoSave()
@@ -151,7 +165,10 @@ struct AuthenticatedView: ViewModifier {
             database.disconnect()
         }
 
-        UIApplication.shared.isIdleTimerDisabled = false
+        // Re-enable idle timer for iOS 18 and below
+        if #unavailable(iOS 26.0) {
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
     }
 
     func loadFavorites() async {
