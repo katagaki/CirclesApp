@@ -49,7 +49,7 @@ struct ProgressOverlay: View {
                 
                 if showOfflineOption {
                     Button(action: onUseOfflineMode) {
-                        Text("Shared.UseOfflineMode")
+                        Text(NSLocalizedString("Shared.UseOfflineMode", comment: ""))
                             .font(.body)
                             .fontWeight(.medium)
                             .frame(maxWidth: .infinity)
