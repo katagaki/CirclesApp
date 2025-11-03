@@ -42,7 +42,7 @@ struct MapLayoutLayer: View {
             }
             .overlay {
                 // Selection highlight
-                if popoverWebCatalogIDSet != nil {
+                if let popoverWebCatalogIDSet {
                     Rectangle()
                         .foregroundStyle(.primary.opacity(0.3))
                         .frame(
@@ -51,6 +51,7 @@ struct MapLayoutLayer: View {
                         )
                         .position(x: popoverSourceRect.midX, y: popoverSourceRect.midY)
                         .transition(.opacity.animation(.smooth.speed(2.0)))
+                        .id(popoverWebCatalogIDSet.id)
                 }
             }
             .overlay {

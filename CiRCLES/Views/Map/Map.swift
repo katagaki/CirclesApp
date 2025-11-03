@@ -122,7 +122,9 @@ struct Map: View {
                     }
                     .onChange(of: popoverWebCatalogIDSet) {
                         if let popoverWebCatalogIDSet {
-                            reader.scrollTo(popoverWebCatalogIDSet.id, anchor: .center)
+                            withAnimation(.smooth) {
+                                reader.scrollTo(popoverWebCatalogIDSet.id, anchor: .center)
+                            }
                         }
                     }
                 }
