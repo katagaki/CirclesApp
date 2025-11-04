@@ -43,8 +43,8 @@ struct Map: View {
         switch unifier.selectedDetent {
         case .height(120):
             return 120.0
-        case .height(150):
-            return 150.0
+        case .height(160):
+            return 160.0
         case .height(360):
             return 360.0
         default:
