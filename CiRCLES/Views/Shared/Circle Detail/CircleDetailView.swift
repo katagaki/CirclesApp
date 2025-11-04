@@ -16,6 +16,7 @@ struct CircleDetailView: View {
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
+    @Environment(Unifier.self) var unifier
 
     @State var circle: ComiketCircle
 
@@ -115,6 +116,8 @@ struct CircleDetailView: View {
                 ListSectionWithTranslateButton(title: "Shared.Memo", text: circle.memo)
             }
         }
+        .opacity(unifier.isMinimized ? 0.0 : 1.0)
+        .animation(.easeInOut(duration: 0.2), value: unifier.selectedDetent)
         .listSectionSpacing(.compact)
         .navigationTitle(circle.circleName)
         .navigationBarTitleDisplayMode(.inline)
