@@ -1012,6 +1012,23 @@
         }
       }
     },
+    "More.Accounts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウント"
+          }
+        }
+      }
+    },
     "More.DBAdmin" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -2851,6 +2868,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "マップ"
+          }
+        }
+      }
+    },
+    "ViewTitle.More.Accounts" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウント"
           }
         }
       }

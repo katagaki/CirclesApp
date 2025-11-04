@@ -16,6 +16,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
     case my
     case more
     case moreDBAdmin
+    case moreAccounts
     case moreAttributions
     case circleDetail(
         circle: ComiketCircle
@@ -43,6 +44,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
         case .my: "My"
         case .more: "More"
         case .moreDBAdmin: "More.DBAdmin"
+        case .moreAccounts: "More.Accounts"
         case .moreAttributions: "More.Attributions"
         case .circleDetail(let circle): "Circles.\(circle.id)"
         case .namespacedCircleDetail(
@@ -61,6 +63,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
         case .my: MyView()
         case .more: MoreView()
         case .moreDBAdmin: MoreDatabaseAdministratiion()
+        case .moreAccounts: MoreAccountsView()
         case .moreAttributions: MoreView()
         case .circleDetail(let circle):
             CircleDetailView(circle: circle)
