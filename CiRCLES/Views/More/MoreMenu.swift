@@ -9,7 +9,10 @@ import SwiftUI
 
 struct MoreMenu: View {
 
+    @Environment(\.openURL) var openURL
+
     @Binding var viewPath: [UnifiedPath]
+    @Binding var isGoingToSignOut: Bool
 
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
@@ -81,6 +84,16 @@ struct MoreMenu: View {
                 }
             } header: {
                 Text("More.UsefulResources")
+            }
+            Section {
+                Button("Shared.Logout") {
+                    isGoingToSignOut = true
+                }
+                Button("More.DeleteAccount", role: .destructive) {
+                    openURL(URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
+                }
+            } header: {
+                Text("More.Account")
             }
             Button("Tab.More", systemImage: "ellipsis") {
                 self.viewPath.append(.more)

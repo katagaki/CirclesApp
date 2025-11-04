@@ -102,10 +102,16 @@ struct Map: View {
                     .overlay {
                         if isLoadingLayouts {
                             ZStack(alignment: .center) {
-                                ProgressView("Map.LoadingLayouts")
-                                    .padding()
-                                    .background(Material.regular)
-                                    .clipShape(.rect(cornerRadius: 8.0))
+                                if #available(iOS 26.0, *) {
+                                    ProgressView("Map.LoadingLayouts")
+                                        .padding()
+                                        .glassEffect(.regular, in: .rect(cornerRadius: 20.0))
+                                } else {
+                                    ProgressView("Map.LoadingLayouts")
+                                        .padding()
+                                        .background(Material.regular)
+                                        .clipShape(.rect(cornerRadius: 8.0))
+                                }
                                 Color.clear
                             }
                         }

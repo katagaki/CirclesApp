@@ -74,14 +74,14 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "translated",
-            "value" : "When you sign in again, all necessary data will need to be downloaded again."
+            "state" : "needs_review",
+            "value" : "When you sign in again, map and circle data will need to be downloaded again."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "再度ログインすると、データのダウンロードが行います。"
+            "value" : "再度ログインすると、マップとサークルデータのダウンロードが再度行われます。"
           }
         }
       }
@@ -861,6 +861,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "会場マップを表示するには、棟を選択してください。"
+          }
+        }
+      }
+    },
+    "More.Account" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アカウント設定"
           }
         }
       }
@@ -2262,22 +2278,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Circle.msでログイン"
-          }
-        }
-      }
-    },
-    "Shared.LoginAgain" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sign In Again"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "再度ログイン"
           }
         }
       }

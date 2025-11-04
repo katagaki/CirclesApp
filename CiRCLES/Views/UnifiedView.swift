@@ -14,12 +14,15 @@ struct UnifiedView: View {
 
     @Environment(\.requestReview) var requestReview
     @Environment(Authenticator.self) var authenticator
+    @Environment(Database.self) var database
+    @Environment(ImageCache.self) var imageCache
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
 
     @State var viewPath: [UnifiedPath] = []
 
     @State var isMyComiketPresenting: Bool = false
+    @State var isGoingToSignOut: Bool = false
 
     @Namespace var namespace
 
@@ -48,7 +51,10 @@ struct UnifiedView: View {
                             .adaptiveShadow()
                     }
                     ToolbarItem(placement: .topBarTrailing) {
-                        MoreMenu(viewPath: $viewPath)
+                        MoreMenu(
+                            viewPath: $viewPath,
+                            isGoingToSignOut: $isGoingToSignOut
+                        )
                             .popoverTip(GenreOverlayTip())
                     }
                 }
@@ -84,6 +90,14 @@ struct UnifiedView: View {
                 #if DEBUG
                 .debugOverlay()
                 #endif
+        }
+        .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
+            Button("Shared.Cancel", role: .cancel) {
+                unifier.isPresented = true
+            }
+            Button("Shared.Logout", role: .destructive, action: logout)
+        } message: {
+            Text("Alerts.Logout.Message")
         }
     }
 
@@ -144,5 +158,23 @@ struct UnifiedView: View {
             }
         }
         .padding(.horizontal, 2.0)
+    }
+
+    func logout() {
+        database.delete()
+        imageCache.clear()
+        let dictionary = UserDefaults.standard.dictionaryRepresentation()
+        dictionary.keys.forEach { key in
+            UserDefaults.standard.removeObject(forKey: key)
+        }
+        UserDefaults.standard.synchronize()
+        Task.detached {
+            let actor = DataConverter(modelContainer: sharedModelContainer)
+            await actor.deleteAll()
+            await MainActor.run {
+                unifier.close()
+                authenticator.resetAuthentication()
+            }
+        }
     }
 }
