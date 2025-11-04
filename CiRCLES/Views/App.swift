@@ -77,6 +77,7 @@ struct CirclesApp: App {
                     if authenticator.token != nil && authenticator.onlineState == .online {
                         // Require authentication when token expires
                         if authenticator.tokenExpiryDate < .now {
+                            unifier.isPresented = false
                             authenticator.isAuthenticating = true
                         // Refresh authentication token 1 hour before expiry
                         } else if authenticator.tokenExpiryDate.addingTimeInterval(-3600) < .now {

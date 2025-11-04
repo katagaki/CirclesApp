@@ -55,6 +55,7 @@ struct MyView: View {
                             }
                             .contextMenu {
                                 Button("Shared.LoginAgain", role: .destructive) {
+                                    unifier.isPresented = false
                                     authenticator.isAuthenticating = true
                                 }
                             }
@@ -91,6 +92,7 @@ struct MyView: View {
                             }
                             .contextMenu {
                                 Button("Shared.LoginAgain", role: .destructive) {
+                                    unifier.isPresented = false
                                     authenticator.isAuthenticating = true
                                 }
                             }

@@ -89,7 +89,9 @@ struct AuthenticatedView: ViewModifier {
                             if selections.map == nil {
                                 selections.map = selections.fetchDefaultMapSelection()
                             }
-                            unifier.isPresented = true
+                            if !authenticator.isAuthenticating {
+                                unifier.isPresented = true
+                            }
                             isReloadingData = false
                         }
                     }
