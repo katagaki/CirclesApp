@@ -147,7 +147,7 @@ struct Map: View {
             reloadAll()
         }
         .onChange(of: useHighResolutionMaps) {
-            reloadMapImage()
+            reloadAll()
         }
         .onChange(of: favorites.items) {
             Task.detached(priority: .high) {
@@ -269,7 +269,7 @@ struct Map: View {
                         let color = keyValue.value
                         result[spaceNumberSuffixes[webCatalogID] ?? webCatalogID] = color
                     }
-        }
+            }
 
         await MainActor.run {
             withAnimation(.smooth.speed(2.0)) {
