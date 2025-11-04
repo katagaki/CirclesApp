@@ -51,6 +51,9 @@ struct MapLayoutLayer: View {
                         )
                         .position(x: popoverSourceRect.midX, y: popoverSourceRect.midY)
                         .transition(.opacity.animation(.smooth.speed(2.0)))
+                        .onTapGesture {
+                            closeMapPopover()
+                        }
                 }
             }
             .overlay {
@@ -86,9 +89,13 @@ struct MapLayoutLayer: View {
                 return
             }
         }
+        closeMapPopover()
+    }
+    // swiftlint:enable identifier_name
+
+    func closeMapPopover() {
         popoverSourceRect = .null
         popoverLayoutMapping = nil
         popoverWebCatalogIDSet = nil
     }
-    // swiftlint:enable identifier_name
 }

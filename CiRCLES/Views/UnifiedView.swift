@@ -13,6 +13,7 @@ import TipKit
 struct UnifiedView: View {
 
     @Environment(\.requestReview) var requestReview
+    @Environment(Authenticator.self) var authenticator
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
 
@@ -52,7 +53,13 @@ struct UnifiedView: View {
                     }
                 }
                 .sheet(isPresented: $unifier.isPresented) {
-                    bottomPanel()
+                    if authenticator.isAuthenticating {
+                        LoginView()
+                            .environment(authenticator)
+                            .interactiveDismissDisabled()
+                    } else {
+                        bottomPanel()
+                    }
                 }
                 .fullScreenCover(isPresented: $isMyComiketPresenting) {
                     if #available(iOS 26.0, *) {
