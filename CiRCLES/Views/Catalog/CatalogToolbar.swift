@@ -45,7 +45,7 @@ struct CatalogToolbar: View {
                         }
                     }
                     BarAccessoryMenu(LocalizedStringKey(selections.block?.name ?? "Shared.Block"),
-                                     icon: "table.furniture") {
+                                     icon: "squareshape.split.2x2.dotted.inside") {
                         Button("Shared.All") {
                             selections.block = nil
                         }
