@@ -13,13 +13,18 @@ import TipKit
 struct UnifiedView: View {
 
     @Environment(\.requestReview) var requestReview
+    @Environment(\.openURL) var openURL
     @Environment(Authenticator.self) var authenticator
+    @Environment(Database.self) var database
+    @Environment(ImageCache.self) var imageCache
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
 
     @State var viewPath: [UnifiedPath] = []
 
     @State var isMyComiketPresenting: Bool = false
+    @State var isGoingToSignOut: Bool = false
+    @State var isDeletingAccount: Bool = false
 
     @Namespace var namespace
 
@@ -48,8 +53,22 @@ struct UnifiedView: View {
                             .adaptiveShadow()
                     }
                     ToolbarItem(placement: .topBarTrailing) {
-                        MoreMenu(viewPath: $viewPath)
-                            .popoverTip(GenreOverlayTip())
+                        MoreMenu(
+                            viewPath: $viewPath,
+                            onLogout: { isGoingToSignOut = true },
+                            onLoginAgain: {
+                                unifier.isPresented = false
+                                authenticator.isAuthenticating = true
+                            },
+                            onDeleteAccount: {
+                                #if os(visionOS)
+                                openURL(URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
+                                #else
+                                isDeletingAccount = true
+                                #endif
+                            }
+                        )
+                        .popoverTip(GenreOverlayTip())
                     }
                 }
                 .sheet(isPresented: $unifier.isPresented) {
@@ -81,6 +100,22 @@ struct UnifiedView: View {
                     showReviewPromptIfLaunchedEnoughTimes()
                 }
                 .authenticated()
+                #if !os(visionOS)
+                .sheet(isPresented: $isDeletingAccount) {
+                    SafariView(url: URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
+                        .ignoresSafeArea()
+                }
+                #endif
+                .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
+                    Button("Shared.Logout", role: .destructive) {
+                        logout()
+                    }
+                    Button("Shared.Cancel", role: .cancel) {
+                        isGoingToSignOut = false
+                    }
+                } message: {
+                    Text("Alerts.Logout.Message")
+                }
                 #if DEBUG
                 .debugOverlay()
                 #endif
@@ -144,5 +179,23 @@ struct UnifiedView: View {
             }
         }
         .padding(.horizontal, 2.0)
+    }
+    
+    func logout() {
+        database.delete()
+        imageCache.clear()
+        let dictionary = UserDefaults.standard.dictionaryRepresentation()
+        dictionary.keys.forEach { key in
+            UserDefaults.standard.removeObject(forKey: key)
+        }
+        UserDefaults.standard.synchronize()
+        Task.detached {
+            let actor = DataConverter(modelContainer: sharedModelContainer)
+            await actor.deleteAll()
+            await MainActor.run {
+                unifier.close()
+                authenticator.resetAuthentication()
+            }
+        }
     }
 }

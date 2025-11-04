@@ -16,13 +16,6 @@ struct MoreView: View {
     var body: some View {
         MoreList(repoName: "katagaki/CirclesApp", viewPath: UnifiedPath.moreAttributions) {
             Section {
-                NavigationLink(value: UnifiedPath.moreAccounts) {
-                    ListRow(image: "ListIcon.Profile.User", title: "More.Accounts")
-                }
-            } header: {
-                ListSectionHeader(text: "More.Accounts")
-            }
-            Section {
                 NavigationLink(value: UnifiedPath.moreDBAdmin) {
                     ListRow(image: "ListIcon.MasterDB", title: "More.DBAdmin.ManageDB")
                 }
@@ -43,7 +36,6 @@ struct MoreView: View {
         .listSectionSpacing(.compact)
         .navigationDestination(for: UnifiedPath.self) { path in
             switch path {
-            case .moreAccounts: MoreAccountsView()
             case .moreDBAdmin: MoreDatabaseAdministratiion()
             case .moreAttributions:
                 LicensesView(licenses: [

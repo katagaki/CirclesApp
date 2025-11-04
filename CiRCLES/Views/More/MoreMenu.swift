@@ -10,6 +10,10 @@ import SwiftUI
 struct MoreMenu: View {
 
     @Binding var viewPath: [UnifiedPath]
+    
+    var onLogout: () -> Void
+    var onLoginAgain: () -> Void
+    var onDeleteAccount: () -> Void
 
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
@@ -20,6 +24,19 @@ struct MoreMenu: View {
 
     var body: some View {
         Menu("Tab.More", systemImage: "ellipsis") {
+            Section {
+                Button("Shared.Logout") {
+                    onLogout()
+                }
+                Button("Shared.LoginAgain", role: .destructive) {
+                    onLoginAgain()
+                }
+                Button("More.DeleteAccount", role: .destructive) {
+                    onDeleteAccount()
+                }
+            } header: {
+                Text("More.Accounts")
+            }
             Section {
                 Toggle("More.Customization.Map.ShowsGenreOverlays", isOn: $showGenreOverlay)
                 Toggle("More.Customization.Map.UseDarkModeMap", isOn: $useDarkModeMaps)
