@@ -41,8 +41,10 @@ struct Map: View {
 
     var mapBottomPadding: CGFloat {
         switch unifier.selectedDetent {
-        case .height(72.0):
-            return 72.0
+        case .height(120):
+            return 120.0
+        case .height(150):
+            return 150.0
         case .height(360):
             return 360.0
         default:

@@ -107,10 +107,12 @@ struct CatalogView: View {
                 }
             }
         }
-        .searchable(text: $searchTerm,
-                    isPresented: $isSearchActive,
-                    placement: .navigationBarDrawer(displayMode: .always),
-                    prompt: "Circles.Search.Prompt")
+        .searchable(
+            text: $searchTerm,
+            isPresented: $isSearchActive,
+            placement: .toolbar,
+            prompt: "Circles.Search.Prompt"
+)
         .onAppear {
             if !isInitialLoadCompleted {
                 reloadDisplayedCircles(

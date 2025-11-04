@@ -141,7 +141,7 @@ struct UnifiedView: View {
         }
         .presentationContentInteraction(.scrolls)
         .presentationBackgroundInteraction(.enabled)
-        .presentationDetents([.height(72.0), .height(360), .large], selection: $unifier.selectedDetent)
+        .presentationDetentsForUnifiedView($unifier.selectedDetent)
         .interactiveDismissDisabled()
     }
 
