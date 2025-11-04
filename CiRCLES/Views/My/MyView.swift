@@ -11,11 +11,9 @@ import SwiftUI
 
 struct MyView: View {
 
-    @Environment(\.openURL) var openURL
     @Environment(\.dismiss) var dismiss
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
-    @Environment(ImageCache.self) var imageCache
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
 
@@ -30,7 +28,6 @@ struct MyView: View {
     @State var eventTitle: String?
 
     @State var isShowingEventCoverImage: Bool = false
-    @State var isGoingToSignOut: Bool = false
 
     @State var dateForNotifier: Date?
     @State var dayForNotifier: Int?
@@ -49,26 +46,6 @@ struct MyView: View {
                         if isInitialLoadCompleted {
                             MyProfileSection(userInfo: $userInfo)
                         }
-                        Section {
-                            Button("Shared.Logout") {
-                                isGoingToSignOut = true
-                            }
-                            .contextMenu {
-                                Button("Shared.LoginAgain", role: .destructive) {
-                                    unifier.isPresented = false
-                                    authenticator.isAuthenticating = true
-                                }
-                            }
-                        }
-                        Section {
-                            Button("More.DeleteAccount", role: .destructive) {
-                                #if !os(visionOS)
-                                isDeletingAccount = true
-                                #else
-                                openURL(URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
-                                #endif
-                            }
-                        }
                     }
                 }
                 List {
@@ -84,28 +61,6 @@ struct MyView: View {
                             participationForNotifier: $participationForNotifier
                         )
                         MyEventPickerSection()
-                    }
-                    if UIDevice.current.userInterfaceIdiom != .pad {
-                        Section {
-                            Button("Shared.Logout") {
-                                isGoingToSignOut = true
-                            }
-                            .contextMenu {
-                                Button("Shared.LoginAgain", role: .destructive) {
-                                    unifier.isPresented = false
-                                    authenticator.isAuthenticating = true
-                                }
-                            }
-                        }
-                        Section {
-                            Button("More.DeleteAccount", role: .destructive) {
-                                #if !os(visionOS)
-                                isDeletingAccount = true
-                                #else
-                                openURL(URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
-                                #endif
-                            }
-                        }
                     }
                 }
             }
@@ -169,28 +124,12 @@ struct MyView: View {
                 image: $eventCoverImage
             )
         }
-        #if !os(visionOS)
-        .sheet(isPresented: $isDeletingAccount) {
-            SafariView(url: URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
-                .ignoresSafeArea()
-        }
-        #endif
         .sheet(item: $dateForNotifier) { date in
             MyEventNotifierSheet(
                 date: date,
                 day: $dayForNotifier,
                 participation: $participationForNotifier
             )
-        }
-        .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
-            Button("Shared.Logout", role: .destructive) {
-                logout()
-            }
-            Button("Shared.Cancel", role: .cancel) {
-                isGoingToSignOut = false
-            }
-        } message: {
-            Text("Alerts.Logout.Message")
         }
         .onAppear {
             if !isInitialLoadCompleted {
@@ -257,24 +196,6 @@ struct MyView: View {
                 self.eventData = eventData
                 self.eventDates = eventDates
                 self.eventCoverImage = database.coverImage()
-            }
-        }
-    }
-
-    func logout() {
-        database.delete()
-        imageCache.clear()
-        let dictionary = UserDefaults.standard.dictionaryRepresentation()
-        dictionary.keys.forEach { key in
-            UserDefaults.standard.removeObject(forKey: key)
-        }
-        UserDefaults.standard.synchronize()
-        Task.detached {
-            let actor = DataConverter(modelContainer: sharedModelContainer)
-            await actor.deleteAll()
-            await MainActor.run {
-                unifier.close()
-                authenticator.resetAuthentication()
             }
         }
     }
