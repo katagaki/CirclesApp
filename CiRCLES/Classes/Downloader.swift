@@ -16,23 +16,11 @@ class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelegate {
 
     override init() {
         super.init()
-        // Use background session for iOS 26+, standard background for earlier versions
-        if #available(iOS 26.0, *) {
-            // iOS 26 has improved background download handling
-            let config = URLSessionConfiguration.background(withIdentifier: "com.tsubuzaki.CiRCLES.Downloader.\(UUID().uuidString)")
-            config.sessionSendsLaunchEvents = true
-            self.session = URLSession(
-                configuration: config,
-                delegate: self,
-                delegateQueue: .main
-            )
-        } else {
-            self.session = URLSession(
-                configuration: .background(withIdentifier: "com.tsubuzaki.CiRCLES.Downloader.\(UUID().uuidString)"),
-                delegate: self,
-                delegateQueue: .main
-            )
-        }
+        self.session = URLSession(
+            configuration: .background(withIdentifier: "com.tsubuzaki.CiRCLES.Downloader.\(UUID().uuidString)"),
+            delegate: self,
+            delegateQueue: .main
+        )
     }
 
     @MainActor

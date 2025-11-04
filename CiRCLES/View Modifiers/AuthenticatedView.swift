@@ -99,11 +99,6 @@ struct AuthenticatedView: ViewModifier {
     }
 
     func loadDataFromDatabase(for activeEvent: WebCatalogEvent.Response.Event? = nil) async {
-        // Keep screen on for iOS 18 and below during downloads
-        if #unavailable(iOS 26.0) {
-            UIApplication.shared.isIdleTimerDisabled = true
-        }
-
         let token = authenticator.token ?? OpenIDToken()
 
         if let activeEvent {
@@ -140,11 +135,6 @@ struct AuthenticatedView: ViewModifier {
             database.loadCircleImages()
 
             database.disconnect()
-        }
-
-        // Re-enable idle timer for iOS 18 and below
-        if #unavailable(iOS 26.0) {
-            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
 

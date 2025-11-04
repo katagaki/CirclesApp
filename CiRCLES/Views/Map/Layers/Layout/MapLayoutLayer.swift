@@ -51,6 +51,14 @@ struct MapLayoutLayer: View {
                         )
                         .position(x: popoverSourceRect.midX, y: popoverSourceRect.midY)
                         .transition(.opacity.animation(.smooth.speed(2.0)))
+                }
+            }
+            .overlay {
+                // Scroll anchor for popover
+                if let popoverWebCatalogIDSet {
+                    Color.clear
+                        .frame(width: 1, height: 1)
+                        .position(x: popoverSourceRect.midX, y: popoverSourceRect.midY)
                         .id(popoverWebCatalogIDSet.id)
                 }
             }
