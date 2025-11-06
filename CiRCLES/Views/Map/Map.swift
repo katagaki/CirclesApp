@@ -28,6 +28,7 @@ struct Map: View {
     @State var popoverLayoutMapping: LayoutCatalogMapping?
     @State var popoverWebCatalogIDSet: WebCatalogIDSet?
     @State var popoverSourceRect: CGRect = .null
+    @State var canvasSize: CGSize = .zero
 
     @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
@@ -57,44 +58,50 @@ struct Map: View {
             if let mapImage {
                 ScrollViewReader { reader in
                     ScrollView([.horizontal, .vertical]) {
-                        ZStack(alignment: .topLeading) {
-                            // Layout layer
-                            MapLayoutLayer(
-                                image: mapImage,
-                                mappings: $layoutWebCatalogIDMappings,
-                                spaceSize: spaceSize,
-                                width: $mapImageWidth,
-                                height: $mapImageHeight,
-                                zoomDivisor: $zoomDivisor,
-                                popoverLayoutMapping: $popoverLayoutMapping,
-                                popoverWebCatalogIDSet: $popoverWebCatalogIDSet,
-                                popoverSourceRect: $popoverSourceRect,
-                                namespace: namespace
-                            )
-                            // Favorites layer
-                            MapFavoritesLayer(
-                                mappings: $layoutFavoriteWebCatalogIDMappings,
-                                spaceSize: spaceSize,
-                                width: $mapImageWidth,
-                                height: $mapImageHeight,
-                                zoomDivisor: $zoomDivisor
-                            )
-                            // Genre layer
-                            if showGenreOverlay, let genreImage {
-                                MapLayer(
-                                    image: genreImage,
+                        GeometryReader { geometry in
+                            ZStack(alignment: .topLeading) {
+                                // Layout layer
+                                MapLayoutLayer(
+                                    image: mapImage,
+                                    mappings: $layoutWebCatalogIDMappings,
+                                    spaceSize: spaceSize,
+                                    width: $mapImageWidth,
+                                    height: $mapImageHeight,
+                                    zoomDivisor: $zoomDivisor,
+                                    popoverLayoutMapping: $popoverLayoutMapping,
+                                    popoverWebCatalogIDSet: $popoverWebCatalogIDSet,
+                                    popoverSourceRect: $popoverSourceRect,
+                                    namespace: namespace
+                                )
+                                // Favorites layer
+                                MapFavoritesLayer(
+                                    mappings: $layoutFavoriteWebCatalogIDMappings,
+                                    spaceSize: spaceSize,
                                     width: $mapImageWidth,
                                     height: $mapImageHeight,
                                     zoomDivisor: $zoomDivisor
                                 )
+                                // Genre layer
+                                if showGenreOverlay, let genreImage {
+                                    MapLayer(
+                                        image: genreImage,
+                                        width: $mapImageWidth,
+                                        height: $mapImageHeight,
+                                        zoomDivisor: $zoomDivisor
+                                    )
+                                }
+                                // Popover layer
+                                MapPopoverLayer(
+                                    sourceRect: $popoverSourceRect,
+                                    selection: $popoverWebCatalogIDSet,
+                                    canvasSize: $canvasSize
+                                ) { idSet, isDismissing in
+                                    MapPopoverDetail(webCatalogIDSet: idSet)
+                                        .id("\(isDismissing ? "!" : "")\(idSet.id)")
+                                }
                             }
-                            // Popover layer
-                            MapPopoverLayer(
-                                sourceRect: $popoverSourceRect,
-                                selection: $popoverWebCatalogIDSet,
-                            ) { idSet, isDismissing in
-                                MapPopoverDetail(webCatalogIDSet: idSet)
-                                    .id("\(isDismissing ? "!" : "")\(idSet.id)")
+                            .onChange(of: geometry.size) { _, newValue in
+                                canvasSize = newValue
                             }
                         }
                     }
