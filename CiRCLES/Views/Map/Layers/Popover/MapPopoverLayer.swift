@@ -23,26 +23,29 @@ struct MapPopoverLayer<Content: View>: View {
     var body: some View {
         ZStack {
             Color.clear
-            if let currentItem, !currentRect.isNull {
-                MapPopover(
-                    sourceRect: currentRect,
-                    canvasSize: canvasSize,
-                    isDismissing: false
-                ) {
-                    content(currentItem, false)
+            GeometryReader { reader in
+                Color.clear
+                if let currentItem, !currentRect.isNull {
+                    MapPopover(
+                        sourceRect: currentRect,
+                        canvasSize: canvasSize,
+                        isDismissing: false
+                    ) {
+                        content(currentItem, false)
+                    }
+                    .id(currentItem.id)
                 }
-                .id(currentItem.id)
-            }
 
-            if let dismissingItem, !dismissingRect.isNull {
-                MapPopover(
-                    sourceRect: dismissingRect,
-                    canvasSize: canvasSize,
-                    isDismissing: true
-                ) {
-                    content(dismissingItem, true)
+                if let dismissingItem, !dismissingRect.isNull {
+                    MapPopover(
+                        sourceRect: dismissingRect,
+                        canvasSize: canvasSize,
+                        isDismissing: true
+                    ) {
+                        content(dismissingItem, true)
+                    }
+                    .id("!\(dismissingItem.id)")
                 }
-                .id("!\(dismissingItem.id)")
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

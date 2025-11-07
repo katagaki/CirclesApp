@@ -56,51 +56,61 @@ struct Map: View {
     var body: some View {
         VStack(alignment: .leading) {
             if let mapImage {
-                GeometryReader { geometry in
-                    ScrollViewReader { reader in
-                        ScrollView([.horizontal, .vertical]) {
-                            ZStack(alignment: .topLeading) {
-                                // Layout layer
-                                MapLayoutLayer(
-                                    image: mapImage,
-                                    mappings: $layoutWebCatalogIDMappings,
-                                    spaceSize: spaceSize,
-                                    width: $mapImageWidth,
-                                    height: $mapImageHeight,
-                                    zoomDivisor: $zoomDivisor,
-                                    popoverLayoutMapping: $popoverLayoutMapping,
-                                    popoverWebCatalogIDSet: $popoverWebCatalogIDSet,
-                                    popoverSourceRect: $popoverSourceRect,
-                                    namespace: namespace
-                                )
-                                // Favorites layer
-                                MapFavoritesLayer(
-                                    mappings: $layoutFavoriteWebCatalogIDMappings,
-                                    spaceSize: spaceSize,
+                ScrollViewReader { reader in
+                    ScrollView([.horizontal, .vertical]) {
+                        ZStack(alignment: .topLeading) {
+                            // Layout layer
+                            MapLayoutLayer(
+                                image: mapImage,
+                                mappings: $layoutWebCatalogIDMappings,
+                                spaceSize: spaceSize,
+                                width: $mapImageWidth,
+                                height: $mapImageHeight,
+                                zoomDivisor: $zoomDivisor,
+                                popoverLayoutMapping: $popoverLayoutMapping,
+                                popoverWebCatalogIDSet: $popoverWebCatalogIDSet,
+                                popoverSourceRect: $popoverSourceRect,
+                                namespace: namespace
+                            )
+                            // Favorites layer
+                            MapFavoritesLayer(
+                                mappings: $layoutFavoriteWebCatalogIDMappings,
+                                spaceSize: spaceSize,
+                                width: $mapImageWidth,
+                                height: $mapImageHeight,
+                                zoomDivisor: $zoomDivisor
+                            )
+                            // Genre layer
+                            if showGenreOverlay, let genreImage {
+                                MapLayer(
+                                    image: genreImage,
                                     width: $mapImageWidth,
                                     height: $mapImageHeight,
                                     zoomDivisor: $zoomDivisor
                                 )
-                                // Genre layer
-                                if showGenreOverlay, let genreImage {
-                                    MapLayer(
-                                        image: genreImage,
-                                        width: $mapImageWidth,
-                                        height: $mapImageHeight,
-                                        zoomDivisor: $zoomDivisor
-                                    )
-                                }
-                                // Popover layer
-                                MapPopoverLayer(
-                                    sourceRect: $popoverSourceRect,
-                                    selection: $popoverWebCatalogIDSet,
-                                    canvasSize: $canvasSize
-                                ) { idSet, isDismissing in
-                                    MapPopoverDetail(webCatalogIDSet: idSet)
-                                        .id("\(isDismissing ? "!" : "")\(idSet.id)")
-                                }
+                            }
+                            // Popover layer
+                            MapPopoverLayer(
+                                sourceRect: $popoverSourceRect,
+                                selection: $popoverWebCatalogIDSet,
+                                canvasSize: $canvasSize
+                            ) { idSet, isDismissing in
+                                MapPopoverDetail(webCatalogIDSet: idSet)
+                                    .id("\(isDismissing ? "!" : "")\(idSet.id)")
                             }
                         }
+                        .background(
+                            GeometryReader { contentGeometry in
+                                Color.clear
+                                    .onChange(of: contentGeometry.size) { _, newValue in
+                                        canvasSize = newValue
+                                    }
+                                    .onAppear {
+                                        canvasSize = contentGeometry.size
+                                    }
+                            }
+                        )
+                    }
                         .contentMargins(.bottom, mapBottomPadding + 12.0, for: .scrollContent)
                         .contentMargins(.trailing, 120.0, for: .scrollContent)
                         .scrollIndicators(.hidden)
@@ -136,9 +146,6 @@ struct Map: View {
                                 reader.scrollTo(popoverWebCatalogIDSet.id, anchor: .center)
                             }
                         }
-                    }
-                    .onChange(of: geometry.size) { _, newValue in
-                        canvasSize = newValue
                     }
                 }
             } else {
