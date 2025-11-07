@@ -9,39 +9,37 @@ import SwiftUI
 
 struct MapPopover<Content: View>: View {
 
-    var sourceRect: CGRect
-    var canvasSize: CGSize
-    var popoverWidth: CGFloat = 220.0
-    var popoverHeight: CGFloat = (16.0 * 2) + (60.0 * 2) + 8.0
+    let popoverWidth: CGFloat = 220.0
+    let popoverHeight: CGFloat = (16.0 * 2) + (60.0 * 2) + 8.0
     var edgePadding: CGFloat = 16.0
+
+    @Binding var canvasSize: CGSize
+    var sourceRect: CGRect
     var isDismissing: Bool
     var content: () -> Content
 
     @State var animationProgress: CGFloat = 0
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            content()
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16.0)
-        }
-        .frame(width: popoverWidth, height: popoverHeight)
-        .adaptiveGlass(.regular, cornerRadius: 16.0)
-        .scaleEffect(0.3 + (0.7 * animationProgress))
-        .opacity(animationProgress)
-        .position(animatedPosition())
-        .onAppear {
-            if isDismissing {
-                animationProgress = 1
-                withAnimation(.snappy.speed(2.5)) {
-                    animationProgress = 0
-                }
-            } else {
-                withAnimation(.snappy.speed(2.5)) {
+        content()
+            .padding(16.0)
+            .frame(width: popoverWidth, height: popoverHeight)
+            .adaptiveGlass(.regular, cornerRadius: 16.0)
+            .scaleEffect(0.3 + (0.7 * animationProgress))
+            .opacity(animationProgress)
+            .position(animatedPosition())
+            .onAppear {
+                if isDismissing {
                     animationProgress = 1
+                    withAnimation(.smooth.speed(2.5)) {
+                        animationProgress = 0
+                    }
+                } else {
+                    withAnimation(.smooth.speed(2.5)) {
+                        animationProgress = 1
+                    }
                 }
             }
-        }
     }
 
     func animatedPosition() -> CGPoint {
