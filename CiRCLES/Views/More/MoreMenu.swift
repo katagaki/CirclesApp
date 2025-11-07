@@ -10,9 +10,13 @@ import SwiftUI
 struct MoreMenu: View {
 
     @Environment(\.openURL) var openURL
+    @Environment(Authenticator.self) var authenticator
+    @Environment(Events.self) var planner
 
     @Binding var viewPath: [UnifiedPath]
     @Binding var isGoingToSignOut: Bool
+
+    @State var activeEventNumber: Int = -1
 
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
@@ -23,6 +27,24 @@ struct MoreMenu: View {
 
     var body: some View {
         Menu("Tab.More", systemImage: "ellipsis") {
+            Section {
+                if let eventData = planner.eventData {
+                    Picker(selection: $activeEventNumber) {
+                        ForEach(eventData.list.sorted(by: {$0.number > $1.number}), id: \.id) { event in
+                            Text("Shared.Event.\(event.number)")
+                                .tag(event.number)
+                        }
+                    } label: {
+                        Text("My.Events.SelectEvent")
+                    }
+                    .pickerStyle(.menu)
+                    .disabled(authenticator.onlineState == .offline ||
+                              authenticator.onlineState == .undetermined)
+                } else {
+                    Text("My.Events.OfflineMode")
+                        .foregroundStyle(.secondary)
+                }
+            }
             Section {
                 Toggle("More.Customization.Map.ShowsGenreOverlays", isOn: $showGenreOverlay)
                 Toggle("More.Customization.Map.UseDarkModeMap", isOn: $useDarkModeMaps)
@@ -100,5 +122,13 @@ struct MoreMenu: View {
             }
         }
         .menuActionDismissBehavior(.disabled)
+        .onAppear {
+            activeEventNumber = planner.activeEventNumber
+        }
+        .onChange(of: activeEventNumber) { oldValue, _ in
+            if oldValue != -1 {
+                planner.activeEventNumber = activeEventNumber
+            }
+        }
     }
 }
