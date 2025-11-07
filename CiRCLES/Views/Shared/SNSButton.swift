@@ -36,8 +36,8 @@ struct SNSButton: View {
                         Text("Shared.SNS.Twitter")
                     }
                 }
-                .foregroundStyle(.background)
-                .tint(.primary)
+                .foregroundStyle(.white)
+                .tint(.init(red: 0.05, green: 0.05, blue: 0.05))
             case .pixiv:
                 Button {
                     var urlToOpen: URL = url

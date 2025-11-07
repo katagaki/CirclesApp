@@ -15,6 +15,8 @@ struct Map: View {
     @Environment(UserSelections.self) var selections
     @Environment(Unifier.self) var unifier
 
+    @State var canvasSize: CGSize = .zero
+
     @State var mapImage: UIImage?
     @State var mapImageWidth: Int = 0
     @State var mapImageHeight: Int = 0
@@ -90,11 +92,20 @@ struct Map: View {
                             }
                             // Popover layer
                             MapPopoverLayer(
+                                canvasSize: $canvasSize,
                                 sourceRect: $popoverSourceRect,
                                 selection: $popoverWebCatalogIDSet,
                             ) { idSet, isDismissing in
                                 MapPopoverDetail(webCatalogIDSet: idSet)
                                     .id("\(isDismissing ? "!" : "")\(idSet.id)")
+                            }
+                        }
+                        .background {
+                            GeometryReader { reader in
+                                Color.clear
+                                    .onChange(of: reader.size) { _, newValue in
+                                        canvasSize = newValue
+                                    }
                             }
                         }
                     }
@@ -128,9 +139,9 @@ struct Map: View {
                             .offset(x: -12.0, y: 12.0)
                         }
                     }
-                    .onChange(of: popoverWebCatalogIDSet) {
-                        if let popoverWebCatalogIDSet {
-                            reader.scrollTo(popoverWebCatalogIDSet.id, anchor: .center)
+                    .onChange(of: popoverWebCatalogIDSet) { _, newValue in
+                        if let newValue {
+                            reader.scrollTo(newValue.id, anchor: .center)
                         }
                     }
                 }

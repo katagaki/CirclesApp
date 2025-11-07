@@ -128,8 +128,10 @@ struct UnifiedView: View {
                     Picker(selection: $unifier.current) {
                         Text("ViewTitle.Circles")
                             .tag(UnifiedPath.circles)
-                        Text("ViewTitle.Favorites")
-                            .tag(UnifiedPath.favorites)
+                        if planner.isActiveEventLatest {
+                            Text("ViewTitle.Favorites")
+                                .tag(UnifiedPath.favorites)
+                        }
                     } label: { }
                         .id("Unifier.Picker")
                         .pickerStyle(.segmented)

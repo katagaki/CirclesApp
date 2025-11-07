@@ -9,11 +9,11 @@ import SwiftUI
 
 struct MapPopoverLayer<Content: View>: View {
 
+    @Binding var canvasSize: CGSize
+
     @Binding var sourceRect: CGRect
     @Binding var selection: WebCatalogIDSet?
     var content: (WebCatalogIDSet, Bool) -> Content
-
-    @State var canvasSize: CGSize = .zero
 
     @State var currentRect: CGRect = .null
     @State var currentItem: WebCatalogIDSet?
@@ -22,37 +22,28 @@ struct MapPopoverLayer<Content: View>: View {
     @State var dismissingItem: WebCatalogIDSet?
 
     var body: some View {
-        ZStack {
-            Color.clear
-            GeometryReader { reader in
-                Color.clear
-                    .onChange(of: reader.size) { _, newValue in
-                        canvasSize = newValue
-                    }
-                if let currentItem, !currentRect.isNull {
-                    MapPopover(
-                        sourceRect: currentRect,
-                        canvasSize: canvasSize,
-                        isDismissing: false
-                    ) {
-                        content(currentItem, false)
-                    }
-                    .id(currentItem.id)
+        Group {
+            if let currentItem, !currentRect.isNull {
+                MapPopover(
+                    canvasSize: $canvasSize,
+                    sourceRect: currentRect,
+                    isDismissing: false
+                ) {
+                    content(currentItem, false)
                 }
-
-                if let dismissingItem, !dismissingRect.isNull {
-                    MapPopover(
-                        sourceRect: dismissingRect,
-                        canvasSize: canvasSize,
-                        isDismissing: true
-                    ) {
-                        content(dismissingItem, true)
-                    }
-                    .id("!\(dismissingItem.id)")
+                .id(currentItem.id)
+            }
+            if let dismissingItem, !dismissingRect.isNull {
+                MapPopover(
+                    canvasSize: $canvasSize,
+                    sourceRect: dismissingRect,
+                    isDismissing: true
+                ) {
+                    content(dismissingItem, true)
                 }
+                .id("!\(dismissingItem.id)")
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .onChange(of: sourceRect) { oldValue, newValue in
             currentRect = newValue
             dismissingRect = oldValue
