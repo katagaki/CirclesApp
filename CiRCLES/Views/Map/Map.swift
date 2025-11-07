@@ -29,7 +29,6 @@ struct Map: View {
     @State var popoverWebCatalogIDSet: WebCatalogIDSet?
     @State var popoverSourceRect: CGRect = .null
     @State var canvasSize: CGSize = .zero
-    @State var scrollPositionID: String?
 
     @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
@@ -115,7 +114,6 @@ struct Map: View {
                     .contentMargins(.bottom, mapBottomPadding + 12.0, for: .scrollContent)
                     .contentMargins(.trailing, 120.0, for: .scrollContent)
                     .scrollIndicators(.hidden)
-                    .scrollPosition(id: $scrollPositionID)
                     .overlay {
                         if isLoadingLayouts {
                             ZStack(alignment: .center) {
@@ -144,12 +142,8 @@ struct Map: View {
                         }
                     }
                     .onChange(of: popoverWebCatalogIDSet) {
-                        if let popoverWebCatalogIDSet {
-                            scrollPositionID = popoverWebCatalogIDSet.id
-                            withAnimation(.easeInOut(duration: 0.3)) {
-                                reader.scrollTo(popoverWebCatalogIDSet.id, anchor: .center)
-                            }
-                        }
+                        // Popover opening/closing logic is handled by MapPopoverLayer
+                        // Automatic scrolling removed as it was causing unintended scroll behavior
                     }
                 }
             } else {
