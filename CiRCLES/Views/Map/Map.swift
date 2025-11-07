@@ -56,9 +56,9 @@ struct Map: View {
     var body: some View {
         VStack(alignment: .leading) {
             if let mapImage {
-                ScrollViewReader { reader in
-                    ScrollView([.horizontal, .vertical]) {
-                        GeometryReader { geometry in
+                GeometryReader { geometry in
+                    ScrollViewReader { reader in
+                        ScrollView([.horizontal, .vertical]) {
                             ZStack(alignment: .topLeading) {
                                 // Layout layer
                                 MapLayoutLayer(
@@ -100,45 +100,45 @@ struct Map: View {
                                         .id("\(isDismissing ? "!" : "")\(idSet.id)")
                                 }
                             }
-                            .onChange(of: geometry.size) { _, newValue in
-                                canvasSize = newValue
-                            }
                         }
-                    }
-                    .contentMargins(.bottom, mapBottomPadding + 12.0, for: .scrollContent)
-                    .contentMargins(.trailing, 120.0, for: .scrollContent)
-                    .scrollIndicators(.hidden)
-                    .overlay {
-                        if isLoadingLayouts {
-                            ZStack(alignment: .center) {
-                                if #available(iOS 26.0, *) {
-                                    ProgressView("Map.LoadingLayouts")
-                                        .padding()
-                                        .glassEffect(.regular, in: .rect(cornerRadius: 20.0))
-                                } else {
-                                    ProgressView("Map.LoadingLayouts")
-                                        .padding()
-                                        .background(Material.regular)
-                                        .clipShape(.rect(cornerRadius: 8.0))
+                        .contentMargins(.bottom, mapBottomPadding + 12.0, for: .scrollContent)
+                        .contentMargins(.trailing, 120.0, for: .scrollContent)
+                        .scrollIndicators(.hidden)
+                        .overlay {
+                            if isLoadingLayouts {
+                                ZStack(alignment: .center) {
+                                    if #available(iOS 26.0, *) {
+                                        ProgressView("Map.LoadingLayouts")
+                                            .padding()
+                                            .glassEffect(.regular, in: .rect(cornerRadius: 20.0))
+                                    } else {
+                                        ProgressView("Map.LoadingLayouts")
+                                            .padding()
+                                            .background(Material.regular)
+                                            .clipShape(.rect(cornerRadius: 8.0))
+                                    }
+                                    Color.clear
                                 }
+                            }
+                        }
+                        .overlay {
+                            ZStack(alignment: .topTrailing) {
                                 Color.clear
+                                MapControlStack(
+                                    showGenreOverlay: $showGenreOverlay,
+                                    zoomDivisor: $zoomDivisor
+                                )
+                                .offset(x: -12.0, y: 12.0)
+                            }
+                        }
+                        .onChange(of: popoverWebCatalogIDSet) {
+                            if let popoverWebCatalogIDSet {
+                                reader.scrollTo(popoverWebCatalogIDSet.id, anchor: .center)
                             }
                         }
                     }
-                    .overlay {
-                        ZStack(alignment: .topTrailing) {
-                            Color.clear
-                            MapControlStack(
-                                showGenreOverlay: $showGenreOverlay,
-                                zoomDivisor: $zoomDivisor
-                            )
-                            .offset(x: -12.0, y: 12.0)
-                        }
-                    }
-                    .onChange(of: popoverWebCatalogIDSet) {
-                        if let popoverWebCatalogIDSet {
-                            reader.scrollTo(popoverWebCatalogIDSet.id, anchor: .center)
-                        }
+                    .onChange(of: geometry.size) { _, newValue in
+                        canvasSize = newValue
                     }
                 }
             } else {
