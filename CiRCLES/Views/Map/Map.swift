@@ -89,6 +89,19 @@ struct Map: View {
                                     zoomDivisor: $zoomDivisor
                                 )
                             }
+                        }
+                        .background(
+                            GeometryReader { geometry in
+                                Color.clear
+                                    .onChange(of: geometry.size) { _, newValue in
+                                        canvasSize = newValue
+                                    }
+                                    .onAppear {
+                                        canvasSize = geometry.size
+                                    }
+                            }
+                        )
+                        .overlay(alignment: .topLeading) {
                             // Popover layer
                             MapPopoverLayer(
                                 sourceRect: $popoverSourceRect,
@@ -99,52 +112,40 @@ struct Map: View {
                                     .id("\(isDismissing ? "!" : "")\(idSet.id)")
                             }
                         }
-                        .background(
-                            GeometryReader { contentGeometry in
-                                Color.clear
-                                    .onChange(of: contentGeometry.size) { _, newValue in
-                                        canvasSize = newValue
-                                    }
-                                    .onAppear {
-                                        canvasSize = contentGeometry.size
-                                    }
-                            }
-                        )
                     }
-                        .contentMargins(.bottom, mapBottomPadding + 12.0, for: .scrollContent)
-                        .contentMargins(.trailing, 120.0, for: .scrollContent)
-                        .scrollIndicators(.hidden)
-                        .overlay {
-                            if isLoadingLayouts {
-                                ZStack(alignment: .center) {
-                                    if #available(iOS 26.0, *) {
-                                        ProgressView("Map.LoadingLayouts")
-                                            .padding()
-                                            .glassEffect(.regular, in: .rect(cornerRadius: 20.0))
-                                    } else {
-                                        ProgressView("Map.LoadingLayouts")
-                                            .padding()
-                                            .background(Material.regular)
-                                            .clipShape(.rect(cornerRadius: 8.0))
-                                    }
-                                    Color.clear
+                    .contentMargins(.bottom, mapBottomPadding + 12.0, for: .scrollContent)
+                    .contentMargins(.trailing, 120.0, for: .scrollContent)
+                    .scrollIndicators(.hidden)
+                    .overlay {
+                        if isLoadingLayouts {
+                            ZStack(alignment: .center) {
+                                if #available(iOS 26.0, *) {
+                                    ProgressView("Map.LoadingLayouts")
+                                        .padding()
+                                        .glassEffect(.regular, in: .rect(cornerRadius: 20.0))
+                                } else {
+                                    ProgressView("Map.LoadingLayouts")
+                                        .padding()
+                                        .background(Material.regular)
+                                        .clipShape(.rect(cornerRadius: 8.0))
                                 }
-                            }
-                        }
-                        .overlay {
-                            ZStack(alignment: .topTrailing) {
                                 Color.clear
-                                MapControlStack(
-                                    showGenreOverlay: $showGenreOverlay,
-                                    zoomDivisor: $zoomDivisor
-                                )
-                                .offset(x: -12.0, y: 12.0)
                             }
                         }
-                        .onChange(of: popoverWebCatalogIDSet) {
-                            if let popoverWebCatalogIDSet {
-                                reader.scrollTo(popoverWebCatalogIDSet.id, anchor: .center)
-                            }
+                    }
+                    .overlay {
+                        ZStack(alignment: .topTrailing) {
+                            Color.clear
+                            MapControlStack(
+                                showGenreOverlay: $showGenreOverlay,
+                                zoomDivisor: $zoomDivisor
+                            )
+                            .offset(x: -12.0, y: 12.0)
+                        }
+                    }
+                    .onChange(of: popoverWebCatalogIDSet) {
+                        if let popoverWebCatalogIDSet {
+                            reader.scrollTo(popoverWebCatalogIDSet.id, anchor: .center)
                         }
                     }
                 }

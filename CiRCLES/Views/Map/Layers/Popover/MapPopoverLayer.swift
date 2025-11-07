@@ -21,9 +21,8 @@ struct MapPopoverLayer<Content: View>: View {
     @State var dismissingItem: WebCatalogIDSet?
 
     var body: some View {
-        ZStack {
-            Color.clear
-            GeometryReader { reader in
+        GeometryReader { geometry in
+            ZStack {
                 Color.clear
                 if let currentItem, !currentRect.isNull {
                     MapPopover(
