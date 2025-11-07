@@ -90,6 +90,15 @@ struct Map: View {
                                     zoomDivisor: $zoomDivisor
                                 )
                             }
+                            // Popover layer
+                            MapPopoverLayer(
+                                sourceRect: $popoverSourceRect,
+                                selection: $popoverWebCatalogIDSet,
+                                canvasSize: $canvasSize
+                            ) { idSet, isDismissing in
+                                MapPopoverDetail(webCatalogIDSet: idSet)
+                                    .id("\(isDismissing ? "!" : "")\(idSet.id)")
+                            }
                         }
                         .background(
                             GeometryReader { geometry in
@@ -102,17 +111,6 @@ struct Map: View {
                                     }
                             }
                         )
-                        .overlay(alignment: .topLeading) {
-                            // Popover layer
-                            MapPopoverLayer(
-                                sourceRect: $popoverSourceRect,
-                                selection: $popoverWebCatalogIDSet,
-                                canvasSize: $canvasSize
-                            ) { idSet, isDismissing in
-                                MapPopoverDetail(webCatalogIDSet: idSet)
-                                    .id("\(isDismissing ? "!" : "")\(idSet.id)")
-                            }
-                        }
                     }
                     .contentMargins(.bottom, mapBottomPadding + 12.0, for: .scrollContent)
                     .contentMargins(.trailing, 120.0, for: .scrollContent)
