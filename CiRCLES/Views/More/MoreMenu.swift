@@ -42,7 +42,7 @@ struct MoreMenu: View {
                               authenticator.onlineState == .undetermined)
                 } else {
                     Text("My.Events.OfflineMode")
-                        .disabled(true)
+                        .foregroundStyle(.secondary)
                 }
             }
             Section {
