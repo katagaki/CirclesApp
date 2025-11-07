@@ -98,6 +98,13 @@ struct Map: View {
                                 MapPopoverDetail(webCatalogIDSet: idSet)
                                     .id("\(isDismissing ? "!" : "")\(idSet.id)")
                             }
+                            // Scroll anchor for popover source
+                            if let popoverWebCatalogIDSet, !popoverSourceRect.isNull {
+                                Color.clear
+                                    .frame(width: 1, height: 1)
+                                    .position(x: popoverSourceRect.midX, y: popoverSourceRect.midY)
+                                    .id("popover-anchor-\(popoverWebCatalogIDSet.id)")
+                            }
                         }
                         .background(
                             GeometryReader { geometry in
@@ -142,7 +149,11 @@ struct Map: View {
                         }
                     }
                     .onChange(of: popoverWebCatalogIDSet) {
-                        // Automatic scrolling removed - popover logic handled by MapPopoverLayer
+                        if let popoverWebCatalogIDSet {
+                            withAnimation(.easeInOut(duration: 0.3)) {
+                                reader.scrollTo("popover-anchor-\(popoverWebCatalogIDSet.id)", anchor: .center)
+                            }
+                        }
                     }
                 }
             } else {
