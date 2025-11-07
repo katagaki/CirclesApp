@@ -60,7 +60,6 @@ struct MyView: View {
                             dayForNotifier: $dayForNotifier,
                             participationForNotifier: $participationForNotifier
                         )
-                        MyEventPickerSection()
                     }
                 }
             }
