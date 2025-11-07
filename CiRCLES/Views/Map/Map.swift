@@ -142,8 +142,7 @@ struct Map: View {
                         }
                     }
                     .onChange(of: popoverWebCatalogIDSet) {
-                        // Popover opening/closing logic is handled by MapPopoverLayer
-                        // Automatic scrolling removed as it was causing unintended scroll behavior
+                        // Automatic scrolling removed - popover logic handled by MapPopoverLayer
                     }
                 }
             } else {
