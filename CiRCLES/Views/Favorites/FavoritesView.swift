@@ -89,12 +89,7 @@ struct FavoritesView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .navigationTitle("ViewTitle.Favorites")
         .navigationBarTitleDisplayMode(.inline)
-        .overlay {
-            if isVisitModeOn {
-                GradientBorder()
-                    .ignoresSafeArea(edges: .all)
-            }
-        }
+        .visitModeStyle($isVisitModeOn)
         .toolbar {
             FavoritesToolbar(isVisitModeOn: $isVisitModeOn, isGroupedByColor: $isGroupedByColor)
         }
