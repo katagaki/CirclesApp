@@ -2856,19 +2856,19 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket Web 카탈로그"
+            "value" : "Comiket Web Catalog"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket Web目录"
+            "value" : "Comiket Web Catalog"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket Web目錄"
+            "value" : "Comiket Web Catalog"
           }
         }
       }
@@ -3186,7 +3186,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket Day %lld - End Notification"
+            "value" : "Comic Market Day %lld - End Notification"
           }
         },
         "ja" : {
@@ -3204,13 +3204,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket第%lld天 - 结束通知"
+            "value" : "Comic Market第%lld天 - 结束通知"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket第%lld天 - 結束通知"
+            "value" : "Comic Market第%lld天 - 結束通知"
           }
         }
       }
@@ -3221,7 +3221,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket Day %lld - Pre-Event Reminder"
+            "value" : "Comic Market Day %lld - Pre-Event Reminder"
           }
         },
         "ja" : {
@@ -3239,13 +3239,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket第%lld天 - 活动前提醒"
+            "value" : "Comic Market第%lld天 - 活动前提醒"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket第%lld天 - 活動前提醒"
+            "value" : "Comic Market第%lld天 - 活動前提醒"
           }
         }
       }
@@ -3256,7 +3256,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket Day %lld - Start Notification"
+            "value" : "Comic Market Day %lld - Start Notification"
           }
         },
         "ja" : {
@@ -3274,13 +3274,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket第%lld天 - 开始通知"
+            "value" : "Comic Market第%lld天 - 开始通知"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket第%lld天 - 開始通知"
+            "value" : "Comic Market第%lld天 - 開始通知"
           }
         }
       }
@@ -3601,7 +3601,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket is going to start in an hour."
+            "value" : "Comic Market is going to start in an hour."
           }
         },
         "ja" : {
@@ -3619,13 +3619,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket将在1小时后开始。"
+            "value" : "Comic Market将在1小时后开始。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket將在1小時後開始。"
+            "value" : "Comic Market將在1小時後開始。"
           }
         }
       }
@@ -3670,7 +3670,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket is going to start in 2 hours."
+            "value" : "Comic Market is going to start in 2 hours."
           }
         },
         "ja" : {
@@ -3688,13 +3688,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket将在2小时后开始。"
+            "value" : "Comic Market将在2小时后开始。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket將在2小時後開始。"
+            "value" : "Comic Market將在2小時後開始。"
           }
         }
       }
@@ -3739,7 +3739,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket is going to start in 3 hours."
+            "value" : "Comic Market is going to start in 3 hours."
           }
         },
         "ja" : {
@@ -3757,13 +3757,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket将在3小时后开始。"
+            "value" : "Comic Market将在3小时后开始。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket將在3小時後開始。"
+            "value" : "Comic Market將在3小時後開始。"
           }
         }
       }
@@ -3808,7 +3808,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket is going to start in 4 hours."
+            "value" : "Comic Market is going to start in 4 hours."
           }
         },
         "ja" : {
@@ -3826,13 +3826,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket将在4小时后开始。"
+            "value" : "Comic Market将在4小时后开始。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket將在4小時後開始。"
+            "value" : "Comic Market將在4小時後開始。"
           }
         }
       }
@@ -3877,7 +3877,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket is going to start in just 30 minutes."
+            "value" : "Comic Market is going to start in just 30 minutes."
           }
         },
         "ja" : {
@@ -3895,13 +3895,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket将在30分钟后开始。"
+            "value" : "Comic Market将在30分钟后开始。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket將在30分鐘後開始。"
+            "value" : "Comic Market將在30分鐘後開始。"
           }
         }
       }
@@ -3947,7 +3947,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket has started. Good luck and have fun!"
+            "value" : "Comic Market has started. Good luck and have fun!"
           }
         },
         "ja" : {
@@ -3965,13 +3965,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket已经开始。祝您好运，玩得开心！"
+            "value" : "Comic Market已经开始。祝您好运，玩得开心！"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Comiket已經開始。祝您好運，玩得開心！"
+            "value" : "Comic Market已經開始。祝您好運，玩得開心！"
           }
         }
       }
@@ -5858,6 +5858,60 @@
                 "stringUnit" : {
                   "state" : "translated",
                   "value" : "訪問モードをオンにすると、サークルをタッチすると訪問済みとされます。\n訪問モードをオフにするには、再度「訪問モード」をタッチします。"
+                }
+              }
+            }
+          }
+        },
+        "ko" : {
+          "variations" : {
+            "device" : {
+              "mac" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "방문 모드를 켜면 서클을 클릭하여 쉽게 방문 완료로 표시할 수 있습니다.\n방문 모드를 끄려면 '방문 모드'를 다시 클릭하세요."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "방문 모드를 켜면 서클을 탭하여 쉽게 방문 완료로 표시할 수 있습니다.\n방문 모드를 끄려면 '방문 모드'를 다시 탭하세요."
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans" : {
+          "variations" : {
+            "device" : {
+              "mac" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "开启参观模式后，只需点击社团即可轻松将其标记为已参观。\n要关闭参观模式，请再次点击\"参观模式\"。"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "开启参观模式后，只需轻点社团即可轻松将其标记为已参观。\n要关闭参观模式，请再次轻点\"参观模式\"。"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hant" : {
+          "variations" : {
+            "device" : {
+              "mac" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "開啟參觀模式後，只需點擊社團即可輕鬆將其標記為已參觀。\n要關閉參觀模式，請再次點擊「參觀模式」。"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "開啟參觀模式後，只需輕點社團即可輕鬆將其標記為已參觀。\n要關閉參觀模式，請再次輕點「參觀模式」。"
                 }
               }
             }
