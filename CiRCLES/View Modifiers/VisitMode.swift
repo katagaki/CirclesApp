@@ -17,8 +17,10 @@ struct VisitModeModifier: ViewModifier {
         } else {
             content
                 .overlay {
-                    GradientBorder()
-                        .ignoresSafeArea(edges: .all)
+                    if isVisitModeOn {
+                        GradientBorder()
+                            .ignoresSafeArea(edges: .all)
+                    }
                 }
         }
     }
