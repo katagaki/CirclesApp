@@ -23,7 +23,7 @@ struct AdaptiveGlass: ViewModifier {
                     .background(style.style as! Material)
                     .cornerRadius(cornerRadius ?? 16.0)
                     .overlay {
-                        RoundedRectangle(cornerRadius: cornerRadius ?? 0.0)
+                        RoundedRectangle(cornerRadius: cornerRadius ?? 16.0)
                             .stroke(.primary.opacity(0.1), lineWidth: 1)
                     }
             case .coloredInteractive(let color):
