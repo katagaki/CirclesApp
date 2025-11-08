@@ -119,7 +119,11 @@ struct UnifiedMoreMenu: View {
             }
             Section {
                 Button("Shared.Logout") {
-                    isGoingToSignOut = true
+                    unifier.isPresented = false
+                    Task {
+                        try? await Task.sleep(for: .seconds(0.5))
+                        isGoingToSignOut = true
+                    }
                 }
                 Button("More.DeleteAccount", role: .destructive) {
                     openURL(URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)

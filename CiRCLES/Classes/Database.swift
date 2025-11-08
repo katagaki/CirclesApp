@@ -295,4 +295,14 @@ class Database {
 
         return request
     }
+
+    // MARK: Destructive
+
+    func reset() {
+        textDatabaseURL = nil
+        imageDatabaseURL = nil
+        imageCache.removeAll()
+        commonImages.removeAll()
+        circleImages.removeAll()
+    }
 }
