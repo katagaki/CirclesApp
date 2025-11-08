@@ -17,7 +17,7 @@ struct ListSectionWithTranslateButton: View {
                 .textSelection(.enabled)
         } header: {
             HStack {
-                Text(String(localized: title))
+                Text(title)
                 Spacer()
                 if text.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
                     TranslateButton(translating: text)
