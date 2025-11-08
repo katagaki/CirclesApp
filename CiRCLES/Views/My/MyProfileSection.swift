@@ -41,7 +41,7 @@ struct MyProfileSection: View {
                         }
                     }
                     .scaledToFill()
-                    .frame(width: 110.0, height: 110.0)
+                    .frame(width: 220.0, height: 220.0)
                     .clipShape(.circle)
                 }
                 VStack(alignment: .center) {
@@ -53,8 +53,8 @@ struct MyProfileSection: View {
                                 .foregroundStyle(.secondary)
                         }
                     }
-                    .fontWeight(.bold)
-                    .font(.title3)
+                    .font(.largeTitle)
+                    .fontWeight(.black)
                     .onLongPressGesture {
                         isShowingUserPID.toggle()
                     }
