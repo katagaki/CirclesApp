@@ -1600,7 +1600,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "To use CiRCLES, you will need a Comic Market Web Catalog Gold Member subscription."
+            "value": "To use CiRCLES, you will need a Comiket Web Catalog Gold Member subscription."
           }
         },
         "ja": {
@@ -1612,19 +1612,19 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "要使用CiRCLES，您需要Comic Market Web Catalog金會員訂閱。"
+            "value": "要使用CiRCLES，您需要Comiket Web Catalog金會員訂閱。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "要使用CiRCLES，您需要Comic Market Web Catalog金会员订阅。"
+            "value": "要使用CiRCLES，您需要Comiket Web Catalog金会员订阅。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "CiRCLES를 사용하려면 Comic Market Web Catalog 골드 회원 구독이 필요합니다."
+            "value": "CiRCLES를 사용하려면 Comiket Web Catalog 골드 회원 구독이 필요합니다."
           }
         }
       }
@@ -2635,7 +2635,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Data provided by Comic Market Web Catalog"
+            "value": "Data provided by Comiket Web Catalog"
           }
         },
         "ja": {
@@ -2647,19 +2647,19 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "資料由Comic Market Web Catalog提供"
+            "value": "資料由Comiket Web Catalog提供"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "数据由Comic Market Web Catalog提供"
+            "value": "数据由Comiket Web Catalog提供"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comic Market Web Catalog에서 제공하는 데이터"
+            "value": "Comiket Web Catalog에서 제공하는 데이터"
           }
         }
       }
@@ -2775,7 +2775,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comic Market Web Catalog"
+            "value": "Comiket Web Catalog"
           }
         },
         "ja": {
@@ -2787,19 +2787,19 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comic Market Web目錄"
+            "value": "Comiket Web目錄"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comic Market Web目录"
+            "value": "Comiket Web目录"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comic Market Web 카탈로그"
+            "value": "Comiket Web 카탈로그"
           }
         }
       }
