@@ -9,6 +9,7 @@ import SwiftUI
 
 struct UnifiedToolbar: ToolbarContent {
 
+    @Environment(Oasis.self) var oasis
     @Environment(Unifier.self) var unifier
 
     @Binding var viewPath: [UnifiedPath]
@@ -26,18 +27,20 @@ struct UnifiedToolbar: ToolbarContent {
             .aspectRatio(1.0, contentMode: .fit)
             .matchedTransitionSource(id: "My.View", in: namespace)
         }
-        ToolbarItem(placement: .principal) {
-            UnifiedControl()
-                .foregroundStyle(.primary)
-                .glassEffectInteractiveIfSupported()
-                .adaptiveShadow()
-        }
-        ToolbarItem(placement: .topBarTrailing) {
-            UnifiedMoreMenu(
-                viewPath: $viewPath,
-                isGoingToSignOut: $isGoingToSignOut
-            )
-            .popoverTip(GenreOverlayTip())
+        if !oasis.isShowing {
+            ToolbarItem(placement: .principal) {
+                UnifiedControl()
+                    .foregroundStyle(.primary)
+                    .glassEffectInteractiveIfSupported()
+                    .adaptiveShadow()
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                UnifiedMoreMenu(
+                    viewPath: $viewPath,
+                    isGoingToSignOut: $isGoingToSignOut
+                )
+                .popoverTip(GenreOverlayTip())
+            }
         }
         if #available(iOS 26.0, *) {
             ToolbarSpacer(.flexible, placement: .bottomBar)

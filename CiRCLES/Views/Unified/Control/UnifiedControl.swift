@@ -41,7 +41,7 @@ struct UnifiedControl: View {
             }
         }
         .padding(6.0)
-        .id(selections.idMap)
+        .id(selections.fullMapId)
     }
 
     func accentColorForMap(_ map: ComiketMap?) -> Color? {

@@ -24,7 +24,7 @@ struct MapPopover<Content: View>: View {
         content()
             .padding(16.0)
             .frame(width: popoverWidth, height: popoverHeight)
-            .adaptiveGlass(.regular, cornerRadius: 16.0)
+            .adaptiveGlass(.regular)
             .scaleEffect(0.3 + (0.7 * animationProgress))
             .opacity(animationProgress)
             .position(animatedPosition())

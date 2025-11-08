@@ -115,11 +115,16 @@ class UserSelections: Equatable {
         return try? modelContext.fetch(fetchDescriptor).first
     }
 
-    var idMap: String {
-        return "G\(_genre?.id ?? 0),M\(_map?.id ?? 0),B\(_block?.id ?? 0),D\(_date?.id ?? 0)"
+    var fullMapId: String {
+        return "M\(_map?.id ?? 0),D\(_date?.id ?? 0)"
+    }
+
+    var catalogSelectionId: String {
+        return "G\(_genre?.id ?? 0),B\(_block?.id ?? 0)"
     }
 
     static func == (lhs: UserSelections, rhs: UserSelections) -> Bool {
-        return lhs.idMap == rhs.idMap
+        return lhs.fullMapId == rhs.fullMapId &&
+        lhs.catalogSelectionId == rhs.catalogSelectionId
     }
 }
