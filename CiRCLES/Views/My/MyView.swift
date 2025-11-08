@@ -59,6 +59,7 @@ struct MyView: View {
                         )
                     }
                 }
+                .contentMargins(.top, 0.0)
             }
             .listSectionSpacing(.compact)
             .scrollContentBackground(.hidden)
@@ -68,6 +69,7 @@ struct MyView: View {
         .toolbar {
             MyToolbar(
                 eventTitle: $eventTitle,
+                eventCoverImage: $eventCoverImage,
                 isShowingEventCoverImage: $isShowingEventCoverImage
             )
         }
