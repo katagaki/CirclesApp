@@ -140,8 +140,6 @@ struct UnifiedMoreMenu: View {
                 }
             } header: {
                 Text("More.More")
-            } footer: {
-                Text("More.PrivacyMode.Description")
             }
         }
         .menuActionDismissBehavior(.disabled)
