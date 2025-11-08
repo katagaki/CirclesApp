@@ -65,11 +65,13 @@ struct CircleCutImage: View {
                         Image(uiImage: webCutImage)
                             .resizable()
                             .scaledToFit()
+                            .usesPrivacyMode()
                     } else {
                         if showCatalogCut {
                             Image(uiImage: image)
                                 .resizable()
                                 .scaledToFit()
+                                .usesPrivacyMode()
                         } else {
                             if shouldFetchWebCut && !isWebCutURLFetched {
                                 ZStack(alignment: .center) {

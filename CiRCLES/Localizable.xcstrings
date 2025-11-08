@@ -74,7 +74,7 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
+            "state" : "translated",
             "value" : "When you sign in again, map and circle data will need to be downloaded again."
           }
         },
@@ -1178,6 +1178,22 @@
         }
       }
     },
+    "More.More" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "More"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "その他"
+          }
+        }
+      }
+    },
     "More.Navigate" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1242,6 +1258,25 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Yahoo!マップ"
+          }
+        }
+      }
+    },
+    "More.PrivacyMode.Description" : {
+
+    },
+    "More.PrivacyMode.On" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacy Mode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "プライバシーモード"
           }
         }
       }
@@ -1360,23 +1395,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "参加中イベント"
-          }
-        }
-      }
-    },
-    "My.Events.Disclaimer" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Older events may not support high resolution maps."
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "一部のイベントは、高解像度のマップに対応できません。"
           }
         }
       }
@@ -2022,7 +2040,20 @@
       }
     },
     "Shared.ClosePanel" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close Panel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パネルを閉じる"
+          }
+        }
+      }
     },
     "Shared.Delete" : {
       "localizations" : {
@@ -2384,7 +2415,20 @@
       }
     },
     "Shared.OpenPanel" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Panel"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パネルを開く"
+          }
+        }
+      }
     },
     "Shared.Placeholder.NoBlock" : {
       "localizations" : {
@@ -2575,40 +2619,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "訪問モード"
-          }
-        }
-      }
-    },
-    "Tab.Circles" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Circles"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "サークル"
-          }
-        }
-      }
-    },
-    "Tab.Favorites" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favorites"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "お気に入り"
           }
         }
       }
@@ -2844,23 +2854,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "お気に入り"
-          }
-        }
-      }
-    },
-    "ViewTitle.Map" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Map"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "マップ"
           }
         }
       }
