@@ -36,27 +36,12 @@ struct UnifiedView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button("Tab.My", image: .tabIconMy) {
-                            unifier.isPresented = false
-                            isMyComiketPresenting = true
-                        }
-                        .aspectRatio(1.0, contentMode: .fit)
-                        .matchedTransitionSource(id: "My.View", in: namespace)
-                    }
-                    ToolbarItem(placement: .principal) {
-                        UnifiedControl()
-                            .foregroundStyle(.primary)
-                            .glassEffectInteractiveIfSupported()
-                            .adaptiveShadow()
-                    }
-                    ToolbarItem(placement: .topBarTrailing) {
-                        MoreMenu(
-                            viewPath: $viewPath,
-                            isGoingToSignOut: $isGoingToSignOut
-                        )
-                            .popoverTip(GenreOverlayTip())
-                    }
+                    UnifiedToolbar(
+                        viewPath: $viewPath,
+                        isMyComiketPresenting: $isMyComiketPresenting,
+                        isGoingToSignOut: $isGoingToSignOut,
+                        namespace: namespace
+                    )
                 }
                 .sheet(isPresented: $unifier.isPresented) {
                     if authenticator.isAuthenticating {
@@ -64,20 +49,28 @@ struct UnifiedView: View {
                             .environment(authenticator)
                             .interactiveDismissDisabled()
                     } else {
-                        UnifiedPanel()
+                        if #available(iOS 26.0, *) {
+                            UnifiedPanel()
+                                .navigationTransition(.zoom(sourceID: "BottomPanel", in: namespace))
+                        } else {
+                            UnifiedPanel()
+                        }
                     }
                 }
-                .fullScreenCover(isPresented: $isMyComiketPresenting) {
-                    if #available(iOS 26.0, *) {
-                        NavigationStack {
-                            MyView()
-                        }
-                        .navigationTransition(.zoom(sourceID: "My.View", in: namespace))
-                    } else {
-                        NavigationStack {
-                            MyView()
+                .sheet(isPresented: $isMyComiketPresenting) {
+                    Group {
+                        if #available(iOS 26.0, *) {
+                            NavigationStack {
+                                MyView()
+                            }
+                            .navigationTransition(.zoom(sourceID: "My.View", in: namespace))
+                        } else {
+                            NavigationStack {
+                                MyView()
+                            }
                         }
                     }
+                    .presentationDetents([.large])
                 }
                 .navigationDestination(for: UnifiedPath.self) { path in
                     path.view()

@@ -1365,6 +1365,7 @@
       }
     },
     "My.Events.Disclaimer" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2020,6 +2021,9 @@
         }
       }
     },
+    "Shared.ClosePanel" : {
+
+    },
     "Shared.Delete" : {
       "localizations" : {
         "en" : {
@@ -2378,6 +2382,9 @@
           }
         }
       }
+    },
+    "Shared.OpenPanel" : {
+
     },
     "Shared.Placeholder.NoBlock" : {
       "localizations" : {

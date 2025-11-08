@@ -1,5 +1,5 @@
 //
-//  MoreMenu.swift
+//  UnifiedMoreMenu.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2025/11/02.
@@ -7,11 +7,12 @@
 
 import SwiftUI
 
-struct MoreMenu: View {
+struct UnifiedMoreMenu: View {
 
     @Environment(\.openURL) var openURL
     @Environment(Authenticator.self) var authenticator
     @Environment(Events.self) var planner
+    @Environment(Unifier.self) var unifier
 
     @Binding var viewPath: [UnifiedPath]
     @Binding var isGoingToSignOut: Bool
@@ -118,6 +119,7 @@ struct MoreMenu: View {
                 Text("More.Account")
             }
             Button("Tab.More", systemImage: "ellipsis") {
+                unifier.isPresented = false
                 self.viewPath.append(.more)
             }
         }
