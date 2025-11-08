@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Komponents
 import SwiftUI
 
 struct ListSectionWithTranslateButton: View {
@@ -18,7 +17,7 @@ struct ListSectionWithTranslateButton: View {
                 .textSelection(.enabled)
         } header: {
             HStack {
-                ListSectionHeader(text: title)
+                Text(title)
                 Spacer()
                 if text.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
                     TranslateButton(translating: text)

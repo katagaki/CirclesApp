@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Komponents
 import SwiftUI
 
 enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresentable {

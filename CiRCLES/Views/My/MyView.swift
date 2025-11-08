@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2024/09/06.
 //
 
-import Komponents
 import SwiftData
 import SwiftUI
 

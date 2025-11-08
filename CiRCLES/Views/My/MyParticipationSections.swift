@@ -83,7 +83,6 @@ struct MyParticipationSections: View {
                         Spacer()
                     }
                 }
-                .font(.body)
                 .textCase(nil)
             } footer: {
                 HStack(alignment: .center) {

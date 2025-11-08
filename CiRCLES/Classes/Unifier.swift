@@ -25,8 +25,8 @@ class Unifier {
         } else {
             var height: CGFloat = .zero
             switch self.selectedDetent {
-            case .height(120):
-                height = 120.0
+            case .height(100):
+                height = 100.0
             case .height(150):
                 height = 150.0
             case .height(360):
