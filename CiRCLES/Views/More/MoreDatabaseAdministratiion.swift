@@ -94,8 +94,14 @@ struct MoreDatabaseAdministratiion: View {
             for file in downloadedFiles where file.isFileURL && file.pathExtension == "db" {
                 var fileName = file.lastPathComponent
                 fileName = fileName.replacingOccurrences(of: "webcatalog", with: "C")
-                fileName = fileName.replacingOccurrences(of: "Image1.db", with: "（画像データ）")
-                fileName = fileName.replacingOccurrences(of: ".db", with: "（テキストデータ）")
+                fileName = fileName.replacingOccurrences(
+                    of: "Image1.db",
+                    with: String(localized: "More.DBAdmin.ImageData")
+                )
+                fileName = fileName.replacingOccurrences(
+                    of: ".db",
+                    with: String(localized: "More.DBAdmin.TextData")
+                )
                 files[fileName] = file
             }
         }

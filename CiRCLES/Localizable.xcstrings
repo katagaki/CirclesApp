@@ -1600,7 +1600,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "To use CiRCLES, you will need a Comike Web Catalog Gold Member subscription."
+            "value": "To use CiRCLES, you will need a Comic Market Web Catalog Gold Member subscription."
           }
         },
         "ja": {
@@ -1612,19 +1612,19 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "要使用CiRCLES，您需要Comike Web Catalog金會員訂閱。"
+            "value": "要使用CiRCLES，您需要Comic Market Web Catalog金會員訂閱。"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "要使用CiRCLES，您需要Comike Web Catalog金会员订阅。"
+            "value": "要使用CiRCLES，您需要Comic Market Web Catalog金会员订阅。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "CiRCLES를 사용하려면 Comike Web Catalog 골드 회원 구독이 필요합니다."
+            "value": "CiRCLES를 사용하려면 Comic Market Web Catalog 골드 회원 구독이 필요합니다."
           }
         }
       }
@@ -2635,7 +2635,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Data provided by Comike Web Catalog"
+            "value": "Data provided by Comic Market Web Catalog"
           }
         },
         "ja": {
@@ -2647,19 +2647,19 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "資料由Comike Web Catalog提供"
+            "value": "資料由Comic Market Web Catalog提供"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "数据由Comike Web Catalog提供"
+            "value": "数据由Comic Market Web Catalog提供"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comike Web Catalog에서 제공하는 데이터"
+            "value": "Comic Market Web Catalog에서 제공하는 데이터"
           }
         }
       }
@@ -2775,7 +2775,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comike Web Catalog"
+            "value": "Comic Market Web Catalog"
           }
         },
         "ja": {
@@ -2787,19 +2787,19 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comike Web目錄"
+            "value": "Comic Market Web目錄"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comike Web目录"
+            "value": "Comic Market Web目录"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comike Web 카탈로그"
+            "value": "Comic Market Web 카탈로그"
           }
         }
       }
@@ -5963,6 +5963,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "프로필"
+          }
+        }
+      }
+    },
+    "More.DBAdmin.ImageData": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(Image Data)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "（画像データ）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "（圖片資料）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "（图片数据）"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(이미지 데이터)"
+          }
+        }
+      }
+    },
+    "More.DBAdmin.TextData": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(Text Data)"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "（テキストデータ）"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "（文字資料）"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "（文本数据）"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(텍스트 데이터)"
           }
         }
       }
