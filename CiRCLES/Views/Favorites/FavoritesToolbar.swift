@@ -18,6 +18,7 @@ struct FavoritesToolbar: ToolbarContent {
             Button {
                 withAnimation(.smooth.speed(2.0)) {
                     isVisitModeOn.toggle()
+                    UIApplication.shared.isIdleTimerDisabled = isVisitModeOn
                 }
             } label: {
                 ToolbarButtonLabel(
