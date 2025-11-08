@@ -15,13 +15,13 @@ struct AdaptiveGlass: ViewModifier {
     func body(content: Content) -> some View {
         if #available(iOS 26.0, *) {
             content
-                .glassEffect(style.style as! Glass, in: .rect(cornerRadius: cornerRadius ?? 0.0))
+                .glassEffect(style.style as! Glass, in: .rect(cornerRadius: cornerRadius ?? 20.0))
         } else {
             switch style {
             case .regular:
                 content
                     .background(style.style as! Material)
-                    .cornerRadius(cornerRadius ?? 0.0)
+                    .cornerRadius(cornerRadius ?? 16.0)
                     .overlay {
                         RoundedRectangle(cornerRadius: cornerRadius ?? 0.0)
                             .stroke(.primary.opacity(0.1), lineWidth: 1)
@@ -30,7 +30,7 @@ struct AdaptiveGlass: ViewModifier {
                 content
                     .background(style.style as! Material)
                     .background(color)
-                    .cornerRadius(cornerRadius ?? 0.0)
+                    .cornerRadius(cornerRadius ?? 16.0)
             }
         }
     }
@@ -56,7 +56,7 @@ enum AdaptiveGlassStyle {
 }
 
 extension View {
-    func adaptiveGlass(_ style: AdaptiveGlassStyle, cornerRadius: CGFloat?) -> some View {
+    func adaptiveGlass(_ style: AdaptiveGlassStyle, cornerRadius: CGFloat? = nil) -> some View {
         modifier(AdaptiveGlass(style: style, cornerRadius: cornerRadius))
     }
 }

@@ -53,7 +53,7 @@ struct CatalogToolbar: ToolbarContent {
                     )
                 }
             }
-            .onChange(of: selections.idMap) {
+            .onChange(of: selections.fullMapId) {
                 Task.detached {
                     await reloadBlocksInMap()
                 }

@@ -111,7 +111,7 @@ struct CatalogView: View {
                 isInitialLoadCompleted = true
             }
         }
-        .onChange(of: selections.idMap) {
+        .onChange(of: selections.catalogSelectionId) {
             if isInitialLoadCompleted {
                 reloadDisplayedCircles(
                     genreID: selections.genre?.id,
