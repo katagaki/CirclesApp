@@ -31,6 +31,13 @@ struct UnifiedPanel: View {
                         .id("Unifier.Picker")
                         .pickerStyle(.segmented)
                 }
+                if #available(iOS 26.0, *) {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Shared.ClosePanel", systemImage: "chevron.down") {
+                            self.unifier.isPresented = false
+                        }
+                    }
+                }
             }
             .navigationDestination(for: UnifiedPath.self) { path in
                 path.view()

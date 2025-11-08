@@ -13,7 +13,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
     case map
     case circles
     case favorites
-    case my
+    case my // swiftlint:disable:this identifier_name
     case more
     case moreDBAdmin
     case moreAttributions
@@ -61,7 +61,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
         case .my: MyView()
         case .more: MoreView()
         case .moreDBAdmin: MoreDatabaseAdministratiion()
-        case .moreAttributions: MoreView()
+        case .moreAttributions: MoreLicensesView()
         case .circleDetail(let circle):
             CircleDetailView(circle: circle)
         case .namespacedCircleDetail(

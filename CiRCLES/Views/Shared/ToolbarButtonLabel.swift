@@ -25,4 +25,3 @@ struct ToolbarButtonLabel: View {
         .padding(.horizontal, 8.0)
     }
 }
-

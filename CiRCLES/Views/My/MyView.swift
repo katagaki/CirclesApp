@@ -11,11 +11,9 @@ import SwiftUI
 
 struct MyView: View {
 
-    @Environment(\.dismiss) var dismiss
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
-    @Environment(Unifier.self) var unifier
 
     @Query var events: [ComiketEvent]
 
@@ -69,34 +67,10 @@ struct MyView: View {
         .navigationTitle(eventTitle ?? String(localized: "ViewTitle.My"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if UIDevice.current.userInterfaceIdiom != .pad {
-                ToolbarItem(placement: .primaryAction) {
-                    Button(eventTitle ?? String(localized: "ViewTitle.My"), systemImage: "photo") {
-                        withAnimation(.smooth.speed(2.0)) {
-                            isShowingEventCoverImage.toggle()
-                        }
-                    }
-                }
-            }
-            ToolbarItem(placement: .topBarLeading) {
-                if #available(iOS 26.0, *) {
-                    Button(role: .close) {
-                        dismiss()
-                        Task {
-                            try? await Task.sleep(nanoseconds: 300000000)
-                            unifier.isPresented = true
-                        }
-                    }
-                } else {
-                    CloseButton {
-                        dismiss()
-                        Task {
-                            try? await Task.sleep(nanoseconds: 300000000)
-                            unifier.isPresented = true
-                        }
-                    }
-                }
-            }
+            MyToolbar(
+                eventTitle: $eventTitle,
+                isShowingEventCoverImage: $isShowingEventCoverImage
+            )
         }
         .background {
             Group {
@@ -133,26 +107,6 @@ struct MyView: View {
         .onAppear {
             if !isInitialLoadCompleted {
                 reloadDataInBackground()
-            }
-        }
-        .onChange(of: authenticator.token) {
-            userInfo = nil
-            reloadDataInBackground()
-        }
-        .onChange(of: authenticator.onlineState) {
-            reloadDataInBackground()
-        }
-        .onChange(of: isDatabaseInitialized) { _, newValue in
-            if newValue {
-                reloadDataInBackground(forceReload: true)
-            }
-        }
-        .onChange(of: database.commonImages) {
-            if eventDates == nil {
-                reloadDataInBackground()
-            }
-            withAnimation(.smooth.speed(2.0)) {
-                eventCoverImage = database.coverImage()
             }
         }
     }

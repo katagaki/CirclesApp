@@ -19,6 +19,28 @@ class Unifier {
     var isMinimized: Bool {
         selectedDetent != .height(360) && selectedDetent != .large
     }
+    var safeAreaHeight: CGFloat {
+        if !isPresented {
+            return 0
+        } else {
+            var height: CGFloat = .zero
+            switch self.selectedDetent {
+            case .height(120):
+                height = 120.0
+            case .height(150):
+                height = 150.0
+            case .height(360):
+                height = 360.0
+            default:
+                height = 0.0
+            }
+            if #available(iOS 26.0, *) {
+                return max(0.0, height - 60.0)
+            } else {
+                return height
+            }
+        }
+    }
 
     // Currently displayed sheet's navigation stack's view path
     var path: [UnifiedPath] = []
