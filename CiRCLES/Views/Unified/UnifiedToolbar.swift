@@ -9,6 +9,7 @@ import SwiftUI
 
 struct UnifiedToolbar: ToolbarContent {
 
+    @Environment(Authenticator.self) var authenticator
     @Environment(Oasis.self) var oasis
     @Environment(Unifier.self) var unifier
 
@@ -27,7 +28,7 @@ struct UnifiedToolbar: ToolbarContent {
             .aspectRatio(1.0, contentMode: .fit)
             .matchedTransitionSource(id: "My.View", in: namespace)
         }
-        if !oasis.isShowing {
+        if !oasis.isShowing && !authenticator.isAuthenticating {
             ToolbarItem(placement: .principal) {
                 UnifiedControl()
                     .foregroundStyle(.primary)
@@ -39,7 +40,6 @@ struct UnifiedToolbar: ToolbarContent {
                     viewPath: $viewPath,
                     isGoingToSignOut: $isGoingToSignOut
                 )
-                .popoverTip(GenreOverlayTip())
             }
         }
         if #available(iOS 26.0, *) {
