@@ -53,6 +53,7 @@ struct CatalogToolbar: ToolbarContent {
                     )
                 }
             }
+            .menuActionDismissBehavior(.disabled)
             .onChange(of: selections.fullMapId) {
                 Task.detached {
                     await reloadBlocksInMap()
@@ -93,6 +94,7 @@ struct CatalogToolbar: ToolbarContent {
                     )
                 }
             }
+            .menuActionDismissBehavior(.disabled)
         }
         if #available(iOS 26.0, *) {
             ToolbarSpacer(.fixed, placement: .bottomBar)
