@@ -93,19 +93,7 @@ struct CatalogView: View {
                     ListModeSwitcher($listDisplayModeState)
                 }
             }
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0.0) {
-            if searchTerm.trimmingCharacters(in: .whitespaces).count < 2 {
-                if #available(iOS 26.0, *) {
-                    CatalogToolbar(displayedCircles: $displayedCircles)
-                        .transition(.opacity.animation(.snappy.speed(2.0)))
-                } else {
-                    BarAccessory(placement: .bottom) {
-                        CatalogToolbar(displayedCircles: $displayedCircles)
-                            .transition(.opacity.animation(.snappy.speed(2.0)))
-                    }
-                }
-            }
+            CatalogToolbar(displayedCircles: $displayedCircles)
         }
         .searchable(
             text: $searchTerm,

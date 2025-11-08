@@ -5,46 +5,45 @@
 //  Created by シン・ジャスティン on 2024/11/16.
 //
 
-import Komponents
 import SwiftData
 import SwiftUI
 
-struct FavoritesToolbar: View {
+struct FavoritesToolbar: ToolbarContent {
 
     @Binding var isVisitModeOn: Bool
     @Binding var isGroupedByColor: Bool
 
-    @State var isInitialLoadCompleted: Bool = false
-
-    var body: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 12.0) {
-                Group {
-                    BarAccessoryButton(
-                        "Shared.VisitMode",
-                        icon: isVisitModeOn ? "checkmark.rectangle.stack.fill" : "checkmark.rectangle.stack",
-                        isSecondary: !isVisitModeOn
-                    ) {
-                        withAnimation(.smooth.speed(2.0)) {
-                            isVisitModeOn.toggle()
-                        }
-                    }
-                    .popoverTip(VisitModeTip())
-                    BarAccessoryButton(
-                        "Shared.GroupByColor",
-                        icon: isGroupedByColor ? "paintpalette.fill" : "paintpalette",
-                        isSecondary: !isGroupedByColor
-                    ) {
-                        withAnimation(.smooth.speed(2.0)) {
-                            isGroupedByColor.toggle()
-                        }
-                    }
+    var body: some ToolbarContent {
+        ToolbarItem(placement: .bottomBar) {
+            Button {
+                withAnimation(.smooth.speed(2.0)) {
+                    isVisitModeOn.toggle()
                 }
-                .glassEffectIfSupported()
+            } label: {
+                ToolbarButtonLabel(
+                    "Shared.VisitMode",
+                    imageName: isVisitModeOn ? "figure.walk.motion" : "figure.walk"
+                )
             }
-            .padding(.horizontal)
-            .padding(.vertical, 12.0)
+            .popoverTip(VisitModeTip())
         }
-        .scrollIndicators(.hidden)
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+        }
+        ToolbarItem(placement: .bottomBar) {
+            Button {
+                withAnimation(.smooth.speed(2.0)) {
+                    isGroupedByColor.toggle()
+                }
+            } label: {
+                ToolbarButtonLabel(
+                    "Shared.GroupByColor",
+                    imageName: isGroupedByColor ? "paintpalette.fill" : "paintpalette"
+                )
+            }
+        }
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+        }
     }
 }

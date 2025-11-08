@@ -96,20 +96,8 @@ struct FavoritesView: View {
                     .ignoresSafeArea(edges: .all)
             }
         }
-        .safeAreaInset(edge: .bottom, spacing: 0.0) {
-            if #available(iOS 26.0, *) {
-                FavoritesToolbar(
-                    isVisitModeOn: $isVisitModeOn,
-                    isGroupedByColor: $isGroupedByColor
-                )
-            } else {
-                BarAccessory(placement: .bottom) {
-                    FavoritesToolbar(
-                        isVisitModeOn: $isVisitModeOn,
-                        isGroupedByColor: $isGroupedByColor
-                    )
-                }
-            }
+        .toolbar {
+            FavoritesToolbar(isVisitModeOn: $isVisitModeOn, isGroupedByColor: $isGroupedByColor)
         }
         .refreshable {
             await reloadFavorites()

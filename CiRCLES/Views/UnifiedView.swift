@@ -32,7 +32,7 @@ struct UnifiedView: View {
     var body: some View {
         NavigationStack(path: $viewPath) {
             @Bindable var unifier = unifier
-            Map()
+            MapView()
                 .navigationBarTitleDisplayMode(.inline)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .toolbar {
@@ -64,7 +64,7 @@ struct UnifiedView: View {
                             .environment(authenticator)
                             .interactiveDismissDisabled()
                     } else {
-                        bottomPanel()
+                        UnifiedPanel()
                     }
                 }
                 .fullScreenCover(isPresented: $isMyComiketPresenting) {
@@ -114,52 +114,6 @@ struct UnifiedView: View {
             requestReview()
             hasReviewBeenPrompted = true
         }
-    }
-
-    @ViewBuilder
-    func bottomPanel() -> some View {
-        @Bindable var unifier = unifier
-        NavigationStack(path: $unifier.path) {
-            ZStack {
-                self.unifier.view()
-            }
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    Picker(selection: $unifier.current) {
-                        Text("ViewTitle.Circles")
-                            .tag(UnifiedPath.circles)
-                        if planner.isActiveEventLatest {
-                            Text("ViewTitle.Favorites")
-                                .tag(UnifiedPath.favorites)
-                        }
-                    } label: { }
-                        .id("Unifier.Picker")
-                        .pickerStyle(.segmented)
-                }
-            }
-            .navigationDestination(for: UnifiedPath.self) { path in
-                path.view()
-            }
-        }
-        .presentationContentInteraction(.scrolls)
-        .presentationBackgroundInteraction(.enabled)
-        .presentationDetentsForUnifiedView($unifier.selectedDetent)
-        .interactiveDismissDisabled()
-    }
-
-    @ViewBuilder
-    func bottomToolbarContent() -> some View {
-        HStack(spacing: 18.0) {
-            Button("Tab.Circles", systemImage: "square.grid.3x3.fill") {
-                self.unifier.show(.circles)
-            }
-            if planner.isActiveEventLatest {
-                Button("Tab.Favorites", systemImage: "star.fill") {
-                    self.unifier.show(.favorites)
-                }
-            }
-        }
-        .padding(.horizontal, 2.0)
     }
 
     func logout() {
