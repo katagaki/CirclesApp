@@ -10,9 +10,9 @@ import SwiftUI
 // swiftlint:disable identifier_name line_length
 struct GradientBorder: View {
     var body: some View {
-        GeometryReader { proxy in
-            let height: Float = Float(proxy.size.height)
-            let width: Float = Float(proxy.size.width)
+        GeometryReader { reader in
+            let height: Float = Float(reader.size.height)
+            let width: Float = Float(reader.size.width)
 
             let depth: Float = 40.0
 
