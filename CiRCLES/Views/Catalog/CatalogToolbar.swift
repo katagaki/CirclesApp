@@ -97,6 +97,10 @@ struct CatalogToolbar: ToolbarContent {
         if #available(iOS 26.0, *) {
             ToolbarSpacer(.fixed, placement: .bottomBar)
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
+        } else {
+            ToolbarItem(placement: .bottomBar) {
+                Spacer()
+            }
         }
     }
 
