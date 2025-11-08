@@ -22,9 +22,12 @@ struct UnifiedMoreMenu: View {
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
+
     @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
+
+    @AppStorage(wrappedValue: false, "PrivacyMode.On") var isPrivacyModeOn: Bool
 
     var body: some View {
         Menu("Tab.More", systemImage: "ellipsis") {
@@ -47,16 +50,22 @@ struct UnifiedMoreMenu: View {
                 }
             }
             Section {
-                Toggle("More.Customization.Map.ShowsGenreOverlays", isOn: $showGenreOverlay)
-                Toggle("More.Customization.Map.UseDarkModeMap", isOn: $useDarkModeMaps)
-                Toggle("More.Customization.Map.UseHighDefinitionMap", isOn: $useHighResolutionMaps)
+                Toggle("More.Customization.Map.ShowsGenreOverlays", systemImage: "theatermasks",
+                       isOn: $showGenreOverlay)
+                Toggle("More.Customization.Map.UseDarkModeMap", systemImage: "moon",
+                       isOn: $useDarkModeMaps)
+                Toggle("More.Customization.Map.UseHighDefinitionMap", systemImage: "square.resize.up",
+                       isOn: $useHighResolutionMaps)
             } header: {
                 Text("More.Customization.Map")
             }
             Section {
-                Toggle("More.Customization.Circles.ShowWebCut", isOn: $showWebCut)
-                Toggle("More.Customization.Circles.ShowHallAndBlock", isOn: $showSpaceName)
-                Toggle("More.Customization.Circles.ShowDay", isOn: $showDay)
+                Toggle("More.Customization.Circles.ShowWebCut", systemImage: "text.rectangle.page",
+                       isOn: $showWebCut)
+                Toggle("More.Customization.Circles.ShowHallAndBlock", systemImage: "building",
+                       isOn: $showSpaceName)
+                Toggle("More.Customization.Circles.ShowDay", systemImage: "calendar",
+                       isOn: $showDay)
             } header: {
                 Text("More.Customization.Circles")
             }
@@ -118,9 +127,17 @@ struct UnifiedMoreMenu: View {
             } header: {
                 Text("More.Account")
             }
-            Button("Tab.More", systemImage: "ellipsis") {
-                unifier.isPresented = false
-                self.viewPath.append(.more)
+            Section {
+                Toggle("More.PrivacyMode.On", systemImage: "eye.slash",
+                       isOn: $isPrivacyModeOn)
+                Button("More.More", systemImage: "ellipsis") {
+                    unifier.isPresented = false
+                    self.viewPath.append(.more)
+                }
+            } header: {
+                Text("More.More")
+            } footer: {
+                Text("More.PrivacyMode.Description")
             }
         }
         .menuActionDismissBehavior(.disabled)
