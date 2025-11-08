@@ -18,6 +18,7 @@ struct FavoritesView: View {
     @Environment(Events.self) var planner
     @Environment(UserSelections.self) var selections
     @Environment(Unifier.self) var unifier
+    @Environment(FavoritesDataManager.self) var favoritesDataManager
 
     @State var favoriteCircles: [String: [ComiketCircle]]?
 
@@ -26,8 +27,6 @@ struct FavoritesView: View {
 
     @State var isGroupedByColor: Bool = true
     @AppStorage(wrappedValue: true, "Favorites.GroupByColor") var isGroupedByColorDefault: Bool
-
-    @State var isInitialLoadCompleted: Bool = false
 
     @Namespace var namespace
 
@@ -102,7 +101,7 @@ struct FavoritesView: View {
             await reloadFavorites()
         }
         .onAppear {
-            if !isInitialLoadCompleted {
+            if !favoritesDataManager.isInitialLoadCompleted {
                 if favoriteCircles == nil, let favoriteItems = favorites.items {
                     Task.detached {
                         await prepareCircles(using: favoriteItems)
@@ -110,11 +109,18 @@ struct FavoritesView: View {
                 }
                 isVisitModeOn = isVisitModeOnDefault
                 isGroupedByColor = isGroupedByColorDefault
-                isInitialLoadCompleted = true
+                favoritesDataManager.isInitialLoadCompleted = true
+            } else {
+                // Load from cache when returning to view
+                if let favoriteItems = favorites.items {
+                    Task.detached {
+                        await prepareCircles(using: favoriteItems)
+                    }
+                }
             }
         }
         .onChange(of: selections.date) {
-            if isInitialLoadCompleted {
+            if favoritesDataManager.isInitialLoadCompleted {
                 if let favoriteItems = favorites.items {
                     Task.detached {
                         await prepareCircles(using: favoriteItems)
@@ -123,12 +129,12 @@ struct FavoritesView: View {
             }
         }
         .onChange(of: isVisitModeOn) {
-            if isInitialLoadCompleted {
+            if favoritesDataManager.isInitialLoadCompleted {
                 isVisitModeOnDefault = isVisitModeOn
             }
         }
         .onChange(of: isGroupedByColor) {
-            if isInitialLoadCompleted {
+            if favoritesDataManager.isInitialLoadCompleted {
                 isGroupedByColorDefault = isGroupedByColor
             }
         }
@@ -153,34 +159,12 @@ struct FavoritesView: View {
     }
 
     func prepareCircles(using favoriteItems: [UserFavorites.Response.FavoriteItem]) async {
-        let favoriteItemsSorted: [Int: [UserFavorites.Response.FavoriteItem]] = favoriteItems.reduce(
-            into: [Int: [UserFavorites.Response.FavoriteItem]]()
-        ) { partialResult, favoriteItem in
-            partialResult[favoriteItem.favorite.color.rawValue, default: []].append(favoriteItem)
-        }
-
-        let actor = DataFetcher(modelContainer: sharedModelContainer)
-        var favoriteCircleIdentifiers: [Int: [PersistentIdentifier]] = [:]
-        for colorKey in favoriteItemsSorted.keys {
-            if let favoriteItems = favoriteItemsSorted[colorKey] {
-                favoriteCircleIdentifiers[colorKey] = await actor.circles(forFavorites: favoriteItems)
-            }
-        }
+        let favoriteCircles = await favoritesDataManager.circles(
+            for: favoriteItems,
+            dateID: selections.date?.id,
+            database: database
+        )
         await MainActor.run {
-            var favoriteCircles: [String: [ComiketCircle]] = [:]
-            for colorKey in favoriteCircleIdentifiers.keys.sorted() {
-                if let circleIdentifiers = favoriteCircleIdentifiers[colorKey] {
-                    var circles = database.circles(circleIdentifiers)
-                    circles.sort(by: {$0.id < $1.id})
-                    if let selectedDate = selections.date {
-                        favoriteCircles[String(colorKey)] = circles.filter({
-                            $0.day == selectedDate.id
-                        })
-                    } else {
-                        favoriteCircles[String(colorKey)] = circles
-                    }
-                }
-            }
             withAnimation(.smooth.speed(2.0)) {
                 self.favoriteCircles = favoriteCircles
             }

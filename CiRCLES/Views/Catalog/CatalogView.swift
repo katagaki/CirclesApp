@@ -16,6 +16,7 @@ struct CatalogView: View {
     @Environment(Database.self) var database
     @Environment(UserSelections.self) var selections
     @Environment(Unifier.self) var unifier
+    @Environment(CatalogDataManager.self) var catalogDataManager
 
     @Environment(\.modelContext) var modelContext
 
@@ -28,7 +29,6 @@ struct CatalogView: View {
     @State var isSearchActive: Bool = false
     @State var searchTerm: String = ""
 
-    @State var isInitialLoadCompleted: Bool = false
     @State var isLoading: Bool = false
 
     @State var displayModeState: CircleDisplayMode = .grid
@@ -102,17 +102,24 @@ struct CatalogView: View {
             prompt: "Circles.Search.Prompt"
 )
         .onAppear {
-            if !isInitialLoadCompleted {
+            if !catalogDataManager.isInitialLoadCompleted {
                 reloadDisplayedCircles(
                     genreID: selections.genre?.id,
                     mapID: selections.map?.id,
                     blockID: selections.block?.id
                 )
-                isInitialLoadCompleted = true
+                catalogDataManager.isInitialLoadCompleted = true
+            } else {
+                // Load from cache when returning to view
+                reloadDisplayedCircles(
+                    genreID: selections.genre?.id,
+                    mapID: selections.map?.id,
+                    blockID: selections.block?.id
+                )
             }
         }
         .onChange(of: selections.idMap) {
-            if isInitialLoadCompleted {
+            if catalogDataManager.isInitialLoadCompleted {
                 reloadDisplayedCircles(
                     genreID: selections.genre?.id,
                     mapID: selections.map?.id,
@@ -133,6 +140,7 @@ struct CatalogView: View {
         .onChange(of: isDatabaseInitialized) { _, newValue in
             if !newValue {
                 displayedCircles.removeAll()
+                catalogDataManager.clearCache()
             }
         }
     }
@@ -141,52 +149,17 @@ struct CatalogView: View {
         withAnimation(.smooth.speed(2.0)) {
             self.isLoading = true
         } completion: {
-            Task.detached {
-                let actor = DataFetcher(modelContainer: sharedModelContainer)
-
-                var circleIdentifiersByGenre: [PersistentIdentifier]?
-                var circleIdentifiersByMap: [PersistentIdentifier]?
-                var circleIdentifiersByBlock: [PersistentIdentifier]?
-                var circleIdentifiers: [PersistentIdentifier] = []
-
-                if let genreID {
-                    circleIdentifiersByGenre = await actor.circles(withGenre: genreID)
-                }
-                if let mapID {
-                    circleIdentifiersByMap = await actor.circles(inMap: mapID)
-                }
-                if let blockID {
-                    circleIdentifiersByBlock = await actor.circles(inBlock: blockID)
-                }
-
-                if let circleIdentifiersByGenre {
-                    circleIdentifiers = circleIdentifiersByGenre
-                }
-                if let circleIdentifiersByMap {
-                    if circleIdentifiers.isEmpty {
-                        circleIdentifiers = circleIdentifiersByMap
-                    } else {
-                        circleIdentifiers = Array(
-                            Set(circleIdentifiers).intersection(Set(circleIdentifiersByMap))
-                        )
-                    }
-                }
-                if let circleIdentifiersByBlock {
-                    circleIdentifiers = Array(
-                        Set(circleIdentifiers).intersection(Set(circleIdentifiersByBlock))
-                    )
-                }
-
-                await MainActor.run {
-                    var displayedCircles: [ComiketCircle] = []
-                    displayedCircles = database.circles(circleIdentifiers)
-                    if let selectedDate = selections.date {
-                        displayedCircles.removeAll(where: { $0.day != selectedDate.id })
-                    }
-                    withAnimation(.smooth.speed(2.0)) {
-                        self.displayedCircles = displayedCircles
-                        self.isLoading = false
-                    }
+            Task {
+                let circles = await catalogDataManager.circles(
+                    for: genreID,
+                    mapID: mapID,
+                    blockID: blockID,
+                    dateID: selections.date?.id,
+                    database: database
+                )
+                withAnimation(.smooth.speed(2.0)) {
+                    self.displayedCircles = circles
+                    self.isLoading = false
                 }
             }
         }
