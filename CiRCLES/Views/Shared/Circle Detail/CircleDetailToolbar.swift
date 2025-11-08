@@ -32,7 +32,7 @@ struct CircleDetailToolbar: View {
 
     var body: some View {
         ScrollView(.horizontal) {
-            HStack(spacing: 10.0) {
+            HStack(spacing: 8.0) {
                 if isActiveEventLatest && authenticator.onlineState == .online {
                     FavoriteButton(
                         color: selectedFavoriteColor?.backgroundColor()
