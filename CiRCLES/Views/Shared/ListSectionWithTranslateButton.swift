@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct ListSectionWithTranslateButton: View {
-    var title: LocalizedStringKey
+    var title: String
     var text: String
     var body: some View {
         Section {
@@ -17,7 +17,7 @@ struct ListSectionWithTranslateButton: View {
                 .textSelection(.enabled)
         } header: {
             HStack {
-                Text(title)
+                Text(LocalizedStringKey(title))
                 Spacer()
                 if text.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
                     TranslateButton(translating: text)
