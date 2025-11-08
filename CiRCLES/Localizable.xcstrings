@@ -2573,6 +2573,7 @@
       }
     },
     "Tab.Circles" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2589,6 +2590,7 @@
       }
     },
     "Tab.Favorites" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2840,6 +2842,7 @@
       }
     },
     "ViewTitle.Map" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

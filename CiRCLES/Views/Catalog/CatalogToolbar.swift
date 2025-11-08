@@ -5,11 +5,10 @@
 //  Created by シン・ジャスティン on 2024/09/07.
 //
 
-import Komponents
 import SwiftData
 import SwiftUI
 
-struct CatalogToolbar: View {
+struct CatalogToolbar: ToolbarContent {
 
     @Environment(Database.self) var database
     @Environment(UserSelections.self) var selections
@@ -24,56 +23,80 @@ struct CatalogToolbar: View {
 
     @Binding var displayedCircles: [ComiketCircle]
 
-    var body: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 12.0) {
-                @Bindable var selections = selections
-                Group {
-                    BarAccessoryMenu(LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                                     icon: (selections.genre?.name == "ブルーアーカイブ" ?
-                                            "scope" : "theatermask.and.paintbrush")) {
-                        Button("Shared.All") {
-                            selections.genre = nil
-                        }
-                        Picker(selection: $selections.genre.animation(.smooth.speed(2.0))) {
-                            ForEach(genres) { genre in
-                                Text(genre.name)
-                                    .tag(genre)
-                            }
-                        } label: {
-                            Text("Shared.Genre")
-                        }
-                    }
-                    BarAccessoryMenu(LocalizedStringKey(selections.block?.name ?? "Shared.Block"),
-                                     icon: "squareshape.split.2x2.dotted.inside") {
-                        Button("Shared.All") {
-                            selections.block = nil
-                        }
-                        Picker(selection: $selections.block.animation(.smooth.speed(2.0))) {
-                            ForEach(selectableBlocks ?? blocks, id: \.id) { block in
-                                Text(block.name)
-                                    .tag(block)
-                            }
-                        } label: {
-                            Text("Shared.Block")
-                        }
-                    }
+    var body: some ToolbarContent {
+        @Bindable var selections = selections
+        ToolbarItem(placement: .bottomBar) {
+            Menu {
+                Button("Shared.All") {
+                    selections.genre = nil
                 }
-                .glassEffectIfSupported()
+                Picker(selection: $selections.genre.animation(.smooth.speed(2.0))) {
+                    ForEach(genres) { genre in
+                        Text(genre.name)
+                            .tag(genre)
+                    }
+                } label: {
+                    Text("Shared.Genre")
+                }
+            } label: {
+                if #available(iOS 26.0, *) {
+                    Label(
+                        LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                        systemImage: (selections.genre?.name == "ブルーアーカイブ" ?
+                                      "scope" : "theatermask.and.paintbrush")
+                    )
+                } else {
+                    ToolbarButtonLabel(
+                        LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                        imageName: (selections.genre?.name == "ブルーアーカイブ" ?
+                                      "scope" : "theatermask.and.paintbrush")
+                    )
+                }
             }
-            .padding(.horizontal)
-            .padding(.vertical, 12.0)
+            .onChange(of: selections.idMap) {
+                Task.detached {
+                    await reloadBlocksInMap()
+                }
+            }
+            .onChange(of: displayedCircles) {
+                Task.detached {
+                    await reloadSelectableMapsBlocksAndDates()
+                }
+            }
         }
-        .scrollIndicators(.hidden)
-        .onChange(of: selections.idMap) {
-            Task.detached {
-                await reloadBlocksInMap()
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+        }
+        ToolbarItem(placement: .bottomBar) {
+            Menu {
+                Button("Shared.All") {
+                    selections.block = nil
+                }
+                Picker(selection: $selections.block.animation(.smooth.speed(2.0))) {
+                    ForEach(selectableBlocks ?? blocks, id: \.id) { block in
+                        Text(block.name)
+                            .tag(block)
+                    }
+                } label: {
+                    Text("Shared.Block")
+                }
+            } label: {
+                if #available(iOS 26.0, *) {
+                    Label(
+                        LocalizedStringKey(selections.block?.name ?? "Shared.Block"),
+                        systemImage: "squareshape.split.2x2.dotted.inside"
+                    )
+                } else {
+                    ToolbarButtonLabel(
+                        LocalizedStringKey(selections.block?.name ?? "Shared.Block"),
+                        imageName: "squareshape.split.2x2.dotted.inside"
+                    )
+                }
             }
         }
-        .onChange(of: displayedCircles) {
-            Task.detached {
-                await reloadSelectableMapsBlocksAndDates()
-            }
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
         }
     }
 

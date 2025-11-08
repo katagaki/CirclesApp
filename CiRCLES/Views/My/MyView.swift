@@ -148,7 +148,6 @@ struct MyView: View {
             }
         }
         .onChange(of: database.commonImages) {
-            // TODO: Improve race condition when My tab is the startup tab
             if eventDates == nil {
                 reloadDataInBackground()
             }
