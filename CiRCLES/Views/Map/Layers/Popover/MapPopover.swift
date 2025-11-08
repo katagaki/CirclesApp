@@ -52,6 +52,7 @@ struct MapPopover<Content: View>: View {
         )
     }
 
+    // swiftlint:disable function_body_length
     func calculatePopoverPosition() -> CGPoint {
         let gapFromSquare: CGFloat = 8
         let effectiveHeight = max(popoverHeight, 150)
@@ -124,4 +125,5 @@ struct MapPopover<Content: View>: View {
 
         return CGPoint(x: positionX, y: positionY)
     }
+    // swiftlint:enable function_body_length
 }

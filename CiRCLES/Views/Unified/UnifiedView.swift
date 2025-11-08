@@ -84,6 +84,20 @@ struct UnifiedView: View {
                 .debugOverlay()
                 #endif
         }
+        .onChange(of: isMyComiketPresenting) { _, newValue in
+            if #unavailable(iOS 26.0) {
+                if !newValue {
+                    unifier.isPresented = true
+                }
+            }
+        }
+        .onChange(of: viewPath) { _, newValue in
+            if #unavailable(iOS 26.0) {
+                if newValue.isEmpty {
+                    unifier.isPresented = true
+                }
+            }
+        }
         .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
             Button("Shared.Cancel", role: .cancel) {
                 unifier.isPresented = true

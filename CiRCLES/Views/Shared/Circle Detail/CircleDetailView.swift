@@ -100,7 +100,7 @@ struct CircleDetailView: View {
                     Text("Circles.NoDescription")
                         .foregroundStyle(.secondary)
                 } header: {
-                    ListSectionHeader(text: "Shared.Description")
+                    Text("Shared.Description")
                 }
             }
             if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {

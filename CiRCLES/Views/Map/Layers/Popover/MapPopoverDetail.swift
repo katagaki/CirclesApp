@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2024/08/15.
 //
 
-import Komponents
 import SwiftUI
 
 struct MapPopoverDetail: View {

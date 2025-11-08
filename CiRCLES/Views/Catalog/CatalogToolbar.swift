@@ -84,12 +84,12 @@ struct CatalogToolbar: ToolbarContent {
                 if #available(iOS 26.0, *) {
                     Label(
                         LocalizedStringKey(selections.block?.name ?? "Shared.Block"),
-                        systemImage: "squareshape.split.2x2.dotted.inside"
+                        systemImage: "rectangle.split.3x1"
                     )
                 } else {
                     ToolbarButtonLabel(
                         LocalizedStringKey(selections.block?.name ?? "Shared.Block"),
-                        imageName: "squareshape.split.2x2.dotted.inside"
+                        imageName: "rectangle.split.3x1"
                     )
                 }
             }

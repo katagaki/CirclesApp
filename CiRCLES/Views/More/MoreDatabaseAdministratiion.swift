@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2024/07/15.
 //
 
-import Komponents
 import SQLite
 import SwiftUI
 
@@ -74,7 +73,7 @@ struct MoreDatabaseAdministratiion: View {
                         }
                 }
             } header: {
-                ListSectionHeader(text: "More.DBAdmin.DownloadedData")
+                Text("More.DBAdmin.DownloadedData")
             }
         }
         .navigationTitle("ViewTitle.More.DBAdmin")

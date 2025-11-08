@@ -16,7 +16,7 @@ struct SheetDetentsModifier: ViewModifier {
                 .presentationDetents([.height(150), .height(360), .large], selection: $selectedDetent)
         } else {
             content
-                .presentationDetents([.height(120), .height(360), .large], selection: $selectedDetent)
+                .presentationDetents([.height(100), .height(360), .large], selection: $selectedDetent)
         }
     }
 }

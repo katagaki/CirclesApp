@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2024/09/15.
 //
 
-import Komponents
 import SwiftUI
 import UserNotifications
 
@@ -140,7 +139,7 @@ struct MyEventNotifierSheet: View {
                                 }
                             }
                         } header: {
-                            ListSectionHeader(text: "Notifier.BeforeEvent")
+                            Text("Notifier.BeforeEvent")
                         }
                     }
                     if let notificationsOnStart = notificationsOnStart[participation] {
@@ -155,7 +154,7 @@ struct MyEventNotifierSheet: View {
                                 }
                             }
                         } header: {
-                            ListSectionHeader(text: "Notifier.StartOfEvent")
+                            Text("Notifier.StartOfEvent")
                         }
                     }
                     if let notificationOnEnd = notificationOnEnd[participation] {
@@ -170,7 +169,7 @@ struct MyEventNotifierSheet: View {
                                 }
                             }
                         } header: {
-                            ListSectionHeader(text: "Notifier.EndOfEvent")
+                            Text("Notifier.EndOfEvent")
                         }
                     }
                 }
