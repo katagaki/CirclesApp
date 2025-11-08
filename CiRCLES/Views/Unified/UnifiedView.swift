@@ -135,6 +135,8 @@ struct UnifiedView: View {
             let actor = DataConverter(modelContainer: sharedModelContainer)
             await actor.deleteAll()
             await MainActor.run {
+                imageCache.clear()
+                database.reset()
                 unifier.close()
                 authenticator.resetAuthentication()
             }

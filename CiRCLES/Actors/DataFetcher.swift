@@ -8,7 +8,7 @@
 import Foundation
 import SwiftData
 
-// swiftline:disable type_body_length
+// swiftlint:disable type_body_length
 @ModelActor
 actor DataFetcher {
 
@@ -289,4 +289,4 @@ actor DataFetcher {
         }
     }
 }
-// swiftline:enable type_body_length
+// swiftlint:enable type_body_length
