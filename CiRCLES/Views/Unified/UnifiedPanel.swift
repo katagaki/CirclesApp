@@ -35,7 +35,7 @@ struct UnifiedPanel: View {
                     if UIDevice.current.userInterfaceIdiom == .phone {
                         ToolbarItem(placement: .topBarTrailing) {
                             Button("Shared.ClosePanel", systemImage: "chevron.down") {
-                                self.unifier.isPresented = false
+                                self.unifier.hide()
                             }
                         }
                     } else {

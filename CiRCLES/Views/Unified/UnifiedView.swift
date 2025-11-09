@@ -146,22 +146,20 @@ struct UnifiedView: View {
         .onChange(of: isMyComiketPresenting) { _, newValue in
             if #unavailable(iOS 26.0) {
                 if !newValue {
-                    unifier.isPresented = true
+                    unifier.showOnPhone()
                 }
             }
         }
         .onChange(of: viewPath) { _, newValue in
             if #unavailable(iOS 26.0) {
                 if newValue.isEmpty {
-                    unifier.isPresented = true
+                    unifier.showOnPhone()
                 }
             }
         }
         .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
             Button("Shared.Cancel", role: .cancel) {
-                if UIDevice.current.userInterfaceIdiom == .phone {
-                    unifier.isPresented = true
-                }
+                unifier.showOnPhone()
             }
             Button("Shared.Logout", role: .destructive, action: logout)
         } message: {
