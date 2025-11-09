@@ -68,15 +68,26 @@ struct CircleDetailView: View {
                         if let extendedInformation,
                            let favoriteMemo = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.memo,
                            !favoriteMemo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            VStack(alignment: .leading, spacing: 4.0) {
-                                Text("Shared.Memo.Favorites")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .textCase(.uppercase)
-                                Text(favoriteMemo)
-                                    .font(.subheadline)
-                            }
+                            InfoStackSection(
+                                title: "Shared.Memo.Favorites",
+                                contents: favoriteMemo,
+                                canTranslate: false
+                            ) 
                         }
+
+                        if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
+                            InfoStackSection(
+                                title: "Shared.Description",
+                                contents: circle.supplementaryDescription
+                                canTranslate: true
+                            )
+                        } else {
+                            InfoStackSection(
+                                title: "Shared.Description",
+                                contents: String(localized: "Circles.NoDescription")
+                                canTranslate: false
+                            )
+                        } 
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -84,16 +95,6 @@ struct CircleDetailView: View {
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
                 .listRowInsets(.init(top: 0.0, leading: 20.0, bottom: 0.0, trailing: 20.0))
-            }
-            if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
-                ListSectionWithTranslateButton(title: "Shared.Description", text: circle.supplementaryDescription)
-            } else {
-                Section {
-                    Text("Circles.NoDescription")
-                        .foregroundStyle(.secondary)
-                } header: {
-                    Text("Shared.Description")
-                }
             }
             if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
                 ListSectionWithTranslateButton(title: "Shared.BookName", text: circle.bookName)
