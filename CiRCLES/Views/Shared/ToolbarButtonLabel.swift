@@ -19,7 +19,10 @@ struct ToolbarButtonLabel: View {
     var body: some View {
         HStack(spacing: 8.0) {
             Image(systemName: imageName)
+                .font(.subheadline)
             Text(text)
+                .font(.subheadline)
+                .fontWeight(.bold)
                 .truncationMode(.middle)
         }
         .padding(.horizontal, 8.0)

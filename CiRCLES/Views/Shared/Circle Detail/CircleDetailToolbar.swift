@@ -20,7 +20,7 @@ struct CircleDetailToolbar: View {
 
     @State var isAddingToFavorites: Bool = false
     @State var selectedFavoriteColor: WebCatalogColor?
-    @State var shouldCallAPIToUpdateFavorites: Bool = true
+    @State var favoriteMemo: String = ""
 
     @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
 
@@ -42,7 +42,23 @@ struct CircleDetailToolbar: View {
                         isAddingToFavorites = true
                     }
                     .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
-                        FavoriteColorSelector(selectedColor: $selectedFavoriteColor)
+                        FavoritePopover(
+                            initialColor: selectedFavoriteColor,
+                            initialMemo: favoriteMemo,
+                            isExistingFavorite: favorites.contains(webCatalogID: extendedInformation.webCatalogID),
+                            onSave: { color, memo in
+                                Task.detached {
+                                    await saveFavorite(color: color, memo: memo)
+                                }
+                                isAddingToFavorites = false
+                            },
+                            onDelete: {
+                                Task.detached {
+                                    await deleteFavorite()
+                                }
+                                isAddingToFavorites = false
+                            }
+                        )
                     }
                 }
                 HStack(spacing: 5.0) {
@@ -71,42 +87,32 @@ struct CircleDetailToolbar: View {
             }
             .padding(.horizontal, 12.0)
         }
+        .padding(
+            .bottom,
+            UIDevice.current.userInterfaceIdiom == .pad ?
+            12.0 : 0.0
+        )
         .scrollIndicators(.hidden)
         .onAppear {
             reloadFavoriteColor()
-            shouldCallAPIToUpdateFavorites = true
         }
         .onChange(of: extendedInformation.webCatalogID) {
             reloadFavoriteColor()
         }
-        .onChange(of: selectedFavoriteColor) { oldValue, newValue in
-            // TODO: Potential race condition may happen here when switching quickly between circles
-            if shouldCallAPIToUpdateFavorites {
-                Task.detached {
-                    if oldValue != nil && newValue == nil {
-                        await deleteFavorite()
-                    } else {
-                        await addToFavorites(with: newValue)
-                    }
-                }
-                isAddingToFavorites = false
-            } else {
-                shouldCallAPIToUpdateFavorites = true
-            }
-        }
     }
 
     func reloadFavoriteColor() {
-        shouldCallAPIToUpdateFavorites = false
         selectedFavoriteColor = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.color
+        favoriteMemo = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.memo ?? ""
     }
 
-    func addToFavorites(with color: WebCatalogColor?) async {
-        if let color, let token = authenticator.token {
+    func saveFavorite(color: WebCatalogColor, memo: String) async {
+        if let token = authenticator.token {
             let actor = FavoritesActor(modelContainer: sharedModelContainer)
             let favoritesAddResult = await actor.add(
                 extendedInformation.webCatalogID,
                 to: color,
+                memo: memo,
                 authToken: token
             )
             if favoritesAddResult {
@@ -114,6 +120,8 @@ struct CircleDetailToolbar: View {
                 await MainActor.run {
                     favorites.items = items
                     favorites.wcIDMappedItems = wcIDMappedItems
+                    selectedFavoriteColor = color
+                    favoriteMemo = memo
                 }
             }
         }
@@ -131,6 +139,8 @@ struct CircleDetailToolbar: View {
                 await MainActor.run {
                     favorites.items = items
                     favorites.wcIDMappedItems = wcIDMappedItems
+                    selectedFavoriteColor = nil
+                    favoriteMemo = ""
                 }
             }
         }
