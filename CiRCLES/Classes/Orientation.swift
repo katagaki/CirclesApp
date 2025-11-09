@@ -9,15 +9,14 @@ import Foundation
 import SwiftUI
 
 @Observable
+@MainActor
 class Orientation {
     private var orientation: UIDeviceOrientation
 
-    @MainActor
     init() {
         self.orientation = UIDevice.current.orientation
     }
 
-    @MainActor
     func update() {
         if UIDevice.current.orientation == .portrait ||
             UIDevice.current.orientation == .landscapeLeft ||
@@ -26,18 +25,15 @@ class Orientation {
         }
     }
 
-    @MainActor
     func update(to orientation: UIDeviceOrientation) {
         self.orientation = orientation
     }
 
-    @MainActor
     func isPortrait() -> Bool {
-        return orientation.isPortrait || UIDevice.current.userInterfaceIdiom != .phone
+        return orientation.isPortrait || UIDevice.current.orientation == .portraitUpsideDown
     }
 
-    @MainActor
     func isLandscape() -> Bool {
-        return orientation.isLandscape && UIDevice.current.userInterfaceIdiom == .phone
+        return orientation.isLandscape && UIDevice.current.orientation != .portraitUpsideDown
     }
 }
