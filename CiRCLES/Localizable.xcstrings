@@ -243,6 +243,7 @@
       }
     },
     "Circles.Image.Catalog" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -277,6 +278,7 @@
       }
     },
     "Circles.Image.Web" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
