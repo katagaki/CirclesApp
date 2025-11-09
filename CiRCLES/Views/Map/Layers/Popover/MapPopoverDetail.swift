@@ -11,6 +11,7 @@ struct MapPopoverDetail: View {
 
     @Environment(Database.self) var database
     @Environment(Unifier.self) var unifier
+    @Environment(Favorites.self) var favorites
 
     @Environment(\.modelContext) var modelContext
 
@@ -39,8 +40,18 @@ struct MapPopoverDetail: View {
                                     showSpaceName: .constant(false), showDay: .constant(false)
                                 )
                                 .frame(width: 49.0, height: 70.0, alignment: .center)
-                                Text(circle.circleName)
-                                    .lineLimit(2)
+                                VStack(alignment: .leading, spacing: 2.0) {
+                                    Text(circle.circleName)
+                                        .lineLimit(2)
+                                    if let extendedInfo = circle.extendedInformation,
+                                       let memo = favorites.wcIDMappedItems?[extendedInfo.webCatalogID]?.favorite.memo,
+                                       !memo.isEmpty {
+                                        Text(memo)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(2)
+                                    }
+                                }
                                 Spacer(minLength: 0.0)
                             }
                             .contentShape(.rect)

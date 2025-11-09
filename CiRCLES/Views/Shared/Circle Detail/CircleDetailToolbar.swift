@@ -20,6 +20,7 @@ struct CircleDetailToolbar: View {
 
     @State var isAddingToFavorites: Bool = false
     @State var selectedFavoriteColor: WebCatalogColor?
+    @State var favoriteMemo: String = ""
     @State var shouldCallAPIToUpdateFavorites: Bool = true
 
     @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
@@ -42,7 +43,7 @@ struct CircleDetailToolbar: View {
                         isAddingToFavorites = true
                     }
                     .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
-                        FavoriteColorSelector(selectedColor: $selectedFavoriteColor)
+                        FavoriteColorSelector(selectedColor: $selectedFavoriteColor, memo: $favoriteMemo)
                     }
                 }
                 HStack(spacing: 5.0) {
@@ -85,6 +86,9 @@ struct CircleDetailToolbar: View {
                 Task.detached {
                     if oldValue != nil && newValue == nil {
                         await deleteFavorite()
+                        await MainActor.run {
+                            favoriteMemo = ""
+                        }
                     } else {
                         await addToFavorites(with: newValue)
                     }
@@ -99,6 +103,7 @@ struct CircleDetailToolbar: View {
     func reloadFavoriteColor() {
         shouldCallAPIToUpdateFavorites = false
         selectedFavoriteColor = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.color
+        favoriteMemo = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.memo ?? ""
     }
 
     func addToFavorites(with color: WebCatalogColor?) async {
@@ -107,6 +112,7 @@ struct CircleDetailToolbar: View {
             let favoritesAddResult = await actor.add(
                 extendedInformation.webCatalogID,
                 to: color,
+                memo: favoriteMemo,
                 authToken: token
             )
             if favoritesAddResult {
