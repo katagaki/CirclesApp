@@ -5080,8 +5080,8 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Notes"
+            "state" : "translated",
+            "value" : "Notes (Favorites)"
           }
         },
         "ja" : {
@@ -5092,20 +5092,20 @@
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "메모"
+            "state" : "translated",
+            "value" : "메모 (즐겨찾기)"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "备注"
+            "state" : "translated",
+            "value" : "备注（收藏）"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "備註"
+            "state" : "translated",
+            "value" : "備註（收藏）"
           }
         }
       }
