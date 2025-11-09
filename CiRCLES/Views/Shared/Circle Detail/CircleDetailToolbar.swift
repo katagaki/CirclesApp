@@ -87,7 +87,11 @@ struct CircleDetailToolbar: View {
             }
             .padding(.horizontal, 12.0)
         }
-        .padding(.bottom, UIDevice.current.userInterfaceIdiom == .pad ? 12.0 : 0.0)
+        .padding(
+            .bottom,
+            UIDevice.current.userInterfaceIdiom == .pad ?
+            12.0 : 0.0
+        )
         .scrollIndicators(.hidden)
         .onAppear {
             reloadFavoriteColor()
