@@ -8,10 +8,16 @@
 import Observation
 import SwiftUI
 
+enum SidebarPosition {
+    case leading
+    case trailing
+}
+
 @Observable
 class Unifier {
 
     var isPresented: Bool = false
+    var sidebarPosition: SidebarPosition = .leading
 
     // Currently displayed sheet's data representation
     var current: UnifiedPath? = .circles
@@ -45,18 +51,28 @@ class Unifier {
     // Currently displayed sheet's navigation stack's view path
     var path: [UnifiedPath] = []
 
-    func show(_ newPath: UnifiedPath) {
-        self.current = newPath
-        self.path.removeAll()
-        self.isPresented = true
+    @MainActor
+    func show() {
+        // Only set isPresented on phone, iPad sidebar is always visible
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            self.isPresented = true
+        }
     }
 
+    @MainActor
     func hide() {
-        self.isPresented = false
+        // Only hide on phone, iPad sidebar is always visible
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            self.isPresented = false
+        }
     }
 
+    @MainActor
     func close() {
-        self.isPresented = false
+        // Only close on phone, iPad sidebar is always visible
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            self.isPresented = false
+        }
         self.current = nil
         self.path = []
     }
@@ -73,12 +89,23 @@ class Unifier {
         }
     }
 
+    @MainActor
     func append(_ newPath: UnifiedPath) {
         if self.current != nil {
             self.path.append(newPath)
-            self.isPresented = true
+            // Only set isPresented on phone, iPad sidebar is always visible
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                self.isPresented = true
+            }
         } else {
-            self.show(newPath)
+            self.current = newPath
+            self.show()
+        }
+    }
+
+    func toggleSidebarPosition() {
+        withAnimation(.smooth.speed(2.0)) {
+            sidebarPosition = sidebarPosition == .leading ? .trailing : .leading
         }
     }
 }
