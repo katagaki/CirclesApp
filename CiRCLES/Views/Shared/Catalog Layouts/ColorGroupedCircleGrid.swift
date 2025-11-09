@@ -25,7 +25,7 @@ struct ColorGroupedCircleGrid: View {
         #if targetEnvironment(macCatalyst)
         let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: gridSpacing)]
         #else
-        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 100.0), spacing: gridSpacing)]
+        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 60.0), spacing: gridSpacing)]
         #endif
 
         ScrollView {

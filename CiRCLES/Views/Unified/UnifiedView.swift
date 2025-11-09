@@ -35,6 +35,7 @@ struct UnifiedView: View {
             MapView()
                 .navigationBarTitleDisplayMode(.inline)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .safeAreaPadding(.leading, 400.0)
                 .toolbar {
                     UnifiedToolbar(
                         viewPath: $viewPath,
@@ -43,20 +44,7 @@ struct UnifiedView: View {
                         namespace: namespace
                     )
                 }
-                .sheet(isPresented: $unifier.isPresented) {
-                    if authenticator.isAuthenticating {
-                        LoginView()
-                            .environment(authenticator)
-                            .interactiveDismissDisabled()
-                    } else {
-                        if #available(iOS 26.0, *) {
-                            UnifiedPanel()
-                                .navigationTransition(.zoom(sourceID: "BottomPanel", in: namespace))
-                        } else {
-                            UnifiedPanel()
-                        }
-                    }
-                }
+                .unifierSheets(namespace: namespace)
                 .sheet(isPresented: $isMyComiketPresenting) {
                     Group {
                         if #available(iOS 26.0, *) {
@@ -74,15 +62,34 @@ struct UnifiedView: View {
                 }
                 .navigationDestination(for: UnifiedPath.self) { path in
                     path.view()
+                        .safeAreaPadding(.leading, 380.0)
                 }
-                .task {
-                    prepareTipKit()
-                    showReviewPromptIfLaunchedEnoughTimes()
+        }
+        .task {
+            prepareTipKit()
+            showReviewPromptIfLaunchedEnoughTimes()
+        }
+        .authenticated()
+        #if DEBUG
+        .debugOverlay()
+        #endif
+        .overlay {
+            if UIDevice.current.userInterfaceIdiom != .phone {
+                GeometryReader { reader in
+                    ZStack(alignment: .bottomLeading) {
+                        UnifiedPanel()
+                            .frame(
+                                width: 360.0,
+                                height: reader.size.height * 0.85
+                            )
+                            .adaptiveGlass(.regular, cornerRadius: 20.0)
+                            .clipShape(.rect(cornerRadius: 20.0))
+                            .padding(20.0)
+                            .shadow(color: .black.opacity(0.1), radius: 16.0, y: 2.0)
+                        Color.clear
+                    }
                 }
-                .authenticated()
-                #if DEBUG
-                .debugOverlay()
-                #endif
+            }
         }
         .onChange(of: isMyComiketPresenting) { _, newValue in
             if #unavailable(iOS 26.0) {
