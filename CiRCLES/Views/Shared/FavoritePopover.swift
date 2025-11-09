@@ -1,5 +1,5 @@
 //
-//  FavoriteColorSelector.swift
+//  FavoritePopover.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2024/08/04.
@@ -7,18 +7,18 @@
 
 import SwiftUI
 
-struct FavoriteColorSelector: View {
+struct FavoritePopover: View {
 
     var initialColor: WebCatalogColor?
     var initialMemo: String
     var isExistingFavorite: Bool
     var onSave: (WebCatalogColor, String) -> Void
     var onDelete: () -> Void
-    
+
     @State private var selectedColor: WebCatalogColor?
     @State private var memo: String
     let colors: [WebCatalogColor] = WebCatalogColor.allCases
-    
+
     init(
         initialColor: WebCatalogColor?,
         initialMemo: String,
@@ -36,22 +36,24 @@ struct FavoriteColorSelector: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .center, spacing: 16.0) {
+        VStack(alignment: .leading, spacing: 16.0) {
+            VStack(alignment: .leading, spacing: 8.0) {
                 Text("Shared.SelectColor")
                     .fontWeight(.semibold)
-                LazyVGrid(columns: [.init(.fixed(64.0), spacing: 8.0),
-                                    .init(.fixed(64.0), spacing: 8.0),
-                                    .init(.fixed(64.0), spacing: 8.0)]) {
+                LazyVGrid(
+                    columns: [.init(.fixed(64.0), spacing: 8.0),
+                              .init(.fixed(64.0), spacing: 8.0),
+                              .init(.fixed(64.0), spacing: 8.0)]
+                ) {
                     ForEach(colors, id: \.self) { color in
                         Button {
                             selectedColor = color
                         } label: {
                             color.backgroundColor()
                                 .aspectRatio(1.0, contentMode: .fit)
-                                .clipShape(.rect(cornerRadius: 6.0))
+                                .clipShape(.rect(cornerRadius: 12.0))
                                 .overlay {
-                                    RoundedRectangle(cornerRadius: 6.0)
+                                    RoundedRectangle(cornerRadius: 12.0)
                                         .stroke(Color.primary.opacity(0.3))
                                 }
                                 .overlay {
@@ -64,28 +66,42 @@ struct FavoriteColorSelector: View {
                         }
                     }
                 }
-                VStack(alignment: .leading, spacing: 8.0) {
-                    Text("Shared.Memo")
-                        .font(.subheadline)
-                        .fontWeight(.medium)
-                    TextField("Shared.Memo.Placeholder", text: $memo, axis: .vertical)
-                        .textFieldStyle(.roundedBorder)
-                        .lineLimit(2...4)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                Button(isExistingFavorite ? "Shared.SaveFavorite" : "Shared.RegisterFavorite") {
+                .frame(height: ((64.0 * 3) + (8.0 * 2)))
+            }
+            VStack(alignment: .leading, spacing: 8.0) {
+                Text("Shared.Memo.Placeholder")
+                    .fontWeight(.semibold)
+                TextEditor(text: $memo)
+                    .clipShape(.rect(cornerRadius: 12.0))
+                    .frame(height: 64.0)
+            }
+            VStack(alignment: .leading, spacing: 8.0) {
+                Button {
                     if let selectedColor {
                         onSave(selectedColor, memo)
                     }
+                } label: {
+                    Label(
+                        isExistingFavorite ? "Shared.SaveFavorite" : "Shared.AddToFavorites",
+                        systemImage: "plus"
+                    )
+                    .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.borderedProminent)
                 .disabled(selectedColor == nil)
-                Button("Shared.RemoveFromFavorites", role: .destructive) {
+                Button(role: .destructive) {
                     onDelete()
+                } label: {
+                    Label(
+                        "Shared.RemoveFromFavorites",
+                        systemImage: "minus.circle"
+                    )
+                    .frame(maxWidth: .infinity)
                 }
+                .disabled(initialColor == nil)
             }
-            .padding()
+            .buttonStyleGlassProminentIfSupported()
         }
+        .padding()
         .presentationCompactAdaptation(.popover)
     }
 }
