@@ -51,6 +51,7 @@ class Unifier {
     // Currently displayed sheet's navigation stack's view path
     var path: [UnifiedPath] = []
 
+    @MainActor
     func show() {
         // Only set isPresented on phone, iPad sidebar is always visible
         if UIDevice.current.userInterfaceIdiom == .phone {
@@ -58,6 +59,7 @@ class Unifier {
         }
     }
 
+    @MainActor
     func hide() {
         // Only hide on phone, iPad sidebar is always visible
         if UIDevice.current.userInterfaceIdiom == .phone {
@@ -65,6 +67,7 @@ class Unifier {
         }
     }
 
+    @MainActor
     func close() {
         // Only close on phone, iPad sidebar is always visible
         if UIDevice.current.userInterfaceIdiom == .phone {
@@ -86,6 +89,7 @@ class Unifier {
         }
     }
 
+    @MainActor
     func append(_ newPath: UnifiedPath) {
         if self.current != nil {
             self.path.append(newPath)
@@ -100,7 +104,7 @@ class Unifier {
     }
 
     func toggleSidebarPosition() {
-        withAnimation(.smooth(duration: 0.5)) {
+        withAnimation(.smooth.speed(2.0)) {
             sidebarPosition = sidebarPosition == .leading ? .trailing : .leading
         }
     }

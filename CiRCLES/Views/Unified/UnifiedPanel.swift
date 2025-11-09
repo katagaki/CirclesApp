@@ -11,6 +11,7 @@ struct UnifiedPanel: View {
 
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
+    @Environment(Orientation.self) var orientation
 
     var body: some View {
         @Bindable var unifier = unifier
@@ -38,19 +39,16 @@ struct UnifiedPanel: View {
                                 self.unifier.hide()
                             }
                         }
-                    } else {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button("Shared.ToggleSidebarPosition", systemImage: unifier.sidebarPosition == .leading ? "sidebar.leading" : "sidebar.trailing") {
-                                self.unifier.toggleSidebarPosition()
-                            }
-                        }
                     }
-                } else {
-                    if UIDevice.current.userInterfaceIdiom != .phone {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button("Shared.ToggleSidebarPosition", systemImage: unifier.sidebarPosition == .leading ? "sidebar.leading" : "sidebar.trailing") {
-                                self.unifier.toggleSidebarPosition()
-                            }
+                }
+                if UIDevice.current.userInterfaceIdiom != .phone && orientation.isLandscape() {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(
+                            "Shared.ToggleSidebarPosition",
+                            systemImage: unifier.sidebarPosition == .leading ?
+                            "sidebar.leading" : "sidebar.trailing"
+                        ) {
+                            self.unifier.toggleSidebarPosition()
                         }
                     }
                 }

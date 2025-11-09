@@ -33,11 +33,11 @@ class Orientation {
 
     @MainActor
     func isPortrait() -> Bool {
-        return orientation.isPortrait || UIDevice.current.userInterfaceIdiom != .phone
+        return orientation.isPortrait || UIDevice.current.orientation == .portraitUpsideDown
     }
 
     @MainActor
     func isLandscape() -> Bool {
-        return orientation.isLandscape && UIDevice.current.userInterfaceIdiom == .phone
+        return orientation.isLandscape && UIDevice.current.orientation != .portraitUpsideDown
     }
 }

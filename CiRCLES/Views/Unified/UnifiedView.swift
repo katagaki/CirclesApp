@@ -30,7 +30,7 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
 
-    var isIPad: Bool {
+    var isiPad: Bool {
         UIDevice.current.userInterfaceIdiom != .phone
     }
 
@@ -43,11 +43,11 @@ struct UnifiedView: View {
     }
 
     var sidebarHeight: CGFloat {
-        600.0
+        400.0
     }
 
     var mapLeadingPadding: CGFloat {
-        guard isIPad else { return 0.0 }
+        guard isiPad else { return 0.0 }
         if isVerticalOrientation {
             return 0.0
         } else {
@@ -56,7 +56,7 @@ struct UnifiedView: View {
     }
 
     var mapTrailingPadding: CGFloat {
-        guard isIPad else { return 0.0 }
+        guard isiPad else { return 0.0 }
         if isVerticalOrientation {
             return 0.0
         } else {
@@ -65,7 +65,7 @@ struct UnifiedView: View {
     }
 
     var mapBottomPadding: CGFloat {
-        guard isIPad else { return 0.0 }
+        guard isiPad else { return 0.0 }
         return isVerticalOrientation ? (sidebarHeight + 40.0) : 0.0
     }
 
@@ -118,20 +118,19 @@ struct UnifiedView: View {
         .debugOverlay()
         #endif
         .overlay {
-            if isIPad {
+            if isiPad {
                 GeometryReader { reader in
                     let alignment: Alignment = {
                         if isVerticalOrientation {
                             return .bottom
                         } else {
-                            return unifier.sidebarPosition == .leading ? .leading : .trailing
+                            return unifier.sidebarPosition == .leading ? .bottomLeading : .bottomTrailing
                         }
                     }()
-                    
                     ZStack(alignment: alignment) {
                         UnifiedPanel()
                             .frame(
-                                width: isVerticalOrientation ? reader.size.width : sidebarWidth,
+                                width: isVerticalOrientation ? reader.size.width - 40.0 : sidebarWidth,
                                 height: isVerticalOrientation ? sidebarHeight : reader.size.height * 0.85
                             )
                             .adaptiveGlass(.regular, cornerRadius: 20.0)
