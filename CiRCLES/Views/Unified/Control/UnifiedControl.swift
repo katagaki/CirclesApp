@@ -40,6 +40,7 @@ struct UnifiedControl: View {
                 }
             }
         }
+        .frame(maxWidth: 280.0)
         .padding(6.0)
         .id(selections.fullMapId)
     }
