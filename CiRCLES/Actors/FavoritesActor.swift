@@ -53,6 +53,7 @@ actor FavoritesActor {
     func add(
         _ webCatalogID: Int,
         to color: WebCatalogColor,
+        memo: String = "",
         authToken: OpenIDToken
     ) async -> Bool {
         let request = urlRequestForReadersAPI(
@@ -61,7 +62,7 @@ actor FavoritesActor {
                 "access_token": authToken.accessToken,
                 "wcid": String(webCatalogID),
                 "color": String(color.rawValue),
-                "memo": ""
+                "memo": memo
                 ],
             authToken: authToken
         )

@@ -10,6 +10,7 @@ import SwiftUI
 struct FavoriteColorSelector: View {
 
     @Binding var selectedColor: WebCatalogColor?
+    @Binding var memo: String
     let colors: [WebCatalogColor] = WebCatalogColor.allCases
 
     var body: some View {
@@ -41,6 +42,15 @@ struct FavoriteColorSelector: View {
                         }
                     }
                 }
+                VStack(alignment: .leading, spacing: 8.0) {
+                    Text("Shared.Memo")
+                        .font(.subheadline)
+                        .fontWeight(.medium)
+                    TextField("Shared.Memo.Placeholder", text: $memo, axis: .vertical)
+                        .textFieldStyle(.roundedBorder)
+                        .lineLimit(2...4)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
                 Button("Shared.RemoveFromFavorites", role: .destructive) {
                     selectedColor = nil
                 }
