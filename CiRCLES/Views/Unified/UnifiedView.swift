@@ -18,6 +18,7 @@ struct UnifiedView: View {
     @Environment(ImageCache.self) var imageCache
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
+    @Environment(Orientation.self) var orientation
 
     @State var viewPath: [UnifiedPath] = []
 
@@ -29,13 +30,54 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
 
+    var isIPad: Bool {
+        UIDevice.current.userInterfaceIdiom != .phone
+    }
+
+    var isVerticalOrientation: Bool {
+        orientation.isPortrait()
+    }
+
+    var sidebarWidth: CGFloat {
+        360.0
+    }
+
+    var sidebarHeight: CGFloat {
+        600.0
+    }
+
+    var mapLeadingPadding: CGFloat {
+        guard isIPad else { return 0.0 }
+        if isVerticalOrientation {
+            return 0.0
+        } else {
+            return unifier.sidebarPosition == .leading ? (sidebarWidth + 40.0) : 0.0
+        }
+    }
+
+    var mapTrailingPadding: CGFloat {
+        guard isIPad else { return 0.0 }
+        if isVerticalOrientation {
+            return 0.0
+        } else {
+            return unifier.sidebarPosition == .trailing ? (sidebarWidth + 40.0) : 0.0
+        }
+    }
+
+    var mapBottomPadding: CGFloat {
+        guard isIPad else { return 0.0 }
+        return isVerticalOrientation ? (sidebarHeight + 40.0) : 0.0
+    }
+
     var body: some View {
         NavigationStack(path: $viewPath) {
             @Bindable var unifier = unifier
             MapView()
                 .navigationBarTitleDisplayMode(.inline)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .safeAreaPadding(.leading, UIDevice.current.userInterfaceIdiom != .phone ? 400.0 : 0.0)
+                .safeAreaPadding(.leading, mapLeadingPadding)
+                .safeAreaPadding(.trailing, mapTrailingPadding)
+                .safeAreaPadding(.bottom, mapBottomPadding)
                 .toolbar {
                     UnifiedToolbar(
                         viewPath: $viewPath,
@@ -62,7 +104,9 @@ struct UnifiedView: View {
                 }
                 .navigationDestination(for: UnifiedPath.self) { path in
                     path.view()
-                        .safeAreaPadding(.leading, UIDevice.current.userInterfaceIdiom != .phone ? 380.0 : 0.0)
+                        .safeAreaPadding(.leading, mapLeadingPadding)
+                        .safeAreaPadding(.trailing, mapTrailingPadding)
+                        .safeAreaPadding(.bottom, mapBottomPadding)
                 }
         }
         .task {
@@ -74,13 +118,21 @@ struct UnifiedView: View {
         .debugOverlay()
         #endif
         .overlay {
-            if UIDevice.current.userInterfaceIdiom != .phone {
+            if isIPad {
                 GeometryReader { reader in
-                    ZStack(alignment: .bottomLeading) {
+                    let alignment: Alignment = {
+                        if isVerticalOrientation {
+                            return .bottom
+                        } else {
+                            return unifier.sidebarPosition == .leading ? .leading : .trailing
+                        }
+                    }()
+                    
+                    ZStack(alignment: alignment) {
                         UnifiedPanel()
                             .frame(
-                                width: 360.0,
-                                height: reader.size.height * 0.85
+                                width: isVerticalOrientation ? reader.size.width : sidebarWidth,
+                                height: isVerticalOrientation ? sidebarHeight : reader.size.height * 0.85
                             )
                             .adaptiveGlass(.regular, cornerRadius: 20.0)
                             .clipShape(.rect(cornerRadius: 20.0))
@@ -107,7 +159,9 @@ struct UnifiedView: View {
         }
         .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
             Button("Shared.Cancel", role: .cancel) {
-                unifier.isPresented = true
+                if UIDevice.current.userInterfaceIdiom == .phone {
+                    unifier.isPresented = true
+                }
             }
             Button("Shared.Logout", role: .destructive, action: logout)
         } message: {
