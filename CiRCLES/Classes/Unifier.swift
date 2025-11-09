@@ -53,28 +53,24 @@ class Unifier {
 
     func show(_ newPath: UnifiedPath) {
         self.current = newPath
-        self.path.removeAll()
-        self.isPresented = true
-    }
-
-    func hide() {
-        self.isPresented = false
-    }
-
-    func hideOnPhone() {
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            self.isPresented = false
-        }
-    }
-
-    func showOnPhone() {
+        // Only set isPresented on phone, iPad sidebar is always visible
         if UIDevice.current.userInterfaceIdiom == .phone {
             self.isPresented = true
         }
     }
 
+    func hide() {
+        // Only hide on phone, iPad sidebar is always visible
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            self.isPresented = false
+        }
+    }
+
     func close() {
-        self.isPresented = false
+        // Only close on phone, iPad sidebar is always visible
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            self.isPresented = false
+        }
         self.current = nil
         self.path = []
     }
@@ -94,7 +90,10 @@ class Unifier {
     func append(_ newPath: UnifiedPath) {
         if self.current != nil {
             self.path.append(newPath)
-            self.isPresented = true
+            // Only set isPresented on phone, iPad sidebar is always visible
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                self.isPresented = true
+            }
         } else {
             self.show(newPath)
         }
