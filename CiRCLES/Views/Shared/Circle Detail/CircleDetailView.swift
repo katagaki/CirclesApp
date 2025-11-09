@@ -78,13 +78,13 @@ struct CircleDetailView: View {
                         if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
                             InfoStackSection(
                                 title: "Shared.Description",
-                                contents: circle.supplementaryDescription
+                                contents: circle.supplementaryDescription,
                                 canTranslate: true
                             )
                         } else {
                             InfoStackSection(
                                 title: "Shared.Description",
-                                contents: String(localized: "Circles.NoDescription")
+                                contents: String(localized: "Circles.NoDescription"),
                                 canTranslate: false
                             )
                         } 
