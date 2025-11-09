@@ -29,79 +29,61 @@ struct CircleDetailView: View {
     @State var nextCircle: ((ComiketCircle) -> ComiketCircle?)?
     @State var isFirstCircleAlertShowing: Bool = false
     @State var isLastCircleAlertShowing: Bool = false
+    @State var showWebCut: Bool = false
 
     @Namespace var namespace
 
     var body: some View {
         List {
             Section {
-                VStack(spacing: 2.0) {
-                    HStack(spacing: 6.0) {
-                        Group {
-                            Text("Circles.Image.Catalog")
-                            if authenticator.onlineState == .online {
-                                Text("Circles.Image.Web")
-                            }
-                        }
-                        .textCase(.uppercase)
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                        .frame(maxWidth: .infinity)
-                    }
-                    HStack(spacing: 6.0) {
-                        Group {
-                            CircleCutImage(
-                                circle,
-                                in: namespace,
-                                showSpaceName: .constant(false),
-                                showDay: .constant(false)
-                            )
-                            if authenticator.onlineState == .online {
-                                CircleCutImage(
-                                    circle,
-                                    in: namespace,
-                                    shouldFetchWebCut: true,
-                                    showCatalogCut: false,
-                                    forceWebCutUpdate: true,
-                                    showSpaceName: .constant(false),
-                                    showDay: .constant(false)
-                                )
-                            }
-                        }
-                        .frame(maxWidth: .infinity, maxHeight: 250.0)
-                    }
+                HStack(alignment: .top, spacing: 12.0) {
+                    // Cut image
+                    CircleCutImage(
+                        circle,
+                        in: namespace,
+                        shouldFetchWebCut: showWebCut && authenticator.onlineState == .online,
+                        showCatalogCut: !showWebCut || authenticator.onlineState != .online,
+                        forceWebCutUpdate: true,
+                        showSpaceName: .constant(false),
+                        showDay: .constant(false)
+                    )
+                    .frame(width: 100.0)
                     .onTapGesture {
-                        let circleID = circle.id
-                        let eventNumber = planner.activeEventNumber
-                        Task.detached {
-                            let actor = VisitActor(modelContainer: sharedModelContainer)
-                            await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
+                        if authenticator.onlineState == .online {
+                            withAnimation(.smooth.speed(2.0)) {
+                                showWebCut.toggle()
+                            }
                         }
                     }
+                    
+                    // Info stack
+                    VStack(alignment: .leading, spacing: 8.0) {
+                        HStack(spacing: 5.0) {
+                            CircleBlockPill("Shared.\(circle.day)th.Day", size: .large)
+                            if let circleSpaceName = circle.spaceName() {
+                                CircleBlockPill(LocalizedStringKey(circleSpaceName), size: .large)
+                            }
+                        }
+                        
+                        if let extendedInformation,
+                           let favoriteMemo = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.memo,
+                           !favoriteMemo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                            VStack(alignment: .leading, spacing: 4.0) {
+                                Text("Shared.Memo.Favorites")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .textCase(.uppercase)
+                                Text(favoriteMemo)
+                                    .font(.subheadline)
+                            }
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
+                .padding(.vertical, 8.0)
                 .listRowSeparator(.hidden)
                 .listRowBackground(Color.clear)
                 .listRowInsets(.init(top: 0.0, leading: 20.0, bottom: 0.0, trailing: 20.0))
-                HStack(spacing: 5.0) {
-                    CircleBlockPill("Shared.\(circle.day)th.Day", size: .large)
-                    if let circleSpaceName = circle.spaceName() {
-                        CircleBlockPill(LocalizedStringKey(circleSpaceName), size: .large)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .center)
-                .padding(.bottom, 2.0)
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
-                .listRowInsets(.init(top: 10.0, leading: 20.0, bottom: 0.0, trailing: 20.0))
-            }
-            if let extendedInformation,
-               let favoriteMemo = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.memo,
-               !favoriteMemo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                Section {
-                    Text(favoriteMemo)
-                } header: {
-                    Text("Shared.Memo.Favorites")
-                }
             }
             if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
                 ListSectionWithTranslateButton(title: "Shared.Description", text: circle.supplementaryDescription)
@@ -155,18 +137,9 @@ struct CircleDetailView: View {
                 }
             }
         }
-        .safeAreaInset(edge: .bottom, spacing: 0.0) {
+        .toolbar {
             if let extendedInformation {
-                if #available(iOS 26.0, *) {
-                    CircleDetailToolbar(extendedInformation, webCatalogInformation)
-                } else {
-                    BarAccessory(placement: .bottom) {
-                        VStack(spacing: 12.0) {
-                            CircleDetailToolbar(extendedInformation, webCatalogInformation)
-                        }
-                        .padding(.vertical, 12.0)
-                    }
-                }
+                CircleDetailToolbar(extendedInformation, webCatalogInformation)
             }
         }
         .alert("Alerts.FirstCircle.Title", isPresented: $isFirstCircleAlertShowing) {
