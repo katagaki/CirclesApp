@@ -51,8 +51,7 @@ class Unifier {
     // Currently displayed sheet's navigation stack's view path
     var path: [UnifiedPath] = []
 
-    func show(_ newPath: UnifiedPath) {
-        self.current = newPath
+    func show() {
         // Only set isPresented on phone, iPad sidebar is always visible
         if UIDevice.current.userInterfaceIdiom == .phone {
             self.isPresented = true
@@ -95,7 +94,8 @@ class Unifier {
                 self.isPresented = true
             }
         } else {
-            self.show(newPath)
+            self.current = newPath
+            self.show()
         }
     }
 

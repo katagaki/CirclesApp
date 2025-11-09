@@ -47,7 +47,7 @@ struct UnifiedToolbar: ToolbarContent {
                 ToolbarSpacer(.flexible, placement: .bottomBar)
                 ToolbarItem(placement: .bottomBar) {
                     Button("Shared.OpenPanel", systemImage: "chevron.up") {
-                        unifier.show(.circles)
+                        unifier.show()
                     }
                 }
                 .matchedTransitionSource(id: "BottomPanel", in: namespace)
