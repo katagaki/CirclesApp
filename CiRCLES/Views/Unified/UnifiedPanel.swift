@@ -40,7 +40,7 @@ struct UnifiedPanel: View {
                         }
                     } else {
                         ToolbarItem(placement: .topBarTrailing) {
-                            Button("Toggle Sidebar Position", systemImage: unifier.sidebarPosition == .leading ? "sidebar.leading" : "sidebar.trailing") {
+                            Button("Shared.ToggleSidebarPosition", systemImage: unifier.sidebarPosition == .leading ? "sidebar.leading" : "sidebar.trailing") {
                                 self.unifier.toggleSidebarPosition()
                             }
                         }
@@ -48,7 +48,7 @@ struct UnifiedPanel: View {
                 } else {
                     if UIDevice.current.userInterfaceIdiom != .phone {
                         ToolbarItem(placement: .topBarTrailing) {
-                            Button("Toggle Sidebar Position", systemImage: unifier.sidebarPosition == .leading ? "sidebar.leading" : "sidebar.trailing") {
+                            Button("Shared.ToggleSidebarPosition", systemImage: unifier.sidebarPosition == .leading ? "sidebar.leading" : "sidebar.trailing") {
                                 self.unifier.toggleSidebarPosition()
                             }
                         }
