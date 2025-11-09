@@ -22,7 +22,7 @@ struct UnifiedToolbar: ToolbarContent {
     var body: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
             Button("Tab.My", image: .tabIconMy) {
-                unifier.isPresented = false
+                unifier.hide()
                 isMyComiketPresenting = true
             }
             .aspectRatio(1.0, contentMode: .fit)
@@ -47,7 +47,7 @@ struct UnifiedToolbar: ToolbarContent {
                 ToolbarSpacer(.flexible, placement: .bottomBar)
                 ToolbarItem(placement: .bottomBar) {
                     Button("Shared.OpenPanel", systemImage: "chevron.up") {
-                        unifier.isPresented = true
+                        unifier.show(.circles)
                     }
                 }
                 .matchedTransitionSource(id: "BottomPanel", in: namespace)

@@ -67,7 +67,7 @@ struct AuthenticatedView: ViewModifier {
             if forceDownload {
                 isDatabaseInitialized = false
             }
-            unifier.isPresented = false
+            unifier.hide()
             oasis.open {
                 Task {
                     await oasis.setHeaderText("Shared.LoadingHeader.Event")
@@ -90,7 +90,7 @@ struct AuthenticatedView: ViewModifier {
                                 selections.map = selections.fetchDefaultMapSelection()
                             }
                             if !authenticator.isAuthenticating {
-                                unifier.isPresented = true
+                                unifier.showOnPhone()
                             }
                             isReloadingData = false
                         }

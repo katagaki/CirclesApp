@@ -61,6 +61,18 @@ class Unifier {
         self.isPresented = false
     }
 
+    func hideOnPhone() {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            self.isPresented = false
+        }
+    }
+
+    func showOnPhone() {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            self.isPresented = true
+        }
+    }
+
     func close() {
         self.isPresented = false
         self.current = nil
