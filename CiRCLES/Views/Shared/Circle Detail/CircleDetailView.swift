@@ -14,6 +14,7 @@ struct CircleDetailView: View {
 
     @Environment(\.modelContext) var modelContext
     @Environment(Authenticator.self) var authenticator
+    @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
@@ -93,6 +94,15 @@ struct CircleDetailView: View {
                 .listRowBackground(Color.clear)
                 .listRowInsets(.init(top: 10.0, leading: 20.0, bottom: 0.0, trailing: 20.0))
             }
+            if let extendedInformation,
+               let favoriteMemo = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.memo,
+               !favoriteMemo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                Section {
+                    Text(favoriteMemo)
+                } header: {
+                    Text("Shared.Memo.Favorites")
+                }
+            }
             if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
                 ListSectionWithTranslateButton(title: "Shared.Description", text: circle.supplementaryDescription)
             } else {
@@ -113,11 +123,12 @@ struct CircleDetailView: View {
                 ListSectionWithTranslateButton(title: "Shared.Tags", text: tags)
             }
             if circle.memo.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
-                ListSectionWithTranslateButton(title: "Shared.Memo", text: circle.memo)
+                ListSectionWithTranslateButton(title: "Shared.Memo.Circle", text: circle.memo)
             }
         }
         .opacity(unifier.isMinimized ? 0.0 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: unifier.selectedDetent)
+        .contentMargins(.top, 0.0)
         .listSectionSpacing(.compact)
         .navigationTitle(circle.circleName)
         .navigationBarTitleDisplayMode(.inline)
