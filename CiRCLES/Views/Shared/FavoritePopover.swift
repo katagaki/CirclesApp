@@ -19,6 +19,14 @@ struct FavoritePopover: View {
     @State private var memo: String
     let colors: [WebCatalogColor] = WebCatalogColor.allCases
 
+    var cornerRadius: CGFloat {
+        if #available(iOS 26.0, *) {
+            return 12.0
+        } else {
+            return 8.0
+        }
+    }
+
     init(
         initialColor: WebCatalogColor?,
         initialMemo: String,
@@ -51,9 +59,9 @@ struct FavoritePopover: View {
                         } label: {
                             color.backgroundColor()
                                 .aspectRatio(1.0, contentMode: .fit)
-                                .clipShape(.rect(cornerRadius: 12.0))
+                                .clipShape(.rect(cornerRadius: cornerRadius))
                                 .overlay {
-                                    RoundedRectangle(cornerRadius: 12.0)
+                                    RoundedRectangle(cornerRadius: cornerRadius)
                                         .stroke(Color.primary.opacity(0.3))
                                 }
                                 .overlay {
@@ -72,8 +80,12 @@ struct FavoritePopover: View {
                 Text("Shared.Memo.Placeholder")
                     .fontWeight(.semibold)
                 TextEditor(text: $memo)
-                    .clipShape(.rect(cornerRadius: 12.0))
+                    .clipShape(.rect(cornerRadius: cornerRadius))
                     .frame(height: 64.0)
+                    .overlay {
+                        RoundedRectangle(cornerRadius: cornerRadius)
+                            .stroke(Color.primary.opacity(0.3))
+                    }
             }
             VStack(alignment: .leading, spacing: 8.0) {
                 Button {
