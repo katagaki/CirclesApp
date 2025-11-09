@@ -333,13 +333,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "加载摊位中..."
+            "value" : "正在加载摊位..."
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "載入攤位中..."
+            "value" : "正在載入攤位..."
           }
         }
       }
@@ -921,13 +921,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "加载收藏中..."
+            "value" : "正在加载收藏..."
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "載入收藏中..."
+            "value" : "正在載入收藏..."
           }
         }
       }
@@ -1234,13 +1234,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "加载摊位中..."
+            "value" : "正在加载摊位..."
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "載入攤位中..."
+            "value" : "正在載入攤位..."
           }
         }
       }
@@ -1269,13 +1269,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "连接数据库中…"
+            "value" : "正在连接数据库…"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "連接資料庫中…"
+            "value" : "正在連接資料庫…"
           }
         }
       }
@@ -1304,13 +1304,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "下载图片中…"
+            "value" : "正在下载图片…"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "下載圖片中…"
+            "value" : "正在下載圖片…"
           }
         }
       }
@@ -1339,13 +1339,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "下载活动数据中…"
+            "value" : "正在下载活动数据…"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "下載活動資料中…"
+            "value" : "正在下載活動資料…"
           }
         }
       }
@@ -1374,13 +1374,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "加载活动中…"
+            "value" : "正在加载活动…"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "載入活動中…"
+            "value" : "正在載入活動…"
           }
         }
       }
@@ -1409,13 +1409,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "获取收藏数据中..."
+            "value" : "正在获取收藏数据..."
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "取得收藏資料中..."
+            "value" : "正在取得收藏資料..."
           }
         }
       }
@@ -1444,13 +1444,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "获取活动数据中..."
+            "value" : "正在获取活动数据..."
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "取得活動資料中..."
+            "value" : "正在取得活動資料..."
           }
         }
       }
@@ -1479,13 +1479,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "加载类型中..."
+            "value" : "正在加载类型..."
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "載入類型中..."
+            "value" : "正在載入類型..."
           }
         }
       }
@@ -1514,13 +1514,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "加载图片中..."
+            "value" : "正在加载图片..."
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "載入圖片中..."
+            "value" : "正在載入圖片..."
           }
         }
       }
@@ -1549,13 +1549,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "加载地图中..."
+            "value" : "正在加载地图..."
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "載入地圖中..."
+            "value" : "正在載入地圖..."
           }
         }
       }
@@ -1584,13 +1584,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "修复数据中..."
+            "value" : "正在修复数据…"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "修復資料中..."
+            "value" : "正在修復資料..."
           }
         }
       }
@@ -1686,13 +1686,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "加载配置中…"
+            "value" : "正在加载配置…"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "載入配置中…"
+            "value" : "正在載入配置…"
           }
         }
       }
@@ -4718,13 +4718,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "更新数据中"
+            "value" : "正在更新数据"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "更新資料中"
+            "value" : "正在更新資料"
           }
         }
       }
@@ -4753,13 +4753,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "更新活动数据中"
+            "value" : "正在更新活动数据"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "更新活動資料中"
+            "value" : "正在更新活動資料"
           }
         }
       }
@@ -4788,13 +4788,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "更新收藏中"
+            "value" : "正在更新收藏"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "更新收藏中"
+            "value" : "正在更新收藏"
           }
         }
       }
@@ -4823,13 +4823,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "准备中"
+            "value" : "正在准备"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "準備中"
+            "value" : "正在準備"
           }
         }
       }
@@ -4970,37 +4970,107 @@
         }
       }
     },
-    "Shared.Memo" : {
+    "Shared.Memo.Circle" : {
       "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
+            "value" : "Notes (Circle)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メモ（サークル）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "메모 (서클)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "备注（摊位）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "備註（攤位）"
+          }
+        }
+      }
+    },
+    "Shared.Memo.Favorites" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "needs_review",
             "value" : "Notes"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "メモ"
+            "value" : "メモ（お気に入り）"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "메모"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "备注"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "備註"
+          }
+        }
+      }
+    },
+    "Shared.Memo.Placeholder" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notes (Optional)"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メモを入力（任意）"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "메모 입력 (선택 사항)"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入备注（可选）"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "輸入備註（選填）"
           }
         }
       }
@@ -5277,36 +5347,71 @@
         }
       }
     },
-    "Shared.SelectColor" : {
+    "Shared.SaveFavorite" : {
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select Color for Favorite"
+            "value" : "Save Favorite"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "お気に入りの色を選択"
+            "value" : "お気に入りを更新"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "즐겨찾기 색상 선택"
+            "value" : "즐겨찾기 저장"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "选择收藏颜色"
+            "value" : "保存收藏"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "選擇收藏顏色"
+            "value" : "儲存收藏"
+          }
+        }
+      }
+    },
+    "Shared.SelectColor" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select Color"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "色を選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "색상 선택"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "选择颜色"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選擇顏色"
           }
         }
       }
@@ -5448,40 +5553,6 @@
         }
       }
     },
-    "Shared.Translate" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Translate"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "翻訳"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "번역"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "翻译"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "翻譯"
-          }
-        }
-      }
-    },
     "Shared.ToggleSidebarPosition" : {
       "localizations" : {
         "en" : {
@@ -5512,6 +5583,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "切換側邊欄位置"
+          }
+        }
+      }
+    },
+    "Shared.Translate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translate"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻訳"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "번역"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻译"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "翻譯"
           }
         }
       }
