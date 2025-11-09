@@ -43,13 +43,15 @@ struct UnifiedToolbar: ToolbarContent {
             }
         }
         if #available(iOS 26.0, *) {
-            ToolbarSpacer(.flexible, placement: .bottomBar)
-            ToolbarItem(placement: .bottomBar) {
-                Button("Shared.OpenPanel", systemImage: "chevron.up") {
-                    unifier.isPresented = true
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                ToolbarSpacer(.flexible, placement: .bottomBar)
+                ToolbarItem(placement: .bottomBar) {
+                    Button("Shared.OpenPanel", systemImage: "chevron.up") {
+                        unifier.isPresented = true
+                    }
                 }
+                .matchedTransitionSource(id: "BottomPanel", in: namespace)
             }
-            .matchedTransitionSource(id: "BottomPanel", in: namespace)
         }
     }
 }
