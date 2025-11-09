@@ -66,12 +66,20 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
         case .namespacedCircleDetail(
             let circle, let previousCircle, let nextCircle, let namespace
         ):
-            CircleDetailView(
-                circle: circle,
-                previousCircle: previousCircle,
-                nextCircle: nextCircle
-            )
-            .navigationTransition(.zoom(sourceID: circle.id, in: namespace))
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                CircleDetailView(
+                    circle: circle,
+                    previousCircle: previousCircle,
+                    nextCircle: nextCircle
+                )
+                .navigationTransition(.zoom(sourceID: circle.id, in: namespace))
+            } else {
+                CircleDetailView(
+                    circle: circle,
+                    previousCircle: previousCircle,
+                    nextCircle: nextCircle
+                )
+            }
         }
     }
 }
