@@ -9,8 +9,8 @@ import SwiftUI
 
 struct MapPopover<Content: View>: View {
 
-    let popoverWidth: CGFloat = 220.0
-    let popoverHeight: CGFloat = (16.0 * 2) + (60.0 * 2) + 8.0
+    let popoverWidth: CGFloat = 240.0
+    let popoverHeight: CGFloat = (16.0 * 2) + (70.0 * 2) + 8.0
     var edgePadding: CGFloat = 16.0
 
     @Binding var canvasSize: CGSize
