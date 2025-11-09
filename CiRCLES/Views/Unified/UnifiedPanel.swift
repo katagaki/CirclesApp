@@ -38,6 +38,20 @@ struct UnifiedPanel: View {
                                 self.unifier.isPresented = false
                             }
                         }
+                    } else {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Toggle Sidebar Position", systemImage: unifier.sidebarPosition == .leading ? "sidebar.leading" : "sidebar.trailing") {
+                                self.unifier.toggleSidebarPosition()
+                            }
+                        }
+                    }
+                } else {
+                    if UIDevice.current.userInterfaceIdiom != .phone {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Toggle Sidebar Position", systemImage: unifier.sidebarPosition == .leading ? "sidebar.leading" : "sidebar.trailing") {
+                                self.unifier.toggleSidebarPosition()
+                            }
+                        }
                     }
                 }
             }

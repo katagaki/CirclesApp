@@ -119,7 +119,9 @@ struct UnifiedMoreMenu: View {
             }
             Section {
                 Button("Shared.Logout") {
-                    unifier.isPresented = false
+                    if UIDevice.current.userInterfaceIdiom == .phone {
+                        unifier.isPresented = false
+                    }
                     Task {
                         try? await Task.sleep(for: .seconds(0.5))
                         isGoingToSignOut = true
@@ -135,7 +137,9 @@ struct UnifiedMoreMenu: View {
                 Toggle("More.PrivacyMode.On", systemImage: "eye.slash",
                        isOn: $isPrivacyModeOn)
                 Button("More.More", systemImage: "ellipsis") {
-                    unifier.isPresented = false
+                    if UIDevice.current.userInterfaceIdiom == .phone {
+                        unifier.isPresented = false
+                    }
                     self.viewPath.append(.more)
                 }
             } header: {

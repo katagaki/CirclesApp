@@ -8,10 +8,16 @@
 import Observation
 import SwiftUI
 
+enum SidebarPosition {
+    case leading
+    case trailing
+}
+
 @Observable
 class Unifier {
 
     var isPresented: Bool = false
+    var sidebarPosition: SidebarPosition = .leading
 
     // Currently displayed sheet's data representation
     var current: UnifiedPath? = .circles
@@ -79,6 +85,12 @@ class Unifier {
             self.isPresented = true
         } else {
             self.show(newPath)
+        }
+    }
+
+    func toggleSidebarPosition() {
+        withAnimation(.smooth(duration: 0.5)) {
+            sidebarPosition = sidebarPosition == .leading ? .trailing : .leading
         }
     }
 }
