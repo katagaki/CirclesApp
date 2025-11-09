@@ -39,17 +39,9 @@ struct CircleDetailToolbar: ToolbarContent {
                     isAddingToFavorites = true
                 } label: {
                     if #available(iOS 26.0, *) {
-                        Label(
-                            favorites.contains(webCatalogID: extendedInformation.webCatalogID) ?
-                                "Shared.EditFavorites" : "Shared.AddToFavorites",
-                            systemImage: "star.fill"
-                        )
+                        Label("Shared.Favorite", systemImage: "star.fill")
                     } else {
-                        ToolbarButtonLabel(
-                            favorites.contains(webCatalogID: extendedInformation.webCatalogID) ?
-                                "Shared.EditFavorites" : "Shared.AddToFavorites",
-                            imageName: "star.fill"
-                        )
+                        ToolbarButtonLabel("Shared.Favorite", imageName: "star.fill")
                     }
                 }
                 .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
