@@ -9,9 +9,31 @@ import SwiftUI
 
 struct FavoriteColorSelector: View {
 
-    @Binding var selectedColor: WebCatalogColor?
-    @Binding var memo: String
+    var initialColor: WebCatalogColor?
+    var initialMemo: String
+    var isExistingFavorite: Bool
+    var onSave: (WebCatalogColor, String) -> Void
+    var onDelete: () -> Void
+    
+    @State private var selectedColor: WebCatalogColor?
+    @State private var memo: String
     let colors: [WebCatalogColor] = WebCatalogColor.allCases
+    
+    init(
+        initialColor: WebCatalogColor?,
+        initialMemo: String,
+        isExistingFavorite: Bool,
+        onSave: @escaping (WebCatalogColor, String) -> Void,
+        onDelete: @escaping () -> Void
+    ) {
+        self.initialColor = initialColor
+        self.initialMemo = initialMemo
+        self.isExistingFavorite = isExistingFavorite
+        self.onSave = onSave
+        self.onDelete = onDelete
+        self._selectedColor = State(initialValue: initialColor)
+        self._memo = State(initialValue: initialMemo)
+    }
 
     var body: some View {
         ScrollView {
@@ -51,8 +73,15 @@ struct FavoriteColorSelector: View {
                         .lineLimit(2...4)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
+                Button(isExistingFavorite ? "Shared.SaveFavorite" : "Shared.RegisterFavorite") {
+                    if let selectedColor {
+                        onSave(selectedColor, memo)
+                    }
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(selectedColor == nil)
                 Button("Shared.RemoveFromFavorites", role: .destructive) {
-                    selectedColor = nil
+                    onDelete()
                 }
             }
             .padding()
