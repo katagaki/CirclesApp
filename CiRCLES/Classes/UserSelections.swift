@@ -123,6 +123,17 @@ class UserSelections: Equatable {
         return "G\(_genre?.id ?? 0),B\(_block?.id ?? 0)"
     }
 
+    func resetSelections() {
+        _genre = nil
+        defaults.set(nil, forKey: selectedGenreKey)
+        _map = nil
+        defaults.set(nil, forKey: selectedMapKey)
+        _block = nil
+        defaults.set(nil, forKey: selectedBlockKey)
+        _date = nil
+        defaults.set(nil, forKey: selectedDateKey)
+    }
+
     static func == (lhs: UserSelections, rhs: UserSelections) -> Bool {
         return lhs.fullMapId == rhs.fullMapId &&
         lhs.catalogSelectionId == rhs.catalogSelectionId
