@@ -35,7 +35,7 @@ struct UnifiedView: View {
             MapView()
                 .navigationBarTitleDisplayMode(.inline)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .safeAreaPadding(.leading, UIDevice.current.userInterfaceIdiom == .pad ? 400.0 : 0.0)
+                .safeAreaPadding(.leading, UIDevice.current.userInterfaceIdiom != .phone ? 400.0 : 0.0)
                 .toolbar {
                     UnifiedToolbar(
                         viewPath: $viewPath,
@@ -62,7 +62,7 @@ struct UnifiedView: View {
                 }
                 .navigationDestination(for: UnifiedPath.self) { path in
                     path.view()
-                        .safeAreaPadding(.leading, UIDevice.current.userInterfaceIdiom == .pad ? 380.0 : 0.0)
+                        .safeAreaPadding(.leading, UIDevice.current.userInterfaceIdiom != .phone ? 380.0 : 0.0)
                 }
         }
         .task {
