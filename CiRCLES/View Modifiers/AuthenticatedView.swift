@@ -90,7 +90,7 @@ struct AuthenticatedView: ViewModifier {
                                 selections.map = selections.fetchDefaultMapSelection()
                             }
                             if !authenticator.isAuthenticating {
-                                unifier.show(.circles)
+                                unifier.show()
                             }
                             isReloadingData = false
                         }

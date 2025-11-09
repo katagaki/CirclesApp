@@ -146,20 +146,20 @@ struct UnifiedView: View {
         .onChange(of: isMyComiketPresenting) { _, newValue in
             if #unavailable(iOS 26.0) {
                 if !newValue {
-                    unifier.show(.circles)
+                    unifier.show()
                 }
             }
         }
         .onChange(of: viewPath) { _, newValue in
             if #unavailable(iOS 26.0) {
                 if newValue.isEmpty {
-                    unifier.show(.circles)
+                    unifier.show()
                 }
             }
         }
         .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
             Button("Shared.Cancel", role: .cancel) {
-                unifier.show(.circles)
+                unifier.show()
             }
             Button("Shared.Logout", role: .destructive, action: logout)
         } message: {
