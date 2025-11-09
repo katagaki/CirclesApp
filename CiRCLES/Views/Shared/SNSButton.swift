@@ -27,6 +27,7 @@ struct SNSButton: View {
                 .buttonStyle(.glassProminent)
         } else {
             buttonWithIcon()
+                .foregroundStyle(.white)
                 .clipShape(showsLabel ? AnyShape(.capsule) : AnyShape(.circle))
                 .buttonStyle(.borderedProminent)
         }
@@ -48,7 +49,6 @@ struct SNSButton: View {
                     Text("Shared.SNS.Twitter")
                 }
             }
-            .foregroundStyle(.white)
             .tint(.init(red: 0.05, green: 0.05, blue: 0.05))
         case .pixiv:
             Button {
@@ -74,7 +74,6 @@ struct SNSButton: View {
                     Text("Shared.SNS.Pixiv")
                 }
             }
-            .foregroundStyle(.white)
             .tint(.blue)
         case .circleMs:
             Button {
@@ -88,7 +87,6 @@ struct SNSButton: View {
                     Text("Shared.SNS.CircleMsPortal")
                 }
             }
-            .foregroundStyle(.white)
             .tint(.green)
         }
     }
