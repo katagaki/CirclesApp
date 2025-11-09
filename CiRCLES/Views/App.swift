@@ -105,6 +105,9 @@ struct CirclesApp: App {
         .onChange(of: planner.participation) {
             planner.participationUserDefault = planner.participation
         }
+        .onChange(of: planner.activeEventNumber) {
+            selections.resetSelections()
+        }
         .backgroundTask(.appRefresh("RefreshAuthToken")) {
             await authenticator.refreshAuthenticationToken()
             await registerBackgroundRefreshTask()
