@@ -13,9 +13,9 @@ struct InfoStackSection: View {
     let contents: String
     let canTranslate: Bool
     let showContextMenu: Bool
-    
+
     @State var isShowingTranslationPopover: Bool = false
-    
+
     init(title: String, contents: String, canTranslate: Bool, showContextMenu: Bool = true) {
         self.title = title
         self.contents = contents
@@ -25,54 +25,57 @@ struct InfoStackSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4.0) {
-            Text(LocalizedStringKey(title))
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
-            
-            if showContextMenu {
-                if canTranslate {
-                    #if !targetEnvironment(macCatalyst) && !os(visionOS)
-                    Text(contents)
-                        .font(.subheadline)
-                        .textSelection(.enabled)
-                        .contextMenu {
-                            Button("Shared.Copy", systemImage: "doc.on.doc") {
-                                UIPasteboard.general.string = contents
+            Group {
+                Text(LocalizedStringKey(title))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
+
+                if showContextMenu {
+                    if canTranslate {
+#if !targetEnvironment(macCatalyst) && !os(visionOS)
+                        Text(contents)
+                            .font(.subheadline)
+                            .textSelection(.enabled)
+                            .contextMenu {
+                                Button("Shared.Copy", systemImage: "doc.on.doc") {
+                                    UIPasteboard.general.string = contents
+                                }
+                                Button("Shared.Translate", systemImage: "character.bubble") {
+                                    isShowingTranslationPopover = true
+                                }
                             }
-                            Button("Shared.Translate", systemImage: "character.bubble") {
-                                isShowingTranslationPopover = true
+                            .translationPresentation(
+                                isPresented: $isShowingTranslationPopover,
+                                text: contents
+                            )
+#else
+                        Text(contents)
+                            .font(.subheadline)
+                            .textSelection(.enabled)
+                            .contextMenu {
+                                Button("Shared.Copy", systemImage: "doc.on.doc") {
+                                    UIPasteboard.general.string = contents
+                                }
                             }
-                        }
-                        .translationPresentation(
-                            isPresented: $isShowingTranslationPopover,
-                            text: contents
-                        )
-                    #else
-                    Text(contents)
-                        .font(.subheadline)
-                        .textSelection(.enabled)
-                        .contextMenu {
-                            Button("Shared.Copy", systemImage: "doc.on.doc") {
-                                UIPasteboard.general.string = contents
+#endif
+                    } else {
+                        Text(contents)
+                            .font(.subheadline)
+                            .textSelection(.enabled)
+                            .contextMenu {
+                                Button("Shared.Copy", systemImage: "doc.on.doc") {
+                                    UIPasteboard.general.string = contents
+                                }
                             }
-                        }
-                    #endif
+                    }
                 } else {
                     Text(contents)
                         .font(.subheadline)
                         .textSelection(.enabled)
-                        .contextMenu {
-                            Button("Shared.Copy", systemImage: "doc.on.doc") {
-                                UIPasteboard.general.string = contents
-                            }
-                        }
                 }
-            } else {
-                Text(contents)
-                    .font(.subheadline)
-                    .textSelection(.enabled)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }

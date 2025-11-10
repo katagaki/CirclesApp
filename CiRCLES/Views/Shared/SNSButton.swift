@@ -24,10 +24,10 @@ struct SNSButton: View {
     var body: some View {
         if #available(iOS 26.0, *) {
             buttonWithIcon()
+                .foregroundStyle(.white)
                 .buttonStyle(.glassProminent)
         } else {
             buttonWithIcon()
-                .foregroundStyle(.white)
                 .clipShape(showsLabel ? AnyShape(.capsule) : AnyShape(.circle))
                 .buttonStyle(.borderedProminent)
         }
@@ -44,6 +44,7 @@ struct SNSButton: View {
                 Image(.snsTwitter)
                     .resizable()
                     .frame(width: 28.0, height: 28.0)
+                    .foregroundStyle(.white)
                     .padding(1.0)
                 if showsLabel {
                     Text("Shared.SNS.Twitter")
@@ -69,6 +70,7 @@ struct SNSButton: View {
                 Image(.snsPixiv)
                     .resizable()
                     .frame(width: 28.0, height: 28.0)
+                    .foregroundStyle(.white)
                     .padding(1.0)
                 if showsLabel {
                     Text("Shared.SNS.Pixiv")
@@ -82,6 +84,7 @@ struct SNSButton: View {
                 Image(.snsCircleMs)
                     .resizable()
                     .frame(width: 28.0, height: 28.0)
+                    .foregroundStyle(.white)
                     .padding(1.0)
                 if showsLabel {
                     Text("Shared.SNS.CircleMsPortal")

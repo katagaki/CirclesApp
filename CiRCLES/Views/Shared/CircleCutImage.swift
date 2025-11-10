@@ -18,7 +18,7 @@ struct CircleCutImage: View {
 
     @Binding var showSpaceName: Bool
     @Binding var showDay: Bool
-    
+
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCutSetting: Bool
 
     @Query var visits: [CirclesVisitEntry]
@@ -52,7 +52,7 @@ struct CircleCutImage: View {
             }
         )
     }
-    
+
     var shouldFetchWebCut: Bool {
         switch cutType {
         case .catalog:
@@ -63,7 +63,7 @@ struct CircleCutImage: View {
             return authenticator.onlineState == .online
         }
     }
-    
+
     var showCatalogCut: Bool {
         switch cutType {
         case .catalog:
@@ -74,7 +74,7 @@ struct CircleCutImage: View {
             return false
         }
     }
-    
+
     var forceWebCutUpdate: Bool {
         return cutType == .webForced
     }
