@@ -29,11 +29,12 @@ struct CircleDetailHero: View {
                 circle,
                 in: namespace,
                 cutType: currentCutType,
+                forceReload: currentCutType == .web && !hasShownWebCutOnce,
                 showSpaceName: .constant(false),
                 showDay: .constant(false)
             )
             .frame(width: 120.0, height: 172.0)
-            .id("cut-\(currentCutType)")
+            .id("cut-\(currentCutType)-\(hasShownWebCutOnce)")
             .onTapGesture {
                 if authenticator.onlineState == .online {
                     withAnimation(.smooth.speed(2.0)) {
@@ -96,13 +97,11 @@ struct CircleDetailHero: View {
         withAnimation(.smooth.speed(2.0)) {
             switch currentCutType {
             case .catalog:
+                currentCutType = .web
                 if !hasShownWebCutOnce {
-                    currentCutType = .webForced
                     hasShownWebCutOnce = true
-                } else {
-                    currentCutType = .web
                 }
-            case .web, .webForced:
+            case .web:
                 currentCutType = .catalog
             }
         }
