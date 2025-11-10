@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 struct InfoStackSection: View {
-    let title: String
+    let title: LocalizedStringKey
     let contents: String
     let canTranslate: Bool
 
