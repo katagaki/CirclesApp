@@ -34,7 +34,6 @@ struct CircleDetailHero: View {
                 showDay: .constant(false)
             )
             .frame(width: 120.0, height: 172.0)
-            .id("cut-\(currentCutType)-\(hasShownWebCutOnce)")
             .onTapGesture {
                 if authenticator.onlineState == .online {
                     withAnimation(.smooth.speed(2.0)) {
