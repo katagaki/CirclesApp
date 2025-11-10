@@ -146,37 +146,11 @@ class Database {
     // MARK: Loading
 
     func loadCommonImages() {
-        if let imageDatabase {
-            do {
-                let table = Table("ComiketCommonImage")
-                let colName = Expression<String>("name")
-                let colImage = Expression<Data>("image")
-                var commonImages: [String: Data] = [:]
-                for row in try imageDatabase.prepare(table) {
-                    commonImages[row[colName]] = row[colImage]
-                }
-                self.commonImages = commonImages
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
+        // Now loads images on-demand via commonImage(named:) - no-op for backwards compatibility
     }
 
     func loadCircleImages() {
-        if let imageDatabase {
-            do {
-                let table = Table("ComiketCircleImage")
-                let colID = Expression<Int>("id")
-                let colCutImage = Expression<Data>("cutImage")
-                var circleImages: [Int: Data] = [:]
-                for row in try imageDatabase.prepare(table) {
-                    circleImages[row[colID]] = row[colCutImage]
-                }
-                self.circleImages = circleImages
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
+        // Now loads images on-demand via circleImage(for:) - no-op for backwards compatibility
     }
 
     // MARK: Persistent Identifier Fetches
@@ -225,26 +199,74 @@ class Database {
     // MARK: Circle Images
 
     func circleImage(for id: Int) -> UIImage? {
+        // Check cache first
         if let cachedImage = imageCache[String(id)] {
             return cachedImage
         }
+        
+        // Check in-memory dictionary (if already loaded)
         if let circleImageData = circleImages[id] {
             let circleImage = UIImage(data: circleImageData)
             imageCache[String(id)] = circleImage
             return circleImage
         }
+        
+        // Load on-demand from database
+        if let imageDatabase {
+            do {
+                let table = Table("ComiketCircleImage")
+                let colID = Expression<Int>("id")
+                let colCutImage = Expression<Data>("cutImage")
+                let query = table.filter(colID == id)
+                
+                if let row = try imageDatabase.pluck(query) {
+                    let imageData = row[colCutImage]
+                    circleImages[id] = imageData
+                    let circleImage = UIImage(data: imageData)
+                    imageCache[String(id)] = circleImage
+                    return circleImage
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        
         return nil
     }
 
     func commonImage(named imageName: String) -> UIImage? {
+        // Check cache first
         if let cachedImage = imageCache[imageName] {
             return cachedImage
         }
+        
+        // Check in-memory dictionary (if already loaded)
         if let imageData = commonImages[imageName] {
             let image = UIImage(data: imageData)
             imageCache[imageName] = image
             return image
         }
+        
+        // Load on-demand from database
+        if let imageDatabase {
+            do {
+                let table = Table("ComiketCommonImage")
+                let colName = Expression<String>("name")
+                let colImage = Expression<Data>("image")
+                let query = table.filter(colName == imageName)
+                
+                if let row = try imageDatabase.pluck(query) {
+                    let imageData = row[colImage]
+                    commonImages[imageName] = imageData
+                    let image = UIImage(data: imageData)
+                    imageCache[imageName] = image
+                    return image
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        
         return nil
     }
 

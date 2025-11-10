@@ -79,7 +79,8 @@ struct AuthenticatedView: ViewModifier {
                     let activeEvent = planner.activeEvent
                     Task.detached {
                         await loadDataFromDatabase(for: activeEvent)
-                        await loadFavorites()
+                        
+                        // Show UI immediately after database is loaded
                         await MainActor.run {
                             oasis.close()
                             // Set initial selections
@@ -93,6 +94,11 @@ struct AuthenticatedView: ViewModifier {
                                 unifier.show()
                             }
                             isReloadingData = false
+                        }
+                        
+                        // Load favorites in background without blocking UI
+                        Task.detached(priority: .background) {
+                            await loadFavorites()
                         }
                     }
                 }
@@ -145,21 +151,16 @@ struct AuthenticatedView: ViewModifier {
                 isDatabaseInitialized = true
             }
 
-            await oasis.setBodyText("Loading.Images")
+            // Images are now loaded on-demand - clear cache but keep database connected
             database.imageCache.removeAll()
-            database.loadCommonImages()
-            database.loadCircleImages()
-
-            database.disconnect()
+            // database.disconnect() - Keep connected for on-demand image loading
         }
 
         UIApplication.shared.isIdleTimerDisabled = false
     }
 
     func loadFavorites() async {
-        await oasis.setModality(false)
-        await oasis.setHeaderText("Shared.LoadingHeader.Favorites")
-        await oasis.setBodyText("Loading.Favorites")
+        // Load favorites silently in the background without showing progress UI
         let actor = FavoritesActor(modelContainer: sharedModelContainer)
         if let token = authenticator.token {
             let (items, wcIDMappedItems) = await actor.all(authToken: token)
