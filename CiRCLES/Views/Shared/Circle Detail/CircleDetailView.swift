@@ -71,7 +71,8 @@ struct CircleDetailView: View {
                             InfoStackSection(
                                 title: "Shared.Memo.Favorites",
                                 contents: favoriteMemo,
-                                canTranslate: false
+                                canTranslate: false,
+                                showContextMenu: false
                             ) 
                         }
 
@@ -106,7 +107,7 @@ struct CircleDetailView: View {
                 ListSectionWithTranslateButton(title: "Shared.Tags", text: tags)
             }
             if circle.memo.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
-                ListSectionWithTranslateButton(title: "Shared.Memo.Circle", text: circle.memo)
+                ListSectionWithTranslateButton(title: "Shared.Memo.Circle", text: circle.memo, showContextMenu: false)
             }
         }
         .opacity(unifier.isMinimized ? 0.0 : 1.0)
