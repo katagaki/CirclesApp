@@ -154,6 +154,9 @@ struct AuthenticatedView: ViewModifier {
             // Images are now loaded on-demand - clear cache but keep database connected
             database.imageCache.removeAll()
             // database.disconnect() - Keep connected for on-demand image loading
+            
+            // Preload essential images in background
+            database.preloadEssentialImages()
         }
 
         UIApplication.shared.isIdleTimerDisabled = false

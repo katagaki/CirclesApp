@@ -152,6 +152,15 @@ class Database {
     func loadCircleImages() {
         // Now loads images on-demand via circleImage(for:) - no-op for backwards compatibility
     }
+    
+    func preloadEssentialImages() {
+        // Preload cover and placeholder images in background for better UX
+        Task.detached(priority: .utility) { [weak self] in
+            guard let self = self else { return }
+            _ = await MainActor.run { self.coverImage() }
+            _ = await MainActor.run { self.jikoCircleCutImage() }
+        }
+    }
 
     // MARK: Persistent Identifier Fetches
 
