@@ -36,8 +36,7 @@ struct CircleDetailView: View {
         List {
             Section {
                 CircleDetailHero(
-                    circle: $circle,
-                    extendedInformation: $extendedInformation,
+                    circle: $circle, extendedInformation: $extendedInformation,
                     namespace: namespace
                 )
                     .listRowSeparator(.hidden)

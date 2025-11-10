@@ -18,8 +18,6 @@ struct CircleCutImage: View {
 
     @Binding var showSpaceName: Bool
     @Binding var showDay: Bool
-    
-    @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCutSetting: Bool
 
     @Query var visits: [CirclesVisitEntry]
 
@@ -78,7 +76,7 @@ struct CircleCutImage: View {
                             }
                             .aspectRatio(180.0 / 256.0, contentMode: .fit)
                     }
-                    
+
                 case .web:
                     // Try to show web cut, fallback to catalog
                     if let webCutImage {
@@ -87,7 +85,7 @@ struct CircleCutImage: View {
                             .resizable()
                             .scaledToFit()
                             .usesPrivacyMode()
-                    } else if showWebCutSetting && authenticator.onlineState == .online && !isWebCutURLFetched {
+                    } else if authenticator.onlineState == .online && !isWebCutURLFetched {
                         // Still loading web cut, show catalog in background with progress
                         ZStack {
                             if let catalogImage = database.circleImage(for: circle.id) {
@@ -105,7 +103,7 @@ struct CircleCutImage: View {
                             .scaledToFit()
                             .usesPrivacyMode()
                     } else {
-                        // No image available at all
+                        // No image available
                         Rectangle()
                             .foregroundStyle(Color.primary.opacity(0.05))
                             .overlay {
@@ -183,7 +181,7 @@ struct CircleCutImage: View {
 
     func prepareCutImage() {
         // Only fetch web cut when cutType is .web and we're online
-        if cutType == .web && showWebCutSetting && authenticator.onlineState == .online && !isWebCutURLFetched {
+        if cutType == .web && authenticator.onlineState == .online && !isWebCutURLFetched {
             if let extendedInformation = circle.extendedInformation {
                 let circleID = circle.id
                 let webCatalogID = extendedInformation.webCatalogID
