@@ -37,7 +37,7 @@ struct CircleGrid: View {
                         onSelect(circle)
                     } label: {
                         CircleCutImage(
-                            circle, in: namespace, shouldFetchWebCut: showWebCut,
+                            circle, in: namespace, cutType: .web,
                             showSpaceName: $showSpaceName, showDay: $showDay
                         )
                         .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
