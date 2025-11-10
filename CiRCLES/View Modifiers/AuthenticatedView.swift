@@ -151,12 +151,12 @@ struct AuthenticatedView: ViewModifier {
                 isDatabaseInitialized = true
             }
 
-            // Images are now loaded on-demand - clear cache but keep database connected
+            // Load image data into memory (prevents scroll jank, decoding happens on-demand)
+            await oasis.setBodyText("Loading.Images")
             database.imageCache.removeAll()
-            // database.disconnect() - Keep connected for on-demand image loading
-            
-            // Preload essential images in background
-            database.preloadEssentialImages()
+            database.loadCommonImages()
+            database.loadCircleImages()
+            database.disconnect()
         }
 
         UIApplication.shared.isIdleTimerDisabled = false

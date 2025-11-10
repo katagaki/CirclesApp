@@ -146,19 +146,39 @@ class Database {
     // MARK: Loading
 
     func loadCommonImages() {
-        // Now loads images on-demand via commonImage(named:) - no-op for backwards compatibility
+        // Load all common image DATA into memory (fast, no UIImage decoding)
+        if let imageDatabase {
+            do {
+                let table = Table("ComiketCommonImage")
+                let colName = Expression<String>("name")
+                let colImage = Expression<Data>("image")
+                var commonImages: [String: Data] = [:]
+                for row in try imageDatabase.prepare(table) {
+                    commonImages[row[colName]] = row[colImage]
+                }
+                self.commonImages = commonImages
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
     }
 
     func loadCircleImages() {
-        // Now loads images on-demand via circleImage(for:) - no-op for backwards compatibility
-    }
-    
-    func preloadEssentialImages() {
-        // Preload cover and placeholder images in background for better UX
-        Task.detached(priority: .utility) { [weak self] in
-            guard let self = self else { return }
-            _ = await MainActor.run { self.coverImage() }
-            _ = await MainActor.run { self.jikoCircleCutImage() }
+        // Load all circle image DATA into memory (fast, no UIImage decoding)
+        // UIImage decoding happens lazily on-demand to reduce startup time
+        if let imageDatabase {
+            do {
+                let table = Table("ComiketCircleImage")
+                let colID = Expression<Int>("id")
+                let colCutImage = Expression<Data>("cutImage")
+                var circleImages: [Int: Data] = [:]
+                for row in try imageDatabase.prepare(table) {
+                    circleImages[row[colID]] = row[colCutImage]
+                }
+                self.circleImages = circleImages
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
         }
     }
 
@@ -208,72 +228,32 @@ class Database {
     // MARK: Circle Images
 
     func circleImage(for id: Int) -> UIImage? {
-        // Check cache first
+        // Check UIImage cache first for instant return
         if let cachedImage = imageCache[String(id)] {
             return cachedImage
         }
         
-        // Check in-memory dictionary (if already loaded)
+        // Decode from in-memory data (fast, no SQLite query)
         if let circleImageData = circleImages[id] {
             let circleImage = UIImage(data: circleImageData)
             imageCache[String(id)] = circleImage
             return circleImage
         }
         
-        // Load on-demand from database
-        if let imageDatabase {
-            do {
-                let table = Table("ComiketCircleImage")
-                let colID = Expression<Int>("id")
-                let colCutImage = Expression<Data>("cutImage")
-                let query = table.filter(colID == id)
-                
-                if let row = try imageDatabase.pluck(query) {
-                    let imageData = row[colCutImage]
-                    circleImages[id] = imageData
-                    let circleImage = UIImage(data: imageData)
-                    imageCache[String(id)] = circleImage
-                    return circleImage
-                }
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-        
         return nil
     }
 
     func commonImage(named imageName: String) -> UIImage? {
-        // Check cache first
+        // Check UIImage cache first for instant return
         if let cachedImage = imageCache[imageName] {
             return cachedImage
         }
         
-        // Check in-memory dictionary (if already loaded)
+        // Decode from in-memory data (fast, no SQLite query)
         if let imageData = commonImages[imageName] {
             let image = UIImage(data: imageData)
             imageCache[imageName] = image
             return image
-        }
-        
-        // Load on-demand from database
-        if let imageDatabase {
-            do {
-                let table = Table("ComiketCommonImage")
-                let colName = Expression<String>("name")
-                let colImage = Expression<Data>("image")
-                let query = table.filter(colName == imageName)
-                
-                if let row = try imageDatabase.pluck(query) {
-                    let imageData = row[colImage]
-                    commonImages[imageName] = imageData
-                    let image = UIImage(data: imageData)
-                    imageCache[imageName] = image
-                    return image
-                }
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
         }
         
         return nil
