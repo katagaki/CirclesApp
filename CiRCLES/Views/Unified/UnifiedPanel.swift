@@ -21,16 +21,12 @@ struct UnifiedPanel: View {
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Picker(selection: $unifier.current) {
-                        Text("ViewTitle.Circles")
-                            .tag(UnifiedPath.circles)
-                        if planner.isActiveEventLatest {
-                            Text("ViewTitle.Favorites")
-                                .tag(UnifiedPath.favorites)
-                        }
-                    } label: { }
-                        .id("Unifier.Picker")
-                        .pickerStyle(.segmented)
+                    if #available(iOS 26.0, *) {
+                        viewPicker()
+                    } else {
+                        viewPicker()
+                            .fixedSize()
+                    }
                 }
                 if #available(iOS 26.0, *) {
                     if UIDevice.current.userInterfaceIdiom == .phone {
@@ -61,5 +57,20 @@ struct UnifiedPanel: View {
         .presentationBackgroundInteraction(.enabled)
         .presentationDetentsForUnifiedView($unifier.selectedDetent)
         .interactiveDismissDisabled()
+    }
+
+    @ViewBuilder
+    func viewPicker() -> some View {
+        @Bindable var unifier = unifier
+        Picker(selection: $unifier.current) {
+            Text("ViewTitle.Circles")
+                .tag(UnifiedPath.circles)
+            if planner.isActiveEventLatest {
+                Text("ViewTitle.Favorites")
+                    .tag(UnifiedPath.favorites)
+            }
+        } label: { }
+            .id("Unifier.Picker")
+            .pickerStyle(.segmented)
     }
 }

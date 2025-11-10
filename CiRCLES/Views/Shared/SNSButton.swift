@@ -15,6 +15,22 @@ struct SNSButton: View {
     var showsLabel: Bool
     var type: SNSType
 
+    var buttonSize: CGFloat {
+        if #available(iOS 26.0, *) {
+            return 28.0
+        } else {
+            return 24.0
+        }
+    }
+
+    var padding: CGFloat {
+        if #available(iOS 26.0, *) {
+            return 1.0
+        } else {
+            return 0.0
+        }
+    }
+
     init(_ url: URL, showsLabel: Bool = true, type: SNSType) {
         self.url = url
         self.showsLabel = showsLabel
@@ -22,65 +38,76 @@ struct SNSButton: View {
     }
 
     var body: some View {
-        Group {
-            switch type {
-            case .twitter:
-                Button {
-                    openURL(url)
-                } label: {
-                    Image(.snsTwitter)
-                        .resizable()
-                        .frame(width: 28.0, height: 28.0)
-                        .padding(1.0)
-                    if showsLabel {
-                        Text("Shared.SNS.Twitter")
-                    }
-                }
+        if #available(iOS 26.0, *) {
+            buttonWithIcon()
                 .foregroundStyle(.white)
-                .tint(.init(red: 0.05, green: 0.05, blue: 0.05))
-            case .pixiv:
-                Button {
-                    var urlToOpen: URL = url
-                    if UIApplication.shared.canOpenURL(URL(string: "pixiv://")!) {
-                        let pixivPrefix = "https://www.pixiv.net/member.php?id="
-                        let urlString = url.absoluteString
-                        if urlString.starts(with: pixivPrefix) {
-                            let userID = urlString.trimmingPrefix(pixivPrefix)
-                            let formattedURL = "pixiv://users/\(userID)"
-                            if let appURL = URL(string: formattedURL) {
-                                urlToOpen = appURL
-                            }
+                .buttonStyle(.glassProminent)
+        } else {
+            buttonWithIcon()
+                .clipShape(showsLabel ? AnyShape(.capsule) : AnyShape(.circle))
+                .buttonStyle(.borderedProminent)
+        }
+    }
+
+    // swiftlint:disable function_body_length
+    @ViewBuilder
+    func buttonWithIcon() -> some View {
+        switch type {
+        case .twitter:
+            Button {
+                openURL(url)
+            } label: {
+                Image(.snsTwitter)
+                    .resizable()
+                    .frame(width: buttonSize, height: buttonSize)
+                    .foregroundStyle(.white)
+                    .padding(padding)
+                if showsLabel {
+                    Text("Shared.SNS.Twitter")
+                }
+            }
+            .tint(.init(red: 0.05, green: 0.05, blue: 0.05))
+        case .pixiv:
+            Button {
+                var urlToOpen: URL = url
+                if UIApplication.shared.canOpenURL(URL(string: "pixiv://")!) {
+                    let pixivPrefix = "https://www.pixiv.net/member.php?id="
+                    let urlString = url.absoluteString
+                    if urlString.starts(with: pixivPrefix) {
+                        let userID = urlString.trimmingPrefix(pixivPrefix)
+                        let formattedURL = "pixiv://users/\(userID)"
+                        if let appURL = URL(string: formattedURL) {
+                            urlToOpen = appURL
                         }
                     }
-                    openURL(urlToOpen)
-                } label: {
-                    Image(.snsPixiv)
-                        .resizable()
-                        .frame(width: 28.0, height: 28.0)
-                        .padding(1.0)
-                    if showsLabel {
-                        Text("Shared.SNS.Pixiv")
-                    }
                 }
-                .foregroundStyle(.white)
-                .tint(.blue)
-            case .circleMs:
-                Button {
-                    openURL(url)
-                } label: {
-                    Image(.snsCircleMs)
-                        .resizable()
-                        .frame(width: 28.0, height: 28.0)
-                        .padding(1.0)
-                    if showsLabel {
-                        Text("Shared.SNS.CircleMsPortal")
-                    }
+                openURL(urlToOpen)
+            } label: {
+                Image(.snsPixiv)
+                    .resizable()
+                    .frame(width: buttonSize, height: buttonSize)
+                    .foregroundStyle(.white)
+                    .padding(padding)
+                if showsLabel {
+                    Text("Shared.SNS.Pixiv")
                 }
-                .foregroundStyle(.white)
-                .tint(.green)
             }
+            .tint(.blue)
+        case .circleMs:
+            Button {
+                openURL(url)
+            } label: {
+                Image(.snsCircleMs)
+                    .resizable()
+                    .frame(width: buttonSize, height: buttonSize)
+                    .foregroundStyle(.white)
+                    .padding(padding)
+                if showsLabel {
+                    Text("Shared.SNS.CircleMsPortal")
+                }
+            }
+            .tint(.green)
         }
-        .clipShape(showsLabel ? AnyShape(.capsule) : AnyShape(.circle))
-        .buttonStyleGlassProminentCircularIfSupported()
     }
+    // swiftlint:enable function_body_length
 }

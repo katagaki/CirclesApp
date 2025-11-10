@@ -8,7 +8,7 @@
 import Komponents
 import SwiftUI
 
-struct CircleDetailToolbar: View {
+struct CircleDetailToolbar: ToolbarContent {
 
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
@@ -21,6 +21,7 @@ struct CircleDetailToolbar: View {
     @State var isAddingToFavorites: Bool = false
     @State var selectedFavoriteColor: WebCatalogColor?
     @State var favoriteMemo: String = ""
+    @State var isLinksMenuPresented: Bool = false
 
     @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
 
@@ -30,74 +31,106 @@ struct CircleDetailToolbar: View {
         self.webCatalogInformation = webCatalogInformation
     }
 
-    var body: some View {
-        ScrollView(.horizontal) {
-            HStack(spacing: 8.0) {
-                if isActiveEventLatest && authenticator.onlineState == .online {
-                    FavoriteButton(
-                        color: selectedFavoriteColor?.backgroundColor()
-                    ) {
-                        favorites.contains(webCatalogID: extendedInformation.webCatalogID)
-                    } onSelect: {
-                        isAddingToFavorites = true
+    var body: some ToolbarContent {
+        // Favorites button
+        if isActiveEventLatest && authenticator.onlineState == .online {
+            ToolbarItem(placement: .bottomBar) {
+                Button {
+                    isAddingToFavorites = true
+                } label: {
+                    if #available(iOS 26.0, *) {
+                        Label("Shared.Favorite", systemImage: "star.fill")
+                    } else {
+                        ToolbarButtonLabel("Shared.Favorite", imageName: "star.fill")
                     }
-                    .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
-                        FavoritePopover(
-                            initialColor: selectedFavoriteColor,
-                            initialMemo: favoriteMemo,
-                            isExistingFavorite: favorites.contains(webCatalogID: extendedInformation.webCatalogID),
-                            onSave: { color, memo in
-                                Task.detached {
-                                    await saveFavorite(color: color, memo: memo)
-                                }
-                                isAddingToFavorites = false
-                            },
-                            onDelete: {
-                                Task.detached {
-                                    await deleteFavorite()
-                                }
-                                isAddingToFavorites = false
+                }
+                .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
+                    FavoritePopover(
+                        initialColor: selectedFavoriteColor,
+                        initialMemo: favoriteMemo,
+                        isExistingFavorite: favorites.contains(webCatalogID: extendedInformation.webCatalogID),
+                        onSave: { color, memo in
+                            Task.detached {
+                                await saveFavorite(color: color, memo: memo)
                             }
-                        )
-                    }
+                            isAddingToFavorites = false
+                        },
+                        onDelete: {
+                            Task.detached {
+                                await deleteFavorite()
+                            }
+                            isAddingToFavorites = false
+                        }
+                    )
                 }
-                HStack(spacing: 5.0) {
-                    Group {
-                        if let twitterURL = extendedInformation.twitterURL {
-                            SNSButton(twitterURL, showsLabel: false, type: .twitter)
-                        }
-                        if let pixivURL = extendedInformation.pixivURL {
-                            SNSButton(pixivURL, showsLabel: false, type: .pixiv)
-                        }
-                        if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
-                            SNSButton(circleMsPortalURL, showsLabel: false, type: .circleMs)
-                        }
-                    }
+                .onAppear {
+                    reloadFavoriteColor()
                 }
-                if let webCatalogInformation {
+                .onChange(of: extendedInformation.webCatalogID) {
+                    reloadFavoriteColor()
+                }
+            }
+        }
+
+        // Spacer
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+        } else {
+            ToolbarItem(placement: .bottomBar) {
+                Spacer()
+            }
+        }
+
+        // SNS buttons
+        if extendedInformation.twitterURL != nil ||
+           extendedInformation.pixivURL != nil ||
+           extendedInformation.circleMsPortalURL != nil {
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+            }
+
+            if let twitterURL = extendedInformation.twitterURL {
+                ToolbarItem(placement: .bottomBar) {
+                    SNSButton(twitterURL, showsLabel: false, type: .twitter)
+                }
+            }
+
+            if let pixivURL = extendedInformation.pixivURL {
+                ToolbarItem(placement: .bottomBar) {
+                    SNSButton(pixivURL, showsLabel: false, type: .pixiv)
+                }
+            }
+
+            if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
+                ToolbarItem(placement: .bottomBar) {
+                    SNSButton(circleMsPortalURL, showsLabel: false, type: .circleMs)
+                }
+            }
+        }
+
+        // Links menu (only show if there are links)
+        if let webCatalogInformation, !webCatalogInformation.onlineStores.isEmpty {
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+            }
+
+            ToolbarItem(placement: .bottomBar) {
+                Menu {
                     ForEach(webCatalogInformation.onlineStores, id: \.link) { onlineStore in
-                        BarAccessoryButton(LocalizedStringKey(onlineStore.name)) {
+                        Button(onlineStore.name) {
                             if let url = URL(string: onlineStore.link) {
                                 openURL(url)
                             }
                         }
-                        .glassEffectIfSupported()
+                    }
+                } label: {
+                    if #available(iOS 26.0, *) {
+                        Label("Shared.Links", systemImage: "link")
+                    } else {
+                        ToolbarButtonLabel("Shared.Links", imageName: "link")
                     }
                 }
             }
-            .padding(.horizontal, 12.0)
-        }
-        .padding(
-            .bottom,
-            UIDevice.current.userInterfaceIdiom == .pad ?
-            12.0 : 0.0
-        )
-        .scrollIndicators(.hidden)
-        .onAppear {
-            reloadFavoriteColor()
-        }
-        .onChange(of: extendedInformation.webCatalogID) {
-            reloadFavoriteColor()
         }
     }
 

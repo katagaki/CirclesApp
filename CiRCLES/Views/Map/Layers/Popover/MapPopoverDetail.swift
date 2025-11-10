@@ -36,7 +36,7 @@ struct MapPopoverDetail: View {
                         } label: {
                             HStack {
                                 CircleCutImage(
-                                    circle, in: popoverNamespace, shouldFetchWebCut: showWebCut,
+                                    circle, in: popoverNamespace, cutType: .web,
                                     showSpaceName: .constant(false), showDay: .constant(false)
                                 )
                                 .frame(width: 49.0, height: 70.0, alignment: .center)

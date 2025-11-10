@@ -68,6 +68,7 @@ struct MapView: View {
                                 height: $mapImageHeight,
                                 zoomDivisor: $zoomDivisor
                             )
+                            .allowsHitTesting(false)
                             // Genre layer
                             if showGenreOverlay, let genreImage {
                                 MapLayer(
@@ -76,6 +77,7 @@ struct MapView: View {
                                     height: $mapImageHeight,
                                     zoomDivisor: $zoomDivisor
                                 )
+                                .allowsHitTesting(false)
                             }
                             // Popover layer
                             MapPopoverLayer(
