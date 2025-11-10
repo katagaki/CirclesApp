@@ -15,6 +15,22 @@ struct SNSButton: View {
     var showsLabel: Bool
     var type: SNSType
 
+    var buttonSize: CGFloat {
+        if #available(iOS 26.0, *) {
+            return 28.0
+        } else {
+            return 24.0
+        }
+    }
+
+    var padding: CGFloat {
+        if #available(iOS 26.0, *) {
+            return 1.0
+        } else {
+            return 0.0
+        }
+    }
+
     init(_ url: URL, showsLabel: Bool = true, type: SNSType) {
         self.url = url
         self.showsLabel = showsLabel
@@ -43,9 +59,9 @@ struct SNSButton: View {
             } label: {
                 Image(.snsTwitter)
                     .resizable()
-                    .frame(width: 28.0, height: 28.0)
+                    .frame(width: buttonSize, height: buttonSize)
                     .foregroundStyle(.white)
-                    .padding(1.0)
+                    .padding(padding)
                 if showsLabel {
                     Text("Shared.SNS.Twitter")
                 }
@@ -69,9 +85,9 @@ struct SNSButton: View {
             } label: {
                 Image(.snsPixiv)
                     .resizable()
-                    .frame(width: 28.0, height: 28.0)
+                    .frame(width: buttonSize, height: buttonSize)
                     .foregroundStyle(.white)
-                    .padding(1.0)
+                    .padding(padding)
                 if showsLabel {
                     Text("Shared.SNS.Pixiv")
                 }
@@ -83,9 +99,9 @@ struct SNSButton: View {
             } label: {
                 Image(.snsCircleMs)
                     .resizable()
-                    .frame(width: 28.0, height: 28.0)
+                    .frame(width: buttonSize, height: buttonSize)
                     .foregroundStyle(.white)
-                    .padding(1.0)
+                    .padding(padding)
                 if showsLabel {
                     Text("Shared.SNS.CircleMsPortal")
                 }
