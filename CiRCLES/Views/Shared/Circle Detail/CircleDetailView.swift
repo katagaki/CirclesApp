@@ -29,9 +29,8 @@ struct CircleDetailView: View {
     @State var nextCircle: ((ComiketCircle) -> ComiketCircle?)?
     @State var isFirstCircleAlertShowing: Bool = false
     @State var isLastCircleAlertShowing: Bool = false
-    @State var currentShowWebCut: Bool = false
-    
-    @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var defaultShowWebCut: Bool
+    @State var currentCutType: CircleCutType = .catalog
+    @State var hasShownWebCutOnce: Bool = false
 
     @Namespace var namespace
 
@@ -43,18 +42,16 @@ struct CircleDetailView: View {
                     CircleCutImage(
                         circle,
                         in: namespace,
-                        shouldFetchWebCut: currentShowWebCut && authenticator.onlineState == .online,
-                        showCatalogCut: !currentShowWebCut || authenticator.onlineState != .online,
-                        forceWebCutUpdate: true,
+                        cutType: currentCutType,
                         showSpaceName: .constant(false),
                         showDay: .constant(false)
                     )
                     .frame(width: 100.0)
-                    .id("cut-\(currentShowWebCut)")
+                    .id("cut-\(currentCutType)")
                     .onTapGesture {
                         if authenticator.onlineState == .online {
                             withAnimation(.smooth.speed(2.0)) {
-                                currentShowWebCut.toggle()
+                                toggleCutType()
                             }
                         }
                     }
@@ -158,16 +155,32 @@ struct CircleDetailView: View {
             }
         }
         .onAppear {
-            currentShowWebCut = defaultShowWebCut
+            currentCutType = .catalog
+            hasShownWebCutOnce = false
         }
         .task {
             await prepareCircle()
         }
         .onChange(of: circle.id) {
-            currentShowWebCut = defaultShowWebCut
+            currentCutType = .catalog
+            hasShownWebCutOnce = false
             Task {
                 await prepareCircle()
             }
+        }
+    }
+    
+    func toggleCutType() {
+        switch currentCutType {
+        case .catalog:
+            if !hasShownWebCutOnce {
+                currentCutType = .webForced
+                hasShownWebCutOnce = true
+            } else {
+                currentCutType = .web
+            }
+        case .web, .webForced:
+            currentCutType = .catalog
         }
     }
 

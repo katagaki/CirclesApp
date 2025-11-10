@@ -24,8 +24,7 @@ struct CirclePreview: View {
             CircleCutImage(
                 circle,
                 in: namespace,
-                shouldFetchWebCut: showWebCut,
-                showCatalogCut: true,
+                cutType: .web,
                 showSpaceName: .constant(showSpaceName),
                 showDay: .constant(showDay)
             )

@@ -18,14 +18,14 @@ struct CircleCutImage: View {
 
     @Binding var showSpaceName: Bool
     @Binding var showDay: Bool
+    
+    @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCutSetting: Bool
 
     @Query var visits: [CirclesVisitEntry]
 
     var circle: ComiketCircle
     var namespace: Namespace.ID
-    var shouldFetchWebCut: Bool
-    var showCatalogCut: Bool
-    var forceWebCutUpdate: Bool
+    var cutType: CircleCutType
     var showVisitStatus: Bool
 
     @State var isWebCutURLFetched: Bool = false
@@ -34,18 +34,14 @@ struct CircleCutImage: View {
     init(
         _ circle: ComiketCircle,
         in namespace: Namespace.ID,
-        shouldFetchWebCut: Bool = false,
-        showCatalogCut: Bool = true,
-        forceWebCutUpdate: Bool = false,
+        cutType: CircleCutType = .catalog,
         showVisitStatus: Bool = true,
         showSpaceName: Binding<Bool>,
         showDay: Binding<Bool>
     ) {
         self.circle = circle
         self.namespace = namespace
-        self.shouldFetchWebCut = shouldFetchWebCut
-        self.showCatalogCut = showCatalogCut
-        self.forceWebCutUpdate = forceWebCutUpdate
+        self.cutType = cutType
         self.showVisitStatus = showVisitStatus
         self._showSpaceName = showSpaceName
         self._showDay = showDay
@@ -55,6 +51,32 @@ struct CircleCutImage: View {
                 $0.circleID == circleID
             }
         )
+    }
+    
+    var shouldFetchWebCut: Bool {
+        switch cutType {
+        case .catalog:
+            return false
+        case .web:
+            return showWebCutSetting && authenticator.onlineState == .online
+        case .webForced:
+            return authenticator.onlineState == .online
+        }
+    }
+    
+    var showCatalogCut: Bool {
+        switch cutType {
+        case .catalog:
+            return true
+        case .web:
+            return !showWebCutSetting || authenticator.onlineState != .online
+        case .webForced:
+            return false
+        }
+    }
+    
+    var forceWebCutUpdate: Bool {
+        return cutType == .webForced
     }
 
     var body: some View {
@@ -158,7 +180,7 @@ struct CircleCutImage: View {
             isWebCutURLFetched = false
             prepareCutImage()
         }
-        .onChange(of: shouldFetchWebCut) {
+        .onChange(of: cutType) {
             prepareCutImage()
         }
     }
