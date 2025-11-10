@@ -17,15 +17,10 @@ struct InfoStackSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4.0) {
-            HStack(alignment: .center, spacing: 4.0) {
-                Text(LocalizedStringKey(title))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .textCase(.uppercase)
-                if canTranslate {
-                    TranslateButton(translating: contents)
-                }
-            }  
+            Text(LocalizedStringKey(title))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
             
             if canTranslate {
                 #if !targetEnvironment(macCatalyst) && !os(visionOS)
@@ -33,6 +28,9 @@ struct InfoStackSection: View {
                     .font(.subheadline)
                     .textSelection(.enabled)
                     .contextMenu {
+                        Button("Shared.Copy", systemImage: "doc.on.doc") {
+                            UIPasteboard.general.string = contents
+                        }
                         Button("Shared.Translate", systemImage: "character.bubble") {
                             isShowingTranslationPopover = true
                         }
@@ -45,11 +43,21 @@ struct InfoStackSection: View {
                 Text(contents)
                     .font(.subheadline)
                     .textSelection(.enabled)
+                    .contextMenu {
+                        Button("Shared.Copy", systemImage: "doc.on.doc") {
+                            UIPasteboard.general.string = contents
+                        }
+                    }
                 #endif
             } else {
                 Text(contents)
                     .font(.subheadline)
                     .textSelection(.enabled)
+                    .contextMenu {
+                        Button("Shared.Copy", systemImage: "doc.on.doc") {
+                            UIPasteboard.general.string = contents
+                        }
+                    }
             }
         }
     }
