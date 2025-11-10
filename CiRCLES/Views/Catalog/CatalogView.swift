@@ -16,10 +16,10 @@ struct CatalogView: View {
     @Environment(Database.self) var database
     @Environment(UserSelections.self) var selections
     @Environment(Unifier.self) var unifier
+    @Environment(CatalogCache.self) var catalogCache
 
     @Environment(\.modelContext) var modelContext
 
-    @State var displayedCircles: [ComiketCircle] = []
     @State var searchedCircles: [ComiketCircle]?
 
     @State var blocksInMap: [ComiketBlock] = []
@@ -28,7 +28,6 @@ struct CatalogView: View {
     @State var isSearchActive: Bool = false
     @State var searchTerm: String = ""
 
-    @State var isInitialLoadCompleted: Bool = false
     @State var isLoading: Bool = false
 
     @State var displayModeState: CircleDisplayMode = .grid
@@ -51,7 +50,7 @@ struct CatalogView: View {
                             unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
                     } else {
-                        CircleGrid(circles: displayedCircles,
+                        CircleGrid(circles: catalogCache.displayedCircles,
                                    showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
                                    namespace: namespace) { circle in
                             unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
@@ -65,7 +64,7 @@ struct CatalogView: View {
                             unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
                     } else {
-                        CircleList(circles: displayedCircles,
+                        CircleList(circles: catalogCache.displayedCircles,
                                    showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
                                    displayMode: listDisplayModeState,
                                    namespace: namespace) { circle in
@@ -93,7 +92,7 @@ struct CatalogView: View {
                     ListModeSwitcher($listDisplayModeState)
                 }
             }
-            CatalogToolbar(displayedCircles: $displayedCircles)
+            CatalogToolbar(displayedCircles: $catalogCache.displayedCircles)
         }
         .searchable(
             text: $searchTerm,
@@ -102,17 +101,24 @@ struct CatalogView: View {
             prompt: "Circles.Search.Prompt"
 )
         .onAppear {
-            if !isInitialLoadCompleted {
+            if catalogCache.shouldReload(
+                genreID: selections.genre?.id,
+                mapID: selections.map?.id,
+                blockID: selections.block?.id
+            ) {
                 reloadDisplayedCircles(
                     genreID: selections.genre?.id,
                     mapID: selections.map?.id,
                     blockID: selections.block?.id
                 )
-                isInitialLoadCompleted = true
             }
         }
         .onChange(of: selections.catalogSelectionId) {
-            if isInitialLoadCompleted {
+            if catalogCache.shouldReload(
+                genreID: selections.genre?.id,
+                mapID: selections.map?.id,
+                blockID: selections.block?.id
+            ) {
                 reloadDisplayedCircles(
                     genreID: selections.genre?.id,
                     mapID: selections.map?.id,
@@ -132,7 +138,7 @@ struct CatalogView: View {
         }
         .onChange(of: isDatabaseInitialized) { _, newValue in
             if !newValue {
-                displayedCircles.removeAll()
+                catalogCache.reset()
             }
         }
     }
@@ -184,7 +190,7 @@ struct CatalogView: View {
                         displayedCircles.removeAll(where: { $0.day != selectedDate.id })
                     }
                     withAnimation(.smooth.speed(2.0)) {
-                        self.displayedCircles = displayedCircles
+                        catalogCache.updateCircles(displayedCircles)
                         self.isLoading = false
                     }
                 }

@@ -24,6 +24,7 @@ struct CirclesApp: App {
     @State var oasis = Oasis()
     @State var selections = UserSelections()
     @State var unifier = Unifier()
+    @State var catalogCache = CatalogCache()
 
     @State var hasAppLaunchedForTheFirstTime: Bool = false
 
@@ -70,6 +71,7 @@ struct CirclesApp: App {
         .environment(oasis)
         .environment(selections)
         .environment(unifier)
+        .environment(catalogCache)
         .onChange(of: scenePhase) { _, newValue in
             if !hasAppLaunchedForTheFirstTime {
                 hasAppLaunchedForTheFirstTime = true
