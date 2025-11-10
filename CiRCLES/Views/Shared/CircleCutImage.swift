@@ -23,9 +23,8 @@ struct CircleCutImage: View {
 
     var circle: ComiketCircle
     var namespace: Namespace.ID
-    var shouldFetchWebCut: Bool
-    var showCatalogCut: Bool
-    var forceWebCutUpdate: Bool
+    var cutType: CircleCutType
+    var forceReload: Bool
     var showVisitStatus: Bool
 
     @State var isWebCutURLFetched: Bool = false
@@ -34,18 +33,16 @@ struct CircleCutImage: View {
     init(
         _ circle: ComiketCircle,
         in namespace: Namespace.ID,
-        shouldFetchWebCut: Bool = false,
-        showCatalogCut: Bool = true,
-        forceWebCutUpdate: Bool = false,
+        cutType: CircleCutType = .catalog,
+        forceReload: Bool = false,
         showVisitStatus: Bool = true,
         showSpaceName: Binding<Bool>,
         showDay: Binding<Bool>
     ) {
         self.circle = circle
         self.namespace = namespace
-        self.shouldFetchWebCut = shouldFetchWebCut
-        self.showCatalogCut = showCatalogCut
-        self.forceWebCutUpdate = forceWebCutUpdate
+        self.cutType = cutType
+        self.forceReload = forceReload
         self.showVisitStatus = showVisitStatus
         self._showSpaceName = showSpaceName
         self._showDay = showDay
@@ -60,47 +57,66 @@ struct CircleCutImage: View {
     var body: some View {
         ZStack(alignment: .topLeading) {
             Group {
-                if let image = database.circleImage(for: circle.id) {
-                    if let webCutImage {
-                        Image(uiImage: webCutImage)
+                switch cutType {
+                case .catalog:
+                    // Show catalog cut
+                    if let catalogImage = database.circleImage(for: circle.id) {
+                        Image(uiImage: catalogImage)
                             .resizable()
                             .scaledToFit()
                             .usesPrivacyMode()
                     } else {
-                        if showCatalogCut {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFit()
-                                .usesPrivacyMode()
-                        } else {
-                            if shouldFetchWebCut && !isWebCutURLFetched {
-                                ZStack(alignment: .center) {
-                                    ProgressView()
-                                    Color.clear
-                                }
-                                .aspectRatio(180.0 / 256.0, contentMode: .fit)
-                            } else {
-                                Rectangle()
-                                    .foregroundStyle(Color.primary.opacity(0.05))
-                                    .overlay {
-                                        Text("Circles.NoImage")
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    }
-                                    .aspectRatio(180.0 / 256.0, contentMode: .fit)
+                        // No image available
+                        Rectangle()
+                            .foregroundStyle(Color.primary.opacity(0.05))
+                            .overlay {
+                                Text("Circles.NoImage")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                             }
+                            .aspectRatio(180.0 / 256.0, contentMode: .fit)
+                    }
+
+                case .web:
+                    // Try to show web cut, fallback to catalog
+                    if let webCutImage {
+                        // Web cut is available
+                        Image(uiImage: webCutImage)
+                            .resizable()
+                            .scaledToFit()
+                            .usesPrivacyMode()
+                    } else if authenticator.onlineState == .online && !isWebCutURLFetched {
+                        // Still loading web cut, show catalog in background with progress
+                        ZStack {
+                            if let catalogImage = database.circleImage(for: circle.id) {
+                                Image(uiImage: catalogImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .usesPrivacyMode()
+                            }
+                            ProgressView()
                         }
+                    } else if let catalogImage = database.circleImage(for: circle.id) {
+                        // Fallback to catalog cut
+                        Image(uiImage: catalogImage)
+                            .resizable()
+                            .scaledToFit()
+                            .usesPrivacyMode()
+                    } else {
+                        // No image available
+                        Rectangle()
+                            .foregroundStyle(Color.primary.opacity(0.05))
+                            .overlay {
+                                Text("Circles.NoImage")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .aspectRatio(180.0 / 256.0, contentMode: .fit)
                     }
-                } else {
-                    ZStack(alignment: .center) {
-                        ProgressView()
-                        Color.clear
-                    }
-                    .aspectRatio(180.0 / 256.0, contentMode: .fit)
                 }
             }
             GeometryReader { proxy in
-                if showCatalogCut || (shouldFetchWebCut && isWebCutURLFetched && webCutImage != nil) {
+                if database.circleImage(for: circle.id) != nil {
                     ZStack(alignment: .topLeading) {
                         if let favorites = favorites.wcIDMappedItems,
                            let extendedInformation = circle.extendedInformation,
@@ -158,10 +174,14 @@ struct CircleCutImage: View {
             isWebCutURLFetched = false
             prepareCutImage()
         }
+        .onChange(of: cutType) {
+            prepareCutImage()
+        }
     }
 
     func prepareCutImage() {
-        if shouldFetchWebCut && !isWebCutURLFetched {
+        // Only fetch web cut when cutType is .web and we're online
+        if cutType == .web && authenticator.onlineState == .online && !isWebCutURLFetched {
             if let extendedInformation = circle.extendedInformation {
                 let circleID = circle.id
                 let webCatalogID = extendedInformation.webCatalogID
@@ -179,7 +199,7 @@ struct CircleCutImage: View {
     }
 
     func webCut(for circleID: Int, webCatalogID: Int) async throws -> UIImage? {
-        if !forceWebCutUpdate {
+        if !forceReload {
             let (isWebCutFetched, image) = imageCache.image(circleID)
             if isWebCutFetched {
                 return image
