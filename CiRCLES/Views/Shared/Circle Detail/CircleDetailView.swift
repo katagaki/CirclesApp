@@ -29,73 +29,20 @@ struct CircleDetailView: View {
     @State var nextCircle: ((ComiketCircle) -> ComiketCircle?)?
     @State var isFirstCircleAlertShowing: Bool = false
     @State var isLastCircleAlertShowing: Bool = false
-    @State var currentCutType: CircleCutType = .catalog
-    @State var hasShownWebCutOnce: Bool = false
 
     @Namespace var namespace
 
     var body: some View {
         List {
             Section {
-                HStack(alignment: .top, spacing: 12.0) {
-                    // Cut image
-                    CircleCutImage(
-                        circle,
-                        in: namespace,
-                        cutType: currentCutType,
-                        showSpaceName: .constant(false),
-                        showDay: .constant(false)
-                    )
-                    .frame(width: 100.0)
-                    .id("cut-\(currentCutType)")
-                    .onTapGesture {
-                        if authenticator.onlineState == .online {
-                            withAnimation(.smooth.speed(2.0)) {
-                                toggleCutType()
-                            }
-                        }
-                    }
-                    
-                    // Info stack
-                    VStack(alignment: .leading, spacing: 8.0) {
-                        HStack(spacing: 5.0) {
-                            CircleBlockPill("Shared.\(circle.day)th.Day", size: .large)
-                            if let circleSpaceName = circle.spaceName() {
-                                CircleBlockPill(LocalizedStringKey(circleSpaceName), size: .large)
-                            }
-                        }
-                        
-                        if let extendedInformation,
-                           let favoriteMemo = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.memo,
-                           !favoriteMemo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                            InfoStackSection(
-                                title: "Shared.Memo.Favorites",
-                                contents: favoriteMemo,
-                                canTranslate: false,
-                                showContextMenu: false
-                            ) 
-                        }
-
-                        if circle.supplementaryDescription.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
-                            InfoStackSection(
-                                title: "Shared.Description",
-                                contents: circle.supplementaryDescription,
-                                canTranslate: true
-                            )
-                        } else {
-                            InfoStackSection(
-                                title: "Shared.Description",
-                                contents: String(localized: "Circles.NoDescription"),
-                                canTranslate: false
-                            )
-                        } 
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                .padding(.vertical, 8.0)
-                .listRowSeparator(.hidden)
-                .listRowBackground(Color.clear)
-                .listRowInsets(.init(top: 0.0, leading: 20.0, bottom: 0.0, trailing: 20.0))
+                CircleDetailHero(
+                    circle: $circle,
+                    extendedInformation: $extendedInformation,
+                    namespace: namespace
+                )
+                    .listRowSeparator(.hidden)
+                    .listRowBackground(Color.clear)
+                    .listRowInsets(.init(top: 0.0, leading: 20.0, bottom: 0.0, trailing: 20.0))
             }
             if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
                 ListSectionWithTranslateButton(title: "Shared.BookName", text: circle.bookName)
@@ -154,33 +101,13 @@ struct CircleDetailView: View {
                 isLastCircleAlertShowing = false
             }
         }
-        .onAppear {
-            currentCutType = .catalog
-            hasShownWebCutOnce = false
-        }
         .task {
             await prepareCircle()
         }
         .onChange(of: circle.id) {
-            currentCutType = .catalog
-            hasShownWebCutOnce = false
             Task {
                 await prepareCircle()
             }
-        }
-    }
-    
-    func toggleCutType() {
-        switch currentCutType {
-        case .catalog:
-            if !hasShownWebCutOnce {
-                currentCutType = .webForced
-                hasShownWebCutOnce = true
-            } else {
-                currentCutType = .web
-            }
-        case .web, .webForced:
-            currentCutType = .catalog
         }
     }
 

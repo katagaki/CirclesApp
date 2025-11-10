@@ -60,6 +60,7 @@ struct MapView: View {
                                 popoverSourceRect: $popoverSourceRect,
                                 namespace: namespace
                             )
+                            .allowsHitTesting(false)
                             // Favorites layer
                             MapFavoritesLayer(
                                 mappings: $layoutFavoriteWebCatalogIDMappings,
@@ -68,6 +69,7 @@ struct MapView: View {
                                 height: $mapImageHeight,
                                 zoomDivisor: $zoomDivisor
                             )
+                            .allowsHitTesting(false)
                             // Genre layer
                             if showGenreOverlay, let genreImage {
                                 MapLayer(
