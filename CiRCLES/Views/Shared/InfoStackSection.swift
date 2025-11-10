@@ -12,8 +12,16 @@ struct InfoStackSection: View {
     let title: String
     let contents: String
     let canTranslate: Bool
+    let showContextMenu: Bool
     
     @State var isShowingTranslationPopover: Bool = false
+    
+    init(title: String, contents: String, canTranslate: Bool, showContextMenu: Bool = true) {
+        self.title = title
+        self.contents = contents
+        self.canTranslate = canTranslate
+        self.showContextMenu = showContextMenu
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4.0) {
@@ -22,42 +30,48 @@ struct InfoStackSection: View {
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
             
-            if canTranslate {
-                #if !targetEnvironment(macCatalyst) && !os(visionOS)
-                Text(contents)
-                    .font(.subheadline)
-                    .textSelection(.enabled)
-                    .contextMenu {
-                        Button("Shared.Copy", systemImage: "doc.on.doc") {
-                            UIPasteboard.general.string = contents
+            if showContextMenu {
+                if canTranslate {
+                    #if !targetEnvironment(macCatalyst) && !os(visionOS)
+                    Text(contents)
+                        .font(.subheadline)
+                        .textSelection(.enabled)
+                        .contextMenu {
+                            Button("Shared.Copy", systemImage: "doc.on.doc") {
+                                UIPasteboard.general.string = contents
+                            }
+                            Button("Shared.Translate", systemImage: "character.bubble") {
+                                isShowingTranslationPopover = true
+                            }
                         }
-                        Button("Shared.Translate", systemImage: "character.bubble") {
-                            isShowingTranslationPopover = true
+                        .translationPresentation(
+                            isPresented: $isShowingTranslationPopover,
+                            text: contents
+                        )
+                    #else
+                    Text(contents)
+                        .font(.subheadline)
+                        .textSelection(.enabled)
+                        .contextMenu {
+                            Button("Shared.Copy", systemImage: "doc.on.doc") {
+                                UIPasteboard.general.string = contents
+                            }
                         }
-                    }
-                    .translationPresentation(
-                        isPresented: $isShowingTranslationPopover,
-                        text: contents
-                    )
-                #else
-                Text(contents)
-                    .font(.subheadline)
-                    .textSelection(.enabled)
-                    .contextMenu {
-                        Button("Shared.Copy", systemImage: "doc.on.doc") {
-                            UIPasteboard.general.string = contents
+                    #endif
+                } else {
+                    Text(contents)
+                        .font(.subheadline)
+                        .textSelection(.enabled)
+                        .contextMenu {
+                            Button("Shared.Copy", systemImage: "doc.on.doc") {
+                                UIPasteboard.general.string = contents
+                            }
                         }
-                    }
-                #endif
+                }
             } else {
                 Text(contents)
                     .font(.subheadline)
                     .textSelection(.enabled)
-                    .contextMenu {
-                        Button("Shared.Copy", systemImage: "doc.on.doc") {
-                            UIPasteboard.general.string = contents
-                        }
-                    }
             }
         }
     }
