@@ -151,11 +151,20 @@ struct AuthenticatedView: ViewModifier {
                 isDatabaseInitialized = true
             }
 
-            // Load image data into memory (prevents scroll jank, decoding happens on-demand)
+            // Load image data into memory concurrently (prevents scroll jank, decoding happens on-demand)
             await oasis.setBodyText("Loading.Images")
             database.imageCache.removeAll()
-            database.loadCommonImages()
-            database.loadCircleImages()
+            
+            // Load common and circle images in parallel for faster startup
+            await withTaskGroup(of: Void.self) { group in
+                group.addTask {
+                    database.loadCommonImages()
+                }
+                group.addTask {
+                    database.loadCircleImages()
+                }
+            }
+            
             database.disconnect()
         }
 

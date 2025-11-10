@@ -33,6 +33,9 @@ class UserSelections: Equatable {
         set(value) {
             _map = value
             defaults.set(value?.id, forKey: selectedMapKey)
+            // Reset genre and block when map changes
+            _genre = nil
+            defaults.set(nil, forKey: selectedGenreKey)
             _block = nil
             defaults.set(nil, forKey: selectedBlockKey)
         }
