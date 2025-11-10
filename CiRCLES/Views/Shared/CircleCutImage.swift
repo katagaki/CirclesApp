@@ -61,7 +61,7 @@ struct CircleCutImage: View {
         ZStack(alignment: .topLeading) {
             Group {
                 if let image = database.circleImage(for: circle.id) {
-                    if let webCutImage {
+                    if let webCutImage, !showCatalogCut {
                         Image(uiImage: webCutImage)
                             .resizable()
                             .scaledToFit()
@@ -156,6 +156,9 @@ struct CircleCutImage: View {
         .onChange(of: circle.id) {
             self.webCutImage = nil
             isWebCutURLFetched = false
+            prepareCutImage()
+        }
+        .onChange(of: shouldFetchWebCut) {
             prepareCutImage()
         }
     }
