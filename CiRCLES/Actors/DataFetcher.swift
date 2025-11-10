@@ -128,21 +128,24 @@ actor DataFetcher {
                 sortBy: [SortDescriptor(\.id, order: .forward)]
             )
             let circles = try modelContext.fetch(fetchDescriptor)
-            let circleWebCatalogIDMapping = circles.reduce(
-                into: [LayoutCatalogMapping: [Int]]()) { partialResult, circle in
-                    if let extendedInformation = circle.extendedInformation {
-                        let mapping = LayoutCatalogMapping(blockID: circle.blockID, spaceNumber: circle.spaceNumber)
-                        partialResult[mapping, default: []].append(extendedInformation.webCatalogID)
+            
+            // Build mapping key -> index for O(1) lookup instead of O(n) search
+            let mappingIndex = mappings.enumerated().reduce(into: [String: Int]()) { result, item in
+                let key = "\(item.element.blockID)_\(item.element.spaceNumber)"
+                result[key] = item.offset
+            }
+            
+            // Single pass through circles with O(1) lookup
+            for circle in circles {
+                if let extendedInformation = circle.extendedInformation {
+                    let key = "\(circle.blockID)_\(circle.spaceNumber)"
+                    if let index = mappingIndex[key] {
+                        let originalMapping = mappings[index]
+                        layoutWebCatalogIDMappings[originalMapping, default: []].append(extendedInformation.webCatalogID)
                     }
                 }
-            for (blockIDAndSpaceNumber, webCatalogIDs) in circleWebCatalogIDMapping {
-                if let originalMapping = mappings.first(where: {
-                    $0.blockID == blockIDAndSpaceNumber.blockID &&
-                    $0.spaceNumber == blockIDAndSpaceNumber.spaceNumber
-                }) {
-                    layoutWebCatalogIDMappings[originalMapping] = webCatalogIDs
-                }
             }
+            
             return layoutWebCatalogIDMappings
         } catch {
             debugPrint(error)
@@ -257,29 +260,38 @@ actor DataFetcher {
 
     func spaceNumberSuffixes(forWebCatalogIDs webCatalogIDs: [Int]) -> [Int: Int] {
         do {
+            // Fetch all extended information in one query
             let extendedInformationFetchDescriptor = FetchDescriptor<ComiketCircleExtendedInformation>(
                 predicate: #Predicate<ComiketCircleExtendedInformation> {
                     webCatalogIDs.contains($0.webCatalogID)
                 }
             )
             let extendedInformation = try modelContext.fetch(extendedInformationFetchDescriptor)
+            
+            // Get all circle IDs to fetch in one query
+            let circleIDs = extendedInformation.map { $0.id }
+            
+            // Fetch all circles in one query instead of one-by-one
+            let circlesFetchDescriptor = FetchDescriptor<ComiketCircle>(
+                predicate: #Predicate<ComiketCircle> {
+                    circleIDs.contains($0.id)
+                }
+            )
+            let circles = try modelContext.fetch(circlesFetchDescriptor)
+            
+            // Build a mapping of circle ID to space number suffix
+            let circleIDToSuffix = circles.reduce(into: [Int: Int]()) { result, circle in
+                result[circle.id] = circle.spaceNumberSuffix
+            }
+            
+            // Map web catalog IDs to space number suffixes
             let webCatalogIDMappedToSpaceSubNo: [Int: Int] = extendedInformation
-                .reduce(into: [:]) { result, extendedInformation in
-                    do {
-                        let circleID = extendedInformation.id
-                        let circlesFetchDescriptor = FetchDescriptor<ComiketCircle>(
-                            predicate: #Predicate<ComiketCircle> {
-                                $0.id == circleID
-                            }
-                        )
-                        let circles = try modelContext.fetch(circlesFetchDescriptor)
-                        if let firstCircle = circles.first {
-                            result[extendedInformation.webCatalogID] = firstCircle.spaceNumberSuffix
-                        }
-                    } catch {
-                        // Intentionally left blank
+                .reduce(into: [:]) { result, extInfo in
+                    if let suffix = circleIDToSuffix[extInfo.id] {
+                        result[extInfo.webCatalogID] = suffix
                     }
                 }
+            
             return webCatalogIDMappedToSpaceSubNo
         } catch {
             debugPrint(error.localizedDescription)
