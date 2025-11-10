@@ -158,10 +158,14 @@ struct AuthenticatedView: ViewModifier {
             // Load common and circle images in parallel for faster startup
             await withTaskGroup(of: Void.self) { group in
                 group.addTask {
-                    database.loadCommonImages()
+                    await MainActor.run {
+                        database.loadCommonImages()
+                    }
                 }
                 group.addTask {
-                    database.loadCircleImages()
+                    await MainActor.run {
+                        database.loadCircleImages()
+                    }
                 }
             }
             

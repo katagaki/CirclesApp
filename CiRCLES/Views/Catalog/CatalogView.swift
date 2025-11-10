@@ -38,6 +38,9 @@ struct CatalogView: View {
     @Namespace var namespace
 
     var body: some View {
+        @Bindable var catalogCache = catalogCache
+        let hasFilterSelected = selections.genre != nil || selections.map != nil
+        
         ZStack(alignment: .center) {
             if isLoading {
                 ProgressView("Circles.Loading")
@@ -51,7 +54,7 @@ struct CatalogView: View {
                         }
                     } else {
                         CircleGrid(circles: catalogCache.displayedCircles,
-                                   showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
+                                   showsOverlayWhenEmpty: hasFilterSelected,
                                    namespace: namespace) { circle in
                             unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
@@ -65,14 +68,14 @@ struct CatalogView: View {
                         }
                     } else {
                         CircleList(circles: catalogCache.displayedCircles,
-                                   showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
+                                   showsOverlayWhenEmpty: hasFilterSelected,
                                    displayMode: listDisplayModeState,
                                    namespace: namespace) { circle in
                             unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
                     }
                 }
-                if selections.genre == nil && selections.map == nil && searchedCircles == nil {
+                if !hasFilterSelected && searchedCircles == nil {
                     ContentUnavailableView(
                         "Circles.NoFilterSelected",
                         systemImage: "questionmark.square.dashed",
