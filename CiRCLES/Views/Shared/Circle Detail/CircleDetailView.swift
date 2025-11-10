@@ -29,7 +29,9 @@ struct CircleDetailView: View {
     @State var nextCircle: ((ComiketCircle) -> ComiketCircle?)?
     @State var isFirstCircleAlertShowing: Bool = false
     @State var isLastCircleAlertShowing: Bool = false
-    @State var showWebCut: Bool = false
+    @State var currentShowWebCut: Bool = false
+    
+    @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var defaultShowWebCut: Bool
 
     @Namespace var namespace
 
@@ -41,18 +43,18 @@ struct CircleDetailView: View {
                     CircleCutImage(
                         circle,
                         in: namespace,
-                        shouldFetchWebCut: showWebCut && authenticator.onlineState == .online,
-                        showCatalogCut: !showWebCut || authenticator.onlineState != .online,
+                        shouldFetchWebCut: currentShowWebCut && authenticator.onlineState == .online,
+                        showCatalogCut: !currentShowWebCut || authenticator.onlineState != .online,
                         forceWebCutUpdate: true,
                         showSpaceName: .constant(false),
                         showDay: .constant(false)
                     )
                     .frame(width: 100.0)
-                    .id("cut-\(showWebCut)")
+                    .id("cut-\(currentShowWebCut)")
                     .onTapGesture {
                         if authenticator.onlineState == .online {
                             withAnimation(.smooth.speed(2.0)) {
-                                showWebCut.toggle()
+                                currentShowWebCut.toggle()
                             }
                         }
                     }
@@ -155,10 +157,14 @@ struct CircleDetailView: View {
                 isLastCircleAlertShowing = false
             }
         }
+        .onAppear {
+            currentShowWebCut = defaultShowWebCut
+        }
         .task {
             await prepareCircle()
         }
         .onChange(of: circle.id) {
+            currentShowWebCut = defaultShowWebCut
             Task {
                 await prepareCircle()
             }
