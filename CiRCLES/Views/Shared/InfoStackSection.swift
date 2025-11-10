@@ -9,14 +9,14 @@ import Foundation
 import SwiftUI
 
 struct InfoStackSection: View {
-    let title: LocalizedStringKey
+    let title: String
     let contents: String
     let canTranslate: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4.0) {
             HStack(alignment: .center, spacing: 4.0) {
-                Text(String(localized: title))
+                Text(LocalizedStringKey(title))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .textCase(.uppercase)
