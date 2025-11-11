@@ -25,7 +25,6 @@ struct UnifiedToolbar: ToolbarContent {
                 unifier.hide()
                 isMyComiketPresenting = true
             }
-            .aspectRatio(1.0, contentMode: .fit)
             .matchedTransitionSource(id: "My.View", in: namespace)
         }
         if !oasis.isShowing && !authenticator.isAuthenticating {
