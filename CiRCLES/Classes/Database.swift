@@ -189,13 +189,18 @@ class Database {
         return models(identifiers, sortedBy: \ComiketBlock.id, in: modelContext)
     }
 
-    func circles(_ identifiers: [PersistentIdentifier]) -> [ComiketCircle] {
-        return models(identifiers, sortedBy: \ComiketCircle.id, in: modelContext)
+    func circles(_ identifiers: [PersistentIdentifier], reversed: Bool = true) -> [ComiketCircle] {
+        return models(
+            identifiers,
+            sortedBy: \ComiketCircle.id, reversed: reversed,
+            in: modelContext
+        )
     }
 
     func models<T, K: Comparable>(
         _ identifiers: [PersistentIdentifier],
         sortedBy keyPath: KeyPath<T, K>,
+        reversed: Bool = false,
         in modelContext: ModelContext
     ) -> [T] {
         var models: [T] = []
@@ -204,7 +209,11 @@ class Database {
                 models.append(model)
             }
         }
-        models.sort(by: {$0[keyPath: keyPath] < $1[keyPath: keyPath]})
+        if reversed {
+            models.sort(by: {$0[keyPath: keyPath] > $1[keyPath: keyPath]})
+        } else {
+            models.sort(by: {$0[keyPath: keyPath] < $1[keyPath: keyPath]})
+        }
         return models
     }
 

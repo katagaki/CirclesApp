@@ -11,42 +11,34 @@ struct MapPopoverLayer<Content: View>: View {
 
     @Binding var canvasSize: CGSize
 
-    @Binding var sourceRect: CGRect
-    @Binding var selection: WebCatalogIDSet?
-    var content: (WebCatalogIDSet, Bool) -> Content
+    @Binding var selection: PopoverData?
+    var content: (PopoverData) -> Content
 
-    @State var currentRect: CGRect = .null
-    @State var currentItem: WebCatalogIDSet?
-
-    @State var dismissingRect: CGRect = .null
-    @State var dismissingItem: WebCatalogIDSet?
+    @State var currentItem: PopoverData?
+    @State var dismissingItem: PopoverData?
 
     var body: some View {
         Group {
-            if let currentItem, !currentRect.isNull {
+            if let currentItem, !currentItem.sourceRect.isNull {
                 MapPopover(
                     canvasSize: $canvasSize,
-                    sourceRect: currentRect,
+                    sourceRect: currentItem.sourceRect,
                     isDismissing: false
                 ) {
-                    content(currentItem, false)
+                    content(currentItem)
                 }
                 .id(currentItem.id)
             }
-            if let dismissingItem, !dismissingRect.isNull {
+            if let dismissingItem, !dismissingItem.sourceRect.isNull {
                 MapPopover(
                     canvasSize: $canvasSize,
-                    sourceRect: dismissingRect,
+                    sourceRect: dismissingItem.sourceRect,
                     isDismissing: true
                 ) {
-                    content(dismissingItem, true)
+                    content(dismissingItem)
                 }
                 .id("!\(dismissingItem.id)")
             }
-        }
-        .onChange(of: sourceRect) { oldValue, newValue in
-            currentRect = newValue
-            dismissingRect = oldValue
         }
         .onChange(of: selection) { oldValue, newValue in
             if oldValue != nil, newValue == nil {

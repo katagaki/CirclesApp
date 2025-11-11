@@ -18,22 +18,16 @@ struct MapView: View {
     @State var canvasSize: CGSize = .zero
 
     @State var mapImage: UIImage?
-    @State var mapImageWidth: Int = 0
-    @State var mapImageHeight: Int = 0
     @State var genreImage: UIImage?
 
     @State var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
     @State var isInitialLoadCompleted: Bool = false
 
-    @State var popoverLayoutMapping: LayoutCatalogMapping?
-    @State var popoverWebCatalogIDSet: WebCatalogIDSet?
-    @State var popoverSourceRect: CGRect = .null
+    @State var popoverData: PopoverData?
 
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
-
-    @Namespace var namespace
 
     var spaceSize: Int {
         useHighResolutionMaps ? 40 : 20
@@ -71,26 +65,21 @@ struct MapView: View {
                                 canvasSize: $canvasSize,
                                 mappings: $layoutWebCatalogIDMappings,
                                 spaceSize: spaceSize,
-                                popoverLayoutMapping: $popoverLayoutMapping,
-                                popoverWebCatalogIDSet: $popoverWebCatalogIDSet,
-                                popoverSourceRect: $popoverSourceRect,
-                                namespace: namespace
+                                popoverData: $popoverData
                             )
 
                             // Popover layer
                             MapPopoverLayer(
                                 canvasSize: $canvasSize,
-                                sourceRect: $popoverSourceRect,
-                                selection: $popoverWebCatalogIDSet,
-                            ) { idSet, isDismissing in
-                                MapPopoverDetail(webCatalogIDSet: idSet)
-                                    .id("\(isDismissing ? "!" : "")\(idSet.id)")
+                                selection: $popoverData,
+                            ) { selection in
+                                MapPopoverDetail(selection: selection)
                             }
                         }
                     }
                     .contentMargins(.bottom, unifier.safeAreaHeight + 12.0, for: .scrollContent)
                     .scrollIndicators(.hidden)
-                    .onChange(of: popoverWebCatalogIDSet) { _, newValue in
+                    .onChange(of: popoverData) { _, newValue in
                         if let newValue {
                             reader.scrollTo("\(newValue.id)", anchor: .center)
                         }
@@ -128,9 +117,7 @@ struct MapView: View {
             }
         }
         .onChange(of: zoomDivisor) {
-            popoverSourceRect = .null
-            popoverLayoutMapping = nil
-            popoverWebCatalogIDSet = nil
+            popoverData = nil
             if let mapImage {
                 updateCanvasSize(mapImage)
             }

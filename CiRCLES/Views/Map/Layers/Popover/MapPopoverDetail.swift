@@ -15,7 +15,7 @@ struct MapPopoverDetail: View {
 
     @Environment(\.modelContext) var modelContext
 
-    @State var webCatalogIDSet: WebCatalogIDSet?
+    @State var selection: PopoverData?
 
     @State var circles: [ComiketCircle]?
 
@@ -71,12 +71,12 @@ struct MapPopoverDetail: View {
     }
 
     func fetchCircles() {
-        if let webCatalogIDSet {
+        if let selection {
             Task.detached {
                 let actor = DataFetcher(modelContainer: sharedModelContainer)
-                let circleIdentifiers = await actor.circles(withWebCatalogIDs: webCatalogIDSet.ids)
+                let circleIdentifiers = await actor.circles(withWebCatalogIDs: selection.ids)
                 await MainActor.run {
-                    let circles = database.circles(circleIdentifiers)
+                    let circles = database.circles(circleIdentifiers, reversed: selection.reversed)
                     self.circles = circles
                 }
             }

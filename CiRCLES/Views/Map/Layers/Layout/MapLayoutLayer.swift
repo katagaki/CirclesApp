@@ -17,27 +17,17 @@ struct MapLayoutLayer: View {
     @Binding var mappings: [LayoutCatalogMapping: [Int]]
     let spaceSize: Int
 
-    @Binding var popoverLayoutMapping: LayoutCatalogMapping?
-    @Binding var popoverWebCatalogIDSet: WebCatalogIDSet?
-    @Binding var popoverSourceRect: CGRect
+    @Binding var popoverData: PopoverData?
 
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
-    var namespace: Namespace.ID
-
     var body: some View {
         Canvas { context, _ in
             // Draw selection highlight if popover is active
-            if popoverWebCatalogIDSet != nil {
-                let rect = CGRect(
-                    x: popoverSourceRect.minX,
-                    y: popoverSourceRect.minY,
-                    width: popoverSourceRect.width,
-                    height: popoverSourceRect.height
-                )
+            if let popoverData {
                 context.fill(
-                    Path(rect),
+                    Path(popoverData.sourceRect),
                     with: !useDarkModeMaps ? .color(.black.opacity(0.3)) :
                             .color(.primary.opacity(0.3))
                 )
@@ -50,18 +40,11 @@ struct MapLayoutLayer: View {
         }
         .overlay {
             // Selection source rectangle for matched transition
-            if let popoverLayoutMapping {
+            if let popoverData {
                 ZStack {}
                     .contentShape(.rect)
-                    .matchedTransitionSource(
-                        id: "Layout.\(popoverLayoutMapping.blockID).\(popoverLayoutMapping.spaceNumber)",
-                        in: namespace
-                    )
-                    .frame(
-                        width: popoverSourceRect.width,
-                        height: popoverSourceRect.height
-                    )
-                    .position(x: popoverSourceRect.midX, y: popoverSourceRect.midY)
+                    .frame(width: popoverData.sourceWidth, height: popoverData.sourceHeight)
+                    .position(x: popoverData.sourceMidX, y: popoverData.sourceMidY)
             }
         }
     }
@@ -76,9 +59,17 @@ struct MapLayoutLayer: View {
             let yMax: Int = Int(Double(layout.positionY + spaceSize) / zoomFactor)
             if x >= xMin && x < xMax && y >= yMin && y < yMax {
                 let spaceSize = Int(Double(spaceSize) / zoomFactor)
-                popoverSourceRect = CGRect(x: xMin, y: yMin, width: spaceSize, height: spaceSize)
-                popoverLayoutMapping = layout
-                popoverWebCatalogIDSet = WebCatalogIDSet(ids: webCatalogIDs)
+                let newPopoverData = PopoverData(
+                    layout: layout,
+                    idSet: WebCatalogIDSet(ids: webCatalogIDs),
+                    reversed: layout.layoutType == .aOnBottom || layout.layoutType == .aOnRight,
+                    sourceRect: CGRect(x: xMin, y: yMin, width: spaceSize, height: spaceSize)
+                )
+                if popoverData == newPopoverData {
+                    closeMapPopover()
+                } else {
+                    popoverData = newPopoverData
+                }
                 return
             }
         }
@@ -87,8 +78,6 @@ struct MapLayoutLayer: View {
     // swiftlint:enable identifier_name
 
     func closeMapPopover() {
-        popoverSourceRect = .null
-        popoverLayoutMapping = nil
-        popoverWebCatalogIDSet = nil
+        popoverData = nil
     }
 }
