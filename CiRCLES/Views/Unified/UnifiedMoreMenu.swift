@@ -19,14 +19,18 @@ struct UnifiedMoreMenu: View {
 
     @State var activeEventNumber: Int = -1
 
+    // Map Settings
+    @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
 
+    // Circle Display Settings
     @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 
+    // Others
     @AppStorage(wrappedValue: false, "PrivacyMode.On") var isPrivacyModeOn: Bool
 
     var body: some View {
@@ -49,6 +53,16 @@ struct UnifiedMoreMenu: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            ControlGroup("More.Customization.Map") {
+                Button("Shared.Zoom.Out", systemImage: "minus") {
+                    zoomDivisor += 1
+                }
+                .disabled(zoomDivisor >= 4)
+                Button("Shared.Zoom.In", systemImage: "plus") {
+                    zoomDivisor -= 1
+                }
+                .disabled(zoomDivisor <= 1)
+            }
             Section {
                 Toggle("More.Customization.Map.ShowsGenreOverlays", systemImage: "theatermasks",
                        isOn: $showGenreOverlay)
@@ -56,8 +70,6 @@ struct UnifiedMoreMenu: View {
                        isOn: $useDarkModeMaps)
                 Toggle("More.Customization.Map.UseHighDefinitionMap", systemImage: "square.resize.up",
                        isOn: $useHighResolutionMaps)
-            } header: {
-                Text("More.Customization.Map")
             }
             Section {
                 Toggle("More.Customization.Circles.ShowWebCut", systemImage: "text.rectangle.page",
