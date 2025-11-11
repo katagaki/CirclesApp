@@ -60,20 +60,8 @@ struct CircleDetailView: View {
         .animation(.easeInOut(duration: 0.2), value: unifier.selectedDetent)
         .contentMargins(.top, 0.0)
         .listSectionSpacing(.compact)
-        .navigationTitle(circle.circleName)
-        .navigationBarTitleDisplayMode(.inline)
+        .subtitledTitle(circle.circleName, subtitle: circle.penName)
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                VStack(spacing: 0.0) {
-                    Text(circle.circleName)
-                        .bold()
-                    if circle.penName.trimmingCharacters(in: .whitespaces) != "" {
-                        Text(circle.penName)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-            }
             ToolbarItem(placement: .topBarTrailing) {
                 HStack {
                     Button("Circles.GoPrevious", systemImage: "chevron.left") {
