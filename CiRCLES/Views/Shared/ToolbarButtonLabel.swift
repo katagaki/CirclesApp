@@ -11,6 +11,14 @@ struct ToolbarButtonLabel: View {
     let text: LocalizedStringKey
     let imageName: String
 
+    var padding: CGFloat {
+        if #available(iOS 26.0, *) {
+            return 8.0
+        } else {
+            return 0.0
+        }
+    }
+
     init(_ text: LocalizedStringKey, imageName: String) {
         self.text = text
         self.imageName = imageName
@@ -25,6 +33,6 @@ struct ToolbarButtonLabel: View {
                 .fontWeight(.bold)
                 .truncationMode(.middle)
         }
-        .padding(.horizontal, 8.0)
+        .padding(.horizontal, padding)
     }
 }
