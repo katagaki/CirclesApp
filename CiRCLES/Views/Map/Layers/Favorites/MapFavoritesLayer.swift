@@ -14,7 +14,8 @@ struct MapFavoritesLayer: View {
 
     @Binding var width: Int
     @Binding var height: Int
-    @Binding var zoomDivisor: Int
+
+    @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
 
     var body: some View {
         ZStack(alignment: .topLeading) {
@@ -22,8 +23,7 @@ struct MapFavoritesLayer: View {
                 MapFavoriteLayerBlock(
                     layout: layout,
                     colorMap: mappings[layout] ?? [:],
-                    spaceSize: spaceSize,
-                    zoomDivisor: zoomDivisor
+                    spaceSize: spaceSize
                 )
             }
             Color.clear

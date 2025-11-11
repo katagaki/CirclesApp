@@ -18,12 +18,12 @@ struct MapLayoutLayer: View {
 
     @Binding var width: Int
     @Binding var height: Int
-    @Binding var zoomDivisor: Int
 
     @Binding var popoverLayoutMapping: LayoutCatalogMapping?
     @Binding var popoverWebCatalogIDSet: WebCatalogIDSet?
     @Binding var popoverSourceRect: CGRect
 
+    @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var namespace: Namespace.ID

@@ -13,8 +13,8 @@ struct MapLayer: View {
 
     @Binding var width: Int
     @Binding var height: Int
-    @Binding var zoomDivisor: Int
 
+    @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var body: some View {

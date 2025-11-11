@@ -14,8 +14,8 @@ struct MapFavoriteLayerBlock: View {
     var layout: LayoutCatalogMapping
     var colorMap: [Int: WebCatalogColor?]
     var spaceSize: Int
-    var zoomDivisor: Int
 
+    @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var webCatalogIDs: [Int] {
