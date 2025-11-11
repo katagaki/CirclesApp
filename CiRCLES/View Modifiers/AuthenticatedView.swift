@@ -79,7 +79,6 @@ struct AuthenticatedView: ViewModifier {
                     let activeEvent = planner.activeEvent
                     Task.detached {
                         await loadDataFromDatabase(for: activeEvent)
-                        await loadFavorites()
                         await MainActor.run {
                             oasis.close()
                             // Set initial selections
@@ -93,6 +92,9 @@ struct AuthenticatedView: ViewModifier {
                                 unifier.show()
                             }
                             isReloadingData = false
+                        }
+                        Task.detached(priority: .background) {
+                            await loadFavorites()
                         }
                     }
                 }
@@ -157,9 +159,6 @@ struct AuthenticatedView: ViewModifier {
     }
 
     func loadFavorites() async {
-        await oasis.setModality(false)
-        await oasis.setHeaderText("Shared.LoadingHeader.Favorites")
-        await oasis.setBodyText("Loading.Favorites")
         let actor = FavoritesActor(modelContainer: sharedModelContainer)
         if let token = authenticator.token {
             let (items, wcIDMappedItems) = await actor.all(authToken: token)

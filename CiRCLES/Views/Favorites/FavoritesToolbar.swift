@@ -9,21 +9,19 @@ import SwiftData
 import SwiftUI
 
 struct FavoritesToolbar: ToolbarContent {
-
-    @Binding var isVisitModeOn: Bool
-    @Binding var isGroupedByColor: Bool
+    @Environment(FavoritesCache.self) var favoritesCache
 
     var body: some ToolbarContent {
         ToolbarItem(placement: .bottomBar) {
             Button {
                 withAnimation(.smooth.speed(2.0)) {
-                    isVisitModeOn.toggle()
-                    UIApplication.shared.isIdleTimerDisabled = isVisitModeOn
+                    favoritesCache.isVisitModeOn.toggle()
+                    UIApplication.shared.isIdleTimerDisabled = favoritesCache.isVisitModeOn
                 }
             } label: {
                 ToolbarButtonLabel(
                     "Shared.VisitMode",
-                    imageName: isVisitModeOn ? "figure.walk.motion" : "figure.walk"
+                    imageName: favoritesCache.isVisitModeOn ? "figure.walk.motion" : "figure.walk"
                 )
             }
             .popoverTip(VisitModeTip())
@@ -34,12 +32,13 @@ struct FavoritesToolbar: ToolbarContent {
         ToolbarItem(placement: .bottomBar) {
             Button {
                 withAnimation(.smooth.speed(2.0)) {
-                    isGroupedByColor.toggle()
+                    favoritesCache.isGroupedByColor.toggle()
                 }
             } label: {
                 ToolbarButtonLabel(
                     "Shared.GroupByColor",
-                    imageName: isGroupedByColor ? "paintpalette.fill" : "paintpalette"
+                    imageName: favoritesCache.isGroupedByColor ?
+                    "paintpalette.fill" : "paintpalette"
                 )
             }
         }

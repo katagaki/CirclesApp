@@ -10,7 +10,6 @@ import SwiftUI
 extension MapView {
     func reloadAll() {
         withAnimation(.smooth.speed(2.0)) {
-            isLoadingLayouts = true
             removeAllMappings()
             reloadMapImage()
         } completion: {
@@ -76,7 +75,6 @@ extension MapView {
         await MainActor.run {
             withAnimation(.smooth.speed(2.0)) {
                 self.layoutWebCatalogIDMappings = layoutWebCatalogIDMappings
-                isLoadingLayouts = false
             }
         }
     }

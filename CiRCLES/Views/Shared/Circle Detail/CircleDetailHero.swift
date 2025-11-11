@@ -25,21 +25,33 @@ struct CircleDetailHero: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12.0) {
             // Cut image
-            CircleCutImage(
-                circle,
-                in: namespace,
-                cutType: currentCutType,
-                forceReload: currentCutType == .web && !hasShownWebCutOnce,
-                showSpaceName: .constant(false),
-                showDay: .constant(false)
-            )
-            .frame(width: 120.0, height: 172.0)
-            .onTapGesture {
-                if authenticator.onlineState == .online {
-                    withAnimation(.smooth.speed(2.0)) {
-                        toggleCutType()
+            VStack(alignment: .leading, spacing: 2.0) {
+                CircleCutImage(
+                    circle,
+                    in: namespace,
+                    cutType: currentCutType,
+                    forceReload: currentCutType == .web && !hasShownWebCutOnce,
+                    showSpaceName: .constant(false),
+                    showDay: .constant(false)
+                )
+                .frame(width: 120.0, height: 172.0)
+                .onTapGesture {
+                    if authenticator.onlineState == .online {
+                        withAnimation(.smooth.speed(2.0)) {
+                            toggleCutType()
+                        }
                     }
                 }
+                Group {
+                    switch currentCutType {
+                    case .catalog:
+                        Text("Circles.Image.Catalog")
+                    case .web:
+                        Text("Circles.Image.Web")
+                    }
+                }
+                .font(.caption2)
+                .foregroundStyle(.secondary)
             }
 
             // Info stack
