@@ -140,7 +140,7 @@ struct MapView: View {
             reloadAll()
         }
         .onChange(of: favorites.items) {
-            Task.detached(priority: .high) {
+            Task.detached {
                 await reloadFavorites()
             }
         }

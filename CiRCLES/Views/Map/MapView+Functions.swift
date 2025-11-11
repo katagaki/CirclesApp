@@ -17,7 +17,7 @@ extension MapView {
                 let mapID = map.id
                 let selectedDate = selections.date?.id
                 let useHighResolutionMaps = useHighResolutionMaps
-                Task.detached(priority: .high) {
+                Task.detached {
                     await reloadMapLayouts(
                         mapID: mapID,
                         selectedDate: selectedDate,
