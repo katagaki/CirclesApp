@@ -25,7 +25,6 @@ struct MapView: View {
     @State var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
     @State var layoutFavoriteWebCatalogIDMappings: [LayoutCatalogMapping: [Int: WebCatalogColor?]] = [:]
     @State var isInitialLoadCompleted: Bool = false
-    @State var isLoadingLayouts: Bool = false
 
     @State var popoverLayoutMapping: LayoutCatalogMapping?
     @State var popoverWebCatalogIDSet: WebCatalogIDSet?
@@ -101,16 +100,6 @@ struct MapView: View {
                     .contentMargins(.bottom, unifier.safeAreaHeight + 12.0, for: .scrollContent)
                     .contentMargins(.trailing, 120.0, for: .scrollContent)
                     .scrollIndicators(.hidden)
-                    .overlay {
-                        if isLoadingLayouts {
-                            ZStack(alignment: .center) {
-                                ProgressView("Map.LoadingLayouts")
-                                    .padding()
-                                    .adaptiveGlass(.regular)
-                                Color.clear
-                            }
-                        }
-                    }
                     .overlay {
                         ZStack(alignment: .topTrailing) {
                             Color.clear

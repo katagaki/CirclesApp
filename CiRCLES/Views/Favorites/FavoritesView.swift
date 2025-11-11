@@ -14,34 +14,29 @@ struct FavoritesView: View {
 
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
+    @Environment(FavoritesCache.self) var favoritesCache
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
     @Environment(UserSelections.self) var selections
     @Environment(Unifier.self) var unifier
 
-    @State var favoriteCircles: [String: [ComiketCircle]]?
-
-    @State var isVisitModeOn: Bool = false
     @AppStorage(wrappedValue: false, "Favorites.VisitModeOn") var isVisitModeOnDefault: Bool
-
-    @State var isGroupedByColor: Bool = true
     @AppStorage(wrappedValue: true, "Favorites.GroupByColor") var isGroupedByColorDefault: Bool
-
-    @State var isInitialLoadCompleted: Bool = false
 
     @Namespace var namespace
 
     var body: some View {
+        @Bindable var favoritesCache = favoritesCache
         ZStack(alignment: .center) {
-            if let favoriteCircles {
+            if let favoriteCircles = favoritesCache.circles {
                 Group {
-                    if isGroupedByColor {
+                    if favoritesCache.isGroupedByColor {
                         ColorGroupedCircleGrid(
                             groups: favoriteCircles,
                             showsOverlayWhenEmpty: false,
                             namespace: namespace
                         ) { circle in
-                            if !isVisitModeOn {
+                            if !favoritesCache.isVisitModeOn {
                                 unifier.append(.namespacedCircleDetail(
                                     circle: circle,
                                     previousCircle: { previousCircle(for: $0) },
@@ -89,49 +84,44 @@ struct FavoritesView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .navigationTitle("ViewTitle.Favorites")
         .navigationBarTitleDisplayMode(.inline)
-        .visitModeStyle($isVisitModeOn)
+        .visitModeStyle($favoritesCache.isVisitModeOn)
         .toolbar {
-            FavoritesToolbar(isVisitModeOn: $isVisitModeOn, isGroupedByColor: $isGroupedByColor)
+            FavoritesToolbar()
         }
         .refreshable {
             await reloadFavorites()
         }
         .onAppear {
-            if !isInitialLoadCompleted {
-                if favoriteCircles == nil, let favoriteItems = favorites.items {
-                    Task.detached {
-                        await prepareCircles(using: favoriteItems)
-                    }
+            if !favoritesCache.isInitialLoadCompleted {
+                if favoritesCache.circles == nil,
+                    let favoriteItems = favorites.items {
+                    Task { await prepareCircles(using: favoriteItems) }
                 }
-                isVisitModeOn = isVisitModeOnDefault
-                isGroupedByColor = isGroupedByColorDefault
-                isInitialLoadCompleted = true
+                favoritesCache.isVisitModeOn = isVisitModeOnDefault
+                favoritesCache.isGroupedByColor = isGroupedByColorDefault
+                favoritesCache.isInitialLoadCompleted = true
             }
         }
         .onChange(of: selections.date) {
-            if isInitialLoadCompleted {
+            if favoritesCache.isInitialLoadCompleted {
                 if let favoriteItems = favorites.items {
-                    Task.detached {
-                        await prepareCircles(using: favoriteItems)
-                    }
+                    Task { await prepareCircles(using: favoriteItems) }
                 }
             }
         }
-        .onChange(of: isVisitModeOn) {
-            if isInitialLoadCompleted {
-                isVisitModeOnDefault = isVisitModeOn
+        .onChange(of: favoritesCache.isVisitModeOn) {
+            if favoritesCache.isInitialLoadCompleted {
+                isVisitModeOnDefault = favoritesCache.isVisitModeOn
             }
         }
-        .onChange(of: isGroupedByColor) {
-            if isInitialLoadCompleted {
-                isGroupedByColorDefault = isGroupedByColor
+        .onChange(of: favoritesCache.isGroupedByColor) {
+            if favoritesCache.isInitialLoadCompleted {
+                isGroupedByColorDefault = favoritesCache.isGroupedByColor
             }
         }
         .onChange(of: favorites.items) {
             if let favoriteItems = favorites.items {
-                Task.detached {
-                    await prepareCircles(using: favoriteItems)
-                }
+                Task { await prepareCircles(using: favoriteItems) }
             }
         }
     }
@@ -148,19 +138,7 @@ struct FavoritesView: View {
     }
 
     func prepareCircles(using favoriteItems: [UserFavorites.Response.FavoriteItem]) async {
-        let favoriteItemsSorted: [Int: [UserFavorites.Response.FavoriteItem]] = favoriteItems.reduce(
-            into: [Int: [UserFavorites.Response.FavoriteItem]]()
-        ) { partialResult, favoriteItem in
-            partialResult[favoriteItem.favorite.color.rawValue, default: []].append(favoriteItem)
-        }
-
-        let actor = DataFetcher(modelContainer: sharedModelContainer)
-        var favoriteCircleIdentifiers: [Int: [PersistentIdentifier]] = [:]
-        for colorKey in favoriteItemsSorted.keys {
-            if let favoriteItems = favoriteItemsSorted[colorKey] {
-                favoriteCircleIdentifiers[colorKey] = await actor.circles(forFavorites: favoriteItems)
-            }
-        }
+        let favoriteCircleIdentifiers = await FavoritesCache.mapped(using: favoriteItems)
         await MainActor.run {
             var favoriteCircles: [String: [ComiketCircle]] = [:]
             for colorKey in favoriteCircleIdentifiers.keys.sorted() {
@@ -177,13 +155,13 @@ struct FavoritesView: View {
                 }
             }
             withAnimation(.smooth.speed(2.0)) {
-                self.favoriteCircles = favoriteCircles
+                self.favoritesCache.circles = favoriteCircles
             }
         }
     }
 
     func previousCircle(for circle: ComiketCircle) -> ComiketCircle? {
-        if let favoriteCircles {
+        if let favoriteCircles = favoritesCache.circles {
             let colors = WebCatalogColor.allCases.map({String($0.rawValue)})
             for colorIndex in 0..<colors.count {
                 if let circles = favoriteCircles[colors[colorIndex]],
@@ -200,7 +178,7 @@ struct FavoritesView: View {
     }
 
     func nextCircle(for circle: ComiketCircle) -> ComiketCircle? {
-        if let favoriteCircles {
+        if let favoriteCircles = favoritesCache.circles {
             let colors = WebCatalogColor.allCases.map({String($0.rawValue)})
             for colorIndex in 0..<colors.count {
                 if let circles = favoriteCircles[colors[colorIndex]],

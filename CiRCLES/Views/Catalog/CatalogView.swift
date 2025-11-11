@@ -12,6 +12,7 @@ import SwiftUI
 struct CatalogView: View {
 
     @Environment(Authenticator.self) var authenticator
+    @Environment(CatalogCache.self) var catalogCache
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
     @Environment(UserSelections.self) var selections
@@ -19,18 +20,11 @@ struct CatalogView: View {
 
     @Environment(\.modelContext) var modelContext
 
-    @State var displayedCircles: [ComiketCircle] = []
-    @State var searchedCircles: [ComiketCircle]?
-
-    @State var blocksInMap: [ComiketBlock] = []
-
     // Search
     @State var isSearchActive: Bool = false
     @State var searchTerm: String = ""
 
-    @State var isInitialLoadCompleted: Bool = false
-    @State var isLoading: Bool = false
-
+    // Display
     @State var displayModeState: CircleDisplayMode = .grid
     @State var listDisplayModeState: ListDisplayMode = .regular
 
@@ -40,32 +34,32 @@ struct CatalogView: View {
 
     var body: some View {
         ZStack(alignment: .center) {
-            if isLoading {
+            if catalogCache.isLoading {
                 ProgressView("Circles.Loading")
                 Color.clear
             } else {
                 switch displayModeState {
                 case .grid:
-                    if let searchedCircles {
+                    if let searchedCircles = catalogCache.searchedCircles {
                         CircleGrid(circles: searchedCircles, namespace: namespace) { circle in
                             unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
                     } else {
-                        CircleGrid(circles: displayedCircles,
+                        CircleGrid(circles: catalogCache.displayedCircles,
                                    showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
                                    namespace: namespace) { circle in
                             unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
                     }
                 case .list:
-                    if let searchedCircles {
+                    if let searchedCircles = catalogCache.searchedCircles {
                         CircleList(circles: searchedCircles,
                                    displayMode: listDisplayModeState,
                                    namespace: namespace) { circle in
                             unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
                         }
                     } else {
-                        CircleList(circles: displayedCircles,
+                        CircleList(circles: catalogCache.displayedCircles,
                                    showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
                                    displayMode: listDisplayModeState,
                                    namespace: namespace) { circle in
@@ -73,7 +67,7 @@ struct CatalogView: View {
                         }
                     }
                 }
-                if selections.genre == nil && selections.map == nil && searchedCircles == nil {
+                if selections.genre == nil && selections.map == nil && catalogCache.searchedCircles == nil {
                     ContentUnavailableView(
                         "Circles.NoFilterSelected",
                         systemImage: "questionmark.square.dashed",
@@ -85,6 +79,7 @@ struct CatalogView: View {
         .navigationTitle("ViewTitle.Circles")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            @Bindable var catalogCache = catalogCache
             ToolbarItem(placement: .topBarLeading) {
                 DisplayModeSwitcher($displayModeState)
             }
@@ -93,90 +88,51 @@ struct CatalogView: View {
                     ListModeSwitcher($listDisplayModeState)
                 }
             }
-            CatalogToolbar(displayedCircles: $displayedCircles)
+            CatalogToolbar(displayedCircles: $catalogCache.displayedCircles)
         }
         .searchable(
             text: $searchTerm,
             isPresented: $isSearchActive,
             placement: .toolbar,
             prompt: "Circles.Search.Prompt"
-)
+        )
         .onAppear {
-            if !isInitialLoadCompleted {
-                reloadDisplayedCircles(
-                    genreID: selections.genre?.id,
-                    mapID: selections.map?.id,
-                    blockID: selections.block?.id
-                )
-                isInitialLoadCompleted = true
+            if !catalogCache.isInitialLoadCompleted {
+                Task { await reloadDisplayedCircles() }
             }
         }
         .onChange(of: selections.catalogSelectionId) {
-            if isInitialLoadCompleted {
-                reloadDisplayedCircles(
-                    genreID: selections.genre?.id,
-                    mapID: selections.map?.id,
-                    blockID: selections.block?.id
-                )
-            }
+            Task { await reloadDisplayedCircles() }
+        }
+        .onChange(of: searchTerm) {
+            Task { await searchCircles() }
         }
         .onChange(of: isSearchActive) {
             if isSearchActive && unifier.isMinimized {
                 unifier.selectedDetent = .height(360)
             }
         }
-        .onChange(of: searchTerm) {
-            Task.detached {
-                await searchCircles()
-            }
-        }
         .onChange(of: isDatabaseInitialized) { _, newValue in
             if !newValue {
-                displayedCircles.removeAll()
+                catalogCache.displayedCircles.removeAll()
             }
         }
     }
 
-    func reloadDisplayedCircles(genreID: Int?, mapID: Int?, blockID: Int?) {
+    func reloadDisplayedCircles() async {
         withAnimation(.smooth.speed(2.0)) {
-            self.isLoading = true
+            catalogCache.isLoading = true
         } completion: {
+            catalogCache.isInitialLoadCompleted = true
+            let selectedGenreId = selections.genre?.id
+            let selectedMapId = selections.map?.id
+            let selectedBlockId = selections.block?.id
             Task.detached {
-                let actor = DataFetcher(modelContainer: sharedModelContainer)
-
-                var circleIdentifiersByGenre: [PersistentIdentifier]?
-                var circleIdentifiersByMap: [PersistentIdentifier]?
-                var circleIdentifiersByBlock: [PersistentIdentifier]?
-                var circleIdentifiers: [PersistentIdentifier] = []
-
-                if let genreID {
-                    circleIdentifiersByGenre = await actor.circles(withGenre: genreID)
-                }
-                if let mapID {
-                    circleIdentifiersByMap = await actor.circles(inMap: mapID)
-                }
-                if let blockID {
-                    circleIdentifiersByBlock = await actor.circles(inBlock: blockID)
-                }
-
-                if let circleIdentifiersByGenre {
-                    circleIdentifiers = circleIdentifiersByGenre
-                }
-                if let circleIdentifiersByMap {
-                    if circleIdentifiers.isEmpty {
-                        circleIdentifiers = circleIdentifiersByMap
-                    } else {
-                        circleIdentifiers = Array(
-                            Set(circleIdentifiers).intersection(Set(circleIdentifiersByMap))
-                        )
-                    }
-                }
-                if let circleIdentifiersByBlock {
-                    circleIdentifiers = Array(
-                        Set(circleIdentifiers).intersection(Set(circleIdentifiersByBlock))
-                    )
-                }
-
+                let circleIdentifiers = await CatalogCache.displayedCircles(
+                    genreID: selectedGenreId,
+                    mapID: selectedMapId,
+                    blockID: selectedBlockId
+                )
                 await MainActor.run {
                     var displayedCircles: [ComiketCircle] = []
                     displayedCircles = database.circles(circleIdentifiers)
@@ -184,8 +140,8 @@ struct CatalogView: View {
                         displayedCircles.removeAll(where: { $0.day != selectedDate.id })
                     }
                     withAnimation(.smooth.speed(2.0)) {
-                        self.displayedCircles = displayedCircles
-                        self.isLoading = false
+                        catalogCache.displayedCircles = displayedCircles
+                        catalogCache.isLoading = false
                     }
                 }
             }
@@ -193,20 +149,20 @@ struct CatalogView: View {
     }
 
     func searchCircles() async {
-        let actor = DataFetcher(modelContainer: sharedModelContainer)
-
-        if searchTerm.trimmingCharacters(in: .whitespaces).count >= 2 {
-            let circleIdentifiers = await actor.circles(containing: searchTerm)
-            await MainActor.run {
-                let searchedCircles = database.circles(circleIdentifiers)
-                withAnimation(.smooth.speed(2.0)) {
-                    self.searchedCircles = searchedCircles
+        Task.detached {
+            let circleIdentifiers = await CatalogCache.searchCircles(searchTerm)
+            if let circleIdentifiers {
+                await MainActor.run {
+                    let searchedCircles = database.circles(circleIdentifiers)
+                    withAnimation(.smooth.speed(2.0)) {
+                        catalogCache.searchedCircles = searchedCircles
+                    }
                 }
-            }
-        } else {
-            await MainActor.run {
-                withAnimation(.smooth.speed(2.0)) {
-                    searchedCircles = nil
+            } else {
+                await MainActor.run {
+                    withAnimation(.smooth.speed(2.0)) {
+                        catalogCache.searchedCircles = nil
+                    }
                 }
             }
         }
