@@ -24,6 +24,7 @@ struct CircleDetailView: View {
     @State var extendedInformation: ComiketCircleExtendedInformation?
     @State var webCatalogInformation: WebCatalogCircle?
     @State var genre: String?
+    @State var favoriteMemo: String = ""
 
     @State var previousCircle: ((ComiketCircle) -> ComiketCircle?)?
     @State var nextCircle: ((ComiketCircle) -> ComiketCircle?)?
@@ -37,6 +38,7 @@ struct CircleDetailView: View {
             Section {
                 CircleDetailHero(
                     circle: $circle, extendedInformation: $extendedInformation,
+                    favoriteMemo: $favoriteMemo,
                     namespace: namespace
                 )
                     .listRowSeparator(.hidden)
@@ -75,7 +77,11 @@ struct CircleDetailView: View {
         }
         .toolbar {
             if let extendedInformation {
-                CircleDetailToolbar(extendedInformation, webCatalogInformation)
+                CircleDetailToolbar(
+                    extendedInformation: extendedInformation,
+                    webCatalogInformation: webCatalogInformation,
+                    favoriteMemo: $favoriteMemo
+                )
             }
         }
         .alert("Alerts.FirstCircle.Title", isPresented: $isFirstCircleAlertShowing) {
@@ -113,6 +119,7 @@ struct CircleDetailView: View {
                     self.webCatalogInformation = webCatalogInformation
                 }
             }
+            favoriteMemo = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.memo ?? ""
         }
         let actor = DataFetcher(modelContainer: sharedModelContainer)
         if let genre = await actor.genre(circle.genreID) {

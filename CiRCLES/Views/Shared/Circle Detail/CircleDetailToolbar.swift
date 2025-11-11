@@ -17,57 +17,64 @@ struct CircleDetailToolbar: ToolbarContent {
 
     let extendedInformation: ComiketCircleExtendedInformation
     let webCatalogInformation: WebCatalogCircle?
+    @Binding var favoriteMemo: String
 
-    @State var isAddingToFavorites: Bool = false
+    @State var isFavoritesPopoverPresented: Bool = false
+    @State var isCallingFavoritesAPI: Bool = false
     @State var selectedFavoriteColor: WebCatalogColor?
-    @State var favoriteMemo: String = ""
     @State var isLinksMenuPresented: Bool = false
 
     @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
-
-    init(_ extendedInformation: ComiketCircleExtendedInformation,
-         _ webCatalogInformation: WebCatalogCircle?) {
-        self.extendedInformation = extendedInformation
-        self.webCatalogInformation = webCatalogInformation
-    }
 
     var body: some ToolbarContent {
         // Favorites button
         if isActiveEventLatest && authenticator.onlineState == .online {
             ToolbarItem(placement: .bottomBar) {
-                Button {
-                    isAddingToFavorites = true
-                } label: {
-                    if #available(iOS 26.0, *) {
-                        Label("Shared.Favorite", systemImage: "star.fill")
-                    } else {
-                        ToolbarButtonLabel("Shared.Favorite", imageName: "star.fill")
-                    }
-                }
-                .popover(isPresented: $isAddingToFavorites, arrowEdge: .bottom) {
-                    FavoritePopover(
-                        initialColor: selectedFavoriteColor,
-                        initialMemo: favoriteMemo,
-                        isExistingFavorite: favorites.contains(webCatalogID: extendedInformation.webCatalogID),
-                        onSave: { color, memo in
-                            Task.detached {
-                                await saveFavorite(color: color, memo: memo)
-                            }
-                            isAddingToFavorites = false
-                        },
-                        onDelete: {
-                            Task.detached {
-                                await deleteFavorite()
-                            }
-                            isAddingToFavorites = false
+                if isCallingFavoritesAPI {
+                    ProgressView()
+                } else {
+                    Button {
+                        isFavoritesPopoverPresented = true
+                    } label: {
+                        if #available(iOS 26.0, *) {
+                            Label("Shared.Favorite", systemImage: "star.fill")
+                        } else {
+                            ToolbarButtonLabel("Shared.Favorite", imageName: "star.fill")
                         }
-                    )
-                }
-                .onAppear {
-                    reloadFavoriteColor()
-                }
-                .onChange(of: extendedInformation.webCatalogID) {
-                    reloadFavoriteColor()
+                    }
+                    .popover(isPresented: $isFavoritesPopoverPresented, arrowEdge: .bottom) {
+                        FavoritePopover(
+                            initialColor: selectedFavoriteColor,
+                            initialMemo: favoriteMemo,
+                            isExistingFavorite: favorites.contains(webCatalogID: extendedInformation.webCatalogID),
+                            onSave: { color, memo in
+                                isCallingFavoritesAPI = true
+                                Task.detached {
+                                    await saveFavorite(color: color, memo: memo)
+                                    await MainActor.run {
+                                        isCallingFavoritesAPI = false
+                                    }
+                                }
+                                isFavoritesPopoverPresented = false
+                            },
+                            onDelete: {
+                                isCallingFavoritesAPI = true
+                                Task.detached {
+                                    await deleteFavorite()
+                                    await MainActor.run {
+                                        isCallingFavoritesAPI = false
+                                    }
+                                }
+                                isFavoritesPopoverPresented = false
+                            }
+                        )
+                    }
+                    .onAppear {
+                        reloadFavoriteColor()
+                    }
+                    .onChange(of: extendedInformation.webCatalogID) {
+                        reloadFavoriteColor()
+                    }
                 }
             }
         }

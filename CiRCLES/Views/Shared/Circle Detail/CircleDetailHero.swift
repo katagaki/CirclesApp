@@ -14,6 +14,7 @@ struct CircleDetailHero: View {
 
     @Binding var circle: ComiketCircle
     @Binding var extendedInformation: ComiketCircleExtendedInformation?
+    @Binding var favoriteMemo: String
 
     @State var currentCutType: CircleCutType = .catalog
     @State var hasShownWebCutOnce: Bool = false
@@ -63,12 +64,7 @@ struct CircleDetailHero: View {
                     }
                 }
 
-                if let extendedInformation,
-                   let favoriteMemo = (
-                    favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?
-                        .favorite.memo
-                   ),
-                   !favoriteMemo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                if !favoriteMemo.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                     InfoStackSection(
                         title: "Shared.Memo.Favorites",
                         contents: favoriteMemo,
