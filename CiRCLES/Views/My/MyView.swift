@@ -105,7 +105,7 @@ struct MyView: View {
                 participation: $participationForNotifier
             )
         }
-        .onAppear {
+        .task {
             if !isInitialLoadCompleted {
                 reloadDataInBackground()
             }

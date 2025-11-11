@@ -186,11 +186,17 @@ struct CircleCutImage: View {
                 let circleID = circle.id
                 let webCatalogID = extendedInformation.webCatalogID
                 Task.detached {
-                    let webCutImage = try? await webCut(for: circleID, webCatalogID: webCatalogID)
-                    await MainActor.run {
-                        withAnimation(.smooth.speed(2.0)) {
-                            self.webCutImage = webCutImage
-                            isWebCutURLFetched = true
+                    try? await webCut(for: circleID, webCatalogID: webCatalogID) { image, data in
+                        await MainActor.run {
+                            withAnimation(.smooth.speed(2.0)) {
+                                if let image {
+                                    self.webCutImage = image
+                                }
+                                if let data {
+                                    imageCache.set(circleID, data: data)
+                                }
+                                isWebCutURLFetched = true
+                            }
                         }
                     }
                 }
@@ -198,11 +204,14 @@ struct CircleCutImage: View {
         }
     }
 
-    func webCut(for circleID: Int, webCatalogID: Int) async throws -> UIImage? {
+    func webCut(
+        for circleID: Int, webCatalogID: Int,
+        completion: @escaping ((UIImage?, Data?)) async -> Void
+    ) async throws {
         if !forceReload {
             let (isWebCutFetched, image) = imageCache.image(circleID)
             if isWebCutFetched {
-                return image
+                await completion((image, nil))
             }
         }
         if let token = authenticator.token {
@@ -212,14 +221,17 @@ struct CircleCutImage: View {
                let webCatalogInformation = circleResponse.response.circle {
                 if webCatalogInformation.cutWebURL != "" {
                     if let webCutURL = URL(string: webCatalogInformation.cutWebURL) {
-                        return await imageCache.download(id: circleID, url: webCutURL)
+                        let (image, data) = await ImageCache.download(
+                            id: circleID, url: webCutURL
+                        )
+                        await completion((image, data))
                     }
                 } else {
-                    imageCache.saveImage(Data(), named: String(circleID))
+                    ImageCache.saveImage(Data(), named: String(circleID))
                 }
             }
         }
-        return nil
+        await completion((nil, nil))
     }
 
     func checkmarkColor() -> Color {

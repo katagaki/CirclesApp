@@ -33,6 +33,10 @@ struct MapView: View {
         useHighResolutionMaps ? 40 : 20
     }
 
+    var mapId: String {
+        "\(selections.fullMapID).\(useHighResolutionMaps ? "H" : "L").\(database.commonImages.count)"
+    }
+
     var body: some View {
         VStack(alignment: .leading) {
             if let mapImage {
@@ -102,13 +106,7 @@ struct MapView: View {
                 reloadAll()
             }
         }
-        .onChange(of: database.commonImages) {
-            reloadAll()
-        }
-        .onChange(of: selections.fullMapId) {
-            reloadAll()
-        }
-        .onChange(of: useHighResolutionMaps) {
+        .onChange(of: mapId) {
             reloadAll()
         }
         .onChange(of: mapImage) { _, newImage in

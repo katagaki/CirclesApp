@@ -20,8 +20,6 @@ struct MyParticipationSections: View {
     @Binding var dayForNotifier: Int?
     @Binding var participationForNotifier: String?
 
-    @State var isInitialLoadCompleted: Bool = false
-
     var body: some View {
         ForEach(Array((eventDates ?? [:]).keys).sorted(), id: \.self) { dayID in
             Section {
@@ -99,11 +97,6 @@ struct MyParticipationSections: View {
                     .disabled(!isAllowedToSetNotification(dayID: dayID))
                 }
                 .font(.subheadline)
-            }
-        }
-        .onAppear {
-            if !isInitialLoadCompleted {
-                isInitialLoadCompleted = true
             }
         }
     }

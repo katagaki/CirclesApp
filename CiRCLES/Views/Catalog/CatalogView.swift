@@ -101,7 +101,7 @@ struct CatalogView: View {
                 reloadDisplayedCircles()
             }
         }
-        .onChange(of: selections.catalogSelectionId) {
+        .onChange(of: selections.catalogSelectionID) {
             reloadDisplayedCircles()
         }
         .onChange(of: searchTerm) {

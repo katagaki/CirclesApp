@@ -34,7 +34,7 @@ struct MoreDatabaseAdministratiion: View {
                 }
             }
             Section {
-                if let imageCacheDirectory = imageCache.cacheURL,
+                if let imageCacheDirectory = ImageCache.cacheURL,
                    FileManager.default.fileExists(atPath: imageCacheDirectory.path()) {
                     HStack {
                         Text("More.DBAdmin.ImageCache")
