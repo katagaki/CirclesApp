@@ -22,11 +22,7 @@ struct ColorGroupedCircleGrid: View {
 
     var body: some View {
         let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 76.0), spacing: gridSpacing)]
-        #if targetEnvironment(macCatalyst)
-        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 80.0), spacing: gridSpacing)]
-        #else
-        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 60.0), spacing: gridSpacing)]
-        #endif
+        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 68.0), spacing: gridSpacing)]
 
         ScrollView {
             VStack(alignment: .leading, spacing: 0.0) {
