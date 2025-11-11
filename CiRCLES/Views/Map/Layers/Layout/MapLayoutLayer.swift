@@ -38,7 +38,7 @@ struct MapLayoutLayer: View {
                 )
                 context.fill(
                     Path(rect),
-                    with: useDarkModeMaps ? .color(.black.opacity(0.3)) :
+                    with: !useDarkModeMaps ? .color(.black.opacity(0.3)) :
                             .color(.primary.opacity(0.3))
                 )
             }
