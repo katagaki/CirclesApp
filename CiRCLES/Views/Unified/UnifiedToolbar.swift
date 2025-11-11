@@ -21,7 +21,7 @@ struct UnifiedToolbar: ToolbarContent {
 
     var body: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
-            Button("Tab.My", image: .tabIconMy) {
+            Button("Tab.My", image: .buttonMy) {
                 unifier.hide()
                 isMyComiketPresenting = true
             }
