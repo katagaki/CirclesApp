@@ -40,11 +40,33 @@ struct CatalogToolbar: ToolbarContent {
                 }
             } label: {
                 if #available(iOS 26.0, *) {
-                    Label(
-                        LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                        systemImage: (selections.genre?.name == "ブルーアーカイブ" ?
-                                      "scope" : "theatermask.and.paintbrush")
-                    )
+                    switch selections.genre?.name {
+                    case "男性向":
+                        Label(
+                            LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                            image: .buttonR18
+                        )
+                    case "ブルーアーカイブ":
+                        Label(
+                            LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                            systemImage: "scope"
+                        )
+                    case "艦これ", "アズールレーン":
+                        Label(
+                            LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                            systemImage: "water.waves"
+                        )
+                    case "コスプレ":
+                        Label(
+                            LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                            systemImage: "tshirt"
+                        )
+                    default:
+                        Label(
+                            LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                            systemImage: "theatermask.and.paintbrush"
+                        )
+                    }
                 } else {
                     ToolbarButtonLabel(
                         LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
