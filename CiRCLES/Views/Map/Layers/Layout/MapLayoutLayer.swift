@@ -21,61 +21,61 @@ struct MapLayoutLayer: View {
     @Binding var popoverWebCatalogIDSet: WebCatalogIDSet?
     @Binding var popoverSourceRect: CGRect
 
-    @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
+    @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var namespace: Namespace.ID
 
     var body: some View {
-        Color.clear
-            .frame(width: canvasSize.width, height: canvasSize.height)
-            .contentShape(.rect)
-            .onTapGesture { location in
-                openMapPopoverIn(x: Int(location.x), y: Int(location.y))
+        Canvas { context, _ in
+            // Draw selection highlight if popover is active
+            if popoverWebCatalogIDSet != nil {
+                let rect = CGRect(
+                    x: popoverSourceRect.minX,
+                    y: popoverSourceRect.minY,
+                    width: popoverSourceRect.width,
+                    height: popoverSourceRect.height
+                )
+                context.fill(
+                    Path(rect),
+                    with: useDarkModeMaps ? .color(.black.opacity(0.3)) :
+                            .color(.primary.opacity(0.3))
+                )
             }
-            .overlay {
-                // Selection highlight
-                if popoverWebCatalogIDSet != nil {
-                    Rectangle()
-                        .foregroundStyle(.primary.opacity(0.3))
-                        .frame(
-                            width: popoverSourceRect.width,
-                            height: popoverSourceRect.height
-                        )
-                        .position(x: popoverSourceRect.midX, y: popoverSourceRect.midY)
-                        .transition(.opacity.animation(.smooth.speed(2.0)))
-                        .onTapGesture {
-                            closeMapPopover()
-                        }
-                }
+        }
+        .frame(width: canvasSize.width, height: canvasSize.height)
+        .contentShape(.rect)
+        .onTapGesture { location in
+            openMapPopoverIn(x: Int(location.x), y: Int(location.y))
+        }
+        .overlay {
+            // Selection source rectangle for matched transition
+            if let popoverLayoutMapping {
+                ZStack {}
+                    .contentShape(.rect)
+                    .matchedTransitionSource(
+                        id: "Layout.\(popoverLayoutMapping.blockID).\(popoverLayoutMapping.spaceNumber)",
+                        in: namespace
+                    )
+                    .frame(
+                        width: popoverSourceRect.width,
+                        height: popoverSourceRect.height
+                    )
+                    .position(x: popoverSourceRect.midX, y: popoverSourceRect.midY)
             }
-            .overlay {
-                // Selection source rectangle
-                if let popoverLayoutMapping {
-                    ZStack {}
-                        .contentShape(.rect)
-                        .matchedTransitionSource(
-                            id: "Layout.\(popoverLayoutMapping.blockID).\(popoverLayoutMapping.spaceNumber)",
-                            in: namespace
-                        )
-                        .frame(
-                            width: popoverSourceRect.width,
-                            height: popoverSourceRect.height
-                        )
-                        .position(x: popoverSourceRect.midX, y: popoverSourceRect.midY)
-                }
-            }
+        }
     }
 
     // swiftlint:disable identifier_name
     func openMapPopoverIn(x: Int, y: Int) {
+        let zoomFactor = zoomFactorDouble(zoomDivisor)
         for (layout, webCatalogIDs) in mappings {
-            let xMin: Int = layout.positionX / zoomDivisor
-            let xMax: Int = (layout.positionX + spaceSize) / zoomDivisor
-            let yMin: Int = layout.positionY / zoomDivisor
-            let yMax: Int = (layout.positionY + spaceSize) / zoomDivisor
+            let xMin: Int = Int(Double(layout.positionX) / zoomFactor)
+            let xMax: Int = Int(Double(layout.positionX + spaceSize) / zoomFactor)
+            let yMin: Int = Int(Double(layout.positionY) / zoomFactor)
+            let yMax: Int = Int(Double(layout.positionY + spaceSize) / zoomFactor)
             if x >= xMin && x < xMax && y >= yMin && y < yMax {
-                let spaceSize = spaceSize / zoomDivisor
+                let spaceSize = Int(Double(spaceSize) / zoomFactor)
                 popoverSourceRect = CGRect(x: xMin, y: yMin, width: spaceSize, height: spaceSize)
                 popoverLayoutMapping = layout
                 popoverWebCatalogIDSet = WebCatalogIDSet(ids: webCatalogIDs)
