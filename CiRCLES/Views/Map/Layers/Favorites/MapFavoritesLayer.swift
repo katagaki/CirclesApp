@@ -10,6 +10,7 @@ import SwiftUI
 struct MapFavoritesLayer: View {
 
     @Environment(Favorites.self) var favorites
+    @Environment(\.colorScheme) var colorScheme
 
     @Binding var canvasSize: CGSize
 
@@ -18,19 +19,20 @@ struct MapFavoritesLayer: View {
 
     let spaceSize: Int
 
+    @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
+    @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
+
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            ForEach(Array(favoriteMappings.keys), id: \.hashValue) { layout in
-                MapFavoriteLayerBlock(
+        Canvas { context, _ in
+            for (layout, colorMap) in favoriteMappings {
+                drawFavoritesForLayout(
+                    context: context,
                     layout: layout,
-                    colorMap: favoriteMappings[layout] ?? [:],
-                    spaceSize: spaceSize
+                    colorMap: colorMap
                 )
             }
-            Color.clear
         }
         .frame(width: canvasSize.width, height: canvasSize.height)
-        .animation(.smooth.speed(2.0), value: canvasSize)
         .allowsHitTesting(false)
         .onChange(of: mappings) {
             favoriteMappings.removeAll()
@@ -42,6 +44,83 @@ struct MapFavoritesLayer: View {
             Task.detached {
                 await reloadFavorites()
             }
+        }
+    }
+
+    func drawFavoritesForLayout(
+        context: GraphicsContext,
+        layout: LayoutCatalogMapping,
+        colorMap: [Int: WebCatalogColor?]
+    ) {
+        let webCatalogIDs = Array(colorMap.keys).sorted()
+        let scaledSpaceSize = CGFloat(spaceSize) / CGFloat(zoomDivisor)
+
+        // Determine if we need to reverse the order based on layout type
+        let orderedIDs: [Int]
+        switch layout.layoutType {
+        case .aOnLeft, .aOnTop, .unknown:
+            orderedIDs = webCatalogIDs
+        case .aOnBottom, .aOnRight:
+            orderedIDs = webCatalogIDs.reversed()
+        }
+
+        let count = orderedIDs.count
+        guard count > 0 else { return }
+
+        // Calculate the base position (center of the layout)
+        let baseX = CGFloat(layout.positionX) / CGFloat(zoomDivisor)
+        let baseY = CGFloat(layout.positionY) / CGFloat(zoomDivisor)
+
+        for (index, webCatalogID) in orderedIDs.enumerated() {
+            guard let color = colorMap[webCatalogID], let color else { continue }
+
+            let rect: CGRect
+
+            switch layout.layoutType {
+            case .aOnLeft, .aOnRight, .unknown:
+                // Horizontal layout - divide width
+                let rectWidth = scaledSpaceSize / CGFloat(count)
+                let rectHeight = scaledSpaceSize
+                let offsetX = CGFloat(index) * rectWidth
+                rect = CGRect(
+                    x: baseX + offsetX,
+                    y: baseY,
+                    width: rectWidth,
+                    height: rectHeight
+                )
+            case .aOnTop, .aOnBottom:
+                // Vertical layout - divide height
+                let rectWidth = scaledSpaceSize
+                let rectHeight = scaledSpaceSize / CGFloat(count)
+                let offsetY = CGFloat(index) * rectHeight
+                rect = CGRect(
+                    x: baseX,
+                    y: baseY + offsetY,
+                    width: rectWidth,
+                    height: rectHeight
+                )
+            }
+
+            context.fill(
+                Path(rect),
+                with: .color(highlightColor(color))
+            )
+        }
+    }
+
+    func highlightColor(_ color: WebCatalogColor) -> Color {
+        switch colorScheme {
+        case .light:
+            return color.backgroundColor().opacity(0.5)
+        case .dark:
+            if useDarkModeMaps {
+                return color.backgroundColor().brightness(0.1).opacity(0.5) as? Color ??
+                color.backgroundColor().opacity(0.5)
+            } else {
+                return color.backgroundColor().opacity(0.5)
+            }
+        @unknown default:
+            return color.backgroundColor().opacity(0.5)
         }
     }
 
