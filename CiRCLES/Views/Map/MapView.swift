@@ -98,18 +98,7 @@ struct MapView: View {
                         }
                     }
                     .contentMargins(.bottom, unifier.safeAreaHeight + 12.0, for: .scrollContent)
-                    .contentMargins(.trailing, 120.0, for: .scrollContent)
                     .scrollIndicators(.hidden)
-                    .overlay {
-                        ZStack(alignment: .topTrailing) {
-                            Color.clear
-                            MapControlStack(
-                                showGenreOverlay: $showGenreOverlay,
-                                zoomDivisor: $zoomDivisor
-                            )
-                            .offset(x: -12.0, y: 12.0)
-                        }
-                    }
                     .onChange(of: popoverWebCatalogIDSet) { _, newValue in
                         if let newValue {
                             reader.scrollTo("\(newValue.id)", anchor: .center)
