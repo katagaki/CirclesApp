@@ -114,17 +114,21 @@ struct MyEventNotifierSheet: View {
         NavigationStack {
             List {
                 Section {
-                    VStack(alignment: .center, spacing: 16.0) {
-                        Image(systemName: "bell.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 52.0, height: 52.0, alignment: .center)
-                            .foregroundStyle(.red)
+                    VStack(alignment: .leading, spacing: 14.0) {
+                        ZStack(alignment: .center) {
+                            Image(systemName: "bell.fill")
+                                .resizable()
+                                .foregroundStyle(.white)
+                                .frame(width: 32.0, height: 32.0, alignment: .center)
+                            Color.clear
+                        }
+                        .background(.red.gradient)
+                        .clipShape(.rect(cornerRadius: 14.0))
+                        .frame(width: 52.0, height: 52.0, alignment: .center)
                         Text("Notifier.Explainer")
                             .frame(maxWidth: .infinity)
                     }
-                    .frame(maxWidth: .infinity, alignment: .center)
-                    .padding(8.0)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 if let participation, participation != "" {
                     if let notificationsPrior = notificationsPrior[participation] {
