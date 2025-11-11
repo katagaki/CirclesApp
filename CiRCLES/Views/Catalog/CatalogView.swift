@@ -124,21 +124,20 @@ struct CatalogView: View {
             catalogCache.isLoading = true
         } completion: {
             catalogCache.isInitialLoadCompleted = true
-            let selectedGenreId = selections.genre?.id
-            let selectedMapId = selections.map?.id
-            let selectedBlockId = selections.block?.id
+            let selectedGenreID = selections.genre?.id
+            let selectedMapID = selections.map?.id
+            let selectedBlockID = selections.block?.id
+            let selectedDayID = selections.date?.id
             Task.detached {
-                let circleIdentifiers = await CatalogCache.displayedCircles(
-                    genreID: selectedGenreId,
-                    mapID: selectedMapId,
-                    blockID: selectedBlockId
+                let circleIdentifiers = await CatalogCache.fetchCircles(
+                    genreID: selectedGenreID,
+                    mapID: selectedMapID,
+                    blockID: selectedBlockID,
+                    dayID: selectedDayID
                 )
                 await MainActor.run {
                     var displayedCircles: [ComiketCircle] = []
                     displayedCircles = database.circles(circleIdentifiers)
-                    if let selectedDate = selections.date {
-                        displayedCircles.removeAll(where: { $0.day != selectedDate.id })
-                    }
                     withAnimation(.smooth.speed(2.0)) {
                         catalogCache.displayedCircles = displayedCircles
                         catalogCache.isLoading = false

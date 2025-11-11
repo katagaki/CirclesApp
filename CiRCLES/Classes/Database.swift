@@ -189,7 +189,7 @@ class Database {
         return models(identifiers, sortedBy: \ComiketBlock.id, in: modelContext)
     }
 
-    func circles(_ identifiers: [PersistentIdentifier], reversed: Bool = true) -> [ComiketCircle] {
+    func circles(_ identifiers: [PersistentIdentifier], reversed: Bool = false) -> [ComiketCircle] {
         return models(
             identifiers,
             sortedBy: \ComiketCircle.id, reversed: reversed,
