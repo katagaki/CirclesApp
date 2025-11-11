@@ -12,6 +12,7 @@ struct MapView: View {
 
     @Environment(Database.self) var database
     @Environment(Favorites.self) var favorites
+    @Environment(MapLayoutCache.self) var mapLayoutCache
     @Environment(UserSelections.self) var selections
     @Environment(Unifier.self) var unifier
 
@@ -141,7 +142,33 @@ struct MapView: View {
         }
         .onChange(of: favorites.items) {
             Task.detached {
-                await reloadFavorites()
+                // When favorites change, we only need to reload favorites, not the entire map layout
+                await self.reloadFavorites()
+                
+                // Update cache with new favorites data if we have a valid cache entry
+                if let map = self.selections.map,
+                   let selectedDate = self.selections.date?.id {
+                    let cacheKey = MapLayoutCache.CacheKey(
+                        mapID: map.id,
+                        dateID: selectedDate,
+                        useHighResolutionMaps: self.useHighResolutionMaps
+                    )
+                    
+                    // Update cache with new favorites if we have layout data
+                    if !self.layoutWebCatalogIDMappings.isEmpty {
+                        let layoutFavoriteWebCatalogIDMappings = await self.processFavorites(
+                            layoutWebCatalogIDMappings: self.layoutWebCatalogIDMappings
+                        )
+                        
+                        let cachedData = MapLayoutCache.CachedMapData(
+                            layoutWebCatalogIDMappings: self.layoutWebCatalogIDMappings,
+                            layoutFavoriteWebCatalogIDMappings: layoutFavoriteWebCatalogIDMappings
+                        )
+                        await MainActor.run {
+                            self.mapLayoutCache.setCachedData(cachedData, for: cacheKey)
+                        }
+                    }
+                }
             }
         }
         .onChange(of: mapImage) { _, newValue in

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum WebCatalogColor: Int, CaseIterable, Codable {
+enum WebCatalogColor: Int, CaseIterable, Codable, Sendable {
     case orange = 1
     case pink = 2
     case yellow = 3

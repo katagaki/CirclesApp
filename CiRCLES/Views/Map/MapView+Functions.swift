@@ -17,13 +17,31 @@ extension MapView {
                 let mapID = map.id
                 let selectedDate = selections.date?.id
                 let useHighResolutionMaps = useHighResolutionMaps
-                Task.detached {
-                    await reloadMapLayouts(
-                        mapID: mapID,
-                        selectedDate: selectedDate,
-                        useHighResolutionMaps: useHighResolutionMaps
-                    )
-                    await reloadFavorites()
+                let cacheKey = MapLayoutCache.CacheKey(
+                    mapID: mapID,
+                    dateID: selectedDate,
+                    useHighResolutionMaps: useHighResolutionMaps
+                )
+                
+                // Check cache first
+                if let cachedData = mapLayoutCache.getCachedData(for: cacheKey) {
+                    // Use cached data immediately
+                    Task { @MainActor in
+                        withAnimation(.smooth.speed(2.0)) {
+                            self.layoutWebCatalogIDMappings = cachedData.layoutWebCatalogIDMappings
+                            self.layoutFavoriteWebCatalogIDMappings = cachedData.layoutFavoriteWebCatalogIDMappings
+                        }
+                    }
+                } else {
+                    // Load data in background
+                    Task.detached {
+                        await self.loadMapData(
+                            mapID: mapID,
+                            selectedDate: selectedDate,
+                            useHighResolutionMaps: useHighResolutionMaps,
+                            cacheKey: cacheKey
+                        )
+                    }
                 }
             }
         }
@@ -78,14 +96,76 @@ extension MapView {
             }
         }
     }
+    
+    func loadMapData(
+        mapID: Int,
+        selectedDate: Int?,
+        useHighResolutionMaps: Bool,
+        cacheKey: MapLayoutCache.CacheKey
+    ) async {
+        var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
+        
+        if let selectedDate {
+            // Fetch map layouts
+            let actor = DataFetcher(modelContainer: sharedModelContainer)
+            let layoutCatalogMappings = await actor.layoutMappings(
+                inMap: mapID,
+                useHighResolutionMaps: useHighResolutionMaps
+            )
+            
+            // Create Layout Mapping <> Web Catalog ID mapping data
+            if layoutCatalogMappings.count > 0 {
+                layoutWebCatalogIDMappings = await actor.layoutCatalogMappingToWebCatalogIDs(
+                    forMappings: layoutCatalogMappings, on: selectedDate
+                )
+            }
+        }
+        
+        // Process favorites concurrently with the layout data we just fetched
+        let layoutFavoriteWebCatalogIDMappings = await processFavorites(
+            layoutWebCatalogIDMappings: layoutWebCatalogIDMappings
+        )
+        
+        // Cache the results
+        let cachedData = MapLayoutCache.CachedMapData(
+            layoutWebCatalogIDMappings: layoutWebCatalogIDMappings,
+            layoutFavoriteWebCatalogIDMappings: layoutFavoriteWebCatalogIDMappings
+        )
+        await MainActor.run {
+            mapLayoutCache.setCachedData(cachedData, for: cacheKey)
+        }
+        
+        // Send results back to the view
+        await MainActor.run {
+            withAnimation(.smooth.speed(2.0)) {
+                self.layoutWebCatalogIDMappings = layoutWebCatalogIDMappings
+                self.layoutFavoriteWebCatalogIDMappings = layoutFavoriteWebCatalogIDMappings
+            }
+        }
+    }
 
     func reloadFavorites() async {
+        let layoutFavoriteWebCatalogIDMappings = await processFavorites(
+            layoutWebCatalogIDMappings: layoutWebCatalogIDMappings
+        )
+        
+        await MainActor.run {
+            withAnimation(.smooth.speed(2.0)) {
+                self.layoutFavoriteWebCatalogIDMappings = layoutFavoriteWebCatalogIDMappings
+            }
+        }
+    }
+    
+    func processFavorites(
+        layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]]
+    ) async -> [LayoutCatalogMapping: [Int: WebCatalogColor?]] {
         let actor = DataFetcher(modelContainer: sharedModelContainer)
-
+        
         // Create favorites mapping for Web Catalog IDs
         let layoutFavoriteWebCatalogIDMappings = mapFavoriteMappings(
             layoutWebCatalogIDMappings
         )
+        
         // List out all Web Catalog IDs
         let webCatalogIDs: [Int] = Array(Set(
             layoutFavoriteWebCatalogIDMappings.values
@@ -93,10 +173,17 @@ extension MapView {
                     result.append(contentsOf: webCatalogIDs.keys)
                 }
         ))
+        
+        // Return early if there are no web catalog IDs to process
+        guard !webCatalogIDs.isEmpty else {
+            return layoutFavoriteWebCatalogIDMappings
+        }
+        
         // Map all Web Catalog IDs to space number suffixes
         let spaceNumberSuffixes = await actor.spaceNumberSuffixes(
             forWebCatalogIDs: webCatalogIDs
         )
+        
         // Replace Web Catalog IDs with space number suffixes
         let layoutFavoriteWebCatalogIDSorted = layoutFavoriteWebCatalogIDMappings
             .reduce(into: [LayoutCatalogMapping: [Int: WebCatalogColor?]]()) { result, keyValue in
@@ -109,12 +196,8 @@ extension MapView {
                         result[spaceNumberSuffixes[webCatalogID] ?? webCatalogID] = color
                     }
             }
-
-        await MainActor.run {
-            withAnimation(.smooth.speed(2.0)) {
-                self.layoutFavoriteWebCatalogIDMappings = layoutFavoriteWebCatalogIDSorted
-            }
-        }
+        
+        return layoutFavoriteWebCatalogIDSorted
     }
 
     func mapFavoriteMappings(
