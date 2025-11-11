@@ -98,14 +98,14 @@ struct CatalogView: View {
         )
         .onAppear {
             if !catalogCache.isInitialLoadCompleted {
-                Task { await reloadDisplayedCircles() }
+                reloadDisplayedCircles()
             }
         }
         .onChange(of: selections.catalogSelectionId) {
-            Task { await reloadDisplayedCircles() }
+            reloadDisplayedCircles()
         }
         .onChange(of: searchTerm) {
-            Task { await searchCircles() }
+            searchCircles()
         }
         .onChange(of: isSearchActive) {
             if isSearchActive && unifier.isMinimized {
@@ -119,7 +119,7 @@ struct CatalogView: View {
         }
     }
 
-    func reloadDisplayedCircles() async {
+    func reloadDisplayedCircles() {
         withAnimation(.smooth.speed(2.0)) {
             catalogCache.isLoading = true
         } completion: {
@@ -148,7 +148,7 @@ struct CatalogView: View {
         }
     }
 
-    func searchCircles() async {
+    func searchCircles() {
         Task.detached {
             let circleIdentifiers = await CatalogCache.searchCircles(searchTerm)
             if let circleIdentifiers {
