@@ -53,7 +53,6 @@ struct MapView: View {
                                 spaceSize: spaceSize,
                                 width: $mapImageWidth,
                                 height: $mapImageHeight,
-                                zoomDivisor: $zoomDivisor,
                                 popoverLayoutMapping: $popoverLayoutMapping,
                                 popoverWebCatalogIDSet: $popoverWebCatalogIDSet,
                                 popoverSourceRect: $popoverSourceRect,
@@ -64,8 +63,7 @@ struct MapView: View {
                                 mappings: $layoutFavoriteWebCatalogIDMappings,
                                 spaceSize: spaceSize,
                                 width: $mapImageWidth,
-                                height: $mapImageHeight,
-                                zoomDivisor: $zoomDivisor
+                                height: $mapImageHeight
                             )
                             .allowsHitTesting(false)
                             // Genre layer
@@ -73,8 +71,7 @@ struct MapView: View {
                                 MapLayer(
                                     image: genreImage,
                                     width: $mapImageWidth,
-                                    height: $mapImageHeight,
-                                    zoomDivisor: $zoomDivisor
+                                    height: $mapImageHeight
                                 )
                                 .allowsHitTesting(false)
                             }
@@ -88,13 +85,10 @@ struct MapView: View {
                                     .id("\(isDismissing ? "!" : "")\(idSet.id)")
                             }
                         }
-                        .background {
-                            GeometryReader { reader in
-                                Color.clear
-                                    .onChange(of: reader.size) { _, newValue in
-                                        canvasSize = newValue
-                                    }
-                            }
+                        .onGeometryChange(for: CGSize.self) { reader in
+                            reader.size
+                        } action: { newSize in
+                            canvasSize = newSize
                         }
                     }
                     .contentMargins(.bottom, unifier.safeAreaHeight + 12.0, for: .scrollContent)
@@ -114,6 +108,9 @@ struct MapView: View {
             }
         }
         .onAppear {
+            if zoomDivisor == 0 {
+                zoomDivisor = 1
+            }
             if !isInitialLoadCompleted {
                 isInitialLoadCompleted = true
                 reloadAll()
