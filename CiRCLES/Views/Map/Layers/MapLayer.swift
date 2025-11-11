@@ -19,7 +19,6 @@ struct MapLayer: View {
             .resizable()
             .colorInvert(adaptive: true, enabled: $useDarkModeMaps)
             .frame(width: canvasSize.width, height: canvasSize.height)
-            .animation(.smooth.speed(2.0), value: canvasSize)
             .allowsHitTesting(false)
     }
 }
