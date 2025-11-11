@@ -15,8 +15,8 @@ struct CircleDetailToolbar: ToolbarContent {
 
     @Environment(\.openURL) var openURL
 
-    var extendedInformation: ComiketCircleExtendedInformation
-    @State var webCatalogInformation: WebCatalogCircle?
+    let extendedInformation: ComiketCircleExtendedInformation
+    let webCatalogInformation: WebCatalogCircle?
 
     @State var isAddingToFavorites: Bool = false
     @State var selectedFavoriteColor: WebCatalogColor?
@@ -81,33 +81,6 @@ struct CircleDetailToolbar: ToolbarContent {
             }
         }
 
-        // SNS buttons
-        if extendedInformation.twitterURL != nil ||
-           extendedInformation.pixivURL != nil ||
-           extendedInformation.circleMsPortalURL != nil {
-            if #available(iOS 26.0, *) {
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-            }
-
-            if let twitterURL = extendedInformation.twitterURL {
-                ToolbarItem(placement: .bottomBar) {
-                    SNSButton(twitterURL, showsLabel: false, type: .twitter)
-                }
-            }
-
-            if let pixivURL = extendedInformation.pixivURL {
-                ToolbarItem(placement: .bottomBar) {
-                    SNSButton(pixivURL, showsLabel: false, type: .pixiv)
-                }
-            }
-
-            if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
-                ToolbarItem(placement: .bottomBar) {
-                    SNSButton(circleMsPortalURL, showsLabel: false, type: .circleMs)
-                }
-            }
-        }
-
         // Links menu (only show if there are links)
         if let webCatalogInformation, !webCatalogInformation.onlineStores.isEmpty {
             if #available(iOS 26.0, *) {
@@ -132,6 +105,34 @@ struct CircleDetailToolbar: ToolbarContent {
                 }
             }
         }
+
+        // SNS buttons
+        if extendedInformation.twitterURL != nil ||
+           extendedInformation.pixivURL != nil ||
+           extendedInformation.circleMsPortalURL != nil {
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+            }
+
+            if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
+                ToolbarItem(placement: .bottomBar) {
+                    SNSButton(circleMsPortalURL, showsLabel: false, type: .circleMs)
+                }
+            }
+
+            if let pixivURL = extendedInformation.pixivURL {
+                ToolbarItem(placement: .bottomBar) {
+                    SNSButton(pixivURL, showsLabel: false, type: .pixiv)
+                }
+            }
+
+            if let twitterURL = extendedInformation.twitterURL {
+                ToolbarItem(placement: .bottomBar) {
+                    SNSButton(twitterURL, showsLabel: false, type: .twitter)
+                }
+            }
+        }
+
     }
 
     func reloadFavoriteColor() {
