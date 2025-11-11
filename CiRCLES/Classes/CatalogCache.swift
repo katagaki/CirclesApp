@@ -17,44 +17,20 @@ class CatalogCache {
     var isInitialLoadCompleted: Bool = false
     var isLoading: Bool = false
 
-    static func displayedCircles(
-        genreID: Int?, mapID: Int?, blockID: Int?
+    static func fetchCircles(
+        genreID: Int?, mapID: Int?, blockID: Int?, dayID: Int?
     ) async -> [PersistentIdentifier] {
         let actor = DataFetcher(modelContainer: sharedModelContainer)
 
-        var circleIdentifiersByGenre: [PersistentIdentifier]?
-        var circleIdentifiersByMap: [PersistentIdentifier]?
-        var circleIdentifiersByBlock: [PersistentIdentifier]?
-        var circleIdentifiers: [PersistentIdentifier] = []
-
-        if let genreID {
-            circleIdentifiersByGenre = await actor.circles(withGenre: genreID)
-        }
-        if let mapID {
-            circleIdentifiersByMap = await actor.circles(inMap: mapID)
-        }
-        if let blockID {
-            circleIdentifiersByBlock = await actor.circles(inBlock: blockID)
+        if let circleIdentifiers = await actor.circles(
+            withGenre: genreID, inBlock: blockID, onDay: dayID
+        ) {
+            return circleIdentifiers
+        } else if let mapID {
+            return await actor.circles(inMap: mapID)
         }
 
-        if let circleIdentifiersByGenre {
-            circleIdentifiers = circleIdentifiersByGenre
-        }
-        if let circleIdentifiersByMap {
-            if circleIdentifiers.isEmpty {
-                circleIdentifiers = circleIdentifiersByMap
-            } else {
-                circleIdentifiers = Array(
-                    Set(circleIdentifiers).intersection(Set(circleIdentifiersByMap))
-                )
-            }
-        }
-        if let circleIdentifiersByBlock {
-            circleIdentifiers = Array(
-                Set(circleIdentifiers).intersection(Set(circleIdentifiersByBlock))
-            )
-        }
-        return circleIdentifiers
+        return []
     }
 
     static func searchCircles(_ searchTerm: String) async -> [PersistentIdentifier]? {
