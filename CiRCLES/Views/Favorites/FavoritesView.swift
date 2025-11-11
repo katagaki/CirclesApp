@@ -103,21 +103,15 @@ struct FavoritesView: View {
             }
         }
         .onChange(of: selections.date) {
-            if favoritesCache.isInitialLoadCompleted {
-                if let favoriteItems = favorites.items {
-                    Task { await prepareCircles(using: favoriteItems) }
-                }
+            if let favoriteItems = favorites.items {
+                Task { await prepareCircles(using: favoriteItems) }
             }
         }
         .onChange(of: favoritesCache.isVisitModeOn) {
-            if favoritesCache.isInitialLoadCompleted {
-                isVisitModeOnDefault = favoritesCache.isVisitModeOn
-            }
+            isVisitModeOnDefault = favoritesCache.isVisitModeOn
         }
         .onChange(of: favoritesCache.isGroupedByColor) {
-            if favoritesCache.isInitialLoadCompleted {
-                isGroupedByColorDefault = favoritesCache.isGroupedByColor
-            }
+            isGroupedByColorDefault = favoritesCache.isGroupedByColor
         }
         .onChange(of: favorites.items) {
             if let favoriteItems = favorites.items {
