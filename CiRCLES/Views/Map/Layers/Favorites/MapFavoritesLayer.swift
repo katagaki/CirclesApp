@@ -19,7 +19,7 @@ struct MapFavoritesLayer: View {
 
     let spaceSize: Int
 
-    @AppStorage(wrappedValue: 1, "Map.ZoomDivisor") var zoomDivisor: Int
+    @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var body: some View {
@@ -53,7 +53,8 @@ struct MapFavoritesLayer: View {
         colorMap: [Int: WebCatalogColor?]
     ) {
         let webCatalogIDs = Array(colorMap.keys).sorted()
-        let scaledSpaceSize = CGFloat(spaceSize) / CGFloat(zoomDivisor)
+        let zoomFactor = zoomFactor(zoomDivisor)
+        let scaledSpaceSize = CGFloat(spaceSize) / zoomFactor
 
         // Determine if we need to reverse the order based on layout type
         let orderedIDs: [Int]
@@ -68,8 +69,8 @@ struct MapFavoritesLayer: View {
         guard count > 0 else { return }
 
         // Calculate the base position (center of the layout)
-        let baseX = CGFloat(layout.positionX) / CGFloat(zoomDivisor)
-        let baseY = CGFloat(layout.positionY) / CGFloat(zoomDivisor)
+        let baseX = CGFloat(layout.positionX) / zoomFactor
+        let baseY = CGFloat(layout.positionY) / zoomFactor
 
         for (index, webCatalogID) in orderedIDs.enumerated() {
             guard let color = colorMap[webCatalogID], let color else { continue }
