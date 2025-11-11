@@ -12,8 +12,17 @@ struct VisitModeModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         if #available(iOS 26.0, *) {
-            content
-                .presentationBackground(isVisitModeOn ? Color.accentColor : Color.clear)
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                if isVisitModeOn {
+                    content
+                        .presentationBackground(Color.accentColor.opacity(0.2))
+                } else {
+                    content
+                }
+            } else {
+                content
+                    .background(isVisitModeOn ? Color.accentColor.opacity(0.2) : Color.clear)
+            }
         } else {
             content
                 .overlay {
