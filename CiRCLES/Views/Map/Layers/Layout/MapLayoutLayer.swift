@@ -12,12 +12,10 @@ struct MapLayoutLayer: View {
     @Environment(Database.self) var database
     @Environment(Unifier.self) var unifier
 
-    var image: UIImage
-    @Binding var mappings: [LayoutCatalogMapping: [Int]]
-    var spaceSize: Int
+    @Binding var canvasSize: CGSize
 
-    @Binding var width: Int
-    @Binding var height: Int
+    @Binding var mappings: [LayoutCatalogMapping: [Int]]
+    let spaceSize: Int
 
     @Binding var popoverLayoutMapping: LayoutCatalogMapping?
     @Binding var popoverWebCatalogIDSet: WebCatalogIDSet?
@@ -29,14 +27,9 @@ struct MapLayoutLayer: View {
     var namespace: Namespace.ID
 
     var body: some View {
-        Image(uiImage: image)
-            .resizable()
-            .frame(
-                width: CGFloat(width / zoomDivisor),
-                height: CGFloat(height / zoomDivisor)
-            )
-            .animation(.smooth.speed(2.0), value: zoomDivisor)
-            .colorInvert(adaptive: true, enabled: $useDarkModeMaps)
+        Color.clear
+            .frame(width: canvasSize.width, height: canvasSize.height)
+            .contentShape(.rect)
             .onTapGesture { location in
                 openMapPopoverIn(x: Int(location.x), y: Int(location.y))
             }

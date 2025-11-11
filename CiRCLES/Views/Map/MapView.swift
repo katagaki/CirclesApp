@@ -23,7 +23,6 @@ struct MapView: View {
     @State var genreImage: UIImage?
 
     @State var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
-    @State var layoutFavoriteWebCatalogIDMappings: [LayoutCatalogMapping: [Int: WebCatalogColor?]] = [:]
     @State var isInitialLoadCompleted: Bool = false
 
     @State var popoverLayoutMapping: LayoutCatalogMapping?
@@ -46,35 +45,38 @@ struct MapView: View {
                 ScrollViewReader { reader in
                     ScrollView([.horizontal, .vertical]) {
                         ZStack(alignment: .topLeading) {
-                            // Layout layer
+                            // Map image layer
+                            MapLayer(
+                                canvasSize: $canvasSize,
+                                image: mapImage
+                            )
+
+                            // Favorites layer
+                            MapFavoritesLayer(
+                                canvasSize: $canvasSize,
+                                mappings: $layoutWebCatalogIDMappings,
+                                spaceSize: spaceSize
+                            )
+
+                            // Genre layer
+                            if showGenreOverlay, let genreImage {
+                                MapLayer(
+                                    canvasSize: $canvasSize,
+                                    image: genreImage
+                                )
+                            }
+
+                            // Map layouts layer
                             MapLayoutLayer(
-                                image: mapImage,
+                                canvasSize: $canvasSize,
                                 mappings: $layoutWebCatalogIDMappings,
                                 spaceSize: spaceSize,
-                                width: $mapImageWidth,
-                                height: $mapImageHeight,
                                 popoverLayoutMapping: $popoverLayoutMapping,
                                 popoverWebCatalogIDSet: $popoverWebCatalogIDSet,
                                 popoverSourceRect: $popoverSourceRect,
                                 namespace: namespace
                             )
-                            // Favorites layer
-                            MapFavoritesLayer(
-                                mappings: $layoutFavoriteWebCatalogIDMappings,
-                                spaceSize: spaceSize,
-                                width: $mapImageWidth,
-                                height: $mapImageHeight
-                            )
-                            .allowsHitTesting(false)
-                            // Genre layer
-                            if showGenreOverlay, let genreImage {
-                                MapLayer(
-                                    image: genreImage,
-                                    width: $mapImageWidth,
-                                    height: $mapImageHeight
-                                )
-                                .allowsHitTesting(false)
-                            }
+
                             // Popover layer
                             MapPopoverLayer(
                                 canvasSize: $canvasSize,
@@ -84,11 +86,6 @@ struct MapView: View {
                                 MapPopoverDetail(webCatalogIDSet: idSet)
                                     .id("\(isDismissing ? "!" : "")\(idSet.id)")
                             }
-                        }
-                        .onGeometryChange(for: CGSize.self) { reader in
-                            reader.size
-                        } action: { newSize in
-                            canvasSize = newSize
                         }
                     }
                     .contentMargins(.bottom, unifier.safeAreaHeight + 12.0, for: .scrollContent)
@@ -125,21 +122,18 @@ struct MapView: View {
         .onChange(of: useHighResolutionMaps) {
             reloadAll()
         }
-        .onChange(of: favorites.items) {
-            Task.detached {
-                await reloadFavorites()
-            }
-        }
-        .onChange(of: mapImage) { _, newValue in
-            if let newValue {
-                mapImageWidth = Int(newValue.size.width)
-                mapImageHeight = Int(newValue.size.height)
+        .onChange(of: mapImage) { _, newImage in
+            if let newImage {
+                updateCanvasSize(newImage)
             }
         }
         .onChange(of: zoomDivisor) {
             popoverSourceRect = .null
             popoverLayoutMapping = nil
             popoverWebCatalogIDSet = nil
+            if let mapImage {
+                updateCanvasSize(mapImage)
+            }
         }
     }
 }
