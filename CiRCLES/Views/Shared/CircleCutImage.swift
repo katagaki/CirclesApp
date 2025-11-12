@@ -55,94 +55,103 @@ struct CircleCutImage: View {
     }
 
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            Group {
-                switch cutType {
-                case .catalog:
-                    // Show catalog cut
-                    if let catalogImage = database.circleImage(for: circle.id) {
-                        Image(uiImage: catalogImage)
-                            .resizable()
-                            .scaledToFit()
-                            .usesPrivacyMode()
-                    } else {
-                        // No image available
-                        Rectangle()
-                            .foregroundStyle(Color.primary.opacity(0.05))
-                            .overlay {
-                                Text("Circles.NoImage")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .aspectRatio(180.0 / 256.0, contentMode: .fit)
-                    }
-
-                case .web:
-                    // Try to show web cut, fallback to catalog
-                    if let webCutImage {
-                        // Web cut is available
-                        Image(uiImage: webCutImage)
-                            .resizable()
-                            .scaledToFit()
-                            .usesPrivacyMode()
-                    } else if authenticator.onlineState == .online && !isWebCutURLFetched {
-                        // Still loading web cut, show catalog in background with progress
-                        ZStack {
-                            if let catalogImage = database.circleImage(for: circle.id) {
-                                Image(uiImage: catalogImage)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .usesPrivacyMode()
-                            }
-                            ProgressView()
+        Group {
+            switch cutType {
+            case .catalog:
+                // Show catalog cut
+                if let catalogImage = database.circleImage(for: circle.id) {
+                    Image(uiImage: catalogImage)
+                        .resizable()
+                        .scaledToFit()
+                        .usesPrivacyMode()
+                } else {
+                    // No image available
+                    Rectangle()
+                        .foregroundStyle(Color.primary.opacity(0.05))
+                        .overlay {
+                            Text("Circles.NoImage")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
-                    } else if let catalogImage = database.circleImage(for: circle.id) {
-                        // Fallback to catalog cut
-                        Image(uiImage: catalogImage)
-                            .resizable()
-                            .scaledToFit()
-                            .usesPrivacyMode()
-                    } else {
-                        // No image available
-                        Rectangle()
-                            .foregroundStyle(Color.primary.opacity(0.05))
-                            .overlay {
-                                Text("Circles.NoImage")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .aspectRatio(180.0 / 256.0, contentMode: .fit)
-                    }
+                        .aspectRatio(180.0 / 256.0, contentMode: .fit)
                 }
-            }
-            GeometryReader { proxy in
-                if database.circleImage(for: circle.id) != nil {
-                    ZStack(alignment: .topLeading) {
-                        if let favorites = favorites.wcIDMappedItems,
-                           let extendedInformation = circle.extendedInformation,
-                           let favorite = favorites[extendedInformation.webCatalogID] {
-                            favorite.favorite.color.backgroundColor()
-                                .frame(width: 0.23 * proxy.size.width,
-                                       height: 0.23 * proxy.size.width)
-                                .offset(x: 0.03 * proxy.size.width,
-                                        y: 0.03 * proxy.size.width)
-                        }
-                        if showVisitStatus, !visits.filter({$0.eventNumber == planner.activeEventNumber}).isEmpty {
-                            Image(systemName: "checkmark")
+
+            case .web:
+                // Try to show web cut, fallback to catalog
+                if let webCutImage {
+                    // Web cut is available
+                    Image(uiImage: webCutImage)
+                        .resizable()
+                        .scaledToFit()
+                        .usesPrivacyMode()
+                } else if authenticator.onlineState == .online && !isWebCutURLFetched {
+                    // Still loading web cut, show catalog in background with progress
+                    ZStack {
+                        if let catalogImage = database.circleImage(for: circle.id) {
+                            Image(uiImage: catalogImage)
                                 .resizable()
                                 .scaledToFit()
-                                .fontWeight(.black)
-                                .foregroundStyle(checkmarkColor())
-                                .frame(width: 0.20 * proxy.size.width,
-                                       height: 0.20 * proxy.size.width)
-                                .offset(x: 0.045 * proxy.size.width,
-                                        y: 0.045 * proxy.size.width)
+                                .usesPrivacyMode()
                         }
-                        Color.clear
+                        ProgressView()
                     }
+                } else if let catalogImage = database.circleImage(for: circle.id) {
+                    // Fallback to catalog cut
+                    Image(uiImage: catalogImage)
+                        .resizable()
+                        .scaledToFit()
+                        .usesPrivacyMode()
+                } else {
+                    // No image available
+                    Rectangle()
+                        .foregroundStyle(Color.primary.opacity(0.05))
+                        .overlay {
+                            Text("Circles.NoImage")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .aspectRatio(180.0 / 256.0, contentMode: .fit)
                 }
             }
-            .aspectRatio(180.0 / 256.0, contentMode: .fit)
+        }
+        .overlay {
+            if database.circleImage(for: circle.id) != nil {
+                Canvas { context, size in
+                    // Favorite color
+                    if let favorites = favorites.wcIDMappedItems,
+                       let extendedInformation = circle.extendedInformation,
+                       let favorite = favorites[extendedInformation.webCatalogID] {
+                        let squareSize = 0.23 * size.width
+                        let offset = 0.03 * size.width
+                        let rect = CGRect(x: offset, y: offset, width: squareSize, height: squareSize)
+                        let path = Path(rect)
+                        context.fill(path, with: .color(favorite.favorite.color.backgroundColor()))
+                    }
+
+                    // Visit status for visit mode
+                    if showVisitStatus, !visits.filter({$0.eventNumber == planner.activeEventNumber}).isEmpty {
+                        let checkmarkSize = 0.20 * size.width
+                        let checkmarkOffset = 0.045 * size.width
+
+                        if let checkmark = context.resolveSymbol(id: "checkmark") {
+                            let rect = CGRect(
+                                x: checkmarkOffset,
+                                y: checkmarkOffset,
+                                width: checkmarkSize,
+                                height: checkmarkSize
+                            )
+                            context.draw(checkmark, in: rect)
+                        }
+                    }
+                } symbols: {
+                    Image(systemName: "checkmark")
+                        .fontWeight(.black)
+                        .foregroundStyle(checkmarkColor())
+                        .tag("checkmark")
+                }
+                .aspectRatio(180.0 / 256.0, contentMode: .fit)
+                .allowsHitTesting(false)
+            }
         }
         .overlay {
             if showSpaceName || showDay {
