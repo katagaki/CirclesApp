@@ -36,34 +36,21 @@ struct MyView: View {
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
 
     var body: some View {
-        HStack {
-            Group {
-                if UIDevice.current.userInterfaceIdiom == .pad {
-                    List {
-                        if isInitialLoadCompleted {
-                            MyProfileSection(userInfo: $userInfo)
-                        }
-                    }
-                }
-                List {
-                    if isInitialLoadCompleted {
-                        if UIDevice.current.userInterfaceIdiom != .pad {
-                            MyProfileSection(userInfo: $userInfo)
-                        }
-                        MyParticipationSections(
-                            eventTitle: $eventTitle,
-                            eventDates: $eventDates,
-                            dateForNotifier: $dateForNotifier,
-                            dayForNotifier: $dayForNotifier,
-                            participationForNotifier: $participationForNotifier
-                        )
-                    }
-                }
-                .contentMargins(.top, 0.0)
+        List {
+            if isInitialLoadCompleted {
+                MyProfileSection(userInfo: $userInfo)
+                MyParticipationSections(
+                    eventTitle: $eventTitle,
+                    eventDates: $eventDates,
+                    dateForNotifier: $dateForNotifier,
+                    dayForNotifier: $dayForNotifier,
+                    participationForNotifier: $participationForNotifier
+                )
             }
-            .listSectionSpacing(.compact)
-            .scrollContentBackground(.hidden)
         }
+        .contentMargins(.top, 0.0)
+        .listSectionSpacing(.compact)
+        .scrollContentBackground(.hidden)
         .navigationTitle(eventTitle ?? String(localized: "ViewTitle.My"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
