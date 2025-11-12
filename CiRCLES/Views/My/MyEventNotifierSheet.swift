@@ -126,7 +126,7 @@ struct MyEventNotifierSheet: View {
                         .clipShape(.rect(cornerRadius: 14.0))
                         .frame(width: 52.0, height: 52.0, alignment: .center)
                         Text("Notifier.Explainer")
-                            .frame(maxWidth: .infinity)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }

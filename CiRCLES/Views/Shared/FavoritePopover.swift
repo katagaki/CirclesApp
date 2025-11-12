@@ -98,6 +98,8 @@ struct FavoritePopover: View {
                             isExistingFavorite ? "Shared.SaveFavorite" : "Shared.AddToFavorites",
                             systemImage: "plus"
                         )
+                        .fontWeight(.bold)
+                        .padding(.vertical, 2.0)
                         .frame(maxWidth: .infinity)
                     }
                     .disabled(selectedColor == nil)
@@ -108,6 +110,8 @@ struct FavoritePopover: View {
                             "Shared.RemoveFromFavorites",
                             systemImage: "minus.circle"
                         )
+                        .fontWeight(.bold)
+                        .padding(.vertical, 2.0)
                         .frame(maxWidth: .infinity)
                     }
                     .disabled(initialColor == nil)
