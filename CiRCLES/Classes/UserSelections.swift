@@ -116,11 +116,11 @@ class UserSelections: Equatable {
     }
 
     var fullMapID: String {
-        return "M\(_map?.id ?? 0),D\(_date?.id ?? 0)"
+        return "M\(_map?.id ?? -1),D\(_date?.id ?? -1)"
     }
 
     var catalogSelectionID: String {
-        return "M\(_map?.id ?? 0),D\(_date?.id ?? 0),G\(_genre?.id ?? 0),B\(_block?.id ?? 0)"
+        return "M\(_map?.id ?? -1),D\(_date?.id ?? -1),G\(_genre?.id ?? -1),B\(_block?.id ?? -1)"
     }
 
     func resetSelections() {

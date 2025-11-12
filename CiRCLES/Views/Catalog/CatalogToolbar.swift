@@ -11,6 +11,7 @@ import SwiftUI
 struct CatalogToolbar: ToolbarContent {
 
     @Environment(Database.self) var database
+    @Environment(CatalogCache.self) var catalogCache
     @Environment(UserSelections.self) var selections
 
     @Query(sort: [SortDescriptor(\ComiketGenre.id, order: .forward)])
@@ -19,9 +20,8 @@ struct CatalogToolbar: ToolbarContent {
     @Query(sort: [SortDescriptor(\ComiketBlock.id, order: .forward)])
     var blocks: [ComiketBlock]
 
+    @State var selectableGenres: [ComiketGenre]?
     @State var selectableBlocks: [ComiketBlock]?
-
-    @Binding var displayedCircles: [ComiketCircle]
 
     var body: some ToolbarContent {
         if #available(iOS 26.0, *) {
@@ -52,10 +52,10 @@ struct CatalogToolbar: ToolbarContent {
         Menu {
             @Bindable var selections = selections
             Button("Shared.All") {
-                selections.genre = nil
+                self.selections.genre = nil
             }
             Picker(selection: $selections.genre.animation(.smooth.speed(2.0))) {
-                ForEach(genres) { genre in
+                ForEach(selectableGenres ?? genres, id: \.id) { genre in
                     Text(genre.name)
                         .tag(genre)
                 }
@@ -63,43 +63,41 @@ struct CatalogToolbar: ToolbarContent {
                 Text("Shared.Genre")
             }
         } label: {
-            switch selections.genre?.name {
-            case "男性向":
-                ToolbarButtonLabel(
-                    LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                    image: .asset("Button.R18")
-                )
-            case "ブルーアーカイブ":
-                ToolbarButtonLabel(
-                    LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                    image: .system("scope")
-                )
-            case "艦これ", "アズールレーン":
-                ToolbarButtonLabel(
-                    LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                    image: .system("water.waves")
-                )
-            case "コスプレ":
-                ToolbarButtonLabel(
-                    LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                    image: .system("tshirt")
-                )
-            default:
-                ToolbarButtonLabel(
-                    LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                    image: .system("theatermask.and.paintbrush")
-                )
-            }
+            genreIcon(selections.genre?.name)
         }
-        .onChange(of: selections.fullMapID) {
-            Task.detached {
-                await reloadBlocksInMap()
-            }
+        .onChange(of: catalogCache.displayedCircles.hashValue, initial: true) {
+            reloadSelectableGenres()
         }
-        .onChange(of: displayedCircles) {
-            Task.detached {
-                await reloadSelectableMapsBlocksAndDates()
-            }
+    }
+
+    @ViewBuilder
+    func genreIcon(_ genreName: String?) -> some View {
+        switch genreName {
+        case "男性向":
+            ToolbarButtonLabel(
+                LocalizedStringKey(genreName ?? "Shared.Genre"),
+                image: .asset("Button.R18")
+            )
+        case "ブルーアーカイブ":
+            ToolbarButtonLabel(
+                LocalizedStringKey(genreName ?? "Shared.Genre"),
+                image: .system("scope")
+            )
+        case "艦これ", "アズールレーン":
+            ToolbarButtonLabel(
+                LocalizedStringKey(genreName ?? "Shared.Genre"),
+                image: .system("water.waves")
+            )
+        case "コスプレ":
+            ToolbarButtonLabel(
+                LocalizedStringKey(genreName ?? "Shared.Genre"),
+                image: .system("tshirt")
+            )
+        default:
+            ToolbarButtonLabel(
+                LocalizedStringKey(genreName ?? "Shared.Genre"),
+                image: .system("theatermask.and.paintbrush")
+            )
         }
     }
 
@@ -108,7 +106,7 @@ struct CatalogToolbar: ToolbarContent {
         Menu {
             @Bindable var selections = selections
             Button("Shared.All") {
-                selections.block = nil
+                self.selections.block = nil
             }
             Picker(selection: $selections.block.animation(.smooth.speed(2.0))) {
                 ForEach(selectableBlocks ?? blocks, id: \.id) { block in
@@ -124,37 +122,26 @@ struct CatalogToolbar: ToolbarContent {
                 image: .system("rectangle.split.3x1")
             )
         }
-    }
-
-    func reloadSelectableMapsBlocksAndDates() async {
-        if displayedCircles.isEmpty {
-            await MainActor.run {
-                selectableBlocks = nil
-            }
-        } else {
-            var selectableBlocks: [ComiketBlock] = []
-            blocks.forEach { block in
-                if displayedCircles.contains(where: {
-                    $0.layout?.blockID == block.id
-                }) {
-                    selectableBlocks.append(block)
-                }
-            }
-            await MainActor.run {
-                self.selectableBlocks = selectableBlocks
-            }
+        .onChange(of: catalogCache.displayedCircles.hashValue, initial: true) {
+            reloadSelectableBlocks()
         }
     }
 
-    func reloadBlocksInMap() async {
-        let actor = DataFetcher(modelContainer: sharedModelContainer)
-        if let selectedMap = selections.map {
-            let blockIdentifiers = await actor.blocks(inMap: selectedMap.id)
-            await MainActor.run {
-                self.selectableBlocks = database.blocks(blockIdentifiers)
-            }
+    func reloadSelectableGenres() {
+        if catalogCache.displayedCircles.isEmpty {
+            selectableGenres = nil
         } else {
-            self.selectableBlocks = []
+            let genreIDs: [Int] = Array(Set(catalogCache.displayedCircles.compactMap({$0.genreID})))
+            selectableGenres = genres.filter({ genreIDs.contains($0.id) })
+        }
+    }
+
+    func reloadSelectableBlocks() {
+        if catalogCache.displayedCircles.isEmpty {
+            selectableBlocks = nil
+        } else {
+            let blockIDs: [Int] = Array(Set(catalogCache.displayedCircles.compactMap({$0.blockID})))
+            selectableBlocks = blocks.filter({ blockIDs.contains($0.id) })
         }
     }
 }
