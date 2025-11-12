@@ -22,15 +22,20 @@ class CatalogCache {
     ) async -> [PersistentIdentifier] {
         let actor = DataFetcher(modelContainer: sharedModelContainer)
 
-        if let circleIdentifiers = await actor.circles(
-            withGenre: genreID, inBlock: blockID, onDay: dayID
-        ) {
-            return circleIdentifiers
-        } else if let mapID {
-            return await actor.circles(inMap: mapID)
+        var circleIdentifiers: [PersistentIdentifier] = []
+        if let mapID {
+            circleIdentifiers = await actor.circles(inMap: mapID)
         }
 
-        return []
+        if let filteredCircleIdentifiers = await actor.circles(
+            withGenre: genreID, inBlock: blockID, onDay: dayID
+        ) {
+            return filteredCircleIdentifiers.filter { identifier in
+                circleIdentifiers.contains(identifier)
+            }
+        } else {
+            return circleIdentifiers
+        }
     }
 
     static func searchCircles(_ searchTerm: String) async -> [PersistentIdentifier]? {
