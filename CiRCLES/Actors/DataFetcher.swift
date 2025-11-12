@@ -23,11 +23,9 @@ actor DataFetcher {
         )
         do {
             let dates = try modelContext.fetch(fetchDescriptor)
-            var dayAndDate: [Int: Date] = [:]
-            for date in dates {
-                dayAndDate[date.id] = date.date
+            return dates.reduce(into: [Int: Date]()) { result, date in
+                result[date.id] = date.date
             }
-            return dayAndDate
         } catch {
             debugPrint(error.localizedDescription)
             return [:]
@@ -41,11 +39,11 @@ actor DataFetcher {
                     $0.mapID == mapID
                 }
             )
-            let layouts: [ComiketLayout] = try modelContext.fetch(layoutsFetchDescriptor)
-            let blocks: [Int] = layouts.map({$0.blockID})
+            let layouts = try modelContext.fetch(layoutsFetchDescriptor)
+            let blockIDs = Set(layouts.map { $0.blockID })
             let blocksFetchDescriptor = FetchDescriptor<ComiketBlock>(
                 predicate: #Predicate<ComiketBlock> {
-                    blocks.contains($0.id)
+                    blockIDs.contains($0.id)
                 }
             )
             return try modelContext.fetchIdentifiers(blocksFetchDescriptor)
@@ -62,14 +60,15 @@ actor DataFetcher {
                     $0.id == mapID
                 }
             )
-            if let map = try modelContext.fetch(mapFetchDescriptor).first,
-               let layouts = map.layouts {
-                return layouts.map({$0.persistentModelID})
+            guard let map = try modelContext.fetch(mapFetchDescriptor).first,
+                  let layouts = map.layouts else {
+                return []
             }
+            return layouts.map { $0.persistentModelID }
         } catch {
             debugPrint(error.localizedDescription)
+            return []
         }
-        return []
     }
 
     func layoutMappings(inMap mapID: Int, useHighResolutionMaps: Bool) -> [LayoutCatalogMapping] {
@@ -104,7 +103,7 @@ actor DataFetcher {
             }
         )
         do {
-            return (try modelContext.fetch(fetchDescriptor)).first?.name
+            return try modelContext.fetch(fetchDescriptor).first?.name
         } catch {
             debugPrint(error.localizedDescription)
             return nil
@@ -116,7 +115,6 @@ actor DataFetcher {
         on dateID: Int
     ) -> [LayoutCatalogMapping: [Int]] {
         do {
-            var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
             let blockIDs = Set(mappings.map { $0.blockID })
             let spaceNumbers = Set(mappings.map { $0.spaceNumber })
             let fetchDescriptor = FetchDescriptor<ComiketCircle>(
@@ -128,24 +126,19 @@ actor DataFetcher {
                 sortBy: [SortDescriptor(\.id, order: .forward)]
             )
             let circles = try modelContext.fetch(fetchDescriptor)
-            let circleWebCatalogIDMapping = circles.reduce(
-                into: [LayoutCatalogMapping: [Int]]()) { partialResult, circle in
-                    if let extendedInformation = circle.extendedInformation {
-                        let mapping = LayoutCatalogMapping(blockID: circle.blockID, spaceNumber: circle.spaceNumber)
-                        partialResult[mapping, default: []].append(extendedInformation.webCatalogID)
-                    }
+
+            let mappingLookup = Dictionary(uniqueKeysWithValues: mappings.map {
+                ("\($0.blockID)-\($0.spaceNumber)", $0)
+            })
+
+            return circles.reduce(into: [LayoutCatalogMapping: [Int]]()) { result, circle in
+                guard let extendedInformation = circle.extendedInformation,
+                      let originalMapping = mappingLookup["\(circle.blockID)-\(circle.spaceNumber)"] else {
+                    return
                 }
-            for (blockIDAndSpaceNumber, webCatalogIDs) in circleWebCatalogIDMapping {
-                if let originalMapping = mappings.first(where: {
-                    $0.blockID == blockIDAndSpaceNumber.blockID &&
-                    $0.spaceNumber == blockIDAndSpaceNumber.spaceNumber
-                }) {
-                    layoutWebCatalogIDMappings[originalMapping] = webCatalogIDs
-                }
+                result[originalMapping, default: []].append(extendedInformation.webCatalogID)
             }
-            return layoutWebCatalogIDMappings
         } catch {
-            debugPrint(error)
             debugPrint(error.localizedDescription)
             return [:]
         }
@@ -210,7 +203,6 @@ actor DataFetcher {
             return try modelContext.fetchIdentifiers(fetchDescriptor)
         } catch {
             debugPrint(error.localizedDescription)
-            debugPrint(error)
             return []
         }
     }
@@ -223,34 +215,29 @@ actor DataFetcher {
                 }
             )
             let mappings = try modelContext.fetch(mappingFetchDescriptor)
-            let blockIDs = mappings.map({$0.blockID}).sorted()
-            var circleIdentifiers: [PersistentIdentifier] = []
-            for blockID in blockIDs {
-                circleIdentifiers.append(contentsOf: circles(inBlock: blockID) ?? [])
-            }
-            return circleIdentifiers
+            let blockIDs = Set(mappings.map { $0.blockID })
+            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+                predicate: #Predicate<ComiketCircle> {
+                    blockIDs.contains($0.blockID)
+                }
+            )
+            return try modelContext.fetchIdentifiers(fetchDescriptor)
         } catch {
             debugPrint(error.localizedDescription)
             return []
         }
-
     }
 
     func circles(withWebCatalogIDs webCatalogIDs: [Int]) -> [PersistentIdentifier] {
         do {
-            var circleIdentifiers: [PersistentIdentifier] = []
-            for webCatalogID in webCatalogIDs {
-                let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-                    predicate: #Predicate<ComiketCircle> {
-                        $0.extendedInformation.flatMap({$0.webCatalogID}) == webCatalogID
-                    }
-                )
-                let circleIdentifier = try modelContext.fetchIdentifiers(fetchDescriptor).first
-                if let circleIdentifier {
-                    circleIdentifiers.append(circleIdentifier)
+            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+                predicate: #Predicate<ComiketCircle> {
+                    $0.extendedInformation.flatMap {
+                        webCatalogIDs.contains($0.webCatalogID)
+                    } == true
                 }
-            }
-            return circleIdentifiers
+            )
+            return try modelContext.fetchIdentifiers(fetchDescriptor)
         } catch {
             debugPrint(error.localizedDescription)
             return []
@@ -259,7 +246,7 @@ actor DataFetcher {
 
     func circles(forFavorites favoriteItems: [UserFavorites.Response.FavoriteItem]) -> [PersistentIdentifier] {
         do {
-            let webCatalogIDs = favoriteItems.map({$0.circle.webCatalogID})
+            let webCatalogIDs = favoriteItems.map { $0.circle.webCatalogID }
             let fetchDescriptor = FetchDescriptor<ComiketCircle>(
                 predicate: #Predicate<ComiketCircle> {
                     $0.extendedInformation.flatMap {
