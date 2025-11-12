@@ -33,8 +33,12 @@ struct MapView: View {
         useHighResolutionMaps ? 40 : 20
     }
 
-    var mapId: String {
-        "\(selections.fullMapID).\(useHighResolutionMaps ? "H" : "L").\(database.commonImages.count)"
+    var mapInvalidationID: String {
+        "M\(selections.fullMapID)_R\(useHighResolutionMaps ? "H" : "L")_D\(database.commonImages.count)"
+    }
+
+    var popoverInvalidationID: String {
+        "Z\(zoomDivisor)_R\(useHighResolutionMaps ? 1 : 0)"
     }
 
     var body: some View {
@@ -98,23 +102,20 @@ struct MapView: View {
             }
         }
         .onAppear {
-            if zoomDivisor == 0 {
-                zoomDivisor = 1
-            }
             if !isInitialLoadCompleted {
                 isInitialLoadCompleted = true
                 reloadAll()
             }
-        }
-        .onChange(of: mapId) {
-            reloadAll()
         }
         .onChange(of: mapImage) { _, newImage in
             if let newImage {
                 updateCanvasSize(newImage)
             }
         }
-        .onChange(of: zoomDivisor) {
+        .onChange(of: mapInvalidationID) {
+            reloadAll()
+        }
+        .onChange(of: popoverInvalidationID) {
             popoverData = nil
             if let mapImage {
                 updateCanvasSize(mapImage)
