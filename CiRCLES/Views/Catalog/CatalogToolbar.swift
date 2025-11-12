@@ -65,6 +65,7 @@ struct CatalogToolbar: ToolbarContent {
         } label: {
             genreIcon(selections.genre?.name)
         }
+        .menuActionDismissBehavior(.disabled)
         .onChange(of: catalogCache.displayedCircles.hashValue, initial: true) {
             reloadSelectableGenres()
         }
@@ -122,6 +123,7 @@ struct CatalogToolbar: ToolbarContent {
                 image: .system("rectangle.split.3x1")
             )
         }
+        .menuActionDismissBehavior(.disabled)
         .onChange(of: catalogCache.displayedCircles.hashValue, initial: true) {
             reloadSelectableBlocks()
         }
