@@ -47,14 +47,13 @@ struct MapFavoritesLayer: View {
         }
     }
 
+    // swiftlint:disable function_body_length
     func drawFavoritesForLayout(
         context: GraphicsContext,
         layout: LayoutCatalogMapping,
         colorMap: [Int: WebCatalogColor?]
     ) {
         let webCatalogIDs = Array(colorMap.keys).sorted()
-        let zoomFactor = zoomFactor(zoomDivisor)
-        let scaledSpaceSize = CGFloat(spaceSize) / zoomFactor
 
         // Determine if we need to reverse the order based on layout type
         let orderedIDs: [Int]
@@ -68,35 +67,46 @@ struct MapFavoritesLayer: View {
         let count = orderedIDs.count
         guard count > 0 else { return }
 
-        // Calculate the base position (center of the layout)
+        // Cache computed values
+        let zoomFactor = zoomFactor(zoomDivisor)
+        let scaledSpaceSize = CGFloat(spaceSize) / zoomFactor
         let baseX = CGFloat(layout.positionX) / zoomFactor
         let baseY = CGFloat(layout.positionY) / zoomFactor
+        let countCGFloat = CGFloat(count)
+
+        // Pre-compute rectangle dimensions based on layout type
+        let isHorizontal: Bool
+        let rectWidth: CGFloat
+        let rectHeight: CGFloat
+
+        switch layout.layoutType {
+        case .aOnLeft, .aOnRight, .unknown:
+            isHorizontal = true
+            rectWidth = scaledSpaceSize / countCGFloat
+            rectHeight = scaledSpaceSize
+        case .aOnTop, .aOnBottom:
+            isHorizontal = false
+            rectWidth = scaledSpaceSize
+            rectHeight = scaledSpaceSize / countCGFloat
+        }
 
         for (index, webCatalogID) in orderedIDs.enumerated() {
             guard let color = colorMap[webCatalogID], let color else { continue }
 
+            let indexCGFloat = CGFloat(index)
             let rect: CGRect
 
-            switch layout.layoutType {
-            case .aOnLeft, .aOnRight, .unknown:
-                // Horizontal layout - divide width
-                let rectWidth = scaledSpaceSize / CGFloat(count)
-                let rectHeight = scaledSpaceSize
-                let offsetX = CGFloat(index) * rectWidth
+            if isHorizontal {
                 rect = CGRect(
-                    x: baseX + offsetX,
+                    x: baseX + indexCGFloat * rectWidth,
                     y: baseY,
                     width: rectWidth,
                     height: rectHeight
                 )
-            case .aOnTop, .aOnBottom:
-                // Vertical layout - divide height
-                let rectWidth = scaledSpaceSize
-                let rectHeight = scaledSpaceSize / CGFloat(count)
-                let offsetY = CGFloat(index) * rectHeight
+            } else {
                 rect = CGRect(
                     x: baseX,
-                    y: baseY + offsetY,
+                    y: baseY + indexCGFloat * rectHeight,
                     width: rectWidth,
                     height: rectHeight
                 )
@@ -108,53 +118,39 @@ struct MapFavoritesLayer: View {
             )
         }
     }
+    // swiftlint:enable function_body_length
 
     func highlightColor(_ color: WebCatalogColor) -> Color {
+        let baseColor = color.backgroundColor()
         switch colorScheme {
         case .light:
-            return color.backgroundColor().opacity(0.5)
+            return baseColor.opacity(0.5)
         case .dark:
             if useDarkModeMaps {
-                return color.backgroundColor().brightness(0.1).opacity(0.5) as? Color ??
-                color.backgroundColor().opacity(0.5)
+                return baseColor.brightness(0.1).opacity(0.5) as? Color ?? baseColor.opacity(0.5)
             } else {
-                return color.backgroundColor().opacity(0.5)
+                return baseColor.opacity(0.5)
             }
         @unknown default:
-            return color.backgroundColor().opacity(0.5)
+            return baseColor.opacity(0.5)
         }
     }
 
     func reloadFavorites() async {
         let actor = DataFetcher(modelContainer: sharedModelContainer)
 
-        // Create favorites mapping for Web Catalog IDs
-        let layoutFavoriteWebCatalogIDMappings = mapFavoriteMappings(
-            mappings
-        )
-        // List out all Web Catalog IDs
-        let webCatalogIDs: [Int] = Array(Set(
-            layoutFavoriteWebCatalogIDMappings.values
-                .reduce(into: [] as [Int]) { result, webCatalogIDs in
-                    result.append(contentsOf: webCatalogIDs.keys)
-                }
-        ))
-        // Map all Web Catalog IDs to space number suffixes
-        let spaceNumberSuffixes = await actor.spaceNumberSuffixes(
-            forWebCatalogIDs: webCatalogIDs
-        )
-        // Replace Web Catalog IDs with space number suffixes
-        let layoutFavoriteWebCatalogIDSorted = layoutFavoriteWebCatalogIDMappings
-            .reduce(into: [LayoutCatalogMapping: [Int: WebCatalogColor?]]()) { result, keyValue in
-                let mapping = keyValue.key
-                let colorMapping = keyValue.value
-                result[mapping] = colorMapping
-                    .reduce(into: [Int: WebCatalogColor?]()) { result, keyValue in
-                        let webCatalogID = keyValue.key
-                        let color = keyValue.value
-                        result[spaceNumberSuffixes[webCatalogID] ?? webCatalogID] = color
-                    }
+        let layoutFavoriteWebCatalogIDMappings = mapFavoriteMappings(mappings)
+
+        let webCatalogIDs = Array(Set(layoutFavoriteWebCatalogIDMappings.values.flatMap { $0.keys }))
+
+        let spaceNumberSuffixes = await actor.spaceNumberSuffixes(forWebCatalogIDs: webCatalogIDs)
+
+        let layoutFavoriteWebCatalogIDSorted = layoutFavoriteWebCatalogIDMappings.mapValues { colorMapping in
+            colorMapping.reduce(into: [Int: WebCatalogColor?]()) { result, keyValue in
+                let remappedID = spaceNumberSuffixes[keyValue.key] ?? keyValue.key
+                result[remappedID] = keyValue.value
             }
+        }
 
         await MainActor.run {
             withAnimation(.smooth.speed(2.0)) {
@@ -166,32 +162,30 @@ struct MapFavoritesLayer: View {
     func mapFavoriteMappings(
         _ layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]]
     ) -> [LayoutCatalogMapping: [Int: WebCatalogColor?]] {
-        var layoutFavoriteWebCatalogIDMappings: [LayoutCatalogMapping: [Int: WebCatalogColor?]] = [:]
-        if let webCatalogIDMappedItems = favorites.wcIDMappedItems {
-            for (webCatalogID, favoriteItem) in webCatalogIDMappedItems {
-                // 1. Find the layout catalog mapping that matches the Web Catalog ID
-                let matchingLayoutMaps: [LayoutCatalogMapping: [Int]] = layoutWebCatalogIDMappings
-                    .filter { $1.contains(webCatalogID) }
-
-                // 2. Ensure that only one layout is selected
-                if let (matchedLayoutMap, _) = matchingLayoutMaps.first {
-                    // 3. Set up the sub-dictionary for the favorites mapping
-                    if layoutFavoriteWebCatalogIDMappings[matchedLayoutMap] == nil {
-                        let webCatalogIDs = layoutWebCatalogIDMappings[matchedLayoutMap] ?? []
-                        layoutFavoriteWebCatalogIDMappings[matchedLayoutMap] = webCatalogIDs
-                            .reduce(into: [:]) { partialResult, webCatalogID in
-                                let nilColor: WebCatalogColor? = nil
-                                partialResult[webCatalogID] = nilColor
-                            }
-                    }
-
-                    // 4. Set the color for the Web Catalog ID in the favorites mapping
-                    layoutFavoriteWebCatalogIDMappings[matchedLayoutMap]?[webCatalogID] = favoriteItem.favorite.color
-                }
-            }
-            // 5. Change keys to space sub number to force MapFavoriteLayerBlock to sort correctly
-            // TODO
+        guard let webCatalogIDMappedItems = favorites.wcIDMappedItems else {
+            return [:]
         }
+
+        var webCatalogIDToLayout: [Int: LayoutCatalogMapping] = [:]
+        for (layout, webCatalogIDs) in layoutWebCatalogIDMappings {
+            for webCatalogID in webCatalogIDs {
+                webCatalogIDToLayout[webCatalogID] = layout
+            }
+        }
+
+        var layoutFavoriteWebCatalogIDMappings: [LayoutCatalogMapping: [Int: WebCatalogColor?]] = [:]
+        for (layout, webCatalogIDs) in layoutWebCatalogIDMappings {
+            layoutFavoriteWebCatalogIDMappings[layout] = Dictionary(
+                uniqueKeysWithValues: webCatalogIDs.map { ($0, nil) }
+            )
+        }
+
+        for (webCatalogID, favoriteItem) in webCatalogIDMappedItems {
+            if let matchedLayout = webCatalogIDToLayout[webCatalogID] {
+                layoutFavoriteWebCatalogIDMappings[matchedLayout]?[webCatalogID] = favoriteItem.favorite.color
+            }
+        }
+
         return layoutFavoriteWebCatalogIDMappings
     }
 }
