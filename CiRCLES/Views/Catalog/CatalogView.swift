@@ -88,7 +88,7 @@ struct CatalogView: View {
                     ListModeSwitcher($listDisplayModeState)
                 }
             }
-            CatalogToolbar(displayedCircles: $catalogCache.displayedCircles)
+            CatalogToolbar()
         }
         .searchable(
             text: $searchTerm,
