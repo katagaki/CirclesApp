@@ -36,11 +36,7 @@ struct CircleDetailToolbar: ToolbarContent {
                     Button {
                         isFavoritesPopoverPresented = true
                     } label: {
-                        if #available(iOS 26.0, *) {
-                            Label("Shared.Favorite", systemImage: "star.fill")
-                        } else {
-                            ToolbarButtonLabel("Shared.Favorite", imageName: "star.fill")
-                        }
+                        ToolbarButtonLabel("Shared.Favorite", image: .system("star.fill"))
                     }
                     .popover(isPresented: $isFavoritesPopoverPresented, arrowEdge: .bottom) {
                         FavoritePopover(
@@ -104,11 +100,7 @@ struct CircleDetailToolbar: ToolbarContent {
                         }
                     }
                 } label: {
-                    if #available(iOS 26.0, *) {
-                        Label("Shared.Links", systemImage: "link")
-                    } else {
-                        ToolbarButtonLabel("Shared.Links", imageName: "link")
-                    }
+                    ToolbarButtonLabel("Shared.Links", image: .system("link"))
                 }
             }
         }

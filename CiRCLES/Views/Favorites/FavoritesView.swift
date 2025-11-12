@@ -92,14 +92,12 @@ struct FavoritesView: View {
             await reloadFavorites()
         }
         .onAppear {
-            if !favoritesCache.isInitialLoadCompleted {
-                if favoritesCache.circles == nil,
-                    let favoriteItems = favorites.items {
+            let dateSelectionID = "D\(selections.date?.id ?? -1)"
+            if favoritesCache.invalidationID != dateSelectionID {
+                if let favoriteItems = favorites.items {
                     Task { await prepareCircles(using: favoriteItems) }
                 }
-                favoritesCache.isVisitModeOn = isVisitModeOnDefault
-                favoritesCache.isGroupedByColor = isGroupedByColorDefault
-                favoritesCache.isInitialLoadCompleted = true
+                favoritesCache.invalidationID = dateSelectionID
             }
         }
         .onChange(of: selections.date) {

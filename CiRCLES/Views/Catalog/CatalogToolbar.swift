@@ -24,96 +24,17 @@ struct CatalogToolbar: ToolbarContent {
     @Binding var displayedCircles: [ComiketCircle]
 
     var body: some ToolbarContent {
-        @Bindable var selections = selections
-        ToolbarItem(placement: .bottomBar) {
-            Menu {
-                Button("Shared.All") {
-                    selections.genre = nil
-                }
-                Picker(selection: $selections.genre.animation(.smooth.speed(2.0))) {
-                    ForEach(genres) { genre in
-                        Text(genre.name)
-                            .tag(genre)
-                    }
-                } label: {
-                    Text("Shared.Genre")
-                }
-            } label: {
-                if #available(iOS 26.0, *) {
-                    switch selections.genre?.name {
-                    case "男性向":
-                        Label(
-                            LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                            image: .buttonR18
-                        )
-                    case "ブルーアーカイブ":
-                        Label(
-                            LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                            systemImage: "scope"
-                        )
-                    case "艦これ", "アズールレーン":
-                        Label(
-                            LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                            systemImage: "water.waves"
-                        )
-                    case "コスプレ":
-                        Label(
-                            LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                            systemImage: "tshirt"
-                        )
-                    default:
-                        Label(
-                            LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                            systemImage: "theatermask.and.paintbrush"
-                        )
-                    }
-                } else {
-                    ToolbarButtonLabel(
-                        LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
-                        imageName: (selections.genre?.name == "ブルーアーカイブ" ?
-                                      "scope" : "theatermask.and.paintbrush")
-                    )
-                }
-            }
-            .onChange(of: selections.fullMapID) {
-                Task.detached {
-                    await reloadBlocksInMap()
-                }
-            }
-            .onChange(of: displayedCircles) {
-                Task.detached {
-                    await reloadSelectableMapsBlocksAndDates()
-                }
-            }
-        }
         if #available(iOS 26.0, *) {
-            ToolbarSpacer(.fixed, placement: .bottomBar)
-        }
-        ToolbarItem(placement: .bottomBar) {
-            Menu {
-                Button("Shared.All") {
-                    selections.block = nil
-                }
-                Picker(selection: $selections.block.animation(.smooth.speed(2.0))) {
-                    ForEach(selectableBlocks ?? blocks, id: \.id) { block in
-                        Text(block.name)
-                            .tag(block)
-                    }
-                } label: {
-                    Text("Shared.Block")
-                }
-            } label: {
-                if #available(iOS 26.0, *) {
-                    Label(
-                        LocalizedStringKey(selections.block?.name ?? "Shared.Block"),
-                        systemImage: "rectangle.split.3x1"
-                    )
-                } else {
-                    ToolbarButtonLabel(
-                        LocalizedStringKey(selections.block?.name ?? "Shared.Block"),
-                        imageName: "rectangle.split.3x1"
-                    )
-                }
+            ToolbarItemGroup(placement: .bottomBar) {
+                genreMenu()
+                blockMenu()
+            }
+        } else {
+            ToolbarItem(placement: .bottomBar) {
+                genreMenu()
+            }
+            ToolbarItem(placement: .bottomBar) {
+                blockMenu()
             }
         }
         if #available(iOS 26.0, *) {
@@ -123,6 +44,85 @@ struct CatalogToolbar: ToolbarContent {
             ToolbarItem(placement: .bottomBar) {
                 Spacer()
             }
+        }
+    }
+
+    @ViewBuilder
+    func genreMenu() -> some View {
+        Menu {
+            @Bindable var selections = selections
+            Button("Shared.All") {
+                selections.genre = nil
+            }
+            Picker(selection: $selections.genre.animation(.smooth.speed(2.0))) {
+                ForEach(genres) { genre in
+                    Text(genre.name)
+                        .tag(genre)
+                }
+            } label: {
+                Text("Shared.Genre")
+            }
+        } label: {
+            switch selections.genre?.name {
+            case "男性向":
+                ToolbarButtonLabel(
+                    LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                    image: .asset("Button.R18")
+                )
+            case "ブルーアーカイブ":
+                ToolbarButtonLabel(
+                    LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                    image: .system("scope")
+                )
+            case "艦これ", "アズールレーン":
+                ToolbarButtonLabel(
+                    LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                    image: .system("water.waves")
+                )
+            case "コスプレ":
+                ToolbarButtonLabel(
+                    LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                    image: .system("tshirt")
+                )
+            default:
+                ToolbarButtonLabel(
+                    LocalizedStringKey(selections.genre?.name ?? "Shared.Genre"),
+                    image: .system("theatermask.and.paintbrush")
+                )
+            }
+        }
+        .onChange(of: selections.fullMapID) {
+            Task.detached {
+                await reloadBlocksInMap()
+            }
+        }
+        .onChange(of: displayedCircles) {
+            Task.detached {
+                await reloadSelectableMapsBlocksAndDates()
+            }
+        }
+    }
+
+    @ViewBuilder
+    func blockMenu() -> some View {
+        Menu {
+            @Bindable var selections = selections
+            Button("Shared.All") {
+                selections.block = nil
+            }
+            Picker(selection: $selections.block.animation(.smooth.speed(2.0))) {
+                ForEach(selectableBlocks ?? blocks, id: \.id) { block in
+                    Text(block.name)
+                        .tag(block)
+                }
+            } label: {
+                Text("Shared.Block")
+            }
+        } label: {
+            ToolbarButtonLabel(
+                LocalizedStringKey(selections.block?.name ?? "Shared.Block"),
+                image: .system("rectangle.split.3x1")
+            )
         }
     }
 

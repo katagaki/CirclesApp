@@ -21,7 +21,8 @@ struct FavoritesToolbar: ToolbarContent {
             } label: {
                 ToolbarButtonLabel(
                     "Shared.VisitMode",
-                    imageName: favoritesCache.isVisitModeOn ? "figure.walk.motion" : "figure.walk"
+                    image: .system(favoritesCache.isVisitModeOn ? "figure.walk.motion" : "figure.walk"),
+                    forceLabelStyle: true
                 )
             }
             .popoverTip(VisitModeTip())
@@ -37,8 +38,9 @@ struct FavoritesToolbar: ToolbarContent {
             } label: {
                 ToolbarButtonLabel(
                     "Shared.GroupByColor",
-                    imageName: favoritesCache.isGroupedByColor ?
-                    "paintpalette.fill" : "paintpalette"
+                    image: .system(favoritesCache.isGroupedByColor ?
+                    "paintpalette.fill" : "paintpalette"),
+                    forceLabelStyle: true
                 )
             }
         }
