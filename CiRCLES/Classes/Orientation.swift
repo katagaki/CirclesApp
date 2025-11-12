@@ -18,11 +18,7 @@ class Orientation {
     }
 
     func update() {
-        if UIDevice.current.orientation == .portrait ||
-            UIDevice.current.orientation == .landscapeLeft ||
-            UIDevice.current.orientation == .landscapeRight {
-            self.orientation = UIDevice.current.orientation
-        }
+        self.orientation = UIDevice.current.orientation
     }
 
     func update(to orientation: UIDeviceOrientation) {
