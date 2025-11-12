@@ -95,7 +95,6 @@ struct CircleDetailHero: View {
             hasShownWebCutOnce = showWebCut
         }
         .onChange(of: circle.id) {
-            currentCutType = .catalog
             hasShownWebCutOnce = false
         }
     }
