@@ -97,7 +97,7 @@ struct CatalogView: View {
             prompt: "Circles.Search.Prompt"
         )
         .onAppear {
-            if !catalogCache.isInitialLoadCompleted {
+            if catalogCache.invalidationID != selections.catalogSelectionID {
                 reloadDisplayedCircles()
             }
         }
@@ -123,7 +123,7 @@ struct CatalogView: View {
         withAnimation(.smooth.speed(2.0)) {
             catalogCache.isLoading = true
         } completion: {
-            catalogCache.isInitialLoadCompleted = true
+            catalogCache.invalidationID = selections.catalogSelectionID
             let selectedGenreID = selections.genre?.id
             let selectedMapID = selections.map?.id
             let selectedBlockID = selections.block?.id

@@ -7,9 +7,15 @@
 
 import SwiftUI
 
+enum ToolbarButtonLabelImageType {
+    case system(String)
+    case asset(String)
+}
+
 struct ToolbarButtonLabel: View {
     let text: LocalizedStringKey
-    let imageName: String
+    let image: ToolbarButtonLabelImageType
+    let forceLabelStyle: Bool
 
     var padding: CGFloat {
         if #available(iOS 26.0, *) {
@@ -19,20 +25,39 @@ struct ToolbarButtonLabel: View {
         }
     }
 
-    init(_ text: LocalizedStringKey, imageName: String) {
+    init(
+        _ text: LocalizedStringKey, image: ToolbarButtonLabelImageType,
+        forceLabelStyle: Bool = false
+    ) {
         self.text = text
-        self.imageName = imageName
+        self.image = image
+        self.forceLabelStyle = forceLabelStyle
     }
 
     var body: some View {
-        HStack(spacing: 8.0) {
-            Image(systemName: imageName)
-                .font(.subheadline)
-            Text(text)
-                .font(.subheadline)
-                .fontWeight(.bold)
-                .truncationMode(.middle)
+        if #available(iOS 26.0, *), !forceLabelStyle {
+            switch image {
+            case .system(let imageName):
+                Label(text, systemImage: imageName)
+            case .asset(let imageName):
+                Label(text, image: imageName)
+            }
+        } else {
+            HStack(spacing: 8.0) {
+                switch image {
+                case .system(let imageName):
+                    Image(systemName: imageName)
+                        .font(.subheadline)
+                case .asset(let imageName):
+                    Image(imageName)
+                        .font(.subheadline)
+                }
+                Text(text)
+                    .font(.subheadline)
+                    .fontWeight(.bold)
+                    .truncationMode(.middle)
+            }
+            .padding(.horizontal, padding)
         }
-        .padding(.horizontal, padding)
     }
 }

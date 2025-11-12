@@ -15,7 +15,13 @@ class FavoritesCache {
     var isVisitModeOn: Bool = false
     var isGroupedByColor: Bool = true
 
-    var isInitialLoadCompleted: Bool = false
+    var invalidationID: String = ""
+
+    init() {
+        let defaults = UserDefaults.standard
+        self.isVisitModeOn = defaults.object(forKey: "Favorites.VisitModeOn") as? Bool ?? false
+        self.isGroupedByColor = defaults.object(forKey: "Favorites.GroupByColor") as? Bool ?? true
+    }
 
     static func mapped(
         using favoriteItems: [UserFavorites.Response.FavoriteItem]

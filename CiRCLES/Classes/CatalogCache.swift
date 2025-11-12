@@ -14,7 +14,7 @@ class CatalogCache {
     var displayedCircles: [ComiketCircle] = []
     var searchedCircles: [ComiketCircle]?
 
-    var isInitialLoadCompleted: Bool = false
+    var invalidationID: String = ""
     var isLoading: Bool = false
 
     static func fetchCircles(
@@ -36,6 +36,7 @@ class CatalogCache {
         } else {
             return circleIdentifiers
         }
+
     }
 
     static func searchCircles(_ searchTerm: String) async -> [PersistentIdentifier]? {
