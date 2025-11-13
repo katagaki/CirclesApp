@@ -90,6 +90,7 @@ struct FavoritesView: View {
         }
         .refreshable {
             await reloadFavorites()
+            await prepareCircles(using: favorites.items ?? [])
         }
         .onAppear {
             let dateSelectionID = "D\(selections.date?.id ?? -1)"
