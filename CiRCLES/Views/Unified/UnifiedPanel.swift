@@ -37,7 +37,7 @@ struct UnifiedPanel: View {
                         }
                     }
                 }
-                if UIDevice.current.userInterfaceIdiom != .phone && orientation.isLandscape() {
+                if UIDevice.current.userInterfaceIdiom != .phone && orientation.isLandscape {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(
                             "Shared.ToggleSidebarPosition",

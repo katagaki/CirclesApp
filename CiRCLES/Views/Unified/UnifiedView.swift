@@ -34,21 +34,12 @@ struct UnifiedView: View {
         UIDevice.current.userInterfaceIdiom != .phone
     }
 
-    var isVerticalOrientation: Bool {
-        orientation.isPortrait()
-    }
-
-    var sidebarWidth: CGFloat {
-        360.0
-    }
-
-    var sidebarHeight: CGFloat {
-        400.0
-    }
+    let sidebarWidth: CGFloat = 360.0
+    let sidebarHeight: CGFloat = 400.0
 
     var mapLeadingPadding: CGFloat {
         guard isiPad else { return 0.0 }
-        if isVerticalOrientation {
+        if orientation.isPortrait {
             return 0.0
         } else {
             return unifier.sidebarPosition == .leading ? (sidebarWidth + 40.0) : 0.0
@@ -57,7 +48,7 @@ struct UnifiedView: View {
 
     var mapTrailingPadding: CGFloat {
         guard isiPad else { return 0.0 }
-        if isVerticalOrientation {
+        if orientation.isPortrait {
             return 0.0
         } else {
             return unifier.sidebarPosition == .trailing ? (sidebarWidth + 40.0) : 0.0
@@ -66,7 +57,7 @@ struct UnifiedView: View {
 
     var mapBottomPadding: CGFloat {
         guard isiPad else { return 0.0 }
-        return isVerticalOrientation ? (sidebarHeight + 40.0) : 0.0
+        return orientation.isPortrait ? (sidebarHeight + 40.0) : 0.0
     }
 
     var body: some View {
@@ -121,7 +112,7 @@ struct UnifiedView: View {
             if isiPad {
                 GeometryReader { reader in
                     let alignment: Alignment = {
-                        if isVerticalOrientation {
+                        if orientation.isPortrait {
                             return .bottom
                         } else {
                             return unifier.sidebarPosition == .leading ? .bottomLeading : .bottomTrailing
@@ -130,8 +121,8 @@ struct UnifiedView: View {
                     ZStack(alignment: alignment) {
                         UnifiedPanel()
                             .frame(
-                                width: isVerticalOrientation ? reader.size.width - 40.0 : sidebarWidth,
-                                height: isVerticalOrientation ? sidebarHeight : reader.size.height * 0.85
+                                width: orientation.isPortrait ? reader.size.width - 40.0 : sidebarWidth,
+                                height: orientation.isPortrait ? sidebarHeight : reader.size.height * 0.85
                             )
                             .adaptiveGlass(.regular, cornerRadius: 20.0)
                             .clipShape(.rect(cornerRadius: 20.0))
