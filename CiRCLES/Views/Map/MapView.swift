@@ -103,14 +103,11 @@ struct MapView: View {
                                 currentZoomScale = value
                             }
                             .onEnded { value in
-                                // Update the stored zoom factor
-                                let newZoomFactor = max(0.5, min(10.0, zoomFactor * value))
-                                zoomFactor = newZoomFactor
-                                currentZoomScale = 1.0
-                                
-                                // Update canvas size with new zoom factor
-                                if let mapImage {
-                                    updateCanvasSize(mapImage)
+                                // Update the stored zoom factor with animation
+                                withAnimation(.easeOut(duration: 0.2)) {
+                                    let newZoomFactor = max(0.5, min(10.0, zoomFactor * value))
+                                    zoomFactor = newZoomFactor
+                                    currentZoomScale = 1.0
                                 }
                             }
                     )
