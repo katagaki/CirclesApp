@@ -25,6 +25,7 @@ struct MapView: View {
 
     @State var popoverData: PopoverData?
     @State var baseZoomFactor: Double = 1.9
+    @State var gestureZoomScale: CGFloat = 1.0
 
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: 1.9, "Map.ZoomFactor") var zoomFactor: Double
@@ -80,6 +81,7 @@ struct MapView: View {
                                     popoverData: $popoverData
                                 )
                             }
+                            .scaleEffect(gestureZoomScale, anchor: .center)
 
                             // Popover layer - does not scale
                             MapPopoverLayer(
@@ -95,18 +97,25 @@ struct MapView: View {
                     .simultaneousGesture(
                         MagnificationGesture()
                             .onChanged { value in
-                                // Close popover when zoom gesture starts
+                                // Close popover when zoom gesture starts  
                                 if popoverData != nil {
                                     popoverData = nil
                                 }
-                                // Update zoom factor in real-time during gesture
-                                // Divide by value to invert: pinch out (value>1) = zoom in (lower zoomFactor)
-                                let newZoomFactor = max(0.5, min(10.0, baseZoomFactor / value))
-                                zoomFactor = newZoomFactor
+                                // Update scale effect for smooth visual feedback during gesture
+                                gestureZoomScale = value
                             }
                             .onEnded { value in
-                                // Save the final zoom factor as the new base
-                                baseZoomFactor = zoomFactor
+                                // Calculate new zoom factor
+                                // Divide by value to invert: pinch out (value>1) = zoom in (lower zoomFactor)
+                                let newZoomFactor = max(0.5, min(10.0, baseZoomFactor / value))
+                                
+                                // Apply zoom factor smoothly
+                                withAnimation(.easeOut(duration: 0.15)) {
+                                    zoomFactor = newZoomFactor
+                                    gestureZoomScale = 1.0
+                                }
+                                
+                                baseZoomFactor = newZoomFactor
                             }
                     )
                     .onChange(of: popoverData) { _, newValue in
