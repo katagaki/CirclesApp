@@ -25,6 +25,7 @@ struct MapView: View {
 
     @State var popoverData: PopoverData?
     @State var currentZoomScale: CGFloat = 1.0
+    @State var zoomAnchor: UnitPoint = .center
 
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: 1.9, "Map.ZoomFactor") var zoomFactor: Double
@@ -80,7 +81,7 @@ struct MapView: View {
                                     popoverData: $popoverData
                                 )
                             }
-                            .scaleEffect(currentZoomScale)
+                            .scaleEffect(currentZoomScale, anchor: zoomAnchor)
 
                             // Popover layer - does not scale
                             MapPopoverLayer(
@@ -104,9 +105,11 @@ struct MapView: View {
                             }
                             .onEnded { value in
                                 // Update the stored zoom factor
-                                let newZoomFactor = max(0.5, min(10.0, zoomFactor * value))
+                                // Divide by value to invert: pinch out (value>1) = zoom in (lower zoomFactor)
+                                let newZoomFactor = max(0.5, min(10.0, zoomFactor / value))
                                 zoomFactor = newZoomFactor
                                 currentZoomScale = 1.0
+                                zoomAnchor = .center
                             }
                     )
                     .onChange(of: popoverData) { _, newValue in
