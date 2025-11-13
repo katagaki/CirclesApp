@@ -67,7 +67,7 @@ struct UnifiedView: View {
                 .navigationTitle("ViewTitle.Map")
                 .navigationBarTitleDisplayMode(.inline)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .ignoresSafeArea(.all, edges: .top)
+                .ignoresSafeArea(.all, edges: isiPad ? [] : .top) // HACK: .top breaks iPad UI
                 .safeAreaPadding(.leading, mapLeadingPadding)
                 .safeAreaPadding(.trailing, mapTrailingPadding)
                 .safeAreaPadding(.bottom, mapBottomPadding)
@@ -79,7 +79,7 @@ struct UnifiedView: View {
                         namespace: namespace
                     )
                 }
-                .adaptiveNavigationBar()
+//                .adaptiveNavigationBar()
                 .unifierSheets(namespace: namespace)
                 .sheet(isPresented: $isMyComiketPresenting) {
                     Group {

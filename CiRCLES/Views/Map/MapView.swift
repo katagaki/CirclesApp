@@ -90,9 +90,7 @@ struct MapView: View {
                     }
                 }
                 .onChange(of: popoverPosition) { _, newValue in
-                    if let newValue {
-                        scrollToPosition = newValue
-                    }
+                    scrollToPosition = newValue
                 }
             } else {
                 ContentUnavailableView(
