@@ -19,7 +19,7 @@ struct MapFavoritesLayer: View {
 
     let spaceSize: Int
 
-    @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
+    @AppStorage(wrappedValue: 1.9, "Map.ZoomFactor") var zoomFactor: Double
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var body: some View {
@@ -68,7 +68,6 @@ struct MapFavoritesLayer: View {
         guard count > 0 else { return }
 
         // Cache computed values
-        let zoomFactor = zoomFactor(zoomDivisor)
         let scaledSpaceSize = CGFloat(spaceSize) / zoomFactor
         let baseX = CGFloat(layout.positionX) / zoomFactor
         let baseY = CGFloat(layout.positionY) / zoomFactor

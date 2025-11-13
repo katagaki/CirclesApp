@@ -19,7 +19,7 @@ struct MapLayoutLayer: View {
 
     @Binding var popoverData: PopoverData?
 
-    @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
+    @AppStorage(wrappedValue: 1.9, "Map.ZoomFactor") var zoomFactor: Double
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var body: some View {
@@ -51,7 +51,6 @@ struct MapLayoutLayer: View {
 
     // swiftlint:disable identifier_name
     func openMapPopoverIn(x: Int, y: Int) {
-        let zoomFactor = zoomFactorDouble(zoomDivisor)
         for (layout, webCatalogIDs) in mappings {
             let xMin: Int = Int(Double(layout.positionX) / zoomFactor)
             let xMax: Int = Int(Double(layout.positionX + spaceSize) / zoomFactor)
