@@ -24,6 +24,7 @@ struct MapView: View {
     @State var isInitialLoadCompleted: Bool = false
 
     @State var popoverData: PopoverData?
+    @State var scrollToPosition: CGPoint?
 
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
@@ -44,53 +45,55 @@ struct MapView: View {
     var body: some View {
         VStack(alignment: .leading) {
             if let mapImage {
-                ScrollViewReader { reader in
-                    ScrollView([.horizontal, .vertical]) {
-                        ZStack(alignment: .topLeading) {
-                            // Map image layer
+                MapScrollView(
+                    contentMarginBottom: unifier.safeAreaHeight + 12.0,
+                    scrollToPosition: $scrollToPosition
+                ) {
+                    ZStack(alignment: .topLeading) {
+                        // Map image layer
+                        MapLayer(
+                            canvasSize: $canvasSize,
+                            image: mapImage
+                        )
+
+                        // Favorites layer
+                        MapFavoritesLayer(
+                            canvasSize: $canvasSize,
+                            mappings: $layoutWebCatalogIDMappings,
+                            spaceSize: spaceSize
+                        )
+
+                        // Genre layer
+                        if showGenreOverlay, let genreImage {
                             MapLayer(
                                 canvasSize: $canvasSize,
-                                image: mapImage
+                                image: genreImage
                             )
+                        }
 
-                            // Favorites layer
-                            MapFavoritesLayer(
-                                canvasSize: $canvasSize,
-                                mappings: $layoutWebCatalogIDMappings,
-                                spaceSize: spaceSize
-                            )
+                        // Map layouts layer
+                        MapLayoutLayer(
+                            canvasSize: $canvasSize,
+                            mappings: $layoutWebCatalogIDMappings,
+                            spaceSize: spaceSize,
+                            popoverData: $popoverData
+                        )
 
-                            // Genre layer
-                            if showGenreOverlay, let genreImage {
-                                MapLayer(
-                                    canvasSize: $canvasSize,
-                                    image: genreImage
-                                )
-                            }
-
-                            // Map layouts layer
-                            MapLayoutLayer(
-                                canvasSize: $canvasSize,
-                                mappings: $layoutWebCatalogIDMappings,
-                                spaceSize: spaceSize,
-                                popoverData: $popoverData
-                            )
-
-                            // Popover layer
-                            MapPopoverLayer(
-                                canvasSize: $canvasSize,
-                                selection: $popoverData,
-                            ) { selection in
-                                MapPopoverDetail(selection: selection)
-                            }
+                        // Popover layer
+                        MapPopoverLayer(
+                            canvasSize: $canvasSize,
+                            selection: $popoverData,
+                        ) { selection in
+                            MapPopoverDetail(selection: selection)
                         }
                     }
-                    .contentMargins(.bottom, unifier.safeAreaHeight + 12.0, for: .scrollContent)
-                    .scrollIndicators(.hidden)
-                    .onChange(of: popoverData) { _, newValue in
-                        if let newValue {
-                            reader.scrollTo("\(newValue.id)", anchor: .center)
-                        }
+                }
+                .onChange(of: popoverData) { _, newValue in
+                    if let newValue {
+                        scrollToPosition = CGPoint(
+                            x: max(newValue.sourceMidX, 0.0),
+                            y: max(newValue.sourceMidY, 0.0)
+                        )
                     }
                 }
             } else {

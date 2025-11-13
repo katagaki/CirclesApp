@@ -25,11 +25,11 @@ class Orientation {
         self.orientation = orientation
     }
 
-    func isPortrait() -> Bool {
-        return orientation.isPortrait || UIDevice.current.orientation == .portraitUpsideDown
+    var isPortrait: Bool {
+        return orientation.isPortrait || orientation == .portraitUpsideDown
     }
 
-    func isLandscape() -> Bool {
-        return orientation.isLandscape && UIDevice.current.orientation != .portraitUpsideDown
+    var isLandscape: Bool {
+        return orientation.isLandscape && orientation != .portraitUpsideDown
     }
 }
