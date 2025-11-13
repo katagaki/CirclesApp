@@ -31,21 +31,13 @@ class Unifier {
         } else {
             var height: CGFloat = .zero
             switch self.selectedDetent {
-            case .height(100):
-                height = 100.0
-            case .height(150):
-                height = 150.0
-            case .height(360):
-                if #available(iOS 26.0, *) {
-                    height = 380.0
-                } else {
-                    height = 360.0
-                }
-            default:
-                height = 0.0
+            case .height(100): height = 100.0
+            case .height(150): height = 150.0
+            case .height(360): height = 360.0
+            default: height = 0.0
             }
             if #available(iOS 26.0, *) {
-                return max(0.0, height - 60.0)
+                return max(0.0, height - 60.0) + 20.0
             } else {
                 return height
             }
