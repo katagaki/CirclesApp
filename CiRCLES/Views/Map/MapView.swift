@@ -112,6 +112,7 @@ struct MapView: View {
             }
         }
         .onChange(of: mapInvalidationID) {
+            popoverData = nil
             reloadAll()
         }
         .onChange(of: popoverInvalidationID) {
