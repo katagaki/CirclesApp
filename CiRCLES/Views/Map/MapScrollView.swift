@@ -10,16 +10,13 @@ import UIKit
 
 struct MapScrollView<Content: View>: UIViewRepresentable {
     let content: Content
-    let contentMarginBottom: CGFloat
     @Binding var scrollToPosition: CGPoint?
 
     init(
-        contentMarginBottom: CGFloat = 0,
         scrollToPosition: Binding<CGPoint?> = .constant(nil),
         @ViewBuilder content: () -> Content
     ) {
         self.content = content()
-        self.contentMarginBottom = contentMarginBottom
         self._scrollToPosition = scrollToPosition
     }
 
@@ -28,6 +25,7 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
         scrollView.showsHorizontalScrollIndicator = false
         scrollView.showsVerticalScrollIndicator = false
         scrollView.delegate = context.coordinator
+        scrollView.contentInsetAdjustmentBehavior = .always
 
         let hostingController = UIHostingController(rootView: content)
         hostingController.view.backgroundColor = .clear
@@ -47,25 +45,19 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
             hostingController.view.heightAnchor.constraint(equalTo: scrollView.contentLayoutGuide.heightAnchor)
         ])
 
-        scrollView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: contentMarginBottom, right: 0)
-
         return scrollView
     }
 
     func updateUIView(_ scrollView: UIScrollView, context: Context) {
-        scrollView.contentInset = UIEdgeInsets(
-            top: 0, left: 0, bottom: contentMarginBottom, right: 0
-        )
-
         if let hostingController = context.coordinator.hostingController {
             hostingController.rootView = content
             hostingController.view.setNeedsLayout()
         }
 
         if let position = scrollToPosition {
-            let effectiveVisibleHeight = scrollView.bounds.height - contentMarginBottom
+            let effectiveHeight = scrollView.bounds.height + scrollView.safeAreaInsets.top
             let halfWidth = scrollView.bounds.width / 2
-            let halfHeight = effectiveVisibleHeight / 2
+            let halfHeight = effectiveHeight / 2
 
             let centeredX = max(0, min(position.x - halfWidth,
                                        scrollView.contentSize.width - scrollView.bounds.width))

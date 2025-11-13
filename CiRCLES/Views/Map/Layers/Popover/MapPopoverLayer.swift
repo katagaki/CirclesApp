@@ -12,6 +12,7 @@ struct MapPopoverLayer<Content: View>: View {
     @Binding var canvasSize: CGSize
 
     @Binding var selection: PopoverData?
+    @Binding var popoverPosition: CGPoint?
     var content: (PopoverData) -> Content
 
     @State var currentItem: PopoverData?
@@ -22,6 +23,7 @@ struct MapPopoverLayer<Content: View>: View {
             if let currentItem, !currentItem.sourceRect.isNull {
                 MapPopover(
                     canvasSize: $canvasSize,
+                    popoverPosition: $popoverPosition,
                     sourceRect: currentItem.sourceRect,
                     isDismissing: false
                 ) {
@@ -32,6 +34,7 @@ struct MapPopoverLayer<Content: View>: View {
             if let dismissingItem, !dismissingItem.sourceRect.isNull {
                 MapPopover(
                     canvasSize: $canvasSize,
+                    popoverPosition: .constant(nil),
                     sourceRect: dismissingItem.sourceRect,
                     isDismissing: true
                 ) {

@@ -56,7 +56,7 @@ struct UnifiedView: View {
     }
 
     var mapBottomPadding: CGFloat {
-        guard isiPad else { return 0.0 }
+        guard isiPad else { return unifier.safeAreaHeight }
         return orientation.isPortrait ? (sidebarHeight + 40.0) : 0.0
     }
 
@@ -64,8 +64,10 @@ struct UnifiedView: View {
         NavigationStack(path: $viewPath) {
             @Bindable var unifier = unifier
             MapView()
+                .navigationTitle("ViewTitle.Map")
                 .navigationBarTitleDisplayMode(.inline)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea(.all, edges: .top)
                 .safeAreaPadding(.leading, mapLeadingPadding)
                 .safeAreaPadding(.trailing, mapTrailingPadding)
                 .safeAreaPadding(.bottom, mapBottomPadding)
@@ -77,6 +79,7 @@ struct UnifiedView: View {
                         namespace: namespace
                     )
                 }
+                .adaptiveNavigationBar()
                 .unifierSheets(namespace: namespace)
                 .sheet(isPresented: $isMyComiketPresenting) {
                     Group {

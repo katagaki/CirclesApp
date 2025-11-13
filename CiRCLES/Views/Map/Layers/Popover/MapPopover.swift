@@ -14,6 +14,7 @@ struct MapPopover<Content: View>: View {
     var edgePadding: CGFloat = 16.0
 
     @Binding var canvasSize: CGSize
+    @Binding var popoverPosition: CGPoint?
     var sourceRect: CGRect
     var isDismissing: Bool
     var content: () -> Content
@@ -38,6 +39,7 @@ struct MapPopover<Content: View>: View {
                     withAnimation(.smooth.speed(2.5)) {
                         animationProgress = 1
                     }
+                    popoverPosition = calculatePopoverPosition()
                 }
             }
     }
