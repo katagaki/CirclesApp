@@ -93,7 +93,7 @@ struct MapView: View {
                     }
                     .contentMargins(.bottom, unifier.safeAreaHeight + 12.0, for: .scrollContent)
                     .scrollIndicators(.hidden)
-                    .gesture(
+                    .simultaneousGesture(
                         MagnificationGesture()
                             .onChanged { value in
                                 // Close popover when zoom gesture starts
