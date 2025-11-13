@@ -26,6 +26,8 @@ struct MapView: View {
     @State var popoverData: PopoverData?
     @State var baseZoomFactor: Double = 1.9
     @State var gestureScale: CGFloat = 1.0
+    @State var gestureAnchor: UnitPoint = .center
+    @State var isPinching: Bool = false
 
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: 1.9, "Map.ZoomFactor") var zoomFactor: Double
@@ -81,7 +83,7 @@ struct MapView: View {
                                     popoverData: $popoverData
                                 )
                             }
-                            .scaleEffect(gestureScale, anchor: .center)
+                            .scaleEffect(gestureScale, anchor: gestureAnchor)
 
                             // Popover layer - does not scale
                             MapPopoverLayer(
@@ -94,28 +96,29 @@ struct MapView: View {
                     }
                     .contentMargins(.bottom, unifier.safeAreaHeight + 12.0, for: .scrollContent)
                     .scrollIndicators(.hidden)
-                    .simultaneousGesture(
-                        MagnificationGesture()
-                            .onChanged { value in
-                                // Close popover when zoom gesture starts
-                                if popoverData != nil {
-                                    popoverData = nil
-                                }
-                                // Update gesture scale for immediate visual feedback
-                                gestureScale = value
+                    .pinchToZoom(
+                        scale: $gestureScale,
+                        anchor: $gestureAnchor,
+                        isPinching: $isPinching,
+                        onScaleChange: { _ in
+                            // Close popover when zoom gesture starts
+                            if popoverData != nil {
+                                popoverData = nil
                             }
-                            .onEnded { value in
-                                // Calculate the new effective zoom factor
-                                // gestureScale > 1 means pinched out (should zoom in = lower zoomFactor)
-                                let newZoomFactor = max(0.5, min(10.0, baseZoomFactor / value))
-                                
-                                // Update stored zoom factor
-                                zoomFactor = newZoomFactor
-                                baseZoomFactor = newZoomFactor
-                                
-                                // Reset gesture scale
-                                gestureScale = 1.0
-                            }
+                        },
+                        onPinchEnd: { finalScale in
+                            // Calculate the new effective zoom factor
+                            // finalScale > 1 means pinched out (should zoom in = lower zoomFactor)
+                            let newZoomFactor = max(0.5, min(10.0, baseZoomFactor / finalScale))
+                            
+                            // Update stored zoom factor
+                            zoomFactor = newZoomFactor
+                            baseZoomFactor = newZoomFactor
+                            
+                            // Reset gesture scale and anchor
+                            gestureScale = 1.0
+                            gestureAnchor = .center
+                        }
                     )
                     .onChange(of: popoverData) { _, newValue in
                         if let newValue {
