@@ -49,12 +49,8 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
     func updateUIView(_ scrollView: UIScrollView, context: Context) {
         if let hostingController = context.coordinator.hostingController {
             hostingController.rootView = content
-            
-            // Force the hosting controller to update its size
             hostingController.view.setNeedsLayout()
             hostingController.view.layoutIfNeeded()
-            
-            // Invalidate the intrinsic content size to trigger contentSize update
             hostingController.view.invalidateIntrinsicContentSize()
         }
 
