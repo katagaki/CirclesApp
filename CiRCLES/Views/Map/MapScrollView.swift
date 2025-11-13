@@ -40,9 +40,7 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
             hostingController.view.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             hostingController.view.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             hostingController.view.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-            hostingController.view.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
-            hostingController.view.widthAnchor.constraint(equalTo: scrollView.contentLayoutGuide.widthAnchor),
-            hostingController.view.heightAnchor.constraint(equalTo: scrollView.contentLayoutGuide.heightAnchor)
+            hostingController.view.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
         ])
 
         return scrollView
@@ -51,7 +49,13 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
     func updateUIView(_ scrollView: UIScrollView, context: Context) {
         if let hostingController = context.coordinator.hostingController {
             hostingController.rootView = content
+            
+            // Force the hosting controller to update its size
             hostingController.view.setNeedsLayout()
+            hostingController.view.layoutIfNeeded()
+            
+            // Invalidate the intrinsic content size to trigger contentSize update
+            hostingController.view.invalidateIntrinsicContentSize()
         }
 
         if let position = scrollToPosition {
