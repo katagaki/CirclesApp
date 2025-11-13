@@ -24,6 +24,7 @@ struct MapView: View {
     @State var isInitialLoadCompleted: Bool = false
 
     @State var popoverData: PopoverData?
+    @State var popoverPosition: CGPoint?
     @State var scrollToPosition: CGPoint?
 
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
@@ -46,7 +47,6 @@ struct MapView: View {
         VStack(alignment: .leading) {
             if let mapImage {
                 MapScrollView(
-                    contentMarginBottom: unifier.safeAreaHeight + 12.0,
                     scrollToPosition: $scrollToPosition
                 ) {
                     ZStack(alignment: .topLeading) {
@@ -83,17 +83,15 @@ struct MapView: View {
                         MapPopoverLayer(
                             canvasSize: $canvasSize,
                             selection: $popoverData,
+                            popoverPosition: $popoverPosition,
                         ) { selection in
                             MapPopoverDetail(selection: selection)
                         }
                     }
                 }
-                .onChange(of: popoverData) { _, newValue in
+                .onChange(of: popoverPosition) { _, newValue in
                     if let newValue {
-                        scrollToPosition = CGPoint(
-                            x: max(newValue.sourceMidX, 0.0),
-                            y: max(newValue.sourceMidY, 0.0)
-                        )
+                        scrollToPosition = newValue
                     }
                 }
             } else {

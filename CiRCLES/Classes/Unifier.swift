@@ -36,7 +36,11 @@ class Unifier {
             case .height(150):
                 height = 150.0
             case .height(360):
-                height = 360.0
+                if #available(iOS 26.0, *) {
+                    height = 380.0
+                } else {
+                    height = 360.0
+                }
             default:
                 height = 0.0
             }
