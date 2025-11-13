@@ -38,33 +38,17 @@ struct CircleDetailToolbar: ToolbarContent {
                     } label: {
                         ToolbarButtonLabel("Shared.Favorite", image: .system("star.fill"))
                     }
-                    .popover(isPresented: $isFavoritesPopoverPresented, arrowEdge: .bottom) {
-                        FavoritePopover(
-                            initialColor: selectedFavoriteColor,
-                            initialMemo: favoriteMemo,
-                            isExistingFavorite: favorites.contains(webCatalogID: extendedInformation.webCatalogID),
-                            onSave: { color, memo in
-                                isCallingFavoritesAPI = true
-                                Task.detached {
-                                    await saveFavorite(color: color, memo: memo)
-                                    await MainActor.run {
-                                        isCallingFavoritesAPI = false
-                                    }
-                                }
-                                isFavoritesPopoverPresented = false
-                            },
-                            onDelete: {
-                                isCallingFavoritesAPI = true
-                                Task.detached {
-                                    await deleteFavorite()
-                                    await MainActor.run {
-                                        isCallingFavoritesAPI = false
-                                    }
-                                }
-                                isFavoritesPopoverPresented = false
-                            }
-                        )
+                    #if targetEnvironment(macCatalyst)
+                    .sheet(isPresented: $isFavoritesPopoverPresented) {
+                        favoritesPopover()
+                            .presentationSizing(.fitted)
+                            .interactiveDismissDisabled(false)
                     }
+                    #else
+                    .popover(isPresented: $isFavoritesPopoverPresented, arrowEdge: .bottom) {
+                        favoritesPopover()
+                    }
+                    #endif
                     .onAppear {
                         reloadFavoriteColor()
                     }
@@ -177,5 +161,34 @@ struct CircleDetailToolbar: ToolbarContent {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    func favoritesPopover() -> some View {
+        FavoritePopover(
+            initialColor: selectedFavoriteColor,
+            initialMemo: favoriteMemo,
+            isExistingFavorite: favorites.contains(webCatalogID: extendedInformation.webCatalogID),
+            onSave: { color, memo in
+                isCallingFavoritesAPI = true
+                Task.detached {
+                    await saveFavorite(color: color, memo: memo)
+                    await MainActor.run {
+                        isCallingFavoritesAPI = false
+                    }
+                }
+                isFavoritesPopoverPresented = false
+            },
+            onDelete: {
+                isCallingFavoritesAPI = true
+                Task.detached {
+                    await deleteFavorite()
+                    await MainActor.run {
+                        isCallingFavoritesAPI = false
+                    }
+                }
+                isFavoritesPopoverPresented = false
+            }
+        )
     }
 }

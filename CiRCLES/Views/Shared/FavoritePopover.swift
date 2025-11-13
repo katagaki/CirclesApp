@@ -9,6 +9,8 @@ import SwiftUI
 
 struct FavoritePopover: View {
 
+    @Environment(\.dismiss) var dismiss
+
     var initialColor: WebCatalogColor?
     var initialMemo: String
     var isExistingFavorite: Bool
@@ -115,6 +117,17 @@ struct FavoritePopover: View {
                         .frame(maxWidth: .infinity)
                     }
                     .disabled(initialColor == nil)
+                    #if targetEnvironment(macCatalyst)
+                    Divider()
+                    Button(role: .cancel) {
+                        dismiss()
+                    } label: {
+                        Text("Shared.Cancel")
+                            .fontWeight(.bold)
+                            .padding(.vertical, 2.0)
+                            .frame(maxWidth: .infinity)
+                    }
+                    #endif
                 }
                 .buttonStyleGlassProminentIfSupported()
             }
