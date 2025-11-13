@@ -25,6 +25,7 @@ struct MapView: View {
 
     @State var popoverData: PopoverData?
     @State var baseZoomFactor: Double = 1.9
+    @State var gestureScale: CGFloat = 1.0
 
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: 1.9, "Map.ZoomFactor") var zoomFactor: Double
@@ -80,6 +81,7 @@ struct MapView: View {
                                     popoverData: $popoverData
                                 )
                             }
+                            .scaleEffect(gestureScale, anchor: .center)
 
                             // Popover layer - does not scale
                             MapPopoverLayer(
@@ -99,14 +101,20 @@ struct MapView: View {
                                 if popoverData != nil {
                                     popoverData = nil
                                 }
-                                // Update zoom factor continuously during gesture for smooth zooming
-                                // Divide by value to invert: pinch out (value>1) = zoom in (lower zoomFactor)
-                                let newZoomFactor = max(0.5, min(10.0, baseZoomFactor / value))
-                                zoomFactor = newZoomFactor
+                                // Update gesture scale for immediate visual feedback
+                                gestureScale = value
                             }
                             .onEnded { value in
-                                // Save the final zoom factor as the new base for next gesture
-                                baseZoomFactor = zoomFactor
+                                // Calculate the new effective zoom factor
+                                // gestureScale > 1 means pinched out (should zoom in = lower zoomFactor)
+                                let newZoomFactor = max(0.5, min(10.0, baseZoomFactor / value))
+                                
+                                // Update stored zoom factor
+                                zoomFactor = newZoomFactor
+                                baseZoomFactor = newZoomFactor
+                                
+                                // Reset gesture scale
+                                gestureScale = 1.0
                             }
                     )
                     .onChange(of: popoverData) { _, newValue in
