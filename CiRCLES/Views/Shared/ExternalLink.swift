@@ -23,9 +23,13 @@ struct ExternalLink: View {
     var body: some View {
         Link(destination: url) {
             HStack(alignment: .center) {
+                #if targetEnvironment(macCatalyst)
+                Text(LocalizedStringKey(title))
+                #else
                 ListRow(image: image, title: title)
                     .foregroundStyle(.foreground)
                 Spacer()
+                #endif
                 Image(systemName: "arrow.up.right.square")
                     .foregroundStyle(.foreground.opacity(0.5))
             }
