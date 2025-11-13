@@ -40,9 +40,7 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
             hostingController.view.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
             hostingController.view.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
             hostingController.view.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-            hostingController.view.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
-            hostingController.view.widthAnchor.constraint(equalTo: scrollView.contentLayoutGuide.widthAnchor),
-            hostingController.view.heightAnchor.constraint(equalTo: scrollView.contentLayoutGuide.heightAnchor)
+            hostingController.view.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
         ])
 
         return scrollView
@@ -52,6 +50,8 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
         if let hostingController = context.coordinator.hostingController {
             hostingController.rootView = content
             hostingController.view.setNeedsLayout()
+            hostingController.view.layoutIfNeeded()
+            hostingController.view.invalidateIntrinsicContentSize()
         }
 
         if let position = scrollToPosition {
