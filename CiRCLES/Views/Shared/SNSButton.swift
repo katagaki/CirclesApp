@@ -15,22 +15,6 @@ struct SNSButton: View {
     var showsLabel: Bool
     var type: SNSType
 
-    var buttonSize: CGFloat {
-        if #available(iOS 26.0, *) {
-            return 28.0
-        } else {
-            return 24.0
-        }
-    }
-
-    var padding: CGFloat {
-        if #available(iOS 26.0, *) {
-            return 1.0
-        } else {
-            return 0.0
-        }
-    }
-
     init(_ url: URL, showsLabel: Bool = true, type: SNSType) {
         self.url = url
         self.showsLabel = showsLabel
@@ -39,9 +23,15 @@ struct SNSButton: View {
 
     var body: some View {
         if #available(iOS 26.0, *) {
+            #if targetEnvironment(macCatalyst)
+            buttonWithIcon()
+                .foregroundStyle(.white)
+                .buttonStyle(.borderedProminent)
+            #else
             buttonWithIcon()
                 .foregroundStyle(.white)
                 .buttonStyle(.glassProminent)
+            #endif
         } else {
             buttonWithIcon()
                 .clipShape(showsLabel ? AnyShape(.capsule) : AnyShape(.circle))
@@ -49,7 +39,6 @@ struct SNSButton: View {
         }
     }
 
-    // swiftlint:disable function_body_length
     @ViewBuilder
     func buttonWithIcon() -> some View {
         switch type {
@@ -58,10 +47,7 @@ struct SNSButton: View {
                 openURL(url)
             } label: {
                 Image(.snsTwitter)
-                    .resizable()
-                    .frame(width: buttonSize, height: buttonSize)
                     .foregroundStyle(.white)
-                    .padding(padding)
                 if showsLabel {
                     Text("Shared.SNS.Twitter")
                 }
@@ -84,10 +70,7 @@ struct SNSButton: View {
                 openURL(urlToOpen)
             } label: {
                 Image(.snsPixiv)
-                    .resizable()
-                    .frame(width: buttonSize, height: buttonSize)
                     .foregroundStyle(.white)
-                    .padding(padding)
                 if showsLabel {
                     Text("Shared.SNS.Pixiv")
                 }
@@ -98,10 +81,7 @@ struct SNSButton: View {
                 openURL(url)
             } label: {
                 Image(.snsCircleMs)
-                    .resizable()
-                    .frame(width: buttonSize, height: buttonSize)
                     .foregroundStyle(.white)
-                    .padding(padding)
                 if showsLabel {
                     Text("Shared.SNS.CircleMsPortal")
                 }
@@ -109,5 +89,4 @@ struct SNSButton: View {
             .tint(.green)
         }
     }
-    // swiftlint:enable function_body_length
 }
