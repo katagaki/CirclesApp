@@ -61,7 +61,7 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
 
             let centeredX = max(0, min(position.x - halfWidth,
                                        scrollView.contentSize.width - scrollView.bounds.width))
-            let centeredY = max(0, min(position.y - halfHeight,
+            let centeredY = max(-scrollView.safeAreaInsets.top, min(position.y - halfHeight,
                                        scrollView.contentSize.height - scrollView.bounds.height))
 
             let centeredOffset = CGPoint(x: centeredX, y: centeredY)
