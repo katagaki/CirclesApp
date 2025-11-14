@@ -17,6 +17,7 @@ struct CircleDetailView: View {
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
+    @Environment(Mapper.self) var mapper
     @Environment(Unifier.self) var unifier
 
     @State var circle: ComiketCircle
@@ -65,16 +66,19 @@ struct CircleDetailView: View {
         .subtitledTitle(circle.circleName, subtitle: circle.penName)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                HStack {
-                    Button("Circles.GoPrevious", systemImage: "chevron.left") {
-                        goToPreviousCircle()
-                    }
-                    Button("Circles.GoNext", systemImage: "chevron.right") {
-                        goToNextCircle()
-                    }
-                    Button("Circles.ShowOnMap", systemImage: "mappin.and.ellipse") {
-                        showOnMap()
-                    }
+                Button("Circles.ShowOnMap", systemImage: "mappin.and.ellipse") {
+                    showOnMap()
+                }
+            }
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            }
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button("Circles.GoPrevious", systemImage: "chevron.left") {
+                    goToPreviousCircle()
+                }
+                Button("Circles.GoNext", systemImage: "chevron.right") {
+                    goToNextCircle()
                 }
             }
         }
@@ -183,8 +187,8 @@ struct CircleDetailView: View {
             return false
         }
     }
-    
+
     func showOnMap() {
-        unifier.showCircleOnMap(circle)
+        mapper.highlightTarget = circle
     }
 }

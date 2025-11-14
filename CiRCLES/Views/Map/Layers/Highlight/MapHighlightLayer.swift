@@ -8,57 +8,48 @@
 import SwiftUI
 
 struct MapHighlightLayer: View {
-    
-    @Binding var canvasSize: CGSize
-    @Binding var highlightData: HighlightData?
-    
-    @State private var blinkCount: Int = 0
-    @State private var isVisible: Bool = true
-    
+
+    @Environment(Mapper.self) var mapper
+
+    @State var isVisible: Bool = true
+
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
-    
+
     var body: some View {
         Canvas { context, _ in
-            if let highlightData, isVisible {
+            if let highlightData = mapper.highlightData, isVisible {
                 context.fill(
                     Path(highlightData.sourceRect),
-                    with: !useDarkModeMaps ? .color(.black) :
-                            .color(.primary)
+                    with: !useDarkModeMaps ? .color(.black.opacity(0.9)) :
+                            .color(.primary.opacity(0.9))
                 )
             }
         }
-        .frame(width: canvasSize.width, height: canvasSize.height)
+        .frame(width: mapper.canvasSize.width, height: mapper.canvasSize.height)
         .allowsHitTesting(false)
-        .onChange(of: highlightData) { _, newValue in
+        .onChange(of: mapper.highlightData) { _, newValue in
             if let newValue, newValue.shouldBlink {
-                startBlinking()
+                Task {
+                    await startBlinking()
+                }
             } else {
                 isVisible = true
-                blinkCount = 0
             }
         }
     }
-    
-    func startBlinking() {
-        blinkCount = 0
+
+    func startBlinking() async {
         isVisible = true
-        blink()
-    }
-    
-    func blink() {
-        guard blinkCount < 6 else { // 3 full blinks (on-off-on-off-on-off)
-            highlightData = nil
-            return
+        for _ in 0...6 {
+            await blink()
         }
-        
-        withAnimation(.easeInOut(duration: 0.3)) {
+        mapper.highlightData = nil
+    }
+
+    func blink() async {
+        withAnimation(.easeInOut(duration: 0.2)) {
             isVisible.toggle()
         }
-        
-        blinkCount += 1
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            blink()
-        }
+        try? await Task.sleep(for: .seconds(0.2))
     }
 }

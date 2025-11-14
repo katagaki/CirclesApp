@@ -9,12 +9,10 @@ import SwiftUI
 
 struct MapFavoritesLayer: View {
 
-    @Environment(Favorites.self) var favorites
     @Environment(\.colorScheme) var colorScheme
+    @Environment(Favorites.self) var favorites
+    @Environment(Mapper.self) var mapper
 
-    @Binding var canvasSize: CGSize
-
-    @Binding var mappings: [LayoutCatalogMapping: [Int]]
     @State var favoriteMappings: [LayoutCatalogMapping: [Int: WebCatalogColor?]] = [:]
 
     let spaceSize: Int
@@ -32,9 +30,9 @@ struct MapFavoritesLayer: View {
                 )
             }
         }
-        .frame(width: canvasSize.width, height: canvasSize.height)
+        .frame(width: mapper.canvasSize.width, height: mapper.canvasSize.height)
         .allowsHitTesting(false)
-        .onChange(of: mappings) {
+        .onChange(of: mapper.layouts) {
             favoriteMappings.removeAll()
             Task.detached {
                 await reloadFavorites()
@@ -139,7 +137,7 @@ struct MapFavoritesLayer: View {
     func reloadFavorites() async {
         let actor = DataFetcher(modelContainer: sharedModelContainer)
 
-        let layoutFavoriteWebCatalogIDMappings = mapFavoriteMappings(mappings)
+        let layoutFavoriteWebCatalogIDMappings = mapFavoriteMappings(mapper.layouts)
 
         let webCatalogIDs = Array(Set(layoutFavoriteWebCatalogIDMappings.values.flatMap { $0.keys }))
 
@@ -160,21 +158,21 @@ struct MapFavoritesLayer: View {
     }
 
     func mapFavoriteMappings(
-        _ layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]]
+        _ mappings: [LayoutCatalogMapping: [Int]]
     ) -> [LayoutCatalogMapping: [Int: WebCatalogColor?]] {
         guard let webCatalogIDMappedItems = favorites.wcIDMappedItems else {
             return [:]
         }
 
         var webCatalogIDToLayout: [Int: LayoutCatalogMapping] = [:]
-        for (layout, webCatalogIDs) in layoutWebCatalogIDMappings {
+        for (layout, webCatalogIDs) in mappings {
             for webCatalogID in webCatalogIDs {
                 webCatalogIDToLayout[webCatalogID] = layout
             }
         }
 
         var layoutFavoriteWebCatalogIDMappings: [LayoutCatalogMapping: [Int: WebCatalogColor?]] = [:]
-        for (layout, webCatalogIDs) in layoutWebCatalogIDMappings {
+        for (layout, webCatalogIDs) in mappings {
             layoutFavoriteWebCatalogIDMappings[layout] = Dictionary(
                 uniqueKeysWithValues: webCatalogIDs.map { ($0, nil) }
             )

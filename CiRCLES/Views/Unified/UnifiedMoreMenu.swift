@@ -71,7 +71,8 @@ struct UnifiedMoreMenu: View {
                        isOn: $useDarkModeMaps)
                 Toggle("More.Customization.Map.UseHighDefinitionMap", systemImage: "square.resize.up",
                        isOn: $useHighResolutionMaps)
-                Toggle("More.Customization.Map.ScrollToSelection", systemImage: "arrow.up.and.down.and.arrow.left.and.right",
+                Toggle("More.Customization.Map.ScrollToSelection",
+                       systemImage: "arrow.up.and.down.and.arrow.left.and.right",
                        isOn: Binding(
                            get: { scrollType == .popover },
                            set: { scrollType = $0 ? .popover : .none }
