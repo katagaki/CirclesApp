@@ -91,10 +91,10 @@ struct MapView: View {
         }
         .onChange(of: mapper.highlightTarget) {
             Task {
-                let isHighlighting = await mapper.highlightCircle(
+                let shouldHighlight = await mapper.highlightCircle(
                     zoomDivisor: zoomDivisor, spaceSize: spaceSize
                 )
-                if !isHighlighting {
+                if !shouldHighlight {
                     unifier.isCircleNotInMapAlertShowing = true
                 }
             }

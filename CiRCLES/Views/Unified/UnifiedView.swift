@@ -133,14 +133,9 @@ struct UnifiedView: View {
                 }
             }
         }
-        .onChange(of: unifier.sheetPath) { _, newValue in
+        .onChange(of: unifier.sheetPath) {
             if #unavailable(iOS 26.0) {
                 unifier.show()
-            }
-        }
-        .alert("Alerts.CircleNotInMap.Title", isPresented: $unifier.isCircleNotInMapAlertShowing) {
-            Button("Shared.OK", role: .cancel) {
-                unifier.isCircleNotInMapAlertShowing = false
             }
         }
         .alert("Alerts.Logout.Title", isPresented: $unifier.isGoingToSignOut) {
