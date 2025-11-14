@@ -13,17 +13,13 @@ struct UnifiedToolbar: ToolbarContent {
     @Environment(Oasis.self) var oasis
     @Environment(Unifier.self) var unifier
 
-    @Binding var viewPath: [UnifiedPath]
-    @Binding var isMyComiketPresenting: Bool
-    @Binding var isGoingToSignOut: Bool
-
     let namespace: Namespace.ID
 
     var body: some ToolbarContent {
         ToolbarItem(placement: .topBarLeading) {
             Button("Tab.My", image: .buttonMy) {
                 unifier.hide()
-                isMyComiketPresenting = true
+                unifier.isMyComiketPresenting = true
             }
             .matchedTransitionSource(id: "My.View", in: namespace)
         }
@@ -35,10 +31,7 @@ struct UnifiedToolbar: ToolbarContent {
                     .adaptiveShadow()
             }
             ToolbarItem(placement: .topBarTrailing) {
-                UnifiedMoreMenu(
-                    viewPath: $viewPath,
-                    isGoingToSignOut: $isGoingToSignOut
-                )
+                UnifiedMoreMenu()
             }
         }
         if #available(iOS 26.0, *) {

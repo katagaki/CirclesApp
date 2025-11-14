@@ -20,11 +20,6 @@ struct UnifiedView: View {
     @Environment(Unifier.self) var unifier
     @Environment(Orientation.self) var orientation
 
-    @State var viewPath: [UnifiedPath] = []
-
-    @State var isMyComiketPresenting: Bool = false
-    @State var isGoingToSignOut: Bool = false
-
     @Namespace var namespace
 
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
@@ -61,8 +56,8 @@ struct UnifiedView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $viewPath) {
-            @Bindable var unifier = unifier
+        @Bindable var unifier = unifier
+        NavigationStack(path: $unifier.stackPath) {
             MapView()
                 .navigationTitle("ViewTitle.Map")
                 .navigationBarTitleDisplayMode(.inline)
@@ -72,16 +67,11 @@ struct UnifiedView: View {
                 .safeAreaPadding(.trailing, mapTrailingPadding)
                 .safeAreaPadding(.bottom, mapBottomPadding)
                 .toolbar {
-                    UnifiedToolbar(
-                        viewPath: $viewPath,
-                        isMyComiketPresenting: $isMyComiketPresenting,
-                        isGoingToSignOut: $isGoingToSignOut,
-                        namespace: namespace
-                    )
+                    UnifiedToolbar(namespace: namespace)
                 }
 //                .adaptiveNavigationBar()
                 .unifierSheets(namespace: namespace)
-                .sheet(isPresented: $isMyComiketPresenting) {
+                .sheet(isPresented: $unifier.isMyComiketPresenting) {
                     Group {
                         if #available(iOS 26.0, *) {
                             NavigationStack {
@@ -136,21 +126,24 @@ struct UnifiedView: View {
                 }
             }
         }
-        .onChange(of: isMyComiketPresenting) { _, newValue in
+        .onChange(of: unifier.isMyComiketPresenting) { _, newValue in
             if #unavailable(iOS 26.0) {
                 if !newValue {
                     unifier.show()
                 }
             }
         }
-        .onChange(of: viewPath) { _, newValue in
+        .onChange(of: unifier.sheetPath) { _, newValue in
             if #unavailable(iOS 26.0) {
-                if newValue.isEmpty {
-                    unifier.show()
-                }
+                unifier.show()
             }
         }
-        .alert("Alerts.Logout.Title", isPresented: $isGoingToSignOut) {
+        .alert("Alerts.CircleNotInMap.Title", isPresented: $unifier.isCircleNotInMapAlertShowing) {
+            Button("Shared.OK", role: .cancel) {
+                unifier.isCircleNotInMapAlertShowing = false
+            }
+        }
+        .alert("Alerts.Logout.Title", isPresented: $unifier.isGoingToSignOut) {
             Button("Shared.Cancel", role: .cancel) {
                 unifier.show()
             }

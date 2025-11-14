@@ -14,9 +14,6 @@ struct UnifiedMoreMenu: View {
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
 
-    @Binding var viewPath: [UnifiedPath]
-    @Binding var isGoingToSignOut: Bool
-
     @State var activeEventNumber: Int = -1
 
     // Map Settings
@@ -141,7 +138,7 @@ struct UnifiedMoreMenu: View {
                     unifier.hide()
                     Task {
                         try? await Task.sleep(for: .seconds(0.5))
-                        isGoingToSignOut = true
+                        unifier.isGoingToSignOut = true
                     }
                 }
                 Button("More.DeleteAccount", role: .destructive) {
@@ -155,7 +152,7 @@ struct UnifiedMoreMenu: View {
                        isOn: $isPrivacyModeOn)
                 Button("More.More", systemImage: "ellipsis") {
                     unifier.hide()
-                    self.viewPath.append(.more)
+                    unifier.stackPath.append(.more)
                 }
             } header: {
                 Text("More.More")
