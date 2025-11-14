@@ -92,45 +92,54 @@ extension MapView {
         let spaceNumberSuffix = circle.spaceNumberSuffix
         
         // Find the matching layout mapping
-        for (layout, _) in layoutWebCatalogIDMappings {
+        for (layout, webCatalogIDs) in layoutWebCatalogIDMappings {
             if layout.blockID == blockID && layout.spaceNumber == spaceNumber {
                 let zoomFactor = zoomFactorDouble(zoomDivisor)
-                let xMin: Int = Int(Double(layout.positionX) / zoomFactor)
-                let yMin: Int = Int(Double(layout.positionY) / zoomFactor)
-                let spaceSize = Int(Double(spaceSize) / zoomFactor)
+                let xMin: CGFloat = CGFloat(layout.positionX) / zoomFactor
+                let yMin: CGFloat = CGFloat(layout.positionY) / zoomFactor
+                let scaledSpaceSize = CGFloat(spaceSize) / zoomFactor
                 
-                // Calculate position based on spaceNumberSuffix and layout type
-                var highlightRect: CGRect
-                let halfSpace = spaceSize / 2
+                // Get all circles in this space to determine positioning
+                let count = webCatalogIDs.count
+                guard count > 0 else { return }
+                
+                // Determine if we need to reverse the order based on layout type
+                let needsReverse = layout.layoutType == .aOnBottom || layout.layoutType == .aOnRight
+                
+                // Find the index of this circle based on spaceNumberSuffix
+                // The spaceNumberSuffix is the order index (0 for a, 1 for b, 2 for c)
+                var circleIndex = spaceNumberSuffix
+                
+                // If the layout is reversed, we need to adjust the index
+                if needsReverse {
+                    circleIndex = count - 1 - spaceNumberSuffix
+                }
+                
+                let countCGFloat = CGFloat(count)
+                let indexCGFloat = CGFloat(circleIndex)
+                
+                // Calculate the highlight rectangle based on layout type
+                let highlightRect: CGRect
                 
                 switch layout.layoutType {
-                case .aOnLeft: // a is on left, b is on right
-                    if spaceNumberSuffix == 0 { // a
-                        highlightRect = CGRect(x: xMin, y: yMin, width: halfSpace, height: spaceSize)
-                    } else { // b
-                        highlightRect = CGRect(x: xMin + halfSpace, y: yMin, width: halfSpace, height: spaceSize)
-                    }
-                case .aOnBottom: // a is on bottom, b is on top
-                    if spaceNumberSuffix == 0 { // a
-                        highlightRect = CGRect(x: xMin, y: yMin + halfSpace, width: spaceSize, height: halfSpace)
-                    } else { // b
-                        highlightRect = CGRect(x: xMin, y: yMin, width: spaceSize, height: halfSpace)
-                    }
-                case .aOnRight: // a is on right, b is on left
-                    if spaceNumberSuffix == 0 { // a
-                        highlightRect = CGRect(x: xMin + halfSpace, y: yMin, width: halfSpace, height: spaceSize)
-                    } else { // b
-                        highlightRect = CGRect(x: xMin, y: yMin, width: halfSpace, height: spaceSize)
-                    }
-                case .aOnTop: // a is on top, b is on bottom
-                    if spaceNumberSuffix == 0 { // a
-                        highlightRect = CGRect(x: xMin, y: yMin, width: spaceSize, height: halfSpace)
-                    } else { // b
-                        highlightRect = CGRect(x: xMin, y: yMin + halfSpace, width: spaceSize, height: halfSpace)
-                    }
-                case .unknown:
-                    // For unknown layout, highlight the entire space
-                    highlightRect = CGRect(x: xMin, y: yMin, width: spaceSize, height: spaceSize)
+                case .aOnLeft, .aOnRight, .unknown:
+                    // Horizontal layout
+                    let rectWidth = scaledSpaceSize / countCGFloat
+                    highlightRect = CGRect(
+                        x: xMin + indexCGFloat * rectWidth,
+                        y: yMin,
+                        width: rectWidth,
+                        height: scaledSpaceSize
+                    )
+                case .aOnTop, .aOnBottom:
+                    // Vertical layout
+                    let rectHeight = scaledSpaceSize / countCGFloat
+                    highlightRect = CGRect(
+                        x: xMin,
+                        y: yMin + indexCGFloat * rectHeight,
+                        width: scaledSpaceSize,
+                        height: rectHeight
+                    )
                 }
                 
                 // Set scroll position to center of highlight
