@@ -151,12 +151,13 @@ class Database {
     func loadCommonImages() {
         if let imageDatabase {
             do {
-                let table = Table("ComiketCommonImage")
                 let colName = Expression<String>("name")
                 let colImage = Expression<Data>("image")
-                var commonImages: [String: Data] = [:]
-                for row in try imageDatabase.prepare(table) {
-                    commonImages[row[colName]] = row[colImage]
+                let table = Table("ComiketCommonImage").select(colName, colImage)
+                let commonImages: [String: Data] = try imageDatabase.prepare(table).reduce(
+                    into: [:]
+                ) { partialResult, row in
+                    partialResult[row[colName]] = row[colImage]
                 }
                 self.commonImages = commonImages
                 self.commonImagesLoadCount += 1
@@ -169,12 +170,13 @@ class Database {
     func loadCircleImages() {
         if let imageDatabase {
             do {
-                let table = Table("ComiketCircleImage")
                 let colID = Expression<Int>("id")
                 let colCutImage = Expression<Data>("cutImage")
-                var circleImages: [Int: Data] = [:]
-                for row in try imageDatabase.prepare(table) {
-                    circleImages[row[colID]] = row[colCutImage]
+                let table = Table("ComiketCircleImage").select(colID, colCutImage)
+                let circleImages: [Int: Data] = try imageDatabase.prepare(table).reduce(
+                    into: [:]
+                ) { partialResult, row in
+                    partialResult[row[colID]] = row[colCutImage]
                 }
                 self.circleImages = circleImages
                 self.circleImagesLoadCount += 1
