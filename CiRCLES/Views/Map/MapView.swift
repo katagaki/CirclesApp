@@ -30,7 +30,7 @@ struct MapView: View {
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
-    @AppStorage(wrappedValue: 0, "Map.ScrollType") var scrollType: Int
+    @AppStorage(wrappedValue: .none, "Map.ScrollType") var scrollType: MapAutoScrollType
 
     var spaceSize: Int {
         useHighResolutionMaps ? 40 : 20
@@ -91,7 +91,7 @@ struct MapView: View {
                     }
                 }
                 .onChange(of: popoverPosition) { _, newValue in
-                    if MapAutoScrollType(rawValue: scrollType) == .popover {
+                    if scrollType == .popover {
                         scrollToPosition = newValue
                     }
                 }
