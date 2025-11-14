@@ -24,6 +24,7 @@ struct UnifiedMoreMenu: View {
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
+    @AppStorage(wrappedValue: 0, "Map.ScrollType") var scrollType: Int
 
     // Circle Display Settings
     @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
@@ -70,6 +71,11 @@ struct UnifiedMoreMenu: View {
                        isOn: $useDarkModeMaps)
                 Toggle("More.Customization.Map.UseHighDefinitionMap", systemImage: "square.resize.up",
                        isOn: $useHighResolutionMaps)
+                Toggle("More.Customization.Map.ScrollToSelection", systemImage: "arrow.up.left.and.arrow.down.right",
+                       isOn: Binding(
+                           get: { MapAutoScrollType(rawValue: scrollType) == .popover },
+                           set: { scrollType = $0 ? MapAutoScrollType.popover.rawValue : MapAutoScrollType.none.rawValue }
+                       ))
             }
             Section {
                 Toggle("More.Customization.Circles.ShowWebCut", systemImage: "text.rectangle.page",
