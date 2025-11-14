@@ -22,9 +22,12 @@ class Database {
     @ObservationIgnored var imageDatabase: Connection?
     @ObservationIgnored var textDatabaseURL: URL?
     @ObservationIgnored var imageDatabaseURL: URL?
-    var commonImages: [String: Data] = [:]
-    var circleImages: [Int: Data] = [:]
+    @ObservationIgnored var commonImages: [String: Data] = [:]
+    @ObservationIgnored var circleImages: [Int: Data] = [:]
     @ObservationIgnored var imageCache: [String: UIImage] = [:]
+
+    var commonImagesLoadCount: Int = 0
+    var circleImagesLoadCount: Int = 0
 
     init() {
         modelContext = sharedModelContainer.mainContext
@@ -156,6 +159,7 @@ class Database {
                     commonImages[row[colName]] = row[colImage]
                 }
                 self.commonImages = commonImages
+                self.commonImagesLoadCount += 1
             } catch {
                 debugPrint(error.localizedDescription)
             }
@@ -173,6 +177,7 @@ class Database {
                     circleImages[row[colID]] = row[colCutImage]
                 }
                 self.circleImages = circleImages
+                self.circleImagesLoadCount += 1
             } catch {
                 debugPrint(error.localizedDescription)
             }

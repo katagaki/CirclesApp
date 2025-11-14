@@ -31,7 +31,7 @@ struct MapView: View {
     }
 
     var mapInvalidationID: String {
-        "M\(selections.fullMapID)_R\(useHighResolutionMaps ? "H" : "L")_D\(database.commonImages.count)"
+        "M\(selections.fullMapID)_R\(useHighResolutionMaps ? "H" : "L")_D\(database.commonImagesLoadCount)"
     }
 
     var popoverInvalidationID: String {
