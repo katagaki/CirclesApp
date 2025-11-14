@@ -82,7 +82,7 @@ extension MapView {
     }
 
     // swiftlint:disable function_body_length
-    func highlightCircle(_ circle: ComiketCircle) async {
+    func highlightCircle(_ circle: ComiketCircle) async -> Bool {
         let blockID = circle.blockID
         let spaceNumber = circle.spaceNumber
         let spaceNumberSuffix = circle.spaceNumberSuffix
@@ -92,8 +92,7 @@ extension MapView {
                 layout.blockID == blockID && layout.spaceNumber == spaceNumber
             }
         ) else {
-            // TODO: Show message telling user the circle is not in this map
-            return
+            return false
         }
 
         let zoomFactor = zoomFactorDouble(zoomDivisor)
@@ -145,6 +144,8 @@ extension MapView {
                 sourceRect: highlightRect, shouldBlink: true
             )
         }
+        
+        return true
     }
     // swiftlint:enable function_body_length
 

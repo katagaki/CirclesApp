@@ -20,6 +20,7 @@ struct MapView: View {
     @State var genreImage: UIImage?
 
     @State var isInitialLoadCompleted: Bool = false
+    @State var isCircleNotInMapAlertShowing: Bool = false
 
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
@@ -92,11 +93,19 @@ struct MapView: View {
         .onChange(of: mapper.highlightTarget) { _, circle in
             if let circle {
                 Task {
-                    await highlightCircle(circle)
+                    let success = await highlightCircle(circle)
                     await MainActor.run {
                         mapper.highlightTarget = nil
+                        if !success {
+                            isCircleNotInMapAlertShowing = true
+                        }
                     }
                 }
+            }
+        }
+        .alert("Alerts.CircleNotInMap.Title", isPresented: $isCircleNotInMapAlertShowing) {
+            Button("Shared.OK", role: .cancel) {
+                isCircleNotInMapAlertShowing = false
             }
         }
     }

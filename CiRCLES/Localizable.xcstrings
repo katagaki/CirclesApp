@@ -6326,6 +6326,41 @@
           }
         }
       }
+    },
+    "Alerts.CircleNotInMap.Title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This circle is not present in the selected hall."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このサークルは選択されたホールに存在しません。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 서클은 선택한 홀에 없습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "该社团不在所选展厅中。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "該社團不在所選展廳中。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
