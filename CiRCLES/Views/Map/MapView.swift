@@ -26,6 +26,7 @@ struct MapView: View {
     @State var popoverData: PopoverData?
     @State var popoverPosition: CGPoint?
     @State var scrollToPosition: CGPoint?
+    @State var highlightData: HighlightData?
 
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
@@ -80,6 +81,12 @@ struct MapView: View {
                             popoverData: $popoverData
                         )
 
+                        // Highlight layer
+                        MapHighlightLayer(
+                            canvasSize: $canvasSize,
+                            highlightData: $highlightData
+                        )
+
                         // Popover layer
                         MapPopoverLayer(
                             canvasSize: $canvasSize,
@@ -122,6 +129,17 @@ struct MapView: View {
             popoverData = nil
             if let mapImage {
                 updateCanvasSize(mapImage)
+            }
+        }
+        .onChange(of: unifier.circleToHighlight) { _, circle in
+            if let circle {
+                Task {
+                    await highlightCircle(circle)
+                    // Reset the circle to highlight after processing
+                    await MainActor.run {
+                        unifier.circleToHighlight = nil
+                    }
+                }
             }
         }
     }

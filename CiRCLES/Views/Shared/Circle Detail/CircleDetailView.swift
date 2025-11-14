@@ -72,6 +72,9 @@ struct CircleDetailView: View {
                     Button("Circles.GoNext", systemImage: "chevron.right") {
                         goToNextCircle()
                     }
+                    Button("Circles.ShowOnMap", systemImage: "mappin.and.ellipse") {
+                        showOnMap()
+                    }
                 }
             }
         }
@@ -179,5 +182,9 @@ struct CircleDetailView: View {
         } else {
             return false
         }
+    }
+    
+    func showOnMap() {
+        unifier.showCircleOnMap(circle)
     }
 }

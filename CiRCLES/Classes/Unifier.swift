@@ -46,6 +46,9 @@ class Unifier {
 
     // Currently displayed sheet's navigation stack's view path
     var path: [UnifiedPath] = []
+    
+    // Circle to highlight on map
+    var circleToHighlight: ComiketCircle?
 
     @MainActor
     func show() {
@@ -103,5 +106,14 @@ class Unifier {
         withAnimation(.smooth.speed(2.0)) {
             sidebarPosition = sidebarPosition == .leading ? .trailing : .leading
         }
+    }
+    
+    @MainActor
+    func showCircleOnMap(_ circle: ComiketCircle) {
+        // Close the current sheet
+        self.close()
+        
+        // Set the circle to highlight
+        self.circleToHighlight = circle
     }
 }
