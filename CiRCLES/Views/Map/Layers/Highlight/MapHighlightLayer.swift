@@ -22,8 +22,8 @@ struct MapHighlightLayer: View {
             if let highlightData, isVisible {
                 context.fill(
                     Path(highlightData.sourceRect),
-                    with: !useDarkModeMaps ? .color(.black.opacity(0.3)) :
-                            .color(.primary.opacity(0.3))
+                    with: !useDarkModeMaps ? .color(.black) :
+                            .color(.primary)
                 )
             }
         }

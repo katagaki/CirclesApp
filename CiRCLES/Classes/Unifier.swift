@@ -110,9 +110,6 @@ class Unifier {
     
     @MainActor
     func showCircleOnMap(_ circle: ComiketCircle) {
-        // Close the current sheet
-        self.close()
-        
         // Set the circle to highlight
         self.circleToHighlight = circle
     }
