@@ -27,8 +27,8 @@ struct CircleCutImage: View {
     var forceReload: Bool
     var showVisitStatus: Bool
 
-    @State var isWebCutURLFetched: Bool = false
-    @State var webCutImage: UIImage?
+    @State var isWebCutFetched: Bool = false
+    @State var cutImage: UIImage?
 
     init(
         _ circle: ComiketCircle,
@@ -55,65 +55,17 @@ struct CircleCutImage: View {
     }
 
     var body: some View {
-        Group {
-            switch cutType {
-            case .catalog:
-                // Show catalog cut
-                if let catalogImage = database.circleImage(for: circle.id) {
-                    Image(uiImage: catalogImage)
-                        .resizable()
-                        .scaledToFit()
-                        .usesPrivacyMode()
-                } else {
-                    // No image available
-                    Rectangle()
-                        .foregroundStyle(Color.primary.opacity(0.05))
-                        .overlay {
-                            Text("Circles.NoImage")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        .aspectRatio(180.0 / 256.0, contentMode: .fit)
-                }
-
-            case .web:
-                // Try to show web cut, fallback to catalog
-                if let webCutImage {
-                    // Web cut is available
-                    Image(uiImage: webCutImage)
-                        .resizable()
-                        .scaledToFit()
-                        .usesPrivacyMode()
-                } else if authenticator.onlineState == .online && !isWebCutURLFetched {
-                    // Still loading web cut, show catalog in background with progress
-                    ZStack {
-                        if let catalogImage = database.circleImage(for: circle.id) {
-                            Image(uiImage: catalogImage)
-                                .resizable()
-                                .scaledToFit()
-                                .usesPrivacyMode()
-                        }
-                        ProgressView()
-                    }
-                } else if let catalogImage = database.circleImage(for: circle.id) {
-                    // Fallback to catalog cut
-                    Image(uiImage: catalogImage)
-                        .resizable()
-                        .scaledToFit()
-                        .usesPrivacyMode()
-                } else {
-                    // No image available
-                    Rectangle()
-                        .foregroundStyle(Color.primary.opacity(0.05))
-                        .overlay {
-                            Text("Circles.NoImage")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        .aspectRatio(180.0 / 256.0, contentMode: .fit)
-                }
+        ZStack(alignment: .center) {
+            if let cutImage {
+                Image(uiImage: cutImage)
+                    .resizable()
+                    .scaledToFit()
+                    .usesPrivacyMode()
+            } else {
+                noImageAvailableView()
             }
         }
+        .aspectRatio(180.0 / 256.0, contentMode: .fit)
         .overlay {
             if database.circleImage(for: circle.id) != nil {
                 Canvas { context, size in
@@ -121,26 +73,34 @@ struct CircleCutImage: View {
                     if let favorites = favorites.wcIDMappedItems,
                        let extendedInformation = circle.extendedInformation,
                        let favorite = favorites[extendedInformation.webCatalogID] {
-                        let squareSize = 0.23 * size.width
-                        let offset = 0.03 * size.width
-                        let rect = CGRect(x: offset, y: offset, width: squareSize, height: squareSize)
-                        let path = Path(rect)
-                        context.fill(path, with: .color(favorite.favorite.color.backgroundColor()))
+                        let checkmarkSquareSize = 0.23 * size.width
+                        let checkmarkSquareOffset = 0.03 * size.width
+                        let checkmarkSquarePath = Path(
+                            CGRect(
+                                x: checkmarkSquareOffset,
+                                y: checkmarkSquareOffset,
+                                width: checkmarkSquareSize,
+                                height: checkmarkSquareSize
+                            )
+                        )
+                        context.fill(checkmarkSquarePath, with: .color(favorite.favorite.color.backgroundColor()))
                     }
 
-                    // Visit status for visit mode
-                    if showVisitStatus, !visits.filter({$0.eventNumber == planner.activeEventNumber}).isEmpty {
+                    // Checkmark for visit status
+                    if showVisitStatus,
+                        !visits.filter({$0.eventNumber == planner.activeEventNumber}).isEmpty {
                         let checkmarkSize = 0.20 * size.width
                         let checkmarkOffset = 0.045 * size.width
-
                         if let checkmark = context.resolveSymbol(id: "checkmark") {
-                            let rect = CGRect(
-                                x: checkmarkOffset,
-                                y: checkmarkOffset,
-                                width: checkmarkSize,
-                                height: checkmarkSize
+                            context.draw(
+                                checkmark,
+                                in: CGRect(
+                                    x: checkmarkOffset,
+                                    y: checkmarkOffset,
+                                    width: checkmarkSize,
+                                    height: checkmarkSize
+                                )
                             )
-                            context.draw(checkmark, in: rect)
                         }
                     }
                 } symbols: {
@@ -179,8 +139,6 @@ struct CircleCutImage: View {
             prepareCutImage()
         }
         .onChange(of: circle.id) {
-            self.webCutImage = nil
-            isWebCutURLFetched = false
             prepareCutImage()
         }
         .onChange(of: cutType) {
@@ -189,22 +147,27 @@ struct CircleCutImage: View {
     }
 
     func prepareCutImage() {
+        isWebCutFetched = false
+        // Set the catalog cut as the default
+        if let catalogCutImage = database.circleImage(for: circle.id) {
+            self.cutImage = catalogCutImage
+        }
         // Only fetch web cut when cutType is .web and we're online
-        if cutType == .web && authenticator.onlineState == .online && !isWebCutURLFetched {
+        if cutType == .web && authenticator.onlineState == .online && !isWebCutFetched {
             if let extendedInformation = circle.extendedInformation {
                 let circleID = circle.id
                 let webCatalogID = extendedInformation.webCatalogID
                 Task.detached {
                     try? await webCut(for: circleID, webCatalogID: webCatalogID) { image, data in
                         await MainActor.run {
-                            withAnimation(.smooth.speed(2.0)) {
+                            withAnimation(.easeInOut.speed(2.0)) {
                                 if let image {
-                                    self.webCutImage = image
+                                    self.cutImage = image
                                 }
                                 if let data {
                                     imageCache.set(circleID, data: data)
                                 }
-                                isWebCutURLFetched = true
+                                isWebCutFetched = true
                             }
                         }
                     }
@@ -251,5 +214,16 @@ struct CircleCutImage: View {
         } else {
             return .black.opacity(0.9)
         }
+    }
+
+    @ViewBuilder
+    func noImageAvailableView() -> some View {
+        Rectangle()
+            .foregroundStyle(Color.primary.opacity(0.05))
+            .overlay {
+                Text("Circles.NoImage")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
     }
 }
