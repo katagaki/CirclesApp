@@ -2981,31 +2981,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Switching events is not supported in offline mode."
+            "value" : "Offline Mode"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "現在オフラインモードのため、イベントの切り替えができません。"
+            "value" : "オフラインモード"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "오프라인 모드에서는 이벤트 전환이 지원되지 않습니다."
+            "value" : "오프라인 모드"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "离线模式不支持切换活动。"
+            "value" : "离线模式"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "離線模式不支援切換活動。"
+            "value" : "離線模式"
           }
         }
       }

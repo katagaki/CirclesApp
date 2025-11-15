@@ -34,21 +34,22 @@ struct UnifiedMoreMenu: View {
     var body: some View {
         Menu("Tab.More", systemImage: "ellipsis") {
             Section {
-                if let eventData = planner.eventData {
-                    Picker(selection: $activeEventNumber) {
-                        ForEach(eventData.list.sorted(by: {$0.number > $1.number}), id: \.id) { event in
-                            Text("Shared.Event.\(event.number)")
-                                .tag(event.number)
-                        }
-                    } label: {
-                        Text("My.Events.SelectEvent")
-                    }
-                    .pickerStyle(.menu)
-                    .disabled(authenticator.onlineState == .offline ||
-                              authenticator.onlineState == .undetermined)
-                } else {
+                if authenticator.onlineState == .offline {
                     Text("My.Events.OfflineMode")
-                        .foregroundStyle(.secondary)
+                } else {
+                    if let eventData = planner.eventData {
+                        Picker(selection: $activeEventNumber) {
+                            ForEach(eventData.list.sorted(by: {$0.number > $1.number}), id: \.id) { event in
+                                Text("Shared.Event.\(event.number)")
+                                    .tag(event.number)
+                            }
+                        } label: {
+                            Text("My.Events.SelectEvent")
+                        }
+                        .pickerStyle(.menu)
+                        .disabled(authenticator.onlineState == .offline ||
+                                  authenticator.onlineState == .undetermined)
+                    }
                 }
             }
             ControlGroup("More.Customization.Map") {
@@ -159,7 +160,7 @@ struct UnifiedMoreMenu: View {
             }
         }
         .menuActionDismissBehavior(.disabled)
-        .onAppear {
+        .task {
             activeEventNumber = planner.activeEventNumber
         }
         .onChange(of: activeEventNumber) { oldValue, _ in

@@ -139,15 +139,16 @@ struct CircleCutImage: View {
             prepareCutImage()
         }
         .onChange(of: circle.id) {
+            isWebCutFetched = false
             prepareCutImage()
         }
         .onChange(of: cutType) {
+            isWebCutFetched = false
             prepareCutImage()
         }
     }
 
     func prepareCutImage() {
-        isWebCutFetched = false
         // Set the catalog cut as the default
         if let catalogCutImage = database.circleImage(for: circle.id) {
             self.cutImage = catalogCutImage
@@ -160,15 +161,13 @@ struct CircleCutImage: View {
                 Task.detached {
                     try? await webCut(for: circleID, webCatalogID: webCatalogID) { image, data in
                         await MainActor.run {
-                            withAnimation(.easeInOut.speed(2.0)) {
-                                if let image {
-                                    self.cutImage = image
-                                }
-                                if let data {
-                                    imageCache.set(circleID, data: data)
-                                }
-                                isWebCutFetched = true
+                            if let image {
+                                self.cutImage = image
                             }
+                            if let data {
+                                imageCache.set(circleID, data: data)
+                            }
+                            isWebCutFetched = true
                         }
                     }
                 }
