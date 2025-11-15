@@ -131,14 +131,10 @@ struct AuthenticatedView: ViewModifier {
                 await actor.deleteAll()
                 imageCache.clear()
 
-                await oasis.setBodyText("Loading.Events")
                 await actor.loadEvents(from: database.textDatabase)
-                await oasis.setBodyText("Loading.Maps")
                 await actor.loadMaps(from: database.textDatabase)
                 await actor.loadLayouts(from: database.textDatabase)
-                await oasis.setBodyText("Loading.Genres")
                 await actor.loadGenres(from: database.textDatabase)
-                await oasis.setBodyText("Loading.Circles")
                 await actor.loadCircles(from: database.textDatabase)
 
                 await actor.save()
@@ -147,7 +143,6 @@ struct AuthenticatedView: ViewModifier {
                 isDatabaseInitialized = true
             }
 
-            await oasis.setBodyText("Loading.Images")
             database.imageCache.removeAll()
             database.loadCommonImages()
             database.loadCircleImages()
