@@ -12,6 +12,8 @@ struct AdaptiveNavigationBarModifier: ViewModifier {
         if #unavailable(iOS 26.0) {
             content
                 .toolbarBackground(.visible, for: .navigationBar)
+        } else {
+            content
         }
     }
 }
