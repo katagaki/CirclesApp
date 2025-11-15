@@ -89,13 +89,15 @@ struct MapView: View {
                 updateCanvasSize(mapImage)
             }
         }
-        .onChange(of: mapper.highlightTarget) {
-            Task {
-                let shouldHighlight = await mapper.highlightCircle(
-                    zoomDivisor: zoomDivisor, spaceSize: spaceSize
-                )
-                if !shouldHighlight {
-                    unifier.isCircleNotInMapAlertShowing = true
+        .onChange(of: mapper.highlightTarget) { oldValue, newValue in
+            if oldValue == nil && newValue != nil {
+                Task {
+                    let shouldHighlight = await mapper.highlightCircle(
+                        zoomDivisor: zoomDivisor, spaceSize: spaceSize
+                    )
+                    if !shouldHighlight {
+                        unifier.isCircleNotInMapAlertShowing = true
+                    }
                 }
             }
         }
