@@ -188,6 +188,9 @@ struct CircleDetailView: View {
     }
 
     func showOnMap() {
+        if unifier.selectedDetent == .large {
+            unifier.selectedDetent = .height(360)
+        }
         mapper.highlightTarget = circle
     }
 }
