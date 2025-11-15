@@ -48,9 +48,9 @@ struct MapHighlightLayer: View {
     }
 
     func blink() async {
-        withAnimation(.easeInOut(duration: 0.2)) {
+        withAnimation(.easeInOut(duration: 0.16)) {
             isVisible.toggle()
         }
-        try? await Task.sleep(for: .seconds(0.2))
+        try? await Task.sleep(for: .seconds(0.16))
     }
 }
