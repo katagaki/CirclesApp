@@ -15,7 +15,7 @@ struct UnifiedPanel: View {
 
     var body: some View {
         @Bindable var unifier = unifier
-        NavigationStack(path: $unifier.path) {
+        NavigationStack(path: $unifier.sheetPath) {
             ZStack {
                 self.unifier.view()
             }

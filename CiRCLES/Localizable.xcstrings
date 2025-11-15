@@ -37,6 +37,41 @@
       },
       "shouldTranslate" : false
     },
+    "Alerts.CircleNotInMap.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This circle is not present in the selected hall."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このサークルは選択されたホールに配置されていません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 서클은 선택한 홀에 없습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "该社团不在所选展厅中。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "該社團不在所選展廳中。"
+          }
+        }
+      }
+    },
     "Alerts.FirstCircle.Title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -578,6 +613,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "攤位名稱、筆名、書名"
+          }
+        }
+      }
+    },
+    "Circles.ShowOnMap" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show on Map"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "マップで表示"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "지도에 표시"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在地图上显示"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在地圖上顯示"
           }
         }
       }
@@ -1937,6 +2006,40 @@
         }
       }
     },
+    "More.Customization.Map.ScrollToSelection" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scroll to Selection"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "選択時にスクロール"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "선택 항목으로 스크롤"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "滚动到选择"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "捲動到選擇"
+          }
+        }
+      }
+    },
     "More.Customization.Map.ShowsGenreOverlays" : {
       "localizations" : {
         "en" : {
@@ -2035,40 +2138,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "使用高解析度地圖"
-          }
-        }
-      }
-    },
-    "More.Customization.Map.ScrollToSelection" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Scroll to Selection"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "選択時にスクロール"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "선택 항목으로 스크롤"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "滚动到选择"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "捲動到選擇"
           }
         }
       }
@@ -2912,31 +2981,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Switching events is not supported in offline mode."
+            "value" : "Offline Mode"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "現在オフラインモードのため、イベントの切り替えができません。"
+            "value" : "オフラインモード"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "오프라인 모드에서는 이벤트 전환이 지원되지 않습니다."
+            "value" : "오프라인 모드"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "离线模式不支持切换活动。"
+            "value" : "离线模式"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "離線模式不支援切換活動。"
+            "value" : "離線模式"
           }
         }
       }

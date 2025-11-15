@@ -9,12 +9,10 @@ import SwiftUI
 
 struct MapPopover<Content: View>: View {
 
-    let popoverWidth: CGFloat = 240.0
-    let popoverHeight: CGFloat = (16.0 * 2) + (70.0 * 2) + 8.0
-    var edgePadding: CGFloat = 16.0
+    @Environment(Mapper.self) var mapper
 
-    @Binding var canvasSize: CGSize
-    @Binding var popoverPosition: CGPoint?
+    let edgePadding: CGFloat = 16.0
+
     var sourceRect: CGRect
     var isDismissing: Bool
     var content: () -> Content
@@ -24,7 +22,7 @@ struct MapPopover<Content: View>: View {
     var body: some View {
         content()
             .padding(16.0)
-            .frame(width: popoverWidth, height: popoverHeight)
+            .frame(width: mapper.popoverWidth, height: mapper.popoverHeight)
             .adaptiveGlass(.regular)
             .scaleEffect(0.3 + (0.7 * animationProgress))
             .opacity(animationProgress)
@@ -39,7 +37,7 @@ struct MapPopover<Content: View>: View {
                     withAnimation(.smooth.speed(2.5)) {
                         animationProgress = 1
                     }
-                    popoverPosition = calculatePopoverPosition()
+                    mapper.popoverPosition = calculatePopoverPosition()
                 }
             }
     }
@@ -56,14 +54,19 @@ struct MapPopover<Content: View>: View {
 
     // swiftlint:disable function_body_length
     func calculatePopoverPosition() -> CGPoint {
-        let gapFromSquare: CGFloat = 8
+        let canvasSize = mapper.canvasSize
+        let popoverWidth = mapper.popoverWidth
+        let popoverHeight = mapper.popoverHeight
+        let popoverDistance: CGFloat = mapper.popoverDistance
+        let edgePadding = mapper.popoverEdgePadding
+
         let effectiveHeight = max(popoverHeight, 150)
         let itemCenterX = sourceRect.midX
         let itemCenterY = sourceRect.midY
         let itemHalfWidth = sourceRect.width / 2
         let itemHalfHeight = sourceRect.height / 2
-        let minOffsetX = itemHalfWidth + gapFromSquare + (popoverWidth / 2)
-        let minOffsetY = itemHalfHeight + gapFromSquare + (effectiveHeight / 2)
+        let minOffsetX = itemHalfWidth + popoverDistance + (popoverWidth / 2)
+        let minOffsetY = itemHalfHeight + popoverDistance + (effectiveHeight / 2)
 
         let spaceRight = canvasSize.width - edgePadding - (itemCenterX + minOffsetX + popoverWidth / 2)
         let spaceLeft = (itemCenterX - minOffsetX - popoverWidth / 2) - edgePadding

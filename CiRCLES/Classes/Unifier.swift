@@ -44,8 +44,20 @@ class Unifier {
         }
     }
 
-    // Currently displayed sheet's navigation stack's view path
-    var path: [UnifiedPath] = []
+    // Bottom navigation stack's view path
+    var stackPath: [UnifiedPath] = []
+
+    // Sheet's navigation stack's view path
+    var sheetPath: [UnifiedPath] = []
+
+    // Other sheets
+    var isMyComiketPresenting: Bool = false
+
+    // Alerts
+    var isFirstCircleAlertShowing: Bool = false
+    var isLastCircleAlertShowing: Bool = false
+    var isCircleNotInMapAlertShowing: Bool = false
+    var isGoingToSignOut: Bool = false
 
     @MainActor
     func show() {
@@ -70,7 +82,7 @@ class Unifier {
             self.isPresented = false
         }
         self.current = nil
-        self.path = []
+        self.sheetPath = []
     }
 
     @MainActor
@@ -88,7 +100,7 @@ class Unifier {
     @MainActor
     func append(_ newPath: UnifiedPath) {
         if self.current != nil {
-            self.path.append(newPath)
+            self.sheetPath.append(newPath)
             // Only set isPresented on phone, iPad sidebar is always visible
             if UIDevice.current.userInterfaceIdiom == .phone {
                 self.isPresented = true

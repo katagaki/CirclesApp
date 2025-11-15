@@ -14,9 +14,6 @@ struct UnifiedMoreMenu: View {
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
 
-    @Binding var viewPath: [UnifiedPath]
-    @Binding var isGoingToSignOut: Bool
-
     @State var activeEventNumber: Int = -1
 
     // Map Settings
@@ -37,21 +34,22 @@ struct UnifiedMoreMenu: View {
     var body: some View {
         Menu("Tab.More", systemImage: "ellipsis") {
             Section {
-                if let eventData = planner.eventData {
-                    Picker(selection: $activeEventNumber) {
-                        ForEach(eventData.list.sorted(by: {$0.number > $1.number}), id: \.id) { event in
-                            Text("Shared.Event.\(event.number)")
-                                .tag(event.number)
-                        }
-                    } label: {
-                        Text("My.Events.SelectEvent")
-                    }
-                    .pickerStyle(.menu)
-                    .disabled(authenticator.onlineState == .offline ||
-                              authenticator.onlineState == .undetermined)
-                } else {
+                if authenticator.onlineState == .offline {
                     Text("My.Events.OfflineMode")
-                        .foregroundStyle(.secondary)
+                } else {
+                    if let eventData = planner.eventData {
+                        Picker(selection: $activeEventNumber) {
+                            ForEach(eventData.list.sorted(by: {$0.number > $1.number}), id: \.id) { event in
+                                Text("Shared.Event.\(event.number)")
+                                    .tag(event.number)
+                            }
+                        } label: {
+                            Text("My.Events.SelectEvent")
+                        }
+                        .pickerStyle(.menu)
+                        .disabled(authenticator.onlineState == .offline ||
+                                  authenticator.onlineState == .undetermined)
+                    }
                 }
             }
             ControlGroup("More.Customization.Map") {
@@ -71,7 +69,8 @@ struct UnifiedMoreMenu: View {
                        isOn: $useDarkModeMaps)
                 Toggle("More.Customization.Map.UseHighDefinitionMap", systemImage: "square.resize.up",
                        isOn: $useHighResolutionMaps)
-                Toggle("More.Customization.Map.ScrollToSelection", systemImage: "arrow.up.and.down.and.arrow.left.and.right",
+                Toggle("More.Customization.Map.ScrollToSelection",
+                       systemImage: "arrow.up.and.down.and.arrow.left.and.right",
                        isOn: Binding(
                            get: { scrollType == .popover },
                            set: { scrollType = $0 ? .popover : .none }
@@ -140,7 +139,7 @@ struct UnifiedMoreMenu: View {
                     unifier.hide()
                     Task {
                         try? await Task.sleep(for: .seconds(0.5))
-                        isGoingToSignOut = true
+                        unifier.isGoingToSignOut = true
                     }
                 }
                 Button("More.DeleteAccount", role: .destructive) {
@@ -154,14 +153,14 @@ struct UnifiedMoreMenu: View {
                        isOn: $isPrivacyModeOn)
                 Button("More.More", systemImage: "ellipsis") {
                     unifier.hide()
-                    self.viewPath.append(.more)
+                    unifier.stackPath.append(.more)
                 }
             } header: {
                 Text("More.More")
             }
         }
         .menuActionDismissBehavior(.disabled)
-        .onAppear {
+        .task {
             activeEventNumber = planner.activeEventNumber
         }
         .onChange(of: activeEventNumber) { oldValue, _ in

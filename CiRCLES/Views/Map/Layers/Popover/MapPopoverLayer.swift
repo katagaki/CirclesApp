@@ -9,10 +9,8 @@ import SwiftUI
 
 struct MapPopoverLayer<Content: View>: View {
 
-    @Binding var canvasSize: CGSize
+    @Environment(Mapper.self) var mapper
 
-    @Binding var selection: PopoverData?
-    @Binding var popoverPosition: CGPoint?
     var content: (PopoverData) -> Content
 
     @State var currentItem: PopoverData?
@@ -22,8 +20,6 @@ struct MapPopoverLayer<Content: View>: View {
         Group {
             if let currentItem, !currentItem.sourceRect.isNull {
                 MapPopover(
-                    canvasSize: $canvasSize,
-                    popoverPosition: $popoverPosition,
                     sourceRect: currentItem.sourceRect,
                     isDismissing: false
                 ) {
@@ -33,8 +29,6 @@ struct MapPopoverLayer<Content: View>: View {
             }
             if let dismissingItem, !dismissingItem.sourceRect.isNull {
                 MapPopover(
-                    canvasSize: $canvasSize,
-                    popoverPosition: .constant(nil),
                     sourceRect: dismissingItem.sourceRect,
                     isDismissing: true
                 ) {
@@ -43,7 +37,7 @@ struct MapPopoverLayer<Content: View>: View {
                 .id("!\(dismissingItem.id)")
             }
         }
-        .onChange(of: selection) { oldValue, newValue in
+        .onChange(of: mapper.popoverData) { oldValue, newValue in
             if oldValue != nil, newValue == nil {
                 dismiss()
             } else if let oldValue, let newValue, oldValue.id != newValue.id {
@@ -65,7 +59,7 @@ struct MapPopoverLayer<Content: View>: View {
         if let current = currentItem {
             dismissingItem = current
             currentItem = nil
-            selection = nil
+            mapper.popoverData = nil
 
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 dismissingItem = nil

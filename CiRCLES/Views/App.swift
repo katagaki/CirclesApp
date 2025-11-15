@@ -25,6 +25,7 @@ struct CirclesApp: App {
     @State var planner = Events()
     @State var oasis = Oasis()
     @State var selections = UserSelections()
+    @State var mapper = Mapper()
     @State var unifier = Unifier()
 
     @State var hasAppLaunchedForTheFirstTime: Bool = false
@@ -73,6 +74,7 @@ struct CirclesApp: App {
         .environment(planner)
         .environment(oasis)
         .environment(selections)
+        .environment(mapper)
         .environment(unifier)
         .onChange(of: scenePhase) { _, newValue in
             if !hasAppLaunchedForTheFirstTime {
