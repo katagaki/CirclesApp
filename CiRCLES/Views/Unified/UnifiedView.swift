@@ -69,7 +69,7 @@ struct UnifiedView: View {
                 .toolbar {
                     UnifiedToolbar(namespace: namespace)
                 }
-//                .adaptiveNavigationBar()
+                .adaptiveNavigationBar()
                 .unifierSheets(namespace: namespace)
                 .sheet(isPresented: $unifier.isMyComiketPresenting) {
                     Group {
