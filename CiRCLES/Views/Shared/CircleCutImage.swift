@@ -27,7 +27,6 @@ struct CircleCutImage: View {
     var forceReload: Bool
     var showVisitStatus: Bool
 
-    @State var isWebCutFetched: Bool = false
     @State var cutImage: UIImage?
 
     init(
@@ -139,22 +138,26 @@ struct CircleCutImage: View {
             prepareCutImage()
         }
         .onChange(of: circle.id) {
-            isWebCutFetched = false
+            cutImage = nil
             prepareCutImage()
         }
-        .onChange(of: cutType) {
-            isWebCutFetched = false
-            prepareCutImage()
+        .onChange(of: cutType) { _, newValue in
+            switch newValue {
+            case .catalog:
+                cutImage = database.circleImage(for: circle.id)
+            case .web:
+                prepareCutImage()
+            }
         }
     }
 
     func prepareCutImage() {
         // Set the catalog cut as the default
-        if let catalogCutImage = database.circleImage(for: circle.id) {
-            self.cutImage = catalogCutImage
+        if cutImage == nil {
+            cutImage = database.circleImage(for: circle.id)
         }
         // Only fetch web cut when cutType is .web and we're online
-        if cutType == .web && authenticator.onlineState == .online && !isWebCutFetched {
+        if cutType == .web && authenticator.onlineState == .online {
             if let extendedInformation = circle.extendedInformation {
                 let circleID = circle.id
                 let webCatalogID = extendedInformation.webCatalogID
@@ -167,7 +170,6 @@ struct CircleCutImage: View {
                             if let data {
                                 imageCache.set(circleID, data: data)
                             }
-                            isWebCutFetched = true
                         }
                     }
                 }
