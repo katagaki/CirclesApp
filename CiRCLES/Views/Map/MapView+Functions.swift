@@ -10,7 +10,7 @@ import SwiftUI
 extension MapView {
     func updateCanvasSize(_ image: UIImage) {
         let zoomFactor = zoomFactor(zoomDivisor)
-        canvasSize = CGSize(
+        mapper.canvasSize = CGSize(
             width: image.size.width / zoomFactor,
             height: image.size.height / zoomFactor
         )
@@ -18,7 +18,7 @@ extension MapView {
 
     func reloadAll() {
         withAnimation(.smooth.speed(2.0)) {
-            removeAllMappings()
+            mapper.removeAllLayouts()
             reloadMapImage()
         } completion: {
             if let map = selections.map {
@@ -34,10 +34,6 @@ extension MapView {
                 }
             }
         }
-    }
-
-    func removeAllMappings() {
-        layoutWebCatalogIDMappings.removeAll()
     }
 
     func reloadMapImage() {
@@ -80,9 +76,8 @@ extension MapView {
         // Send results back to the view
         await MainActor.run {
             withAnimation(.smooth.speed(2.0)) {
-                self.layoutWebCatalogIDMappings = layoutWebCatalogIDMappings
+                mapper.layouts = layoutWebCatalogIDMappings
             }
         }
     }
-
 }

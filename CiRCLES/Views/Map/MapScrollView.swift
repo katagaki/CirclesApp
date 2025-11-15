@@ -9,15 +9,13 @@ import SwiftUI
 import UIKit
 
 struct MapScrollView<Content: View>: UIViewRepresentable {
-    let content: Content
-    @Binding var scrollToPosition: CGPoint?
 
-    init(
-        scrollToPosition: Binding<CGPoint?> = .constant(nil),
-        @ViewBuilder content: () -> Content
-    ) {
+    @Environment(Mapper.self) var mapper
+
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
         self.content = content()
-        self._scrollToPosition = scrollToPosition
     }
 
     func makeUIView(context: Context) -> UIScrollView {
@@ -54,7 +52,7 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
             hostingController.view.invalidateIntrinsicContentSize()
         }
 
-        if let position = scrollToPosition {
+        if let position = mapper.scrollToPosition {
             let effectiveHeight = scrollView.bounds.height + scrollView.safeAreaInsets.top
             let halfWidth = scrollView.bounds.width / 2
             let halfHeight = effectiveHeight / 2
@@ -67,7 +65,7 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
             let centeredOffset = CGPoint(x: centeredX, y: centeredY)
             scrollView.setContentOffset(centeredOffset, animated: true)
             Task {
-                scrollToPosition = nil
+                mapper.scrollToPosition = nil
             }
         }
     }

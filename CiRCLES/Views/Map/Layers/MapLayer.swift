@@ -9,16 +9,16 @@ import SwiftUI
 
 struct MapLayer: View {
 
-    @Binding var canvasSize: CGSize
+    @Environment(Mapper.self) var mapper
     var image: UIImage
-
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var body: some View {
         Image(uiImage: image)
             .resizable()
             .colorInvert(adaptive: true, enabled: $useDarkModeMaps)
-            .frame(width: canvasSize.width, height: canvasSize.height)
+            .frame(width: mapper.canvasSize.width,
+                   height: mapper.canvasSize.height)
             .allowsHitTesting(false)
     }
 }

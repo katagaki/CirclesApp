@@ -13,19 +13,13 @@ struct MapView: View {
     @Environment(Database.self) var database
     @Environment(Favorites.self) var favorites
     @Environment(UserSelections.self) var selections
+    @Environment(Mapper.self) var mapper
     @Environment(Unifier.self) var unifier
-
-    @State var canvasSize: CGSize = .zero
 
     @State var mapImage: UIImage?
     @State var genreImage: UIImage?
 
-    @State var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
     @State var isInitialLoadCompleted: Bool = false
-
-    @State var popoverData: PopoverData?
-    @State var popoverPosition: CGPoint?
-    @State var scrollToPosition: CGPoint?
 
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
@@ -37,7 +31,7 @@ struct MapView: View {
     }
 
     var mapInvalidationID: String {
-        "M\(selections.fullMapID)_R\(useHighResolutionMaps ? "H" : "L")_D\(database.commonImages.count)"
+        "M\(selections.fullMapID)_R\(useHighResolutionMaps ? "H" : "L")_D\(database.commonImagesLoadCount)"
     }
 
     var popoverInvalidationID: String {
@@ -47,52 +41,23 @@ struct MapView: View {
     var body: some View {
         VStack(alignment: .leading) {
             if let mapImage {
-                MapScrollView(
-                    scrollToPosition: $scrollToPosition
-                ) {
+                MapScrollView {
                     ZStack(alignment: .topLeading) {
-                        // Map image layer
-                        MapLayer(
-                            canvasSize: $canvasSize,
-                            image: mapImage
-                        )
-
-                        // Favorites layer
-                        MapFavoritesLayer(
-                            canvasSize: $canvasSize,
-                            mappings: $layoutWebCatalogIDMappings,
-                            spaceSize: spaceSize
-                        )
-
-                        // Genre layer
+                        MapLayer(image: mapImage)
+                        MapFavoritesLayer(spaceSize: spaceSize)
                         if showGenreOverlay, let genreImage {
-                            MapLayer(
-                                canvasSize: $canvasSize,
-                                image: genreImage
-                            )
+                            MapLayer(image: genreImage)
                         }
-
-                        // Map layouts layer
-                        MapLayoutLayer(
-                            canvasSize: $canvasSize,
-                            mappings: $layoutWebCatalogIDMappings,
-                            spaceSize: spaceSize,
-                            popoverData: $popoverData
-                        )
-
-                        // Popover layer
-                        MapPopoverLayer(
-                            canvasSize: $canvasSize,
-                            selection: $popoverData,
-                            popoverPosition: $popoverPosition,
-                        ) { selection in
+                        MapLayoutLayer(spaceSize: spaceSize)
+                        MapHighlightLayer()
+                        MapPopoverLayer { selection in
                             MapPopoverDetail(selection: selection)
                         }
                     }
                 }
-                .onChange(of: popoverPosition) { _, newValue in
+                .onChange(of: mapper.popoverPosition) { _, newValue in
                     if scrollType == .popover {
-                        scrollToPosition = newValue
+                        mapper.scrollToPosition = newValue
                     }
                 }
             } else {
@@ -115,13 +80,23 @@ struct MapView: View {
             }
         }
         .onChange(of: mapInvalidationID) {
-            popoverData = nil
+            mapper.popoverData = nil
             reloadAll()
         }
         .onChange(of: popoverInvalidationID) {
-            popoverData = nil
+            mapper.popoverData = nil
             if let mapImage {
                 updateCanvasSize(mapImage)
+            }
+        }
+        .onChange(of: mapper.highlightTarget) {
+            Task {
+                let shouldHighlight = await mapper.highlightCircle(
+                    zoomDivisor: zoomDivisor, spaceSize: spaceSize
+                )
+                if !shouldHighlight {
+                    unifier.isCircleNotInMapAlertShowing = true
+                }
             }
         }
     }

@@ -17,6 +17,7 @@ struct CircleDetailView: View {
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
+    @Environment(Mapper.self) var mapper
     @Environment(Unifier.self) var unifier
 
     @State var circle: ComiketCircle
@@ -28,12 +29,11 @@ struct CircleDetailView: View {
 
     @State var previousCircle: ((ComiketCircle) -> ComiketCircle?)?
     @State var nextCircle: ((ComiketCircle) -> ComiketCircle?)?
-    @State var isFirstCircleAlertShowing: Bool = false
-    @State var isLastCircleAlertShowing: Bool = false
 
     @Namespace var namespace
 
     var body: some View {
+        @Bindable var unifier = unifier
         List {
             Section {
                 CircleDetailHero(
@@ -65,13 +65,19 @@ struct CircleDetailView: View {
         .subtitledTitle(circle.circleName, subtitle: circle.penName)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                HStack {
-                    Button("Circles.GoPrevious", systemImage: "chevron.left") {
-                        goToPreviousCircle()
-                    }
-                    Button("Circles.GoNext", systemImage: "chevron.right") {
-                        goToNextCircle()
-                    }
+                Button("Circles.ShowOnMap", systemImage: "mappin.and.ellipse") {
+                    showOnMap()
+                }
+            }
+            if #available(iOS 26.0, *) {
+                ToolbarSpacer(.fixed, placement: .topBarTrailing)
+            }
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button("Circles.GoPrevious", systemImage: "chevron.left") {
+                    goToPreviousCircle()
+                }
+                Button("Circles.GoNext", systemImage: "chevron.right") {
+                    goToNextCircle()
                 }
             }
         }
@@ -84,15 +90,14 @@ struct CircleDetailView: View {
                 )
             }
         }
-        .alert("Alerts.FirstCircle.Title", isPresented: $isFirstCircleAlertShowing) {
-            Button("Shared.OK", role: .cancel) {
-                isFirstCircleAlertShowing = false
-            }
+        .alert("Alerts.FirstCircle.Title", isPresented: $unifier.isFirstCircleAlertShowing) {
+            Button("Shared.OK", role: .cancel) { }
         }
-        .alert("Alerts.LastCircle.Title", isPresented: $isLastCircleAlertShowing) {
-            Button("Shared.OK", role: .cancel) {
-                isLastCircleAlertShowing = false
-            }
+        .alert("Alerts.LastCircle.Title", isPresented: $unifier.isLastCircleAlertShowing) {
+            Button("Shared.OK", role: .cancel) { }
+        }
+        .alert("Alerts.CircleNotInMap.Title", isPresented: $unifier.isCircleNotInMapAlertShowing) {
+            Button("Shared.OK", role: .cancel) { }
         }
         .task {
             await prepareCircle()
@@ -135,12 +140,12 @@ struct CircleDetailView: View {
                     await prepareCircle()
                 }
             } else {
-                isFirstCircleAlertShowing = true
+                unifier.isFirstCircleAlertShowing = true
             }
         } else {
             let circleID = circle.id - 1
             if !goToCircle(with: circleID) {
-                isFirstCircleAlertShowing = true
+                unifier.isFirstCircleAlertShowing = true
             }
         }
     }
@@ -153,12 +158,12 @@ struct CircleDetailView: View {
                     await prepareCircle()
                 }
             } else {
-                isLastCircleAlertShowing = true
+                unifier.isLastCircleAlertShowing = true
             }
         } else {
             let circleID = circle.id + 1
             if !goToCircle(with: circleID) {
-                isLastCircleAlertShowing = true
+                unifier.isLastCircleAlertShowing = true
             }
         }
     }
@@ -179,5 +184,9 @@ struct CircleDetailView: View {
         } else {
             return false
         }
+    }
+
+    func showOnMap() {
+        mapper.highlightTarget = circle
     }
 }
