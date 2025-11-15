@@ -133,9 +133,16 @@ struct UnifiedView: View {
                 }
             }
         }
-        .onChange(of: unifier.sheetPath) {
-            if #unavailable(iOS 26.0) {
+        .onChange(of: unifier.sheetPath) { _, newValue in
+            if !newValue.isEmpty && !unifier.isPresenting {
                 unifier.show()
+            }
+        }
+        .onChange(of: unifier.stackPath) { _, newValue in
+            if #unavailable(iOS 26.0) {
+                if newValue.isEmpty {
+                    unifier.show()
+                }
             }
         }
         .alert("Alerts.Logout.Title", isPresented: $unifier.isGoingToSignOut) {

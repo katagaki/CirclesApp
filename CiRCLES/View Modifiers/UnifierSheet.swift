@@ -18,7 +18,7 @@ struct UnifierSheetModifier: ViewModifier {
         @Bindable var unifier = unifier
         if UIDevice.current.userInterfaceIdiom == .phone {
             content
-                .sheet(isPresented: $unifier.isPresented) {
+                .sheet(isPresented: $unifier.isPresenting) {
                     if authenticator.isAuthenticating {
                         LoginView()
                             .environment(authenticator)

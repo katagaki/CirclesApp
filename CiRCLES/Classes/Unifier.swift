@@ -16,7 +16,7 @@ enum SidebarPosition {
 @Observable
 class Unifier {
 
-    var isPresented: Bool = false
+    var isPresenting: Bool = false
     var sidebarPosition: SidebarPosition = .leading
 
     // Currently displayed sheet's data representation
@@ -26,7 +26,7 @@ class Unifier {
         selectedDetent != .height(360) && selectedDetent != .large
     }
     var safeAreaHeight: CGFloat {
-        if !isPresented {
+        if !isPresenting {
             return 0
         } else {
             var height: CGFloat = .zero
@@ -63,7 +63,7 @@ class Unifier {
     func show() {
         // Only set isPresented on phone, iPad sidebar is always visible
         if UIDevice.current.userInterfaceIdiom == .phone {
-            self.isPresented = true
+            self.isPresenting = true
         }
     }
 
@@ -71,7 +71,7 @@ class Unifier {
     func hide() {
         // Only hide on phone, iPad sidebar is always visible
         if UIDevice.current.userInterfaceIdiom == .phone {
-            self.isPresented = false
+            self.isPresenting = false
         }
     }
 
@@ -79,7 +79,7 @@ class Unifier {
     func close() {
         // Only close on phone, iPad sidebar is always visible
         if UIDevice.current.userInterfaceIdiom == .phone {
-            self.isPresented = false
+            self.isPresenting = false
         }
         self.current = nil
         self.sheetPath = []
@@ -103,7 +103,7 @@ class Unifier {
             self.sheetPath.append(newPath)
             // Only set isPresented on phone, iPad sidebar is always visible
             if UIDevice.current.userInterfaceIdiom == .phone {
-                self.isPresented = true
+                self.isPresenting = true
             }
         } else {
             self.current = newPath
