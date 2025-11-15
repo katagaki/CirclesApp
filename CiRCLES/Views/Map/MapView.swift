@@ -96,6 +96,7 @@ struct MapView: View {
                         zoomDivisor: zoomDivisor, spaceSize: spaceSize
                     )
                     if !shouldHighlight {
+                        mapper.highlightTarget = nil
                         unifier.isCircleNotInMapAlertShowing = true
                     }
                 }
