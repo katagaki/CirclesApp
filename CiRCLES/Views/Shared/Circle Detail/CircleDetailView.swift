@@ -68,6 +68,7 @@ struct CircleDetailView: View {
                 Button("Circles.ShowOnMap", systemImage: "mappin.and.ellipse") {
                     showOnMap()
                 }
+                .disabled(mapper.highlightTarget != nil)
             }
             if #available(iOS 26.0, *) {
                 ToolbarSpacer(.fixed, placement: .topBarTrailing)
