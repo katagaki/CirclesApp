@@ -44,6 +44,7 @@ struct MapHighlightLayer: View {
             await blink()
         }
         mapper.highlightData = nil
+        mapper.highlightTarget = nil
     }
 
     func blink() async {
