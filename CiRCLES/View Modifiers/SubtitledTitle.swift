@@ -16,7 +16,7 @@ struct SubtitledTitleModifier: ViewModifier {
             content
                 .navigationTitle(title)
                 .navigationSubtitle(subtitle)
-                .toolbarTitleDisplayMode(.inlineLarge)
+                .toolbarTitleDisplayMode(.inline)
         } else {
             content
                 .navigationTitle(title)
