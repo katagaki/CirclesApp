@@ -13,6 +13,7 @@ struct FavoritesToolbar: ToolbarContent {
 
     @Binding var displayMode: CircleDisplayMode
     @Binding var listDisplayMode: ListDisplayMode
+    @Binding var gridDisplayMode: GridDisplayMode
 
     var body: some ToolbarContent {
 
@@ -21,6 +22,9 @@ struct FavoritesToolbar: ToolbarContent {
                 DisplayModeSwitcher(mode: $displayMode)
                 if displayMode == .list {
                     ListModeSwitcher(mode: $listDisplayMode)
+                }
+                if displayMode == .grid {
+                    GridModeSwitcher(mode: $gridDisplayMode)
                 }
             }
         }
