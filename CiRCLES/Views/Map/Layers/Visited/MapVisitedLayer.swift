@@ -63,10 +63,17 @@ struct MapVisitedLayer: View {
         let webCatalogIDs = await actor.webCatalogIDs(forCircleIDs: circleIDs)
         let visitedWCIDSet = Set(webCatalogIDs)
 
+        let allLayoutWCIDs = Array(Set(mapper.layouts.values.flatMap { $0 }))
+        let spaceNumberSuffixes = await actor.spaceNumberSuffixes(forWebCatalogIDs: allLayoutWCIDs)
+
         var newPath = Path()
 
         for (layout, layoutWCIDs) in mapper.layouts {
-            let sortedIDs = layoutWCIDs.sorted()
+            let sortedIDs = layoutWCIDs.sorted {
+                let lhsSuffix = spaceNumberSuffixes[$0] ?? 0
+                let rhsSuffix = spaceNumberSuffixes[$1] ?? 0
+                return lhsSuffix < rhsSuffix
+            }
             let orderedIDs: [Int]
             switch layout.layoutType {
             case .aOnBottom, .aOnRight:
