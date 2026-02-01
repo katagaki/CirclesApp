@@ -258,25 +258,5 @@ struct MyEventNotifierSheet: View {
             notificationsToUpdate[dateString]?.removeAll(where: {$0.time == notification.time})
         }
     }
-
-//    func dateFromTime(_ timeString: String) -> Date? {
-//        let timeFormatter = DateFormatter()
-//        timeFormatter.dateFormat = "HH:mm"
-//        if let time = timeFormatter.date(from: timeString) {
-//            let calendar = Calendar.current
-//            let dateComponents = calendar.dateComponents([.year, .month, .day], from: date)
-//            let timeComponents = calendar.dateComponents([.hour, .minute], from: time)
-//            var mergedComponents = DateComponents()
-//            mergedComponents.year = dateComponents.year
-//            mergedComponents.month = dateComponents.month
-//            mergedComponents.day = dateComponents.day
-//            mergedComponents.hour = timeComponents.hour
-//            mergedComponents.minute = timeComponents.minute
-//            if let date = calendar.date(from: mergedComponents) {
-//                return date
-//            }
-//        }
-//        return nil
-//    }
 }
 // swiftlint:enable type_body_length
