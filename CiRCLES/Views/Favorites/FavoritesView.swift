@@ -20,9 +20,11 @@ struct FavoritesView: View {
     @AppStorage(wrappedValue: true, "Favorites.GroupByColor") var isGroupedByColorDefault: Bool
     @AppStorage(wrappedValue: .grid, "Favorites.DisplayMode") var displayMode: CircleDisplayMode
     @AppStorage(wrappedValue: ListDisplayMode.regular, "Favorites.ListDisplayMode") var listDisplayMode: ListDisplayMode
+    @AppStorage(wrappedValue: GridDisplayMode.medium, "Favorites.GridDisplayMode") var gridDisplayMode: GridDisplayMode
 
     @State var displayModeState: CircleDisplayMode = .grid
     @State var listDisplayModeState: ListDisplayMode = .regular
+    @State var gridDisplayModeState: GridDisplayMode = .medium
 
     @AppStorage(wrappedValue: true, "Customization.DoubleTapToVisit") var isDoubleTapToVisitEnabled: Bool
 
@@ -38,6 +40,7 @@ struct FavoritesView: View {
                         switch displayModeState {
                         case .grid:
                             ColorGroupedCircleGrid(
+                                displayMode: gridDisplayModeState,
                                 groups: favoriteCircles,
                                 showsOverlayWhenEmpty: false,
                                 namespace: namespace,
@@ -72,6 +75,7 @@ struct FavoritesView: View {
                         switch displayModeState {
                         case .grid:
                             CircleGrid(
+                                displayMode: gridDisplayModeState,
                                 circles: favoriteCircles.values.flatMap({ $0 }).sorted(by: { $0.id < $1.id }),
                                 showsOverlayWhenEmpty: false,
                                 namespace: namespace,
@@ -122,7 +126,7 @@ struct FavoritesView: View {
         .navigationTitle("ViewTitle.Favorites")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            FavoritesToolbar(displayMode: $displayModeState, listDisplayMode: $listDisplayModeState)
+            FavoritesToolbar(displayMode: $displayModeState, listDisplayMode: $listDisplayModeState, gridDisplayMode: $gridDisplayModeState)
         }
         .refreshable {
             await reloadFavorites()
@@ -139,12 +143,16 @@ struct FavoritesView: View {
 
             displayModeState = displayMode
             listDisplayModeState = listDisplayMode
+            gridDisplayModeState = gridDisplayMode
         }
         .onChange(of: displayModeState) {
             displayMode = displayModeState
         }
         .onChange(of: listDisplayModeState) {
             listDisplayMode = listDisplayModeState
+        }
+        .onChange(of: gridDisplayModeState) {
+            gridDisplayMode = gridDisplayModeState
         }
         .onChange(of: selections.date) {
             if let favoriteItems = favorites.items {
