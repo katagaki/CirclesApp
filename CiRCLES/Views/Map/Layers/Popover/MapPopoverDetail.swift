@@ -84,8 +84,7 @@ struct MapPopoverDetail: View {
     func fetchCircles() {
         if let selection {
             Task.detached {
-                await database.connect()
-                let textDatabase = await database.textDatabase
+                let textDatabase = await database.getTextDatabase()
                 let actor = DataFetcher(database: textDatabase)
                 let circleIdentifiers = await actor.circles(withWebCatalogIDs: selection.ids)
                 await MainActor.run {

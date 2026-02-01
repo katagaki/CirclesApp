@@ -45,6 +45,7 @@ struct AuthenticatedView: ViewModifier {
             }
             .onChange(of: planner.activeEventNumber) { oldValue, _ in
                 if oldValue != -1 {
+                    database.disconnect()
                     planner.activeEventNumberUserDefault = planner.activeEventNumber
                     planner.updateActiveEvent(onlineState: authenticator.onlineState)
                     reloadData(forceDownload: false, shouldResetSelections: true)
@@ -116,7 +117,6 @@ struct AuthenticatedView: ViewModifier {
             selections.map = selections.fetchDefaultMapSelection(database: database)
         }
 
-        database.connect()
         if !authenticator.isAuthenticating {
             unifier.show()
         }
@@ -149,7 +149,6 @@ struct AuthenticatedView: ViewModifier {
             if oasis.isShowing {
                 await oasis.setBodyText("Loading.Database")
             }
-            database.connect()
             selections.reloadData(database: database)
 
             if oasis.isShowing {

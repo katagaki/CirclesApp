@@ -61,28 +61,24 @@ class UserSelections {
 
     @MainActor
     func reloadData(database: Database) {
-        var dateID = defaults.object(forKey: selectedDateKey) as? Int
-        if dateID == 0 { dateID = nil }
-        var mapID = defaults.object(forKey: selectedMapKey) as? Int
-        if mapID == 0 { mapID = nil }
-        let blockIDs = defaults.array(forKey: selectedBlocksKey) as? [Int] ?? []
-        let genreIDs = defaults.array(forKey: selectedGenresKey) as? [Int] ?? []
-        database.connect()
+        let dateID = defaults.object(forKey: selectedDateKey) as? Int ?? 0
+        let mapID = defaults.object(forKey: selectedMapKey) as? Int ?? 0
         _date = database.dates().first(where: { $0.id == dateID })
         _map = database.maps().first(where: { $0.id == mapID })
+
+        let blockIDs = defaults.array(forKey: selectedBlocksKey) as? [Int] ?? []
+        let genreIDs = defaults.array(forKey: selectedGenresKey) as? [Int] ?? []
         _blocks = Set(database.blocks().filter({ blockIDs.contains($0.id) }))
         _genres = Set(database.genres().filter({ genreIDs.contains($0.id) }))
     }
 
     @MainActor
     func fetchDefaultDateSelection(database: Database) -> ComiketDate? {
-        database.connect()
         return database.dates().first
     }
 
     @MainActor
     func fetchDefaultMapSelection(database: Database) -> ComiketMap? {
-        database.connect()
         return database.maps().first
     }
 
@@ -97,14 +93,13 @@ class UserSelections {
     }
 
     func resetSelections() {
+        defaults.set(0, forKey: selectedDateKey)
+        defaults.set(0, forKey: selectedMapKey)
+
         _genres = []
         defaults.set([], forKey: selectedGenresKey)
-        _map = nil
-        defaults.set(nil, forKey: selectedMapKey)
         _blocks = []
         defaults.set([], forKey: selectedBlocksKey)
-        _date = nil
-        defaults.set(nil, forKey: selectedDateKey)
     }
 
 }

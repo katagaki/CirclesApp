@@ -12,7 +12,7 @@ extension Database {
     // MARK: Text Data
 
     func circles(_ identifiers: [Int], reversed: Bool = false) -> [ComiketCircle] {
-        if let textDatabase {
+        if let textDatabase = getTextDatabase() {
             do {
                 let circlesTable = Table("ComiketCircleWC")
                 let circleExtendedInformationTable = Table("ComiketCircleExtend")
@@ -45,7 +45,7 @@ extension Database {
     }
 
     func genres() -> [ComiketGenre] {
-        if let textDatabase {
+        if let textDatabase = getTextDatabase() {
             do {
                 let table = Table("ComiketGenreWC")
                 return try textDatabase.prepare(table).map { ComiketGenre(from: $0) }
@@ -58,7 +58,7 @@ extension Database {
     }
 
     func blocks() -> [ComiketBlock] {
-        if let textDatabase {
+        if let textDatabase = getTextDatabase() {
             do {
                 let table = Table("ComiketBlockWC")
                 return try textDatabase.prepare(table).map { ComiketBlock(from: $0) }
@@ -71,7 +71,7 @@ extension Database {
     }
 
     func dates() -> [ComiketDate] {
-        if let textDatabase {
+        if let textDatabase = getTextDatabase() {
             do {
                 let table = Table("ComiketDateWC")
                 return try textDatabase.prepare(table).map { ComiketDate(from: $0) }
@@ -84,7 +84,7 @@ extension Database {
     }
 
     func maps() -> [ComiketMap] {
-        if let textDatabase {
+        if let textDatabase = getTextDatabase() {
             do {
                 let table = Table("ComiketMapWC")
                 return try textDatabase.prepare(table).map { ComiketMap(from: $0) }
@@ -97,7 +97,7 @@ extension Database {
     }
 
     func events() -> [ComiketEvent] {
-        if let textDatabase {
+        if let textDatabase = getTextDatabase() {
             do {
                 let table = Table("ComiketInfoWC")
                 return try textDatabase.prepare(table).map { ComiketEvent(from: $0) }

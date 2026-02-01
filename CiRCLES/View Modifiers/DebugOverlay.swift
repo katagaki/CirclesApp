@@ -11,6 +11,8 @@ import SwiftUI
 struct DebugOverlayModifier: ViewModifier {
     @Environment(Authenticator.self) var authenticator
     @Environment(Events.self) var planner
+    @Environment(UserSelections.self) var selections
+    @Environment(Database.self) var database
 
     func body(content: Content) -> some View {
         content
@@ -37,6 +39,9 @@ struct DebugOverlayModifier: ViewModifier {
                             Text(verbatim: "Token string: \((authenticator.token?.accessToken ?? "").prefix(5))")
                             Text(verbatim: "Active event number: \(planner.activeEventNumber)")
                             Text(verbatim: "Event count: \(String(describing: planner.eventData?.list.count))")
+                            Text(verbatim: "Selection: M\(selections.map?.name ?? "-") D\(selections.date?.id ?? -1)")
+                            Text(verbatim: "Text database: \(database.textDatabase != nil ? "connected" : "disconnected")")
+                            Text(verbatim: "Image database: \(database.imageDatabase != nil ? "connected" : "disconnected")")
                         }
                         .font(.system(size: 10.0))
                     }

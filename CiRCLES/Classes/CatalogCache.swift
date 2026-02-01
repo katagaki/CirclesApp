@@ -19,9 +19,9 @@ class CatalogCache {
     var isLoading: Bool = false
 
     static func fetchCircles(
-        genreIDs: [Int]?, mapID: Int?, blockIDs: [Int]?, dayID: Int?, database: Connection?
+        genreIDs: [Int]?, mapID: Int?, blockIDs: [Int]?, dayID: Int?, database: Database
     ) async -> [Int] {
-        let actor = DataFetcher(database: database)
+        let actor = DataFetcher(database: await database.getTextDatabase())
 
         var circleIdentifiers: [Int] = []
         if let mapID {
@@ -44,8 +44,8 @@ class CatalogCache {
 
     }
 
-    static func fetchGenreIDs(inMap mapID: Int, onDay dayID: Int, database: Connection?) async -> [Int] {
-        let actor = DataFetcher(database: database)
+    static func fetchGenreIDs(inMap mapID: Int, onDay dayID: Int, database: Database) async -> [Int] {
+        let actor = DataFetcher(database: await database.getTextDatabase())
         return await actor.genreIDs(inMap: mapID, onDay: dayID)
     }
 
@@ -53,14 +53,14 @@ class CatalogCache {
         inMap mapID: Int,
         onDay dayID: Int,
         withGenreIDs genreIDs: [Int]?,
-        database: Connection?
+        database: Database
     ) async -> [Int] {
-        let actor = DataFetcher(database: database)
+        let actor = DataFetcher(database: await database.getTextDatabase())
         return await actor.blockIDs(inMap: mapID, onDay: dayID, withGenreIDs: genreIDs)
     }
 
-    static func searchCircles(_ searchTerm: String, database: Connection?) async -> [Int]? {
-        let actor = DataFetcher(database: database)
+    static func searchCircles(_ searchTerm: String, database: Database) async -> [Int]? {
+        let actor = DataFetcher(database: await database.getTextDatabase())
         if searchTerm.trimmingCharacters(in: .whitespaces).count >= 2 {
             let circleIdentifiers = await actor.circles(containing: searchTerm)
             return circleIdentifiers

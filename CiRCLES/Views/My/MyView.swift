@@ -106,7 +106,6 @@ struct MyView: View {
                 await reloadData(using: token)
                 await MainActor.run {
                      withAnimation(.smooth.speed(2.0)) {
-                         database.connect()
                          events = database.events()
                          eventTitle = events.first(where: {
                              $0.eventNumber == planner.activeEventNumber
@@ -128,8 +127,7 @@ struct MyView: View {
         var eventDates: [Int: Date]?
 
         if let eventNumber = planner.activeEvent?.number {
-            database.connect()
-            let actor = DataFetcher(database: database.textDatabase)
+            let actor = DataFetcher(database: database.getTextDatabase())
             eventDates = await actor.dates(for: eventNumber)
         }
 
