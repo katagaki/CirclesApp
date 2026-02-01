@@ -21,7 +21,7 @@ struct CircleListRegularRow: View {
     var body: some View {
         HStack(spacing: 10.0) {
             CircleCutImage(
-                circle, in: namespace, cutType: .web,
+                circle, in: namespace, cutType: showWebCut ? .web : .catalog,
                 showSpaceName: .constant(false), showDay: .constant(false)
             )
             .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
@@ -47,6 +47,7 @@ struct CircleListRegularRow: View {
                     }
                 }
             }
+            Spacer(minLength: 0)
         }
     }
 }
