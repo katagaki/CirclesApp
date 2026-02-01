@@ -278,6 +278,21 @@ actor DataFetcher {
         return circles(withWebCatalogIDs: webCatalogIDs)
     }
 
+    func webCatalogIDs(forCircleIDs circleIDs: [Int]) -> [Int] {
+        if let database {
+            do {
+                let extendedTable = Table("ComiketCircleExtend")
+                let colID = Expression<Int>("id")
+                let colWebCatalogID = Expression<Int>("WCId")
+                let query = extendedTable.select(colWebCatalogID).filter(circleIDs.contains(colID))
+                return try database.prepare(query).map { $0[colWebCatalogID] }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return []
+    }
+
     func spaceNumberSuffixes(forWebCatalogIDs webCatalogIDs: [Int]) -> [Int: Int] {
         if let database {
             do {

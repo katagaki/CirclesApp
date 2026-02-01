@@ -27,7 +27,7 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
         scrollView.delegate = context.coordinator
         scrollView.contentInsetAdjustmentBehavior = .always
         scrollView.minimumZoomScale = 0.5
-        scrollView.maximumZoomScale = 5.0
+        scrollView.maximumZoomScale = 3.0
 
         let hostingController = UIHostingController(rootView: content)
         hostingController.view.backgroundColor = .clear
