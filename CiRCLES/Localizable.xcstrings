@@ -6,9 +6,33 @@
     },
     "%@:%@" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@:%2$@"
+          }
+        },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
+            "value" : "%1$@:%2$@"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@:%2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@:%2$@"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "%1$@:%2$@"
           }
         }
@@ -17,6 +41,12 @@
     },
     "16:00" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "16:00"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -28,6 +58,12 @@
     },
     "17:00" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "17:00"
+          }
+        },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
@@ -49,7 +85,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "このサークルは選択された棟に配置されていません。"
+            "value" : "選択された棟にこのサークルはありません。"
           }
         },
         "ko" : {
@@ -4086,6 +4122,24 @@
             "state" : "translated",
             "value" : "複数ブロック"
           }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "여러 블록"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "多个区块"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "多個區塊"
+          }
         }
       }
     },
@@ -4785,6 +4839,24 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "複数ジャンル"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "여러 장르"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "多个类型"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "多個類型"
           }
         }
       }

@@ -101,9 +101,32 @@ struct MapView: View {
                         spaceSize: spaceSize
                     )
                     if !shouldHighlight {
+                        if let circle = newValue {
+                            let actor = DataFetcher(database: database.getTextDatabase())
+                            if let mapID = await actor.mapID(forBlock: circle.blockID) {
+                                let maps = database.maps()
+                                let dates = database.dates()
+                                if let newMap = maps.first(where: { $0.id == mapID }),
+                                   let newDate = dates.first(where: { $0.id == circle.day }) {
+                                    if selections.map?.id != newMap.id || selections.date?.id != newDate.id {
+                                        selections.map = newMap
+                                        selections.date = newDate
+                                        return
+                                    }
+                                }
+                            }
+                        }
                         mapper.highlightTarget = nil
-                        unifier.isCircleNotInMapAlertShowing = true
                     }
+                }
+            }
+        }
+        .onChange(of: mapper.layouts) {
+            if mapper.highlightTarget != nil {
+                Task {
+                    _ = await mapper.highlightCircle(
+                        spaceSize: spaceSize
+                    )
                 }
             }
         }

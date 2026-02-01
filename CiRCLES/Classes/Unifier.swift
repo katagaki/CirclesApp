@@ -56,7 +56,6 @@ class Unifier {
     // Alerts
     var isFirstCircleAlertShowing: Bool = false
     var isLastCircleAlertShowing: Bool = false
-    var isCircleNotInMapAlertShowing: Bool = false
     var isGoingToSignOut: Bool = false
 
     @MainActor
