@@ -49,7 +49,7 @@ struct CirclesApp: App {
                     }
                 }
                 .progressAlert(
-                    isModal: $oasis.isModal,
+                    isModal: .constant(true),
                     isShowing: $oasis.isShowing,
                     headerText: $oasis.headerText,
                     bodyText: $oasis.bodyText,

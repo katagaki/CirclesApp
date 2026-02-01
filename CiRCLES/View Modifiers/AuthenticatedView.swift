@@ -40,7 +40,7 @@ struct AuthenticatedView: ViewModifier {
             }
             .onChange(of: authenticator.isAuthenticating) { oldValue, newValue in
                 if oldValue == true && newValue == false && authenticator.token != nil {
-                    reloadData()
+                    reloadData(shouldResetSelections: true)
                 }
             }
             .onChange(of: planner.activeEventNumber) { oldValue, _ in
@@ -81,13 +81,17 @@ struct AuthenticatedView: ViewModifier {
                             Task.detached {
                                 await loadDataFromDatabase(for: activeEvent)
                                 await MainActor.run {
-                                    finishReload(shouldResetSelections: shouldResetSelections)
+                                    finishReload(shouldResetSelections: true)
                                 }
                             }
                         }
                     } else {
-                        await loadDataFromDatabase(for: activeEvent)
-                        finishReload(shouldResetSelections: shouldResetSelections)
+                        Task.detached {
+                            await loadDataFromDatabase(for: activeEvent)
+                            await MainActor.run {
+                                finishReload(shouldResetSelections: shouldResetSelections)
+                            }
+                        }
                     }
                 } else {
                     finishReload(shouldResetSelections: shouldResetSelections)
@@ -99,6 +103,11 @@ struct AuthenticatedView: ViewModifier {
     @MainActor
     func finishReload(shouldResetSelections: Bool = false) {
         oasis.close()
+
+        if shouldResetSelections {
+            selections.resetSelections()
+        }
+
         // Set initial selections
         if shouldResetSelections || selections.date == nil {
             selections.date = selections.fetchDefaultDateSelection(database: database)
@@ -107,6 +116,7 @@ struct AuthenticatedView: ViewModifier {
             selections.map = selections.fetchDefaultMapSelection(database: database)
         }
 
+        database.connect()
         if !authenticator.isAuthenticating {
             unifier.show()
         }
@@ -133,8 +143,7 @@ struct AuthenticatedView: ViewModifier {
                     await oasis.setProgress(progress)
                 }
             } else {
-                await database.downloadTextDatabase(for: activeEvent, authToken: token) { _ in }
-                await database.downloadImageDatabase(for: activeEvent, authToken: token) { _ in }
+                database.prepare(for: activeEvent)
             }
 
             if oasis.isShowing {
@@ -155,7 +164,6 @@ struct AuthenticatedView: ViewModifier {
             database.imageCache.removeAll()
             database.loadCommonImages()
             database.loadCircleImages()
-            database.disconnect()
         }
 
         UIApplication.shared.isIdleTimerDisabled = false

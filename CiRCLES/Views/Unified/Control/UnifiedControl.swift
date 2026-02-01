@@ -13,7 +13,7 @@ struct UnifiedControl: View {
 
     var body: some View {
         Group {
-            if !(selections.date == nil || selections.map == nil) {
+            if selections.date != nil && selections.map != nil {
                 if #available(iOS 26.0, *) {
                     HStack {
                         DatePicker()

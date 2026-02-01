@@ -44,42 +44,6 @@ actor DataFetcher {
         return [:]
     }
 
-    func blocks(inMap mapID: Int) -> [Int] {
-        if let database {
-            do {
-                let layoutsTable = Table("ComiketLayoutWC")
-                let blocksTable = Table("ComiketBlockWC")
-                let colMapID = Expression<Int>("mapId")
-                let colBlockID = Expression<Int>("blockId")
-                let colID = Expression<Int>("id")
-
-                let layoutsQuery = layoutsTable.select(colBlockID).filter(colMapID == mapID)
-                let blockIDs = Set(try database.prepare(layoutsQuery).map { $0[colBlockID] })
-
-                let blocksQuery = blocksTable.select(colID).filter(blockIDs.contains(colID))
-                return try database.prepare(blocksQuery).map { $0[colID] }
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-        return []
-    }
-
-    func layouts(inMap mapID: Int) -> [Int] {
-        if let database {
-            do {
-                let table = Table("ComiketLayoutWC")
-                let colMapID = Expression<Int>("mapId")
-                let colID = Expression<Int>("id")
-                let query = table.select(colID).filter(colMapID == mapID)
-                return try database.prepare(query).map { $0[colID] }
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-        return []
-    }
-
     func layoutMappings(inMap mapID: Int, useHighResolutionMaps: Bool) -> [LayoutCatalogMapping] {
         if let database {
             do {
@@ -254,7 +218,9 @@ actor DataFetcher {
                 let mappingQuery = mappingTable.select(colBlockID).filter(colMapID == mapID)
                 let blockIDs = Set(try database.prepare(mappingQuery).map { $0[colBlockID] })
 
-                let circlesQuery = circlesTable.select(colGenreID).filter(blockIDs.contains(colBlockID) && colDay == dayID)
+                let circlesQuery = circlesTable
+                    .select(colGenreID)
+                    .filter(blockIDs.contains(colBlockID) && colDay == dayID)
                 return Array(Set(try database.prepare(circlesQuery).map { $0[colGenreID] }))
             } catch {
                 debugPrint(error.localizedDescription)
@@ -276,7 +242,9 @@ actor DataFetcher {
                 let mappingQuery = mappingTable.select(colBlockID).filter(colMapID == mapID)
                 let blockIDs = Set(try database.prepare(mappingQuery).map { $0[colBlockID] })
 
-                var circlesQuery = circlesTable.select(colBlockID).filter(blockIDs.contains(colBlockID) && colDay == dayID)
+                var circlesQuery = circlesTable
+                    .select(colBlockID)
+                    .filter(blockIDs.contains(colBlockID) && colDay == dayID)
                 if let genreIDs, !genreIDs.isEmpty {
                     circlesQuery = circlesQuery.filter(genreIDs.contains(colGenreID))
                 }

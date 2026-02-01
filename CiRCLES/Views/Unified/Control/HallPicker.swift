@@ -40,7 +40,7 @@ struct HallPicker: View {
         }
         .task {
             database.connect()
-            maps = database.allMaps()
+            maps = database.maps()
         }
     }
 

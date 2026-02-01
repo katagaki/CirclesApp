@@ -107,7 +107,7 @@ struct MyView: View {
                 await MainActor.run {
                      withAnimation(.smooth.speed(2.0)) {
                          database.connect()
-                         events = database.allEvents()
+                         events = database.events()
                          eventTitle = events.first(where: {
                              $0.eventNumber == planner.activeEventNumber
                          })?.name

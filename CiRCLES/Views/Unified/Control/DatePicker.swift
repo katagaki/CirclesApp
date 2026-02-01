@@ -40,7 +40,7 @@ struct DatePicker: View {
         }
         .task {
             database.connect()
-            dates = database.allDates()
+            dates = database.dates()
         }
     }
 }
