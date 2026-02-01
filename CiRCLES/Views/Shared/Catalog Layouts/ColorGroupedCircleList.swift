@@ -18,54 +18,57 @@ struct ColorGroupedCircleList: View {
     var onDoubleTap: ((ComiketCircle) -> Void)?
 
     var body: some View {
-        List {
-            ForEach(WebCatalogColor.allCases, id: \.self) { color in
-                if let circles = groups[String(color.rawValue)] {
-                    Section {
-                        ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
-                            Group {
-                                if let onDoubleTap {
-                                    Group {
-                                        switch displayMode {
-                                        case .regular:
-                                            CircleListRegularRow(circle: circle, namespace: namespace)
-                                        case .compact:
-                                            CircleListCompactRow(circle: circle, namespace: namespace)
+        ScrollView {
+            LazyVStack(spacing: 0.0, pinnedViews: [.sectionHeaders]) {
+                ForEach(WebCatalogColor.allCases, id: \.self) { color in
+                    if let circles = groups[String(color.rawValue)] {
+                        Section {
+                            ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
+                                Group {
+                                    if let onDoubleTap {
+                                        Group {
+                                            switch displayMode {
+                                            case .regular:
+                                                CircleListRegularRow(circle: circle, namespace: namespace)
+                                            case .compact:
+                                                CircleListCompactRow(circle: circle, namespace: namespace)
+                                            }
                                         }
-                                    }
-                                    .contentShape(Rectangle())
-                                    .onFastDoubleTap(doubleTap: {
-                                        onDoubleTap(circle)
-                                    }, singleTap: {
-                                        onSelect(circle)
-                                    })
-                                    .contextMenu(circle: circle) {
-                                        onSelect(circle)
-                                    }
-                                    .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
-                                } else {
-                                    Button {
-                                        onSelect(circle)
-                                    } label: {
-                                        switch displayMode {
-                                        case .regular:
-                                            CircleListRegularRow(circle: circle, namespace: namespace)
-                                        case .compact:
-                                            CircleListCompactRow(circle: circle, namespace: namespace)
+                                        .contentShape(Rectangle())
+                                        .onFastDoubleTap(doubleTap: {
+                                            onDoubleTap(circle)
+                                        }, singleTap: {
+                                            onSelect(circle)
+                                        })
+                                        .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
+                                    } else {
+                                        Button {
+                                            onSelect(circle)
+                                        } label: {
+                                            switch displayMode {
+                                            case .regular:
+                                                CircleListRegularRow(circle: circle, namespace: namespace)
+                                            case .compact:
+                                                CircleListCompactRow(circle: circle, namespace: namespace)
+                                            }
                                         }
-                                    }
-                                    .contextMenu(circle: circle) {
-                                        onSelect(circle)
                                     }
                                 }
+                                .padding([.leading, .trailing], 20.0)
+                                .padding([.top, .bottom], 10.0)
+                                .contextMenu(circle: circle) {
+                                    onSelect(circle)
+                                }
+                                .background(Rectangle().fill(color.backgroundColor().tertiary))
+                                Divider()
+                                    .padding([.leading], 100.0)
+                                    .background(Rectangle().fill(color.backgroundColor().tertiary))
                             }
-                            .listRowBackground(Rectangle().fill(color.backgroundColor().tertiary))
                         }
                     }
                 }
             }
         }
-        .listStyle(.plain)
         .overlay {
             if groups.isEmpty && showsOverlayWhenEmpty {
                 ContentUnavailableView(

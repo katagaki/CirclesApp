@@ -26,16 +26,17 @@ actor DataFetcher {
                 let table = Table("ComiketDateWC")
                 let colEventNumber = Expression<Int>("comiketNo")
                 let colID = Expression<Int>("id")
-                let colDate = Expression<String>("date")
+                let colYear = Expression<Int>("year")
+                let colMonth = Expression<Int>("month")
+                let colDay = Expression<Int>("day")
                 let query = table.filter(colEventNumber == eventNumber).order(colID.asc)
 
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "yyyyMMdd"
-
                 return try database.prepare(query).reduce(into: [Int: Date]()) { result, row in
-                    if let date = dateFormatter.date(from: row[colDate]) {
-                        result[row[colID]] = date
-                    }
+                    let year = try row.get(colYear)
+                    let month = try row.get(colMonth)
+                    let day = try row.get(colDay)
+                    let date = Calendar.current.date(from: DateComponents(year: year, month: month, day: day))!
+                    result[row[colID]] = date
                 }
             } catch {
                 debugPrint(error.localizedDescription)
