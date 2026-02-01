@@ -317,6 +317,23 @@ actor DataFetcher {
             result[webCatalogID] = 0
         }
     }
+    func mapID(forBlock blockID: Int) -> Int? {
+        if let database {
+            do {
+                let mappingTable = Table("ComiketMappingWC")
+                let colMapID = Expression<Int>("mapId")
+                let colMappingBlockID = Expression<Int>("blockId")
+
+                let query = mappingTable.select(colMapID).filter(colMappingBlockID == blockID)
+                if let row = try database.pluck(query) {
+                    return row[colMapID]
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return nil
+    }
 }
 
 // swiftlint:enable type_body_length

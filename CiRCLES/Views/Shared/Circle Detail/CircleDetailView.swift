@@ -96,9 +96,6 @@ struct CircleDetailView: View {
         .alert("Alerts.LastCircle.Title", isPresented: $unifier.isLastCircleAlertShowing) {
             Button("Shared.OK", role: .cancel) { }
         }
-        .alert("Alerts.CircleNotInMap.Title", isPresented: $unifier.isCircleNotInMapAlertShowing) {
-            Button("Shared.OK", role: .cancel) { }
-        }
         .task {
             await prepareCircle()
         }
