@@ -52,51 +52,77 @@ struct CatalogToolbar: ToolbarContent {
         Menu {
             @Bindable var selections = selections
             Button("Shared.All") {
-                self.selections.genre = nil
+                self.selections.genres.removeAll()
             }
-            Picker(selection: $selections.genre.animation(.smooth.speed(2.0))) {
-                ForEach(selectableGenres ?? genres, id: \.id) { genre in
-                    Text(genre.name)
-                        .tag(genre)
+            Divider()
+            ForEach(selectableGenres ?? genres, id: \.id) { genre in
+                Button {
+                    var newGenres = selections.genres
+                    if newGenres.contains(genre) {
+                        newGenres.remove(genre)
+                    } else {
+                        newGenres.insert(genre)
+                    }
+                    selections.genres = newGenres
+                } label: {
+                    if selections.genres.contains(genre) {
+                        Label(genre.name, systemImage: "checkmark")
+                    } else {
+                        Text(genre.name)
+                    }
                 }
-            } label: {
-                Text("Shared.Genre")
             }
         } label: {
-            genreIcon(selections.genre?.name)
+            genreIcon(selections.genres)
         }
         .menuActionDismissBehavior(.disabled)
-        .onChange(of: catalogCache.displayedCircles.hashValue, initial: true) {
+        .onChange(of: selections.map, initial: true) {
+            reloadSelectableGenres()
+        }
+        .onChange(of: selections.date, initial: true) {
             reloadSelectableGenres()
         }
     }
 
     @ViewBuilder
-    func genreIcon(_ genreName: String?) -> some View {
-        switch genreName {
-        case "男性向":
+    func genreIcon(_ genres: Set<ComiketGenre>) -> some View {
+        if genres.count == 1, let firstGenre = genres.first {
+            let genreName = firstGenre.name
+            switch genreName {
+            case "男性向":
+                ToolbarButtonLabel(
+                    LocalizedStringKey(genreName),
+                    image: .asset("Button.R18")
+                )
+            case "ブルーアーカイブ":
+                ToolbarButtonLabel(
+                    LocalizedStringKey(genreName),
+                    image: .system("scope")
+                )
+            case "艦これ", "アズールレーン":
+                ToolbarButtonLabel(
+                    LocalizedStringKey(genreName),
+                    image: .system("water.waves")
+                )
+            case "コスプレ":
+                ToolbarButtonLabel(
+                    LocalizedStringKey(genreName),
+                    image: .system("tshirt")
+                )
+            default:
+                ToolbarButtonLabel(
+                    LocalizedStringKey(genreName),
+                    image: .system("theatermask.and.paintbrush")
+                )
+            }
+        } else if genres.count > 1 {
             ToolbarButtonLabel(
-                LocalizedStringKey(genreName ?? "Shared.Genre"),
-                image: .asset("Button.R18")
+                "Shared.Genre.Multiple",
+                image: .system("theatermask.and.paintbrush")
             )
-        case "ブルーアーカイブ":
+        } else {
             ToolbarButtonLabel(
-                LocalizedStringKey(genreName ?? "Shared.Genre"),
-                image: .system("scope")
-            )
-        case "艦これ", "アズールレーン":
-            ToolbarButtonLabel(
-                LocalizedStringKey(genreName ?? "Shared.Genre"),
-                image: .system("water.waves")
-            )
-        case "コスプレ":
-            ToolbarButtonLabel(
-                LocalizedStringKey(genreName ?? "Shared.Genre"),
-                image: .system("tshirt")
-            )
-        default:
-            ToolbarButtonLabel(
-                LocalizedStringKey(genreName ?? "Shared.Genre"),
+                "Shared.Genre",
                 image: .system("theatermask.and.paintbrush")
             )
         }
@@ -107,43 +133,90 @@ struct CatalogToolbar: ToolbarContent {
         Menu {
             @Bindable var selections = selections
             Button("Shared.All") {
-                self.selections.block = nil
+                self.selections.blocks.removeAll()
             }
-            Picker(selection: $selections.block.animation(.smooth.speed(2.0))) {
-                ForEach(selectableBlocks ?? blocks, id: \.id) { block in
-                    Text(block.name)
-                        .tag(block)
+            Divider()
+            ForEach(selectableBlocks ?? blocks, id: \.id) { block in
+                Button {
+                    var newBlocks = selections.blocks
+                    if newBlocks.contains(block) {
+                        newBlocks.remove(block)
+                    } else {
+                        newBlocks.insert(block)
+                    }
+                    selections.blocks = newBlocks
+                } label: {
+                    if selections.blocks.contains(block) {
+                        Label(block.name, systemImage: "checkmark")
+                    } else {
+                        Text(block.name)
+                    }
                 }
-            } label: {
-                Text("Shared.Block")
             }
         } label: {
-            ToolbarButtonLabel(
-                LocalizedStringKey(selections.block?.name ?? "Shared.Block"),
-                image: .system("rectangle.split.3x1")
-            )
+            if selections.blocks.count == 1, let firstBlock = selections.blocks.first {
+                ToolbarButtonLabel(
+                    LocalizedStringKey(firstBlock.name),
+                    image: .system("rectangle.split.3x1")
+                )
+            } else if selections.blocks.count > 1 {
+                 ToolbarButtonLabel(
+                    "Shared.Block.Multiple",
+                    image: .system("rectangle.split.3x1")
+                )
+            } else {
+                ToolbarButtonLabel(
+                    "Shared.Block",
+                    image: .system("rectangle.split.3x1")
+                )
+            }
         }
         .menuActionDismissBehavior(.disabled)
-        .onChange(of: catalogCache.displayedCircles.hashValue, initial: true) {
+        .onChange(of: selections.map, initial: true) {
+            reloadSelectableBlocks()
+        }
+        .onChange(of: selections.date, initial: true) {
+            reloadSelectableBlocks()
+        }
+        .onChange(of: selections.genres) {
             reloadSelectableBlocks()
         }
     }
 
     func reloadSelectableGenres() {
-        if catalogCache.displayedCircles.isEmpty {
-            selectableGenres = nil
+        if let mapID = selections.map?.id, let dayID = selections.date?.id {
+            Task {
+                let genreIDs = await CatalogCache.fetchGenreIDs(inMap: mapID, onDay: dayID)
+                await MainActor.run {
+                    withAnimation(.smooth.speed(2.0)) {
+                        selectableGenres = genres
+                            .filter({ genreIDs.contains($0.id) })
+                            .sorted(by: {$0.name < $1.name})
+                    }
+                }
+            }
         } else {
-            let genreIDs: [Int] = Array(Set(catalogCache.displayedCircles.compactMap({$0.genreID})))
-            selectableGenres = genres.filter({ genreIDs.contains($0.id) })
+            selectableGenres = nil
         }
     }
 
     func reloadSelectableBlocks() {
-        if catalogCache.displayedCircles.isEmpty {
-            selectableBlocks = nil
+        if let mapID = selections.map?.id, let dayID = selections.date?.id {
+            let selectedGenreIDs = selections.genres.isEmpty ? nil : Array(selections.genres.map(\.id))
+            Task {
+                let blockIDs = await CatalogCache.fetchBlockIDs(
+                    inMap: mapID, onDay: dayID, withGenreIDs: selectedGenreIDs
+                )
+                await MainActor.run {
+                    withAnimation(.smooth.speed(2.0)) {
+                        selectableBlocks = blocks
+                            .filter({ blockIDs.contains($0.id) })
+                            .sorted(by: {$0.name < $1.name})
+                    }
+                }
+            }
         } else {
-            let blockIDs: [Int] = Array(Set(catalogCache.displayedCircles.compactMap({$0.blockID})))
-            selectableBlocks = blocks.filter({ blockIDs.contains($0.id) })
+            selectableBlocks = nil
         }
     }
 }

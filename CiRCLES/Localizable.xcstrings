@@ -4039,6 +4039,22 @@
         }
       }
     },
+    "Shared.Block.Multiple" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Multiple Blocks"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複数ブロック"
+          }
+        }
+      }
+    },
     "Shared.BookName" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4617,6 +4633,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "類型"
+          }
+        }
+      }
+    },
+    "Shared.Genre.Multiple" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Multiple Genres"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "複数ジャンル"
           }
         }
       }

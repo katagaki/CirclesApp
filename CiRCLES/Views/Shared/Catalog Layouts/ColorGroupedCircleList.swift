@@ -34,12 +34,11 @@ struct ColorGroupedCircleList: View {
                                         }
                                     }
                                     .contentShape(Rectangle())
-                                    .onTapGesture(count: 2) {
+                                    .onFastDoubleTap(doubleTap: {
                                         onDoubleTap(circle)
-                                    }
-                                    .onTapGesture {
+                                    }, singleTap: {
                                         onSelect(circle)
-                                    }
+                                    })
                                     .contextMenu(circle: circle) {
                                         onSelect(circle)
                                     }

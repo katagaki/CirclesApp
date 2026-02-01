@@ -58,7 +58,7 @@ struct CatalogView: View {
                     } else {
                         CircleGrid(
                             circles: catalogCache.displayedCircles,
-                            showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
+                            showsOverlayWhenEmpty: !selections.genres.isEmpty || selections.map != nil,
                             namespace: namespace,
                             onSelect: { circle in
                                 unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
@@ -80,7 +80,7 @@ struct CatalogView: View {
                     } else {
                         CircleList(
                             circles: catalogCache.displayedCircles,
-                            showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
+                            showsOverlayWhenEmpty: !selections.genres.isEmpty || selections.map != nil,
                             displayMode: listDisplayModeState,
                             namespace: namespace,
                             onSelect: { circle in
@@ -90,7 +90,7 @@ struct CatalogView: View {
                         )
                     }
                 }
-                if selections.genre == nil && selections.map == nil && catalogCache.searchedCircles == nil {
+                if selections.genres.isEmpty && selections.map == nil && catalogCache.searchedCircles == nil {
                     ContentUnavailableView(
                         "Circles.NoFilterSelected",
                         systemImage: "questionmark.square.dashed",
@@ -160,15 +160,15 @@ struct CatalogView: View {
             catalogCache.isLoading = true
         } completion: {
             catalogCache.invalidationID = selections.catalogSelectionID
-            let selectedGenreID = selections.genre?.id
+            let selectedGenreIDs = selections.genres.isEmpty ? nil : Array(selections.genres.map(\.id))
             let selectedMapID = selections.map?.id
-            let selectedBlockID = selections.block?.id
+            let selectedBlockIDs = selections.blocks.isEmpty ? nil : Array(selections.blocks.map(\.id))
             let selectedDayID = selections.date?.id
             Task.detached {
                 let circleIdentifiers = await CatalogCache.fetchCircles(
-                    genreID: selectedGenreID,
+                    genreIDs: selectedGenreIDs,
                     mapID: selectedMapID,
-                    blockID: selectedBlockID,
+                    blockIDs: selectedBlockIDs,
                     dayID: selectedDayID
                 )
                 await MainActor.run {
