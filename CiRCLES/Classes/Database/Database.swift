@@ -95,6 +95,29 @@ class Database {
         }
     }
 
+    func delete(event: WebCatalogEvent.Response.Event) {
+        if let documentsDirectoryURL {
+            let targetTextDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number).db")
+            let targetImageDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number)Image1.db")
+
+            if textDatabaseURL == targetTextDatabaseURL {
+                textDatabase = nil
+                textDatabaseURL = nil
+                databaseInformation = nil
+            }
+            if imageDatabaseURL == targetImageDatabaseURL {
+                imageDatabase = nil
+                imageDatabaseURL = nil
+                commonImages.removeAll()
+                circleImages.removeAll()
+                imageCache.removeAll()
+            }
+
+            try? FileManager.default.removeItem(at: targetTextDatabaseURL)
+            try? FileManager.default.removeItem(at: targetImageDatabaseURL)
+        }
+    }
+
     func reset() {
         #if DEBUG
         debugPrint("Database: Resetting...")
