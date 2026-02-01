@@ -12,7 +12,9 @@ struct MapPopover<Content: View>: View {
     @Environment(Mapper.self) var mapper
 
     let edgePadding: CGFloat = 16.0
-
+    
+    var zoomScale: CGFloat
+    
     var sourceRect: CGRect
     var isDismissing: Bool
     var content: () -> Content
@@ -24,7 +26,7 @@ struct MapPopover<Content: View>: View {
             .padding(16.0)
             .frame(width: mapper.popoverWidth, height: mapper.popoverHeight)
             .adaptiveGlass(.regular)
-            .scaleEffect(0.3 + (0.7 * animationProgress))
+            .scaleEffect((0.3 + (0.7 * animationProgress)) / zoomScale)
             .opacity(animationProgress)
             .position(animatedPosition())
             .onAppear {
@@ -55,10 +57,10 @@ struct MapPopover<Content: View>: View {
     // swiftlint:disable function_body_length
     func calculatePopoverPosition() -> CGPoint {
         let canvasSize = mapper.canvasSize
-        let popoverWidth = mapper.popoverWidth
-        let popoverHeight = mapper.popoverHeight
-        let popoverDistance: CGFloat = mapper.popoverDistance
-        let edgePadding = mapper.popoverEdgePadding
+        let popoverWidth = mapper.popoverWidth / zoomScale
+        let popoverHeight = mapper.popoverHeight / zoomScale
+        let popoverDistance: CGFloat = mapper.popoverDistance / zoomScale
+        let edgePadding = mapper.popoverEdgePadding / zoomScale
 
         let effectiveHeight = max(popoverHeight, 150)
         let itemCenterX = sourceRect.midX

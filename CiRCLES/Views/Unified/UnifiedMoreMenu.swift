@@ -17,7 +17,7 @@ struct UnifiedMoreMenu: View {
     @State var activeEventNumber: Int = -1
 
     // Map Settings
-    @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
+
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
@@ -53,16 +53,7 @@ struct UnifiedMoreMenu: View {
                     }
                 }
             }
-            ControlGroup("More.Customization.Map") {
-                Button("Shared.Zoom.Out", systemImage: "minus") {
-                    zoomDivisor += 1
-                }
-                .disabled(zoomDivisor >= 10)
-                Button("Shared.Zoom.In", systemImage: "plus") {
-                    zoomDivisor -= 1
-                }
-                .disabled(zoomDivisor <= 1)
-            }
+
             Section {
                 Toggle("More.Customization.Map.ShowsGenreOverlays", systemImage: "theatermasks",
                        isOn: $showGenreOverlay)

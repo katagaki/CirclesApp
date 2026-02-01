@@ -5614,6 +5614,7 @@
       }
     },
     "Shared.Zoom.In" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5648,6 +5649,7 @@
       }
     },
     "Shared.Zoom.Out" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

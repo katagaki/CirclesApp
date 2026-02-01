@@ -9,10 +9,9 @@ import SwiftUI
 
 extension MapView {
     func updateCanvasSize(_ image: UIImage) {
-        let zoomFactor = zoomFactor(zoomDivisor)
         mapper.canvasSize = CGSize(
-            width: image.size.width / zoomFactor,
-            height: image.size.height / zoomFactor
+            width: image.size.width,
+            height: image.size.height
         )
     }
 
