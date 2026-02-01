@@ -47,7 +47,7 @@ struct AuthenticatedView: ViewModifier {
                 if oldValue != -1 {
                     planner.activeEventNumberUserDefault = planner.activeEventNumber
                     planner.updateActiveEvent(onlineState: authenticator.onlineState)
-                    reloadData(forceDownload: true)
+                    reloadData(forceDownload: false)
                 }
             }
             .onOpenURL { url in
@@ -62,6 +62,7 @@ struct AuthenticatedView: ViewModifier {
     func reloadData(forceDownload: Bool = false) {
         if !isReloadingData {
             isReloadingData = true
+            database.reset()
             if forceDownload {
                 isDatabaseInitialized = false
             }
@@ -107,14 +108,19 @@ struct AuthenticatedView: ViewModifier {
         let token = authenticator.token ?? OpenIDToken()
 
         if let activeEvent {
-            await oasis.setHeaderText("Shared.LoadingHeader.Download")
-            await oasis.setBodyText("Loading.DownloadTextDatabase")
-            await database.downloadTextDatabase(for: activeEvent, authToken: token) { progress in
-                await oasis.setProgress(progress)
-            }
-            await oasis.setBodyText("Loading.DownloadImageDatabase")
-            await database.downloadImageDatabase(for: activeEvent, authToken: token) { progress in
-                await oasis.setProgress(progress)
+            if !database.isDownloaded(for: activeEvent) {
+                await oasis.setHeaderText("Shared.LoadingHeader.Download")
+                await oasis.setBodyText("Loading.DownloadTextDatabase")
+                await database.downloadTextDatabase(for: activeEvent, authToken: token) { progress in
+                    await oasis.setProgress(progress)
+                }
+                await oasis.setBodyText("Loading.DownloadImageDatabase")
+                await database.downloadImageDatabase(for: activeEvent, authToken: token) { progress in
+                    await oasis.setProgress(progress)
+                }
+            } else {
+                await database.downloadTextDatabase(for: activeEvent, authToken: token) { _ in }
+                await database.downloadImageDatabase(for: activeEvent, authToken: token) { _ in }
             }
 
             await oasis.setBodyText("Loading.Database")
