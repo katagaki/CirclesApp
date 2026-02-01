@@ -49,6 +49,7 @@ struct MapView: View {
                     ZStack(alignment: .topLeading) {
                         MapLayer(image: mapImage)
                         MapFavoritesLayer(spaceSize: spaceSize)
+                        MapVisitedLayer(spaceSize: spaceSize)
                         if showGenreOverlay, let genreImage {
                             MapLayer(image: genreImage)
                         }
