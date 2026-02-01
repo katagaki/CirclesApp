@@ -23,18 +23,28 @@ class UserSelections {
     var date: ComiketDate? {
         get { return _date }
         set(value) {
-            _date = value
-            defaults.set(value?.id, forKey: selectedDateKey)
+            if _date != value {
+                _date = value
+                defaults.set(value?.id, forKey: selectedDateKey)
+                _genres = []
+                defaults.set([], forKey: selectedGenresKey)
+                _blocks = []
+                defaults.set([], forKey: selectedBlocksKey)
+            }
         }
     }
     private var _map: ComiketMap?
     var map: ComiketMap? {
         get { return _map }
         set(value) {
-            _map = value
-            defaults.set(value?.id, forKey: selectedMapKey)
-            _blocks = []
-            defaults.set([], forKey: selectedBlocksKey)
+            if _map != value {
+                _map = value
+                defaults.set(value?.id, forKey: selectedMapKey)
+                _genres = []
+                defaults.set([], forKey: selectedGenresKey)
+                _blocks = []
+                defaults.set([], forKey: selectedBlocksKey)
+            }
         }
     }
     private var _blocks: Set<ComiketBlock> = []
