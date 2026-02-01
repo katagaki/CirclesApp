@@ -139,7 +139,7 @@ class Authenticator {
                     let state = parameters ["state"] {
                     if state == "auth" {
                         self.code = code
-                        self.isAuthenticating = false
+                        self.isWaitingForAuthenticationCode = false
                     }
                 }
             }
@@ -153,7 +153,10 @@ class Authenticator {
         ])
 
         if let (data, _) = try? await URLSession.shared.data(for: request) {
-            decodeAuthenticationToken(data: data)
+            let isSuccessful = decodeAuthenticationToken(data: data)
+            if isSuccessful {
+                self.isAuthenticating = false
+            }
         } else {
             self.token = nil
             self.isAuthenticating = true
@@ -181,7 +184,7 @@ class Authenticator {
         }
     }
 
-    func decodeAuthenticationToken(data: Data) {
+    func decodeAuthenticationToken(data: Data) -> Bool {
         if let token = try? JSONDecoder().decode(OpenIDToken.self, from: data) {
             self.token = token
             self.updateTokenExpiryDate(from: token)
@@ -189,10 +192,12 @@ class Authenticator {
                let tokenString = String(data: tokenEncoded, encoding: .utf8) {
                 try? keychain.set(tokenString, key: keychainAuthTokenKey)
             }
+            return true
         } else {
             self.code = nil
             self.token = nil
             self.isAuthenticating = true
+            return false
         }
     }
 
