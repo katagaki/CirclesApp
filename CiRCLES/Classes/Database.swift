@@ -105,11 +105,9 @@ class Database {
             .joined(separator: "&")
             .data(using: .utf8)
 
-        if self.databaseInformation == nil {
-            if let (data, _) = try? await URLSession.shared.data(for: request) {
-                if let databaseInformation = try? JSONDecoder().decode(WebCatalogDatabase.self, from: data) {
-                    self.databaseInformation = databaseInformation
-                }
+        if let (data, _) = try? await URLSession.shared.data(for: request) {
+            if let databaseInformation = try? JSONDecoder().decode(WebCatalogDatabase.self, from: data) {
+                self.databaseInformation = databaseInformation
             }
         }
 
@@ -135,11 +133,24 @@ class Database {
         if let documentsDirectoryURL {
             textDatabaseURL = nil
             imageDatabaseURL = nil
+            databaseInformation = nil
             textDatabase = nil
             imageDatabase = nil
+            commonImages.removeAll()
+            circleImages.removeAll()
             imageCache.removeAll()
             try? FileManager.default.removeItem(at: documentsDirectoryURL)
         }
+    }
+
+    func isDownloaded(for event: WebCatalogEvent.Response.Event) -> Bool {
+        if let documentsDirectoryURL {
+            let textDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number).db")
+            let imageDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number)Image1.db")
+            return FileManager.default.fileExists(atPath: textDatabaseURL.path(percentEncoded: false)) &&
+                   FileManager.default.fileExists(atPath: imageDatabaseURL.path(percentEncoded: false))
+        }
+        return false
     }
 
     // MARK: Loading
