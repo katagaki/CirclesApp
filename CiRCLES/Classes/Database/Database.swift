@@ -30,22 +30,26 @@ class Database {
 
     // MARK: Database Connection
 
-    func connect() {
-        #if DEBUG
-        debugPrint("Database: Connecting...")
-        #endif
-        if let textDatabaseURL {
+
+
+    func getTextDatabase() -> Connection? {
+        if let textDatabaseURL, textDatabase == nil {
             #if DEBUG
             debugPrint("Database: Connecting to text database at \(textDatabaseURL.path(percentEncoded: false))")
             #endif
             textDatabase = try? Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
         }
-        if let imageDatabaseURL {
+        return textDatabase
+    }
+
+    func getImageDatabase() -> Connection? {
+        if let imageDatabaseURL, imageDatabase == nil {
             #if DEBUG
             debugPrint("Database: Connecting to image database at \(imageDatabaseURL.path(percentEncoded: false))")
             #endif
             imageDatabase = try? Connection(imageDatabaseURL.path(percentEncoded: false), readonly: true)
         }
+        return imageDatabase
     }
 
     func disconnect() {
@@ -57,6 +61,7 @@ class Database {
     }
 
     func prepare(for event: WebCatalogEvent.Response.Event) {
+        disconnect()
         #if DEBUG
         debugPrint("Database: Preparing for event \(event.number)...")
         #endif
@@ -108,7 +113,7 @@ class Database {
     // MARK: Loading
 
     func loadCommonImages() {
-        if let imageDatabase {
+        if let imageDatabase = getImageDatabase() {
             do {
                 let colName = Expression<String>("name")
                 let colImage = Expression<Data>("image")
@@ -127,7 +132,7 @@ class Database {
     }
 
     func loadCircleImages() {
-        if let imageDatabase {
+        if let imageDatabase = getImageDatabase() {
             do {
                 let colID = Expression<Int>("id")
                 let colCutImage = Expression<Data>("cutImage")

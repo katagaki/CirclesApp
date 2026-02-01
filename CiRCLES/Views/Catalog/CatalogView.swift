@@ -158,15 +158,13 @@ struct CatalogView: View {
             let selectedBlockIDs = selections.blocks.isEmpty ? nil :
                 Array(selections.blocks.map({ (block: ComiketBlock) in block.id }))
             let selectedDayID = selections.date?.id
-            Task.detached {
-                await database.connect()
-                let textDatabase = await database.textDatabase
+            Task.detached(priority: .high) {
                 let circleIdentifiers = await CatalogCache.fetchCircles(
                     genreIDs: selectedGenreIDs,
                     mapID: selectedMapID,
                     blockIDs: selectedBlockIDs,
                     dayID: selectedDayID,
-                    database: textDatabase
+                    database: database
                 )
 
                 await MainActor.run {
@@ -192,9 +190,7 @@ struct CatalogView: View {
 
     func searchCircles() {
         Task.detached {
-            await database.connect()
-            let textDatabase = await database.textDatabase
-            let circleIdentifiers = await CatalogCache.searchCircles(searchTerm, database: textDatabase)
+            let circleIdentifiers = await CatalogCache.searchCircles(searchTerm, database: database)
 
             if let circleIdentifiers {
                 await MainActor.run {

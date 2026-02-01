@@ -39,7 +39,6 @@ struct DatePicker: View {
             }
         }
         .task {
-            database.connect()
             dates = database.dates()
         }
     }

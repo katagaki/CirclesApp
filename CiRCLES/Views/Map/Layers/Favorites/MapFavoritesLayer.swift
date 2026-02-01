@@ -136,8 +136,7 @@ struct MapFavoritesLayer: View {
     }
 
     func reloadFavorites() async {
-        database.connect()
-        let actor = DataFetcher(database: database.textDatabase)
+        let actor = DataFetcher(database: database.getTextDatabase())
 
         let layoutFavoriteWebCatalogIDMappings = mapFavoriteMappings(mapper.layouts)
 

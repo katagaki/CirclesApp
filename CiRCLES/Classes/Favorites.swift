@@ -23,7 +23,7 @@ class Favorites {
 
     static func mapped(
         using favoriteItems: [UserFavorites.Response.FavoriteItem],
-        database: Connection?
+        database: Database
     ) async -> [Int: [Int]] {
         let favoriteItemsSorted: [Int: [UserFavorites.Response.FavoriteItem]] = favoriteItems.reduce(
             into: [Int: [UserFavorites.Response.FavoriteItem]]()
@@ -31,7 +31,7 @@ class Favorites {
             partialResult[favoriteItem.favorite.color.rawValue, default: []].append(favoriteItem)
         }
 
-        let actor = DataFetcher(database: database)
+        let actor = DataFetcher(database: await database.getTextDatabase())
         var favoriteCircleIdentifiers: [Int: [Int]] = [:]
         for colorKey in favoriteItemsSorted.keys {
             if let favoriteItems = favoriteItemsSorted[colorKey] {

@@ -174,8 +174,7 @@ struct FavoritesView: View {
     }
 
     func prepareCircles(using favoriteItems: [UserFavorites.Response.FavoriteItem]) async {
-        database.connect()
-        let favoriteCircleIdentifiers = await Favorites.mapped(using: favoriteItems, database: database.textDatabase)
+        let favoriteCircleIdentifiers = await Favorites.mapped(using: favoriteItems, database: database)
 
         await MainActor.run {
             var favoriteCircles: [String: [ComiketCircle]] = [:]

@@ -39,7 +39,6 @@ struct HallPicker: View {
 
         }
         .task {
-            database.connect()
             maps = database.maps()
         }
     }

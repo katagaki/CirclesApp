@@ -81,7 +81,6 @@ struct CatalogToolbar: ToolbarContent {
             reloadSelectableGenres()
         }
         .task {
-            database.connect()
             genres = database.genres()
             blocks = database.blocks()
         }
@@ -191,11 +190,10 @@ struct CatalogToolbar: ToolbarContent {
     func reloadSelectableGenres() {
         if let mapID = selections.map?.id, let dayID = selections.date?.id {
             Task {
-                database.connect()
                 let genreIDs = await CatalogCache.fetchGenreIDs(
                     inMap: mapID,
                     onDay: dayID,
-                    database: database.textDatabase
+                    database: database
                 )
                 await MainActor.run {
                     withAnimation(.smooth.speed(2.0)) {
@@ -216,9 +214,8 @@ struct CatalogToolbar: ToolbarContent {
                 Array(selections.genres.map({ (genre: ComiketGenre) in genre.id }))
 
             Task {
-                database.connect()
                 let blockIDs = await CatalogCache.fetchBlockIDs(
-                    inMap: mapID, onDay: dayID, withGenreIDs: selectedGenreIDs, database: database.textDatabase
+                    inMap: mapID, onDay: dayID, withGenreIDs: selectedGenreIDs, database: database
                 )
                 await MainActor.run {
                     withAnimation(.smooth.speed(2.0)) {

@@ -126,8 +126,7 @@ struct CircleDetailView: View {
             }
             favoriteMemo = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.memo ?? ""
         }
-        database.connect()
-        let actor = DataFetcher(database: database.textDatabase)
+        let actor = DataFetcher(database: database.getTextDatabase())
         if let genre = await actor.genre(circle.genreID) {
             self.genre = genre
         }
@@ -171,7 +170,6 @@ struct CircleDetailView: View {
     }
 
     func goToCircle(with id: Int) -> Bool {
-        database.connect()
         let circles = database.circles([id])
         if circles.count == 1 {
             self.circle = circles.first ?? self.circle
