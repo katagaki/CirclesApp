@@ -1694,6 +1694,40 @@
         }
       }
     },
+    "More.Customization.Circles.DoubleTapToVisit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Double Tap to Mark Visited"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ダブルタップで訪問"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "더블 탭으로 방문"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "双击访问"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "雙擊訪問"
+          }
+        }
+      }
+    },
     "More.Customization.Circles.ShowDay" : {
       "localizations" : {
         "en" : {

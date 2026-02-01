@@ -22,6 +22,7 @@ struct MapPopoverDetail: View {
     @State var circles: [ComiketCircle]?
 
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
+    @AppStorage(wrappedValue: true, "Customization.DoubleTapToVisit") var isDoubleTapToVisitEnabled: Bool
 
     @Namespace var popoverNamespace
 
@@ -52,11 +53,13 @@ struct MapPopoverDetail: View {
                         }
                         .contentShape(.rect)
                         .onTapGesture(count: 2) {
-                            let circleID = circle.id
-                            let eventNumber = planner.activeEventNumber
-                            Task.detached {
-                                let actor = VisitActor(modelContainer: sharedModelContainer)
-                                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
+                            if isDoubleTapToVisitEnabled {
+                                let circleID = circle.id
+                                let eventNumber = planner.activeEventNumber
+                                Task.detached {
+                                    let actor = VisitActor(modelContainer: sharedModelContainer)
+                                    await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
+                                }
                             }
                         }
                         .onTapGesture {
@@ -65,7 +68,7 @@ struct MapPopoverDetail: View {
                             }
                             unifier.append(.circleDetail(circle: circle))
                         }
-                        .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
+                        .popoverTip((index == 0 && isDoubleTapToVisitEnabled) ? DoubleTapVisitTip() : nil)
                     }
                 } else {
                     ProgressView()

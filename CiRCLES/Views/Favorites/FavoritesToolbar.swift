@@ -9,9 +9,21 @@ import SwiftData
 import SwiftUI
 
 struct FavoritesToolbar: ToolbarContent {
-    @Environment(FavoritesCache.self) var favoritesCache
+    @Environment(Favorites.self) var favorites
+
+    @Binding var displayMode: CircleDisplayMode
+    @Binding var listDisplayMode: ListDisplayMode
 
     var body: some ToolbarContent {
+
+        ToolbarItem(placement: .topBarLeading) {
+            HStack {
+                DisplayModeSwitcher(mode: $displayMode)
+                if displayMode == .list {
+                    ListModeSwitcher(mode: $listDisplayMode)
+                }
+            }
+        }
 
         if #available(iOS 26.0, *) {
             ToolbarSpacer(.fixed, placement: .bottomBar)
@@ -19,12 +31,12 @@ struct FavoritesToolbar: ToolbarContent {
         ToolbarItem(placement: .bottomBar) {
             Button {
                 withAnimation(.smooth.speed(2.0)) {
-                    favoritesCache.isGroupedByColor.toggle()
+                    favorites.isGroupedByColor.toggle()
                 }
             } label: {
                 ToolbarButtonLabel(
                     "Shared.GroupByColor",
-                    image: .system(favoritesCache.isGroupedByColor ?
+                    image: .system(favorites.isGroupedByColor ?
                     "paintpalette.fill" : "paintpalette"),
                     forceLabelStyle: true
                 )
@@ -36,6 +48,9 @@ struct FavoritesToolbar: ToolbarContent {
             ToolbarItem(placement: .bottomBar) {
                 Spacer()
             }
+        }
+        if #available(iOS 26.0, *) {
+            ToolbarSpacer(.fixed, placement: .bottomBar)
         }
     }
 }

@@ -9,20 +9,14 @@ import SwiftUI
 
 struct DisplayModeSwitcher: View {
 
-    @Binding var modeState: CircleDisplayMode
-
-    @AppStorage(wrappedValue: CircleDisplayMode.grid, "Circles.DisplayMode") var mode: CircleDisplayMode
-
-    init(_ modeState: Binding<CircleDisplayMode>) {
-        self._modeState = modeState
-    }
+    @Binding var mode: CircleDisplayMode
 
     var body: some View {
         Button {
             withAnimation(.smooth.speed(2.0)) {
-                switch modeState {
-                case .grid: modeState = .list
-                case .list: modeState = .grid
+                switch mode {
+                case .grid: mode = .list
+                case .list: mode = .grid
                 }
             }
         } label: {
@@ -32,12 +26,6 @@ struct DisplayModeSwitcher: View {
             case .list:
                 Label("Shared.DisplayMode.Grid", systemImage: "rectangle.grid.3x2")
             }
-        }
-        .onAppear {
-            self.modeState = mode
-        }
-        .onChange(of: modeState) {
-            mode = modeState
         }
     }
 }
