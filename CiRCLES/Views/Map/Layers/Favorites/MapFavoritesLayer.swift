@@ -104,16 +104,8 @@ struct MapFavoritesLayer: View {
             guard count > 0 else { continue }
 
             for (index, id) in orderedIDs.enumerated() {
-                // Remap ID if needed (suffix logic)
-                let actualID = spaceNumberSuffixes[id] ?? id
-                // Get color from original mapping (since remapping preserves mapping structure conceptually)
-                // Actually mapping is [Int (WebCatalogID) : Color?]
-                // We need to look up the color for the Original ID
                 guard let color = mapping[id], let safeColor = color else { continue }
-
                 let rect = getGenericRect(layout: layout, index: index, total: count)
-
-                // Append to path
                 if colorRects[safeColor] == nil {
                     colorRects[safeColor] = Path()
                 }
