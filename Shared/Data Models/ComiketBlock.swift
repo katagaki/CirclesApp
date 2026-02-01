@@ -6,16 +6,23 @@
 //
 
 import SQLite
-import SwiftData
 
-@Model
-final class ComiketBlock: SQLiteable {
+final class ComiketBlock: SQLiteable, Identifiable, Hashable {
+    static func == (lhs: ComiketBlock, rhs: ComiketBlock) -> Bool {
+        return lhs.id == rhs.id && lhs.eventNumber == rhs.eventNumber
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(eventNumber)
+    }
+
     var eventNumber: Int
     var id: Int
     var name: String
     var areaID: Int
 
-    @Relationship(deleteRule: .nullify) var circles: [ComiketCircle]?
+    var circles: [ComiketCircle]?
 
     init(from row: Row) {
         let colEventNumber = Expression<Int>("comiketNo")

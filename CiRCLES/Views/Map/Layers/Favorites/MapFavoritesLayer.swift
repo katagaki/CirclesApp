@@ -10,6 +10,7 @@ import SwiftUI
 struct MapFavoritesLayer: View {
 
     @Environment(\.colorScheme) var colorScheme
+    @Environment(Database.self) var database
     @Environment(Favorites.self) var favorites
     @Environment(Mapper.self) var mapper
 
@@ -135,7 +136,8 @@ struct MapFavoritesLayer: View {
     }
 
     func reloadFavorites() async {
-        let actor = DataFetcher(modelContainer: sharedModelContainer)
+        database.connect()
+        let actor = DataFetcher(database: database.textDatabase)
 
         let layoutFavoriteWebCatalogIDMappings = mapFavoriteMappings(mapper.layouts)
 

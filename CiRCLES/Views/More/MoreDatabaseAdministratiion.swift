@@ -162,20 +162,7 @@ struct MoreDatabaseAdministratiion: View {
                 }
             }
         }
-        if let textDatabaseURL = database.textDatabaseURL {
-            do {
-                let textDatabase = try Connection(
-                    textDatabaseURL.path(percentEncoded: false),
-                    readonly: true
-                )
-                await oasis.setBodyText("Loading.RepairingData")
-                let actor = DataConverter(modelContainer: sharedModelContainer)
-                await actor.deleteAll()
-                await actor.loadAll(from: textDatabase)
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
+
         refreshDownloadedDataList()
         oasis.close()
         UIApplication.shared.isIdleTimerDisabled = false

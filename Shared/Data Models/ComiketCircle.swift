@@ -7,12 +7,20 @@
 
 import Foundation
 import SQLite
-import SwiftData
 
-@Model
-final class ComiketCircle: SQLiteable {
+final class ComiketCircle: SQLiteable, Identifiable, Hashable {
+    static func == (lhs: ComiketCircle, rhs: ComiketCircle) -> Bool {
+        return lhs.id == rhs.id && lhs.eventNumber == rhs.eventNumber
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(eventNumber)
+    }
+
     var eventNumber: Int
-    @Attribute(.unique) var id: Int
+    var id: Int
+
     var pageNumber: Int
     var cutIndex: Int
     var day: Int
@@ -34,13 +42,11 @@ final class ComiketCircle: SQLiteable {
     var rss: String
     var updateFlag: Int
 
-    @Relationship(.unique, deleteRule: .cascade, inverse: \ComiketCircleExtendedInformation.circle)
     var extendedInformation: ComiketCircleExtendedInformation?
 
-    @Relationship(deleteRule: .nullify, inverse: \ComiketBlock.circles)
     var block: ComiketBlock?
 
-    @Relationship(deleteRule: .nullify, inverse: \ComiketLayout.circles) var layout: ComiketLayout?
+    var layout: ComiketLayout?
 
     init(from row: Row) {
         let table = Table("ComiketCircleWC")

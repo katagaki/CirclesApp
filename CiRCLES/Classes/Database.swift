@@ -7,15 +7,13 @@
 
 import Foundation
 import SQLite
-import SwiftData
+
 import UIKit
 import ZIPFoundation
 
 @Observable
 @MainActor
 class Database {
-
-    @ObservationIgnored var modelContext: ModelContext
 
     @ObservationIgnored var databaseInformation: WebCatalogDatabase?
     @ObservationIgnored var textDatabase: Connection?
@@ -29,9 +27,7 @@ class Database {
     var commonImagesLoadCount: Int = 0
     var circleImagesLoadCount: Int = 0
 
-    init() {
-        modelContext = sharedModelContainer.mainContext
-    }
+    init() { }
 
     // MARK: Database Connection
 
@@ -188,40 +184,132 @@ class Database {
 
     // MARK: Persistent Identifier Fetches
 
-    func layouts(_ identifiers: [PersistentIdentifier]) -> [ComiketLayout] {
-        return models(identifiers, sortedBy: \ComiketLayout.mapID, in: modelContext)
-    }
-
-    func blocks(_ identifiers: [PersistentIdentifier]) -> [ComiketBlock] {
-        return models(identifiers, sortedBy: \ComiketBlock.id, in: modelContext)
-    }
-
-    func circles(_ identifiers: [PersistentIdentifier], reversed: Bool = false) -> [ComiketCircle] {
-        return models(
-            identifiers,
-            sortedBy: \ComiketCircle.id, reversed: reversed,
-            in: modelContext
-        )
-    }
-
-    func models<T, K: Comparable>(
-        _ identifiers: [PersistentIdentifier],
-        sortedBy keyPath: KeyPath<T, K>,
-        reversed: Bool = false,
-        in modelContext: ModelContext
-    ) -> [T] {
-        var models: [T] = []
-        for identifier in Set(identifiers) {
-            if let model = modelContext.model(for: identifier) as? T {
-                models.append(model)
+    func layouts(_ identifiers: [Int]) -> [ComiketLayout] {
+        if let textDatabase {
+            do {
+                let table = Table("ComiketLayoutWC")
+                let id = Expression<Int>("id")
+                let query = table.filter(identifiers.contains(id))
+                return try textDatabase.prepare(query).map { ComiketLayout(from: $0) }
+                    .sorted(by: { $0.mapID < $1.mapID })
+            } catch {
+                debugPrint(error.localizedDescription)
             }
         }
-        if reversed {
-            models.sort(by: {$0[keyPath: keyPath] > $1[keyPath: keyPath]})
-        } else {
-            models.sort(by: {$0[keyPath: keyPath] < $1[keyPath: keyPath]})
+        return []
+    }
+
+    func blocks(_ identifiers: [Int]) -> [ComiketBlock] {
+        if let textDatabase {
+            do {
+                let table = Table("ComiketBlockWC")
+                let id = Expression<Int>("id")
+                let query = table.filter(identifiers.contains(id))
+                return try textDatabase.prepare(query).map { ComiketBlock(from: $0) }
+                    .sorted(by: { $0.id < $1.id })
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
         }
-        return models
+        return []
+    }
+
+    func circles(_ identifiers: [Int], reversed: Bool = false) -> [ComiketCircle] {
+        if let textDatabase {
+            do {
+                let circlesTable = Table("ComiketCircleWC")
+                let circleExtendedInformationTable = Table("ComiketCircleExtend")
+                let id = Expression<Int>("id")
+
+                let joinedTable = circlesTable.join(
+                    .leftOuter,
+                    circleExtendedInformationTable,
+                    on: circlesTable[id] == circleExtendedInformationTable[id]
+                )
+
+                let query = joinedTable.filter(identifiers.contains(circlesTable[id]))
+                let circles = try textDatabase.prepare(query).map { row in
+                    let circle = ComiketCircle(from: row)
+                    let extendedInformation = ComiketCircleExtendedInformation(from: row)
+                    circle.extendedInformation = extendedInformation
+                    return circle
+                }
+
+                if reversed {
+                    return circles.sorted(by: { $0.id > $1.id })
+                } else {
+                    return circles.sorted(by: { $0.id < $1.id })
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return []
+    }
+
+    func allGenres() -> [ComiketGenre] {
+        if let textDatabase {
+            do {
+                let table = Table("ComiketGenreWC")
+                return try textDatabase.prepare(table).map { ComiketGenre(from: $0) }
+                    .sorted(by: { $0.id < $1.id })
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return []
+    }
+
+    func allBlocks() -> [ComiketBlock] {
+        if let textDatabase {
+            do {
+                let table = Table("ComiketBlockWC")
+                return try textDatabase.prepare(table).map { ComiketBlock(from: $0) }
+                    .sorted(by: { $0.id < $1.id })
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return []
+    }
+
+    func allDates() -> [ComiketDate] {
+        if let textDatabase {
+            do {
+                let table = Table("ComiketDateWC")
+                return try textDatabase.prepare(table).map { ComiketDate(from: $0) }
+                    .sorted(by: { $0.id < $1.id })
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return []
+    }
+
+    func allMaps() -> [ComiketMap] {
+        if let textDatabase {
+            do {
+                let table = Table("ComiketMapWC")
+                return try textDatabase.prepare(table).map { ComiketMap(from: $0) }
+                    .sorted(by: { $0.id < $1.id })
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return []
+    }
+
+    func allEvents() -> [ComiketEvent] {
+        if let textDatabase {
+            do {
+                let table = Table("ComiketInfoWC")
+                return try textDatabase.prepare(table).map { ComiketEvent(from: $0) }
+                    .sorted(by: { $0.eventNumber < $1.eventNumber })
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return []
     }
 
     // MARK: Common Images

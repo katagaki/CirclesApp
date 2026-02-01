@@ -19,8 +19,6 @@ struct CatalogView: View {
     @Environment(Unifier.self) var unifier
     @Environment(Events.self) var planner
 
-    @Environment(\.modelContext) var modelContext
-
     // Search
     @State var isSearchActive: Bool = false
     @State var searchTerm: String = ""
@@ -128,14 +126,8 @@ struct CatalogView: View {
         .onChange(of: displayModeState) {
             displayMode = displayModeState
         }
-        .onChange(of: displayMode) {
-            displayModeState = displayMode
-        }
         .onChange(of: listDisplayModeState) {
             listDisplayMode = listDisplayModeState
-        }
-        .onChange(of: listDisplayMode) {
-            listDisplayModeState = listDisplayMode
         }
         .onChange(of: selections.catalogSelectionID) {
             reloadDisplayedCircles()
@@ -160,17 +152,21 @@ struct CatalogView: View {
             catalogCache.isLoading = true
         } completion: {
             catalogCache.invalidationID = selections.catalogSelectionID
-            let selectedGenreIDs = selections.genres.isEmpty ? nil : Array(selections.genres.map(\.id))
+            let selectedGenreIDs = selections.genres.isEmpty ? nil : Array(selections.genres.map({ (genre: ComiketGenre) in genre.id }))
             let selectedMapID = selections.map?.id
-            let selectedBlockIDs = selections.blocks.isEmpty ? nil : Array(selections.blocks.map(\.id))
+            let selectedBlockIDs = selections.blocks.isEmpty ? nil : Array(selections.blocks.map({ (block: ComiketBlock) in block.id }))
             let selectedDayID = selections.date?.id
             Task.detached {
+                await database.connect()
+                let textDatabase = await database.textDatabase
                 let circleIdentifiers = await CatalogCache.fetchCircles(
                     genreIDs: selectedGenreIDs,
                     mapID: selectedMapID,
                     blockIDs: selectedBlockIDs,
-                    dayID: selectedDayID
+                    dayID: selectedDayID,
+                    database: textDatabase
                 )
+
                 await MainActor.run {
                     var displayedCircles: [ComiketCircle] = []
                     displayedCircles = database.circles(circleIdentifiers)
@@ -194,7 +190,10 @@ struct CatalogView: View {
 
     func searchCircles() {
         Task.detached {
-            let circleIdentifiers = await CatalogCache.searchCircles(searchTerm)
+            await database.connect()
+            let textDatabase = await database.textDatabase
+            let circleIdentifiers = await CatalogCache.searchCircles(searchTerm, database: textDatabase)
+
             if let circleIdentifiers {
                 await MainActor.run {
                     let searchedCircles = database.circles(circleIdentifiers)
@@ -210,5 +209,6 @@ struct CatalogView: View {
                 }
             }
         }
+
     }
 }

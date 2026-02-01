@@ -6,11 +6,20 @@
 //
 
 import SQLite
-import SwiftData
 
-@Model
-final class ComiketEvent: SQLiteable {
-    @Attribute(.unique) var eventNumber: Int
+final class ComiketEvent: SQLiteable, Identifiable, Hashable {
+    static func == (lhs: ComiketEvent, rhs: ComiketEvent) -> Bool {
+        return lhs.eventNumber == rhs.eventNumber
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(eventNumber)
+    }
+
+    var id: Int { eventNumber }
+
+    var eventNumber: Int
+
     var name: String
     var circleCutConfiguration: CircleCutConfiguration
     var mapConfiguration: MapConfiguration

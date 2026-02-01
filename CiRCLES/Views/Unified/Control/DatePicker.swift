@@ -10,9 +10,8 @@ import SwiftUI
 
 struct DatePicker: View {
     @Environment(UserSelections.self) var selections
-
-    @Query(sort: [SortDescriptor(\ComiketDate.id, order: .forward)])
-    var dates: [ComiketDate]
+    @Environment(Database.self) var database
+    @State var dates: [ComiketDate] = []
 
     var body: some View {
         Menu {
@@ -38,6 +37,10 @@ struct DatePicker: View {
                     Text("Shared.Placeholder.NoDay")
                 }
             }
+        }
+        .task {
+            database.connect()
+            dates = database.allDates()
         }
     }
 }

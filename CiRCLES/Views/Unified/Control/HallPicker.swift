@@ -10,9 +10,8 @@ import SwiftUI
 
 struct HallPicker: View {
     @Environment(UserSelections.self) var selections
-
-    @Query(sort: [SortDescriptor(\ComiketMap.id, order: .forward)])
-    var maps: [ComiketMap]
+    @Environment(Database.self) var database
+    @State var maps: [ComiketMap] = []
 
     var body: some View {
         Menu {
@@ -37,6 +36,11 @@ struct HallPicker: View {
             .padding(.vertical, verticalPadding())
             .padding(.horizontal, horizontalPadding())
             .foregroundStyle(.white)
+
+        }
+        .task {
+            database.connect()
+            maps = database.allMaps()
         }
     }
 

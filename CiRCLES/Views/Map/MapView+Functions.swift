@@ -60,7 +60,8 @@ extension MapView {
         var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
         if let selectedDate {
             // Fetch map layouts
-            let actor = DataFetcher(modelContainer: sharedModelContainer)
+            database.connect()
+            let actor = DataFetcher(database: database.textDatabase)
             let layoutCatalogMappings = await actor.layoutMappings(
                 inMap: mapID,
                 useHighResolutionMaps: useHighResolutionMaps

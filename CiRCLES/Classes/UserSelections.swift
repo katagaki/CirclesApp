@@ -7,17 +7,17 @@
 
 import Foundation
 import Observation
-import SwiftData
 
 let selectedGenresKey = "Circles.SelectedGenreIDs"
 let selectedMapKey = "Circles.SelectedMapID"
 let selectedBlocksKey = "Circles.SelectedBlockIDs"
 let selectedDateKey = "Circles.SelectedDateID"
 
+@MainActor
 @Observable
-class UserSelections: Equatable {
+class UserSelections {
+
     @ObservationIgnored let defaults: UserDefaults
-    @ObservationIgnored let modelContext: ModelContext
 
     private var _date: ComiketDate?
     var date: ComiketDate? {
@@ -57,62 +57,31 @@ class UserSelections: Equatable {
     @MainActor
     init() {
         defaults = UserDefaults.standard
-        modelContext = sharedModelContainer.mainContext
-        reloadData()
     }
 
     @MainActor
-    func reloadData() {
+    func reloadData(database: Database) {
         let dateID = defaults.integer(forKey: selectedDateKey)
         let mapID = defaults.integer(forKey: selectedMapKey)
         let blockIDs = defaults.array(forKey: selectedBlocksKey) as? [Int] ?? []
         let genreIDs = defaults.array(forKey: selectedGenresKey) as? [Int] ?? []
-        _date = fetchDateSelection(with: dateID)
-        _map = fetchMapSelection(with: mapID)
-        _blocks = fetchBlockSelections(with: blockIDs)
-        _genres = fetchGenreSelections(with: genreIDs)
+        database.connect()
+        _date = database.allDates().first(where: { $0.id == dateID })
+        _map = database.allMaps().first(where: { $0.id == mapID })
+        _blocks = Set(database.allBlocks().filter({ blockIDs.contains($0.id) }))
+        _genres = Set(database.allGenres().filter({ genreIDs.contains($0.id) }))
     }
 
-    func fetchDateSelection(with id: Int) -> ComiketDate? {
-        let fetchDescriptor = FetchDescriptor<ComiketDate>(
-            predicate: #Predicate<ComiketDate> { $0.id == id }
-        )
-        return try? modelContext.fetch(fetchDescriptor).first
+    @MainActor
+    func fetchDefaultDateSelection(database: Database) -> ComiketDate? {
+        database.connect()
+        return database.allDates().first
     }
 
-    func fetchDefaultDateSelection() -> ComiketDate? {
-        let fetchDescriptor = FetchDescriptor<ComiketDate>(
-            sortBy: [SortDescriptor(\.id)]
-        )
-        return try? modelContext.fetch(fetchDescriptor).first
-    }
-
-    func fetchMapSelection(with id: Int) -> ComiketMap? {
-        let fetchDescriptor = FetchDescriptor<ComiketMap>(
-            predicate: #Predicate<ComiketMap> { $0.id == id }
-        )
-        return try? modelContext.fetch(fetchDescriptor).first
-    }
-
-    func fetchDefaultMapSelection() -> ComiketMap? {
-        let fetchDescriptor = FetchDescriptor<ComiketMap>(
-            sortBy: [SortDescriptor(\.id)]
-        )
-        return try? modelContext.fetch(fetchDescriptor).first
-    }
-
-    func fetchBlockSelections(with ids: [Int]) -> Set<ComiketBlock> {
-        let fetchDescriptor = FetchDescriptor<ComiketBlock>(
-            predicate: #Predicate<ComiketBlock> { ids.contains($0.id) }
-        )
-        return Set((try? modelContext.fetch(fetchDescriptor)) ?? [])
-    }
-
-    func fetchGenreSelections(with ids: [Int]) -> Set<ComiketGenre> {
-        let fetchDescriptor = FetchDescriptor<ComiketGenre>(
-            predicate: #Predicate<ComiketGenre> { ids.contains($0.id) }
-        )
-        return Set((try? modelContext.fetch(fetchDescriptor)) ?? [])
+    @MainActor
+    func fetchDefaultMapSelection(database: Database) -> ComiketMap? {
+        database.connect()
+        return database.allMaps().first
     }
 
     var fullMapID: String {
@@ -136,8 +105,4 @@ class UserSelections: Equatable {
         defaults.set(nil, forKey: selectedDateKey)
     }
 
-    static func == (lhs: UserSelections, rhs: UserSelections) -> Bool {
-        return lhs.fullMapID == rhs.fullMapID &&
-        lhs.catalogSelectionID == rhs.catalogSelectionID
-    }
 }

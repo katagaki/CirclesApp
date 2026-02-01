@@ -10,8 +10,6 @@ import SwiftUI
 
 struct FavoritesView: View {
 
-    @Environment(\.modelContext) var modelContext
-
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
@@ -20,8 +18,8 @@ struct FavoritesView: View {
     @Environment(Unifier.self) var unifier
 
     @AppStorage(wrappedValue: true, "Favorites.GroupByColor") var isGroupedByColorDefault: Bool
-    @AppStorage(wrappedValue: .grid, "Favorites.DisplayMode") var displayModeDefault: CircleDisplayMode
-    @AppStorage(wrappedValue: ListDisplayMode.regular, "Favorites.ListDisplayMode") var listDisplayModeDefault: ListDisplayMode
+    @AppStorage(wrappedValue: .grid, "Favorites.DisplayMode") var displayMode: CircleDisplayMode
+    @AppStorage(wrappedValue: ListDisplayMode.regular, "Favorites.ListDisplayMode") var listDisplayMode: ListDisplayMode
 
     @State var displayModeState: CircleDisplayMode = .grid
     @State var listDisplayModeState: ListDisplayMode = .regular
@@ -33,20 +31,27 @@ struct FavoritesView: View {
     var body: some View {
         @Bindable var favorites = favorites
 
-        let doubleTapAction: ((ComiketCircle) -> Void)? = isDoubleTapToVisitEnabled ? { circle in
-            let circleID = circle.id
-            let eventNumber = planner.activeEventNumber
-            Task.detached {
-                let actor = VisitActor(modelContainer: sharedModelContainer)
-                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
-            }
-        } : nil
-
         ZStack(alignment: .center) {
             if let favoriteCircles = favorites.circles {
                 Group {
                     if favorites.isGroupedByColor {
-                        if displayModeState == .list {
+                        switch displayModeState {
+                        case .grid:
+                            ColorGroupedCircleGrid(
+                                groups: favoriteCircles,
+                                showsOverlayWhenEmpty: false,
+                                namespace: namespace,
+                                onSelect: { circle in
+                                    unifier.append(.namespacedCircleDetail(
+                                        circle: circle,
+                                        previousCircle: { previousCircle(for: $0) },
+                                        nextCircle: { nextCircle(for: $0) },
+                                        namespace: namespace
+                                    ))
+                                },
+                                onDoubleTap: doubleTapAction
+                            )
+                        case .list:
                             ColorGroupedCircleList(
                                 groups: favoriteCircles,
                                 showsOverlayWhenEmpty: false,
@@ -62,9 +67,12 @@ struct FavoritesView: View {
                                 },
                                 onDoubleTap: doubleTapAction
                             )
-                        } else {
-                            ColorGroupedCircleGrid(
-                                groups: favoriteCircles,
+                        }
+                    } else {
+                        switch displayModeState {
+                        case .grid:
+                            CircleGrid(
+                                circles: favoriteCircles.values.flatMap({ $0 }).sorted(by: { $0.id < $1.id }),
                                 showsOverlayWhenEmpty: false,
                                 namespace: namespace,
                                 onSelect: { circle in
@@ -77,28 +85,11 @@ struct FavoritesView: View {
                                 },
                                 onDoubleTap: doubleTapAction
                             )
-                        }
-                    } else {
-                        if displayModeState == .list {
+                        case .list:
                             CircleList(
                                 circles: favoriteCircles.values.flatMap({ $0 }).sorted(by: { $0.id < $1.id }),
                                 showsOverlayWhenEmpty: false,
                                 displayMode: listDisplayModeState,
-                                namespace: namespace,
-                                onSelect: { circle in
-                                    unifier.append(.namespacedCircleDetail(
-                                        circle: circle,
-                                        previousCircle: { previousCircle(for: $0) },
-                                        nextCircle: { nextCircle(for: $0) },
-                                        namespace: namespace
-                                    ))
-                                },
-                                onDoubleTap: doubleTapAction
-                            )
-                        } else {
-                            CircleGrid(
-                                circles: favoriteCircles.values.flatMap({ $0 }).sorted(by: { $0.id < $1.id }),
-                                showsOverlayWhenEmpty: false,
                                 namespace: namespace,
                                 onSelect: { circle in
                                     unifier.append(.namespacedCircleDetail(
@@ -146,20 +137,14 @@ struct FavoritesView: View {
                 favorites.invalidationID = dateSelectionID
             }
 
-            displayModeState = displayModeDefault
-            listDisplayModeState = listDisplayModeDefault
+            displayModeState = displayMode
+            listDisplayModeState = listDisplayMode
         }
         .onChange(of: displayModeState) {
-            displayModeDefault = displayModeState
-        }
-        .onChange(of: displayModeDefault) {
-             displayModeState = displayModeDefault
+            displayMode = displayModeState
         }
         .onChange(of: listDisplayModeState) {
-            listDisplayModeDefault = listDisplayModeState
-        }
-        .onChange(of: listDisplayModeDefault) {
-            listDisplayModeState = listDisplayModeDefault
+            listDisplayMode = listDisplayModeState
         }
         .onChange(of: selections.date) {
             if let favoriteItems = favorites.items {
@@ -189,7 +174,9 @@ struct FavoritesView: View {
     }
 
     func prepareCircles(using favoriteItems: [UserFavorites.Response.FavoriteItem]) async {
-        let favoriteCircleIdentifiers = await Favorites.mapped(using: favoriteItems)
+        database.connect()
+        let favoriteCircleIdentifiers = await Favorites.mapped(using: favoriteItems, database: database.textDatabase)
+
         await MainActor.run {
             var favoriteCircles: [String: [ComiketCircle]] = [:]
             for colorKey in favoriteCircleIdentifiers.keys.sorted() {
@@ -243,5 +230,23 @@ struct FavoritesView: View {
             }
         }
         return nil
+    }
+
+    var doubleTapAction: ((ComiketCircle) -> Void)? {
+        if isDoubleTapToVisitEnabled {
+            return { circle in
+                toggleVisitState(circle: circle)
+            }
+        }
+        return nil
+    }
+
+    func toggleVisitState(circle: ComiketCircle) {
+        let circleID = circle.id
+        let eventNumber = planner.activeEventNumber
+        Task.detached {
+            let actor = VisitActor(modelContainer: sharedModelContainer)
+            await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
+        }
     }
 }
