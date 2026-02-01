@@ -32,6 +32,20 @@ extension Database {
                     return circle
                 }
 
+                let blockIDs = Set(circles.map { $0.blockID })
+                if !blockIDs.isEmpty {
+                    let blocksTable = Table("ComiketBlockWC")
+                    let blockIDCol = Expression<Int>("id")
+
+                    let blockQuery = blocksTable.filter(blockIDs.contains(blockIDCol))
+                    let blocks = try textDatabase.prepare(blockQuery).map { ComiketBlock(from: $0) }
+                    let blockDict = Dictionary(uniqueKeysWithValues: blocks.map { ($0.id, $0) })
+
+                    for circle in circles {
+                        circle.block = blockDict[circle.blockID]
+                    }
+                }
+
                 if reversed {
                     return circles.sorted(by: { $0.id > $1.id })
                 } else {
