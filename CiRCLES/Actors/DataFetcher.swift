@@ -150,42 +150,6 @@ actor DataFetcher {
     }
 
     func circles(
-        withGenre genreIDs: [Int]? = nil,
-        inBlock blockIDs: [Int]? = nil,
-        onDay day: Int? = nil
-    ) -> [Int]? {
-        if let database {
-            do {
-                let table = Table("ComiketCircleWC")
-                let colID = Expression<Int>("id")
-                let colGenreID = Expression<Int>("genreId")
-                let colBlockID = Expression<Int>("blockId")
-                let colDay = Expression<Int>("day")
-
-                var query = table.select(colID)
-                if let genreIDs, !genreIDs.isEmpty {
-                    query = query.filter(genreIDs.contains(colGenreID))
-                }
-                if let blockIDs, !blockIDs.isEmpty {
-                    query = query.filter(blockIDs.contains(colBlockID))
-                }
-                if let day {
-                    query = query.filter(colDay == day)
-                }
-
-                if genreIDs == nil && blockIDs == nil && day == nil {
-                    return nil
-                }
-
-                return try database.prepare(query).map { $0[colID] }
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-        return []
-    }
-
-    func circles(
         inMap mapID: Int?,
         withGenre genreIDs: [Int]?,
         inBlock blockIDs: [Int]?,
@@ -209,7 +173,7 @@ actor DataFetcher {
 
                     let mappingQuery = mappingTable.select(colMappingBlockID).filter(colMapID == mapID)
                     let blockIDs = Set(try database.prepare(mappingQuery).map { $0[colMappingBlockID] })
-                    
+
                     if blockIDs.isEmpty {
                         return []
                     }
@@ -236,27 +200,6 @@ actor DataFetcher {
                 if hasFilter {
                     return try database.prepare(query).map { $0[colID] }
                 }
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-        return []
-    }
-
-    func circles(inMap mapID: Int) -> [Int] {
-        if let database {
-            do {
-                let mappingTable = Table("ComiketMappingWC")
-                let circlesTable = Table("ComiketCircleWC")
-                let colMapID = Expression<Int>("mapId")
-                let colBlockID = Expression<Int>("blockId")
-                let colID = Expression<Int>("id")
-
-                let mappingQuery = mappingTable.select(colBlockID).filter(colMapID == mapID)
-                let blockIDs = Set(try database.prepare(mappingQuery).map { $0[colBlockID] })
-
-                let circlesQuery = circlesTable.select(colID).filter(blockIDs.contains(colBlockID))
-                return try database.prepare(circlesQuery).map { $0[colID] }
             } catch {
                 debugPrint(error.localizedDescription)
             }

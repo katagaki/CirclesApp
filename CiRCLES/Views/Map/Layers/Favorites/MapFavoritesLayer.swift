@@ -18,7 +18,6 @@ struct MapFavoritesLayer: View {
 
     let spaceSize: Int
 
-
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var body: some View {
@@ -60,13 +59,13 @@ struct MapFavoritesLayer: View {
 
         // Group by color locally first
         var colorRects: [WebCatalogColor: Path] = [:]
-        
+
         // Helper to get rect
         func getGenericRect(layout: LayoutCatalogMapping, index: Int, total: Int) -> CGRect {
             let rectWidth: CGFloat
             let rectHeight: CGFloat
             let castSpaceSize = CGFloat(spaceSize)
-            
+
             // Determine dimensions
             switch layout.layoutType {
             case .aOnLeft, .aOnRight, .unknown:
@@ -76,11 +75,11 @@ struct MapFavoritesLayer: View {
                 rectWidth = castSpaceSize
                 rectHeight = castSpaceSize / CGFloat(total)
             }
-            
+
             let baseX = CGFloat(layout.positionX)
             let baseY = CGFloat(layout.positionY)
             let idx = CGFloat(index)
-            
+
             if layout.layoutType == .aOnLeft || layout.layoutType == .aOnRight || layout.layoutType == .unknown {
                 return CGRect(x: baseX + idx * rectWidth, y: baseY, width: rectWidth, height: rectHeight)
             } else {
@@ -91,7 +90,7 @@ struct MapFavoritesLayer: View {
         for (layout, mapping) in layoutFavoriteWebCatalogIDMappings {
             // Sort IDs
             let sortedIDs = mapping.keys.sorted()
-            
+
             // Layout order
             let orderedIDs: [Int]
             switch layout.layoutType {
@@ -100,10 +99,10 @@ struct MapFavoritesLayer: View {
             default:
                 orderedIDs = sortedIDs
             }
-            
+
             let count = orderedIDs.count
             guard count > 0 else { continue }
-            
+
             for (index, id) in orderedIDs.enumerated() {
                 // Remap ID if needed (suffix logic)
                 let actualID = spaceNumberSuffixes[id] ?? id
@@ -111,9 +110,9 @@ struct MapFavoritesLayer: View {
                 // Actually mapping is [Int (WebCatalogID) : Color?]
                 // We need to look up the color for the Original ID
                 guard let color = mapping[id], let safeColor = color else { continue }
-                
+
                 let rect = getGenericRect(layout: layout, index: index, total: count)
-                
+
                 // Append to path
                 if colorRects[safeColor] == nil {
                     colorRects[safeColor] = Path()

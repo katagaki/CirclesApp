@@ -10,7 +10,7 @@ import SwiftUI
 struct MapPopoverLayer<Content: View>: View {
 
     @Environment(Mapper.self) var mapper
-    
+
     var zoomScale: CGFloat
 
     var content: (PopoverData) -> Content
