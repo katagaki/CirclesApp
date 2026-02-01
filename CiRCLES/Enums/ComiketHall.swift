@@ -11,5 +11,7 @@ enum ComiketHall: String {
     case east7 = "E7"
     case east78 = "E78"
     case west12 = "W12"
+    case west34 = "W34"
     case south12 = "S12"
+    case south34 = "S34"
 }
