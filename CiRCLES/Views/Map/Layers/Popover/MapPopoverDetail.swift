@@ -52,7 +52,7 @@ struct MapPopoverDetail: View {
                             Spacer(minLength: 0.0)
                         }
                         .contentShape(.rect)
-                        .onTapGesture(count: 2) {
+                        .onFastDoubleTap(doubleTap: {
                             if isDoubleTapToVisitEnabled {
                                 let circleID = circle.id
                                 let eventNumber = planner.activeEventNumber
@@ -61,13 +61,12 @@ struct MapPopoverDetail: View {
                                     await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
                                 }
                             }
-                        }
-                        .onTapGesture {
+                        }, singleTap: {
                             if unifier.isMinimized {
                                 unifier.selectedDetent = .height(360)
                             }
                             unifier.append(.circleDetail(circle: circle))
-                        }
+                        })
                         .popoverTip((index == 0 && isDoubleTapToVisitEnabled) ? DoubleTapVisitTip() : nil)
                     }
                 } else {

@@ -19,30 +19,38 @@ struct CircleList: View {
 
     var body: some View {
         List(Array(circles.enumerated()), id: \.element.id) { index, circle in
-            let row = Button {
-                onSelect(circle)
-            } label: {
-                switch displayMode {
-                case .regular:
-                    CircleListRegularRow(circle: circle, namespace: namespace)
-                case .compact:
-                    CircleListCompactRow(circle: circle, namespace: namespace)
+            Group {
+                if let onDoubleTap {
+                    Group {
+                        switch displayMode {
+                        case .regular:
+                            CircleListRegularRow(circle: circle, namespace: namespace)
+                        case .compact:
+                            CircleListCompactRow(circle: circle, namespace: namespace)
+                        }
+                    }
+                    .contentShape(.rect)
+                    .onFastDoubleTap(doubleTap: {
+                        onDoubleTap(circle)
+                    }, singleTap: {
+                        onSelect(circle)
+                    })
+                    .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
+                } else {
+                    Button {
+                        onSelect(circle)
+                    } label: {
+                        switch displayMode {
+                        case .regular:
+                            CircleListRegularRow(circle: circle, namespace: namespace)
+                        case .compact:
+                            CircleListCompactRow(circle: circle, namespace: namespace)
+                        }
+                    }
                 }
             }
             .contextMenu(circle: circle) {
                 onSelect(circle)
-            }
-
-            Group {
-                if let onDoubleTap {
-                    row
-                        .highPriorityGesture(TapGesture(count: 2).onEnded {
-                            onDoubleTap(circle)
-                        })
-                        .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
-                } else {
-                    row
-                }
             }
             .listRowBackground(Color.clear)
         }

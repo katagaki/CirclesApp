@@ -162,23 +162,23 @@ actor DataFetcher {
     }
 
     func circles(
-        withGenre genreID: Int? = nil,
-        inBlock blockID: Int? = nil,
+        withGenre genreIDs: [Int]? = nil,
+        inBlock blockIDs: [Int]? = nil,
         onDay day: Int? = nil
     ) -> [PersistentIdentifier]? {
         do {
             var predicates: [Predicate<ComiketCircle>] = []
-            if let genreID {
+            if let genreIDs, !genreIDs.isEmpty {
                 predicates.append(
                     #Predicate<ComiketCircle> {
-                        $0.genreID == genreID
+                        genreIDs.contains($0.genreID)
                     }
                 )
             }
-            if let blockID {
+            if let blockIDs, !blockIDs.isEmpty {
                 predicates.append(
                     #Predicate<ComiketCircle> {
-                        $0.blockID == blockID
+                        blockIDs.contains($0.blockID)
                     }
                 )
             }
@@ -222,6 +222,60 @@ actor DataFetcher {
                 }
             )
             return try modelContext.fetchIdentifiers(fetchDescriptor)
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func genreIDs(inMap mapID: Int, onDay dayID: Int) -> [Int] {
+        do {
+            let mappingFetchDescriptor = FetchDescriptor<ComiketMapping>(
+                predicate: #Predicate<ComiketMapping> {
+                    $0.mapID == mapID
+                }
+            )
+            let mappings = try modelContext.fetch(mappingFetchDescriptor)
+            let blockIDs = Set(mappings.map { $0.blockID })
+            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+                predicate: #Predicate<ComiketCircle> {
+                    blockIDs.contains($0.blockID) && $0.day == dayID
+                }
+            )
+            let circles = try modelContext.fetch(fetchDescriptor)
+            return Array(Set(circles.map { $0.genreID }))
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
+
+    func blockIDs(inMap mapID: Int, onDay dayID: Int, withGenreIDs genreIDs: [Int]?) -> [Int] {
+        do {
+            let mappingFetchDescriptor = FetchDescriptor<ComiketMapping>(
+                predicate: #Predicate<ComiketMapping> {
+                    $0.mapID == mapID
+                }
+            )
+            let mappings = try modelContext.fetch(mappingFetchDescriptor)
+            let blockIDs = Set(mappings.map { $0.blockID })
+            if let genreIDs, !genreIDs.isEmpty {
+                let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+                    predicate: #Predicate<ComiketCircle> {
+                        blockIDs.contains($0.blockID) && $0.day == dayID && genreIDs.contains($0.genreID)
+                    }
+                )
+                let circles = try modelContext.fetch(fetchDescriptor)
+                return Array(Set(circles.map { $0.blockID }))
+            } else {
+                let fetchDescriptor = FetchDescriptor<ComiketCircle>(
+                    predicate: #Predicate<ComiketCircle> {
+                        blockIDs.contains($0.blockID) && $0.day == dayID
+                    }
+                )
+                let circles = try modelContext.fetch(fetchDescriptor)
+                return Array(Set(circles.map { $0.blockID }))
+            }
         } catch {
             debugPrint(error.localizedDescription)
             return []

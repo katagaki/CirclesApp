@@ -9,9 +9,9 @@ import Foundation
 import Observation
 import SwiftData
 
-let selectedGenreKey = "Circles.SelectedGenreID"
+let selectedGenresKey = "Circles.SelectedGenreIDs"
 let selectedMapKey = "Circles.SelectedMapID"
-let selectedBlockKey = "Circles.SelectedBlockID"
+let selectedBlocksKey = "Circles.SelectedBlockIDs"
 let selectedDateKey = "Circles.SelectedDateID"
 
 @Observable
@@ -33,24 +33,24 @@ class UserSelections: Equatable {
         set(value) {
             _map = value
             defaults.set(value?.id, forKey: selectedMapKey)
-            _block = nil
-            defaults.set(nil, forKey: selectedBlockKey)
+            _blocks = []
+            defaults.set([], forKey: selectedBlocksKey)
         }
     }
-    private var _block: ComiketBlock?
-    var block: ComiketBlock? {
-        get { return _block }
+    private var _blocks: Set<ComiketBlock> = []
+    var blocks: Set<ComiketBlock> {
+        get { return _blocks }
         set(value) {
-            _block = value
-            defaults.set(value?.id, forKey: selectedBlockKey)
+            _blocks = value
+            defaults.set(value.map({ $0.id }), forKey: selectedBlocksKey)
         }
     }
-    private var _genre: ComiketGenre?
-    var genre: ComiketGenre? {
-        get { return _genre }
+    private var _genres: Set<ComiketGenre> = []
+    var genres: Set<ComiketGenre> {
+        get { return _genres }
         set(value) {
-            _genre = value
-            defaults.set(value?.id, forKey: selectedGenreKey)
+            _genres = value
+            defaults.set(value.map({ $0.id }), forKey: selectedGenresKey)
         }
     }
 
@@ -65,12 +65,12 @@ class UserSelections: Equatable {
     func reloadData() {
         let dateID = defaults.integer(forKey: selectedDateKey)
         let mapID = defaults.integer(forKey: selectedMapKey)
-        let blockID = defaults.integer(forKey: selectedBlockKey)
-        let genreID = defaults.integer(forKey: selectedGenreKey)
+        let blockIDs = defaults.array(forKey: selectedBlocksKey) as? [Int] ?? []
+        let genreIDs = defaults.array(forKey: selectedGenresKey) as? [Int] ?? []
         _date = fetchDateSelection(with: dateID)
         _map = fetchMapSelection(with: mapID)
-        _block = fetchBlockSelection(with: blockID)
-        _genre = fetchGenreSelection(with: genreID)
+        _blocks = fetchBlockSelections(with: blockIDs)
+        _genres = fetchGenreSelections(with: genreIDs)
     }
 
     func fetchDateSelection(with id: Int) -> ComiketDate? {
@@ -101,18 +101,18 @@ class UserSelections: Equatable {
         return try? modelContext.fetch(fetchDescriptor).first
     }
 
-    func fetchBlockSelection(with id: Int) -> ComiketBlock? {
+    func fetchBlockSelections(with ids: [Int]) -> Set<ComiketBlock> {
         let fetchDescriptor = FetchDescriptor<ComiketBlock>(
-            predicate: #Predicate<ComiketBlock> { $0.id == id }
+            predicate: #Predicate<ComiketBlock> { ids.contains($0.id) }
         )
-        return try? modelContext.fetch(fetchDescriptor).first
+        return Set((try? modelContext.fetch(fetchDescriptor)) ?? [])
     }
 
-    func fetchGenreSelection(with id: Int) -> ComiketGenre? {
+    func fetchGenreSelections(with ids: [Int]) -> Set<ComiketGenre> {
         let fetchDescriptor = FetchDescriptor<ComiketGenre>(
-            predicate: #Predicate<ComiketGenre> { $0.id == id }
+            predicate: #Predicate<ComiketGenre> { ids.contains($0.id) }
         )
-        return try? modelContext.fetch(fetchDescriptor).first
+        return Set((try? modelContext.fetch(fetchDescriptor)) ?? [])
     }
 
     var fullMapID: String {
@@ -120,16 +120,18 @@ class UserSelections: Equatable {
     }
 
     var catalogSelectionID: String {
-        return "M\(_map?.id ?? -1),D\(_date?.id ?? -1),G\(_genre?.id ?? -1),B\(_block?.id ?? -1)"
+        let genreIDs = _genres.map({ String($0.id) }).sorted().joined(separator: "-")
+        let blockIDs = _blocks.map({ String($0.id) }).sorted().joined(separator: "-")
+        return "M\(_map?.id ?? -1),D\(_date?.id ?? -1),G[\(genreIDs)],B[\(blockIDs)]"
     }
 
     func resetSelections() {
-        _genre = nil
-        defaults.set(nil, forKey: selectedGenreKey)
+        _genres = []
+        defaults.set([], forKey: selectedGenresKey)
         _map = nil
         defaults.set(nil, forKey: selectedMapKey)
-        _block = nil
-        defaults.set(nil, forKey: selectedBlockKey)
+        _blocks = []
+        defaults.set([], forKey: selectedBlocksKey)
         _date = nil
         defaults.set(nil, forKey: selectedDateKey)
     }

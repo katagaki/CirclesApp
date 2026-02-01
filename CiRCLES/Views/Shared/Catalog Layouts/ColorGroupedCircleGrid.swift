@@ -40,12 +40,11 @@ struct ColorGroupedCircleGrid: View {
                                         showSpaceName: $showSpaceName, showDay: $showDay
                                     )
                                     .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
-                                    .onTapGesture(count: 2) {
+                                    .onFastDoubleTap(doubleTap: {
                                         onDoubleTap(circle)
-                                    }
-                                    .onTapGesture {
+                                    }, singleTap: {
                                         onSelect(circle)
-                                    }
+                                    })
                                     .contextMenu(circle: circle) {
                                         onSelect(circle)
                                     }
