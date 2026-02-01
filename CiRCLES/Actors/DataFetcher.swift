@@ -184,6 +184,64 @@ actor DataFetcher {
         return []
     }
 
+    func circles(
+        inMap mapID: Int?,
+        withGenre genreIDs: [Int]?,
+        inBlock blockIDs: [Int]?,
+        onDay dayID: Int?
+    ) -> [Int] {
+        if let database {
+            do {
+                let table = Table("ComiketCircleWC")
+                let colID = Expression<Int>("id")
+                let colGenreID = Expression<Int>("genreId")
+                let colBlockID = Expression<Int>("blockId")
+                let colDay = Expression<Int>("day")
+
+                var query = table.select(colID)
+                var hasFilter = false
+
+                if let mapID {
+                    let mappingTable = Table("ComiketMappingWC")
+                    let colMapID = Expression<Int>("mapId")
+                    let colMappingBlockID = Expression<Int>("blockId")
+
+                    let mappingQuery = mappingTable.select(colMappingBlockID).filter(colMapID == mapID)
+                    let blockIDs = Set(try database.prepare(mappingQuery).map { $0[colMappingBlockID] })
+                    
+                    if blockIDs.isEmpty {
+                        return []
+                    }
+
+                    query = query.filter(blockIDs.contains(colBlockID))
+                    hasFilter = true
+                }
+
+                if let genreIDs, !genreIDs.isEmpty {
+                    query = query.filter(genreIDs.contains(colGenreID))
+                    hasFilter = true
+                }
+
+                if let blockIDs, !blockIDs.isEmpty {
+                    query = query.filter(blockIDs.contains(colBlockID))
+                    hasFilter = true
+                }
+
+                if let dayID {
+                    query = query.filter(colDay == dayID)
+                    hasFilter = true
+                }
+
+                if hasFilter {
+                    return try database.prepare(query).map { $0[colID] }
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return []
+    }
+
     func circles(inMap mapID: Int) -> [Int] {
         if let database {
             do {
