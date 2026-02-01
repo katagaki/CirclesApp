@@ -14,6 +14,7 @@ struct MoreDatabaseAdministratiion: View {
 
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
+    @Environment(Events.self) var events
     @Environment(ImageCache.self) var imageCache
     @Environment(Oasis.self) var oasis
 
@@ -148,17 +149,30 @@ struct MoreDatabaseAdministratiion: View {
         UIApplication.shared.isIdleTimerDisabled = true
         oasis.open()
         if !willSkipDownload {
-            if let token = authenticator.token,
-               let eventData = await WebCatalog.events(authToken: token),
-               let latestEvent = eventData.list.first(where: {$0.id == eventData.latestEventID}) {
-                database.delete()
-                await oasis.setBodyText("Loading.DownloadTextDatabase")
-                await database.downloadTextDatabase(for: latestEvent, authToken: token) { progress in
-                    await oasis.setProgress(progress)
+            if let token = authenticator.token {
+                var eventToRepair: WebCatalogEvent.Response.Event?
+                if let activeEvent = events.activeEvent {
+                    eventToRepair = activeEvent
+                } else if let eventData = await WebCatalog.events(authToken: token),
+                          let activeEvent = eventData.list.first(
+                            where: { $0.number == events.activeEventNumber }
+                          ) {
+                    eventToRepair = WebCatalogEvent.Response.Event(
+                        id: activeEvent.id,
+                        number: events.activeEventNumber
+                    )
                 }
-                await oasis.setBodyText("Loading.DownloadImageDatabase")
-                await database.downloadImageDatabase(for: latestEvent, authToken: token) { progress in
-                    await oasis.setProgress(progress)
+
+                if let eventToRepair {
+                    database.delete(event: eventToRepair)
+                    await oasis.setBodyText("Loading.DownloadTextDatabase")
+                    await database.downloadTextDatabase(for: eventToRepair, authToken: token) { progress in
+                        await oasis.setProgress(progress)
+                    }
+                    await oasis.setBodyText("Loading.DownloadImageDatabase")
+                    await database.downloadImageDatabase(for: eventToRepair, authToken: token) { progress in
+                        await oasis.setProgress(progress)
+                    }
                 }
             }
         }
