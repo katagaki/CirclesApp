@@ -47,7 +47,7 @@ struct AuthenticatedView: ViewModifier {
                 if oldValue != -1 {
                     planner.activeEventNumberUserDefault = planner.activeEventNumber
                     planner.updateActiveEvent(onlineState: authenticator.onlineState)
-                    reloadData(forceDownload: false)
+                    reloadData(forceDownload: false, shouldResetSelections: true)
                 }
             }
             .onOpenURL { url in
@@ -59,7 +59,7 @@ struct AuthenticatedView: ViewModifier {
             }
     }
 
-    func reloadData(forceDownload: Bool = false) {
+    func reloadData(forceDownload: Bool = false, shouldResetSelections: Bool = false) {
         if !isReloadingData {
             isReloadingData = true
             database.reset()
@@ -67,38 +67,52 @@ struct AuthenticatedView: ViewModifier {
                 isDatabaseInitialized = false
             }
             unifier.hide()
-            oasis.open {
-                Task {
-                    await oasis.setHeaderText("Shared.LoadingHeader.Event")
-                    await oasis.setBodyText("Loading.FetchEventData")
-                    if let authToken = authenticator.token {
-                        await planner.prepare(authToken: authToken)
-                    }
-                    planner.updateActiveEvent(onlineState: authenticator.onlineState)
-                    let activeEvent = planner.activeEvent
-                    Task.detached {
-                        await loadDataFromDatabase(for: activeEvent)
-                        await MainActor.run {
-                            oasis.close()
-                            // Set initial selections
-                            if selections.date == nil {
-                                selections.date = selections.fetchDefaultDateSelection(database: database)
-                            }
-                            if selections.map == nil {
-                                selections.map = selections.fetchDefaultMapSelection(database: database)
-                            }
 
-                            if !authenticator.isAuthenticating {
-                                unifier.show()
+            Task {
+                if let authToken = authenticator.token {
+                    await planner.prepare(authToken: authToken)
+                }
+                planner.updateActiveEvent(onlineState: authenticator.onlineState)
+                let activeEvent = planner.activeEvent
+
+                if let activeEvent {
+                    if !database.isDownloaded(for: activeEvent) {
+                        oasis.open {
+                            Task.detached {
+                                await loadDataFromDatabase(for: activeEvent)
+                                await MainActor.run {
+                                    finishReload(shouldResetSelections: shouldResetSelections)
+                                }
                             }
-                            isReloadingData = false
                         }
-                        Task.detached(priority: .background) {
-                            await loadFavorites()
-                        }
+                    } else {
+                        await loadDataFromDatabase(for: activeEvent)
+                        finishReload(shouldResetSelections: shouldResetSelections)
                     }
+                } else {
+                    finishReload(shouldResetSelections: shouldResetSelections)
                 }
             }
+        }
+    }
+
+    @MainActor
+    func finishReload(shouldResetSelections: Bool = false) {
+        oasis.close()
+        // Set initial selections
+        if shouldResetSelections || selections.date == nil {
+            selections.date = selections.fetchDefaultDateSelection(database: database)
+        }
+        if shouldResetSelections || selections.map == nil {
+            selections.map = selections.fetchDefaultMapSelection(database: database)
+        }
+
+        if !authenticator.isAuthenticating {
+            unifier.show()
+        }
+        isReloadingData = false
+        Task.detached(priority: .background) {
+            await loadFavorites()
         }
     }
 
@@ -123,11 +137,15 @@ struct AuthenticatedView: ViewModifier {
                 await database.downloadImageDatabase(for: activeEvent, authToken: token) { _ in }
             }
 
-            await oasis.setBodyText("Loading.Database")
+            if oasis.isShowing {
+                await oasis.setBodyText("Loading.Database")
+            }
             database.connect()
             selections.reloadData(database: database)
 
-            await oasis.setHeaderText("Shared.LoadingHeader.Initial")
+            if oasis.isShowing {
+                await oasis.setHeaderText("Shared.LoadingHeader.Initial")
+            }
 
             if !isDatabaseInitialized {
                 imageCache.clear()
@@ -137,7 +155,6 @@ struct AuthenticatedView: ViewModifier {
             database.imageCache.removeAll()
             database.loadCommonImages()
             database.loadCircleImages()
-
             database.disconnect()
         }
 

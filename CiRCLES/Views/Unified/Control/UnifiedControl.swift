@@ -13,34 +13,36 @@ struct UnifiedControl: View {
 
     var body: some View {
         Group {
-            if #available(iOS 26.0, *) {
-                HStack {
-                    DatePicker()
-                        .padding([.leading], 12.0)
-                    Spacer()
-                    HallPicker()
-                        .background(accentColorForMap(selections.map))
-                        .clipShape(.capsule)
-                }
-            } else {
-                HStack {
-                    DatePicker()
-                        .padding([.leading], 12.0)
-                    Spacer()
-                    HallPicker()
-                        .background(accentColorForMap(selections.map))
-                        .clipShape(.capsule)
-                }
-                .padding(.horizontal, 1.5)
-                .background(Material.bar)
-                .clipShape(.capsule)
-                .overlay {
-                    Capsule()
-                        .stroke(.primary.opacity(0.2), lineWidth: 1 / 3)
+            if !(selections.date == nil || selections.map == nil) {
+                if #available(iOS 26.0, *) {
+                    HStack {
+                        DatePicker()
+                            .padding([.leading], 12.0)
+                        Spacer()
+                        HallPicker()
+                            .background(accentColorForMap(selections.map))
+                            .clipShape(.capsule)
+                    }
+                } else {
+                    HStack {
+                        DatePicker()
+                            .padding([.leading], 12.0)
+                        Spacer()
+                        HallPicker()
+                            .background(accentColorForMap(selections.map))
+                            .clipShape(.capsule)
+                    }
+                    .padding(.horizontal, 1.5)
+                    .background(Material.bar)
+                    .clipShape(.capsule)
+                    .overlay {
+                        Capsule()
+                            .stroke(.primary.opacity(0.2), lineWidth: 1 / 3)
+                    }
                 }
             }
         }
-        .frame(maxWidth: 280.0)
+        .frame(minWidth: 100.0, maxWidth: 280.0)
         .padding(6.0)
         .id(selections.fullMapID)
     }
