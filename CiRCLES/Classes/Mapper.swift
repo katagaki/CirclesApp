@@ -40,7 +40,6 @@ class Mapper {
     // swiftlint:disable function_body_length
     @MainActor
     func highlightCircle(
-        zoomDivisor: Int,
         spaceSize: Int
     ) async -> Bool {
         guard let circle = highlightTarget else { return false }
@@ -56,10 +55,9 @@ class Mapper {
             return false
         }
 
-        let zoomFactor = zoomFactorDouble(zoomDivisor)
-        let xMin: CGFloat = CGFloat(layout.positionX) / zoomFactor
-        let yMin: CGFloat = CGFloat(layout.positionY) / zoomFactor
-        let scaledSpaceSize = CGFloat(spaceSize) / zoomFactor
+        let xMin: CGFloat = CGFloat(layout.positionX)
+        let yMin: CGFloat = CGFloat(layout.positionY)
+        let scaledSpaceSize = CGFloat(spaceSize)
 
         let count = webCatalogIDs.count
         guard count > 0 else { return false }

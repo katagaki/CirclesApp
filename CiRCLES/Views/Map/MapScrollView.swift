@@ -12,9 +12,11 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
 
     @Environment(Mapper.self) var mapper
 
+    @Binding var zoomScale: CGFloat
     let content: Content
 
-    init(@ViewBuilder content: () -> Content) {
+    init(zoomScale: Binding<CGFloat>, @ViewBuilder content: () -> Content) {
+        self._zoomScale = zoomScale
         self.content = content()
     }
 
@@ -24,6 +26,8 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
         scrollView.showsVerticalScrollIndicator = false
         scrollView.delegate = context.coordinator
         scrollView.contentInsetAdjustmentBehavior = .always
+        scrollView.minimumZoomScale = 0.5
+        scrollView.maximumZoomScale = 5.0
 
         let hostingController = UIHostingController(rootView: content)
         hostingController.view.backgroundColor = .clear
@@ -52,15 +56,29 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
             hostingController.view.invalidateIntrinsicContentSize()
         }
 
-        if let position = mapper.scrollToPosition {
-            let effectiveHeight = scrollView.bounds.height + scrollView.safeAreaInsets.top
-            let halfWidth = scrollView.bounds.width / 2
-            let halfHeight = effectiveHeight / 2
+        if scrollView.zoomScale != zoomScale {
+            scrollView.setZoomScale(zoomScale, animated: false)
+        }
 
-            let centeredX = max(0, min(position.x - halfWidth,
+        if let position = mapper.scrollToPosition {
+            let zoomScale = scrollView.zoomScale
+            
+            // Calculate scaled position based on current zoom
+            let scaledX = position.x * zoomScale
+            let scaledY = position.y * zoomScale
+            
+            let halfWidth = scrollView.bounds.width / 2
+            let halfHeight = scrollView.bounds.height / 2
+
+            // Calculate target offset, clamping to valid scroll range
+            let centeredX = max(0, min(scaledX - halfWidth,
                                        scrollView.contentSize.width - scrollView.bounds.width))
-            let centeredY = max(-scrollView.safeAreaInsets.top, min(position.y - halfHeight,
-                                       scrollView.contentSize.height - scrollView.bounds.height))
+            
+            // Allow scrolling to top inset (e.g. under navigation bar)
+            let minScrollY = -scrollView.safeAreaInsets.top
+            let maxScrollY = max(minScrollY, scrollView.contentSize.height - scrollView.bounds.height + scrollView.safeAreaInsets.bottom)
+            
+            let centeredY = max(minScrollY, min(scaledY - halfHeight, maxScrollY))
 
             let centeredOffset = CGPoint(x: centeredX, y: centeredY)
             scrollView.setContentOffset(centeredOffset, animated: true)
@@ -71,10 +89,23 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator()
+        Coordinator(self)
     }
 
     class Coordinator: NSObject, UIScrollViewDelegate {
+        var parent: MapScrollView
         var hostingController: UIHostingController<Content>?
+
+        init(_ parent: MapScrollView) {
+            self.parent = parent
+        }
+
+        func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+            return hostingController?.view
+        }
+
+        func scrollViewDidZoom(_ scrollView: UIScrollView) {
+            parent.zoomScale = scrollView.zoomScale
+        }
     }
 }

@@ -21,6 +21,7 @@ struct MapView: View {
 
     @State var isInitialLoadCompleted: Bool = false
 
+    @AppStorage(wrappedValue: 1.0, "Map.ZoomScale") var zoomScale: Double
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
@@ -35,13 +36,16 @@ struct MapView: View {
     }
 
     var popoverInvalidationID: String {
-        "Z\(zoomDivisor)_R\(useHighResolutionMaps ? 1 : 0)"
+        "R\(useHighResolutionMaps ? 1 : 0)"
     }
 
     var body: some View {
         VStack(alignment: .leading) {
             if let mapImage {
-                MapScrollView {
+                MapScrollView(zoomScale: Binding(
+                    get: { CGFloat(zoomScale) },
+                    set: { zoomScale = Double($0) }
+                )) {
                     ZStack(alignment: .topLeading) {
                         MapLayer(image: mapImage)
                         MapFavoritesLayer(spaceSize: spaceSize)
@@ -50,7 +54,7 @@ struct MapView: View {
                         }
                         MapLayoutLayer(spaceSize: spaceSize)
                         MapHighlightLayer()
-                        MapPopoverLayer { selection in
+                        MapPopoverLayer(zoomScale: zoomScale) { selection in
                             MapPopoverDetail(selection: selection)
                         }
                     }
@@ -93,7 +97,7 @@ struct MapView: View {
             if oldValue == nil && newValue != nil {
                 Task {
                     let shouldHighlight = await mapper.highlightCircle(
-                        zoomDivisor: zoomDivisor, spaceSize: spaceSize
+                        spaceSize: spaceSize
                     )
                     if !shouldHighlight {
                         mapper.highlightTarget = nil

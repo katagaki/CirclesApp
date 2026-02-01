@@ -15,25 +15,28 @@ struct MapLayoutLayer: View {
 
     let spaceSize: Int
 
-    @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
+
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var body: some View {
-        Canvas { context, _ in
+        let color: Color = !useDarkModeMaps ? .black.opacity(0.3) : .primary.opacity(0.3)
+        ZStack(alignment: .topLeading) {
             // Draw selection highlight if popover is active
             if let popoverData = mapper.popoverData {
-                context.fill(
-                    Path(popoverData.sourceRect),
-                    with: !useDarkModeMaps ? .color(.black.opacity(0.3)) :
-                            .color(.primary.opacity(0.3))
-                )
+                Rectangle()
+                    .fill(color)
+                    .frame(width: popoverData.sourceRect.width, height: popoverData.sourceRect.height)
+                    .position(x: popoverData.sourceRect.midX, y: popoverData.sourceRect.midY)
             }
+            
+            // Interaction layer
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture { location in
+                    openMapPopoverIn(x: Int(location.x), y: Int(location.y))
+                }
         }
         .frame(width: mapper.canvasSize.width, height: mapper.canvasSize.height)
-        .contentShape(.rect)
-        .onTapGesture { location in
-            openMapPopoverIn(x: Int(location.x), y: Int(location.y))
-        }
         .overlay {
             // Selection source rectangle for matched transition
             if let popoverData = mapper.popoverData {
@@ -47,14 +50,13 @@ struct MapLayoutLayer: View {
 
     // swiftlint:disable identifier_name
     func openMapPopoverIn(x: Int, y: Int) {
-        let zoomFactor = zoomFactorDouble(zoomDivisor)
         for (layout, webCatalogIDs) in mapper.layouts {
-            let xMin: Int = Int(Double(layout.positionX) / zoomFactor)
-            let xMax: Int = Int(Double(layout.positionX + spaceSize) / zoomFactor)
-            let yMin: Int = Int(Double(layout.positionY) / zoomFactor)
-            let yMax: Int = Int(Double(layout.positionY + spaceSize) / zoomFactor)
+            let xMin: Int = Int(Double(layout.positionX))
+            let xMax: Int = Int(Double(layout.positionX + spaceSize))
+            let yMin: Int = Int(Double(layout.positionY))
+            let yMax: Int = Int(Double(layout.positionY + spaceSize))
             if x >= xMin && x < xMax && y >= yMin && y < yMax {
-                let spaceSize = Int(Double(spaceSize) / zoomFactor)
+                let spaceSize = Int(Double(spaceSize))
                 let newPopoverData = PopoverData(
                     layout: layout,
                     idSet: WebCatalogIDSet(ids: webCatalogIDs),

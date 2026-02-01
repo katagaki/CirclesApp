@@ -14,27 +14,30 @@ struct MapFavoritesLayer: View {
     @Environment(Favorites.self) var favorites
     @Environment(Mapper.self) var mapper
 
-    @State var favoriteMappings: [LayoutCatalogMapping: [Int: WebCatalogColor?]] = [:]
+    @State var favoritePaths: [WebCatalogColor: Path] = [:]
 
     let spaceSize: Int
 
-    @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
+
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var body: some View {
-        Canvas { context, _ in
-            for (layout, colorMap) in favoriteMappings {
-                drawFavoritesForLayout(
-                    context: context,
-                    layout: layout,
-                    colorMap: colorMap
-                )
+        ZStack(alignment: .topLeading) {
+            ForEach(WebCatalogColor.allCases, id: \.self) { color in
+                if let path = favoritePaths[color] {
+                    path.fill(color.backgroundColor())
+                }
             }
         }
         .frame(width: mapper.canvasSize.width, height: mapper.canvasSize.height)
+        .opacity(0.5)
         .allowsHitTesting(false)
+        .onAppear {
+            Task {
+                await reloadFavorites()
+            }
+        }
         .onChange(of: mapper.layouts) {
-            favoriteMappings.removeAll()
             Task.detached {
                 await reloadFavorites()
             }
@@ -43,95 +46,6 @@ struct MapFavoritesLayer: View {
             Task.detached {
                 await reloadFavorites()
             }
-        }
-    }
-
-    // swiftlint:disable function_body_length
-    func drawFavoritesForLayout(
-        context: GraphicsContext,
-        layout: LayoutCatalogMapping,
-        colorMap: [Int: WebCatalogColor?]
-    ) {
-        let webCatalogIDs = Array(colorMap.keys).sorted()
-
-        // Determine if we need to reverse the order based on layout type
-        let orderedIDs: [Int]
-        switch layout.layoutType {
-        case .aOnLeft, .aOnTop, .unknown:
-            orderedIDs = webCatalogIDs
-        case .aOnBottom, .aOnRight:
-            orderedIDs = webCatalogIDs.reversed()
-        }
-
-        let count = orderedIDs.count
-        guard count > 0 else { return }
-
-        // Cache computed values
-        let zoomFactor = zoomFactor(zoomDivisor)
-        let scaledSpaceSize = CGFloat(spaceSize) / zoomFactor
-        let baseX = CGFloat(layout.positionX) / zoomFactor
-        let baseY = CGFloat(layout.positionY) / zoomFactor
-        let countCGFloat = CGFloat(count)
-
-        // Pre-compute rectangle dimensions based on layout type
-        let isHorizontal: Bool
-        let rectWidth: CGFloat
-        let rectHeight: CGFloat
-
-        switch layout.layoutType {
-        case .aOnLeft, .aOnRight, .unknown:
-            isHorizontal = true
-            rectWidth = scaledSpaceSize / countCGFloat
-            rectHeight = scaledSpaceSize
-        case .aOnTop, .aOnBottom:
-            isHorizontal = false
-            rectWidth = scaledSpaceSize
-            rectHeight = scaledSpaceSize / countCGFloat
-        }
-
-        for (index, webCatalogID) in orderedIDs.enumerated() {
-            guard let color = colorMap[webCatalogID], let color else { continue }
-
-            let indexCGFloat = CGFloat(index)
-            let rect: CGRect
-
-            if isHorizontal {
-                rect = CGRect(
-                    x: baseX + indexCGFloat * rectWidth,
-                    y: baseY,
-                    width: rectWidth,
-                    height: rectHeight
-                )
-            } else {
-                rect = CGRect(
-                    x: baseX,
-                    y: baseY + indexCGFloat * rectHeight,
-                    width: rectWidth,
-                    height: rectHeight
-                )
-            }
-
-            context.fill(
-                Path(rect),
-                with: .color(highlightColor(color))
-            )
-        }
-    }
-    // swiftlint:enable function_body_length
-
-    func highlightColor(_ color: WebCatalogColor) -> Color {
-        let baseColor = color.backgroundColor()
-        switch colorScheme {
-        case .light:
-            return baseColor.opacity(0.5)
-        case .dark:
-            if useDarkModeMaps {
-                return baseColor.brightness(0.1).opacity(0.5) as? Color ?? baseColor.opacity(0.5)
-            } else {
-                return baseColor.opacity(0.5)
-            }
-        @unknown default:
-            return baseColor.opacity(0.5)
         }
     }
 
@@ -144,16 +58,75 @@ struct MapFavoritesLayer: View {
 
         let spaceNumberSuffixes = await actor.spaceNumberSuffixes(forWebCatalogIDs: webCatalogIDs)
 
-        let layoutFavoriteWebCatalogIDSorted = layoutFavoriteWebCatalogIDMappings.mapValues { colorMapping in
-            colorMapping.reduce(into: [Int: WebCatalogColor?]()) { result, keyValue in
-                let remappedID = spaceNumberSuffixes[keyValue.key] ?? keyValue.key
-                result[remappedID] = keyValue.value
+        // Group by color locally first
+        var colorRects: [WebCatalogColor: Path] = [:]
+        
+        // Helper to get rect
+        func getGenericRect(layout: LayoutCatalogMapping, index: Int, total: Int) -> CGRect {
+            let rectWidth: CGFloat
+            let rectHeight: CGFloat
+            let castSpaceSize = CGFloat(spaceSize)
+            
+            // Determine dimensions
+            switch layout.layoutType {
+            case .aOnLeft, .aOnRight, .unknown:
+                rectWidth = castSpaceSize / CGFloat(total)
+                rectHeight = castSpaceSize
+            case .aOnTop, .aOnBottom:
+                rectWidth = castSpaceSize
+                rectHeight = castSpaceSize / CGFloat(total)
+            }
+            
+            let baseX = CGFloat(layout.positionX)
+            let baseY = CGFloat(layout.positionY)
+            let idx = CGFloat(index)
+            
+            if layout.layoutType == .aOnLeft || layout.layoutType == .aOnRight || layout.layoutType == .unknown {
+                return CGRect(x: baseX + idx * rectWidth, y: baseY, width: rectWidth, height: rectHeight)
+            } else {
+                return CGRect(x: baseX, y: baseY + idx * rectHeight, width: rectWidth, height: rectHeight)
             }
         }
 
+        for (layout, mapping) in layoutFavoriteWebCatalogIDMappings {
+            // Sort IDs
+            let sortedIDs = mapping.keys.sorted()
+            
+            // Layout order
+            let orderedIDs: [Int]
+            switch layout.layoutType {
+            case .aOnBottom, .aOnRight:
+                orderedIDs = sortedIDs.reversed()
+            default:
+                orderedIDs = sortedIDs
+            }
+            
+            let count = orderedIDs.count
+            guard count > 0 else { continue }
+            
+            for (index, id) in orderedIDs.enumerated() {
+                // Remap ID if needed (suffix logic)
+                let actualID = spaceNumberSuffixes[id] ?? id
+                // Get color from original mapping (since remapping preserves mapping structure conceptually)
+                // Actually mapping is [Int (WebCatalogID) : Color?]
+                // We need to look up the color for the Original ID
+                guard let color = mapping[id], let safeColor = color else { continue }
+                
+                let rect = getGenericRect(layout: layout, index: index, total: count)
+                
+                // Append to path
+                if colorRects[safeColor] == nil {
+                    colorRects[safeColor] = Path()
+                }
+                colorRects[safeColor]?.addRect(rect)
+            }
+        }
+
+        let finalPaths = colorRects
+
         await MainActor.run {
             withAnimation(.smooth.speed(2.0)) {
-                self.favoriteMappings = layoutFavoriteWebCatalogIDSorted
+                self.favoritePaths = finalPaths
             }
         }
     }

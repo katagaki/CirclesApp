@@ -16,13 +16,15 @@ struct MapHighlightLayer: View {
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var body: some View {
-        Canvas { context, _ in
+        let color: Color = !useDarkModeMaps ? .black.opacity(0.9) : .primary.opacity(0.9)
+        ZStack(alignment: .topLeading) {
             if let highlightData = mapper.highlightData, isVisible {
-                context.fill(
-                    Path(highlightData.sourceRect),
-                    with: !useDarkModeMaps ? .color(.black.opacity(0.9)) :
-                            .color(.primary.opacity(0.9))
-                )
+                Rectangle()
+                    .fill(color)
+                    .frame(width: highlightData.sourceRect.width,
+                           height: highlightData.sourceRect.height)
+                    .position(x: highlightData.sourceRect.midX,
+                              y: highlightData.sourceRect.midY)
             }
         }
         .frame(width: mapper.canvasSize.width, height: mapper.canvasSize.height)
