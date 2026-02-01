@@ -27,6 +27,7 @@ struct UnifiedMoreMenu: View {
     @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
+    @AppStorage(wrappedValue: true, "Customization.DoubleTapToVisit") var isDoubleTapToVisitEnabled: Bool
 
     // Others
     @AppStorage(wrappedValue: false, "PrivacyMode.On") var isPrivacyModeOn: Bool
@@ -83,6 +84,8 @@ struct UnifiedMoreMenu: View {
                        isOn: $showSpaceName)
                 Toggle("More.Customization.Circles.ShowDay", systemImage: "calendar",
                        isOn: $showDay)
+                Toggle("More.Customization.Circles.DoubleTapToVisit", systemImage: "hand.tap",
+                       isOn: $isDoubleTapToVisitEnabled)
             } header: {
                 Text("More.Customization.Circles")
             }

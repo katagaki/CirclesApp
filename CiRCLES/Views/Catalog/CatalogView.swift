@@ -26,15 +26,20 @@ struct CatalogView: View {
     @State var searchTerm: String = ""
 
     // Display
+    @AppStorage(wrappedValue: .grid, "Circles.DisplayMode") var displayMode: CircleDisplayMode
+    @AppStorage(wrappedValue: .regular, "Circles.ListSize") var listDisplayMode: ListDisplayMode
+
     @State var displayModeState: CircleDisplayMode = .grid
     @State var listDisplayModeState: ListDisplayMode = .regular
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
+    @AppStorage(wrappedValue: true, "Customization.DoubleTapToVisit") var isDoubleTapToVisitEnabled: Bool
 
     @Namespace var namespace
 
     var body: some View {
         ZStack(alignment: .center) {
+            let doubleTapAction = isDoubleTapToVisitEnabled ? toggleVisitState : nil
             if catalogCache.isLoading {
                 ProgressView("Circles.Loading")
                 Color.clear
@@ -42,61 +47,47 @@ struct CatalogView: View {
                 switch displayModeState {
                 case .grid:
                     if let searchedCircles = catalogCache.searchedCircles {
-                        CircleGrid(circles: searchedCircles, namespace: namespace, onSelect: { circle in
-                            unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
-                        }, onDoubleTap: { circle in
-                            let circleID = circle.id
-                            let eventNumber = planner.activeEventNumber
-                            Task.detached {
-                                let actor = VisitActor(modelContainer: sharedModelContainer)
-                                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
-                            }
-                        })
+                        CircleGrid(
+                            circles: searchedCircles,
+                            namespace: namespace,
+                            onSelect: { circle in
+                                unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
+                            },
+                            onDoubleTap: doubleTapAction
+                        )
                     } else {
-                        CircleGrid(circles: catalogCache.displayedCircles,
-                                   showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
-                                   namespace: namespace,
-                                   onSelect: { circle in
-                            unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
-                        }, onDoubleTap: { circle in
-                            let circleID = circle.id
-                            let eventNumber = planner.activeEventNumber
-                            Task.detached {
-                                let actor = VisitActor(modelContainer: sharedModelContainer)
-                                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
-                            }
-                        })
+                        CircleGrid(
+                            circles: catalogCache.displayedCircles,
+                            showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
+                            namespace: namespace,
+                            onSelect: { circle in
+                                unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
+                            },
+                            onDoubleTap: doubleTapAction
+                        )
                     }
                 case .list:
                     if let searchedCircles = catalogCache.searchedCircles {
-                        CircleList(circles: searchedCircles,
-                                   displayMode: listDisplayModeState,
-                                   namespace: namespace,
-                                   onSelect: { circle in
-                            unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
-                        }, onDoubleTap: { circle in
-                            let circleID = circle.id
-                            let eventNumber = planner.activeEventNumber
-                            Task.detached {
-                                let actor = VisitActor(modelContainer: sharedModelContainer)
-                                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
-                            }
-                        })
+                        CircleList(
+                            circles: searchedCircles,
+                            displayMode: listDisplayModeState,
+                            namespace: namespace,
+                            onSelect: { circle in
+                                unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
+                            },
+                            onDoubleTap: doubleTapAction
+                        )
                     } else {
-                        CircleList(circles: catalogCache.displayedCircles,
-                                   showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
-                                   displayMode: listDisplayModeState,
-                                   namespace: namespace,
-                                   onSelect: { circle in
-                            unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
-                        }, onDoubleTap: { circle in
-                            let circleID = circle.id
-                            let eventNumber = planner.activeEventNumber
-                            Task.detached {
-                                let actor = VisitActor(modelContainer: sharedModelContainer)
-                                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
-                            }
-                        })
+                        CircleList(
+                            circles: catalogCache.displayedCircles,
+                            showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
+                            displayMode: listDisplayModeState,
+                            namespace: namespace,
+                            onSelect: { circle in
+                                unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
+                            },
+                            onDoubleTap: doubleTapAction
+                        )
                     }
                 }
                 if selections.genre == nil && selections.map == nil && catalogCache.searchedCircles == nil {
@@ -111,13 +102,12 @@ struct CatalogView: View {
         .navigationTitle("ViewTitle.Circles")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            @Bindable var catalogCache = catalogCache
             ToolbarItem(placement: .topBarLeading) {
-                DisplayModeSwitcher($displayModeState)
-            }
-            if displayModeState == .list {
-                ToolbarItem(placement: .topBarLeading) {
-                    ListModeSwitcher($listDisplayModeState)
+                HStack {
+                    DisplayModeSwitcher(mode: $displayModeState)
+                    if displayModeState == .list {
+                        ListModeSwitcher(mode: $listDisplayModeState)
+                    }
                 }
             }
             CatalogToolbar()
@@ -132,6 +122,20 @@ struct CatalogView: View {
             if catalogCache.invalidationID != selections.catalogSelectionID {
                 reloadDisplayedCircles()
             }
+            displayModeState = displayMode
+            listDisplayModeState = listDisplayMode
+        }
+        .onChange(of: displayModeState) {
+            displayMode = displayModeState
+        }
+        .onChange(of: displayMode) {
+            displayModeState = displayMode
+        }
+        .onChange(of: listDisplayModeState) {
+            listDisplayMode = listDisplayModeState
+        }
+        .onChange(of: listDisplayMode) {
+            listDisplayModeState = listDisplayMode
         }
         .onChange(of: selections.catalogSelectionID) {
             reloadDisplayedCircles()
@@ -144,8 +148,8 @@ struct CatalogView: View {
                 unifier.selectedDetent = .height(360)
             }
         }
-        .onChange(of: isDatabaseInitialized) { _, newValue in
-            if !newValue {
+        .onChange(of: isDatabaseInitialized) {
+            if !isDatabaseInitialized {
                 catalogCache.displayedCircles.removeAll()
             }
         }
@@ -176,6 +180,15 @@ struct CatalogView: View {
                     }
                 }
             }
+        }
+    }
+
+    func toggleVisitState(circle: ComiketCircle) {
+        let circleID = circle.id
+        let eventNumber = planner.activeEventNumber
+        Task.detached {
+            let actor = VisitActor(modelContainer: sharedModelContainer)
+            await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
         }
     }
 

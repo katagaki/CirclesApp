@@ -9,20 +9,14 @@ import SwiftUI
 
 struct ListModeSwitcher: View {
 
-    @Binding var modeState: ListDisplayMode
-
-    @AppStorage(wrappedValue: ListDisplayMode.regular, "Circles.ListSize") var mode: ListDisplayMode
-
-    init(_ modeState: Binding<ListDisplayMode>) {
-        self._modeState = modeState
-    }
+    @Binding var mode: ListDisplayMode
 
     var body: some View {
         Button {
             withAnimation(.smooth.speed(2.0)) {
-                switch modeState {
-                case .regular: modeState = .compact
-                case .compact: modeState = .regular
+                switch mode {
+                case .regular: mode = .compact
+                case .compact: mode = .regular
                 }
             }
         } label: {
@@ -32,12 +26,6 @@ struct ListModeSwitcher: View {
             case .compact:
                 Label("Shared.DisplayMode.List.Regular", systemImage: "rectangle.expand.vertical")
             }
-        }
-        .onAppear {
-            self.modeState = mode
-        }
-        .onChange(of: modeState) {
-            mode = modeState
         }
     }
 }
