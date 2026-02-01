@@ -89,7 +89,11 @@ struct MapFavoritesLayer: View {
 
         for (layout, mapping) in layoutFavoriteWebCatalogIDMappings {
             // Sort IDs
-            let sortedIDs = mapping.keys.sorted()
+            let sortedIDs = mapping.keys.sorted {
+                let lhsSuffix = spaceNumberSuffixes[$0] ?? 0
+                let rhsSuffix = spaceNumberSuffixes[$1] ?? 0
+                return lhsSuffix < rhsSuffix
+            }
 
             // Layout order
             let orderedIDs: [Int]
