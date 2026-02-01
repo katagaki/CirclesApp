@@ -22,26 +22,12 @@ class CatalogCache {
         genreIDs: [Int]?, mapID: Int?, blockIDs: [Int]?, dayID: Int?, database: Database
     ) async -> [Int] {
         let actor = DataFetcher(database: await database.getTextDatabase())
-
-        var circleIdentifiers: [Int] = []
-        if let mapID {
-            circleIdentifiers = await actor.circles(inMap: mapID)
-        }
-
-        if let filteredCircleIdentifiers = await actor.circles(
-            withGenre: genreIDs, inBlock: blockIDs, onDay: dayID
-        ) {
-            if circleIdentifiers.isEmpty {
-                return filteredCircleIdentifiers
-            } else {
-                return filteredCircleIdentifiers.filter { identifier in
-                    circleIdentifiers.contains(identifier)
-                }
-            }
-        } else {
-            return circleIdentifiers
-        }
-
+        return await actor.circles(
+            inMap: mapID,
+            withGenre: genreIDs,
+            inBlock: blockIDs,
+            onDay: dayID
+        )
     }
 
     static func fetchGenreIDs(inMap mapID: Int, onDay dayID: Int, database: Database) async -> [Int] {
