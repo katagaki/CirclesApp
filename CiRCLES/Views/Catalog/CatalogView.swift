@@ -26,9 +26,11 @@ struct CatalogView: View {
     // Display
     @AppStorage(wrappedValue: .grid, "Circles.DisplayMode") var displayMode: CircleDisplayMode
     @AppStorage(wrappedValue: .regular, "Circles.ListSize") var listDisplayMode: ListDisplayMode
+    @AppStorage(wrappedValue: .medium, "Circles.GridSize") var gridDisplayMode: GridDisplayMode
 
     @State var displayModeState: CircleDisplayMode = .grid
     @State var listDisplayModeState: ListDisplayMode = .regular
+    @State var gridDisplayModeState: GridDisplayMode = .medium
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
     @AppStorage(wrappedValue: true, "Customization.DoubleTapToVisit") var isDoubleTapToVisitEnabled: Bool
@@ -46,6 +48,7 @@ struct CatalogView: View {
                 case .grid:
                     if let searchedCircles = catalogCache.searchedCircles {
                         CircleGrid(
+                            displayMode: gridDisplayModeState,
                             circles: searchedCircles,
                             namespace: namespace,
                             onSelect: { circle in
@@ -55,6 +58,7 @@ struct CatalogView: View {
                         )
                     } else {
                         CircleGrid(
+                            displayMode: gridDisplayModeState,
                             circles: catalogCache.displayedCircles,
                             showsOverlayWhenEmpty: !selections.genres.isEmpty || selections.map != nil,
                             namespace: namespace,
@@ -106,6 +110,9 @@ struct CatalogView: View {
                     if displayModeState == .list {
                         ListModeSwitcher(mode: $listDisplayModeState)
                     }
+                    if displayModeState == .grid {
+                        GridModeSwitcher(mode: $gridDisplayModeState)
+                    }
                 }
             }
             CatalogToolbar()
@@ -122,12 +129,16 @@ struct CatalogView: View {
             }
             displayModeState = displayMode
             listDisplayModeState = listDisplayMode
+            gridDisplayModeState = gridDisplayMode
         }
         .onChange(of: displayModeState) {
             displayMode = displayModeState
         }
         .onChange(of: listDisplayModeState) {
             listDisplayMode = listDisplayModeState
+        }
+        .onChange(of: gridDisplayModeState) {
+            gridDisplayMode = gridDisplayModeState
         }
         .onChange(of: selections.catalogSelectionID) {
             reloadDisplayedCircles()

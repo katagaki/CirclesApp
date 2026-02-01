@@ -12,6 +12,7 @@ struct CircleGrid: View {
 
     let gridSpacing: CGFloat = 1.0
 
+    var displayMode: GridDisplayMode = .medium
     var circles: [ComiketCircle]
     var showsOverlayWhenEmpty: Bool = true
     var namespace: Namespace.ID
@@ -23,8 +24,20 @@ struct CircleGrid: View {
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 
     var body: some View {
-        let phoneColumnConfiguration = [GridItem(.adaptive(minimum: 76.0), spacing: gridSpacing)]
-        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: 68.0), spacing: gridSpacing)]
+        let phoneColumnConfiguration = [GridItem(.adaptive(minimum: {
+            switch displayMode {
+            case .big: return 110.0
+            case .medium: return 76.0
+            case .small: return 48.0
+            }
+        }()), spacing: gridSpacing)]
+        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: {
+            switch displayMode {
+            case .big: return 100.0
+            case .medium: return 68.0
+            case .small: return 44.0
+            }
+        }()), spacing: gridSpacing)]
 
         ScrollView {
             LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
