@@ -30,8 +30,6 @@ class Database {
 
     // MARK: Database Connection
 
-
-
     func getTextDatabase() -> Connection? {
         if let textDatabaseURL, textDatabase == nil {
             #if DEBUG

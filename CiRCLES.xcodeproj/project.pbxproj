@@ -25,6 +25,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
+				"OpenID-Sample.plist",
 			);
 			target = E4A769452C21A20A00BE3491 /* CiRCLES */;
 		};

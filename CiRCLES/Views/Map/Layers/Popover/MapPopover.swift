@@ -12,9 +12,9 @@ struct MapPopover<Content: View>: View {
     @Environment(Mapper.self) var mapper
 
     let edgePadding: CGFloat = 16.0
-    
+
     var zoomScale: CGFloat
-    
+
     var sourceRect: CGRect
     var isDismissing: Bool
     var content: () -> Content

@@ -11,20 +11,28 @@ struct FastDoubleTapModifier: ViewModifier {
     var onDoubleTap: () -> Void
     var onSingleTap: (() -> Void)?
 
+    @State private var isPressed: Bool = false
+
     func body(content: Content) -> some View {
-        content.overlay {
-            FastDoubleTapView(onDoubleTap: onDoubleTap, onSingleTap: onSingleTap)
-        }
+        content
+            .opacity(isPressed ? 0.7 : 1.0)
+            .overlay {
+                FastDoubleTapView(onDoubleTap: onDoubleTap, onSingleTap: onSingleTap, isPressed: $isPressed)
+            }
     }
 }
 
 struct FastDoubleTapView: UIViewRepresentable {
     var onDoubleTap: () -> Void
     var onSingleTap: (() -> Void)?
+    @Binding var isPressed: Bool
 
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
+    func makeUIView(context: Context) -> FastDoubleTapTouchView {
+        let view = FastDoubleTapTouchView()
         view.backgroundColor = .clear
+        view.onPressStateChange = { pressed in
+            context.coordinator.isPressed.wrappedValue = pressed
+        }
 
         let gesture = FastDoubleTapGestureRecognizer(
             target: context.coordinator,
@@ -37,22 +45,25 @@ struct FastDoubleTapView: UIViewRepresentable {
         return view
     }
 
-    func updateUIView(_ uiView: UIView, context: Context) {
+    func updateUIView(_ uiView: FastDoubleTapTouchView, context: Context) {
         context.coordinator.onDoubleTap = onDoubleTap
         context.coordinator.onSingleTap = onSingleTap
+        context.coordinator.isPressed = _isPressed
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(onDoubleTap: onDoubleTap, onSingleTap: onSingleTap)
+        Coordinator(onDoubleTap: onDoubleTap, onSingleTap: onSingleTap, isPressed: _isPressed)
     }
 
     class Coordinator: NSObject {
         var onDoubleTap: () -> Void
         var onSingleTap: (() -> Void)?
+        var isPressed: Binding<Bool>
 
-        init(onDoubleTap: @escaping () -> Void, onSingleTap: (() -> Void)?) {
+        init(onDoubleTap: @escaping () -> Void, onSingleTap: (() -> Void)?, isPressed: Binding<Bool>) {
             self.onDoubleTap = onDoubleTap
             self.onSingleTap = onSingleTap
+            self.isPressed = isPressed
         }
 
         @MainActor
@@ -65,6 +76,25 @@ struct FastDoubleTapView: UIViewRepresentable {
         func handleSingleTap() {
             onSingleTap?()
         }
+    }
+}
+
+class FastDoubleTapTouchView: UIView {
+    var onPressStateChange: ((Bool) -> Void)?
+
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        onPressStateChange?(true)
+    }
+
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        onPressStateChange?(false)
+    }
+
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesCancelled(touches, with: event)
+        onPressStateChange?(false)
     }
 }
 

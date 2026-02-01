@@ -62,22 +62,22 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
 
         if let position = mapper.scrollToPosition {
             let zoomScale = scrollView.zoomScale
-            
+
             // Calculate scaled position based on current zoom
             let scaledX = position.x * zoomScale
             let scaledY = position.y * zoomScale
-            
+
             let halfWidth = scrollView.bounds.width / 2
             let halfHeight = scrollView.bounds.height / 2
 
             // Calculate target offset, clamping to valid scroll range
             let centeredX = max(0, min(scaledX - halfWidth,
                                        scrollView.contentSize.width - scrollView.bounds.width))
-            
+
             // Allow scrolling to top inset (e.g. under navigation bar)
             let minScrollY = -scrollView.safeAreaInsets.top
             let maxScrollY = max(minScrollY, scrollView.contentSize.height - scrollView.bounds.height + scrollView.safeAreaInsets.bottom)
-            
+
             let centeredY = max(minScrollY, min(scaledY - halfHeight, maxScrollY))
 
             let centeredOffset = CGPoint(x: centeredX, y: centeredY)

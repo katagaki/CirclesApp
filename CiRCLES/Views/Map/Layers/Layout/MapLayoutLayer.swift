@@ -15,7 +15,6 @@ struct MapLayoutLayer: View {
 
     let spaceSize: Int
 
-
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     var body: some View {
@@ -28,7 +27,7 @@ struct MapLayoutLayer: View {
                     .frame(width: popoverData.sourceRect.width, height: popoverData.sourceRect.height)
                     .position(x: popoverData.sourceRect.midX, y: popoverData.sourceRect.midY)
             }
-            
+
             // Interaction layer
             Color.clear
                 .contentShape(Rectangle())

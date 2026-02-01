@@ -44,11 +44,11 @@ struct EventCoverImageAccessory: View {
         }
     }
 
-    func bottomPadding() -> CGFloat {
-        if image != nil {
-            return UIDevice.current.userInterfaceIdiom != .pad ? 6.0 : 12.0
-        } else {
-            return 0.0
-        }
-    }
+//    func bottomPadding() -> CGFloat {
+//        if image != nil {
+//            return UIDevice.current.userInterfaceIdiom != .pad ? 6.0 : 12.0
+//        } else {
+//            return 0.0
+//        }
+//    }
 }
