@@ -175,7 +175,7 @@ class Authenticator {
             ])
 
             if let (data, _) = try? await URLSession.shared.data(for: request) {
-                decodeAuthenticationToken(data: data)
+                _ = decodeAuthenticationToken(data: data)
             } else {
                 self.isAuthenticating = true
             }

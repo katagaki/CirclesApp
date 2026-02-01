@@ -49,7 +49,12 @@ class CatalogCache {
         return await actor.genreIDs(inMap: mapID, onDay: dayID)
     }
 
-    static func fetchBlockIDs(inMap mapID: Int, onDay dayID: Int, withGenreIDs genreIDs: [Int]?, database: Connection?) async -> [Int] {
+    static func fetchBlockIDs(
+        inMap mapID: Int,
+        onDay dayID: Int,
+        withGenreIDs genreIDs: [Int]?,
+        database: Connection?
+    ) async -> [Int] {
         let actor = DataFetcher(database: database)
         return await actor.blockIDs(inMap: mapID, onDay: dayID, withGenreIDs: genreIDs)
     }

@@ -61,27 +61,29 @@ class UserSelections {
 
     @MainActor
     func reloadData(database: Database) {
-        let dateID = defaults.integer(forKey: selectedDateKey)
-        let mapID = defaults.integer(forKey: selectedMapKey)
+        var dateID = defaults.object(forKey: selectedDateKey) as? Int
+        if dateID == 0 { dateID = nil }
+        var mapID = defaults.object(forKey: selectedMapKey) as? Int
+        if mapID == 0 { mapID = nil }
         let blockIDs = defaults.array(forKey: selectedBlocksKey) as? [Int] ?? []
         let genreIDs = defaults.array(forKey: selectedGenresKey) as? [Int] ?? []
         database.connect()
-        _date = database.allDates().first(where: { $0.id == dateID })
-        _map = database.allMaps().first(where: { $0.id == mapID })
-        _blocks = Set(database.allBlocks().filter({ blockIDs.contains($0.id) }))
-        _genres = Set(database.allGenres().filter({ genreIDs.contains($0.id) }))
+        _date = database.dates().first(where: { $0.id == dateID })
+        _map = database.maps().first(where: { $0.id == mapID })
+        _blocks = Set(database.blocks().filter({ blockIDs.contains($0.id) }))
+        _genres = Set(database.genres().filter({ genreIDs.contains($0.id) }))
     }
 
     @MainActor
     func fetchDefaultDateSelection(database: Database) -> ComiketDate? {
         database.connect()
-        return database.allDates().first
+        return database.dates().first
     }
 
     @MainActor
     func fetchDefaultMapSelection(database: Database) -> ComiketMap? {
         database.connect()
-        return database.allMaps().first
+        return database.maps().first
     }
 
     var fullMapID: String {

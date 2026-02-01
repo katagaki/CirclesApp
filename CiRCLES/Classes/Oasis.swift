@@ -11,21 +11,12 @@ import SwiftUI
 @Observable
 class Oasis {
 
-    var isModal: Bool = true
     var isProgressDeterminate: Bool = false
 
     var isShowing: Bool = false
     var headerText: String?
     var bodyText: String?
     var progress: Double?
-
-    @MainActor
-    func setModality(_ isModal: Bool) async {
-        withAnimation(.smooth.speed(2.0)) {
-            self.isModal = isModal
-        }
-        try? await Task.sleep(nanoseconds: 20000000)
-    }
 
     @MainActor
     func setHeaderText(_ headerText: String?) async {
@@ -62,7 +53,6 @@ class Oasis {
         } completion: {
             self.headerText = nil
             self.bodyText = nil
-            self.isModal = true
         }
     }
 }

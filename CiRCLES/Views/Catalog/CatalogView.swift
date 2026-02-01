@@ -152,9 +152,11 @@ struct CatalogView: View {
             catalogCache.isLoading = true
         } completion: {
             catalogCache.invalidationID = selections.catalogSelectionID
-            let selectedGenreIDs = selections.genres.isEmpty ? nil : Array(selections.genres.map({ (genre: ComiketGenre) in genre.id }))
+            let selectedGenreIDs = selections.genres.isEmpty ? nil :
+                Array(selections.genres.map({ (genre: ComiketGenre) in genre.id }))
             let selectedMapID = selections.map?.id
-            let selectedBlockIDs = selections.blocks.isEmpty ? nil : Array(selections.blocks.map({ (block: ComiketBlock) in block.id }))
+            let selectedBlockIDs = selections.blocks.isEmpty ? nil :
+                Array(selections.blocks.map({ (block: ComiketBlock) in block.id }))
             let selectedDayID = selections.date?.id
             Task.detached {
                 await database.connect()
