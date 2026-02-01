@@ -25,6 +25,7 @@ struct CircleCutImage: View {
     var namespace: Namespace.ID
     var cutType: CircleCutType
     var forceReload: Bool
+    var displayMode: GridDisplayMode
     var showVisitStatus: Bool
 
     @State var cutImage: UIImage?
@@ -34,6 +35,7 @@ struct CircleCutImage: View {
         in namespace: Namespace.ID,
         cutType: CircleCutType = .catalog,
         forceReload: Bool = false,
+        displayMode: GridDisplayMode = .medium,
         showVisitStatus: Bool = true,
         showSpaceName: Binding<Bool>,
         showDay: Binding<Bool>
@@ -42,6 +44,7 @@ struct CircleCutImage: View {
         self.namespace = namespace
         self.cutType = cutType
         self.forceReload = forceReload
+        self.displayMode = displayMode
         self.showVisitStatus = showVisitStatus
         self._showSpaceName = showSpaceName
         self._showDay = showDay
@@ -117,13 +120,13 @@ struct CircleCutImage: View {
                 ZStack(alignment: .bottomTrailing) {
                     VStack(alignment: .trailing, spacing: 2.0) {
                         if showDay {
-                            CircleBlockPill("Shared.\(circle.day)th.Day")
+                            CircleBlockPill("Shared.\(circle.day)th.Day", size: displayMode == .small ? .tiny : .small)
                                 .matchedGeometryEffect(
                                     id: "\(circle.id).Day", in: namespace
                                 )
                         }
                         if showSpaceName, let spaceName = circle.spaceName() {
-                            CircleBlockPill(LocalizedStringKey(spaceName))
+                            CircleBlockPill(LocalizedStringKey(spaceName), size: displayMode == .small ? .tiny : .small)
                                 .matchedGeometryEffect(
                                     id: "\(circle.id).Space", in: namespace
                                 )

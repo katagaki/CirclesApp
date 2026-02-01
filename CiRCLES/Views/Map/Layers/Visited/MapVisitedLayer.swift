@@ -78,12 +78,10 @@ struct MapVisitedLayer: View {
             let count = orderedIDs.count
             guard count > 0 else { continue }
 
-            for (index, id) in orderedIDs.enumerated() {
-                if visitedWCIDSet.contains(id) {
-                    let rect = getGenericRect(layout: layout, index: index, total: count)
-                    let checkmark = checkmarkPath(in: rect)
-                    newPath.addPath(checkmark)
-                }
+            for (index, id) in orderedIDs.enumerated() where visitedWCIDSet.contains(id) {
+                let rect = getGenericRect(layout: layout, index: index, total: count)
+                let checkmark = checkmarkPath(in: rect)
+                newPath.addPath(checkmark)
             }
         }
 

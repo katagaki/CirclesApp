@@ -126,7 +126,11 @@ struct FavoritesView: View {
         .navigationTitle("ViewTitle.Favorites")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            FavoritesToolbar(displayMode: $displayModeState, listDisplayMode: $listDisplayModeState, gridDisplayMode: $gridDisplayModeState)
+            FavoritesToolbar(
+                displayMode: $displayModeState,
+                listDisplayMode: $listDisplayModeState,
+                gridDisplayMode: $gridDisplayModeState
+            )
         }
         .refreshable {
             await reloadFavorites()

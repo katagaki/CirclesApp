@@ -47,6 +47,7 @@ struct CircleGrid: View {
                     if let onDoubleTap {
                         CircleCutImage(
                             circle, in: namespace, cutType: showWebCut ? .web : .catalog,
+                            displayMode: displayMode,
                             showSpaceName: $showSpaceName, showDay: $showDay
                         )
                         .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
@@ -66,6 +67,7 @@ struct CircleGrid: View {
                         } label: {
                             CircleCutImage(
                                 circle, in: namespace, cutType: showWebCut ? .web : .catalog,
+                                displayMode: displayMode,
                                 showSpaceName: $showSpaceName, showDay: $showDay
                             )
                             .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)

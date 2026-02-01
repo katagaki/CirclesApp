@@ -76,7 +76,10 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
 
             // Allow scrolling to top inset (e.g. under navigation bar)
             let minScrollY = -scrollView.safeAreaInsets.top
-            let maxScrollY = max(minScrollY, scrollView.contentSize.height - scrollView.bounds.height + scrollView.safeAreaInsets.bottom)
+            let maxScrollY = max(
+                minScrollY,
+                scrollView.contentSize.height - scrollView.bounds.height + scrollView.safeAreaInsets.bottom
+            )
 
             let centeredY = max(minScrollY, min(scaledY - halfHeight, maxScrollY))
 

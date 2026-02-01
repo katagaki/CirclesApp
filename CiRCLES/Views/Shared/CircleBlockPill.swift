@@ -34,6 +34,13 @@ struct CircleBlockPill: View {
                     .foregroundStyle(Color(uiColor: UIColor.label))
                     .padding(.vertical, 2.0)
                     .padding(.horizontal, 6.0)
+            case .tiny:
+                Text(text)
+                    .font(.system(size: 8.0))
+                    .fontWeight(.bold)
+                    .foregroundStyle(Color(uiColor: UIColor.label))
+                    .padding(.vertical, 1.0)
+                    .padding(.horizontal, 3.0)
             }
         }
         .background(Material.thin)
