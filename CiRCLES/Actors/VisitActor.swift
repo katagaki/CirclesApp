@@ -32,4 +32,22 @@ actor VisitActor {
         }
         try? modelContext.save()
     }
+
+    func markVisited(circleID: Int, eventNumber: Int) {
+        let fetchDescriptor = FetchDescriptor<CirclesVisitEntry>(
+            predicate: #Predicate {
+                $0.circleID == circleID && $0.eventNumber == eventNumber
+            }
+        )
+        if let existingVisits = try? modelContext.fetch(fetchDescriptor) {
+            if existingVisits.isEmpty {
+                modelContext.insert(
+                    CirclesVisitEntry(eventNumber: eventNumber,
+                                      circleID: circleID,
+                                      visitDate: .now)
+                )
+            }
+        }
+        try? modelContext.save()
+    }
 }

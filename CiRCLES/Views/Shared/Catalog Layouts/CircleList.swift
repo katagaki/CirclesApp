@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TipKit
 
 struct CircleList: View {
 
@@ -14,21 +15,46 @@ struct CircleList: View {
     var displayMode: ListDisplayMode
     var namespace: Namespace.ID
     var onSelect: ((ComiketCircle) -> Void)
+    var onDoubleTap: ((ComiketCircle) -> Void)?
 
     var body: some View {
-        List(circles) { circle in
-            Button {
-                onSelect(circle)
-            } label: {
-                switch displayMode {
-                case .regular:
-                    CircleListRegularRow(circle: circle, namespace: namespace)
-                case .compact:
-                    CircleListCompactRow(circle: circle, namespace: namespace)
+        List(Array(circles.enumerated()), id: \.element.id) { index, circle in
+            Group {
+                if let onDoubleTap {
+                    Group {
+                        switch displayMode {
+                        case .regular:
+                            CircleListRegularRow(circle: circle, namespace: namespace)
+                        case .compact:
+                            CircleListCompactRow(circle: circle, namespace: namespace)
+                        }
+                    }
+                    .contentShape(Rectangle())
+                    .onTapGesture(count: 2) {
+                        onDoubleTap(circle)
+                    }
+                    .onTapGesture {
+                        onSelect(circle)
+                    }
+                    .contextMenu(circle: circle) {
+                        onSelect(circle)
+                    }
+                    .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
+                } else {
+                    Button {
+                        onSelect(circle)
+                    } label: {
+                        switch displayMode {
+                        case .regular:
+                            CircleListRegularRow(circle: circle, namespace: namespace)
+                        case .compact:
+                            CircleListCompactRow(circle: circle, namespace: namespace)
+                        }
+                    }
+                    .contextMenu(circle: circle) {
+                        onSelect(circle)
+                    }
                 }
-            }
-            .contextMenu(circle: circle) {
-                onSelect(circle)
             }
             .listRowBackground(Color.clear)
         }
