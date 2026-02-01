@@ -6,10 +6,17 @@
 //
 
 import SQLite
-import SwiftData
 
-@Model
-final class ComiketMap: SQLiteable {
+final class ComiketMap: SQLiteable, Identifiable, Hashable {
+    static func == (lhs: ComiketMap, rhs: ComiketMap) -> Bool {
+        return lhs.id == rhs.id && lhs.eventNumber == rhs.eventNumber
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(eventNumber)
+    }
+
     var eventNumber: Int
     var id: Int
     var name: String
@@ -19,7 +26,7 @@ final class ComiketMap: SQLiteable {
     var hdConfiguration: MapConfiguration
     var rotation: Int
 
-    @Relationship(deleteRule: .nullify) var layouts: [ComiketLayout]?
+    var layouts: [ComiketLayout]?
 
     init(from row: Row) {
         let colEventNumber = Expression<Int>("comiketNo")

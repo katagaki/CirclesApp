@@ -179,9 +179,8 @@ struct UnifiedView: View {
         }
         UserDefaults.standard.synchronize()
         Task.detached {
-            let actor = DataConverter(modelContainer: sharedModelContainer)
-            await actor.deleteAll()
             await MainActor.run {
+
                 imageCache.clear()
                 database.reset()
                 unifier.close()

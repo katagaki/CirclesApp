@@ -7,10 +7,17 @@
 
 import Foundation
 import SQLite
-import SwiftData
 
-@Model
-final class ComiketDate: SQLiteable {
+final class ComiketDate: SQLiteable, Identifiable, Hashable {
+    static func == (lhs: ComiketDate, rhs: ComiketDate) -> Bool {
+        return lhs.id == rhs.id && lhs.eventNumber == rhs.eventNumber
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(eventNumber)
+    }
+
     var eventNumber: Int
     var id: Int
     var date: Date

@@ -14,7 +14,7 @@ struct MyView: View {
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
 
-    @Query var events: [ComiketEvent]
+    @State var events: [ComiketEvent] = []
 
     @State var userInfo: UserInfo.Response?
     @State var userEvents: [UserCircle.Response.Circle] = []
@@ -106,12 +106,15 @@ struct MyView: View {
                 await reloadData(using: token)
                 await MainActor.run {
                      withAnimation(.smooth.speed(2.0)) {
+                         database.connect()
+                         events = database.allEvents()
                          eventTitle = events.first(where: {
                              $0.eventNumber == planner.activeEventNumber
                          })?.name
                          isInitialLoadCompleted = true
                      }
                 }
+
             }
         } else if authenticator.onlineState == .offline {
             isInitialLoadCompleted = true
@@ -125,7 +128,8 @@ struct MyView: View {
         var eventDates: [Int: Date]?
 
         if let eventNumber = planner.activeEvent?.number {
-            let actor = DataFetcher(modelContainer: sharedModelContainer)
+            database.connect()
+            let actor = DataFetcher(database: database.textDatabase)
             eventDates = await actor.dates(for: eventNumber)
         }
 

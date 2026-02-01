@@ -6,9 +6,7 @@
 //
 
 import SQLite
-import SwiftData
 
-@Model
 final class ComiketLayout: SQLiteable {
     var eventNumber: Int
     var blockID: Int
@@ -19,8 +17,8 @@ final class ComiketLayout: SQLiteable {
     var mapID: Int
     var hallID: Int
 
-    @Relationship(deleteRule: .nullify, inverse: \ComiketMap.layouts) var map: ComiketMap?
-    @Relationship(deleteRule: .nullify) var circles: [ComiketCircle]?
+    var map: ComiketMap?
+    var circles: [ComiketCircle]?
 
     var mergedID: String {
         return String(blockID) + "|" + String(spaceNumber)

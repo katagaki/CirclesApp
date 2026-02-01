@@ -81,11 +81,12 @@ struct AuthenticatedView: ViewModifier {
                             oasis.close()
                             // Set initial selections
                             if selections.date == nil {
-                                selections.date = selections.fetchDefaultDateSelection()
+                                selections.date = selections.fetchDefaultDateSelection(database: database)
                             }
                             if selections.map == nil {
-                                selections.map = selections.fetchDefaultMapSelection()
+                                selections.map = selections.fetchDefaultMapSelection(database: database)
                             }
+
                             if !authenticator.isAuthenticating {
                                 unifier.show()
                             }
@@ -118,26 +119,12 @@ struct AuthenticatedView: ViewModifier {
 
             await oasis.setBodyText("Loading.Database")
             database.connect()
+            selections.reloadData(database: database)
 
             await oasis.setHeaderText("Shared.LoadingHeader.Initial")
 
             if !isDatabaseInitialized {
-
-                let actor = DataConverter(modelContainer: sharedModelContainer)
-
-                await actor.disableAutoSave()
-                await actor.deleteAll()
                 imageCache.clear()
-
-                await actor.loadEvents(from: database.textDatabase)
-                await actor.loadMaps(from: database.textDatabase)
-                await actor.loadLayouts(from: database.textDatabase)
-                await actor.loadGenres(from: database.textDatabase)
-                await actor.loadCircles(from: database.textDatabase)
-
-                await actor.save()
-                await actor.enableAutoSave()
-
                 isDatabaseInitialized = true
             }
 

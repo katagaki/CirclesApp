@@ -7,9 +7,7 @@
 
 import Foundation
 import SQLite
-import SwiftData
 
-@Model
 final class ComiketCircleExtendedInformation: SQLiteable {
     var eventNumber: Int
     var id: Int
@@ -18,7 +16,7 @@ final class ComiketCircleExtendedInformation: SQLiteable {
     var pixivURL: URL?
     var circleMsPortalURL: URL?
 
-    @Relationship(.unique, deleteRule: .nullify) var circle: ComiketCircle?
+    var circle: ComiketCircle?
 
     init(from row: Row) {
         let table = Table("ComiketCircleExtend")

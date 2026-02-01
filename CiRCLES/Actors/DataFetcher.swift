@@ -6,347 +6,332 @@
 //
 
 import Foundation
-import SwiftData
+import SQLite
 
 // swiftlint:disable type_body_length
-@ModelActor
+
 actor DataFetcher {
+
+    let database: Connection?
+
+    init(database: Connection?) {
+        self.database = database
+    }
 
     // MARK: Fetching
 
     func dates(for eventNumber: Int) -> [Int: Date] {
-        let fetchDescriptor = FetchDescriptor<ComiketDate>(
-            predicate: #Predicate<ComiketDate> {
-                $0.eventNumber == eventNumber
-            },
-            sortBy: [SortDescriptor(\.id, order: .forward)]
-        )
-        do {
-            let dates = try modelContext.fetch(fetchDescriptor)
-            return dates.reduce(into: [Int: Date]()) { result, date in
-                result[date.id] = date.date
+        if let database {
+            do {
+                let table = Table("ComiketDateWC")
+                let colEventNumber = Expression<Int>("comiketNo")
+                let colID = Expression<Int>("id")
+                let colDate = Expression<String>("date")
+                let query = table.filter(colEventNumber == eventNumber).order(colID.asc)
+
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyyMMdd"
+
+                return try database.prepare(query).reduce(into: [Int: Date]()) { result, row in
+                    if let date = dateFormatter.date(from: row[colDate]) {
+                        result[row[colID]] = date
+                    }
+                }
+            } catch {
+                debugPrint(error.localizedDescription)
             }
-        } catch {
-            debugPrint(error.localizedDescription)
-            return [:]
         }
+        return [:]
     }
 
-    func blocks(inMap mapID: Int) -> [PersistentIdentifier] {
-        do {
-            let layoutsFetchDescriptor = FetchDescriptor<ComiketLayout>(
-                predicate: #Predicate<ComiketLayout> {
-                    $0.mapID == mapID
-                }
-            )
-            let layouts = try modelContext.fetch(layoutsFetchDescriptor)
-            let blockIDs = Set(layouts.map { $0.blockID })
-            let blocksFetchDescriptor = FetchDescriptor<ComiketBlock>(
-                predicate: #Predicate<ComiketBlock> {
-                    blockIDs.contains($0.id)
-                }
-            )
-            return try modelContext.fetchIdentifiers(blocksFetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
+    func blocks(inMap mapID: Int) -> [Int] {
+        if let database {
+            do {
+                let layoutsTable = Table("ComiketLayoutWC")
+                let blocksTable = Table("ComiketBlockWC")
+                let colMapID = Expression<Int>("mapId")
+                let colBlockID = Expression<Int>("blockId")
+                let colID = Expression<Int>("id")
+
+                let layoutsQuery = layoutsTable.select(colBlockID).filter(colMapID == mapID)
+                let blockIDs = Set(try database.prepare(layoutsQuery).map { $0[colBlockID] })
+
+                let blocksQuery = blocksTable.select(colID).filter(blockIDs.contains(colID))
+                return try database.prepare(blocksQuery).map { $0[colID] }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
         }
+        return []
     }
 
-    func layouts(inMap mapID: Int) -> [PersistentIdentifier] {
-        do {
-            let mapFetchDescriptor = FetchDescriptor<ComiketMap>(
-                predicate: #Predicate<ComiketMap> {
-                    $0.id == mapID
-                }
-            )
-            guard let map = try modelContext.fetch(mapFetchDescriptor).first,
-                  let layouts = map.layouts else {
-                return []
+    func layouts(inMap mapID: Int) -> [Int] {
+        if let database {
+            do {
+                let table = Table("ComiketLayoutWC")
+                let colMapID = Expression<Int>("mapId")
+                let colID = Expression<Int>("id")
+                let query = table.select(colID).filter(colMapID == mapID)
+                return try database.prepare(query).map { $0[colID] }
+            } catch {
+                debugPrint(error.localizedDescription)
             }
-            return layouts.map { $0.persistentModelID }
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
         }
+        return []
     }
 
     func layoutMappings(inMap mapID: Int, useHighResolutionMaps: Bool) -> [LayoutCatalogMapping] {
-        do {
-            let mapFetchDescriptor = FetchDescriptor<ComiketMap>(
-                predicate: #Predicate<ComiketMap> {
-                    $0.id == mapID
-                }
-            )
-            if let map = try modelContext.fetch(mapFetchDescriptor).first,
-               let layouts = map.layouts {
-                return layouts.map {
-                    LayoutCatalogMapping(
-                        blockID: $0.blockID,
-                        spaceNumber: $0.spaceNumber,
-                        positionX: useHighResolutionMaps ? $0.hdPosition.x : $0.position.x,
-                        positionY: useHighResolutionMaps ? $0.hdPosition.y : $0.position.y,
-                        layoutType: $0.layout
+        if let database {
+            do {
+                let table = Table("ComiketLayoutWC")
+                let colMapID = Expression<Int>("mapId")
+                let query = table.filter(colMapID == mapID)
+                return try database.prepare(query).map { row in
+                    let layout = ComiketLayout(from: row)
+                    return LayoutCatalogMapping(
+                        blockID: layout.blockID,
+                        spaceNumber: layout.spaceNumber,
+                        positionX: useHighResolutionMaps ? layout.hdPosition.x : layout.position.x,
+                        positionY: useHighResolutionMaps ? layout.hdPosition.y : layout.position.y,
+                        layoutType: layout.layout
                     )
                 }
+            } catch {
+                debugPrint(error.localizedDescription)
             }
-        } catch {
-            debugPrint(error.localizedDescription)
         }
         return []
     }
 
     func genre(_ genreID: Int) -> String? {
-        let fetchDescriptor = FetchDescriptor<ComiketGenre>(
-            predicate: #Predicate<ComiketGenre> {
-                $0.id == genreID
+        if let database {
+            do {
+                let table = Table("ComiketGenreWC")
+                let colID = Expression<Int>("id")
+                let colName = Expression<String>("name")
+                let query = table.select(colName).filter(colID == genreID)
+                return try database.pluck(query)?[colName]
+            } catch {
+                debugPrint(error.localizedDescription)
             }
-        )
-        do {
-            return try modelContext.fetch(fetchDescriptor).first?.name
-        } catch {
-            debugPrint(error.localizedDescription)
-            return nil
         }
+        return nil
     }
 
     func layoutCatalogMappingToWebCatalogIDs(
         forMappings mappings: [LayoutCatalogMapping],
         on dateID: Int
     ) -> [LayoutCatalogMapping: [Int]] {
-        do {
-            let blockIDs = Set(mappings.map { $0.blockID })
-            let spaceNumbers = Set(mappings.map { $0.spaceNumber })
-            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-                predicate: #Predicate<ComiketCircle> { circle in
-                    blockIDs.contains(circle.blockID) &&
-                    spaceNumbers.contains(circle.spaceNumber) &&
-                    circle.day == dateID
-                },
-                sortBy: [SortDescriptor(\.id, order: .forward)]
-            )
-            let circles = try modelContext.fetch(fetchDescriptor)
+        if let database {
+            do {
+                let circlesTable = Table("ComiketCircleWC")
+                let extendedTable = Table("ComiketCircleExtend")
+                let colID = Expression<Int>("id")
+                let colBlockID = Expression<Int>("blockId")
+                let colSpaceNumber = Expression<Int>("spaceNo")
+                let colDay = Expression<Int>("day")
+                let colWebCatalogID = Expression<Int>("WCId")
 
-            let mappingLookup = Dictionary(uniqueKeysWithValues: mappings.map {
-                ("\($0.blockID)-\($0.spaceNumber)", $0)
-            })
+                let blockIDs = Set(mappings.map { $0.blockID })
+                let spaceNumbers = Set(mappings.map { $0.spaceNumber })
 
-            return circles.reduce(into: [LayoutCatalogMapping: [Int]]()) { result, circle in
-                guard let extendedInformation = circle.extendedInformation,
-                      let originalMapping = mappingLookup["\(circle.blockID)-\(circle.spaceNumber)"] else {
-                    return
+                let query = circlesTable
+                    .join(.leftOuter, extendedTable, on: circlesTable[colID] == extendedTable[colID])
+                    .filter(blockIDs.contains(colBlockID) && spaceNumbers.contains(colSpaceNumber) && colDay == dateID)
+                    .order(circlesTable[colID].asc)
+
+                let mappingLookup = Dictionary(uniqueKeysWithValues: mappings.map {
+                    ("\($0.blockID)-\($0.spaceNumber)", $0)
+                })
+
+                var result = [LayoutCatalogMapping: [Int]]()
+                for row in try database.prepare(query) {
+                    if let webCatalogID = try? row.get(colWebCatalogID) {
+                        let blockID = row[colBlockID]
+                        let spaceNumber = row[colSpaceNumber]
+                        if let originalMapping = mappingLookup["\(blockID)-\(spaceNumber)"] {
+                            result[originalMapping, default: []].append(webCatalogID)
+                        }
+                    }
                 }
-                result[originalMapping, default: []].append(extendedInformation.webCatalogID)
+                return result
+            } catch {
+                debugPrint(error.localizedDescription)
             }
-        } catch {
-            debugPrint(error.localizedDescription)
-            return [:]
         }
+        return [:]
     }
 
-    func circles(containing searchTerm: String) -> [PersistentIdentifier] {
-        let searchTermLowercased = searchTerm.lowercased()
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.circleName.localizedStandardContains(searchTermLowercased) ||
-                $0.circleNameKana.localizedStandardContains(searchTermLowercased) ||
-                $0.penName.localizedStandardContains(searchTermLowercased)
+    func circles(containing searchTerm: String) -> [Int] {
+        if let database {
+            do {
+                let table = Table("ComiketCircleWC")
+                let colID = Expression<Int>("id")
+                let colCircleName = Expression<String>("circleName")
+                let colCircleNameKana = Expression<String>("circleKana")
+                let colPenName = Expression<String>("penName")
+
+                let query = table.select(colID).filter(
+                    colCircleName.like("%\(searchTerm)%") ||
+                    colCircleNameKana.like("%\(searchTerm)%") ||
+                    colPenName.like("%\(searchTerm)%")
+                )
+                return try database.prepare(query).map { $0[colID] }
+            } catch {
+                debugPrint(error.localizedDescription)
             }
-        )
-        do {
-            return try modelContext.fetchIdentifiers(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
         }
+        return []
     }
 
     func circles(
         withGenre genreIDs: [Int]? = nil,
         inBlock blockIDs: [Int]? = nil,
         onDay day: Int? = nil
-    ) -> [PersistentIdentifier]? {
-        do {
-            var predicates: [Predicate<ComiketCircle>] = []
-            if let genreIDs, !genreIDs.isEmpty {
-                predicates.append(
-                    #Predicate<ComiketCircle> {
-                        genreIDs.contains($0.genreID)
-                    }
-                )
-            }
-            if let blockIDs, !blockIDs.isEmpty {
-                predicates.append(
-                    #Predicate<ComiketCircle> {
-                        blockIDs.contains($0.blockID)
-                    }
-                )
-            }
-            if let day {
-                predicates.append(
-                    #Predicate<ComiketCircle> {
-                        $0.day == day
-                    }
-                )
-            }
-            if predicates.isEmpty {
-                return nil
-            }
-            let combinedPredicate = predicates.reduce(predicates[0]) { combined, next in
-                #Predicate<ComiketCircle> {
-                    combined.evaluate($0) && next.evaluate($0)
+    ) -> [Int]? {
+        if let database {
+            do {
+                let table = Table("ComiketCircleWC")
+                let colID = Expression<Int>("id")
+                let colGenreID = Expression<Int>("genreId")
+                let colBlockID = Expression<Int>("blockId")
+                let colDay = Expression<Int>("day")
+
+                var query = table.select(colID)
+                if let genreIDs, !genreIDs.isEmpty {
+                    query = query.filter(genreIDs.contains(colGenreID))
                 }
+                if let blockIDs, !blockIDs.isEmpty {
+                    query = query.filter(blockIDs.contains(colBlockID))
+                }
+                if let day {
+                    query = query.filter(colDay == day)
+                }
+
+                if genreIDs == nil && blockIDs == nil && day == nil {
+                    return nil
+                }
+
+                return try database.prepare(query).map { $0[colID] }
+            } catch {
+                debugPrint(error.localizedDescription)
             }
-            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-                predicate: combinedPredicate
-            )
-            return try modelContext.fetchIdentifiers(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
         }
+        return []
     }
 
-    func circles(inMap mapID: Int) -> [PersistentIdentifier] {
-        do {
-            let mappingFetchDescriptor = FetchDescriptor<ComiketMapping>(
-                predicate: #Predicate<ComiketMapping> {
-                    $0.mapID == mapID
-                }
-            )
-            let mappings = try modelContext.fetch(mappingFetchDescriptor)
-            let blockIDs = Set(mappings.map { $0.blockID })
-            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-                predicate: #Predicate<ComiketCircle> {
-                    blockIDs.contains($0.blockID)
-                }
-            )
-            return try modelContext.fetchIdentifiers(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
+    func circles(inMap mapID: Int) -> [Int] {
+        if let database {
+            do {
+                let mappingTable = Table("ComiketMappingWC")
+                let circlesTable = Table("ComiketCircleWC")
+                let colMapID = Expression<Int>("mapId")
+                let colBlockID = Expression<Int>("blockId")
+                let colID = Expression<Int>("id")
+
+                let mappingQuery = mappingTable.select(colBlockID).filter(colMapID == mapID)
+                let blockIDs = Set(try database.prepare(mappingQuery).map { $0[colBlockID] })
+
+                let circlesQuery = circlesTable.select(colID).filter(blockIDs.contains(colBlockID))
+                return try database.prepare(circlesQuery).map { $0[colID] }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
         }
+        return []
     }
 
     func genreIDs(inMap mapID: Int, onDay dayID: Int) -> [Int] {
-        do {
-            let mappingFetchDescriptor = FetchDescriptor<ComiketMapping>(
-                predicate: #Predicate<ComiketMapping> {
-                    $0.mapID == mapID
-                }
-            )
-            let mappings = try modelContext.fetch(mappingFetchDescriptor)
-            let blockIDs = Set(mappings.map { $0.blockID })
-            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-                predicate: #Predicate<ComiketCircle> {
-                    blockIDs.contains($0.blockID) && $0.day == dayID
-                }
-            )
-            let circles = try modelContext.fetch(fetchDescriptor)
-            return Array(Set(circles.map { $0.genreID }))
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
+        if let database {
+            do {
+                let mappingTable = Table("ComiketMappingWC")
+                let circlesTable = Table("ComiketCircleWC")
+                let colMapID = Expression<Int>("mapId")
+                let colBlockID = Expression<Int>("blockId")
+                let colDay = Expression<Int>("day")
+                let colGenreID = Expression<Int>("genreId")
+
+                let mappingQuery = mappingTable.select(colBlockID).filter(colMapID == mapID)
+                let blockIDs = Set(try database.prepare(mappingQuery).map { $0[colBlockID] })
+
+                let circlesQuery = circlesTable.select(colGenreID).filter(blockIDs.contains(colBlockID) && colDay == dayID)
+                return Array(Set(try database.prepare(circlesQuery).map { $0[colGenreID] }))
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
         }
+        return []
     }
 
     func blockIDs(inMap mapID: Int, onDay dayID: Int, withGenreIDs genreIDs: [Int]?) -> [Int] {
-        do {
-            let mappingFetchDescriptor = FetchDescriptor<ComiketMapping>(
-                predicate: #Predicate<ComiketMapping> {
-                    $0.mapID == mapID
+        if let database {
+            do {
+                let mappingTable = Table("ComiketMappingWC")
+                let circlesTable = Table("ComiketCircleWC")
+                let colMapID = Expression<Int>("mapId")
+                let colBlockID = Expression<Int>("blockId")
+                let colDay = Expression<Int>("day")
+                let colGenreID = Expression<Int>("genreId")
+
+                let mappingQuery = mappingTable.select(colBlockID).filter(colMapID == mapID)
+                let blockIDs = Set(try database.prepare(mappingQuery).map { $0[colBlockID] })
+
+                var circlesQuery = circlesTable.select(colBlockID).filter(blockIDs.contains(colBlockID) && colDay == dayID)
+                if let genreIDs, !genreIDs.isEmpty {
+                    circlesQuery = circlesQuery.filter(genreIDs.contains(colGenreID))
                 }
-            )
-            let mappings = try modelContext.fetch(mappingFetchDescriptor)
-            let blockIDs = Set(mappings.map { $0.blockID })
-            if let genreIDs, !genreIDs.isEmpty {
-                let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-                    predicate: #Predicate<ComiketCircle> {
-                        blockIDs.contains($0.blockID) && $0.day == dayID && genreIDs.contains($0.genreID)
-                    }
-                )
-                let circles = try modelContext.fetch(fetchDescriptor)
-                return Array(Set(circles.map { $0.blockID }))
-            } else {
-                let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-                    predicate: #Predicate<ComiketCircle> {
-                        blockIDs.contains($0.blockID) && $0.day == dayID
-                    }
-                )
-                let circles = try modelContext.fetch(fetchDescriptor)
-                return Array(Set(circles.map { $0.blockID }))
+                return Array(Set(try database.prepare(circlesQuery).map { $0[colBlockID] }))
+            } catch {
+                debugPrint(error.localizedDescription)
             }
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
         }
+        return []
     }
 
-    func circles(withWebCatalogIDs webCatalogIDs: [Int]) -> [PersistentIdentifier] {
-        do {
-            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-                predicate: #Predicate<ComiketCircle> {
-                    $0.extendedInformation.flatMap {
-                        webCatalogIDs.contains($0.webCatalogID)
-                    } == true
-                }
-            )
-            return try modelContext.fetchIdentifiers(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
+    func circles(withWebCatalogIDs webCatalogIDs: [Int]) -> [Int] {
+        if let database {
+            do {
+                let extendedTable = Table("ComiketCircleExtend")
+                let colID = Expression<Int>("id")
+                let colWebCatalogID = Expression<Int>("WCId")
+                let query = extendedTable.select(colID).filter(webCatalogIDs.contains(colWebCatalogID))
+                return try database.prepare(query).map { $0[colID] }
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
         }
+        return []
     }
 
-    func circles(forFavorites favoriteItems: [UserFavorites.Response.FavoriteItem]) -> [PersistentIdentifier] {
-        do {
-            let webCatalogIDs = favoriteItems.map { $0.circle.webCatalogID }
-            let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-                predicate: #Predicate<ComiketCircle> {
-                    $0.extendedInformation.flatMap {
-                        webCatalogIDs.contains($0.webCatalogID)
-                    } == true
-                }
-            )
-            return try modelContext.fetchIdentifiers(fetchDescriptor)
-        } catch {
-            debugPrint(error.localizedDescription)
-            return []
-        }
+    func circles(forFavorites favoriteItems: [UserFavorites.Response.FavoriteItem]) -> [Int] {
+        let webCatalogIDs = favoriteItems.map { $0.circle.webCatalogID }
+        return circles(withWebCatalogIDs: webCatalogIDs)
     }
 
     func spaceNumberSuffixes(forWebCatalogIDs webCatalogIDs: [Int]) -> [Int: Int] {
-        do {
-            let extendedInformationFetchDescriptor = FetchDescriptor<ComiketCircleExtendedInformation>(
-                predicate: #Predicate<ComiketCircleExtendedInformation> {
-                    webCatalogIDs.contains($0.webCatalogID)
+        if let database {
+            do {
+                let circlesTable = Table("ComiketCircleWC")
+                let extendedTable = Table("ComiketCircleExtend")
+                let colID = Expression<Int>("id")
+                let colWebCatalogID = Expression<Int>("WCId")
+                let colSpaceNoSub = Expression<Int>("spaceNoSub")
+
+                let query = circlesTable
+                    .join(.inner, extendedTable, on: circlesTable[colID] == extendedTable[colID])
+                    .filter(webCatalogIDs.contains(colWebCatalogID))
+
+                return try database.prepare(query).reduce(into: [Int: Int]()) { result, row in
+                    result[row[colWebCatalogID]] = row[colSpaceNoSub]
                 }
-            )
-            let extendedInformation = try modelContext.fetch(extendedInformationFetchDescriptor)
-            let webCatalogIDMappedToSpaceSubNo: [Int: Int] = extendedInformation
-                .reduce(into: [:]) { result, extendedInformation in
-                    do {
-                        let circleID = extendedInformation.id
-                        let circlesFetchDescriptor = FetchDescriptor<ComiketCircle>(
-                            predicate: #Predicate<ComiketCircle> {
-                                $0.id == circleID
-                            }
-                        )
-                        let circles = try modelContext.fetch(circlesFetchDescriptor)
-                        if let firstCircle = circles.first {
-                            result[extendedInformation.webCatalogID] = firstCircle.spaceNumberSuffix
-                        }
-                    } catch {
-                        // Intentionally left blank
-                    }
-                }
-            return webCatalogIDMappedToSpaceSubNo
-        } catch {
-            debugPrint(error.localizedDescription)
-            return webCatalogIDs.reduce(into: [:]) { result, webCatalogID in
-                result[webCatalogID] = 0
+            } catch {
+                debugPrint(error.localizedDescription)
             }
+        }
+        return webCatalogIDs.reduce(into: [:]) { result, webCatalogID in
+            result[webCatalogID] = 0
         }
     }
 }
+
 // swiftlint:enable type_body_length

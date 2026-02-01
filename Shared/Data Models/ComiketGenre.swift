@@ -6,10 +6,17 @@
 //
 
 import SQLite
-import SwiftData
 
-@Model
-final class ComiketGenre: SQLiteable {
+final class ComiketGenre: SQLiteable, Identifiable, Hashable {
+    static func == (lhs: ComiketGenre, rhs: ComiketGenre) -> Bool {
+        return lhs.id == rhs.id && lhs.eventNumber == rhs.eventNumber
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(eventNumber)
+    }
+
     var eventNumber: Int
     var id: Int
     var name: String

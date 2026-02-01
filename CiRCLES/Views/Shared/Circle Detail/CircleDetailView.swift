@@ -12,7 +12,6 @@ import Translation
 
 struct CircleDetailView: View {
 
-    @Environment(\.modelContext) var modelContext
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
@@ -127,10 +126,12 @@ struct CircleDetailView: View {
             }
             favoriteMemo = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.memo ?? ""
         }
-        let actor = DataFetcher(modelContainer: sharedModelContainer)
+        database.connect()
+        let actor = DataFetcher(database: database.textDatabase)
         if let genre = await actor.genre(circle.genreID) {
             self.genre = genre
         }
+
     }
 
     func goToPreviousCircle() {
@@ -170,13 +171,9 @@ struct CircleDetailView: View {
     }
 
     func goToCircle(with id: Int) -> Bool {
-        let fetchDescriptor = FetchDescriptor<ComiketCircle>(
-            predicate: #Predicate<ComiketCircle> {
-                $0.id == id
-            }
-        )
-        let circles = try? modelContext.fetch(fetchDescriptor)
-        if let circles, circles.count == 1 {
+        database.connect()
+        let circles = database.circles([id])
+        if circles.count == 1 {
             self.circle = circles.first ?? self.circle
             Task {
                 await prepareCircle()
