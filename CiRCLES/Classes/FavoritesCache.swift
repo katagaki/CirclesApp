@@ -12,14 +12,12 @@ import SwiftUI
 class FavoritesCache {
     var circles: [String: [ComiketCircle]]?
 
-    var isVisitModeOn: Bool = false
     var isGroupedByColor: Bool = true
 
     var invalidationID: String = ""
 
     init() {
         let defaults = UserDefaults.standard
-        self.isVisitModeOn = defaults.object(forKey: "Favorites.VisitModeOn") as? Bool ?? false
         self.isGroupedByColor = defaults.object(forKey: "Favorites.GroupByColor") as? Bool ?? true
     }
 

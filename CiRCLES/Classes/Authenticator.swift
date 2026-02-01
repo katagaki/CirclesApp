@@ -20,6 +20,7 @@ class Authenticator {
 
     var isAuthenticating: Bool = false
     var isWaitingForAuthenticationCode: Bool = false
+    var isReady: Bool = false
     var onlineState: OnlineState = .undetermined
 
     var code: String?
@@ -62,27 +63,44 @@ class Authenticator {
 
     func setupReachability() {
         if let reachability {
-            reachability.whenReachable = { _ in
-                self.onlineState = .online
-                // Restore previous authentication token
-                if !self.restoreAuthenticationFromKeychainAndDefaults() {
-                    self.resetAuthentication()
-                } else {
-                    // Refresh authentication token if not expired
-                    Task {
-                        await self.refreshAuthenticationToken()
-                    }
+            reachability.whenReachable = { [weak self] _ in
+                Task {
+                    await self?.handleReachable()
                 }
             }
-            reachability.whenUnreachable = { _ in
-                self.onlineState = .offline
-                self.useOfflineAuthenticationToken()
+            reachability.whenUnreachable = { [weak self] _ in
+                Task {
+                    self?.handleUnreachable()
+                }
             }
             do {
                 try reachability.startNotifier()
             } catch {
                 debugPrint(error.localizedDescription)
             }
+        }
+    }
+
+    private func handleReachable() async {
+        self.onlineState = .online
+        if !self.isReady {
+            // Restore previous authentication token
+            if !self.restoreAuthenticationFromKeychainAndDefaults() {
+                self.resetAuthentication()
+                self.isReady = true
+            } else {
+                // Refresh authentication token if not expired
+                await self.refreshAuthenticationToken()
+                self.isReady = true
+            }
+        }
+    }
+
+    private func handleUnreachable() {
+        self.onlineState = .offline
+        self.useOfflineAuthenticationToken()
+        if !self.isReady {
+            self.isReady = true
         }
     }
 
@@ -192,7 +210,7 @@ class Authenticator {
         parameters["client_id"] = client.id
         parameters["client_secret"] = client.secret
 
-        var request = URLRequest(url: endpoint)
+        var request = URLRequest(url: endpoint, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 2.0)
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpBody = parameters

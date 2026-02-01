@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import TipKit
 
 struct ColorGroupedCircleGrid: View {
 
@@ -15,6 +16,7 @@ struct ColorGroupedCircleGrid: View {
     var showsOverlayWhenEmpty: Bool = true
     var namespace: Namespace.ID
     var onSelect: ((ComiketCircle) -> Void)
+    var onDoubleTap: ((ComiketCircle) -> Void)?
 
     @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
@@ -31,20 +33,39 @@ struct ColorGroupedCircleGrid: View {
                         LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
                                   phoneColumnConfiguration : padOrMacColumnConfiguration,
                                   spacing: gridSpacing) {
-                            ForEach(circles) { circle in
-                                Button {
-                                    onSelect(circle)
-                                } label: {
+                            ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
+                                if let onDoubleTap {
                                     CircleCutImage(
                                         circle, in: namespace, cutType: showWebCut ? .web : .catalog,
                                         showSpaceName: $showSpaceName, showDay: $showDay
                                     )
                                     .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
+                                    .onTapGesture(count: 2) {
+                                        onDoubleTap(circle)
+                                    }
+                                    .onTapGesture {
+                                        onSelect(circle)
+                                    }
+                                    .contextMenu(circle: circle) {
+                                        onSelect(circle)
+                                    }
+                                    .matchedTransitionSource(id: circle.id, in: namespace)
+                                    .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
+                                } else {
+                                    Button {
+                                        onSelect(circle)
+                                    } label: {
+                                        CircleCutImage(
+                                            circle, in: namespace, cutType: showWebCut ? .web : .catalog,
+                                            showSpaceName: $showSpaceName, showDay: $showDay
+                                        )
+                                        .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
+                                    }
+                                    .contextMenu(circle: circle) {
+                                        onSelect(circle)
+                                    }
+                                    .matchedTransitionSource(id: circle.id, in: namespace)
                                 }
-                                .contextMenu(circle: circle) {
-                                    onSelect(circle)
-                                }
-                                .matchedTransitionSource(id: circle.id, in: namespace)
                             }
                         }
                                   .background(color.backgroundColor().tertiary)

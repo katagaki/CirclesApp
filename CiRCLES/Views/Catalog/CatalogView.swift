@@ -17,6 +17,7 @@ struct CatalogView: View {
     @Environment(Database.self) var database
     @Environment(UserSelections.self) var selections
     @Environment(Unifier.self) var unifier
+    @Environment(Events.self) var planner
 
     @Environment(\.modelContext) var modelContext
 
@@ -41,30 +42,61 @@ struct CatalogView: View {
                 switch displayModeState {
                 case .grid:
                     if let searchedCircles = catalogCache.searchedCircles {
-                        CircleGrid(circles: searchedCircles, namespace: namespace) { circle in
+                        CircleGrid(circles: searchedCircles, namespace: namespace, onSelect: { circle in
                             unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
-                        }
+                        }, onDoubleTap: { circle in
+                            let circleID = circle.id
+                            let eventNumber = planner.activeEventNumber
+                            Task.detached {
+                                let actor = VisitActor(modelContainer: sharedModelContainer)
+                                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
+                            }
+                        })
                     } else {
                         CircleGrid(circles: catalogCache.displayedCircles,
                                    showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
-                                   namespace: namespace) { circle in
+                                   namespace: namespace,
+                                   onSelect: { circle in
                             unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
-                        }
+                        }, onDoubleTap: { circle in
+                            let circleID = circle.id
+                            let eventNumber = planner.activeEventNumber
+                            Task.detached {
+                                let actor = VisitActor(modelContainer: sharedModelContainer)
+                                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
+                            }
+                        })
                     }
                 case .list:
                     if let searchedCircles = catalogCache.searchedCircles {
                         CircleList(circles: searchedCircles,
                                    displayMode: listDisplayModeState,
-                                   namespace: namespace) { circle in
+                                   namespace: namespace,
+                                   onSelect: { circle in
                             unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
-                        }
+                        }, onDoubleTap: { circle in
+                            let circleID = circle.id
+                            let eventNumber = planner.activeEventNumber
+                            Task.detached {
+                                let actor = VisitActor(modelContainer: sharedModelContainer)
+                                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
+                            }
+                        })
                     } else {
                         CircleList(circles: catalogCache.displayedCircles,
                                    showsOverlayWhenEmpty: selections.genre != nil || selections.map != nil,
                                    displayMode: listDisplayModeState,
-                                   namespace: namespace) { circle in
+                                   namespace: namespace,
+                                   onSelect: { circle in
                             unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
-                        }
+                        }, onDoubleTap: { circle in
+                            let circleID = circle.id
+                            let eventNumber = planner.activeEventNumber
+                            Task.detached {
+                                let actor = VisitActor(modelContainer: sharedModelContainer)
+                                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
+                            }
+                        })
                     }
                 }
                 if selections.genre == nil && selections.map == nil && catalogCache.searchedCircles == nil {

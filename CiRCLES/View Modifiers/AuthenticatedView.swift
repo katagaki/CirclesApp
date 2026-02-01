@@ -33,15 +33,13 @@ struct AuthenticatedView: ViewModifier {
                     .environment(authenticator)
                     .interactiveDismissDisabled()
             }
-            .onChange(of: authenticator.onlineState) { _, newValue in
-                switch newValue {
-                case .online, .offline:
+            .onChange(of: authenticator.isReady) { _, newValue in
+                if newValue && !authenticator.isAuthenticating {
                     reloadData()
-                case .undetermined: break
                 }
             }
-            .onChange(of: authenticator.token) { _, newValue in
-                if newValue != nil {
+            .onChange(of: authenticator.isAuthenticating) { oldValue, newValue in
+                if oldValue == true && newValue == false && authenticator.token != nil {
                     reloadData()
                 }
             }

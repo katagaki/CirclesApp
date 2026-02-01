@@ -20,7 +20,6 @@ struct FavoritesView: View {
     @Environment(UserSelections.self) var selections
     @Environment(Unifier.self) var unifier
 
-    @AppStorage(wrappedValue: false, "Favorites.VisitModeOn") var isVisitModeOnDefault: Bool
     @AppStorage(wrappedValue: true, "Favorites.GroupByColor") var isGroupedByColorDefault: Bool
 
     @Namespace var namespace
@@ -34,16 +33,16 @@ struct FavoritesView: View {
                         ColorGroupedCircleGrid(
                             groups: favoriteCircles,
                             showsOverlayWhenEmpty: false,
-                            namespace: namespace
-                        ) { circle in
-                            if !favoritesCache.isVisitModeOn {
+                            namespace: namespace,
+                            onSelect: { circle in
                                 unifier.append(.namespacedCircleDetail(
                                     circle: circle,
                                     previousCircle: { previousCircle(for: $0) },
                                     nextCircle: { nextCircle(for: $0) },
                                     namespace: namespace
                                 ))
-                            } else {
+                            },
+                            onDoubleTap: { circle in
                                 let circleID = circle.id
                                 let eventNumber = planner.activeEventNumber
                                 Task.detached {
@@ -51,20 +50,29 @@ struct FavoritesView: View {
                                     await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
                                 }
                             }
-                        }
+                        )
                     } else {
                         CircleGrid(
                             circles: favoriteCircles.values.flatMap({ $0 }).sorted(by: { $0.id < $1.id }),
                             showsOverlayWhenEmpty: false,
-                            namespace: namespace
-                        ) { circle in
-                            unifier.append(.namespacedCircleDetail(
-                                circle: circle,
-                                previousCircle: { previousCircle(for: $0) },
-                                nextCircle: { nextCircle(for: $0) },
-                                namespace: namespace
-                            ))
-                        }
+                            namespace: namespace,
+                            onSelect: { circle in
+                                unifier.append(.namespacedCircleDetail(
+                                    circle: circle,
+                                    previousCircle: { previousCircle(for: $0) },
+                                    nextCircle: { nextCircle(for: $0) },
+                                    namespace: namespace
+                                ))
+                            },
+                            onDoubleTap: { circle in
+                                let circleID = circle.id
+                                let eventNumber = planner.activeEventNumber
+                                Task.detached {
+                                    let actor = VisitActor(modelContainer: sharedModelContainer)
+                                    await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
+                                }
+                            }
+                        )
                     }
                 }
                 .overlay {
@@ -84,7 +92,6 @@ struct FavoritesView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .navigationTitle("ViewTitle.Favorites")
         .navigationBarTitleDisplayMode(.inline)
-        .visitModeStyle($favoritesCache.isVisitModeOn)
         .toolbar {
             FavoritesToolbar()
         }
@@ -106,9 +113,7 @@ struct FavoritesView: View {
                 Task { await prepareCircles(using: favoriteItems) }
             }
         }
-        .onChange(of: favoritesCache.isVisitModeOn) {
-            isVisitModeOnDefault = favoritesCache.isVisitModeOn
-        }
+
         .onChange(of: favoritesCache.isGroupedByColor) {
             isGroupedByColorDefault = favoritesCache.isGroupedByColor
         }
