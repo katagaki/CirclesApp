@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2024/07/15.
 //
 
-import SQLite
 import SwiftUI
 
 typealias View = SwiftUI.View
