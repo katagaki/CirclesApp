@@ -317,6 +317,7 @@ actor DataFetcher {
             result[webCatalogID] = 0
         }
     }
+
     func mapID(forBlock blockID: Int) -> Int? {
         if let database {
             do {
