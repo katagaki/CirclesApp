@@ -26,6 +26,8 @@ class Database {
     var commonImagesLoadCount: Int = 0
     var circleImagesLoadCount: Int = 0
 
+    let dataStoreURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+
     init() { }
 
     // MARK: Database Connection
@@ -63,15 +65,15 @@ class Database {
         #if DEBUG
         debugPrint("Database: Preparing for event \(event.number)...")
         #endif
-        if let documentsDirectoryURL {
-            let textDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number).db")
+        if let dataStoreURL {
+            let textDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number).db")
             if FileManager.default.fileExists(atPath: textDatabaseURL.path(percentEncoded: false)) {
                 #if DEBUG
                 debugPrint("Database: Found text database.")
                 #endif
                 self.textDatabaseURL = textDatabaseURL
             }
-            let imageDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number)Image1.db")
+            let imageDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number)Image1.db")
             if FileManager.default.fileExists(atPath: imageDatabaseURL.path(percentEncoded: false)) {
                 #if DEBUG
                 debugPrint("Database: Found image database.")
@@ -82,7 +84,7 @@ class Database {
     }
 
     func delete() {
-        if let documentsDirectoryURL {
+        if let dataStoreURL {
             textDatabaseURL = nil
             imageDatabaseURL = nil
             databaseInformation = nil
@@ -91,14 +93,14 @@ class Database {
             commonImages.removeAll()
             circleImages.removeAll()
             imageCache.removeAll()
-            try? FileManager.default.removeItem(at: documentsDirectoryURL)
+            try? FileManager.default.removeItem(at: dataStoreURL)
         }
     }
 
     func delete(event: WebCatalogEvent.Response.Event) {
-        if let documentsDirectoryURL {
-            let targetTextDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number).db")
-            let targetImageDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number)Image1.db")
+        if let dataStoreURL {
+            let targetTextDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number).db")
+            let targetImageDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number)Image1.db")
 
             if textDatabaseURL == targetTextDatabaseURL {
                 textDatabase = nil
