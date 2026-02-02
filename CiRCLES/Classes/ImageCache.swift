@@ -14,9 +14,8 @@ import WebP
 class ImageCache {
 
     @ObservationIgnored
-    static let cacheURL: URL? = documentsDirectoryURL?.appendingPathComponent(
-        "ImageCache", conformingTo: .folder
-    )
+    static let cacheURL: URL? = (FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first)?
+        .appendingPathComponent("ImageCache", conformingTo: .folder)
 
     @ObservationIgnored var images: [Int: Data] = [:]
 

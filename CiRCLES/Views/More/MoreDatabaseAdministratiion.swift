@@ -86,9 +86,9 @@ struct MoreDatabaseAdministratiion: View {
 
     func refreshDownloadedDataList() {
         var files: [String: URL] = [:]
-        if let documentsDirectoryURL,
+        if let dataStoreURL = database.dataStoreURL,
            let downloadedFiles = try? FileManager.default.contentsOfDirectory(
-            at: documentsDirectoryURL,
+            at: dataStoreURL,
             includingPropertiesForKeys: nil,
             options: .skipsHiddenFiles
            ) {

@@ -43,17 +43,17 @@ extension Database {
         case .images: databaseNameSuffix = "Image1"
         }
 
-        if let documentsDirectoryURL {
-            let databaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number)\(databaseNameSuffix).db")
+        if let dataStoreURL {
+            let databaseURL = dataStoreURL.appending(path: "webcatalog\(event.number)\(databaseNameSuffix).db")
 #if DEBUG
             debugPrint(databaseURL)
 #endif
             if FileManager.default.fileExists(atPath: databaseURL.path(percentEncoded: false)) {
                 return databaseURL
             } else {
-                if !FileManager.default.fileExists(atPath: documentsDirectoryURL.path()) {
+                if !FileManager.default.fileExists(atPath: dataStoreURL.path()) {
                     try? FileManager.default.createDirectory(
-                        at: documentsDirectoryURL, withIntermediateDirectories: false
+                        at: dataStoreURL, withIntermediateDirectories: false
                     )
                 }
             }
@@ -93,9 +93,9 @@ extension Database {
     // swiftlint:enable cyclomatic_complexity
 
     func isDownloaded(for event: WebCatalogEvent.Response.Event) -> Bool {
-        if let documentsDirectoryURL {
-            let textDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number).db")
-            let imageDatabaseURL = documentsDirectoryURL.appending(path: "webcatalog\(event.number)Image1.db")
+        if let dataStoreURL {
+            let textDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number).db")
+            let imageDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number)Image1.db")
             return FileManager.default.fileExists(atPath: textDatabaseURL.path(percentEncoded: false)) &&
             FileManager.default.fileExists(atPath: imageDatabaseURL.path(percentEncoded: false))
         }
@@ -103,10 +103,10 @@ extension Database {
     }
 
     func download(_ url: URL?, updateProgress: @escaping (Double?) async -> Void) async -> URL? {
-        if let url = url, let documentsDirectoryURL {
+        if let url = url, let dataStoreURL {
             do {
                 let downloader: Downloader = Downloader()
-                return try await downloader.download(from: url, to: documentsDirectoryURL) { progress in
+                return try await downloader.download(from: url, to: dataStoreURL) { progress in
                     await updateProgress(progress)
                 }
             } catch {
@@ -118,9 +118,9 @@ extension Database {
     }
 
     func unzip(_ url: URL?) -> URL? {
-        if let url, let documentsDirectoryURL {
+        if let url, let dataStoreURL {
             do {
-                let unzipDestinationURL = documentsDirectoryURL
+                let unzipDestinationURL = dataStoreURL
                 try? FileManager.default.removeItem(at: unzipDestinationURL
                     .appendingPathComponent(url.deletingPathExtension().lastPathComponent))
                 try FileManager.default.unzipItem(at: url, to: unzipDestinationURL)

@@ -32,11 +32,6 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		E4065D312DECA2FF00AB7E20 /* Shared */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Shared;
-			sourceTree = "<group>";
-		};
 		E4065DC02DECA30200AB7E20 /* CiRCLES */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -48,6 +43,21 @@
 		E4065E1B2DECA30700AB7E20 /* ci_scripts */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = ci_scripts;
+			sourceTree = "<group>";
+		};
+		E489B5522F315E8200ED193F /* Database */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Database;
+			sourceTree = "<group>";
+		};
+		E489B5652F31606400ED193F /* API */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = API;
+			sourceTree = "<group>";
+		};
+		E489B5772F31607D00ED193F /* Swift Data */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Swift Data";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -73,9 +83,11 @@
 			isa = PBXGroup;
 			children = (
 				E4D74B982C8D7D5B0014CD16 /* README.md */,
-				E4065DC02DECA30200AB7E20 /* CiRCLES */,
-				E4065D312DECA2FF00AB7E20 /* Shared */,
 				E4065E1B2DECA30700AB7E20 /* ci_scripts */,
+				E4065DC02DECA30200AB7E20 /* CiRCLES */,
+				E489B5522F315E8200ED193F /* Database */,
+				E489B5772F31607D00ED193F /* Swift Data */,
+				E489B5652F31606400ED193F /* API */,
 				E4A769472C21A20A00BE3491 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -105,8 +117,10 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				E4065D312DECA2FF00AB7E20 /* Shared */,
 				E4065DC02DECA30200AB7E20 /* CiRCLES */,
+				E489B5522F315E8200ED193F /* Database */,
+				E489B5652F31606400ED193F /* API */,
+				E489B5772F31607D00ED193F /* Swift Data */,
 			);
 			name = CiRCLES;
 			packageProductDependencies = (
