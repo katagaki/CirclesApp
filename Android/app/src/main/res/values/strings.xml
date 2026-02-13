@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CiRCLES</string>
+
+    <!-- Login -->
+    <string name="login_hero_map_title">Interactive Maps</string>
+    <string name="login_hero_map_description">Browse circle locations on interactive hall maps with real-time positions.</string>
+    <string name="login_hero_catalog_title">Circle Catalog</string>
+    <string name="login_hero_catalog_description">Search and browse the full circle catalog with grid and list views.</string>
+    <string name="login_hero_favorites_title">Favorites</string>
+    <string name="login_hero_favorites_description">Manage your favorite circles with color-coded organization.</string>
+    <string name="login_sign_in_prompt">Sign in with your Circle.ms account to access the web catalog and sync your favorites.</string>
+    <string name="login_sign_in">Sign In</string>
+
+    <!-- Catalog / Search -->
+    <string name="search_circles_placeholder">Search circles…</string>
+    <string name="close_search">Close search</string>
+    <string name="clear">Clear</string>
+    <string name="search_min_characters">Type at least 2 characters to search.</string>
+    <string name="no_filter_selected">Select a hall and filters\nto browse circles.</string>
+
+    <!-- Circle Detail -->
+    <string name="back">Back</string>
+    <string name="day_format">Day %1$d</string>
+    <string name="description_label">Description</string>
+    <string name="no_description">No description available.</string>
+    <string name="book_name">Book Name</string>
+    <string name="genre_label">Genre</string>
+    <string name="circle_memo">Circle Memo</string>
+    <string name="links">Links</string>
+    <string name="sns_twitter">X/Twitter</string>
+    <string name="sns_pixiv">Pixiv</string>
+    <string name="sns_circlems">Circle.ms</string>
+
+    <!-- Favorites -->
+    <string name="group_by_color">Group by Color</string>
+    <string name="no_favorites_loaded">No favorites loaded.\nSign in and sync to view favorites.</string>
+    <string name="no_favorites_yet">No favorites yet.\nAdd favorites from the web catalog.</string>
+
+    <!-- Navigation / Tabs -->
+    <string name="tab_circles">Circles</string>
+    <string name="tab_favorites">Favorites</string>
+
+    <!-- Sign Out -->
+    <string name="sign_out">Sign Out</string>
+    <string name="sign_out_confirm_message">Are you sure you want to sign out? All downloaded data will be deleted.</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- More Menu -->
+    <string name="comic_market_format">Comic Market %1$d</string>
+    <string name="more">More</string>
+
+    <!-- Toolbar Filters -->
+    <string name="genre_filter">Genre</string>
+    <string name="genres_count_format">Genres (%1$d)</string>
+    <string name="block_filter">Block</string>
+    <string name="blocks_count_format">Blocks (%1$d)</string>
+    <string name="all_filter">All</string>
+
+    <!-- Day / Hall Picker -->
+    <string name="no_day">No day</string>
+    <string name="no_hall">No hall</string>
+
+    <!-- Data Loading -->
+    <string name="downloading">Downloading</string>
+    <string name="downloading_text_database">Downloading text database…</string>
+    <string name="downloading_image_database">Downloading image database…</string>
+    <string name="loading_database">Loading database…</string>
+
+    <!-- Toolbar -->
+    <string name="show_catalog">Show catalog</string>
+    <string name="hide_catalog">Hide catalog</string>
+
+    <!-- Map -->
+    <string name="loading">Loading…</string>
+    <string name="no_map_selected">No map selected</string>
+</resources>

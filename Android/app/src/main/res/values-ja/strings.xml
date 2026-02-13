@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">サークルズ</string>
+
+    <!-- Login -->
+    <string name="login_hero_map_title">会場マップ</string>
+    <string name="login_hero_map_description">コミケの前でも、当日でも簡単にマップを見て計画する</string>
+    <string name="login_hero_catalog_title">サークルデータ</string>
+    <string name="login_hero_catalog_description">インターネットに接続できなくても、サークルの情報にアクセスできる</string>
+    <string name="login_hero_favorites_title">お気に入りを管理</string>
+    <string name="login_hero_favorites_description">好きなサークルに色付けて、コミケ当日に簡単に見分ける</string>
+    <string name="login_sign_in_prompt">Circle.msでログインするには、コミケWebカタログ・有料プラン（Gold会員）を契約する必要があります。</string>
+    <string name="login_sign_in">Circle.msでログイン</string>
+
+    <!-- Catalog / Search -->
+    <string name="search_circles_placeholder">サークル名、執筆者名、配布誌名</string>
+    <string name="close_search">検索を閉じる</string>
+    <string name="clear">クリア</string>
+    <string name="search_min_characters">2文字以上入力して検索してください。</string>
+    <string name="no_filter_selected">サークルを閲覧するには、ジャンルまたは棟を選択してください。</string>
+
+    <!-- Circle Detail -->
+    <string name="back">戻る</string>
+    <string name="day_format">%1$d日目</string>
+    <string name="description_label">補足説明/サークルアピール</string>
+    <string name="no_description">内容が書かれていません。</string>
+    <string name="book_name">頒布予定の誌名</string>
+    <string name="genre_label">ジャンル</string>
+    <string name="circle_memo">メモ（サークル）</string>
+    <string name="links">リンク</string>
+    <string name="sns_twitter">X（旧Twitter）</string>
+    <string name="sns_pixiv">pixiv</string>
+    <string name="sns_circlems">Circle.msポータル</string>
+
+    <!-- Favorites -->
+    <string name="group_by_color">色でグループ</string>
+    <string name="no_favorites_loaded">お気に入りがありません。\nログインして同期すると表示されます。</string>
+    <string name="no_favorites_yet">お気に入りがありません。\nサークルをお気に入りに追加すると、この画面に表示されます。</string>
+
+    <!-- Navigation / Tabs -->
+    <string name="tab_circles">サークル</string>
+    <string name="tab_favorites">お気に入り</string>
+
+    <!-- Sign Out -->
+    <string name="sign_out">ログアウト</string>
+    <string name="sign_out_confirm_message">ログアウトしますか？再度ログインすると、マップとサークルデータのダウンロードが再度行われます。</string>
+    <string name="cancel">キャンセル</string>
+
+    <!-- More Menu -->
+    <string name="comic_market_format">コミックマーケット%1$d</string>
+    <string name="more">その他</string>
+
+    <!-- Toolbar Filters -->
+    <string name="genre_filter">ジャンル</string>
+    <string name="genres_count_format">ジャンル（%1$d）</string>
+    <string name="block_filter">ブロック</string>
+    <string name="blocks_count_format">ブロック（%1$d）</string>
+    <string name="all_filter">リセット</string>
+
+    <!-- Day / Hall Picker -->
+    <string name="no_day">開催日なし</string>
+    <string name="no_hall">棟なし</string>
+
+    <!-- Toolbar -->
+    <string name="show_catalog">カタログを表示</string>
+    <string name="hide_catalog">カタログを非表示</string>
+
+    <!-- Map -->
+    <string name="loading">読み込み中…</string>
+    <string name="no_map_selected">表示できるマップがありません</string>
+</resources>

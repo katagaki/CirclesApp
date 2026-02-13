@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "WebSearch",
+      "Bash(./gradlew compileDebugKotlin:*)",
+      "WebFetch(domain:composables.com)",
+      "WebFetch(domain:joebirch.co)",
+      "Bash(jar tf:*)",
+      "Bash(./gradlew assembleDebug:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
