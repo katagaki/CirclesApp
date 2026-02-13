@@ -155,6 +155,7 @@ private suspend fun prepareCircles(
     val favoriteCircleIdentifiers = FavoritesState.mapped(favoriteItems, database)
 
     val favoriteCircles = mutableMapOf<String, List<ComiketCircle>>()
+    val allCircleIDs = mutableListOf<Int>()
     for (colorKey in favoriteCircleIdentifiers.keys.sorted()) {
         val circleIDs = favoriteCircleIdentifiers[colorKey] ?: continue
         var circles = database.circles(circleIDs).sortedBy { it.id }
@@ -163,6 +164,8 @@ private suspend fun prepareCircles(
             circles = circles.filter { it.day == selectedDate.id }
         }
         favoriteCircles[colorKey.toString()] = circles
+        allCircleIDs.addAll(circles.map { it.id })
     }
+    database.prefetchCircleImages(allCircleIDs)
     favorites.setCircles(favoriteCircles)
 }
