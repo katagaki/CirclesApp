@@ -74,7 +74,6 @@ class MainActivity : ComponentActivity() {
             CirclesGoTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
                 ) {
                     val isAuthenticating by auth.isAuthenticating.collectAsState()
                     val isReady by auth.isReady.collectAsState()
