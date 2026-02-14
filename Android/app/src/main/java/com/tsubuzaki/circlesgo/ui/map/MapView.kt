@@ -170,7 +170,7 @@ fun MapView(
                 onZoomChange = { zoomScale = it },
                 scrollToPosition = scrollToPosition,
                 onScrollCompleted = { mapper.clearScrollToPosition() },
-                popoverContent = { offset, currentZoom ->
+                popoverContent = { offset, currentZoom, viewportSize ->
                     val density = androidx.compose.ui.platform.LocalDensity.current
                     popoverData?.let { data ->
                         // Project source rect from map coordinates to screen coordinates
@@ -191,8 +191,8 @@ fun MapView(
                         MapPopoverLayer(
                             popoverData = data.copy(sourceRect = projectedRect),
                             zoomScale = 1.0f, // Use 1.0 scale to prevent scaling
-                            canvasWidth = canvasWidth,
-                            canvasHeight = canvasHeight,
+                            canvasWidth = viewportSize.width,
+                            canvasHeight = viewportSize.height,
                             mapper = mapper,
                             database = database,
                             favorites = favorites,

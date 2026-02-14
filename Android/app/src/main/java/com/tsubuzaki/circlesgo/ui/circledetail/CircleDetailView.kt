@@ -8,8 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,9 +24,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
@@ -73,7 +72,6 @@ import com.tsubuzaki.circlesgo.ui.shared.CircleCutImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CircleDetailView(
     circle: ComiketCircle,
@@ -168,13 +166,13 @@ fun CircleDetailView(
                             existingFavorite.favorite.webCatalogColor()?.backgroundColor()
                                 ?: MaterialTheme.colorScheme.primary
                         Icon(
-                            imageVector = Icons.Filled.Favorite,
+                            imageVector = Icons.Filled.Star,
                             contentDescription = stringResource(R.string.edit_favorite),
                             tint = favoriteColor
                         )
                     } else {
                         Icon(
-                            imageVector = Icons.Filled.FavoriteBorder,
+                            imageVector = Icons.Filled.StarBorder,
                             contentDescription = stringResource(R.string.add_to_favorites),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -198,58 +196,64 @@ fun CircleDetailView(
                     fontWeight = FontWeight.Bold
                 )
 
-                // Color picker
-                Text(
-                    text = stringResource(R.string.favorite_color),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                // Color grid (3x3) beside memo input
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    WebCatalogColor.entries.forEach { color ->
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(color.backgroundColor())
-                                .then(
-                                    if (color == selectedColor) {
-                                        Modifier.border(
-                                            3.dp,
-                                            MaterialTheme.colorScheme.onSurface,
-                                            CircleShape
-                                        )
-                                    } else {
-                                        Modifier
+                    // 3x3 Color grid
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        WebCatalogColor.entries.chunked(3).forEach { rowColors ->
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                rowColors.forEach { color ->
+                                    Box(
+                                        modifier = Modifier
+                                            .size(36.dp)
+                                            .clip(CircleShape)
+                                            .background(color.backgroundColor())
+                                            .then(
+                                                if (color == selectedColor) {
+                                                    Modifier.border(
+                                                        3.dp,
+                                                        MaterialTheme.colorScheme.onSurface,
+                                                        CircleShape
+                                                    )
+                                                } else {
+                                                    Modifier
+                                                }
+                                            )
+                                            .clickable { selectedColor = color },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        if (color == selectedColor) {
+                                            Icon(
+                                                imageVector = Icons.Filled.Check,
+                                                contentDescription = null,
+                                                tint = color.foregroundColor(),
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
                                     }
-                                )
-                                .clickable { selectedColor = color },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            if (color == selectedColor) {
-                                Icon(
-                                    imageVector = Icons.Filled.Check,
-                                    contentDescription = null,
-                                    tint = color.foregroundColor(),
-                                    modifier = Modifier.size(18.dp)
-                                )
+                                }
                             }
                         }
                     }
-                }
 
-                // Memo input
-                OutlinedTextField(
-                    value = memo,
-                    onValueChange = { memo = it },
-                    label = { Text(stringResource(R.string.favorite_memo)) },
-                    placeholder = { Text(stringResource(R.string.favorite_memo_placeholder)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = false,
-                    maxLines = 3
-                )
+                    // Memo input
+                    OutlinedTextField(
+                        value = memo,
+                        onValueChange = { memo = it },
+                        label = { Text(stringResource(R.string.favorite_memo)) },
+                        placeholder = { Text(stringResource(R.string.favorite_memo_placeholder)) },
+                        modifier = Modifier.weight(1f),
+                        singleLine = false,
+                        maxLines = 3
+                    )
+                }
 
                 // Action buttons
                 Row(
@@ -274,6 +278,7 @@ fun CircleDetailView(
                                 }
                             },
                             enabled = !isSaving,
+                            modifier = Modifier.height(48.dp),
                             colors = ButtonDefaults.outlinedButtonColors(
                                 contentColor = MaterialTheme.colorScheme.error
                             )
@@ -284,7 +289,7 @@ fun CircleDetailView(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    // Save / Add button
+                    // Save / Add button (larger variant)
                     FilledTonalButton(
                         onClick = {
                             val token = authToken ?: return@FilledTonalButton
@@ -301,16 +306,21 @@ fun CircleDetailView(
                                 isEditing = false
                             }
                         },
-                        enabled = !isSaving
+                        enabled = !isSaving,
+                        modifier = Modifier.height(48.dp),
+                        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 0.dp)
                     ) {
                         if (isSaving) {
                             CircularProgressIndicator(
-                                modifier = Modifier.size(16.dp),
+                                modifier = Modifier.size(18.dp),
                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                         }
-                        Text(stringResource(R.string.save))
+                        Text(
+                            stringResource(R.string.save),
+                            style = MaterialTheme.typography.titleSmall
+                        )
                     }
                 }
             }

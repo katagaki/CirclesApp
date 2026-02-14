@@ -57,6 +57,7 @@
     <!-- More Menu -->
     <string name="comic_market_format">Comic Market %1$d</string>
     <string name="more">More</string>
+    <string name="show_genre_overlay">Show Genre Overlay</string>
 
     <!-- Toolbar Filters -->
     <string name="genre_filter">Genre</string>

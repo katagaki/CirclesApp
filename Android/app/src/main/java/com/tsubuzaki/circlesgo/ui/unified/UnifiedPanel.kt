@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.tsubuzaki.circlesgo.R
+import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
+import com.tsubuzaki.circlesgo.auth.Authenticator
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.state.CatalogCache
 import com.tsubuzaki.circlesgo.state.FavoritesState
@@ -20,8 +22,6 @@ import com.tsubuzaki.circlesgo.state.Mapper
 import com.tsubuzaki.circlesgo.state.UnifiedPath
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
-import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
-import com.tsubuzaki.circlesgo.auth.Authenticator
 import com.tsubuzaki.circlesgo.ui.catalog.CatalogView
 import com.tsubuzaki.circlesgo.ui.circledetail.CircleDetailView
 import com.tsubuzaki.circlesgo.ui.favorites.FavoritesView

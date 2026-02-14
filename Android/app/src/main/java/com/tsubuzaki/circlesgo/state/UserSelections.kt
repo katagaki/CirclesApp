@@ -18,6 +18,7 @@ class UserSelections(context: Context) {
         private const val SELECTED_MAP_KEY = "Circles.SelectedMapID"
         private const val SELECTED_BLOCKS_KEY = "Circles.SelectedBlockIDs"
         private const val SELECTED_GENRES_KEY = "Circles.SelectedGenreIDs"
+        private const val SHOW_GENRE_OVERLAY_KEY = "Circles.ShowGenreOverlay"
     }
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -33,6 +34,16 @@ class UserSelections(context: Context) {
 
     private val _genres = MutableStateFlow<Set<ComiketGenre>>(emptySet())
     val genres: StateFlow<Set<ComiketGenre>> = _genres
+
+    private val _showGenreOverlay = MutableStateFlow(
+        prefs.getBoolean(SHOW_GENRE_OVERLAY_KEY, false)
+    )
+    val showGenreOverlay: StateFlow<Boolean> = _showGenreOverlay
+
+    fun setShowGenreOverlay(show: Boolean) {
+        _showGenreOverlay.value = show
+        prefs.edit { putBoolean(SHOW_GENRE_OVERLAY_KEY, show) }
+    }
 
     fun setDate(date: ComiketDate?) {
         if (_date.value != date) {

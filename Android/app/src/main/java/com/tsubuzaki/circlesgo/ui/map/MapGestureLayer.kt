@@ -21,6 +21,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
 import com.tsubuzaki.circlesgo.database.tables.LayoutCatalogMapping
 import com.tsubuzaki.circlesgo.database.types.LayoutType
@@ -39,7 +40,7 @@ fun MapGestureLayer(
     onZoomChange: (Float) -> Unit,
     scrollToPosition: PointF?,
     onScrollCompleted: () -> Unit,
-    popoverContent: @Composable (Offset, Float) -> Unit = { _, _ -> },
+    popoverContent: @Composable (Offset, Float, DpSize) -> Unit = { _, _, _ -> },
     content: @Composable () -> Unit
 ) {
     var currentZoom by remember { mutableFloatStateOf(zoomScale) }
@@ -147,5 +148,8 @@ fun MapGestureLayer(
         }
     }
 
-    popoverContent(offset, currentZoom)
+    val viewportDpSize = with(density) {
+        DpSize(viewportSize.width.toDp(), viewportSize.height.toDp())
+    }
+    popoverContent(offset, currentZoom, viewportDpSize)
 }
