@@ -85,6 +85,10 @@ class Unifier {
         _isSearchActive.value = value
     }
 
+    fun hasSheetContent(): Boolean {
+        return _sheetPath.value.isNotEmpty()
+    }
+
     fun toggleSidebarPosition() {
         _sidebarPosition.value = if (_sidebarPosition.value == SidebarPosition.LEADING) {
             SidebarPosition.TRAILING

@@ -283,7 +283,7 @@ fun CircleDetailView(
                                 contentColor = MaterialTheme.colorScheme.error
                             )
                         ) {
-                            Text(stringResource(R.string.remove))
+                            Text(stringResource(R.string.remove_from_favorites))
                         }
                     }
 
@@ -318,7 +318,7 @@ fun CircleDetailView(
                             Spacer(modifier = Modifier.width(8.dp))
                         }
                         Text(
-                            stringResource(R.string.save),
+                            stringResource(R.string.add_to_favorites),
                             style = MaterialTheme.typography.titleSmall
                         )
                     }
