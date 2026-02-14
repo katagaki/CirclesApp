@@ -156,7 +156,7 @@ fun MapView(
     if (currentMapImage != null) {
         Box(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .background(MaterialTheme.colorScheme.background)
                 .statusBarsPadding()
                 .fillMaxSize(),
         ) {
