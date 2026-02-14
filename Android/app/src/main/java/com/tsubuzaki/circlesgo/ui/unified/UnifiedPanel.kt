@@ -58,7 +58,8 @@ fun UnifiedPanel(
                 favorites = favorites,
                 unifier = unifier,
                 favoritesAPI = favoritesAPI,
-                authenticator = authenticator
+                authenticator = authenticator,
+                selections = selections
             )
         } else {
             // Tab row: Circles / Favorites

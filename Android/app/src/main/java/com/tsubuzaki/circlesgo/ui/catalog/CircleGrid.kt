@@ -36,7 +36,8 @@ fun CircleGrid(
     showsOverlayWhenEmpty: Boolean = true,
     isLoadingMore: Boolean = false,
     onSelect: (ComiketCircle) -> Unit,
-    onLoadMore: () -> Unit = {}
+    onLoadMore: () -> Unit = {},
+    isPrivacyMode: Boolean = false
 ) {
     val minSize = when (displayMode) {
         GridDisplayMode.BIG -> 110.dp
@@ -82,7 +83,8 @@ fun CircleGrid(
                         favorites = favorites,
                         displayMode = displayMode,
                         showSpaceName = showSpaceName,
-                        showDay = showDay
+                        showDay = showDay,
+                        isPrivacyMode = isPrivacyMode
                     )
                 }
             }

@@ -74,6 +74,18 @@ fun UnifiedMoreMenu(
                 )
             }
         )
+        // Privacy Mode toggle
+        val isPrivacyMode by selections.isPrivacyMode.collectAsState()
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.privacy_mode)) },
+            onClick = { selections.setIsPrivacyMode(!isPrivacyMode) },
+            trailingIcon = {
+                Switch(
+                    checked = isPrivacyMode,
+                    onCheckedChange = { selections.setIsPrivacyMode(it) }
+                )
+            }
+        )
         HorizontalDivider()
         DropdownMenuItem(
             text = { Text(stringResource(R.string.sign_out)) },

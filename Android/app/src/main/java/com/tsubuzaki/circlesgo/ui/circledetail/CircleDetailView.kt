@@ -66,6 +66,7 @@ import com.tsubuzaki.circlesgo.database.DataFetcher
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.Unifier
+import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.ui.shared.CircleBlockPill
 import com.tsubuzaki.circlesgo.ui.shared.CircleBlockPillSize
 import com.tsubuzaki.circlesgo.ui.shared.CircleCutImage
@@ -79,7 +80,8 @@ fun CircleDetailView(
     favorites: FavoritesState,
     unifier: Unifier,
     favoritesAPI: FavoritesAPI,
-    authenticator: Authenticator
+    authenticator: Authenticator,
+    selections: UserSelections
 ) {
     val context = LocalContext.current
     val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
@@ -341,10 +343,12 @@ fun CircleDetailView(
                     .width(120.dp)
                     .height(172.dp)
             ) {
+                val isPrivacyMode by selections.isPrivacyMode.collectAsState()
                 CircleCutImage(
                     circle = circle,
                     database = database,
-                    favorites = favorites
+                    favorites = favorites,
+                    isPrivacyMode = isPrivacyMode
                 )
             }
 

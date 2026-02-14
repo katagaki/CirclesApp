@@ -60,6 +60,7 @@
     <string name="show_genre_overlay">ジャンルを表示</string>
 
     <!-- Toolbar Filters -->
+    <string name="privacy_mode">プライバシーモード</string>
     <string name="genre_filter">ジャンル</string>
     <string name="genres_count_format">ジャンル（%1$d）</string>
     <string name="block_filter">ブロック</string>
@@ -71,10 +72,14 @@
     <string name="no_hall">棟なし</string>
 
     <!-- Toolbar -->
+    <string name="loading_database">データを読み込み中…</string>
     <string name="show_catalog">カタログを表示</string>
     <string name="hide_catalog">カタログを非表示</string>
 
     <!-- Map -->
     <string name="loading">読み込み中…</string>
     <string name="no_map_selected">表示できるマップがありません</string>
+    <string name="downloading">データ更新中</string>
+    <string name="downloading_text_database">イベントデータをダウンロード中…</string>
+    <string name="downloading_image_database">画像データをダウンロード中…</string>
 </resources>

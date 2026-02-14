@@ -39,7 +39,8 @@ fun CircleList(
     showsOverlayWhenEmpty: Boolean = true,
     isLoadingMore: Boolean = false,
     onSelect: (ComiketCircle) -> Unit,
-    onLoadMore: () -> Unit = {}
+    onLoadMore: () -> Unit = {},
+    isPrivacyMode: Boolean = false
 ) {
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
 
@@ -73,7 +74,8 @@ fun CircleList(
                             favorites = favorites,
                             showSpaceName = showSpaceName,
                             showDay = showDay,
-                            onClick = { onSelect(circle) }
+                            onClick = { onSelect(circle) },
+                            isPrivacyMode = isPrivacyMode
                         )
                         HorizontalDivider(
                             modifier = Modifier.padding(start = 100.dp)
@@ -87,7 +89,8 @@ fun CircleList(
                             favorites = favorites,
                             showSpaceName = showSpaceName,
                             showDay = showDay,
-                            onClick = { onSelect(circle) }
+                            onClick = { onSelect(circle) },
+                            isPrivacyMode = isPrivacyMode
                         )
                         HorizontalDivider(
                             modifier = Modifier.padding(start = 58.dp)
@@ -136,7 +139,8 @@ fun CircleListRegularRow(
     favorites: FavoritesState,
     showSpaceName: Boolean,
     showDay: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isPrivacyMode: Boolean = false
 ) {
     Row(
         modifier = Modifier
@@ -153,7 +157,8 @@ fun CircleListRegularRow(
             CircleCutImage(
                 circle = circle,
                 database = database,
-                favorites = favorites
+                favorites = favorites,
+                isPrivacyMode = isPrivacyMode
             )
         }
         Spacer(modifier = Modifier.width(10.dp))
@@ -194,7 +199,8 @@ fun CircleListCompactRow(
     favorites: FavoritesState,
     showSpaceName: Boolean,
     showDay: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isPrivacyMode: Boolean = false
 ) {
     Row(
         modifier = Modifier
@@ -211,7 +217,8 @@ fun CircleListCompactRow(
             CircleCutImage(
                 circle = circle,
                 database = database,
-                favorites = favorites
+                favorites = favorites,
+                isPrivacyMode = isPrivacyMode
             )
         }
         Spacer(modifier = Modifier.width(10.dp))

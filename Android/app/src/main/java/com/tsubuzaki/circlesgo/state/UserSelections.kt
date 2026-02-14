@@ -19,6 +19,7 @@ class UserSelections(context: Context) {
         private const val SELECTED_BLOCKS_KEY = "Circles.SelectedBlockIDs"
         private const val SELECTED_GENRES_KEY = "Circles.SelectedGenreIDs"
         private const val SHOW_GENRE_OVERLAY_KEY = "Circles.ShowGenreOverlay"
+        private const val PRIVACY_MODE_KEY = "Circles.PrivacyMode"
     }
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -40,9 +41,19 @@ class UserSelections(context: Context) {
     )
     val showGenreOverlay: StateFlow<Boolean> = _showGenreOverlay
 
+    private val _isPrivacyMode = MutableStateFlow(
+        prefs.getBoolean(PRIVACY_MODE_KEY, false)
+    )
+    val isPrivacyMode: StateFlow<Boolean> = _isPrivacyMode
+
     fun setShowGenreOverlay(show: Boolean) {
         _showGenreOverlay.value = show
         prefs.edit { putBoolean(SHOW_GENRE_OVERLAY_KEY, show) }
+    }
+
+    fun setIsPrivacyMode(enabled: Boolean) {
+        _isPrivacyMode.value = enabled
+        prefs.edit { putBoolean(PRIVACY_MODE_KEY, enabled) }
     }
 
     fun setDate(date: ComiketDate?) {

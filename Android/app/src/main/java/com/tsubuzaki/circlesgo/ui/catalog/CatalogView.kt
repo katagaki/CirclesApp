@@ -119,6 +119,7 @@ fun CatalogView(
     }
 
     // Search bar
+    val isPrivacyMode by selections.isPrivacyMode.collectAsState()
     SearchBar(
         modifier = Modifier
             .fillMaxWidth()
@@ -179,7 +180,8 @@ fun CatalogView(
                     unifier.showCircleDetail(circle)
                 },
                 onLoadMore = onLoadMore,
-                isLoadingMore = isCurrentlyLoadingMore
+                isLoadingMore = isCurrentlyLoadingMore,
+                isPrivacyMode = isPrivacyMode
             )
         } else if (searchTerm.isNotEmpty()) {
             Box(
@@ -236,7 +238,8 @@ fun CatalogView(
                             unifier.showCircleDetail(circle)
                         },
                         onLoadMore = onLoadMore,
-                        isLoadingMore = isCurrentlyLoadingMore
+                        isLoadingMore = isCurrentlyLoadingMore,
+                        isPrivacyMode = isPrivacyMode
                     )
                 }
             }

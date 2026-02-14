@@ -1,8 +1,8 @@
 package com.tsubuzaki.circlesgo.ui.unified
 
-import androidx.activity.compose.BackHandler
 import android.os.Build
 import android.view.RoundedCorner
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -180,7 +180,10 @@ fun UnifiedView(
                     authenticator = authenticator
                 )
             },
-            sheetShape = RoundedCornerShape(topStart = deviceCornerRadius, topEnd = deviceCornerRadius),
+            sheetShape = RoundedCornerShape(
+                topStart = deviceCornerRadius,
+                topEnd = deviceCornerRadius
+            ),
             sheetShadowElevation = 16.dp,
             sheetSwipeEnabled = scaffoldState.bottomSheetState.currentValue != SheetValue.Hidden
         ) { innerPadding ->

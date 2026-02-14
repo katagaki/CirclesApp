@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +44,7 @@ import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.Mapper
 import com.tsubuzaki.circlesgo.state.PopoverData
+import com.tsubuzaki.circlesgo.state.UserSelections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -55,6 +57,7 @@ fun MapPopoverLayer(
     mapper: Mapper,
     database: CatalogDatabase,
     favorites: FavoritesState,
+    selections: UserSelections,
     onCircleTapped: (ComiketCircle) -> Unit
 ) {
     var circles by remember { mutableStateOf<List<ComiketCircle>?>(null) }
@@ -133,11 +136,13 @@ fun MapPopoverLayer(
                                     .width(40.dp)
                                     .height(57.dp)
                             ) {
+                                val isPrivacyMode by selections.isPrivacyMode.collectAsState()
                                 com.tsubuzaki.circlesgo.ui.shared.CircleCutImage(
                                     circle = circle,
                                     database = database,
                                     favorites = favorites,
-                                    displayMode = com.tsubuzaki.circlesgo.state.GridDisplayMode.SMALL
+                                    displayMode = com.tsubuzaki.circlesgo.state.GridDisplayMode.SMALL,
+                                    isPrivacyMode = isPrivacyMode
                                 )
                             }
                             Spacer(modifier = Modifier.width(8.dp))

@@ -17,6 +17,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.asImageBitmap
@@ -38,7 +39,8 @@ fun CircleCutImage(
     favorites: FavoritesState,
     displayMode: GridDisplayMode = GridDisplayMode.MEDIUM,
     showSpaceName: Boolean = false,
-    showDay: Boolean = false
+    showDay: Boolean = false,
+    isPrivacyMode: Boolean = false
 ) {
     val cachedBitmap = remember(circle.id) {
         database.cachedCircleImage(circle.id)?.asImageBitmap()
@@ -65,7 +67,11 @@ fun CircleCutImage(
                 bitmap = currentBitmap,
                 contentDescription = circle.circleName,
                 contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .then(
+                        if (isPrivacyMode) Modifier.blur(16.dp) else Modifier
+                    )
             )
         } else {
             // No image available placeholder

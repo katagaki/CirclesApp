@@ -197,6 +197,7 @@ fun MapView(
                             mapper = mapper,
                             database = database,
                             favorites = favorites,
+                            selections = selections,
                             onCircleTapped = onCircleTapped
                         )
                     }

@@ -58,6 +58,7 @@
     <string name="comic_market_format">Comic Market %1$d</string>
     <string name="more">More</string>
     <string name="show_genre_overlay">Show Genre Overlay</string>
+    <string name="privacy_mode">Privacy Mode</string>
 
     <!-- Toolbar Filters -->
     <string name="genre_filter">Genre</string>
@@ -71,10 +72,10 @@
     <string name="no_hall">No hall</string>
 
     <!-- Data Loading -->
-    <string name="downloading">Downloading</string>
+    <string name="downloading">Updating Data</string>
     <string name="downloading_text_database">Downloading text database…</string>
-    <string name="downloading_image_database">Downloading image database…</string>
-    <string name="loading_database">Loading database…</string>
+    <string name="downloading_image_database">Downloading images…</string>
+    <string name="loading_database">Loading data…</string>
 
     <!-- Toolbar -->
     <string name="show_catalog">Show catalog</string>

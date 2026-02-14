@@ -28,7 +28,8 @@ fun ColorGroupedCircleList(
     showSpaceName: Boolean = false,
     showDay: Boolean = false,
     showsOverlayWhenEmpty: Boolean = true,
-    onSelect: (ComiketCircle) -> Unit
+    onSelect: (ComiketCircle) -> Unit,
+    isPrivacyMode: Boolean = false
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
@@ -49,7 +50,8 @@ fun ColorGroupedCircleList(
                                     favorites = favorites,
                                     showSpaceName = showSpaceName,
                                     showDay = showDay,
-                                    onClick = { onSelect(circle) }
+                                    onClick = { onSelect(circle) },
+                                    isPrivacyMode = isPrivacyMode
                                 )
                             }
                             HorizontalDivider(
@@ -67,7 +69,8 @@ fun ColorGroupedCircleList(
                                     favorites = favorites,
                                     showSpaceName = showSpaceName,
                                     showDay = showDay,
-                                    onClick = { onSelect(circle) }
+                                    onClick = { onSelect(circle) },
+                                    isPrivacyMode = isPrivacyMode
                                 )
                             }
                             HorizontalDivider(
