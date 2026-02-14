@@ -33,7 +33,7 @@ class CatalogDatabase(private val context: Context) {
     private var textDatabaseFile: File? = null
     private var imageDatabaseFile: File? = null
 
-    private val commonImages = mutableMapOf<String, ByteArray>()
+    private val commonImages = java.util.concurrent.ConcurrentHashMap<String, ByteArray>()
 
     private val imageCache: LruCache<String, Bitmap> = run {
         val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()

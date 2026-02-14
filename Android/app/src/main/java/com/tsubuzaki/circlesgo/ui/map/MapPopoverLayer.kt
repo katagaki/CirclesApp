@@ -2,6 +2,7 @@ package com.tsubuzaki.circlesgo.ui.map
 
 import android.graphics.PointF
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -82,10 +83,21 @@ fun MapPopoverLayer(
         zoomScale = zoomScale
     )
 
+    var visible by remember(popoverData.id) { mutableStateOf(false) }
+    LaunchedEffect(popoverData.id) {
+        visible = true
+    }
+
     AnimatedVisibility(
-        visible = true,
-        enter = fadeIn() + scaleIn(initialScale = 0.3f),
-        exit = fadeOut() + scaleOut(targetScale = 0.3f)
+        visible = visible,
+        enter = fadeIn(animationSpec = tween(200)) + scaleIn(
+            initialScale = 0.8f,
+            animationSpec = tween(250)
+        ),
+        exit = fadeOut(animationSpec = tween(150)) + scaleOut(
+            targetScale = 0.8f,
+            animationSpec = tween(150)
+        )
     ) {
         Box(
             modifier = Modifier

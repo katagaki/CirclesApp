@@ -54,6 +54,7 @@ fun MapView(
     val canvasWidth by mapper.canvasWidth.collectAsState()
     val canvasHeight by mapper.canvasHeight.collectAsState()
     val favoriteItems by favorites.wcIDMappedItems.collectAsState()
+    val commonImagesLoadCount by database.commonImagesLoadCount.collectAsState()
 
     var mapImage by remember { mutableStateOf<Bitmap?>(null) }
     var genreImage by remember { mutableStateOf<Bitmap?>(null) }
@@ -61,8 +62,8 @@ fun MapView(
 
     val spaceSize = if (useHighResolutionMaps) 40 else 20
 
-    // Reload map image when selection changes
-    LaunchedEffect(selectedDate, selectedMap) {
+    // Reload map image when selection changes or when common images finish loading
+    LaunchedEffect(selectedDate, selectedMap, commonImagesLoadCount) {
         val date = selectedDate
         val map = selectedMap
         if (date != null && map != null) {
