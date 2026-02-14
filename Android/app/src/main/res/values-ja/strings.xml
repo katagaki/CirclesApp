@@ -57,7 +57,7 @@
     <!-- More Menu -->
     <string name="comic_market_format">コミックマーケット%1$d</string>
     <string name="more">その他</string>
-    <string name="show_genre_overlay">ジャンルオーバーレイを表示</string>
+    <string name="show_genre_overlay">ジャンルを表示</string>
 
     <!-- Toolbar Filters -->
     <string name="genre_filter">ジャンル</string>
