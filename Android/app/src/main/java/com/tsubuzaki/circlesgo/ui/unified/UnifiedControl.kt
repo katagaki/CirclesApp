@@ -77,12 +77,13 @@ private fun DatePickerButton(
                 Text(
                     text = stringResource(R.string.day_format, date.id),
                     style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
                 Text(
                     text = dateFormatter.format(date.date),
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSecondary
                 )
             } ?: Text(stringResource(R.string.no_day))
         }
