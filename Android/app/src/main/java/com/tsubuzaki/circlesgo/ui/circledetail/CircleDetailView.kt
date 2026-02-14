@@ -2,10 +2,14 @@ package com.tsubuzaki.circlesgo.ui.circledetail
 
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,20 +19,29 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +49,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
@@ -45,6 +59,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.tsubuzaki.circlesgo.R
+import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
+import com.tsubuzaki.circlesgo.api.catalog.WebCatalogColor
+import com.tsubuzaki.circlesgo.auth.Authenticator
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.DataFetcher
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
@@ -56,17 +73,43 @@ import com.tsubuzaki.circlesgo.ui.shared.CircleCutImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun CircleDetailView(
     circle: ComiketCircle,
     database: CatalogDatabase,
     favorites: FavoritesState,
-    unifier: Unifier
+    unifier: Unifier,
+    favoritesAPI: FavoritesAPI,
+    authenticator: Authenticator
 ) {
     val context = LocalContext.current
     val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
     val scope = rememberCoroutineScope()
     var genre by remember { mutableStateOf<String?>(null) }
+
+    // Favorite state
+    val wcIDMappedItems by favorites.wcIDMappedItems.collectAsState()
+    val authToken by authenticator.token.collectAsState()
+    val webCatalogID = circle.extendedInformation?.webCatalogID
+
+    val existingFavorite = webCatalogID?.let { wcIDMappedItems?.get(it) }
+    val isFavorited = existingFavorite != null
+
+    var isEditing by remember { mutableStateOf(false) }
+    var selectedColor by remember {
+        mutableStateOf(
+            existingFavorite?.favorite?.webCatalogColor() ?: WebCatalogColor.ORANGE
+        )
+    }
+    var memo by remember { mutableStateOf(existingFavorite?.favorite?.memo ?: "") }
+    var isSaving by remember { mutableStateOf(false) }
+
+    // Update editing state when favorite data changes
+    LaunchedEffect(existingFavorite) {
+        selectedColor = existingFavorite?.favorite?.webCatalogColor() ?: WebCatalogColor.ORANGE
+        memo = existingFavorite?.favorite?.memo ?: ""
+    }
 
     // Fetch genre name
     LaunchedEffect(circle.genreID) {
@@ -117,6 +160,162 @@ fun CircleDetailView(
                     )
                 }
             }
+            // Favorite toggle button in toolbar
+            if (webCatalogID != null) {
+                IconButton(onClick = { isEditing = !isEditing }) {
+                    if (isFavorited) {
+                        val favoriteColor =
+                            existingFavorite.favorite.webCatalogColor()?.backgroundColor()
+                                ?: MaterialTheme.colorScheme.primary
+                        Icon(
+                            imageVector = Icons.Filled.Favorite,
+                            contentDescription = stringResource(R.string.edit_favorite),
+                            tint = favoriteColor
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Filled.FavoriteBorder,
+                            contentDescription = stringResource(R.string.add_to_favorites),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            }
+        }
+
+        // Favorite editing section
+        if (isEditing && webCatalogID != null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text(
+                    text = if (isFavorited) stringResource(R.string.edit_favorite)
+                    else stringResource(R.string.add_to_favorites),
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold
+                )
+
+                // Color picker
+                Text(
+                    text = stringResource(R.string.favorite_color),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    WebCatalogColor.entries.forEach { color ->
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(color.backgroundColor())
+                                .then(
+                                    if (color == selectedColor) {
+                                        Modifier.border(
+                                            3.dp,
+                                            MaterialTheme.colorScheme.onSurface,
+                                            CircleShape
+                                        )
+                                    } else {
+                                        Modifier
+                                    }
+                                )
+                                .clickable { selectedColor = color },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (color == selectedColor) {
+                                Icon(
+                                    imageVector = Icons.Filled.Check,
+                                    contentDescription = null,
+                                    tint = color.foregroundColor(),
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Memo input
+                OutlinedTextField(
+                    value = memo,
+                    onValueChange = { memo = it },
+                    label = { Text(stringResource(R.string.favorite_memo)) },
+                    placeholder = { Text(stringResource(R.string.favorite_memo_placeholder)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = false,
+                    maxLines = 3
+                )
+
+                // Action buttons
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Remove button (only if already favorited)
+                    if (isFavorited) {
+                        OutlinedButton(
+                            onClick = {
+                                val token = authToken ?: return@OutlinedButton
+                                isSaving = true
+                                scope.launch(Dispatchers.IO) {
+                                    val success = favoritesAPI.delete(webCatalogID, token)
+                                    if (success) {
+                                        val (items, wcIDMapped) = favoritesAPI.all(token)
+                                        favorites.setItems(items)
+                                        favorites.setWcIDMappedItems(wcIDMapped)
+                                    }
+                                    isSaving = false
+                                    isEditing = false
+                                }
+                            },
+                            enabled = !isSaving,
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                contentColor = MaterialTheme.colorScheme.error
+                            )
+                        ) {
+                            Text(stringResource(R.string.remove))
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    // Save / Add button
+                    FilledTonalButton(
+                        onClick = {
+                            val token = authToken ?: return@FilledTonalButton
+                            isSaving = true
+                            scope.launch(Dispatchers.IO) {
+                                val success =
+                                    favoritesAPI.add(webCatalogID, selectedColor, memo, token)
+                                if (success) {
+                                    val (items, wcIDMapped) = favoritesAPI.all(token)
+                                    favorites.setItems(items)
+                                    favorites.setWcIDMappedItems(wcIDMapped)
+                                }
+                                isSaving = false
+                                isEditing = false
+                            }
+                        },
+                        enabled = !isSaving
+                    ) {
+                        if (isSaving) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
+                        Text(stringResource(R.string.save))
+                    }
+                }
+            }
+
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
         }
 
         // Hero section: cut image + info

@@ -36,6 +36,14 @@
     <string name="group_by_color">Group by Color</string>
     <string name="no_favorites_loaded">No favorites loaded.\nSign in and sync to view favorites.</string>
     <string name="no_favorites_yet">No favorites yet.\nAdd favorites from the web catalog.</string>
+    <string name="add_to_favorites">Add to Favorites</string>
+    <string name="edit_favorite">Edit Favorite</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
+    <string name="favorite_color">Color</string>
+    <string name="favorite_memo">Memo</string>
+    <string name="favorite_memo_placeholder">Add a memo…</string>
+    <string name="save">Save</string>
+    <string name="remove">Remove</string>
 
     <!-- Navigation / Tabs -->
     <string name="tab_circles">Circles</string>

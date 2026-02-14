@@ -125,6 +125,8 @@ class MainActivity : ComponentActivity() {
                             favorites = favorites,
                             catalogCache = catalogCache,
                             oasis = oasis,
+                            favoritesAPI = favoritesAPI,
+                            authenticator = auth,
                             onLogout = {
                                 hasTriggeredInitialLoad = false
                                 database.delete()

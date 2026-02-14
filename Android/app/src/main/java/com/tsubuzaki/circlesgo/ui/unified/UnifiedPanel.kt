@@ -20,6 +20,8 @@ import com.tsubuzaki.circlesgo.state.Mapper
 import com.tsubuzaki.circlesgo.state.UnifiedPath
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
+import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
+import com.tsubuzaki.circlesgo.auth.Authenticator
 import com.tsubuzaki.circlesgo.ui.catalog.CatalogView
 import com.tsubuzaki.circlesgo.ui.circledetail.CircleDetailView
 import com.tsubuzaki.circlesgo.ui.favorites.FavoritesView
@@ -32,7 +34,9 @@ fun UnifiedPanel(
     favorites: FavoritesState,
     selections: UserSelections,
     mapper: Mapper,
-    catalogCache: CatalogCache
+    catalogCache: CatalogCache,
+    favoritesAPI: FavoritesAPI,
+    authenticator: Authenticator
 ) {
     val currentPath by unifier.currentPath.collectAsState()
     val sheetPath by unifier.sheetPath.collectAsState()
@@ -52,7 +56,9 @@ fun UnifiedPanel(
                 circle = selectedCircle!!,
                 database = database,
                 favorites = favorites,
-                unifier = unifier
+                unifier = unifier,
+                favoritesAPI = favoritesAPI,
+                authenticator = authenticator
             )
         } else {
             // Tab row: Circles / Favorites
