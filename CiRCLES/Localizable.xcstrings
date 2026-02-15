@@ -1837,31 +1837,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Show Hall and Block"
+            "value" : "Show Space Number"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "棟とブロックを表示"
+            "value" : "スペース番号を表示"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "홀 및 블록 표시"
+            "value" : "공간 번호 표시"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "显示场馆和区块"
+            "value" : "显示场地编号"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "顯示場館和區塊"
+            "value" : "顯示場地編號"
           }
         }
       }
