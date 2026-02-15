@@ -45,6 +45,7 @@ import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.Mapper
 import com.tsubuzaki.circlesgo.state.PopoverData
 import com.tsubuzaki.circlesgo.state.UserSelections
+import com.tsubuzaki.circlesgo.ui.shared.CircleCutImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -112,13 +113,14 @@ fun MapPopoverLayer(
                 }
                 .width(mapper.popoverWidth.dp)
                 .height(IntrinsicSize.Min)
-                .shadow(8.dp, RoundedCornerShape(12.dp))
-                .clip(RoundedCornerShape(12.dp))
+                .shadow(4.dp, RoundedCornerShape(4.dp))
+                .clip(RoundedCornerShape(4.dp))
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(16.dp)
         ) {
             Column(
                 modifier = Modifier
+                    .height(130.dp)
                     .fillMaxWidth()
             ) {
                 val currentCircles = circles
@@ -137,7 +139,7 @@ fun MapPopoverLayer(
                                     .height(57.dp)
                             ) {
                                 val isPrivacyMode by selections.isPrivacyMode.collectAsState()
-                                com.tsubuzaki.circlesgo.ui.shared.CircleCutImage(
+                                CircleCutImage(
                                     circle = circle,
                                     database = database,
                                     favorites = favorites,
