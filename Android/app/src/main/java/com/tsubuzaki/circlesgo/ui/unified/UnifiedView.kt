@@ -104,6 +104,15 @@ fun UnifiedView(
         }
     }
 
+    // Open bottom sheet to standard size when circle detail is pushed (e.g. from map popover)
+    LaunchedEffect(sheetPath) {
+        if (sheetPath.lastOrNull() == UnifiedPath.CIRCLE_DETAIL
+            && bottomSheetState.currentValue == SheetValue.Hidden
+        ) {
+            bottomSheetState.partialExpand()
+        }
+    }
+
     // Handle system back gesture: navigate within the bottom sheet before closing the app
     val sheetValue = scaffoldState.bottomSheetState.currentValue
     BackHandler(
