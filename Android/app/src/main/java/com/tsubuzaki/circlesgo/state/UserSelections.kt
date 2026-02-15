@@ -23,6 +23,7 @@ class UserSelections(context: Context) {
         private const val CIRCLE_DISPLAY_MODE_KEY = "Circles.DisplayMode"
         private const val SHOW_SPACE_NAME_KEY = "Circles.ShowSpaceName"
         private const val SHOW_DAY_KEY = "Circles.ShowDay"
+        private const val DARKEN_MAP_IN_DARK_MODE_KEY = "Circles.DarkenMapInDarkMode"
     }
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -59,6 +60,11 @@ class UserSelections(context: Context) {
     )
     val showDay: StateFlow<Boolean> = _showDay
 
+    private val _darkenMapInDarkMode = MutableStateFlow(
+        prefs.getBoolean(DARKEN_MAP_IN_DARK_MODE_KEY, true)
+    )
+    val darkenMapInDarkMode: StateFlow<Boolean> = _darkenMapInDarkMode
+
     private val _displayMode = MutableStateFlow(
         CircleDisplayMode.entries.find {
             it.value == prefs.getInt(CIRCLE_DISPLAY_MODE_KEY, CircleDisplayMode.GRID.value)
@@ -74,6 +80,11 @@ class UserSelections(context: Context) {
     fun setShowDay(show: Boolean) {
         _showDay.value = show
         prefs.edit { putBoolean(SHOW_DAY_KEY, show) }
+    }
+
+    fun setDarkenMapInDarkMode(enabled: Boolean) {
+        _darkenMapInDarkMode.value = enabled
+        prefs.edit { putBoolean(DARKEN_MAP_IN_DARK_MODE_KEY, enabled) }
     }
 
     fun setShowGenreOverlay(show: Boolean) {

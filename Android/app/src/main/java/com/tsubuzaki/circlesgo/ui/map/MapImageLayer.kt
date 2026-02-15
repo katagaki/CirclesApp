@@ -25,12 +25,14 @@ private val invertColorMatrix = ColorMatrix(
 fun MapImageLayer(
     bitmap: Bitmap,
     canvasWidth: Dp,
-    canvasHeight: Dp
+    canvasHeight: Dp,
+    darkenInDarkMode: Boolean = true
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val imageBitmap = bitmap.asImageBitmap()
 
-    val colorFilter = if (isDarkTheme) ColorFilter.colorMatrix(invertColorMatrix) else null
+    val colorFilter =
+        if (isDarkTheme && darkenInDarkMode) ColorFilter.colorMatrix(invertColorMatrix) else null
 
     Canvas(
         modifier = Modifier

@@ -55,6 +55,7 @@ fun MapView(
     val canvasHeight by mapper.canvasHeight.collectAsState()
     val favoriteItems by favorites.wcIDMappedItems.collectAsState()
     val commonImagesLoadCount by database.commonImagesLoadCount.collectAsState()
+    val darkenMapInDarkMode by selections.darkenMapInDarkMode.collectAsState()
 
     var mapImage by remember { mutableStateOf<Bitmap?>(null) }
     var genreImage by remember { mutableStateOf<Bitmap?>(null) }
@@ -208,7 +209,8 @@ fun MapView(
                     MapImageLayer(
                         bitmap = currentMapImage,
                         canvasWidth = canvasWidth,
-                        canvasHeight = canvasHeight
+                        canvasHeight = canvasHeight,
+                        darkenInDarkMode = darkenMapInDarkMode
                     )
 
                     // Layer 2: Favorites overlay
@@ -227,7 +229,8 @@ fun MapView(
                             MapImageLayer(
                                 bitmap = genre,
                                 canvasWidth = canvasWidth,
-                                canvasHeight = canvasHeight
+                                canvasHeight = canvasHeight,
+                                darkenInDarkMode = darkenMapInDarkMode
                             )
                         }
                     }

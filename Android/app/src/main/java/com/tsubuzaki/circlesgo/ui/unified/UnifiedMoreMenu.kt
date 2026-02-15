@@ -80,6 +80,19 @@ fun UnifiedMoreMenu(
             }
         )
 
+        // Darken map in dark mode toggle
+        val darkenMapInDarkMode by selections.darkenMapInDarkMode.collectAsState()
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.darken_map_in_dark_mode)) },
+            onClick = { selections.setDarkenMapInDarkMode(!darkenMapInDarkMode) },
+            trailingIcon = {
+                Switch(
+                    checked = darkenMapInDarkMode,
+                    onCheckedChange = { selections.setDarkenMapInDarkMode(it) }
+                )
+            }
+        )
+
         HorizontalDivider()
 
         // Show Space Name toggle
