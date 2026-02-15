@@ -6,12 +6,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.icons.outlined.Apartment
-import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.PhoneIphone
 import androidx.compose.material.icons.outlined.TableRestaurant
 import androidx.compose.material.icons.outlined.TheaterComedy
 import androidx.compose.material.icons.outlined.VisibilityOff
@@ -216,6 +214,28 @@ fun UnifiedMoreMenu(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Outlined.Code,
+                    contentDescription = null
+                )
+            },
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.link_ios_app)) },
+            onClick = {
+                expanded = false
+                val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                    .setToolbarColor(primaryColor)
+                    .build()
+                val customTabsIntent = CustomTabsIntent.Builder()
+                    .setDefaultColorSchemeParams(colorSchemeParams)
+                    .build()
+                customTabsIntent.launchUrl(
+                    context,
+                    "https://apps.apple.com/app/id6504527248".toUri()
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.PhoneIphone,
                     contentDescription = null
                 )
             },

@@ -67,6 +67,7 @@
     <string name="link_official_site">Official Comic Market Site</string>
     <string name="link_floor_map">Tokyo Big Sight Floor Map</string>
     <string name="link_source_code">Source Code</string>
+    <string name="link_ios_app">Preview iOS Version</string>
 
     <!-- Toolbar Filters -->
     <string name="genre_filter">Genre</string>

@@ -66,6 +66,7 @@
     <string name="link_official_site">コミックマーケット公式サイト</string>
     <string name="link_floor_map">東京ビッグサイト フロアマップ</string>
     <string name="link_source_code">ソースコード</string>
+    <string name="link_ios_app">iOS版をプレビュー</string>
 
     <!-- Toolbar Filters -->
     <string name="privacy_mode">プライバシーモード</string>
