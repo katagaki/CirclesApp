@@ -82,4 +82,6 @@
     <string name="downloading">データ更新中</string>
     <string name="downloading_text_database">イベントデータをダウンロード中…</string>
     <string name="downloading_image_database">画像データをダウンロード中…</string>
+    <string name="switch_to_list">リスト表示に切り替える</string>
+    <string name="switch_to_grid">グリッド表示に切り替える</string>
 </resources>

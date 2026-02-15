@@ -84,4 +84,6 @@
     <!-- Map -->
     <string name="loading">Loading…</string>
     <string name="no_map_selected">No map selected</string>
+    <string name="switch_to_list">Switch to List</string>
+    <string name="switch_to_grid">Switch to Grid</string>
 </resources>

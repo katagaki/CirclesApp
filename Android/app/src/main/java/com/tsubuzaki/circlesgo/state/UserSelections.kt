@@ -20,6 +20,7 @@ class UserSelections(context: Context) {
         private const val SELECTED_GENRES_KEY = "Circles.SelectedGenreIDs"
         private const val SHOW_GENRE_OVERLAY_KEY = "Circles.ShowGenreOverlay"
         private const val PRIVACY_MODE_KEY = "Circles.PrivacyMode"
+        private const val CIRCLE_DISPLAY_MODE_KEY = "Circles.DisplayMode"
     }
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -46,6 +47,13 @@ class UserSelections(context: Context) {
     )
     val isPrivacyMode: StateFlow<Boolean> = _isPrivacyMode
 
+    private val _displayMode = MutableStateFlow(
+        CircleDisplayMode.entries.find {
+            it.value == prefs.getInt(CIRCLE_DISPLAY_MODE_KEY, CircleDisplayMode.GRID.value)
+        } ?: CircleDisplayMode.GRID
+    )
+    val displayMode: StateFlow<CircleDisplayMode> = _displayMode
+
     fun setShowGenreOverlay(show: Boolean) {
         _showGenreOverlay.value = show
         prefs.edit { putBoolean(SHOW_GENRE_OVERLAY_KEY, show) }
@@ -56,12 +64,17 @@ class UserSelections(context: Context) {
         prefs.edit { putBoolean(PRIVACY_MODE_KEY, enabled) }
     }
 
+    fun setDisplayMode(mode: CircleDisplayMode) {
+        _displayMode.value = mode
+        prefs.edit { putInt(CIRCLE_DISPLAY_MODE_KEY, mode.value) }
+    }
+
     fun setDate(date: ComiketDate?) {
         if (_date.value != date) {
             _date.value = date
-            prefs.edit().putInt(SELECTED_DATE_KEY, date?.id ?: 0).apply()
+            prefs.edit { putInt(SELECTED_DATE_KEY, date?.id ?: 0) }
             _genres.value = emptySet()
-            prefs.edit().putStringSet(SELECTED_GENRES_KEY, emptySet()).apply()
+            prefs.edit { putStringSet(SELECTED_GENRES_KEY, emptySet()) }
             _blocks.value = emptySet()
             prefs.edit { putStringSet(SELECTED_BLOCKS_KEY, emptySet()) }
         }

@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Theaters
 import androidx.compose.material3.DropdownMenu
@@ -13,6 +15,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,6 +34,7 @@ import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.tables.ComiketBlock
 import com.tsubuzaki.circlesgo.database.tables.ComiketGenre
 import com.tsubuzaki.circlesgo.state.CatalogCache
+import com.tsubuzaki.circlesgo.state.CircleDisplayMode
 import com.tsubuzaki.circlesgo.state.UserSelections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -44,6 +48,7 @@ fun CatalogToolbar(
     val selectedDate by selections.date.collectAsState()
     val selectedGenres by selections.genres.collectAsState()
     val selectedBlocks by selections.blocks.collectAsState()
+    val displayMode by selections.displayMode.collectAsState()
 
     val allGenres = remember { database.genres() }
     val allBlocks = remember { database.blocks() }
@@ -120,6 +125,27 @@ fun CatalogToolbar(
             },
             onClearAll = { selections.setBlocks(emptySet()) }
         )
+        Spacer(modifier = Modifier.weight(1f))
+        IconButton(onClick = {
+            val newMode = if (displayMode == CircleDisplayMode.GRID) {
+                CircleDisplayMode.LIST
+            } else {
+                CircleDisplayMode.GRID
+            }
+            selections.setDisplayMode(newMode)
+        }) {
+            Icon(
+                imageVector = if (displayMode == CircleDisplayMode.GRID) {
+                    Icons.AutoMirrored.Filled.List
+                } else {
+                    Icons.Filled.GridView
+                },
+                contentDescription = stringResource(
+                    if (displayMode == CircleDisplayMode.GRID) R.string.switch_to_list
+                    else R.string.switch_to_grid
+                )
+            )
+        }
     }
 }
 

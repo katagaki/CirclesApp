@@ -35,8 +35,10 @@ import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.state.CatalogCache
+import com.tsubuzaki.circlesgo.state.CircleDisplayMode
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.GridDisplayMode
+import com.tsubuzaki.circlesgo.state.ListDisplayMode
 import com.tsubuzaki.circlesgo.state.Mapper
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
@@ -62,6 +64,7 @@ fun CatalogView(
     val selectedBlocks by selections.blocks.collectAsState()
     val selectedMap by selections.map.collectAsState()
     val selectedDate by selections.date.collectAsState()
+    val displayMode by selections.displayMode.collectAsState()
 
     // Search state
     var searchTerm by remember { mutableStateOf("") }
@@ -169,10 +172,24 @@ fun CatalogView(
     ) {
         // Search results view (shown when expanded)
         val currentSearched = searchedCircles
-        if (currentSearched != null) {
+        if (currentSearched != null && displayMode == CircleDisplayMode.GRID) {
             CircleGrid(
                 circles = currentSearched,
                 displayMode = GridDisplayMode.MEDIUM,
+                database = database,
+                favorites = favorites,
+                onSelect = { circle ->
+                    searchExpanded = false
+                    unifier.showCircleDetail(circle)
+                },
+                onLoadMore = onLoadMore,
+                isLoadingMore = isCurrentlyLoadingMore,
+                isPrivacyMode = isPrivacyMode
+            )
+        } else if (currentSearched != null) {
+            CircleList(
+                circles = currentSearched,
+                displayMode = ListDisplayMode.REGULAR,
                 database = database,
                 favorites = favorites,
                 onSelect = { circle ->
@@ -228,10 +245,23 @@ fun CatalogView(
                             modifier = Modifier.padding(16.dp)
                         )
                     }
-                } else {
+                } else if (displayMode == CircleDisplayMode.GRID) {
                     CircleGrid(
                         circles = displayedCircles,
                         displayMode = GridDisplayMode.MEDIUM,
+                        database = database,
+                        favorites = favorites,
+                        onSelect = { circle ->
+                            unifier.showCircleDetail(circle)
+                        },
+                        onLoadMore = onLoadMore,
+                        isLoadingMore = isCurrentlyLoadingMore,
+                        isPrivacyMode = isPrivacyMode
+                    )
+                } else {
+                    CircleList(
+                        circles = displayedCircles,
+                        displayMode = ListDisplayMode.REGULAR,
                         database = database,
                         favorites = favorites,
                         onSelect = { circle ->
@@ -246,6 +276,7 @@ fun CatalogView(
         }
     }
 }
+
 
 private suspend fun reloadDisplayedCircles(
     catalogCache: CatalogCache,
