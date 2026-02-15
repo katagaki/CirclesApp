@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.GridView
-import androidx.compose.material.icons.filled.Theaters
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.outlined.TableRows
+import androidx.compose.material.icons.outlined.TheaterComedy
+import androidx.compose.material.icons.outlined.ViewColumn
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -50,11 +52,10 @@ fun CatalogToolbar(
     val selectedBlocks by selections.blocks.collectAsState()
     val displayMode by selections.displayMode.collectAsState()
 
-    val allGenres = remember { database.genres() }
-    val allBlocks = remember { database.blocks() }
-
     val scope = rememberCoroutineScope()
 
+    var allGenres by remember { mutableStateOf(emptyList<ComiketGenre>()) }
+    var allBlocks by remember { mutableStateOf(emptyList<ComiketBlock>()) }
     var selectableGenres by remember { mutableStateOf<List<ComiketGenre>?>(null) }
     var selectableBlocks by remember { mutableStateOf<List<ComiketBlock>?>(null) }
 
@@ -64,8 +65,10 @@ fun CatalogToolbar(
         val dayID = selectedDate?.id
         if (mapID != null && dayID != null) {
             scope.launch(Dispatchers.IO) {
+                val freshGenres = database.genres()
+                allGenres = freshGenres
                 val genreIDs = CatalogCache.fetchGenreIDs(mapID, dayID, database)
-                selectableGenres = allGenres
+                selectableGenres = freshGenres
                     .filter { it.id in genreIDs }
                     .sortedBy { it.name }
             }
@@ -82,8 +85,10 @@ fun CatalogToolbar(
             val genreIDs = if (selectedGenres.isEmpty()) null
             else selectedGenres.map { it.id }
             scope.launch(Dispatchers.IO) {
+                val freshBlocks = database.blocks()
+                allBlocks = freshBlocks
                 val blockIDs = CatalogCache.fetchBlockIDs(mapID, dayID, genreIDs, database)
-                selectableBlocks = allBlocks
+                selectableBlocks = freshBlocks
                     .filter { it.id in blockIDs }
                     .sortedBy { it.name }
             }
@@ -136,9 +141,9 @@ fun CatalogToolbar(
         }) {
             Icon(
                 imageVector = if (displayMode == CircleDisplayMode.GRID) {
-                    Icons.AutoMirrored.Filled.List
+                    Icons.Outlined.TableRows
                 } else {
-                    Icons.Filled.GridView
+                    Icons.Outlined.GridView
                 },
                 contentDescription = stringResource(
                     if (displayMode == CircleDisplayMode.GRID) R.string.switch_to_list
@@ -161,7 +166,7 @@ private fun GenreFilterMenu(
     Box {
         TextButton(onClick = { expanded = true }) {
             Icon(
-                imageVector = Icons.Filled.Theaters,
+                imageVector = Icons.Outlined.TheaterComedy,
                 contentDescription = null,
                 modifier = Modifier.padding(end = 4.dp)
             )
@@ -186,15 +191,18 @@ private fun GenreFilterMenu(
                     onClearAll()
                 }
             )
+            HorizontalDivider()
             for (genre in genres) {
                 DropdownMenuItem(
                     text = {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(genre.name)
-                            if (selectedGenres.contains(genre)) {
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("✓", fontSize = 12.sp)
-                            }
+                        Text(genre.name)
+                    },
+                    trailingIcon = {
+                        if (selectedGenres.contains(genre)) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null
+                            )
                         }
                     },
                     onClick = { onGenreToggled(genre) }
@@ -216,7 +224,7 @@ private fun BlockFilterMenu(
     Box {
         TextButton(onClick = { expanded = true }) {
             Icon(
-                imageVector = Icons.Filled.Checklist,
+                imageVector = Icons.Outlined.ViewColumn,
                 contentDescription = null,
                 modifier = Modifier.padding(end = 4.dp)
             )
@@ -241,6 +249,7 @@ private fun BlockFilterMenu(
                     onClearAll()
                 }
             )
+            HorizontalDivider()
             for (block in blocks) {
                 DropdownMenuItem(
                     text = {
@@ -250,6 +259,14 @@ private fun BlockFilterMenu(
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text("✓", fontSize = 12.sp)
                             }
+                        }
+                    },
+                    trailingIcon = {
+                        if (selectedBlocks.contains(block)) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null
+                            )
                         }
                     },
                     onClick = { onBlockToggled(block) }
