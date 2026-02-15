@@ -8,8 +8,8 @@
       "Bash(jar tf:*)",
       "Bash(ls:*)",
       "WebFetch(domain:composables.com)",
-      "WebFetch(domain:m3.material.io)"
-      "WebSearch",
+      "WebFetch(domain:m3.material.io)",
+      "WebSearch"
     ]
   }
 }
