@@ -67,11 +67,13 @@ struct UnifiedMoreMenu: View {
                            get: { scrollType == .popover },
                            set: { scrollType = $0 ? .popover : .none }
                        ))
+            } header: {
+                Text("More.Customization.Map")
             }
             Section {
                 Toggle("More.Customization.Circles.ShowWebCut", systemImage: "text.rectangle.page",
                        isOn: $showWebCut)
-                Toggle("More.Customization.Circles.ShowHallAndBlock", systemImage: "building",
+                Toggle("More.Customization.Circles.ShowHallAndBlock", systemImage: "table.furniture",
                        isOn: $showSpaceName)
                 Toggle("More.Customization.Circles.ShowDay", systemImage: "calendar",
                        isOn: $showDay)
