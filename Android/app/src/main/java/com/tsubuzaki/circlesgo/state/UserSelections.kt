@@ -21,6 +21,8 @@ class UserSelections(context: Context) {
         private const val SHOW_GENRE_OVERLAY_KEY = "Circles.ShowGenreOverlay"
         private const val PRIVACY_MODE_KEY = "Circles.PrivacyMode"
         private const val CIRCLE_DISPLAY_MODE_KEY = "Circles.DisplayMode"
+        private const val SHOW_SPACE_NAME_KEY = "Circles.ShowSpaceName"
+        private const val SHOW_DAY_KEY = "Circles.ShowDay"
     }
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -47,12 +49,32 @@ class UserSelections(context: Context) {
     )
     val isPrivacyMode: StateFlow<Boolean> = _isPrivacyMode
 
+    private val _showSpaceName = MutableStateFlow(
+        prefs.getBoolean(SHOW_SPACE_NAME_KEY, false)
+    )
+    val showSpaceName: StateFlow<Boolean> = _showSpaceName
+
+    private val _showDay = MutableStateFlow(
+        prefs.getBoolean(SHOW_DAY_KEY, false)
+    )
+    val showDay: StateFlow<Boolean> = _showDay
+
     private val _displayMode = MutableStateFlow(
         CircleDisplayMode.entries.find {
             it.value == prefs.getInt(CIRCLE_DISPLAY_MODE_KEY, CircleDisplayMode.GRID.value)
         } ?: CircleDisplayMode.GRID
     )
     val displayMode: StateFlow<CircleDisplayMode> = _displayMode
+
+    fun setShowSpaceName(show: Boolean) {
+        _showSpaceName.value = show
+        prefs.edit { putBoolean(SHOW_SPACE_NAME_KEY, show) }
+    }
+
+    fun setShowDay(show: Boolean) {
+        _showDay.value = show
+        prefs.edit { putBoolean(SHOW_DAY_KEY, show) }
+    }
 
     fun setShowGenreOverlay(show: Boolean) {
         _showGenreOverlay.value = show

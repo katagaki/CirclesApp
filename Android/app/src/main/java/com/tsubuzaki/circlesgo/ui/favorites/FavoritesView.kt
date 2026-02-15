@@ -116,12 +116,16 @@ fun FavoritesView(
                 }
             } else {
                 val isPrivacyMode by selections.isPrivacyMode.collectAsState()
+                val showSpaceName by selections.showSpaceName.collectAsState()
+                val showDay by selections.showDay.collectAsState()
                 if (isGroupedByColor) {
                     ColorGroupedCircleGrid(
                         groups = circles,
                         displayMode = GridDisplayMode.MEDIUM,
                         database = database,
                         favorites = favorites,
+                        showSpaceName = showSpaceName,
+                        showDay = showDay,
                         showsOverlayWhenEmpty = false,
                         onSelect = { circle ->
                             unifier.showCircleDetail(circle)
@@ -137,6 +141,8 @@ fun FavoritesView(
                         displayMode = GridDisplayMode.MEDIUM,
                         database = database,
                         favorites = favorites,
+                        showSpaceName = showSpaceName,
+                        showDay = showDay,
                         showsOverlayWhenEmpty = false,
                         onSelect = { circle ->
                             unifier.showCircleDetail(circle)

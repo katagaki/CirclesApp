@@ -121,8 +121,10 @@ fun CatalogView(
         }
     }
 
-    // Search bar
+    // Display overlay settings
     val isPrivacyMode by selections.isPrivacyMode.collectAsState()
+    val showSpaceName by selections.showSpaceName.collectAsState()
+    val showDay by selections.showDay.collectAsState()
     SearchBar(
         modifier = Modifier
             .fillMaxWidth()
@@ -178,6 +180,8 @@ fun CatalogView(
                 displayMode = GridDisplayMode.MEDIUM,
                 database = database,
                 favorites = favorites,
+                showSpaceName = showSpaceName,
+                showDay = showDay,
                 onSelect = { circle ->
                     searchExpanded = false
                     unifier.showCircleDetail(circle)
@@ -192,6 +196,8 @@ fun CatalogView(
                 displayMode = ListDisplayMode.REGULAR,
                 database = database,
                 favorites = favorites,
+                showSpaceName = showSpaceName,
+                showDay = showDay,
                 onSelect = { circle ->
                     searchExpanded = false
                     unifier.showCircleDetail(circle)
@@ -251,6 +257,8 @@ fun CatalogView(
                         displayMode = GridDisplayMode.MEDIUM,
                         database = database,
                         favorites = favorites,
+                        showSpaceName = showSpaceName,
+                        showDay = showDay,
                         onSelect = { circle ->
                             unifier.showCircleDetail(circle)
                         },
@@ -264,6 +272,8 @@ fun CatalogView(
                         displayMode = ListDisplayMode.REGULAR,
                         database = database,
                         favorites = favorites,
+                        showSpaceName = showSpaceName,
+                        showDay = showDay,
                         onSelect = { circle ->
                             unifier.showCircleDetail(circle)
                         },

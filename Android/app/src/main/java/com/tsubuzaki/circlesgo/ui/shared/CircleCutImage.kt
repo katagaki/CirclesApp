@@ -22,7 +22,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.api.catalog.UserFavorites
 import com.tsubuzaki.circlesgo.api.catalog.WebCatalogColor
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
@@ -129,7 +131,7 @@ fun CircleCutImage(
                 ) {
                     if (showDay) {
                         CircleBlockPill(
-                            text = "Day ${circle.day}",
+                            text = stringResource(R.string.day_format, circle.day),
                             size = if (displayMode == GridDisplayMode.SMALL) CircleBlockPillSize.TINY else CircleBlockPillSize.SMALL
                         )
                     }

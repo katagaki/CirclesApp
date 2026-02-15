@@ -6,7 +6,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -66,7 +65,9 @@ fun UnifiedMoreMenu(
                 )
             }
         )
+
         HorizontalDivider()
+
         // Genre overlay toggle
         DropdownMenuItem(
             text = { Text(stringResource(R.string.show_genre_overlay)) },
@@ -78,19 +79,36 @@ fun UnifiedMoreMenu(
                 )
             }
         )
-        // Privacy Mode toggle
-        val isPrivacyMode by selections.isPrivacyMode.collectAsState()
+
+        HorizontalDivider()
+
+        // Show Space Name toggle
+        val showSpaceName by selections.showSpaceName.collectAsState()
         DropdownMenuItem(
-            text = { Text(stringResource(R.string.privacy_mode)) },
-            onClick = { selections.setIsPrivacyMode(!isPrivacyMode) },
+            text = { Text(stringResource(R.string.show_space_name)) },
+            onClick = { selections.setShowSpaceName(!showSpaceName) },
             trailingIcon = {
                 Switch(
-                    checked = isPrivacyMode,
-                    onCheckedChange = { selections.setIsPrivacyMode(it) }
+                    checked = showSpaceName,
+                    onCheckedChange = { selections.setShowSpaceName(it) }
                 )
             }
         )
+        // Show Day toggle
+        val showDay by selections.showDay.collectAsState()
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.show_day)) },
+            onClick = { selections.setShowDay(!showDay) },
+            trailingIcon = {
+                Switch(
+                    checked = showDay,
+                    onCheckedChange = { selections.setShowDay(it) }
+                )
+            }
+        )
+
         HorizontalDivider()
+
         // Links
         DropdownMenuItem(
             text = { Text(stringResource(R.string.link_web_catalog)) },
@@ -134,7 +152,9 @@ fun UnifiedMoreMenu(
                 )
             }
         )
+
         HorizontalDivider()
+
         DropdownMenuItem(
             text = { Text(stringResource(R.string.link_source_code)) },
             onClick = {
@@ -148,7 +168,23 @@ fun UnifiedMoreMenu(
                 customTabsIntent.launchUrl(context, "https://github.com/katagaki/CirclesGo".toUri())
             },
         )
+
         HorizontalDivider()
+
+        // Privacy Mode toggle
+        val isPrivacyMode by selections.isPrivacyMode.collectAsState()
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.privacy_mode)) },
+            onClick = { selections.setIsPrivacyMode(!isPrivacyMode) },
+            trailingIcon = {
+                Switch(
+                    checked = isPrivacyMode,
+                    onCheckedChange = { selections.setIsPrivacyMode(it) }
+                )
+            }
+        )
+
+        // Sign out button
         DropdownMenuItem(
             text = { Text(stringResource(R.string.sign_out)) },
             onClick = {

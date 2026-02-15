@@ -19,7 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
 import com.tsubuzaki.circlesgo.state.FavoritesState
@@ -178,7 +180,7 @@ fun CircleListRegularRow(
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (showDay) {
-                        CircleBlockPill(text = "Day ${circle.day}")
+                        CircleBlockPill(text = stringResource(R.string.day_format, circle.day))
                         Spacer(modifier = Modifier.width(4.dp))
                     }
                     if (showSpaceName) {
@@ -231,7 +233,7 @@ fun CircleListCompactRow(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (showDay) {
                     CircleBlockPill(
-                        text = "Day ${circle.day}",
+                        text = stringResource(R.string.day_format, circle.day),
                         size = CircleBlockPillSize.SMALL
                     )
                     Spacer(modifier = Modifier.width(4.dp))
