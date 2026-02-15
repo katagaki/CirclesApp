@@ -147,9 +147,6 @@ fun UnifiedMoreMenu(
                     .build()
                 customTabsIntent.launchUrl(context, "https://github.com/katagaki/CirclesGo".toUri())
             },
-            leadingIcon = {
-                Icons.Outlined.Code
-            },
         )
         HorizontalDivider()
         DropdownMenuItem(
