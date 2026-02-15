@@ -6,6 +6,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.outlined.Apartment
+import androidx.compose.material.icons.outlined.Business
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.TableRestaurant
+import androidx.compose.material.icons.outlined.TheaterComedy
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -72,6 +81,12 @@ fun UnifiedMoreMenu(
         DropdownMenuItem(
             text = { Text(stringResource(R.string.show_genre_overlay)) },
             onClick = { selections.setShowGenreOverlay(!showGenreOverlay) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.TheaterComedy,
+                    contentDescription = null
+                )
+            },
             trailingIcon = {
                 Switch(
                     checked = showGenreOverlay,
@@ -85,6 +100,12 @@ fun UnifiedMoreMenu(
         DropdownMenuItem(
             text = { Text(stringResource(R.string.darken_map_in_dark_mode)) },
             onClick = { selections.setDarkenMapInDarkMode(!darkenMapInDarkMode) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.DarkMode,
+                    contentDescription = null
+                )
+            },
             trailingIcon = {
                 Switch(
                     checked = darkenMapInDarkMode,
@@ -100,6 +121,12 @@ fun UnifiedMoreMenu(
         DropdownMenuItem(
             text = { Text(stringResource(R.string.show_space_name)) },
             onClick = { selections.setShowSpaceName(!showSpaceName) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.TableRestaurant,
+                    contentDescription = null
+                )
+            },
             trailingIcon = {
                 Switch(
                     checked = showSpaceName,
@@ -112,6 +139,12 @@ fun UnifiedMoreMenu(
         DropdownMenuItem(
             text = { Text(stringResource(R.string.show_day)) },
             onClick = { selections.setShowDay(!showDay) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.CalendarMonth,
+                    contentDescription = null
+                )
+            },
             trailingIcon = {
                 Switch(
                     checked = showDay,
@@ -180,6 +213,12 @@ fun UnifiedMoreMenu(
                     .build()
                 customTabsIntent.launchUrl(context, "https://github.com/katagaki/CirclesGo".toUri())
             },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Code,
+                    contentDescription = null
+                )
+            },
         )
 
         HorizontalDivider()
@@ -189,6 +228,12 @@ fun UnifiedMoreMenu(
         DropdownMenuItem(
             text = { Text(stringResource(R.string.privacy_mode)) },
             onClick = { selections.setIsPrivacyMode(!isPrivacyMode) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.VisibilityOff,
+                    contentDescription = null
+                )
+            },
             trailingIcon = {
                 Switch(
                     checked = isPrivacyMode,

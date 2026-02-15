@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -131,6 +134,12 @@ private fun HallPickerButton(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
+            Icon(
+                imageVector = Icons.Outlined.Business,
+                contentDescription = null,
+                modifier = Modifier.padding(end = 4.dp),
+                tint = Color.White
+            )
             Text(
                 text = selectedMap?.name ?: stringResource(R.string.no_hall),
                 color = Color.White,
