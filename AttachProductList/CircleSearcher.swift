@@ -17,17 +17,21 @@ struct ActionExtensionCircle: Identifiable, Sendable {
 
 enum CircleSearcher {
 
+    static let groupContainerURL = FileManager.default.containerURL(
+        forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.CiRCLES"
+    )
+    static let sharedDefaults = UserDefaults(suiteName: "group.com.tsubuzaki.CiRCLES")
+
     static func search(_ searchTerm: String) -> [ActionExtensionCircle] {
         let term = searchTerm.trimmingCharacters(in: .whitespaces)
         guard term.count >= 2 else { return [] }
 
-        let databaseURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-        guard let databaseURL else { return [] }
+        guard let groupContainerURL else { return [] }
 
-        let activeEventNumber = UserDefaults.standard.integer(forKey: "Events.Active.Number")
+        let activeEventNumber = sharedDefaults?.integer(forKey: "Events.Active.Number") ?? 0
         guard activeEventNumber > 0 else { return [] }
 
-        let textDBURL = databaseURL.appending(path: "webcatalog\(activeEventNumber).db")
+        let textDBURL = groupContainerURL.appending(path: "webcatalog\(activeEventNumber).db")
         guard FileManager.default.fileExists(atPath: textDBURL.path(percentEncoded: false)),
               let db = try? Connection(textDBURL.path(percentEncoded: false), readonly: true) else {
             return []

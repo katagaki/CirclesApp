@@ -28,6 +28,8 @@ class Events {
         }
         set {
             UserDefaults.standard.set(newValue, forKey: activeEventNumberKey)
+            UserDefaults(suiteName: "group.com.tsubuzaki.CiRCLES")?
+                .set(newValue, forKey: activeEventNumberKey)
         }
     }
     var activeEventNumber: Int
@@ -68,6 +70,8 @@ class Events {
     init() {
         if UserDefaults.standard.value(forKey: activeEventNumberKey) != nil {
             activeEventNumber = UserDefaults.standard.integer(forKey: activeEventNumberKey)
+            UserDefaults(suiteName: "group.com.tsubuzaki.CiRCLES")?
+                .set(activeEventNumber, forKey: activeEventNumberKey)
         } else {
             activeEventNumber = -1
         }

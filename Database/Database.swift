@@ -27,6 +27,9 @@ class Database {
     var circleImagesLoadCount: Int = 0
 
     let dataStoreURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
+    static let groupContainerURL = FileManager.default.containerURL(
+        forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.CiRCLES"
+    )
 
     init() {
         // No initialization required; properties are set lazily or by callers.
@@ -74,6 +77,7 @@ class Database {
                 debugPrint("Database: Found text database.")
                 #endif
                 self.textDatabaseURL = textDatabaseURL
+                copyTextDatabaseToGroupContainer(textDatabaseURL, eventNumber: event.number)
             }
             let imageDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number)Image1.db")
             if FileManager.default.fileExists(atPath: imageDatabaseURL.path(percentEncoded: false)) {
@@ -82,6 +86,34 @@ class Database {
                 #endif
                 self.imageDatabaseURL = imageDatabaseURL
             }
+        }
+    }
+
+    private func copyTextDatabaseToGroupContainer(_ sourceURL: URL, eventNumber: Int) {
+        guard let groupContainerURL = Database.groupContainerURL else { return }
+        let destinationURL = groupContainerURL.appending(path: "webcatalog\(eventNumber).db")
+
+        let sourceAttributes = try? FileManager.default.attributesOfItem(
+            atPath: sourceURL.path(percentEncoded: false)
+        )
+        let destinationAttributes = try? FileManager.default.attributesOfItem(
+            atPath: destinationURL.path(percentEncoded: false)
+        )
+        let sourceModDate = sourceAttributes?[.modificationDate] as? Date
+        let destinationModDate = destinationAttributes?[.modificationDate] as? Date
+
+        if let sourceModDate, let destinationModDate, destinationModDate >= sourceModDate {
+            return
+        }
+
+        do {
+            try? FileManager.default.removeItem(at: destinationURL)
+            try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
+            #if DEBUG
+            debugPrint("Database: Copied text database to group container.")
+            #endif
+        } catch {
+            debugPrint("Database: Failed to copy to group container: \(error.localizedDescription)")
         }
     }
 
