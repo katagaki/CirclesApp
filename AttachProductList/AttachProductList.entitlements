@@ -6,9 +6,5 @@
 	<array>
 		<string>group.com.tsubuzaki.CiRCLES</string>
 	</array>
-	<key>keychain-access-groups</key>
-	<array>
-		<string>$(AppIdentifierPrefix)com.tsubuzaki.CiRCLES</string>
-	</array>
 </dict>
 </plist>

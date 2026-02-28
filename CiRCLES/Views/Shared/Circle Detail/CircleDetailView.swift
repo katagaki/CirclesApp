@@ -9,6 +9,7 @@ import Komponents
 import SwiftData
 import SwiftUI
 import Translation
+import UIKit
 
 struct CircleDetailView: View {
 
@@ -28,6 +29,9 @@ struct CircleDetailView: View {
 
     @State var previousCircle: ((ComiketCircle) -> ComiketCircle?)?
     @State var nextCircle: ((ComiketCircle) -> ComiketCircle?)?
+
+    @State var attachments: [CircleAttachment] = []
+    @State var selectedAttachment: CircleAttachment?
 
     @Namespace var namespace
 
@@ -56,6 +60,32 @@ struct CircleDetailView: View {
             if circle.memo.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
                 ListSectionWithTranslateButton(title: "Shared.Memo.Circle", text: circle.memo, showContextMenu: false)
             }
+            if !attachments.isEmpty {
+                Section("Circles.Attachments") {
+                    ForEach(attachments) { attachment in
+                        if let image = UIImage(data: attachment.attachmentBlob) {
+                            Button {
+                                selectedAttachment = attachment
+                                unifier.selectedDetent = .large
+                            } label: {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxWidth: .infinity)
+                                    .clipShape(RoundedRectangle(cornerRadius: 8.0))
+                            }
+                            .contextMenu {
+                                Button("Circles.Attachments.Delete", systemImage: "trash", role: .destructive) {
+                                    deleteAttachment(attachment)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .fullScreenCover(item: $selectedAttachment) { attachment in
+            AttachmentViewer(attachment: attachment)
         }
         .opacity(unifier.isMinimized ? 0.0 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: unifier.selectedDetent)
@@ -131,7 +161,21 @@ struct CircleDetailView: View {
         if let genre = await actor.genre(circle.genreID) {
             self.genre = genre
         }
+        loadAttachments()
+    }
 
+    func loadAttachments() {
+        withAnimation(.smooth.speed(2.0)) {
+            attachments = AttachmentsDatabase.shared.attachments(
+                eventNumber: circle.eventNumber,
+                circleID: circle.id
+            )
+        }
+    }
+
+    func deleteAttachment(_ attachment: CircleAttachment) {
+        AttachmentsDatabase.shared.delete(id: attachment.id)
+        loadAttachments()
     }
 
     func goToPreviousCircle() {
