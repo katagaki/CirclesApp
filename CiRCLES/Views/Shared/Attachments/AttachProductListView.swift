@@ -57,7 +57,7 @@ struct AttachProductListView: View {
                     }
                 }
                 if hasMoreResults {
-                    Text("他にも検索結果があります。検索条件を絞ってください。")
+                    Text("Circles.Attachments.MoreResults")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity)
@@ -69,24 +69,24 @@ struct AttachProductListView: View {
             .overlay {
                 if searchTerm.trimmingCharacters(in: .whitespaces).count < 2 {
                     ContentUnavailableView(
-                        "サークルを検索",
+                        "Circles.Attachments.Search",
                         systemImage: "magnifyingglass",
-                        description: Text("サークル名またはペンネームで検索してください。")
+                        description: Text("Circles.Attachments.Search.Description")
                     )
                 } else if searchResults.isEmpty {
                     ContentUnavailableView(
-                        "見つかりませんでした",
+                        "Circles.Attachments.NoResults",
                         systemImage: "questionmark.square.dashed",
-                        description: Text("検索条件に一致するサークルがありません。")
+                        description: Text("Circles.Attachments.NoResults.Description")
                     )
                 }
             }
-            .navigationTitle("お品書きを添付")
+            .navigationTitle("Circles.Attachments.Attach")
             .navigationBarTitleDisplayMode(.inline)
             .searchable(
                 text: $searchTerm,
                 placement: .navigationBarDrawer(displayMode: .always),
-                prompt: "サークル名・ペンネーム"
+                prompt: "Circles.Attachments.Search.Prompt"
             )
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
