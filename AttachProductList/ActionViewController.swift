@@ -11,12 +11,24 @@ import UniformTypeIdentifiers
 @MainActor
 class ActionViewController: UIViewController {
 
+    var loadedImageData: Data?
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        extractAndOpenApp()
+        view.backgroundColor = .clear
+        extractImage()
     }
 
-    func extractAndOpenApp() {
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let loadedImageData {
+            openContainingApp(with: loadedImageData)
+        } else {
+            // Image not loaded yet; wait for the async callback
+        }
+    }
+
+    func extractImage() {
         guard let extensionItems = extensionContext?.inputItems as? [NSExtensionItem] else {
             extensionContext?.completeRequest(returningItems: nil)
             return
@@ -36,10 +48,14 @@ class ActionViewController: UIViewController {
                             item as? Data
                         }
                         Task { @MainActor in
-                            if let loadedData {
-                                self?.openContainingApp(with: loadedData)
-                            } else {
+                            guard let self, let loadedData else {
                                 self?.extensionContext?.completeRequest(returningItems: nil)
+                                return
+                            }
+                            self.loadedImageData = loadedData
+                            // Only open if viewDidAppear already fired
+                            if self.viewIfLoaded?.window != nil {
+                                self.openContainingApp(with: loadedData)
                             }
                         }
                     }
@@ -63,7 +79,9 @@ class ActionViewController: UIViewController {
             return
         }
 
-        // Walk up the responder chain to find an object that can open URLs
+        // Walk up the responder chain to find an object that can open URLs.
+        // The view must be in the window hierarchy for the chain to reach
+        // the top-level object that responds to openURL:.
         var responder: UIResponder? = self
         let selector = NSSelectorFromString("openURL:")
         while let r = responder {
@@ -74,6 +92,8 @@ class ActionViewController: UIViewController {
             responder = r.next
         }
 
-        extensionContext?.completeRequest(returningItems: nil)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            self?.extensionContext?.completeRequest(returningItems: nil)
+        }
     }
 }
