@@ -121,6 +121,7 @@ struct AuthenticatedView: ViewModifier {
             unifier.show()
         }
         isReloadingData = false
+        unifier.checkPendingAttachments()
         Task.detached(priority: .background) {
             await loadFavorites()
         }

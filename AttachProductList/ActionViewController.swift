@@ -5,21 +5,18 @@
 //  Created by シン・ジャスティン on 2026/02/28.
 //
 
-import SwiftUI
 import UIKit
 import UniformTypeIdentifiers
 
 @MainActor
 class ActionViewController: UIViewController {
 
-    var imageData: Data?
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        extractImage()
+        extractAndSaveImage()
     }
 
-    func extractImage() {
+    func extractAndSaveImage() {
         guard let extensionItems = extensionContext?.inputItems as? [NSExtensionItem] else {
             extensionContext?.completeRequest(returningItems: nil)
             return
@@ -39,37 +36,29 @@ class ActionViewController: UIViewController {
                             item as? Data
                         }
                         Task { @MainActor in
-                            self?.imageData = loadedData
-                            self?.showSearchView()
+                            if let loadedData {
+                                self?.saveToGroupContainer(loadedData)
+                            }
+                            self?.extensionContext?.completeRequest(returningItems: nil)
                         }
                     }
                     return
                 }
             }
         }
+
+        extensionContext?.completeRequest(returningItems: nil)
     }
 
-    func showSearchView() {
-        guard let imageData else {
-            extensionContext?.completeRequest(returningItems: nil)
-            return
-        }
+    func saveToGroupContainer(_ imageData: Data) {
+        guard let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.CiRCLES"
+        ) else { return }
 
-        let searchView = ActionExtensionSearchView(
-            imageData: imageData,
-            onComplete: { [weak self] in
-                self?.extensionContext?.completeRequest(returningItems: nil)
-            },
-            onCancel: { [weak self] in
-                self?.extensionContext?.completeRequest(returningItems: nil)
-            }
-        )
+        let pendingDir = containerURL.appending(path: "PendingAttachments")
+        try? FileManager.default.createDirectory(at: pendingDir, withIntermediateDirectories: true)
 
-        let hostingController = UIHostingController(rootView: searchView)
-        hostingController.view.frame = view.bounds
-        hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        addChild(hostingController)
-        view.addSubview(hostingController.view)
-        hostingController.didMove(toParent: self)
+        let fileURL = pendingDir.appending(path: "\(UUID().uuidString).jpg")
+        try? imageData.write(to: fileURL)
     }
 }

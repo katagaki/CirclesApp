@@ -53,10 +53,29 @@ class Unifier {
     // Other sheets
     var isMyComiketPresenting: Bool = false
 
+    // Pending attachment from action extension
+    var pendingAttachmentURL: URL?
+
     // Alerts
     var isFirstCircleAlertShowing: Bool = false
     var isLastCircleAlertShowing: Bool = false
     var isGoingToSignOut: Bool = false
+
+    @MainActor
+    func checkPendingAttachments() {
+        guard pendingAttachmentURL == nil else { return }
+
+        guard let containerURL = FileManager.default.containerURL(
+            forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.CiRCLES"
+        ) else { return }
+
+        let pendingDir = containerURL.appending(path: "PendingAttachments")
+        guard let files = try? FileManager.default.contentsOfDirectory(
+            at: pendingDir, includingPropertiesForKeys: nil
+        ), let first = files.first else { return }
+
+        pendingAttachmentURL = first
+    }
 
     @MainActor
     func show() {

@@ -1,45 +1,30 @@
 //
-//  ActionExtensionSearchView.swift
-//  AttachProductList
+//  AttachProductListView.swift
+//  CiRCLES
 //
 //  Created by シン・ジャスティン on 2026/02/28.
 //
 
 import SwiftUI
 
-struct ActionExtensionSearchView: View {
+struct AttachProductListView: View {
 
-    let imageData: Data
-    let onComplete: () -> Void
-    let onCancel: () -> Void
+    @Environment(Database.self) var database
+    @Environment(Events.self) var planner
+    @Environment(\.dismiss) var dismiss
+
+    let pendingImageURL: URL
 
     @State var searchTerm: String = ""
-    @State var searchResults: [ActionExtensionCircle] = []
+    @State var searchResults: [ComiketCircle] = []
     @State var hasMoreResults: Bool = false
-    @State var selectedCircle: ActionExtensionCircle?
+    @State var selectedCircle: ComiketCircle?
     @State var isSaving: Bool = false
     @State var searchTask: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    HStack(spacing: 8.0) {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundStyle(.secondary)
-                        TextField("サークル名・ペンネーム", text: $searchTerm)
-                            .autocorrectionDisabled()
-                        if !searchTerm.isEmpty {
-                            Button {
-                                searchTerm = ""
-                            } label: {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundStyle(.secondary)
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
                 ForEach(searchResults) { circle in
                     Button {
                         selectedCircle = circle
@@ -47,8 +32,10 @@ struct ActionExtensionSearchView: View {
                         HStack(spacing: 12.0) {
                             VStack(alignment: .leading, spacing: 4.0) {
                                 Text(circle.circleName)
-                                    .foregroundStyle(selectedCircle?.id == circle.id ? Color.accentColor : .primary)
-                                if !circle.penName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                    .foregroundStyle(selectedCircle?.id == circle.id
+                                                     ? Color.accentColor : .primary)
+                                if !circle.penName
+                                    .trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                                     Text(circle.penName)
                                         .font(.subheadline)
                                         .foregroundStyle(.secondary)
@@ -88,10 +75,15 @@ struct ActionExtensionSearchView: View {
             }
             .navigationTitle("お品書きを添付")
             .navigationBarTitleDisplayMode(.inline)
+            .searchable(
+                text: $searchTerm,
+                placement: .navigationBarDrawer(displayMode: .always),
+                prompt: "サークル名・ペンネーム"
+            )
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("キャンセル") {
-                        onCancel()
+                        cleanupAndDismiss()
                     }
                 }
             }
@@ -107,12 +99,11 @@ struct ActionExtensionSearchView: View {
                 searchTask = Task {
                     try? await Task.sleep(for: .milliseconds(300))
                     guard !Task.isCancelled else { return }
-                    let result = CircleSearcher.search(searchTerm)
-                    searchResults = result.circles
-                    hasMoreResults = result.hasMore
+                    await performSearch()
                 }
             }
         }
+        .interactiveDismissDisabled()
     }
 
     var saveButton: some View {
@@ -130,19 +121,41 @@ struct ActionExtensionSearchView: View {
         .padding(.bottom, 8.0)
     }
 
+    func performSearch() async {
+        let identifiers = await CatalogCache.searchCircles(searchTerm, database: database)
+        guard let identifiers else {
+            searchResults = []
+            hasMoreResults = false
+            return
+        }
+
+        let hasMore = identifiers.count > 10
+        let limited = Array(identifiers.prefix(10))
+        let circles = database.circles(limited)
+        searchResults = circles
+        hasMoreResults = hasMore
+    }
+
     func save() {
         guard let selectedCircle else { return }
+        guard let imageData = try? Data(contentsOf: pendingImageURL) else { return }
         isSaving = true
 
         AttachmentsDatabase.shared.insert(
-            eventNumber: selectedCircle.eventNumber,
+            eventNumber: planner.activeEventNumber,
             circleID: selectedCircle.id,
             attachmentType: "image",
             type: "productList",
             attachmentBlob: imageData
         )
 
-        onComplete()
+        try? FileManager.default.removeItem(at: pendingImageURL)
+        dismiss()
+    }
+
+    func cleanupAndDismiss() {
+        try? FileManager.default.removeItem(at: pendingImageURL)
+        dismiss()
     }
 }
 

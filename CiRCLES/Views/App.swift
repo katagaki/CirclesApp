@@ -55,6 +55,14 @@ struct CirclesApp: App {
                     bodyText: $oasis.bodyText,
                     progress: $oasis.progress
                 )
+                .sheet(isPresented: Binding(
+                    get: { unifier.pendingAttachmentURL != nil },
+                    set: { if !$0 { unifier.pendingAttachmentURL = nil } }
+                )) {
+                    if let url = unifier.pendingAttachmentURL {
+                        AttachProductListView(pendingImageURL: url)
+                    }
+                }
                 .onAppear {
                     orientation.update()
                 }
@@ -75,6 +83,9 @@ struct CirclesApp: App {
         .environment(mapper)
         .environment(unifier)
         .onChange(of: scenePhase) { _, newValue in
+            if newValue == .active {
+                unifier.checkPendingAttachments()
+            }
             if !hasAppLaunchedForTheFirstTime {
                 hasAppLaunchedForTheFirstTime = true
             } else {
