@@ -11,24 +11,13 @@ import UniformTypeIdentifiers
 @MainActor
 class ActionViewController: UIViewController {
 
-    var loadedImageData: Data?
-
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .clear
-        extractImage()
+        view.isHidden = true
+        extractAndOpenApp()
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        if let loadedImageData {
-            openContainingApp(with: loadedImageData)
-        } else {
-            // Image not loaded yet; wait for the async callback
-        }
-    }
-
-    func extractImage() {
+    func extractAndOpenApp() {
         guard let extensionItems = extensionContext?.inputItems as? [NSExtensionItem] else {
             extensionContext?.completeRequest(returningItems: nil)
             return
@@ -48,14 +37,10 @@ class ActionViewController: UIViewController {
                             item as? Data
                         }
                         Task { @MainActor in
-                            guard let self, let loadedData else {
+                            if let loadedData {
+                                self?.openContainingApp(with: loadedData)
+                            } else {
                                 self?.extensionContext?.completeRequest(returningItems: nil)
-                                return
-                            }
-                            self.loadedImageData = loadedData
-                            // Only open if viewDidAppear already fired
-                            if self.viewIfLoaded?.window != nil {
-                                self.openContainingApp(with: loadedData)
                             }
                         }
                     }
@@ -79,20 +64,7 @@ class ActionViewController: UIViewController {
             return
         }
 
-        // Walk up the responder chain to find an object that can open URLs.
-        // The view must be in the window hierarchy for the chain to reach
-        // the top-level object that responds to openURL:.
-        var responder: UIResponder? = self
-        let selector = NSSelectorFromString("openURL:")
-        while let r = responder {
-            if r.responds(to: selector) {
-                r.perform(selector, with: url)
-                break
-            }
-            responder = r.next
-        }
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+        extensionContext?.open(url) { [weak self] _ in
             self?.extensionContext?.completeRequest(returningItems: nil)
         }
     }
