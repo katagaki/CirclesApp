@@ -51,7 +51,11 @@ class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelegate {
         }
     }
 
-    func urlSession(_ session: URLSession, downloadTask _: URLSessionDownloadTask, didFinishDownloadingTo location: URL) { // swiftlint:disable:this unused_parameter
+    func urlSession(
+        _ session: URLSession,
+        downloadTask _: URLSessionDownloadTask,
+        didFinishDownloadingTo location: URL
+    ) {
         if let destinationURL {
             do {
                 let saveDestinationURL = destinationURL.appending(path: location.lastPathComponent)

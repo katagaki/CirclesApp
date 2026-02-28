@@ -64,6 +64,7 @@ struct AttachProductListView: View {
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
                 }
+            }
             .listStyle(.plain)
             .overlay {
                 if searchTerm.trimmingCharacters(in: .whitespaces).count < 2 {
@@ -89,8 +90,14 @@ struct AttachProductListView: View {
             )
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("キャンセル") {
-                        dismiss()
+                    if #available(iOS 26.0, *) {
+                        Button(role: .cancel) {
+                            dismiss()
+                        }
+                    } else {
+                        Button("Shared.Cancel") {
+                            dismiss()
+                        }
                     }
                 }
             }
@@ -117,7 +124,7 @@ struct AttachProductListView: View {
         Button {
             save()
         } label: {
-            Text("保存")
+            Text("Shared.Save")
                 .padding(.horizontal, 20.0)
                 .padding(.vertical, 12.0)
                 .frame(maxWidth: .infinity)

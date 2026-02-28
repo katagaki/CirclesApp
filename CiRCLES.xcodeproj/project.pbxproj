@@ -14,7 +14,7 @@
 		E480AAA62C44BB77009C1445 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = E480AAA52C44BB77009C1445 /* ZIPFoundation */; };
 		E4D74B892C8CAEA70014CD16 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = E4D74B882C8CAEA70014CD16 /* Reachability */; };
 		F1A0B0012F31700000000001 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = F1A0B0022F31700000000001 /* SQLite */; };
-		F1A0B0062F31700000000001 /* AttachProductList.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F1A0B0072F31700000000001 /* AttachProductList.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F1A0B0062F31700000000001 /* ShareWithCiRCLES.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,7 +34,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				F1A0B0062F31700000000001 /* AttachProductList.appex in Embed Foundation Extensions */,
+				F1A0B0062F31700000000001 /* ShareWithCiRCLES.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -44,7 +44,7 @@
 /* Begin PBXFileReference section */
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4D74B982C8D7D5B0014CD16 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		F1A0B0072F31700000000001 /* AttachProductList.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = AttachProductList.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareWithCiRCLES.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -56,33 +56,33 @@
 			);
 			target = E4A769452C21A20A00BE3491 /* CiRCLES */;
 		};
-		F1A0B0082F31700000000001 /* Exceptions for "AttachProductList" folder in "AttachProductList" target */ = {
+		F1A0B0082F31700000000001 /* Exceptions for "Share Extension" folder in "ShareWithCiRCLES" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = F1A0B0042F31700000000001 /* AttachProductList */;
+			target = F1A0B0042F31700000000001 /* ShareWithCiRCLES */;
 		};
-		F1A0B0092F31700000000001 /* Exceptions for "Database" folder in "AttachProductList" target */ = {
+		F1A0B0092F31700000000001 /* Exceptions for "Database" folder in "ShareWithCiRCLES" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"Database.swift",
+				Database.swift,
 				"Database+Download.swift",
 				"Database+Fetchers.swift",
-				"Tables/ComiketBlock.swift",
-				"Tables/ComiketCircle.swift",
-				"Tables/ComiketCircleExtendedInformation.swift",
-				"Tables/ComiketDate.swift",
-				"Tables/ComiketEvent.swift",
-				"Tables/ComiketGenre.swift",
-				"Tables/ComiketLayout.swift",
-				"Tables/ComiketMap.swift",
-				"Types/CircleCutConfiguration.swift",
-				"Types/MapConfiguration.swift",
-				"Types/Point.swift",
-				"Types/Size.swift",
+				Tables/ComiketBlock.swift,
+				Tables/ComiketCircle.swift,
+				Tables/ComiketCircleExtendedInformation.swift,
+				Tables/ComiketDate.swift,
+				Tables/ComiketEvent.swift,
+				Tables/ComiketGenre.swift,
+				Tables/ComiketLayout.swift,
+				Tables/ComiketMap.swift,
+				Types/CircleCutConfiguration.swift,
+				Types/MapConfiguration.swift,
+				Types/Point.swift,
+				Types/Size.swift,
 			);
-			target = F1A0B0042F31700000000001 /* AttachProductList */;
+			target = F1A0B0042F31700000000001 /* ShareWithCiRCLES */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -103,7 +103,7 @@
 		E489B5522F315E8200ED193F /* Database */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				F1A0B0092F31700000000001 /* Exceptions for "Database" folder in "AttachProductList" target */,
+				F1A0B0092F31700000000001 /* Exceptions for "Database" folder in "ShareWithCiRCLES" target */,
 			);
 			path = Database;
 			sourceTree = "<group>";
@@ -118,12 +118,12 @@
 			path = "Swift Data";
 			sourceTree = "<group>";
 		};
-		F1A0B00A2F31700000000001 /* AttachProductList */ = {
+		F1A0B00A2F31700000000001 /* Share Extension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				F1A0B0082F31700000000001 /* Exceptions for "AttachProductList" folder in "AttachProductList" target */,
+				F1A0B0082F31700000000001 /* Exceptions for "Share Extension" folder in "ShareWithCiRCLES" target */,
 			);
-			path = AttachProductList;
+			path = "Share Extension";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -162,7 +162,7 @@
 				E489B5522F315E8200ED193F /* Database */,
 				E489B5772F31607D00ED193F /* Swift Data */,
 				E489B5652F31606400ED193F /* API */,
-				F1A0B00A2F31700000000001 /* AttachProductList */,
+				F1A0B00A2F31700000000001 /* Share Extension */,
 				E4A769472C21A20A00BE3491 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -171,7 +171,7 @@
 			isa = PBXGroup;
 			children = (
 				E4A769462C21A20A00BE3491 /* CiRCLES.app */,
-				F1A0B0072F31700000000001 /* AttachProductList.appex */,
+				F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -213,9 +213,9 @@
 			productReference = E4A769462C21A20A00BE3491 /* CiRCLES.app */;
 			productType = "com.apple.product-type.application";
 		};
-		F1A0B0042F31700000000001 /* AttachProductList */ = {
+		F1A0B0042F31700000000001 /* ShareWithCiRCLES */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F1A0B00D2F31700000000001 /* Build configuration list for PBXNativeTarget "AttachProductList" */;
+			buildConfigurationList = F1A0B00D2F31700000000001 /* Build configuration list for PBXNativeTarget "ShareWithCiRCLES" */;
 			buildPhases = (
 				F1A0B00E2F31700000000001 /* Sources */,
 				F1A0B00B2F31700000000001 /* Frameworks */,
@@ -226,15 +226,15 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				F1A0B00A2F31700000000001 /* AttachProductList */,
 				E489B5522F315E8200ED193F /* Database */,
+				F1A0B00A2F31700000000001 /* Share Extension */,
 			);
-			name = AttachProductList;
+			name = ShareWithCiRCLES;
 			packageProductDependencies = (
 				F1A0B0022F31700000000001 /* SQLite */,
 			);
 			productName = AttachProductList;
-			productReference = F1A0B0072F31700000000001 /* AttachProductList.appex */;
+			productReference = F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -281,7 +281,7 @@
 			projectRoot = "";
 			targets = (
 				E4A769452C21A20A00BE3491 /* CiRCLES */,
-				F1A0B0042F31700000000001 /* AttachProductList */,
+				F1A0B0042F31700000000001 /* ShareWithCiRCLES */,
 			);
 		};
 /* End PBXProject section */
@@ -320,7 +320,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\n# if which periphery > /dev/null; then\n#   periphery scan --format xcode\n# else\n#   echo \"warning: Periphery not installed, download from https://github.com/peripheryapp/periphery\"\n# fi\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which periphery > /dev/null; then\n  periphery scan --format xcode\nelse\n  echo \"warning: Periphery not installed, download from https://github.com/peripheryapp/periphery\"\nfi\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -344,7 +344,7 @@
 /* Begin PBXTargetDependency section */
 		F1A0B00C2F31700000000001 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = F1A0B0042F31700000000001 /* AttachProductList */;
+			target = F1A0B0042F31700000000001 /* ShareWithCiRCLES */;
 			targetProxy = F1A0B0032F31700000000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -564,11 +564,11 @@
 		F1A0B0102F31700000000001 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = AttachProductList/AttachProductList.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Share Extension/Share Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = AttachProductList/Info.plist;
+				INFOPLIST_FILE = "Share Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "お品書きを添付";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
@@ -578,7 +578,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 107.2.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.AttachProductList;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -592,11 +592,11 @@
 		F1A0B0112F31700000000001 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = AttachProductList/AttachProductList.entitlements;
+				CODE_SIGN_ENTITLEMENTS = "Share Extension/Share Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = AttachProductList/Info.plist;
+				INFOPLIST_FILE = "Share Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "お品書きを添付";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
@@ -606,7 +606,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 107.2.3;
-				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.AttachProductList;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -638,7 +638,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F1A0B00D2F31700000000001 /* Build configuration list for PBXNativeTarget "AttachProductList" */ = {
+		F1A0B00D2F31700000000001 /* Build configuration list for PBXNativeTarget "ShareWithCiRCLES" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F1A0B0102F31700000000001 /* Debug */,

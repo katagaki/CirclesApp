@@ -27,8 +27,10 @@ class ActionViewController: UIViewController {
             guard let attachments = item.attachments else { continue }
             for provider in attachments {
                 if provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
-                    provider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) {
-                        [weak self] item, _ in
+                    provider.loadItem(
+                        forTypeIdentifier: UTType.image.identifier,
+                        options: nil
+                    ) { [weak self] item, _ in
                         let loadedData: Data? = if let url = item as? URL {
                             try? Data(contentsOf: url)
                         } else if let image = item as? UIImage {

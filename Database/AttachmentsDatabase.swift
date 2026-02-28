@@ -27,9 +27,9 @@ final class AttachmentsDatabase: Sendable {
     }
 
     private func createTableIfNeeded() {
-        guard let db = connection() else { return }
+        guard let database = connection() else { return }
         do {
-            try db.run("""
+            try database.run("""
                 CREATE TABLE IF NOT EXISTS Attachments (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     eventNumber INTEGER NOT NULL,
@@ -53,7 +53,7 @@ final class AttachmentsDatabase: Sendable {
         type: String,
         attachmentBlob: Data
     ) {
-        guard let db = connection() else { return }
+        guard let database = connection() else { return }
         let table = Table("Attachments")
         let colEventNumber = Expression<Int>("eventNumber")
         let colCircleID = Expression<Int>("circleID")
@@ -62,7 +62,7 @@ final class AttachmentsDatabase: Sendable {
         let colAttachmentBlob = Expression<Data>("attachmentBlob")
 
         do {
-            try db.run(table.insert(
+            try database.run(table.insert(
                 colEventNumber <- eventNumber,
                 colCircleID <- circleID,
                 colAttachmentType <- attachmentType,
@@ -75,7 +75,7 @@ final class AttachmentsDatabase: Sendable {
     }
 
     func attachments(eventNumber: Int, circleID: Int) -> [CircleAttachment] {
-        guard let db = connection() else { return [] }
+        guard let database = connection() else { return [] }
         let table = Table("Attachments")
         let colID = Expression<Int>("id")
         let colEventNumber = Expression<Int>("eventNumber")
@@ -86,7 +86,7 @@ final class AttachmentsDatabase: Sendable {
 
         let query = table.filter(colEventNumber == eventNumber && colCircleID == circleID)
         do {
-            return try db.prepare(query).map { row in
+            return try database.prepare(query).map { row in
                 CircleAttachment(
                     id: row[colID],
                     eventNumber: row[colEventNumber],
@@ -103,12 +103,12 @@ final class AttachmentsDatabase: Sendable {
     }
 
     func delete(id: Int) {
-        guard let db = connection() else { return }
+        guard let database = connection() else { return }
         let table = Table("Attachments")
         let colID = Expression<Int>("id")
         let row = table.filter(colID == id)
         do {
-            try db.run(row.delete())
+            try database.run(row.delete())
         } catch {
             debugPrint("AttachmentsDatabase: Failed to delete: \(error.localizedDescription)")
         }
