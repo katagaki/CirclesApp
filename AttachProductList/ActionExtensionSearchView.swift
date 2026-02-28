@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2026/02/28.
 //
 
-import SQLite
 import SwiftUI
 
 struct ActionExtensionSearchView: View {
@@ -80,7 +79,7 @@ struct ActionExtensionSearchView: View {
             }
             .animation(.smooth.speed(2.0), value: selectedCircle?.id)
             .onChange(of: searchTerm) {
-                search()
+                searchResults = CircleSearcher.search(searchTerm)
             }
         }
     }
@@ -100,52 +99,6 @@ struct ActionExtensionSearchView: View {
         .padding(.bottom, 8.0)
     }
 
-    func search() {
-        let term = searchTerm.trimmingCharacters(in: .whitespaces)
-        guard term.count >= 2 else {
-            searchResults = []
-            return
-        }
-
-        let databaseURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-        guard let databaseURL else { return }
-
-        let activeEventNumber = UserDefaults.standard.integer(forKey: "Events.Active.Number")
-        guard activeEventNumber > 0 else { return }
-
-        let textDBURL = databaseURL.appending(path: "webcatalog\(activeEventNumber).db")
-        guard FileManager.default.fileExists(atPath: textDBURL.path(percentEncoded: false)),
-              let db = try? Connection(textDBURL.path(percentEncoded: false), readonly: true) else {
-            return
-        }
-
-        do {
-            let table = Table("ComiketCircleWC")
-            let colID = Expression<Int>("id")
-            let colEventNumber = table[Expression<Int>("comiketNo")]
-            let colCircleName = Expression<String>("circleName")
-            let colCircleNameKana = Expression<String>("circleKana")
-            let colPenName = Expression<String>("penName")
-
-            let query = table.filter(
-                colCircleName.like("%\(term)%") ||
-                colCircleNameKana.like("%\(term)%") ||
-                colPenName.like("%\(term)%")
-            )
-
-            searchResults = try db.prepare(query).map { row in
-                ActionExtensionCircle(
-                    id: row[colID],
-                    eventNumber: row[colEventNumber],
-                    circleName: row[colCircleName],
-                    penName: row[colPenName]
-                )
-            }
-        } catch {
-            debugPrint("Search failed: \(error.localizedDescription)")
-        }
-    }
-
     func save() {
         guard let selectedCircle else { return }
         isSaving = true
@@ -160,13 +113,6 @@ struct ActionExtensionSearchView: View {
 
         onComplete()
     }
-}
-
-struct ActionExtensionCircle: Identifiable {
-    let id: Int
-    let eventNumber: Int
-    let circleName: String
-    let penName: String
 }
 
 struct SaveButtonStyle: ViewModifier {
