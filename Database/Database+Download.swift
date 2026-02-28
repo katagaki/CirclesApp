@@ -30,7 +30,6 @@ extension Database {
         )
     }
 
-    // swiftlint:disable cyclomatic_complexity
     func download(
         for event: WebCatalogEvent.Response.Event,
         of type: DatabaseType,
@@ -89,7 +88,6 @@ extension Database {
 
         return nil
     }
-    // swiftlint:enable cyclomatic_complexity
 
     func isDownloaded(for event: WebCatalogEvent.Response.Event) -> Bool {
         if let dataStoreURL {

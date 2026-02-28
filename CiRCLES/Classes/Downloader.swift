@@ -66,9 +66,11 @@ class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelegate {
         }
     }
 
-    func urlSession(_ session: URLSession, task _: URLSessionTask, didCompleteWithError error: Error?) { // swiftlint:disable:this unused_parameter
+    // swiftlint:disable unused_parameter
+    func urlSession(_ session: URLSession, task _: URLSessionTask, didCompleteWithError error: Error?) {
         if let error {
             continuation?.resume(throwing: error)
         }
     }
+    // swiftlint:enable unused_parameter
 }

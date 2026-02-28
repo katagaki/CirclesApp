@@ -40,8 +40,10 @@ struct DebugOverlayModifier: ViewModifier {
                             Text(verbatim: "Active event number: \(planner.activeEventNumber)")
                             Text(verbatim: "Event count: \(String(describing: planner.eventData?.list.count))")
                             Text(verbatim: "Selection: M\(selections.map?.name ?? "-") D\(selections.date?.id ?? -1)")
+                            // swiftlint: disable line_length
                             Text(verbatim: "Text database: \(database.textDatabase != nil ? "connected" : "disconnected")")
                             Text(verbatim: "Image database: \(database.imageDatabase != nil ? "connected" : "disconnected")")
+                            // swiftlint: enable line_length
                         }
                         .font(.system(size: 10.0))
                     }
