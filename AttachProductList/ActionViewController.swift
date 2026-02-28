@@ -64,8 +64,17 @@ class ActionViewController: UIViewController {
             return
         }
 
-        extensionContext?.open(url) { [weak self] _ in
-            self?.extensionContext?.completeRequest(returningItems: nil)
+        var responder: UIResponder? = self
+        while let current = responder {
+            if let application = current as? UIApplication {
+                application.open(url, options: [:]) { [weak self] _ in
+                    self?.extensionContext?.completeRequest(returningItems: nil)
+                }
+                return
+            }
+            responder = current.next
         }
+
+        extensionContext?.completeRequest(returningItems: nil)
     }
 }
