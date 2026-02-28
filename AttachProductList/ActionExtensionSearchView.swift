@@ -15,7 +15,7 @@ struct ActionExtensionSearchView: View {
 
     @State var searchTerm: String = ""
     @State var searchResults: [ActionExtensionCircle] = []
-    @State var totalResultCount: Int = 0
+    @State var hasMoreResults: Bool = false
     @State var selectedCircle: ActionExtensionCircle?
     @State var isSaving: Bool = false
     @State var searchTask: Task<Void, Never>?
@@ -45,8 +45,8 @@ struct ActionExtensionSearchView: View {
                         }
                     }
                 }
-                if totalResultCount > 10 {
-                    Text("他\(totalResultCount - 10)件　検索条件を絞ってください。")
+                if hasMoreResults {
+                    Text("他にも検索結果があります。検索条件を絞ってください。")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                         .frame(maxWidth: .infinity)
@@ -97,7 +97,7 @@ struct ActionExtensionSearchView: View {
                     guard !Task.isCancelled else { return }
                     let result = CircleSearcher.search(searchTerm)
                     searchResults = result.circles
-                    totalResultCount = result.totalCount
+                    hasMoreResults = result.hasMore
                 }
             }
         }

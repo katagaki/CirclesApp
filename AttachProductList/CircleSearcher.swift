@@ -17,7 +17,7 @@ struct ActionExtensionCircle: Identifiable, Sendable {
 
 struct CircleSearchResult: Sendable {
     let circles: [ActionExtensionCircle]
-    let totalCount: Int
+    let hasMore: Bool
 }
 
 enum CircleSearcher {
@@ -31,9 +31,9 @@ enum CircleSearcher {
 
     static func search(_ searchTerm: String) -> CircleSearchResult {
         let term = searchTerm.trimmingCharacters(in: .whitespaces)
-        guard term.count >= 2 else { return CircleSearchResult(circles: [], totalCount: 0) }
+        guard term.count >= 2 else { return CircleSearchResult(circles: [], hasMore: false) }
 
-        guard let db = getConnection() else { return CircleSearchResult(circles: [], totalCount: 0) }
+        guard let db = getConnection() else { return CircleSearchResult(circles: [], hasMore: false) }
 
         do {
             let table = Table("ComiketCircleWC")
@@ -49,9 +49,7 @@ enum CircleSearcher {
                 colPenName.like("%\(term)%")
             )
 
-            let totalCount = try db.scalar(filtered.count)
-
-            let circles = try db.prepare(filtered.limit(10)).map { row in
+            let allResults = try db.prepare(filtered.limit(11)).map { row in
                 ActionExtensionCircle(
                     id: row[colID],
                     eventNumber: row[colEventNumber],
@@ -60,10 +58,12 @@ enum CircleSearcher {
                 )
             }
 
-            return CircleSearchResult(circles: circles, totalCount: totalCount)
+            let hasMore = allResults.count > 10
+            let circles = hasMore ? Array(allResults.prefix(10)) : allResults
+            return CircleSearchResult(circles: circles, hasMore: hasMore)
         } catch {
             debugPrint("Search failed: \(error.localizedDescription)")
-            return CircleSearchResult(circles: [], totalCount: 0)
+            return CircleSearchResult(circles: [], hasMore: false)
         }
     }
 
