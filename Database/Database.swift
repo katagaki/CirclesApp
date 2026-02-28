@@ -72,13 +72,28 @@ class Database {
         #endif
         if let dataStoreURL {
             let textDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number).db")
+            let groupTextDatabaseURL = Database.groupContainerURL?
+                .appending(path: "webcatalog\(event.number).db")
+
+            // Migrate from Documents to group container if needed
             if FileManager.default.fileExists(atPath: textDatabaseURL.path(percentEncoded: false)) {
+                migrateTextDatabaseToGroupContainer(textDatabaseURL, eventNumber: event.number)
+            }
+
+            // Use group container database if available, fall back to Documents
+            if let groupTextDatabaseURL,
+               FileManager.default.fileExists(atPath: groupTextDatabaseURL.path(percentEncoded: false)) {
+                #if DEBUG
+                debugPrint("Database: Found text database in group container.")
+                #endif
+                self.textDatabaseURL = groupTextDatabaseURL
+            } else if FileManager.default.fileExists(atPath: textDatabaseURL.path(percentEncoded: false)) {
                 #if DEBUG
                 debugPrint("Database: Found text database.")
                 #endif
                 self.textDatabaseURL = textDatabaseURL
-                copyTextDatabaseToGroupContainer(textDatabaseURL, eventNumber: event.number)
             }
+
             let imageDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number)Image1.db")
             if FileManager.default.fileExists(atPath: imageDatabaseURL.path(percentEncoded: false)) {
                 #if DEBUG
@@ -89,31 +104,18 @@ class Database {
         }
     }
 
-    private func copyTextDatabaseToGroupContainer(_ sourceURL: URL, eventNumber: Int) {
+    private func migrateTextDatabaseToGroupContainer(_ sourceURL: URL, eventNumber: Int) {
         guard let groupContainerURL = Database.groupContainerURL else { return }
         let destinationURL = groupContainerURL.appending(path: "webcatalog\(eventNumber).db")
 
-        let sourceAttributes = try? FileManager.default.attributesOfItem(
-            atPath: sourceURL.path(percentEncoded: false)
-        )
-        let destinationAttributes = try? FileManager.default.attributesOfItem(
-            atPath: destinationURL.path(percentEncoded: false)
-        )
-        let sourceModDate = sourceAttributes?[.modificationDate] as? Date
-        let destinationModDate = destinationAttributes?[.modificationDate] as? Date
-
-        if let sourceModDate, let destinationModDate, destinationModDate >= sourceModDate {
-            return
-        }
-
         do {
             try? FileManager.default.removeItem(at: destinationURL)
-            try FileManager.default.copyItem(at: sourceURL, to: destinationURL)
+            try FileManager.default.moveItem(at: sourceURL, to: destinationURL)
             #if DEBUG
-            debugPrint("Database: Copied text database to group container.")
+            debugPrint("Database: Migrated text database to group container.")
             #endif
         } catch {
-            debugPrint("Database: Failed to copy to group container: \(error.localizedDescription)")
+            debugPrint("Database: Failed to migrate to group container: \(error.localizedDescription)")
         }
     }
 
@@ -135,8 +137,10 @@ class Database {
         if let dataStoreURL {
             let targetTextDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number).db")
             let targetImageDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number)Image1.db")
+            let groupTextDatabaseURL = Database.groupContainerURL?
+                .appending(path: "webcatalog\(event.number).db")
 
-            if textDatabaseURL == targetTextDatabaseURL {
+            if textDatabaseURL == targetTextDatabaseURL || textDatabaseURL == groupTextDatabaseURL {
                 textDatabase = nil
                 textDatabaseURL = nil
                 databaseInformation = nil
@@ -151,6 +155,9 @@ class Database {
 
             try? FileManager.default.removeItem(at: targetTextDatabaseURL)
             try? FileManager.default.removeItem(at: targetImageDatabaseURL)
+            if let groupTextDatabaseURL {
+                try? FileManager.default.removeItem(at: groupTextDatabaseURL)
+            }
         }
     }
 

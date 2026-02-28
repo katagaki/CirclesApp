@@ -20,7 +20,7 @@ enum CircleSearcher {
     static let groupContainerURL = FileManager.default.containerURL(
         forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.CiRCLES"
     )
-    static let sharedDefaults = UserDefaults(suiteName: "group.com.tsubuzaki.CiRCLES")
+    nonisolated(unsafe) static let sharedDefaults = UserDefaults(suiteName: "group.com.tsubuzaki.CiRCLES")
 
     static func search(_ searchTerm: String) -> [ActionExtensionCircle] {
         let term = searchTerm.trimmingCharacters(in: .whitespaces)
