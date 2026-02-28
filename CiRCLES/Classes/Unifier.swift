@@ -72,7 +72,8 @@ class Unifier {
         let pendingDir = containerURL.appending(path: "PendingAttachments")
         guard let files = try? FileManager.default.contentsOfDirectory(
             at: pendingDir, includingPropertiesForKeys: nil
-        ), let first = files.first else { return }
+        ).filter({ $0.pathExtension == "jpg" }),
+              let first = files.first else { return }
 
         pendingAttachmentURL = first
     }
