@@ -17,6 +17,7 @@ struct ActionExtensionSearchView: View {
     @State var searchResults: [ActionExtensionCircle] = []
     @State var selectedCircle: ActionExtensionCircle?
     @State var isSaving: Bool = false
+    @State var searchTask: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
@@ -79,7 +80,12 @@ struct ActionExtensionSearchView: View {
             }
             .animation(.smooth.speed(2.0), value: selectedCircle?.id)
             .onChange(of: searchTerm) {
-                searchResults = CircleSearcher.search(searchTerm)
+                searchTask?.cancel()
+                searchTask = Task {
+                    try? await Task.sleep(for: .milliseconds(300))
+                    guard !Task.isCancelled else { return }
+                    searchResults = CircleSearcher.search(searchTerm)
+                }
             }
         }
     }

@@ -21,25 +21,18 @@ enum CircleSearcher {
         forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.CiRCLES"
     )
     nonisolated(unsafe) static let sharedDefaults = UserDefaults(suiteName: "group.com.tsubuzaki.CiRCLES")
+    nonisolated(unsafe) private static var cachedConnection: Connection?
+    nonisolated(unsafe) private static var cachedEventNumber: Int?
 
     static func search(_ searchTerm: String) -> [ActionExtensionCircle] {
         let term = searchTerm.trimmingCharacters(in: .whitespaces)
         guard term.count >= 2 else { return [] }
 
-        guard let groupContainerURL else { return [] }
-
-        let activeEventNumber = sharedDefaults?.integer(forKey: "Events.Active.Number") ?? 0
-        guard activeEventNumber > 0 else { return [] }
-
-        let textDBURL = groupContainerURL.appending(path: "webcatalog\(activeEventNumber).db")
-        guard FileManager.default.fileExists(atPath: textDBURL.path(percentEncoded: false)),
-              let db = try? Connection(textDBURL.path(percentEncoded: false), readonly: true) else {
-            return []
-        }
+        guard let db = getConnection() else { return [] }
 
         do {
             let table = Table("ComiketCircleWC")
-            let colID = Expression<Int>("id")
+            let colID = table[Expression<Int>("id")]
             let colEventNumber = table[Expression<Int>("comiketNo")]
             let colCircleName = Expression<String>("circleName")
             let colCircleNameKana = Expression<String>("circleKana")
@@ -49,7 +42,7 @@ enum CircleSearcher {
                 colCircleName.like("%\(term)%") ||
                 colCircleNameKana.like("%\(term)%") ||
                 colPenName.like("%\(term)%")
-            )
+            ).limit(100)
 
             return try db.prepare(query).map { row in
                 ActionExtensionCircle(
@@ -63,5 +56,25 @@ enum CircleSearcher {
             debugPrint("Search failed: \(error.localizedDescription)")
             return []
         }
+    }
+
+    private static func getConnection() -> Connection? {
+        let activeEventNumber = sharedDefaults?.integer(forKey: "Events.Active.Number") ?? 0
+        guard activeEventNumber > 0 else { return nil }
+
+        if let cachedConnection, cachedEventNumber == activeEventNumber {
+            return cachedConnection
+        }
+
+        guard let groupContainerURL else { return nil }
+        let textDBURL = groupContainerURL.appending(path: "webcatalog\(activeEventNumber).db")
+        guard FileManager.default.fileExists(atPath: textDBURL.path(percentEncoded: false)),
+              let db = try? Connection(textDBURL.path(percentEncoded: false), readonly: true) else {
+            return nil
+        }
+
+        cachedConnection = db
+        cachedEventNumber = activeEventNumber
+        return db
     }
 }
