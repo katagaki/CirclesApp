@@ -31,14 +31,15 @@ class ActionViewController: UIViewController {
                 if provider.hasItemConformingToTypeIdentifier(UTType.image.identifier) {
                     provider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) {
                         [weak self] item, _ in
+                        let loadedData: Data? = if let url = item as? URL {
+                            try? Data(contentsOf: url)
+                        } else if let image = item as? UIImage {
+                            image.jpegData(compressionQuality: 0.9)
+                        } else {
+                            item as? Data
+                        }
                         Task { @MainActor in
-                            if let url = item as? URL, let data = try? Data(contentsOf: url) {
-                                self?.imageData = data
-                            } else if let image = item as? UIImage {
-                                self?.imageData = image.jpegData(compressionQuality: 0.9)
-                            } else if let data = item as? Data {
-                                self?.imageData = data
-                            }
+                            self?.imageData = loadedData
                             self?.showSearchView()
                         }
                     }
