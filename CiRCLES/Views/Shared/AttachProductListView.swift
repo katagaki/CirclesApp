@@ -13,7 +13,7 @@ struct AttachProductListView: View {
     @Environment(Events.self) var planner
     @Environment(\.dismiss) var dismiss
 
-    let pendingImageURL: URL
+    let imageData: Data
 
     @State var searchTerm: String = ""
     @State var searchResults: [ComiketCircle] = []
@@ -83,7 +83,7 @@ struct AttachProductListView: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("キャンセル") {
-                        cleanupAndDismiss()
+                        dismiss()
                     }
                 }
             }
@@ -138,7 +138,6 @@ struct AttachProductListView: View {
 
     func save() {
         guard let selectedCircle else { return }
-        guard let imageData = try? Data(contentsOf: pendingImageURL) else { return }
         isSaving = true
 
         AttachmentsDatabase.shared.insert(
@@ -149,12 +148,6 @@ struct AttachProductListView: View {
             attachmentBlob: imageData
         )
 
-        try? FileManager.default.removeItem(at: pendingImageURL)
-        dismiss()
-    }
-
-    func cleanupAndDismiss() {
-        try? FileManager.default.removeItem(at: pendingImageURL)
         dismiss()
     }
 }

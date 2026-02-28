@@ -56,11 +56,11 @@ struct CirclesApp: App {
                     progress: $oasis.progress
                 )
                 .sheet(isPresented: Binding(
-                    get: { unifier.pendingAttachmentURL != nil },
-                    set: { if !$0 { unifier.pendingAttachmentURL = nil } }
+                    get: { unifier.pendingAttachmentData != nil },
+                    set: { if !$0 { unifier.pendingAttachmentData = nil } }
                 )) {
-                    if let url = unifier.pendingAttachmentURL {
-                        AttachProductListView(pendingImageURL: url)
+                    if let data = unifier.pendingAttachmentData {
+                        AttachProductListView(imageData: data)
                     }
                 }
                 .onAppear {

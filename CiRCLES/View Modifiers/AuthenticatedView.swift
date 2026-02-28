@@ -52,8 +52,11 @@ struct AuthenticatedView: ViewModifier {
                 }
             }
             .onOpenURL { url in
-                if url.scheme == "circles-app" && url.host() == "attach-product-list" {
-                    unifier.checkPendingAttachments()
+                if url.scheme == "circles-app" && url.host() == "attach-product-list",
+                   let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+                   let base64 = components.queryItems?.first(where: { $0.name == "image" })?.value,
+                   let data = Data(base64Encoded: base64) {
+                    unifier.pendingAttachmentData = data
                 } else if url.absoluteString == circleMsCancelURLSchema {
                     authenticator.isWaitingForAuthenticationCode = false
                 } else {
@@ -123,7 +126,6 @@ struct AuthenticatedView: ViewModifier {
             unifier.show()
         }
         isReloadingData = false
-        unifier.checkPendingAttachments()
         Task.detached(priority: .background) {
             await loadFavorites()
         }

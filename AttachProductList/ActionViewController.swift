@@ -13,10 +13,10 @@ class ActionViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        extractAndSaveImage()
+        extractAndOpenApp()
     }
 
-    func extractAndSaveImage() {
+    func extractAndOpenApp() {
         guard let extensionItems = extensionContext?.inputItems as? [NSExtensionItem] else {
             extensionContext?.completeRequest(returningItems: nil)
             return
@@ -37,9 +37,10 @@ class ActionViewController: UIViewController {
                         }
                         Task { @MainActor in
                             if let loadedData {
-                                self?.saveToGroupContainer(loadedData)
+                                self?.openContainingApp(with: loadedData)
+                            } else {
+                                self?.extensionContext?.completeRequest(returningItems: nil)
                             }
-                            self?.openContainingApp()
                         }
                     }
                     return
@@ -50,20 +51,14 @@ class ActionViewController: UIViewController {
         extensionContext?.completeRequest(returningItems: nil)
     }
 
-    func saveToGroupContainer(_ imageData: Data) {
-        guard let containerURL = FileManager.default.containerURL(
-            forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.CiRCLES"
-        ) else { return }
+    func openContainingApp(with imageData: Data) {
+        let base64 = imageData.base64EncodedString()
+        var components = URLComponents()
+        components.scheme = "circles-app"
+        components.host = "attach-product-list"
+        components.queryItems = [URLQueryItem(name: "image", value: base64)]
 
-        let pendingDir = containerURL.appending(path: "PendingAttachments")
-        try? FileManager.default.createDirectory(at: pendingDir, withIntermediateDirectories: true)
-
-        let fileURL = pendingDir.appending(path: "\(UUID().uuidString).jpg")
-        try? imageData.write(to: fileURL)
-    }
-
-    func openContainingApp() {
-        guard let url = URL(string: "circles-app://attach-product-list") else {
+        guard let url = components.url else {
             extensionContext?.completeRequest(returningItems: nil)
             return
         }
