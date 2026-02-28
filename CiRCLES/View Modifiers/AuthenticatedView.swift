@@ -52,7 +52,12 @@ struct AuthenticatedView: ViewModifier {
                 }
             }
             .onOpenURL { url in
-                if url.absoluteString == circleMsCancelURLSchema {
+                if url.scheme == "circles-app" && url.host() == "attach-product-list",
+                   let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+                   let base64 = components.queryItems?.first(where: { $0.name == "image" })?.value,
+                   let data = Data(base64Encoded: base64) {
+                    unifier.pendingAttachmentData = data
+                } else if url.absoluteString == circleMsCancelURLSchema {
                     authenticator.isWaitingForAuthenticationCode = false
                 } else {
                     authenticator.getAuthenticationCode(from: url)

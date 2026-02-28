@@ -92,9 +92,15 @@ extension Database {
     func isDownloaded(for event: WebCatalogEvent.Response.Event) -> Bool {
         if let dataStoreURL {
             let textDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number).db")
+            let groupTextDatabaseURL = Database.groupContainerURL?
+                .appending(path: "webcatalog\(event.number).db")
             let imageDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number)Image1.db")
-            return FileManager.default.fileExists(atPath: textDatabaseURL.path(percentEncoded: false)) &&
-            FileManager.default.fileExists(atPath: imageDatabaseURL.path(percentEncoded: false))
+            let textExists = FileManager.default.fileExists(atPath: textDatabaseURL.path(percentEncoded: false))
+                || (groupTextDatabaseURL.map {
+                    FileManager.default.fileExists(atPath: $0.path(percentEncoded: false))
+                } ?? false)
+            let imageExists = FileManager.default.fileExists(atPath: imageDatabaseURL.path(percentEncoded: false))
+            return textExists && imageExists
         }
         return false
     }

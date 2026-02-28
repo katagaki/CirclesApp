@@ -55,6 +55,21 @@ struct CirclesApp: App {
                     bodyText: $oasis.bodyText,
                     progress: $oasis.progress
                 )
+                .sheet(isPresented: Binding(
+                    get: { unifier.pendingAttachmentData != nil },
+                    set: { if !$0 { unifier.pendingAttachmentData = nil } }
+                )) {
+                    unifier.show()
+                } content: {
+                    if let data = unifier.pendingAttachmentData {
+                        AttachProductListView(imageData: data)
+                    }
+                }
+                .onChange(of: unifier.pendingAttachmentData) { _, newValue in
+                    if newValue != nil {
+                        unifier.hide()
+                    }
+                }
                 .onAppear {
                     orientation.update()
                 }
