@@ -39,7 +39,7 @@ class ActionViewController: UIViewController {
                             if let loadedData {
                                 self?.saveToGroupContainer(loadedData)
                             }
-                            self?.extensionContext?.completeRequest(returningItems: nil)
+                            self?.openMainApp()
                         }
                     }
                     return
@@ -48,6 +48,17 @@ class ActionViewController: UIViewController {
         }
 
         extensionContext?.completeRequest(returningItems: nil)
+    }
+
+    func openMainApp() {
+        guard let url = URL(string: "circles-app://attach-product-list") else {
+            extensionContext?.completeRequest(returningItems: nil)
+            return
+        }
+
+        extensionContext?.open(url) { [weak self] _ in
+            self?.extensionContext?.completeRequest(returningItems: nil)
+        }
     }
 
     func saveToGroupContainer(_ imageData: Data) {
