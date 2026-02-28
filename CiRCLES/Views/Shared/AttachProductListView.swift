@@ -64,7 +64,7 @@ struct AttachProductListView: View {
                         .listRowBackground(Color.clear)
                         .listRowSeparator(.hidden)
                 }
-            }
+            .listStyle(.plain)
             .overlay {
                 if searchTerm.trimmingCharacters(in: .whitespaces).count < 2 {
                     ContentUnavailableView(
