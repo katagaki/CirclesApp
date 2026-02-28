@@ -30,6 +30,12 @@ struct AttachProductListView: View {
                         selectedCircle = circle
                     } label: {
                         HStack(spacing: 12.0) {
+                            if let cutImage = database.circleImage(for: circle.id) {
+                                Image(uiImage: cutImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 36.0, height: 51.0)
+                            }
                             VStack(alignment: .leading, spacing: 4.0) {
                                 Text(circle.circleName)
                                     .foregroundStyle(selectedCircle?.id == circle.id

@@ -65,6 +65,8 @@ class Unifier {
     func show() {
         // Only set isPresented on phone, iPad sidebar is always visible
         if UIDevice.current.userInterfaceIdiom == .phone {
+            // Don't show unified sheet while attachment search is open
+            guard pendingAttachmentData == nil else { return }
             self.isPresenting = true
         }
     }

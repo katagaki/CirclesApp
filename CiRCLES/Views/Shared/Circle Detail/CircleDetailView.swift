@@ -72,8 +72,8 @@ struct CircleDetailView: View {
                                     .resizable()
                                     .scaledToFit()
                                     .frame(maxWidth: .infinity)
-                                    .clipShape(RoundedRectangle(cornerRadius: 8.0))
                             }
+                            .listRowInsets(EdgeInsets())
                             .contextMenu {
                                 Button("Circles.Attachments.Delete", systemImage: "trash", role: .destructive) {
                                     deleteAttachment(attachment)
