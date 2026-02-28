@@ -52,7 +52,9 @@ struct AuthenticatedView: ViewModifier {
                 }
             }
             .onOpenURL { url in
-                if url.absoluteString == circleMsCancelURLSchema {
+                if url.scheme == "circles-app" && url.host() == "attach-product-list" {
+                    unifier.checkPendingAttachments()
+                } else if url.absoluteString == circleMsCancelURLSchema {
                     authenticator.isWaitingForAuthenticationCode = false
                 } else {
                     authenticator.getAuthenticationCode(from: url)

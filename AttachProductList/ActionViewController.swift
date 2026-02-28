@@ -39,7 +39,7 @@ class ActionViewController: UIViewController {
                             if let loadedData {
                                 self?.saveToGroupContainer(loadedData)
                             }
-                            self?.extensionContext?.completeRequest(returningItems: nil)
+                            self?.openContainingApp()
                         }
                     }
                     return
@@ -60,5 +60,25 @@ class ActionViewController: UIViewController {
 
         let fileURL = pendingDir.appending(path: "\(UUID().uuidString).jpg")
         try? imageData.write(to: fileURL)
+    }
+
+    func openContainingApp() {
+        guard let url = URL(string: "circles-app://attach-product-list") else {
+            extensionContext?.completeRequest(returningItems: nil)
+            return
+        }
+
+        // Walk up the responder chain to find an object that can open URLs
+        var responder: UIResponder? = self
+        let selector = NSSelectorFromString("openURL:")
+        while let r = responder {
+            if r.responds(to: selector) {
+                r.perform(selector, with: url)
+                break
+            }
+            responder = r.next
+        }
+
+        extensionContext?.completeRequest(returningItems: nil)
     }
 }
