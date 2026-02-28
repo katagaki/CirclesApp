@@ -127,21 +127,19 @@ class Authenticator {
     }
 
     func getAuthenticationCode(from url: URL) {
-        if let components = URLComponents(url: url, resolvingAgainstBaseURL: true) {
-            if let queryItems = components.queryItems {
-                var parameters: [String: String] = [:]
-                for item in queryItems {
-                    if let value = item.value {
-                        parameters[item.name] = value
-                    }
+        if let components = URLComponents(url: url, resolvingAgainstBaseURL: true),
+           let queryItems = components.queryItems {
+            var parameters: [String: String] = [:]
+            for item in queryItems {
+                if let value = item.value {
+                    parameters[item.name] = value
                 }
-                if let code = parameters["code"],
-                    let state = parameters ["state"] {
-                    if state == "auth" {
-                        self.code = code
-                        self.isWaitingForAuthenticationCode = false
-                    }
-                }
+            }
+            if let code = parameters["code"],
+               let state = parameters["state"],
+               state == "auth" {
+                self.code = code
+                self.isWaitingForAuthenticationCode = false
             }
         }
     }

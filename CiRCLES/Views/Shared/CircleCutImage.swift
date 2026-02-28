@@ -160,19 +160,18 @@ struct CircleCutImage: View {
             cutImage = database.circleImage(for: circle.id)
         }
         // Only fetch web cut when cutType is .web and we're online
-        if cutType == .web && authenticator.onlineState == .online {
-            if let extendedInformation = circle.extendedInformation {
-                let circleID = circle.id
-                let webCatalogID = extendedInformation.webCatalogID
-                Task.detached {
-                    try? await webCut(for: circleID, webCatalogID: webCatalogID) { image, data in
-                        await MainActor.run {
-                            if let image {
-                                self.cutImage = image
-                            }
-                            if let data {
-                                imageCache.set(circleID, data: data)
-                            }
+        if cutType == .web && authenticator.onlineState == .online,
+           let extendedInformation = circle.extendedInformation {
+            let circleID = circle.id
+            let webCatalogID = extendedInformation.webCatalogID
+            Task.detached {
+                try? await webCut(for: circleID, webCatalogID: webCatalogID) { image, data in
+                    await MainActor.run {
+                        if let image {
+                            self.cutImage = image
+                        }
+                        if let data {
+                            imageCache.set(circleID, data: data)
                         }
                     }
                 }
@@ -190,21 +189,20 @@ struct CircleCutImage: View {
                 await completion((image, nil))
             }
         }
-        if let token = authenticator.token {
-            if let circleResponse = await WebCatalog.circle(
-                with: webCatalogID, authToken: token
-            ),
-               let webCatalogInformation = circleResponse.response.circle {
-                if webCatalogInformation.cutWebURL != "" {
-                    if let webCutURL = URL(string: webCatalogInformation.cutWebURL) {
-                        let (image, data) = await ImageCache.download(
-                            id: circleID, url: webCutURL
-                        )
-                        await completion((image, data))
-                    }
-                } else {
-                    ImageCache.saveImage(Data(), named: String(circleID))
+        if let token = authenticator.token,
+           let circleResponse = await WebCatalog.circle(
+               with: webCatalogID, authToken: token
+           ),
+           let webCatalogInformation = circleResponse.response.circle {
+            if webCatalogInformation.cutWebURL != "" {
+                if let webCutURL = URL(string: webCatalogInformation.cutWebURL) {
+                    let (image, data) = await ImageCache.download(
+                        id: circleID, url: webCutURL
+                    )
+                    await completion((image, data))
                 }
+            } else {
+                ImageCache.saveImage(Data(), named: String(circleID))
             }
         }
         await completion((nil, nil))

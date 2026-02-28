@@ -11,25 +11,25 @@ import SwiftUI
 @Observable
 @MainActor
 class Orientation {
-    private var orientation: UIDeviceOrientation
+    private var deviceOrientation: UIDeviceOrientation
 
     init() {
-        self.orientation = UIDevice.current.orientation
+        self.deviceOrientation = UIDevice.current.orientation
     }
 
     func update() {
-        self.orientation = UIDevice.current.orientation
+        self.deviceOrientation = UIDevice.current.orientation
     }
 
     func update(to orientation: UIDeviceOrientation) {
-        self.orientation = orientation
+        self.deviceOrientation = orientation
     }
 
     var isPortrait: Bool {
-        return orientation.isPortrait || orientation == .portraitUpsideDown
+        return deviceOrientation.isPortrait || deviceOrientation == .portraitUpsideDown
     }
 
     var isLandscape: Bool {
-        return orientation.isLandscape && orientation != .portraitUpsideDown
+        return deviceOrientation.isLandscape && deviceOrientation != .portraitUpsideDown
     }
 }

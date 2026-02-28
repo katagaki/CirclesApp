@@ -235,8 +235,8 @@ struct MyEventNotifierSheet: View {
                     }
                 }
                 dismiss()
-            } else {
-                // TODO: Show message guiding user to Settings app
+            } else if let settingsURL = URL(string: UIApplication.openSettingsURLString) {
+                await UIApplication.shared.open(settingsURL)
             }
         } catch {
             debugPrint(error.localizedDescription)

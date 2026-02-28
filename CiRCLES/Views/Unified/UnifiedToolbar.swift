@@ -34,16 +34,14 @@ struct UnifiedToolbar: ToolbarContent {
                 UnifiedMoreMenu()
             }
         }
-        if #available(iOS 26.0, *) {
-            if UIDevice.current.userInterfaceIdiom == .phone {
-                ToolbarSpacer(.flexible, placement: .bottomBar)
-                ToolbarItem(placement: .bottomBar) {
-                    Button("Shared.OpenPanel", systemImage: "chevron.up") {
-                        unifier.show()
-                    }
+        if #available(iOS 26.0, *), UIDevice.current.userInterfaceIdiom == .phone {
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                Button("Shared.OpenPanel", systemImage: "chevron.up") {
+                    unifier.show()
                 }
-                .matchedTransitionSource(id: "BottomPanel", in: namespace)
             }
+            .matchedTransitionSource(id: "BottomPanel", in: namespace)
         }
     }
 }

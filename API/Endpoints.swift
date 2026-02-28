@@ -7,13 +7,13 @@
 
 import Foundation
 
- #if DEBUG
- let circleMsAuthEndpoint: URL = URL(string: "https://auth1-sandbox.circle.ms")!
- let circleMsAPIEndpoint: URL = URL(string: "https://api1-sandbox.circle.ms")!
- #else
-let circleMsAuthEndpoint: URL = URL(string: "https://auth1.circle.ms")!
-let circleMsAPIEndpoint: URL = URL(string: "https://api1.circle.ms")!
- #endif
+#if DEBUG
+let circleMsAuthEndpoint: URL = URL(string: "https://auth1-sandbox.circle.ms")! // NOSONAR
+let circleMsAPIEndpoint: URL = URL(string: "https://api1-sandbox.circle.ms")! // NOSONAR
+#else
+let circleMsAuthEndpoint: URL = URL(string: "https://auth1.circle.ms")! // NOSONAR
+let circleMsAPIEndpoint: URL = URL(string: "https://api1.circle.ms")! // NOSONAR
+#endif
 
 let circleMsCancelURLSchema: String = """
 circles-app:/?error=access_denied&error_description=user%20access%20denied&state=auth

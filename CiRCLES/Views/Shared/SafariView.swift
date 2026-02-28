@@ -13,7 +13,7 @@ import UIKit
 struct SafariView: UIViewControllerRepresentable {
     let url: URL
 
-    func makeUIViewController(context: Context) -> SFSafariViewController {
+    func makeUIViewController(context _: Context) -> SFSafariViewController {
         let configuration = SFSafariViewController.Configuration()
         configuration.barCollapsingEnabled = false
 
@@ -26,8 +26,8 @@ struct SafariView: UIViewControllerRepresentable {
         return safariViewController
     }
 
-    func updateUIViewController(_ safariViewController: SFSafariViewController, context: Context) {
-
+    func updateUIViewController(_ safariViewController: SFSafariViewController, context _: Context) {
+        // No updates needed; SFSafariViewController manages its own state.
     }
 }
 #endif

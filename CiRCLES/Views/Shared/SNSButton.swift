@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+private let pixivMemberURLPrefix = "https://www.pixiv.net/member.php?id="
+
 struct SNSButton: View {
 
     @Environment(\.openURL) var openURL
@@ -57,10 +59,9 @@ struct SNSButton: View {
             Button {
                 var urlToOpen: URL = url
                 if UIApplication.shared.canOpenURL(URL(string: "pixiv://")!) {
-                    let pixivPrefix = "https://www.pixiv.net/member.php?id="
                     let urlString = url.absoluteString
-                    if urlString.starts(with: pixivPrefix) {
-                        let userID = urlString.trimmingPrefix(pixivPrefix)
+                    if urlString.starts(with: pixivMemberURLPrefix) {
+                        let userID = urlString.trimmingPrefix(pixivMemberURLPrefix)
                         let formattedURL = "pixiv://users/\(userID)"
                         if let appURL = URL(string: formattedURL) {
                             urlToOpen = appURL

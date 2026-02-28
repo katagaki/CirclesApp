@@ -86,10 +86,10 @@ struct MapPopover<Content: View>: View {
         let nearTopEdge = itemCenterY < canvasSize.height * 0.3
         let nearBottomEdge = itemCenterY > canvasSize.height * 0.7
 
-        if nearTopEdge && canFitBelow {
+        if (nearTopEdge && canFitBelow) || (!canFitRight && !canFitLeft && !canFitAbove && canFitBelow) {
             positionX = itemCenterX
             positionY = itemCenterY + minOffsetY
-        } else if nearBottomEdge && canFitAbove {
+        } else if (nearBottomEdge && canFitAbove) || (!canFitRight && !canFitLeft && canFitAbove) {
             positionX = itemCenterX
             positionY = itemCenterY - minOffsetY
         } else if canFitRight {
@@ -110,12 +110,6 @@ struct MapPopover<Content: View>: View {
             } else if positionY - effectiveHeight / 2 < edgePadding {
                 positionY = edgePadding + effectiveHeight / 2
             }
-        } else if canFitBelow {
-            positionX = itemCenterX
-            positionY = itemCenterY + minOffsetY
-        } else if canFitAbove {
-            positionX = itemCenterX
-            positionY = itemCenterY - minOffsetY
         } else {
             positionX = itemCenterX + minOffsetX
             positionY = itemCenterY

@@ -91,10 +91,14 @@ struct CircleDetailView: View {
             }
         }
         .alert("Alerts.FirstCircle.Title", isPresented: $unifier.isFirstCircleAlertShowing) {
-            Button("Shared.OK", role: .cancel) { }
+            Button("Shared.OK", role: .cancel) {
+                // Dismiss the alert; no additional action required.
+            }
         }
         .alert("Alerts.LastCircle.Title", isPresented: $unifier.isLastCircleAlertShowing) {
-            Button("Shared.OK", role: .cancel) { }
+            Button("Shared.OK", role: .cancel) {
+                // Dismiss the alert; no additional action required.
+            }
         }
         .task {
             await prepareCircle()

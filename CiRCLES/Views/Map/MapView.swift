@@ -107,12 +107,11 @@ struct MapView: View {
                                 let maps = database.maps()
                                 let dates = database.dates()
                                 if let newMap = maps.first(where: { $0.id == mapID }),
-                                   let newDate = dates.first(where: { $0.id == circle.day }) {
-                                    if selections.map?.id != newMap.id || selections.date?.id != newDate.id {
-                                        selections.map = newMap
-                                        selections.date = newDate
-                                        return
-                                    }
+                                   let newDate = dates.first(where: { $0.id == circle.day }),
+                                   selections.map?.id != newMap.id || selections.date?.id != newDate.id {
+                                    selections.map = newMap
+                                    selections.date = newDate
+                                    return
                                 }
                             }
                         }
