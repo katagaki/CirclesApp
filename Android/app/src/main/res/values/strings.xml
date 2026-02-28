@@ -61,6 +61,7 @@
     <string name="select_event">Select Event</string>
     <string name="show_genre_overlay">Show Genre Overlay</string>
     <string name="darken_map_in_dark_mode">Darken Map in Dark Mode</string>
+    <string name="use_high_resolution_maps">Use High Definition Map</string>
     <string name="show_space_name">Show Space Number</string>
     <string name="show_day">Show Day</string>
     <string name="privacy_mode">Privacy Mode</string>

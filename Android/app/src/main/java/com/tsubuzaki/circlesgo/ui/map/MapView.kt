@@ -65,8 +65,8 @@ fun MapView(
 
     val spaceSize = if (useHighResolutionMaps) 40 else 20
 
-    // Reload map image when selection changes or when common images finish loading
-    LaunchedEffect(selectedDate, selectedMap, commonImagesLoadCount) {
+    // Reload map image when selection changes, resolution setting changes, or when common images finish loading
+    LaunchedEffect(selectedDate, selectedMap, commonImagesLoadCount, useHighResolutionMaps) {
         val date = selectedDate
         val map = selectedMap
         if (date != null && map != null) {

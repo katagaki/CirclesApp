@@ -71,6 +71,7 @@ fun UnifiedView(
     val isGoingToSignOut by unifier.isGoingToSignOut.collectAsState()
     val isSearchActive by unifier.isSearchActive.collectAsState()
     val showGenreOverlay by selections.showGenreOverlay.collectAsState()
+    val useHighResolutionMaps by selections.useHighResolutionMaps.collectAsState()
     val scope = rememberCoroutineScope()
 
     val bottomSheetState = rememberStandardBottomSheetState(
@@ -208,6 +209,7 @@ fun UnifiedView(
                     mapper = mapper,
                     selections = selections,
                     favorites = favorites,
+                    useHighResolutionMaps = useHighResolutionMaps,
                     showGenreOverlay = showGenreOverlay,
                     onCircleTapped = { circle ->
                         unifier.showCircleDetail(circle)

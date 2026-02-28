@@ -24,6 +24,7 @@ class UserSelections(context: Context) {
         private const val SHOW_SPACE_NAME_KEY = "Circles.ShowSpaceName"
         private const val SHOW_DAY_KEY = "Circles.ShowDay"
         private const val DARKEN_MAP_IN_DARK_MODE_KEY = "Circles.DarkenMapInDarkMode"
+        private const val USE_HIGH_RESOLUTION_MAPS_KEY = "Circles.UseHighResolutionMaps"
         private const val MAP_ZOOM_LEVEL_KEY = "Circles.MapZoomLevel"
     }
 
@@ -66,6 +67,11 @@ class UserSelections(context: Context) {
     )
     val darkenMapInDarkMode: StateFlow<Boolean> = _darkenMapInDarkMode
 
+    private val _useHighResolutionMaps = MutableStateFlow(
+        prefs.getBoolean(USE_HIGH_RESOLUTION_MAPS_KEY, true)
+    )
+    val useHighResolutionMaps: StateFlow<Boolean> = _useHighResolutionMaps
+
     private val _mapZoomLevel = MutableStateFlow(
         prefs.getFloat(MAP_ZOOM_LEVEL_KEY, 1.0f)
     )
@@ -91,6 +97,11 @@ class UserSelections(context: Context) {
     fun setDarkenMapInDarkMode(enabled: Boolean) {
         _darkenMapInDarkMode.value = enabled
         prefs.edit { putBoolean(DARKEN_MAP_IN_DARK_MODE_KEY, enabled) }
+    }
+
+    fun setUseHighResolutionMaps(enabled: Boolean) {
+        _useHighResolutionMaps.value = enabled
+        prefs.edit { putBoolean(USE_HIGH_RESOLUTION_MAPS_KEY, enabled) }
     }
 
     fun setMapZoomLevel(zoom: Float) {

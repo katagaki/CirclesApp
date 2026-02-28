@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.Hd
 import androidx.compose.material.icons.outlined.PhoneIphone
 import androidx.compose.material.icons.outlined.TableRestaurant
 import androidx.compose.material.icons.outlined.TheaterComedy
@@ -108,6 +109,25 @@ fun UnifiedMoreMenu(
                 Switch(
                     checked = darkenMapInDarkMode,
                     onCheckedChange = { selections.setDarkenMapInDarkMode(it) }
+                )
+            }
+        )
+
+        // High resolution maps toggle
+        val useHighResolutionMaps by selections.useHighResolutionMaps.collectAsState()
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.use_high_resolution_maps)) },
+            onClick = { selections.setUseHighResolutionMaps(!useHighResolutionMaps) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Hd,
+                    contentDescription = null
+                )
+            },
+            trailingIcon = {
+                Switch(
+                    checked = useHighResolutionMaps,
+                    onCheckedChange = { selections.setUseHighResolutionMaps(it) }
                 )
             }
         )
