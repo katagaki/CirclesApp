@@ -83,9 +83,6 @@ struct CirclesApp: App {
         .environment(mapper)
         .environment(unifier)
         .onChange(of: scenePhase) { _, newValue in
-            if newValue == .active {
-                unifier.checkPendingAttachments()
-            }
             if !hasAppLaunchedForTheFirstTime {
                 hasAppLaunchedForTheFirstTime = true
             } else {
