@@ -103,7 +103,7 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
             self.parent = parent
         }
 
-        func viewForZooming(in scrollView _: UIScrollView) -> UIView? {
+        func viewForZooming(in scrollView: UIScrollView) -> UIView? {
             return hostingController?.view
         }
 
