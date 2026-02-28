@@ -14,7 +14,7 @@
 		E480AAA62C44BB77009C1445 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = E480AAA52C44BB77009C1445 /* ZIPFoundation */; };
 		E4D74B892C8CAEA70014CD16 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = E4D74B882C8CAEA70014CD16 /* Reachability */; };
 		F1A0B0012F31700000000001 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = F1A0B0022F31700000000001 /* SQLite */; };
-		F1A0B0062F31700000000001 /* ShareWithCiRCLES.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F1A0B0062F31700000000001 /* ShareWithCiRCLES.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -344,6 +344,7 @@
 /* Begin PBXTargetDependency section */
 		F1A0B00C2F31700000000001 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
+			platformFilter = ios;
 			target = F1A0B0042F31700000000001 /* ShareWithCiRCLES */;
 			targetProxy = F1A0B0032F31700000000001 /* PBXContainerItemProxy */;
 		};
