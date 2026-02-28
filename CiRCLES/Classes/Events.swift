@@ -68,13 +68,13 @@ class Events {
     var participation: [String: [String: String]]
 
     init() {
+        let storedEventNumber: Int
         if UserDefaults.standard.value(forKey: activeEventNumberKey) != nil {
-            activeEventNumber = UserDefaults.standard.integer(forKey: activeEventNumberKey)
-            UserDefaults(suiteName: "group.com.tsubuzaki.CiRCLES")?
-                .set(activeEventNumber, forKey: activeEventNumberKey)
+            storedEventNumber = UserDefaults.standard.integer(forKey: activeEventNumberKey)
         } else {
-            activeEventNumber = -1
+            storedEventNumber = -1
         }
+        activeEventNumber = storedEventNumber
         if UserDefaults.standard.value(forKey: participationKey) != nil {
             let participationString: String? = UserDefaults.standard.string(forKey: participationKey)
             if let participationString,
@@ -96,6 +96,9 @@ class Events {
             participation = [:]
             participationUserDefault = participation
         }
+        // Sync to shared UserDefaults after all stored properties are initialized
+        UserDefaults(suiteName: "group.com.tsubuzaki.CiRCLES")?
+            .set(storedEventNumber, forKey: activeEventNumberKey)
     }
 
     @MainActor
