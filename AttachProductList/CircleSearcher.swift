@@ -15,6 +15,11 @@ struct ActionExtensionCircle: Identifiable, Sendable {
     let penName: String
 }
 
+struct CircleSearchResult: Sendable {
+    let circles: [ActionExtensionCircle]
+    let totalCount: Int
+}
+
 enum CircleSearcher {
 
     static let groupContainerURL = FileManager.default.containerURL(
@@ -24,11 +29,11 @@ enum CircleSearcher {
     nonisolated(unsafe) private static var cachedConnection: Connection?
     nonisolated(unsafe) private static var cachedEventNumber: Int?
 
-    static func search(_ searchTerm: String) -> [ActionExtensionCircle] {
+    static func search(_ searchTerm: String) -> CircleSearchResult {
         let term = searchTerm.trimmingCharacters(in: .whitespaces)
-        guard term.count >= 2 else { return [] }
+        guard term.count >= 2 else { return CircleSearchResult(circles: [], totalCount: 0) }
 
-        guard let db = getConnection() else { return [] }
+        guard let db = getConnection() else { return CircleSearchResult(circles: [], totalCount: 0) }
 
         do {
             let table = Table("ComiketCircleWC")
@@ -38,13 +43,15 @@ enum CircleSearcher {
             let colCircleNameKana = Expression<String>("circleKana")
             let colPenName = Expression<String>("penName")
 
-            let query = table.filter(
+            let filtered = table.filter(
                 colCircleName.like("%\(term)%") ||
                 colCircleNameKana.like("%\(term)%") ||
                 colPenName.like("%\(term)%")
-            ).limit(100)
+            )
 
-            return try db.prepare(query).map { row in
+            let totalCount = try db.scalar(filtered.count)
+
+            let circles = try db.prepare(filtered.limit(10)).map { row in
                 ActionExtensionCircle(
                     id: row[colID],
                     eventNumber: row[colEventNumber],
@@ -52,9 +59,11 @@ enum CircleSearcher {
                     penName: row[colPenName]
                 )
             }
+
+            return CircleSearchResult(circles: circles, totalCount: totalCount)
         } catch {
             debugPrint("Search failed: \(error.localizedDescription)")
-            return []
+            return CircleSearchResult(circles: [], totalCount: 0)
         }
     }
 

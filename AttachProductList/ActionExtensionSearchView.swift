@@ -15,32 +15,43 @@ struct ActionExtensionSearchView: View {
 
     @State var searchTerm: String = ""
     @State var searchResults: [ActionExtensionCircle] = []
+    @State var totalResultCount: Int = 0
     @State var selectedCircle: ActionExtensionCircle?
     @State var isSaving: Bool = false
     @State var searchTask: Task<Void, Never>?
 
     var body: some View {
         NavigationStack {
-            List(searchResults) { circle in
-                Button {
-                    selectedCircle = circle
-                } label: {
-                    HStack(spacing: 12.0) {
-                        VStack(alignment: .leading, spacing: 4.0) {
-                            Text(circle.circleName)
-                                .foregroundStyle(selectedCircle?.id == circle.id ? Color.accentColor : .primary)
-                            if !circle.penName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                Text(circle.penName)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+            List {
+                ForEach(searchResults) { circle in
+                    Button {
+                        selectedCircle = circle
+                    } label: {
+                        HStack(spacing: 12.0) {
+                            VStack(alignment: .leading, spacing: 4.0) {
+                                Text(circle.circleName)
+                                    .foregroundStyle(selectedCircle?.id == circle.id ? Color.accentColor : .primary)
+                                if !circle.penName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                    Text(circle.penName)
+                                        .font(.subheadline)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            Spacer(minLength: 0)
+                            if selectedCircle?.id == circle.id {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(Color.accentColor)
                             }
                         }
-                        Spacer(minLength: 0)
-                        if selectedCircle?.id == circle.id {
-                            Image(systemName: "checkmark")
-                                .foregroundStyle(Color.accentColor)
-                        }
                     }
+                }
+                if totalResultCount > 10 {
+                    Text("他\(totalResultCount - 10)件　検索条件を絞ってください。")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity)
+                        .listRowBackground(Color.clear)
+                        .listRowSeparator(.hidden)
                 }
             }
             .overlay {
@@ -84,7 +95,9 @@ struct ActionExtensionSearchView: View {
                 searchTask = Task {
                     try? await Task.sleep(for: .milliseconds(300))
                     guard !Task.isCancelled else { return }
-                    searchResults = CircleSearcher.search(searchTerm)
+                    let result = CircleSearcher.search(searchTerm)
+                    searchResults = result.circles
+                    totalResultCount = result.totalCount
                 }
             }
         }
