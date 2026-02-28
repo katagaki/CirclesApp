@@ -13,11 +13,38 @@
 		E480AA9D2C44A6F1009C1445 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA9C2C44A6F1009C1445 /* SQLite */; };
 		E480AAA62C44BB77009C1445 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = E480AAA52C44BB77009C1445 /* ZIPFoundation */; };
 		E4D74B892C8CAEA70014CD16 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = E4D74B882C8CAEA70014CD16 /* Reachability */; };
+		F1A0B0012F31700000000001 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = F1A0B0022F31700000000001 /* SQLite */; };
+		F1A0B0062F31700000000001 /* ShareWithCiRCLES.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F1A0B0032F31700000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4A7693E2C21A20A00BE3491 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F1A0B0042F31700000000001;
+			remoteInfo = AttachProductList;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F1A0B0052F31700000000001 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F1A0B0062F31700000000001 /* ShareWithCiRCLES.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4D74B982C8D7D5B0014CD16 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareWithCiRCLES.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -28,6 +55,34 @@
 				"OpenID-Sample.plist",
 			);
 			target = E4A769452C21A20A00BE3491 /* CiRCLES */;
+		};
+		F1A0B0082F31700000000001 /* Exceptions for "Share Extension" folder in "ShareWithCiRCLES" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = F1A0B0042F31700000000001 /* ShareWithCiRCLES */;
+		};
+		F1A0B0092F31700000000001 /* Exceptions for "Database" folder in "ShareWithCiRCLES" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Database.swift,
+				"Database+Download.swift",
+				"Database+Fetchers.swift",
+				Tables/ComiketBlock.swift,
+				Tables/ComiketCircle.swift,
+				Tables/ComiketCircleExtendedInformation.swift,
+				Tables/ComiketDate.swift,
+				Tables/ComiketEvent.swift,
+				Tables/ComiketGenre.swift,
+				Tables/ComiketLayout.swift,
+				Tables/ComiketMap.swift,
+				Types/CircleCutConfiguration.swift,
+				Types/MapConfiguration.swift,
+				Types/Point.swift,
+				Types/Size.swift,
+			);
+			target = F1A0B0042F31700000000001 /* ShareWithCiRCLES */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -47,6 +102,9 @@
 		};
 		E489B5522F315E8200ED193F /* Database */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F1A0B0092F31700000000001 /* Exceptions for "Database" folder in "ShareWithCiRCLES" target */,
+			);
 			path = Database;
 			sourceTree = "<group>";
 		};
@@ -58,6 +116,14 @@
 		E489B5772F31607D00ED193F /* Swift Data */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "Swift Data";
+			sourceTree = "<group>";
+		};
+		F1A0B00A2F31700000000001 /* Share Extension */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F1A0B0082F31700000000001 /* Exceptions for "Share Extension" folder in "ShareWithCiRCLES" target */,
+			);
+			path = "Share Extension";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -76,6 +142,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F1A0B00B2F31700000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1A0B0012F31700000000001 /* SQLite in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -88,6 +162,7 @@
 				E489B5522F315E8200ED193F /* Database */,
 				E489B5772F31607D00ED193F /* Swift Data */,
 				E489B5652F31606400ED193F /* API */,
+				F1A0B00A2F31700000000001 /* Share Extension */,
 				E4A769472C21A20A00BE3491 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -96,6 +171,7 @@
 			isa = PBXGroup;
 			children = (
 				E4A769462C21A20A00BE3491 /* CiRCLES.app */,
+				F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -111,10 +187,12 @@
 				E4A769432C21A20A00BE3491 /* Frameworks */,
 				E4A769442C21A20A00BE3491 /* Resources */,
 				E480AA922C449C04009C1445 /* ShellScript */,
+				F1A0B0052F31700000000001 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				F1A0B00C2F31700000000001 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				E4065DC02DECA30200AB7E20 /* CiRCLES */,
@@ -135,6 +213,30 @@
 			productReference = E4A769462C21A20A00BE3491 /* CiRCLES.app */;
 			productType = "com.apple.product-type.application";
 		};
+		F1A0B0042F31700000000001 /* ShareWithCiRCLES */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F1A0B00D2F31700000000001 /* Build configuration list for PBXNativeTarget "ShareWithCiRCLES" */;
+			buildPhases = (
+				F1A0B00E2F31700000000001 /* Sources */,
+				F1A0B00B2F31700000000001 /* Frameworks */,
+				F1A0B00F2F31700000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E489B5522F315E8200ED193F /* Database */,
+				F1A0B00A2F31700000000001 /* Share Extension */,
+			);
+			name = ShareWithCiRCLES;
+			packageProductDependencies = (
+				F1A0B0022F31700000000001 /* SQLite */,
+			);
+			productName = AttachProductList;
+			productReference = F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -147,6 +249,9 @@
 				TargetAttributes = {
 					E4A769452C21A20A00BE3491 = {
 						CreatedOnToolsVersion = 15.4;
+					};
+					F1A0B0042F31700000000001 = {
+						CreatedOnToolsVersion = 16.3;
 					};
 				};
 			};
@@ -176,12 +281,20 @@
 			projectRoot = "";
 			targets = (
 				E4A769452C21A20A00BE3491 /* CiRCLES */,
+				F1A0B0042F31700000000001 /* ShareWithCiRCLES */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		E4A769442C21A20A00BE3491 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F1A0B00F2F31700000000001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -207,7 +320,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\n# if which periphery > /dev/null; then\n#   periphery scan --format xcode\n# else\n#   echo \"warning: Periphery not installed, download from https://github.com/peripheryapp/periphery\"\n# fi\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which periphery > /dev/null; then\n  periphery scan --format xcode\nelse\n  echo \"warning: Periphery not installed, download from https://github.com/peripheryapp/periphery\"\nfi\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -219,7 +332,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F1A0B00E2F31700000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F1A0B00C2F31700000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F1A0B0042F31700000000001 /* ShareWithCiRCLES */;
+			targetProxy = F1A0B0032F31700000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		E4A769542C21A20B00BE3491 /* Debug */ = {
@@ -433,6 +561,62 @@
 			};
 			name = Release;
 		};
+		F1A0B0102F31700000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Share Extension/Share Extension.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Share Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "お品書きを添付";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 107.2.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F1A0B0112F31700000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "Share Extension/Share Extension.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Share Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "お品書きを添付";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 107.2.3;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -450,6 +634,15 @@
 			buildConfigurations = (
 				E4A769572C21A20B00BE3491 /* Debug */,
 				E4A769582C21A20B00BE3491 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F1A0B00D2F31700000000001 /* Build configuration list for PBXNativeTarget "ShareWithCiRCLES" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F1A0B0102F31700000000001 /* Debug */,
+				F1A0B0112F31700000000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -537,6 +730,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability" */;
 			productName = Reachability;
+		};
+		F1A0B0022F31700000000001 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */;
+			productName = SQLite;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

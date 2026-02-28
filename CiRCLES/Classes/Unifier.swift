@@ -53,6 +53,9 @@ class Unifier {
     // Other sheets
     var isMyComiketPresenting: Bool = false
 
+    // Pending attachment from action extension
+    var pendingAttachmentData: Data?
+
     // Alerts
     var isFirstCircleAlertShowing: Bool = false
     var isLastCircleAlertShowing: Bool = false
@@ -62,6 +65,8 @@ class Unifier {
     func show() {
         // Only set isPresented on phone, iPad sidebar is always visible
         if UIDevice.current.userInterfaceIdiom == .phone {
+            // Don't show unified sheet while attachment search is open
+            guard pendingAttachmentData == nil else { return }
             self.isPresenting = true
         }
     }
