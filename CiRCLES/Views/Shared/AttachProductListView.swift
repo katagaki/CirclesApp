@@ -22,6 +22,8 @@ struct AttachProductListView: View {
     @State var isSaving: Bool = false
     @State var searchTask: Task<Void, Never>?
 
+    @Namespace var namespace
+
     var body: some View {
         NavigationStack {
             List {
@@ -29,21 +31,20 @@ struct AttachProductListView: View {
                     Button {
                         selectedCircle = circle
                     } label: {
-                        HStack(spacing: 12.0) {
-                            if let cutImage = database.circleImage(for: circle.id) {
-                                Image(uiImage: cutImage)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 36.0, height: 51.0)
-                            }
-                            VStack(alignment: .leading, spacing: 4.0) {
+                        HStack(spacing: 10.0) {
+                            CircleCutImage(
+                                circle, in: namespace, cutType: .catalog,
+                                showSpaceName: .constant(false), showDay: .constant(false)
+                            )
+                            .frame(width: 70.0, height: 100.0, alignment: .center)
+                            VStack(alignment: .leading, spacing: 5.0) {
                                 Text(circle.circleName)
+                                    .strikethrough(circle: circle)
                                     .foregroundStyle(selectedCircle?.id == circle.id
                                                      ? Color.accentColor : .primary)
-                                if !circle.penName
-                                    .trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                                if circle.penName
+                                    .trimmingCharacters(in: .whitespacesAndNewlines) != "" {
                                     Text(circle.penName)
-                                        .font(.subheadline)
                                         .foregroundStyle(.secondary)
                                 }
                             }
