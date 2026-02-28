@@ -23,6 +23,23 @@ struct ActionExtensionSearchView: View {
     var body: some View {
         NavigationStack {
             List {
+                Section {
+                    HStack(spacing: 8.0) {
+                        Image(systemName: "magnifyingglass")
+                            .foregroundStyle(.secondary)
+                        TextField("サークル名・ペンネーム", text: $searchTerm)
+                            .autocorrectionDisabled()
+                        if !searchTerm.isEmpty {
+                            Button {
+                                searchTerm = ""
+                            } label: {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundStyle(.secondary)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
                 ForEach(searchResults) { circle in
                     Button {
                         selectedCircle = circle
@@ -71,11 +88,6 @@ struct ActionExtensionSearchView: View {
             }
             .navigationTitle("お品書きを添付")
             .navigationBarTitleDisplayMode(.inline)
-            .searchable(
-                text: $searchTerm,
-                placement: .navigationBarDrawer(displayMode: .always),
-                prompt: "サークル名・ペンネーム"
-            )
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("キャンセル") {
