@@ -95,7 +95,7 @@ class MainActivity : ComponentActivity() {
                         LaunchedEffect(isReady, isAuthenticating, token) {
                             if (isReady && !isAuthenticating && token != null && !hasTriggeredInitialLoad) {
                                 hasTriggeredInitialLoad = true
-                                dataManager.reloadData(shouldResetSelections = true)
+                                dataManager.reloadData(shouldResetSelections = false)
                             }
                         }
 

@@ -57,9 +57,11 @@ fun MapView(
     val commonImagesLoadCount by database.commonImagesLoadCount.collectAsState()
     val darkenMapInDarkMode by selections.darkenMapInDarkMode.collectAsState()
 
+    val persistedZoom by selections.mapZoomLevel.collectAsState()
+
     var mapImage by remember { mutableStateOf<Bitmap?>(null) }
     var genreImage by remember { mutableStateOf<Bitmap?>(null) }
-    var zoomScale by remember { mutableFloatStateOf(1.0f) }
+    var zoomScale by remember { mutableFloatStateOf(persistedZoom) }
 
     val spaceSize = if (useHighResolutionMaps) 40 else 20
 
@@ -169,7 +171,10 @@ fun MapView(
                 popoverData = popoverData,
                 mapper = mapper,
                 zoomScale = zoomScale,
-                onZoomChange = { zoomScale = it },
+                onZoomChange = {
+                    zoomScale = it
+                    selections.setMapZoomLevel(it)
+                },
                 scrollToPosition = scrollToPosition,
                 onScrollCompleted = { mapper.clearScrollToPosition() },
                 popoverContent = { offset, currentZoom, viewportSize ->

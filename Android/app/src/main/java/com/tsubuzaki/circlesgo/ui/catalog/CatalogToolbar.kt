@@ -255,10 +255,6 @@ private fun BlockFilterMenu(
                     text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(block.name)
-                            if (selectedBlocks.contains(block)) {
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("✓", fontSize = 12.sp)
-                            }
                         }
                     },
                     trailingIcon = {

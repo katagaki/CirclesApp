@@ -3,13 +3,14 @@
     <string name="app_name">CiRCLES</string>
 
     <!-- Login -->
-    <string name="login_hero_map_title">Interactive Maps</string>
-    <string name="login_hero_map_description">Browse circle locations on interactive hall maps with real-time positions.</string>
-    <string name="login_hero_catalog_title">Circle Catalog</string>
-    <string name="login_hero_catalog_description">Search and browse the full circle catalog with grid and list views.</string>
-    <string name="login_hero_favorites_title">Favorites</string>
-    <string name="login_hero_favorites_description">Manage your favorite circles with color-coded organization.</string>
-    <string name="login_sign_in_prompt">Sign in with your Circle.ms account to access the web catalog and sync your favorites.</string>
+    <string name="login_title">Welcome to CiRCLES</string>
+    <string name="login_hero_map_title">Navigate Halls</string>
+    <string name="login_hero_map_description">Plan and execute your visit to the Comic Market</string>
+    <string name="login_hero_catalog_title">Browse Circles</string>
+    <string name="login_hero_catalog_description">Browse participating circles without an Internet connection</string>
+    <string name="login_hero_favorites_title">Manage Favorites</string>
+    <string name="login_hero_favorites_description">Assign colors to your favorite circles and easily find them on the day of the Comic Market</string>
+    <string name="login_sign_in_prompt">To use CiRCLES, you will need a Comiket Web Catalog Gold Member subscription.</string>
     <string name="login_sign_in">Sign In</string>
 
     <!-- Catalog / Search -->

@@ -2,6 +2,8 @@ package com.tsubuzaki.circlesgo.ui.login
 
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,24 +18,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Map
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.core.net.toUri
 import com.tsubuzaki.circlesgo.R
 
@@ -53,33 +51,33 @@ fun LoginView(
             .verticalScroll(rememberScrollState())
     ) {
         Text(
-            text = "CiRCLES",
+            text = stringResource(R.string.login_title),
             style = MaterialTheme.typography.displaySmall,
+            fontSize = 5.em,
             fontWeight = FontWeight.Black,
             color = MaterialTheme.colorScheme.primary
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
+        val isDarkTheme = isSystemInDarkTheme()
         LoginFeatureHero(
-            icon = Icons.Filled.Map,
+            imageRes = if (isDarkTheme) R.drawable.hero_map_dark else R.drawable.hero_map,
             title = stringResource(R.string.login_hero_map_title),
             description = stringResource(R.string.login_hero_map_description)
         )
         Spacer(modifier = Modifier.height(24.dp))
         LoginFeatureHero(
-            icon = Icons.AutoMirrored.Filled.MenuBook,
+            imageRes = if (isDarkTheme) R.drawable.hero_circles_dark else R.drawable.hero_circles,
             title = stringResource(R.string.login_hero_catalog_title),
             description = stringResource(R.string.login_hero_catalog_description)
         )
         Spacer(modifier = Modifier.height(24.dp))
         LoginFeatureHero(
-            icon = Icons.Filled.Favorite,
+            imageRes = if (isDarkTheme) R.drawable.hero_favorites_dark else R.drawable.hero_favorites,
             title = stringResource(R.string.login_hero_favorites_title),
             description = stringResource(R.string.login_hero_favorites_description)
         )
-
-        Spacer(modifier = Modifier.weight(1f))
 
         HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
@@ -90,6 +88,7 @@ fun LoginView(
             modifier = Modifier.fillMaxWidth()
         )
 
+        Spacer(modifier = Modifier.weight(1f))
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
@@ -123,7 +122,7 @@ fun LoginView(
 
 @Composable
 private fun LoginFeatureHero(
-    icon: ImageVector,
+    imageRes: Int,
     title: String,
     description: String
 ) {
@@ -132,11 +131,10 @@ private fun LoginFeatureHero(
         horizontalArrangement = Arrangement.Start,
         modifier = Modifier.fillMaxWidth()
     ) {
-        Icon(
-            imageVector = icon,
+        Image(
+            painter = painterResource(id = imageRes),
             contentDescription = null,
-            modifier = Modifier.size(48.dp),
-            tint = MaterialTheme.colorScheme.primary
+            modifier = Modifier.size(48.dp)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {

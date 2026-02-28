@@ -3,6 +3,7 @@
     <string name="app_name">サークルズ</string>
 
     <!-- Login -->
+    <string name="login_title">「サークルズ」へようこそ</string>
     <string name="login_hero_map_title">会場マップ</string>
     <string name="login_hero_map_description">コミケの前でも、当日でも簡単にマップを見て計画する</string>
     <string name="login_hero_catalog_title">サークルデータ</string>

@@ -24,6 +24,7 @@ class UserSelections(context: Context) {
         private const val SHOW_SPACE_NAME_KEY = "Circles.ShowSpaceName"
         private const val SHOW_DAY_KEY = "Circles.ShowDay"
         private const val DARKEN_MAP_IN_DARK_MODE_KEY = "Circles.DarkenMapInDarkMode"
+        private const val MAP_ZOOM_LEVEL_KEY = "Circles.MapZoomLevel"
     }
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -65,6 +66,11 @@ class UserSelections(context: Context) {
     )
     val darkenMapInDarkMode: StateFlow<Boolean> = _darkenMapInDarkMode
 
+    private val _mapZoomLevel = MutableStateFlow(
+        prefs.getFloat(MAP_ZOOM_LEVEL_KEY, 1.0f)
+    )
+    val mapZoomLevel: StateFlow<Float> = _mapZoomLevel
+
     private val _displayMode = MutableStateFlow(
         CircleDisplayMode.entries.find {
             it.value == prefs.getInt(CIRCLE_DISPLAY_MODE_KEY, CircleDisplayMode.GRID.value)
@@ -85,6 +91,11 @@ class UserSelections(context: Context) {
     fun setDarkenMapInDarkMode(enabled: Boolean) {
         _darkenMapInDarkMode.value = enabled
         prefs.edit { putBoolean(DARKEN_MAP_IN_DARK_MODE_KEY, enabled) }
+    }
+
+    fun setMapZoomLevel(zoom: Float) {
+        _mapZoomLevel.value = zoom
+        prefs.edit { putFloat(MAP_ZOOM_LEVEL_KEY, zoom) }
     }
 
     fun setShowGenreOverlay(show: Boolean) {
