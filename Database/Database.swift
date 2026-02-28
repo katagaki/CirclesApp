@@ -28,7 +28,9 @@ class Database {
 
     let dataStoreURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
 
-    init() { }
+    init() {
+        // No initialization required; properties are set lazily or by callers.
+    }
 
     // MARK: Database Connection
 

@@ -67,23 +67,22 @@ actor FavoritesActor {
             authToken: authToken
         )
 
-        if let (data, _) = try? await URLSession.shared.data(for: request) {
-            if let response = try? JSONDecoder().decode(UserCircleWithFavorite.self, from: data) {
-                if response.status == "success" {
-                    if let circle = response.response.circle,
-                       let favorite = response.response.favorite {
-                        let favoriteItem = UserFavorites.Response.FavoriteItem(
-                            circle: circle, favorite: favorite
+        if let (data, _) = try? await URLSession.shared.data(for: request),
+           let response = try? JSONDecoder().decode(UserCircleWithFavorite.self, from: data) {
+            if response.status == "success" {
+                if let circle = response.response.circle,
+                   let favorite = response.response.favorite {
+                    let favoriteItem = UserFavorites.Response.FavoriteItem(
+                        circle: circle, favorite: favorite
+                    )
+                    modelContext.insert(
+                        CirclesFavorite(
+                            webCatalogID: webCatalogID,
+                            favoriteItem: favoriteItem
                         )
-                        modelContext.insert(
-                            CirclesFavorite(
-                                webCatalogID: webCatalogID,
-                                favoriteItem: favoriteItem
-                            )
-                        )
-                    }
-                    return true
+                    )
                 }
+                return true
             }
         }
         return false
@@ -103,24 +102,23 @@ actor FavoritesActor {
             authToken: authToken
         )
 
-        if let (data, _) = try? await URLSession.shared.data(for: request) {
-            if let response = try? JSONDecoder().decode(UserResponse.self, from: data) {
-                if response.status == "success" {
-                    let fetchDescriptor = FetchDescriptor<CirclesFavorite>(
-                        predicate: #Predicate<CirclesFavorite> {
-                            $0.webCatalogID == webCatalogID
-                        }
-                    )
-                    if let matchedFavorites = try? modelContext.fetch(fetchDescriptor) {
-                        try? modelContext.transaction {
-                            matchedFavorites.forEach {
-                                modelContext.delete($0)
-                            }
-                            try? modelContext.save()
-                        }
+        if let (data, _) = try? await URLSession.shared.data(for: request),
+           let response = try? JSONDecoder().decode(UserResponse.self, from: data) {
+            if response.status == "success" {
+                let fetchDescriptor = FetchDescriptor<CirclesFavorite>(
+                    predicate: #Predicate<CirclesFavorite> {
+                        $0.webCatalogID == webCatalogID
                     }
-                    return true
+                )
+                if let matchedFavorites = try? modelContext.fetch(fetchDescriptor) {
+                    try? modelContext.transaction {
+                        matchedFavorites.forEach {
+                            modelContext.delete($0)
+                        }
+                        try? modelContext.save()
+                    }
                 }
+                return true
             }
         }
         return false

@@ -26,6 +26,8 @@ struct CatalogToolbar: ToolbarContent {
                 genreMenu()
                 blockMenu()
             }
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            DefaultToolbarItem(kind: .search, placement: .bottomBar)
         } else {
             ToolbarItem(placement: .bottomBar) {
                 genreMenu()
@@ -33,11 +35,6 @@ struct CatalogToolbar: ToolbarContent {
             ToolbarItem(placement: .bottomBar) {
                 blockMenu()
             }
-        }
-        if #available(iOS 26.0, *) {
-            ToolbarSpacer(.fixed, placement: .bottomBar)
-            DefaultToolbarItem(kind: .search, placement: .bottomBar)
-        } else {
             ToolbarItem(placement: .bottomBar) {
                 Spacer()
             }

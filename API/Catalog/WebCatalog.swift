@@ -13,16 +13,14 @@ class WebCatalog {
 
     static func events(authToken: OpenIDToken) async -> WebCatalogEvent.Response? {
         let request = urlRequestForWebCatalogAPI(endpoint: "GetEventList", authToken: authToken)
-        if let (data, _) = try? await URLSession.shared.data(for: request) {
-            if let events = try? JSONDecoder().decode(WebCatalogEvent.self, from: data) {
-                UserDefaults.standard.set(data, forKey: eventCacheKey)
-                return events.response
-            }
+        if let (data, _) = try? await URLSession.shared.data(for: request),
+           let events = try? JSONDecoder().decode(WebCatalogEvent.self, from: data) {
+            UserDefaults.standard.set(data, forKey: eventCacheKey)
+            return events.response
         }
-        if let data = UserDefaults.standard.data(forKey: eventCacheKey) {
-            if let events = try? JSONDecoder().decode(WebCatalogEvent.self, from: data) {
-                return events.response
-            }
+        if let data = UserDefaults.standard.data(forKey: eventCacheKey),
+           let events = try? JSONDecoder().decode(WebCatalogEvent.self, from: data) {
+            return events.response
         }
         return nil
     }
@@ -36,17 +34,16 @@ class WebCatalog {
             ],
             authToken: authToken
         )
-        if let (data, _) = try? await URLSession.shared.data(for: request) {
-            if let circle = try? JSONDecoder().decode(UserCircleWithFavorite.self, from: data) {
-                return circle
-            }
+        if let (data, _) = try? await URLSession.shared.data(for: request),
+           let circle = try? JSONDecoder().decode(UserCircleWithFavorite.self, from: data) {
+            return circle
         }
         return nil
     }
 
     static func urlRequestForWebCatalogAPI(
         endpoint: String,
-        method: String = "POST",
+        method _: String = "POST",
         parameters: [String: String] = [:],
         authToken: OpenIDToken
     ) -> URLRequest {

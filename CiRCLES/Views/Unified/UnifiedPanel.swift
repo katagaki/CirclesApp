@@ -28,12 +28,10 @@ struct UnifiedPanel: View {
                             .fixedSize()
                     }
                 }
-                if #available(iOS 26.0, *) {
-                    if UIDevice.current.userInterfaceIdiom == .phone {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button("Shared.ClosePanel", systemImage: "chevron.down") {
-                                self.unifier.hide()
-                            }
+                if #available(iOS 26.0, *), UIDevice.current.userInterfaceIdiom == .phone {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Shared.ClosePanel", systemImage: "chevron.down") {
+                            self.unifier.hide()
                         }
                     }
                 }
@@ -61,7 +59,7 @@ struct UnifiedPanel: View {
 
     @ViewBuilder
     func viewPicker() -> some View {
-        @Bindable var unifier = unifier
+        @Bindable var unifier = unifier // NOSONAR - needed for $ binding access
         Picker(selection: $unifier.current) {
             Text("ViewTitle.Circles")
                 .tag(UnifiedPath.circles)
@@ -69,7 +67,9 @@ struct UnifiedPanel: View {
                 Text("ViewTitle.Favorites")
                     .tag(UnifiedPath.favorites)
             }
-        } label: { }
+        } label: {
+            // Label intentionally left empty; the picker uses segmented style.
+        }
             .id("Unifier.Picker")
             .pickerStyle(.segmented)
     }

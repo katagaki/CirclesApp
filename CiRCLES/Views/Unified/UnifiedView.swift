@@ -127,10 +127,8 @@ struct UnifiedView: View {
             }
         }
         .onChange(of: unifier.isMyComiketPresenting) { _, newValue in
-            if #unavailable(iOS 26.0) {
-                if !newValue {
-                    unifier.show()
-                }
+            if #unavailable(iOS 26.0), !newValue {
+                unifier.show()
             }
         }
         .onChange(of: unifier.sheetPath) { _, newValue in
@@ -139,10 +137,8 @@ struct UnifiedView: View {
             }
         }
         .onChange(of: unifier.stackPath) { _, newValue in
-            if #unavailable(iOS 26.0) {
-                if newValue.isEmpty {
-                    unifier.show()
-                }
+            if #unavailable(iOS 26.0), newValue.isEmpty {
+                unifier.show()
             }
         }
         .alert("Alerts.Logout.Title", isPresented: $unifier.isGoingToSignOut) {

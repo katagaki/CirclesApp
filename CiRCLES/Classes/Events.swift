@@ -45,23 +45,21 @@ class Events {
         get {
             let participationString: String? = UserDefaults.standard.string(forKey: participationKey)
             if let participationString,
-               let participationJSONData = participationString.data(using: .utf8) {
-                if let participationJSONDictionary = try? JSONSerialization.jsonObject(
-                    with: participationJSONData,
-                    options: []
-                ) as? [String: [String: String]] {
-                    return participationJSONDictionary
-                }
+               let participationJSONData = participationString.data(using: .utf8),
+               let participationJSONDictionary = try? JSONSerialization.jsonObject(
+                   with: participationJSONData,
+                   options: []
+               ) as? [String: [String: String]] {
+                return participationJSONDictionary
             }
             return [:]
         }
         set {
             if let participationJSONData = try? JSONSerialization.data(
-                withJSONObject: newValue, options: []
-            ) {
-                if let participationJSONString = String(data: participationJSONData, encoding: .utf8) {
-                    UserDefaults.standard.set(participationJSONString, forKey: participationKey)
-                }
+                    withJSONObject: newValue, options: []
+                ),
+               let participationJSONString = String(data: participationJSONData, encoding: .utf8) {
+                UserDefaults.standard.set(participationJSONString, forKey: participationKey)
             }
         }
     }

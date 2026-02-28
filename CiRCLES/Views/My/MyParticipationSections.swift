@@ -144,7 +144,7 @@ struct MyParticipationSections: View {
         }
     }
 
-    // swiftlint:disable function_body_length cyclomatic_complexity
+    // swiftlint:disable function_body_length
     func addToCalendar(dayID: Int) async {
         if let eventTitle, let eventDates, let date = eventDates[dayID],
            let participationInfo = planner.participationInfo(for: dayID),
@@ -158,9 +158,10 @@ struct MyParticipationSections: View {
                     let event: EKEvent = EKEvent(eventStore: eventStore)
 
                     let nthDay = String(localized: "Shared.\(dayID)th.Day")
-                    switch Locale.current.language.languageCode {
-                    case .japanese: event.title = "\(eventTitle)（\(nthDay)）"
-                    default: event.title = "\(eventTitle) (\(nthDay))"
+                    if Locale.current.language.languageCode == .japanese {
+                        event.title = "\(eventTitle)（\(nthDay)）"
+                    } else {
+                        event.title = "\(eventTitle) (\(nthDay))"
                     }
 
                     var eventNotes: String = ""
@@ -210,5 +211,5 @@ struct MyParticipationSections: View {
             }
         }
     }
-    // swiftlint:enable function_body_length cyclomatic_complexity
+    // swiftlint:enable function_body_length
 }

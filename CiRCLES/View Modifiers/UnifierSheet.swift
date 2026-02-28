@@ -14,8 +14,8 @@ struct UnifierSheetModifier: ViewModifier {
     let namespace: Namespace.ID
 
     func body(content: Content) -> some View {
-        @Bindable var authenticator = authenticator
-        @Bindable var unifier = unifier
+        @Bindable var authenticator = authenticator // NOSONAR - needed for $ binding access
+        @Bindable var unifier = unifier // NOSONAR - needed for $ binding access
         if UIDevice.current.userInterfaceIdiom == .phone {
             content
                 .sheet(isPresented: $unifier.isPresenting) {

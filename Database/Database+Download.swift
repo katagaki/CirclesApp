@@ -30,7 +30,6 @@ extension Database {
         )
     }
 
-    // swiftlint:disable cyclomatic_complexity
     func download(
         for event: WebCatalogEvent.Response.Event,
         of type: DatabaseType,
@@ -68,10 +67,9 @@ extension Database {
             .joined(separator: "&")
             .data(using: .utf8)
 
-        if let (data, _) = try? await URLSession.shared.data(for: request) {
-            if let databaseInformation = try? JSONDecoder().decode(WebCatalogDatabase.self, from: data) {
-                self.databaseInformation = databaseInformation
-            }
+        if let (data, _) = try? await URLSession.shared.data(for: request),
+           let databaseInformation = try? JSONDecoder().decode(WebCatalogDatabase.self, from: data) {
+            self.databaseInformation = databaseInformation
         }
 
         if let databaseInformation = self.databaseInformation {
@@ -90,7 +88,6 @@ extension Database {
 
         return nil
     }
-    // swiftlint:enable cyclomatic_complexity
 
     func isDownloaded(for event: WebCatalogEvent.Response.Event) -> Bool {
         if let dataStoreURL {
@@ -124,11 +121,10 @@ extension Database {
                 try? FileManager.default.removeItem(at: unzipDestinationURL
                     .appendingPathComponent(url.deletingPathExtension().lastPathComponent))
                 try FileManager.default.unzipItem(at: url, to: unzipDestinationURL)
-                if let archive = try? Archive(url: url, accessMode: .read, pathEncoding: .utf8) {
-                    if let firstFileInArchive = archive.first(where: { _ in return true }) {
-                        try? FileManager.default.removeItem(at: url)
-                        return unzipDestinationURL.appending(path: firstFileInArchive.path)
-                    }
+                if let archive = try? Archive(url: url, accessMode: .read, pathEncoding: .utf8),
+                   let firstFileInArchive = archive.first(where: { _ in return true }) {
+                    try? FileManager.default.removeItem(at: url)
+                    return unzipDestinationURL.appending(path: firstFileInArchive.path)
                 }
             } catch {
                 debugPrint(error.localizedDescription)
