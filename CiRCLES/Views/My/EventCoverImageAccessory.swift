@@ -13,24 +13,22 @@ struct EventCoverImageAccessory: View {
 
     var body: some View {
         VStack {
-            if let image {
-                if isShowing {
-                    Image(uiImage: image)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .clipShape(RoundedRectangle(cornerRadius: 8.0))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 8.0)
-                                .stroke(Color.primary.opacity(0.5), lineWidth: 1/3)
-                        }
-                        .padding()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                    Image(.arrow)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(maxWidth: .infinity, maxHeight: 10.0, alignment: .center)
-                        .rotationEffect(isShowing ? Angle.degrees(180.0) : Angle.degrees(0.0))
-                }
+            if let image, isShowing {
+                Image(uiImage: image)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .clipShape(RoundedRectangle(cornerRadius: 8.0))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8.0)
+                            .stroke(Color.primary.opacity(0.5), lineWidth: 1/3)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                Image(.arrow)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(maxWidth: .infinity, maxHeight: 10.0, alignment: .center)
+                    .rotationEffect(isShowing ? Angle.degrees(180.0) : Angle.degrees(0.0))
             }
         }
         .padding(.bottom)

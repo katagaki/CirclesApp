@@ -30,9 +30,9 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
 
     typealias RawValue = String
 
-    init?(rawValue: String) { return nil }
+    init?(rawValue _: String) { return nil }
     var id: String { return self.identifier() }
-    var rawValue: String { return self.identifier() }
+    var rawValue: String { return self.id }
 
     func identifier() -> String {
         return switch self {

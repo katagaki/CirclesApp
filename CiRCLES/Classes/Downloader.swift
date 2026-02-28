@@ -40,9 +40,9 @@ class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelegate {
     }
 
     func urlSession(
-        _ session: URLSession,
-        downloadTask: URLSessionDownloadTask,
-        didWriteData bytesWritten: Int64,
+        _ session: URLSession, // swiftlint:disable:this unused_parameter
+        downloadTask _: URLSessionDownloadTask,
+        didWriteData _: Int64,
         totalBytesWritten: Int64,
         totalBytesExpectedToWrite: Int64
     ) {
@@ -51,7 +51,7 @@ class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelegate {
         }
     }
 
-    func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
+    func urlSession(_ session: URLSession, downloadTask _: URLSessionDownloadTask, didFinishDownloadingTo location: URL) { // swiftlint:disable:this unused_parameter
         if let destinationURL {
             do {
                 let saveDestinationURL = destinationURL.appending(path: location.lastPathComponent)
@@ -66,7 +66,7 @@ class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelegate {
         }
     }
 
-    func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+    func urlSession(_ session: URLSession, task _: URLSessionTask, didCompleteWithError error: Error?) { // swiftlint:disable:this unused_parameter
         if let error {
             continuation?.resume(throwing: error)
         }

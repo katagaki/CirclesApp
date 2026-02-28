@@ -39,7 +39,9 @@ struct MapLayoutLayer: View {
         .overlay {
             // Selection source rectangle for matched transition
             if let popoverData = mapper.popoverData {
-                ZStack {}
+                ZStack {
+                    // Empty stack used as a transparent hit-test target for matched transitions.
+                }
                     .contentShape(.rect)
                     .frame(width: popoverData.sourceWidth, height: popoverData.sourceHeight)
                     .position(x: popoverData.sourceMidX, y: popoverData.sourceMidY)

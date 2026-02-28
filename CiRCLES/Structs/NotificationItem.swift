@@ -70,10 +70,7 @@ struct NotificationItem: Identifiable {
         case "Early":
             hour = 10
             minutes = 30
-        case "ChangingRoom":
-            hour = 11
-            minutes = 0
-        case "AM":
+        case "ChangingRoom", "AM":
             hour = 11
             minutes = 0
         case "PM":

@@ -7,6 +7,18 @@
 
 import SwiftUI
 
+private let navigateMapsJPURL = "maps://?saddr=現在地&daddr=東京ビッグサイト"
+private let navigateGoogleMapsJPURL = "comgooglemaps://?saddr=現在地&daddr=東京ビッグサイト"
+private let navigateYahooMapJPURL = "yjmap://route/train?from=現在地&to=東京ビッグサイト"
+private let navigateMapsENURL = "maps://?saddr=Current+Location&daddr=Tokyo+Big+Sight"
+private let navigateGoogleMapsENURL = "comgooglemaps://?saddr=My+Location&daddr=Tokyo+Big+Sight"
+private let webCatalogJPURL = "https://webcatalog.circle.ms"
+private let comiketURL = "https://comiket.co.jp"
+private let bigSightMapJPURL = "https://www.bigsight.jp/visitor/floormap/"
+private let webCatalogENURL = "https://int.webcatalog.circle.ms/en/catalog"
+private let bigSightMapENURL = "https://www.bigsight.jp/english/visitor/floormap/"
+private let deleteAccountURL = "https://auth2.circle.ms/Account/WithDraw1"
+
 struct UnifiedMoreMenu: View {
 
     @Environment(\.openURL) var openURL
@@ -83,27 +95,26 @@ struct UnifiedMoreMenu: View {
                 Text("More.Customization.Circles")
             }
             Section {
-                switch Locale.current.language.languageCode {
-                case .japanese:
+                if Locale.current.language.languageCode == .japanese {
                     if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
-                        ExternalLink("maps://?saddr=現在地&daddr=東京ビッグサイト",
+                        ExternalLink(navigateMapsJPURL,
                                      title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
                     }
                     if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
-                        ExternalLink("comgooglemaps://?saddr=現在地&daddr=東京ビッグサイト",
+                        ExternalLink(navigateGoogleMapsJPURL,
                                      title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
                     }
                     if UIApplication.shared.canOpenURL(URL(string: "yjmap://")!) {
-                        ExternalLink("yjmap://route/train?from=現在地&to=東京ビッグサイト",
+                        ExternalLink(navigateYahooMapJPURL,
                                      title: "More.Navigate.YahooMap", image: "ListIcon.YahooMap")
                     }
-                default:
+                } else {
                     if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
-                        ExternalLink("maps://?saddr=Current+Location&daddr=Tokyo+Big+Sight",
+                        ExternalLink(navigateMapsENURL,
                                      title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
                     }
                     if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
-                        ExternalLink("comgooglemaps://?saddr=My+Location&daddr=Tokyo+Big+Sight",
+                        ExternalLink(navigateGoogleMapsENURL,
                                      title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
                     }
                 }
@@ -111,20 +122,19 @@ struct UnifiedMoreMenu: View {
                 Text("More.Navigate")
             }
             Section {
-                switch Locale.current.language.languageCode {
-                case .japanese:
-                    SafariLink("https://webcatalog.circle.ms",
+                if Locale.current.language.languageCode == .japanese {
+                    SafariLink(webCatalogJPURL,
                                title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
-                    SafariLink("https://comiket.co.jp",
+                    SafariLink(comiketURL,
                                title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
-                    SafariLink("https://www.bigsight.jp/visitor/floormap/",
+                    SafariLink(bigSightMapJPURL,
                                title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
-                default:
-                    SafariLink("https://int.webcatalog.circle.ms/en/catalog",
+                } else {
+                    SafariLink(webCatalogENURL,
                                title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
-                    SafariLink("https://comiket.co.jp",
+                    SafariLink(comiketURL,
                                title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
-                    SafariLink("https://www.bigsight.jp/english/visitor/floormap/",
+                    SafariLink(bigSightMapENURL,
                                title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
                 }
             } header: {
@@ -139,7 +149,7 @@ struct UnifiedMoreMenu: View {
                     }
                 }
                 Button("More.DeleteAccount", role: .destructive) {
-                    openURL(URL(string: "https://auth2.circle.ms/Account/WithDraw1")!)
+                    openURL(URL(string: deleteAccountURL)!)
                 }
             } header: {
                 Text("More.Account")

@@ -158,9 +158,10 @@ struct MyParticipationSections: View {
                     let event: EKEvent = EKEvent(eventStore: eventStore)
 
                     let nthDay = String(localized: "Shared.\(dayID)th.Day")
-                    switch Locale.current.language.languageCode {
-                    case .japanese: event.title = "\(eventTitle)（\(nthDay)）"
-                    default: event.title = "\(eventTitle) (\(nthDay))"
+                    if Locale.current.language.languageCode == .japanese {
+                        event.title = "\(eventTitle)（\(nthDay)）"
+                    } else {
+                        event.title = "\(eventTitle) (\(nthDay))"
                     }
 
                     var eventNotes: String = ""

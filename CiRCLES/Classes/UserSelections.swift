@@ -19,47 +19,47 @@ class UserSelections {
 
     @ObservationIgnored let defaults: UserDefaults
 
-    private var _date: ComiketDate?
+    private var dateValue: ComiketDate?
     var date: ComiketDate? {
-        get { return _date }
+        get { return dateValue }
         set(value) {
-            if _date != value {
-                _date = value
+            if dateValue != value {
+                dateValue = value
                 defaults.set(value?.id, forKey: selectedDateKey)
-                _genres = []
+                genresValue = []
                 defaults.set([], forKey: selectedGenresKey)
-                _blocks = []
+                blocksValue = []
                 defaults.set([], forKey: selectedBlocksKey)
             }
         }
     }
-    private var _map: ComiketMap?
+    private var mapValue: ComiketMap?
     var map: ComiketMap? {
-        get { return _map }
+        get { return mapValue }
         set(value) {
-            if _map != value {
-                _map = value
+            if mapValue != value {
+                mapValue = value
                 defaults.set(value?.id, forKey: selectedMapKey)
-                _genres = []
+                genresValue = []
                 defaults.set([], forKey: selectedGenresKey)
-                _blocks = []
+                blocksValue = []
                 defaults.set([], forKey: selectedBlocksKey)
             }
         }
     }
-    private var _blocks: Set<ComiketBlock> = []
+    private var blocksValue: Set<ComiketBlock> = []
     var blocks: Set<ComiketBlock> {
-        get { return _blocks }
+        get { return blocksValue }
         set(value) {
-            _blocks = value
+            blocksValue = value
             defaults.set(value.map({ $0.id }), forKey: selectedBlocksKey)
         }
     }
-    private var _genres: Set<ComiketGenre> = []
+    private var genresValue: Set<ComiketGenre> = []
     var genres: Set<ComiketGenre> {
-        get { return _genres }
+        get { return genresValue }
         set(value) {
-            _genres = value
+            genresValue = value
             defaults.set(value.map({ $0.id }), forKey: selectedGenresKey)
         }
     }
@@ -73,13 +73,13 @@ class UserSelections {
     func reloadData(database: Database) {
         let dateID = defaults.object(forKey: selectedDateKey) as? Int ?? 0
         let mapID = defaults.object(forKey: selectedMapKey) as? Int ?? 0
-        _date = database.dates().first(where: { $0.id == dateID })
-        _map = database.maps().first(where: { $0.id == mapID })
+        dateValue = database.dates().first(where: { $0.id == dateID })
+        mapValue = database.maps().first(where: { $0.id == mapID })
 
         let blockIDs = defaults.array(forKey: selectedBlocksKey) as? [Int] ?? []
         let genreIDs = defaults.array(forKey: selectedGenresKey) as? [Int] ?? []
-        _blocks = Set(database.blocks().filter({ blockIDs.contains($0.id) }))
-        _genres = Set(database.genres().filter({ genreIDs.contains($0.id) }))
+        blocksValue = Set(database.blocks().filter({ blockIDs.contains($0.id) }))
+        genresValue = Set(database.genres().filter({ genreIDs.contains($0.id) }))
     }
 
     @MainActor
@@ -93,22 +93,22 @@ class UserSelections {
     }
 
     var fullMapID: String {
-        return "M\(_map?.id ?? -1),D\(_date?.id ?? -1)"
+        return "M\(mapValue?.id ?? -1),D\(dateValue?.id ?? -1)"
     }
 
     var catalogSelectionID: String {
-        let genreIDs = _genres.map({ String($0.id) }).sorted().joined(separator: "-")
-        let blockIDs = _blocks.map({ String($0.id) }).sorted().joined(separator: "-")
-        return "M\(_map?.id ?? -1),D\(_date?.id ?? -1),G[\(genreIDs)],B[\(blockIDs)]"
+        let genreIDs = genresValue.map({ String($0.id) }).sorted().joined(separator: "-")
+        let blockIDs = blocksValue.map({ String($0.id) }).sorted().joined(separator: "-")
+        return "M\(mapValue?.id ?? -1),D\(dateValue?.id ?? -1),G[\(genreIDs)],B[\(blockIDs)]"
     }
 
     func resetSelections() {
         defaults.set(0, forKey: selectedDateKey)
         defaults.set(0, forKey: selectedMapKey)
 
-        _genres = []
+        genresValue = []
         defaults.set([], forKey: selectedGenresKey)
-        _blocks = []
+        blocksValue = []
         defaults.set([], forKey: selectedBlocksKey)
     }
 

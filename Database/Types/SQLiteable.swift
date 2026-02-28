@@ -8,5 +8,6 @@
 import SQLite
 
 protocol SQLiteable {
-    init(from row: Row)
+    // row is used by conforming types to populate properties from a database row.
+    init(from row: Row) // NOSONAR
 }

@@ -48,13 +48,11 @@ struct FavoritesToolbar: ToolbarContent {
         }
         if #available(iOS 26.0, *) {
             ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
         } else {
             ToolbarItem(placement: .bottomBar) {
                 Spacer()
             }
-        }
-        if #available(iOS 26.0, *) {
-            ToolbarSpacer(.fixed, placement: .bottomBar)
         }
     }
 }

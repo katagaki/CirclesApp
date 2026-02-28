@@ -45,7 +45,7 @@ struct FastDoubleTapView: UIViewRepresentable {
         return view
     }
 
-    func updateUIView(_ uiView: FastDoubleTapTouchView, context: Context) {
+    func updateUIView(_ uiView _: FastDoubleTapTouchView, context: Context) {
         context.coordinator.onDoubleTap = onDoubleTap
         context.coordinator.onSingleTap = onSingleTap
         context.coordinator.isPressed = _isPressed

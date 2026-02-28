@@ -11,10 +11,9 @@ class User {
     static func info(authToken: OpenIDToken) async -> UserInfo.Response? {
         let request = urlRequestForUserAPI(endpoint: "Info", authToken: authToken)
 
-        if let (data, _) = try? await URLSession.shared.data(for: request) {
-            if let userInfo = try? JSONDecoder().decode(UserInfo.self, from: data) {
-                return userInfo.response
-            }
+        if let (data, _) = try? await URLSession.shared.data(for: request),
+           let userInfo = try? JSONDecoder().decode(UserInfo.self, from: data) {
+            return userInfo.response
         }
         return nil
     }
@@ -22,10 +21,9 @@ class User {
     static func events(authToken: OpenIDToken) async -> [UserCircle.Response.Circle] {
         let request = urlRequestForUserAPI(endpoint: "Circles", authToken: authToken)
 
-        if let (data, _) = try? await URLSession.shared.data(for: request) {
-            if let userCircles = try? JSONDecoder().decode(UserCircle.self, from: data) {
-                return userCircles.response.circles
-            }
+        if let (data, _) = try? await URLSession.shared.data(for: request),
+           let userCircles = try? JSONDecoder().decode(UserCircle.self, from: data) {
+            return userCircles.response.circles
         }
         return []
     }

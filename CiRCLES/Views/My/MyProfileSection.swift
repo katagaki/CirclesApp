@@ -8,6 +8,8 @@
 import PhotosUI
 import SwiftUI
 
+private let myPortalURL = "https://myportal.circle.ms/"
+
 struct MyProfileSection: View {
 
     @Binding var userInfo: UserInfo.Response?
@@ -66,7 +68,7 @@ struct MyProfileSection: View {
                 }
                 .padding(.top, 2.0)
                 if userInfo != nil {
-                    Link(destination: URL(string: "https://myportal.circle.ms/")!) {
+                    Link(destination: URL(string: myPortalURL)!) {
                         Text("Profile.Edit")
                             .font(.caption)
                             .underline()
