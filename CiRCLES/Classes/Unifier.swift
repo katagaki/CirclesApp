@@ -57,8 +57,6 @@ class Unifier {
     var pendingAttachmentData: Data?
 
     // Alerts
-    var isFirstCircleAlertShowing: Bool = false
-    var isLastCircleAlertShowing: Bool = false
     var isGoingToSignOut: Bool = false
 
     @MainActor

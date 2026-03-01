@@ -7,44 +7,31 @@
 
 import SwiftUI
 
-struct UnifierSheetModifier: ViewModifier {
-    @Environment(Authenticator.self) var authenticator
+struct UnifierPanelModifier: ViewModifier {
     @Environment(Unifier.self) var unifier
 
     let namespace: Namespace.ID
 
     func body(content: Content) -> some View {
-        @Bindable var authenticator = authenticator // NOSONAR - needed for $ binding access
-        @Bindable var unifier = unifier // NOSONAR - needed for $ binding access
+        @Bindable var unifier = unifier
         if UIDevice.current.userInterfaceIdiom == .phone {
             content
                 .sheet(isPresented: $unifier.isPresenting) {
-                    if authenticator.isAuthenticating {
-                        LoginView()
-                            .environment(authenticator)
-                            .interactiveDismissDisabled()
+                    if #available(iOS 26.0, *) {
+                        UnifiedPanel()
+                            .navigationTransition(.zoom(sourceID: "BottomPanel", in: namespace))
                     } else {
-                        if #available(iOS 26.0, *) {
-                            UnifiedPanel()
-                                .navigationTransition(.zoom(sourceID: "BottomPanel", in: namespace))
-                        } else {
-                            UnifiedPanel()
-                        }
+                        UnifiedPanel()
                     }
                 }
         } else {
             content
-                .sheet(isPresented: $authenticator.isAuthenticating) {
-                    LoginView()
-                        .environment(authenticator)
-                        .interactiveDismissDisabled()
-                }
         }
     }
 }
 
 extension View {
-    func unifierSheets(namespace: Namespace.ID) -> some View {
-        self.modifier(UnifierSheetModifier(namespace: namespace))
+    func unifierPanel(namespace: Namespace.ID) -> some View {
+        self.modifier(UnifierPanelModifier(namespace: namespace))
     }
 }

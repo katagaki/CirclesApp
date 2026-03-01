@@ -33,10 +33,12 @@ struct CircleDetailView: View {
     @State var attachments: [CircleAttachment] = []
     @State var selectedAttachment: CircleAttachment?
 
+    @State var isFirstCircleAlertShowing: Bool = false
+    @State var isLastCircleAlertShowing: Bool = false
+
     @Namespace var namespace
 
     var body: some View {
-        @Bindable var unifier = unifier
         List {
             Section {
                 CircleDetailHero(
@@ -120,12 +122,12 @@ struct CircleDetailView: View {
                 )
             }
         }
-        .alert("Alerts.FirstCircle.Title", isPresented: $unifier.isFirstCircleAlertShowing) {
+        .alert("Alerts.FirstCircle.Title", isPresented: $isFirstCircleAlertShowing) {
             Button("Shared.OK", role: .cancel) {
                 // Dismiss the alert; no additional action required.
             }
         }
-        .alert("Alerts.LastCircle.Title", isPresented: $unifier.isLastCircleAlertShowing) {
+        .alert("Alerts.LastCircle.Title", isPresented: $isLastCircleAlertShowing) {
             Button("Shared.OK", role: .cancel) {
                 // Dismiss the alert; no additional action required.
             }
@@ -186,12 +188,12 @@ struct CircleDetailView: View {
                     await prepareCircle()
                 }
             } else {
-                unifier.isFirstCircleAlertShowing = true
+                isFirstCircleAlertShowing = true
             }
         } else {
             let circleID = circle.id - 1
             if !goToCircle(with: circleID) {
-                unifier.isFirstCircleAlertShowing = true
+                isFirstCircleAlertShowing = true
             }
         }
     }
@@ -204,12 +206,12 @@ struct CircleDetailView: View {
                     await prepareCircle()
                 }
             } else {
-                unifier.isLastCircleAlertShowing = true
+                isLastCircleAlertShowing = true
             }
         } else {
             let circleID = circle.id + 1
             if !goToCircle(with: circleID) {
-                unifier.isLastCircleAlertShowing = true
+                isLastCircleAlertShowing = true
             }
         }
     }
