@@ -68,6 +68,8 @@ struct CircleDetailView: View {
                 } label: {
                     Label("Circles.Detail.EditSections", systemImage: "list.bullet.indent")
                 }
+            } header: {
+                Text(verbatim: "")
             }
         }
         .fullScreenCover(item: $selectedAttachment) { attachment in

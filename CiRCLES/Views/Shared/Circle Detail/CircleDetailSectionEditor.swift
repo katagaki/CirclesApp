@@ -37,12 +37,13 @@ struct CircleDetailSectionEditor: View {
                 orderedSections.move(fromOffsets: from, toOffset: destination)
             }
         }
+        .listStyle(.plain)
         .environment(\.editMode, .constant(.active))
         .navigationTitle("Circles.Detail.SectionEditor.Title")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 if #available(iOS 26.0, *) {
-                    Button("Shared.Save", role: .confirm) {
+                    Button(role: .confirm) {
                         save()
                     }
                 } else {
