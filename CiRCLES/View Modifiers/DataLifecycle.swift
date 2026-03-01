@@ -1,5 +1,5 @@
 //
-//  AuthenticatedView.swift
+//  DataLifecycle.swift
 //  CiRCLES
 //
 //  Created by シン・ジャスティン on 2025/08/18.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AuthenticatedView: ViewModifier {
+struct DataLifecycleModifier: ViewModifier {
 
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
@@ -23,16 +23,7 @@ struct AuthenticatedView: ViewModifier {
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
 
     func body(content: Content) -> some View {
-        @Bindable var authenticator = authenticator
         content
-            .task {
-                authenticator.setupReachability()
-            }
-            .sheet(isPresented: $authenticator.isAuthenticating) {
-                LoginView()
-                    .environment(authenticator)
-                    .interactiveDismissDisabled()
-            }
             .onChange(of: authenticator.isReady) { _, newValue in
                 if newValue && !authenticator.isAuthenticating {
                     reloadData()
@@ -49,18 +40,6 @@ struct AuthenticatedView: ViewModifier {
                     planner.activeEventNumberUserDefault = planner.activeEventNumber
                     planner.updateActiveEvent(onlineState: authenticator.onlineState)
                     reloadData(forceDownload: false, shouldResetSelections: true)
-                }
-            }
-            .onOpenURL { url in
-                if url.scheme == "circles-app" && url.host() == "attach-product-list",
-                   let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
-                   let base64 = components.queryItems?.first(where: { $0.name == "image" })?.value,
-                   let data = Data(base64Encoded: base64) {
-                    unifier.pendingAttachmentData = data
-                } else if url.absoluteString == circleMsCancelURLSchema {
-                    authenticator.isWaitingForAuthenticationCode = false
-                } else {
-                    authenticator.getAuthenticationCode(from: url)
                 }
             }
     }
@@ -192,7 +171,7 @@ struct AuthenticatedView: ViewModifier {
 }
 
 extension View {
-    func authenticated() -> some View {
-        self.modifier(AuthenticatedView())
+    func dataLifecycle() -> some View {
+        self.modifier(DataLifecycleModifier())
     }
 }
