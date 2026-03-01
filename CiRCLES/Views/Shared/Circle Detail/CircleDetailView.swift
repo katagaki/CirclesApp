@@ -36,7 +36,16 @@ struct CircleDetailView: View {
     @State var isFirstCircleAlertShowing: Bool = false
     @State var isLastCircleAlertShowing: Bool = false
 
+    @AppStorage(wrappedValue: "", "Circles.Detail.SectionOrder") var sectionOrderStorage: String
+    @AppStorage(wrappedValue: "", "Circles.Detail.HiddenSections") var hiddenSectionsStorage: String
+
     @Namespace var namespace
+
+    var visibleSections: [CircleDetailSection] {
+        let order = decodeSectionOrder(sectionOrderStorage)
+        let hidden = Set(decodeHiddenSections(hiddenSectionsStorage))
+        return order.filter { !hidden.contains($0) }
+    }
 
     var body: some View {
         List {
@@ -50,39 +59,14 @@ struct CircleDetailView: View {
                     .listRowBackground(Color.clear)
                     .listRowInsets(.init(top: 0.0, leading: 20.0, bottom: 0.0, trailing: 20.0))
             }
-            if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
-                ListSectionWithTranslateButton(title: "Shared.BookName", text: circle.bookName)
+            ForEach(visibleSections) { section in
+                sectionContent(for: section)
             }
-            if let genre {
-                ListSectionWithTranslateButton(title: "Shared.Genre", text: genre)
-            }
-            if let tags = webCatalogInformation?.tag, tags.trimmingCharacters(in: .whitespaces).count > 0 {
-                ListSectionWithTranslateButton(title: "Shared.Tags", text: tags)
-            }
-            if circle.memo.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
-                ListSectionWithTranslateButton(title: "Shared.Memo.Circle", text: circle.memo, showContextMenu: false)
-            }
-            if !attachments.isEmpty {
-                Section("Circles.Attachments") {
-                    ForEach(attachments) { attachment in
-                        if let image = UIImage(data: attachment.attachmentBlob) {
-                            Button {
-                                selectedAttachment = attachment
-                                unifier.selectedDetent = .large
-                            } label: {
-                                Image(uiImage: image)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .listRowInsets(EdgeInsets())
-                            .contextMenu {
-                                Button("Circles.Attachments.Delete", systemImage: "trash", role: .destructive) {
-                                    deleteAttachment(attachment)
-                                }
-                            }
-                        }
-                    }
+            Section {
+                NavigationLink {
+                    CircleDetailSectionEditor()
+                } label: {
+                    Label("Circles.Detail.EditSections", systemImage: "list.bullet.indent")
                 }
             }
         }
@@ -140,6 +124,77 @@ struct CircleDetailView: View {
                 await prepareCircle()
             }
         }
+    }
+
+    @ViewBuilder
+    func sectionContent(for section: CircleDetailSection) -> some View {
+        switch section {
+        case .bookName:
+            if circle.bookName.trimmingCharacters(in: .whitespacesAndNewlines) != "" {
+                ListSectionWithTranslateButton(title: "Shared.BookName", text: circle.bookName)
+            }
+        case .genre:
+            if let genre {
+                ListSectionWithTranslateButton(title: "Shared.Genre", text: genre)
+            }
+        case .tags:
+            if let tags = webCatalogInformation?.tag, tags.trimmingCharacters(in: .whitespaces).count > 0 {
+                ListSectionWithTranslateButton(title: "Shared.Tags", text: tags)
+            }
+        case .memo:
+            if circle.memo.trimmingCharacters(in: .whitespacesAndNewlines).count > 0 {
+                ListSectionWithTranslateButton(
+                    title: "Shared.Memo.Circle", text: circle.memo, showContextMenu: false
+                )
+            }
+        case .attachments:
+            if !attachments.isEmpty {
+                Section("Circles.Attachments") {
+                    ForEach(attachments) { attachment in
+                        if let image = UIImage(data: attachment.attachmentBlob) {
+                            Button {
+                                selectedAttachment = attachment
+                                unifier.selectedDetent = .large
+                            } label: {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .listRowInsets(EdgeInsets())
+                            .contextMenu {
+                                Button(
+                                    "Circles.Attachments.Delete", systemImage: "trash",
+                                    role: .destructive
+                                ) {
+                                    deleteAttachment(attachment)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    func decodeSectionOrder(_ string: String) -> [CircleDetailSection] {
+        guard !string.isEmpty, let data = string.data(using: .utf8),
+              let rawValues = try? JSONDecoder().decode([Int].self, from: data) else {
+            return CircleDetailSection.defaultOrder
+        }
+        var sections = rawValues.compactMap { CircleDetailSection(rawValue: $0) }
+        for section in CircleDetailSection.allCases where !sections.contains(section) {
+            sections.append(section)
+        }
+        return sections
+    }
+
+    func decodeHiddenSections(_ string: String) -> [CircleDetailSection] {
+        guard !string.isEmpty, let data = string.data(using: .utf8),
+              let rawValues = try? JSONDecoder().decode([Int].self, from: data) else {
+            return []
+        }
+        return rawValues.compactMap { CircleDetailSection(rawValue: $0) }
     }
 
     func prepareCircle() async {
