@@ -70,7 +70,7 @@ struct UnifiedView: View {
                     UnifiedToolbar(namespace: namespace)
                 }
                 .adaptiveNavigationBar()
-                .unifierSheets(namespace: namespace)
+                .unifierPanel(namespace: namespace)
                 .sheet(isPresented: $unifier.isMyComiketPresenting) {
                     Group {
                         if #available(iOS 26.0, *) {
@@ -97,7 +97,10 @@ struct UnifiedView: View {
             prepareTipKit()
             showReviewPromptIfLaunchedEnoughTimes()
         }
-        .authenticated()
+        .loginSheet()
+        .dataLifecycle()
+        .urlSchemeHandler()
+        .reachabilitySetup()
         #if DEBUG
         .debugOverlay()
         #endif

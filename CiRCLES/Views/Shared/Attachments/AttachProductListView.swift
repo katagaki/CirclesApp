@@ -21,6 +21,7 @@ struct AttachProductListView: View {
     @State var selectedCircle: ComiketCircle?
     @State var isSaving: Bool = false
     @State var searchTask: Task<Void, Never>?
+    @State var isSearching: Bool = false
 
     @Namespace var namespace
 
@@ -85,6 +86,7 @@ struct AttachProductListView: View {
             .navigationBarTitleDisplayMode(.inline)
             .searchable(
                 text: $searchTerm,
+                isPresented: $isSearching,
                 placement: .navigationBarDrawer(displayMode: .always),
                 prompt: "Circles.Attachments.Search.Prompt"
             )
@@ -118,6 +120,9 @@ struct AttachProductListView: View {
             }
         }
         .interactiveDismissDisabled()
+        .onAppear {
+            isSearching = true
+        }
     }
 
     var saveButton: some View {
