@@ -139,14 +139,16 @@ struct DataLifecycleModifier: ViewModifier {
                 await oasis.setHeaderText("Shared.LoadingHeader.Initial")
             }
 
+            await imageCache.loadFromDisk()
             if !isDatabaseInitialized {
                 imageCache.clear()
                 isDatabaseInitialized = true
             }
 
             database.imageCache.removeAll()
-            database.loadCommonImages()
-            database.loadCircleImages()
+            async let commonLoad: Void = database.loadCommonImages()
+            async let circleLoad: Void = database.loadCircleImages()
+            _ = await (commonLoad, circleLoad)
         }
 
         UIApplication.shared.isIdleTimerDisabled = false

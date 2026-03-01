@@ -11,6 +11,7 @@ import UIKit
 import WebP
 
 @Observable
+@MainActor
 class ImageCache {
 
     @ObservationIgnored
@@ -18,14 +19,22 @@ class ImageCache {
         .appendingPathComponent("ImageCache", conformingTo: .folder)
 
     @ObservationIgnored var images: [Int: Data] = [:]
+    @ObservationIgnored var isLoaded: Bool = false
 
     init() {
-        if let cacheURL = ImageCache.cacheURL {
-            if !FileManager.default.fileExists(atPath: cacheURL.path()) {
-                try? FileManager.default.createDirectory(
-                    at: cacheURL, withIntermediateDirectories: true, attributes: nil
-                )
-            }
+        if let cacheURL = ImageCache.cacheURL,
+           !FileManager.default.fileExists(atPath: cacheURL.path()) {
+            try? FileManager.default.createDirectory(
+                at: cacheURL, withIntermediateDirectories: true, attributes: nil
+            )
+        }
+    }
+
+    func loadFromDisk() async {
+        guard !isLoaded else { return }
+        guard let cacheURL = ImageCache.cacheURL else { return }
+        let loadedImages: [Int: Data] = await Task.detached(priority: .userInitiated) {
+            var result: [Int: Data] = [:]
             if let imageURLs = try? FileManager.default.contentsOfDirectory(
                 at: cacheURL,
                 includingPropertiesForKeys: nil,
@@ -34,11 +43,14 @@ class ImageCache {
                 for imageURL in imageURLs {
                     if let imageData = try? Data(contentsOf: imageURL),
                        let imageID = Int(imageURL.lastPathComponent) {
-                        images[imageID] = imageData
+                        result[imageID] = imageData
                     }
                 }
             }
-        }
+            return result
+        }.value
+        images = loadedImages
+        isLoaded = true
     }
 
     func image(_ id: Int) -> (Bool, UIImage?) {

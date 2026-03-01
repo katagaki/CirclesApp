@@ -280,41 +280,6 @@
         }
       }
     },
-    "Circles.Attachments.Delete" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "削除"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "삭제"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "删除"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "刪除"
-          }
-        }
-      }
-    },
     "Circles.Attachments.Attach" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -346,6 +311,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "附加商品單"
+          }
+        }
+      }
+    },
+    "Circles.Attachments.Delete" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "削除"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "삭제"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "删除"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "刪除"
           }
         }
       }
@@ -6648,30 +6648,6 @@
           }
         }
       }
-    },
-    "お品書きを添付" : {
-
-    },
-    "サークルを検索" : {
-
-    },
-    "サークル名・ペンネーム" : {
-
-    },
-    "サークル名またはペンネームで検索してください。" : {
-
-    },
-    "他にも検索結果があります。検索条件を絞ってください。" : {
-
-    },
-    "保存" : {
-
-    },
-    "検索条件に一致するサークルがありません。" : {
-
-    },
-    "見つかりませんでした" : {
-
     }
   },
   "version" : "1.0"
