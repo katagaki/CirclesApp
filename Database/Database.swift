@@ -176,41 +176,53 @@ class Database {
 
     // MARK: Loading
 
-    func loadCommonImages() {
-        if let imageDatabase = getImageDatabase() {
-            do {
-                let colName = Expression<String>("name")
-                let colImage = Expression<Data>("image")
-                let table = Table("ComiketCommonImage").select(colName, colImage)
-                let commonImages: [String: Data] = try imageDatabase.prepare(table).reduce(
-                    into: [:]
-                ) { partialResult, row in
-                    partialResult[row[colName]] = row[colImage]
-                }
-                self.commonImages = commonImages
-                self.commonImagesLoadCount += 1
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
+    func loadCommonImages() async {
+        guard let imageDatabase = getImageDatabase() else { return }
+        let loaded = await Task.detached(priority: .userInitiated) {
+            Self.readCommonImages(from: imageDatabase)
+        }.value
+        if let loaded {
+            self.commonImages = loaded
+            self.commonImagesLoadCount += 1
         }
     }
 
-    func loadCircleImages() {
-        if let imageDatabase = getImageDatabase() {
-            do {
-                let colID = Expression<Int>("id")
-                let colCutImage = Expression<Data>("cutImage")
-                let table = Table("ComiketCircleImage").select(colID, colCutImage)
-                let circleImages: [Int: Data] = try imageDatabase.prepare(table).reduce(
-                    into: [:]
-                ) { partialResult, row in
-                    partialResult[row[colID]] = row[colCutImage]
-                }
-                self.circleImages = circleImages
-                self.circleImagesLoadCount += 1
-            } catch {
-                debugPrint(error.localizedDescription)
+    func loadCircleImages() async {
+        guard let imageDatabase = getImageDatabase() else { return }
+        let loaded = await Task.detached(priority: .userInitiated) {
+            Self.readCircleImages(from: imageDatabase)
+        }.value
+        if let loaded {
+            self.circleImages = loaded
+            self.circleImagesLoadCount += 1
+        }
+    }
+
+    private nonisolated static func readCommonImages(from imageDatabase: Connection) -> [String: Data]? {
+        do {
+            let colName = Expression<String>("name")
+            let colImage = Expression<Data>("image")
+            let table = Table("ComiketCommonImage").select(colName, colImage)
+            return try imageDatabase.prepare(table).reduce(into: [:]) { partialResult, row in
+                partialResult[row[colName]] = row[colImage]
             }
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
+    }
+
+    private nonisolated static func readCircleImages(from imageDatabase: Connection) -> [Int: Data]? {
+        do {
+            let colID = Expression<Int>("id")
+            let colCutImage = Expression<Data>("cutImage")
+            let table = Table("ComiketCircleImage").select(colID, colCutImage)
+            return try imageDatabase.prepare(table).reduce(into: [:]) { partialResult, row in
+                partialResult[row[colID]] = row[colCutImage]
+            }
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
         }
     }
 }
