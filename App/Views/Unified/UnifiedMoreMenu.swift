@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import RADiUS
 
 private let navigateMapsJPURL = "maps://?saddr=現在地&daddr=東京ビッグサイト"
 private let navigateGoogleMapsJPURL = "comgooglemaps://?saddr=現在地&daddr=東京ビッグサイト"

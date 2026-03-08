@@ -8,6 +8,7 @@
 import Foundation
 import KeychainAccess
 import Reachability
+import RADiUS
 
 @Observable
 @MainActor

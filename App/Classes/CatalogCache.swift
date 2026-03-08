@@ -7,6 +7,7 @@
 
 import SwiftData
 import SwiftUI
+import AXiS
 
 @Observable
 class CatalogCache {
