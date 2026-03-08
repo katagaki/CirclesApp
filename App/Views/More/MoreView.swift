@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2024/07/15.
 //
 
-import Komponents
 import SwiftData
 import SwiftUI
 import AXiS
@@ -16,11 +15,9 @@ struct MoreView: View {
     @Environment(Unifier.self) var unifier
 
     var body: some View {
-        MoreList(repoName: "katagaki/CirclesApp", viewPath: UnifiedPath.moreAttributions) {
+        List {
             Section {
-                NavigationLink(value: UnifiedPath.moreDBAdmin) {
-                    ListRow(image: "ListIcon.MasterDB", title: "More.DBAdmin.ManageDB")
-                }
+                NavigationLink("More.DBAdmin.ManageDB", value: UnifiedPath.moreDBAdmin)
             } header: {
                 Text("More.DBAdmin")
             } footer: {
@@ -32,7 +29,21 @@ struct MoreView: View {
                 .padding(.top, 20.0)
                 .listRowBackground(Color.clear)
             }
+            Section {
+                Link(destination: URL(string: "https://github.com/katagaki/CirclesApp")!) {
+                    HStack {
+                        Text(String(localized: "More.GitHub"))
+                        Spacer()
+                        Text("katagaki/CirclesApp")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .tint(.primary)
+                NavigationLink("More.Attributions", value: UnifiedPath.moreAttributions)
+            }
         }
         .listSectionSpacing(.compact)
+        .navigationTitle("ViewTitle.More")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
