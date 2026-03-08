@@ -51,6 +51,7 @@ struct MapView: View {
                         MapLayer(image: mapImage)
                         MapFavoritesLayer(spaceSize: spaceSize)
                         MapVisitedLayer(spaceSize: spaceSize)
+                        MapFilterLayer(spaceSize: spaceSize)
                         if showGenreOverlay, let genreImage {
                             MapLayer(image: genreImage)
                         }

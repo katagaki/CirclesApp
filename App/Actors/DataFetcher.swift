@@ -280,6 +280,30 @@ actor DataFetcher {
         return circles(withWebCatalogIDs: webCatalogIDs)
     }
 
+    func filteredWebCatalogIDs(
+        inMap mapID: Int?,
+        withGenre genreIDs: [Int]?,
+        inBlock blockIDs: [Int]?,
+        onDay dayID: Int?
+    ) -> Set<Int> {
+        let circleIDs = circles(inMap: mapID, withGenre: genreIDs, inBlock: blockIDs, onDay: dayID)
+        if circleIDs.isEmpty {
+            return []
+        }
+        if let database {
+            do {
+                let extendedTable = Table("ComiketCircleExtend")
+                let colID = Expression<Int>("id")
+                let colWebCatalogID = Expression<Int>("WCId")
+                let query = extendedTable.select(colWebCatalogID).filter(circleIDs.contains(colID))
+                return Set(try database.prepare(query).map { $0[colWebCatalogID] })
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return []
+    }
+
     func webCatalogIDs(forCircleIDs circleIDs: [Int]) -> [Int] {
         if let database {
             do {
