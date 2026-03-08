@@ -19,7 +19,7 @@ struct MoreDatabaseAdministratiion: View {
     @Environment(ImageCache.self) var imageCache
     @Environment(Oasis.self) var oasis
 
-    @State var files: [String: URL] = [:]
+    @State var files: [String: [URL]] = [:]
     @State var isDownloadConfirmationShowing: Bool = false
     @State var estimatedDownloadSize: String = ""
 
@@ -64,19 +64,26 @@ struct MoreDatabaseAdministratiion: View {
                     HStack {
                         Text(fileName)
                         Spacer()
-                        if let fileURL = files[fileName], let fileSizeString = fileSize(of: fileURL.path()) {
-                            Text(fileSizeString)
-                                .foregroundStyle(.secondary)
+                        if let fileURLs = files[fileName] {
+                            let totalSize = fileURLs.compactMap({ fileSizeBytes(of: $0.path()) }).reduce(0, +)
+                            if totalSize > 0 {
+                                Text(ByteCountFormatter.string(fromByteCount: Int64(totalSize), countStyle: .file))
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button("Shared.Delete", role: .destructive) {
-                                if let fileURL = files[fileName] {
-                                    do {
-                                        try FileManager.default.removeItem(at: fileURL)
+                            if fileName != "C\(events.activeEventNumber)" {
+                                Button("Shared.Delete", role: .destructive) {
+                                    if let fileURLs = files[fileName] {
+                                        for fileURL in fileURLs {
+                                            do {
+                                                try FileManager.default.removeItem(at: fileURL)
+                                            } catch {
+                                                debugPrint(error.localizedDescription)
+                                            }
+                                        }
                                         files.removeValue(forKey: fileName)
-                                    } catch {
-                                        debugPrint(error.localizedDescription)
                                     }
                                 }
                             }
@@ -108,7 +115,7 @@ struct MoreDatabaseAdministratiion: View {
     }
 
     func refreshDownloadedDataList() {
-        var files: [String: URL] = [:]
+        var files: [String: [URL]] = [:]
         if let dataStoreURL = database.dataStoreURL,
            let downloadedFiles = try? FileManager.default.contentsOfDirectory(
             at: dataStoreURL,
@@ -116,17 +123,11 @@ struct MoreDatabaseAdministratiion: View {
             options: .skipsHiddenFiles
            ) {
             for file in downloadedFiles where file.isFileURL && file.pathExtension == "db" {
-                var fileName = file.lastPathComponent
-                fileName = fileName.replacingOccurrences(of: "webcatalog", with: "C")
-                fileName = fileName.replacingOccurrences(
-                    of: "Image1.db",
-                    with: String(localized: "More.DBAdmin.ImageData")
-                )
-                fileName = fileName.replacingOccurrences(
-                    of: ".db",
-                    with: String(localized: "More.DBAdmin.TextData")
-                )
-                files[fileName] = file
+                let eventName = file.lastPathComponent
+                    .replacingOccurrences(of: "webcatalog", with: "C")
+                    .replacingOccurrences(of: "Image1.db", with: "")
+                    .replacingOccurrences(of: ".db", with: "")
+                files[eventName, default: []].append(file)
             }
         }
         withAnimation(.smooth.speed(2.0)) {
@@ -134,12 +135,10 @@ struct MoreDatabaseAdministratiion: View {
         }
     }
 
-    func fileSize(of path: String) -> String? {
+    func fileSizeBytes(of path: String) -> UInt64? {
         do {
             let attributes = try FileManager.default.attributesOfItem(atPath: path)
-            if let size = attributes[.size] as? UInt64 {
-                return ByteCountFormatter.string(fromByteCount: Int64(size), countStyle: .file)
-            }
+            return attributes[.size] as? UInt64
         } catch {
             debugPrint(error.localizedDescription)
         }

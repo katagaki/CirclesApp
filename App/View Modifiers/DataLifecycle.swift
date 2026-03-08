@@ -102,21 +102,32 @@ struct DataLifecycleModifier: ViewModifier {
 
                 if let activeEvent {
                     if !database.isDownloaded(for: activeEvent) {
-                        let token = authenticator.token ?? OpenIDToken()
-                        let totalBytes = await database.fetchDownloadSizes(
-                            for: activeEvent, authToken: token
-                        )
-                        let sizeString: String
-                        if let totalBytes {
-                            sizeString = ByteCountFormatter.string(
-                                fromByteCount: totalBytes, countStyle: .file
+                        if isDatabaseInitialized {
+                            let token = authenticator.token ?? OpenIDToken()
+                            let totalBytes = await database.fetchDownloadSizes(
+                                for: activeEvent, authToken: token
                             )
+                            let sizeString: String
+                            if let totalBytes {
+                                sizeString = ByteCountFormatter.string(
+                                    fromByteCount: totalBytes, countStyle: .file
+                                )
+                            } else {
+                                sizeString = String(localized: "Shared.Unknown")
+                            }
+                            pendingDownloadEvent = activeEvent
+                            estimatedDownloadSize = sizeString
+                            isDownloadConfirmationShowing = true
                         } else {
-                            sizeString = String(localized: "Shared.Unknown")
+                            oasis.open {
+                                Task.detached {
+                                    await loadDataFromDatabase(for: activeEvent)
+                                    await MainActor.run {
+                                        finishReload(shouldResetSelections: shouldResetSelections)
+                                    }
+                                }
+                            }
                         }
-                        pendingDownloadEvent = activeEvent
-                        estimatedDownloadSize = sizeString
-                        isDownloadConfirmationShowing = true
                     } else {
                         Task.detached {
                             await loadDataFromDatabase(for: activeEvent)
