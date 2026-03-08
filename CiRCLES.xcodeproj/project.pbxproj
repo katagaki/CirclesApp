@@ -7,8 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A1B2C3012F5D300000000001 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3022F5D300000000001 /* SQLite */; };
+		A1B2C3032F5D300000000002 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3042F5D300000000002 /* ZIPFoundation */; };
+		A1B2C3052F5D300000000003 /* RADiUS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E41642F62F5D2F5200708895 /* RADiUS.framework */; };
+		A1B2C3062F5D300000000004 /* AXiS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E41643072F5D2F6200708895 /* AXiS.framework */; };
 		E405A48F2C21B157006FE791 /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E405A48E2C21B157006FE791 /* Komponents */; };
 		E40623022DEBE238002D3E28 /* WebP in Frameworks */ = {isa = PBXBuildFile; productRef = E40623012DEBE238002D3E28 /* WebP */; };
+		E41642FC2F5D2F5300708895 /* RADiUS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E41642F62F5D2F5200708895 /* RADiUS.framework */; };
+		E41642FD2F5D2F5300708895 /* RADiUS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E41642F62F5D2F5200708895 /* RADiUS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E416430D2F5D2F6200708895 /* AXiS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E41643072F5D2F6200708895 /* AXiS.framework */; };
+		E416430E2F5D2F6200708895 /* AXiS.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = E41643072F5D2F6200708895 /* AXiS.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E480AA772C441DD1009C1445 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA762C441DD1009C1445 /* KeychainAccess */; };
 		E480AA9D2C44A6F1009C1445 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA9C2C44A6F1009C1445 /* SQLite */; };
 		E480AAA62C44BB77009C1445 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = E480AAA52C44BB77009C1445 /* ZIPFoundation */; };
@@ -18,6 +26,27 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		A1B2C3082F5D300000000006 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4A7693E2C21A20A00BE3491 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E41642F52F5D2F5200708895;
+			remoteInfo = RADiUS;
+		};
+		E41642FA2F5D2F5300708895 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4A7693E2C21A20A00BE3491 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E41642F52F5D2F5200708895;
+			remoteInfo = RADiUS;
+		};
+		E416430B2F5D2F6200708895 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4A7693E2C21A20A00BE3491 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E41643062F5D2F6200708895;
+			remoteInfo = AXiS;
+		};
 		F1A0B0032F31700000000001 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E4A7693E2C21A20A00BE3491 /* Project object */;
@@ -28,6 +57,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		E41643012F5D2F5300708895 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E41642FD2F5D2F5300708895 /* RADiUS.framework in Embed Frameworks */,
+				E416430E2F5D2F6200708895 /* AXiS.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F1A0B0052F31700000000001 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -42,6 +83,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		E41642F62F5D2F5200708895 /* RADiUS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RADiUS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E41643072F5D2F6200708895 /* AXiS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AXiS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4D74B982C8D7D5B0014CD16 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareWithCiRCLES.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -63,27 +106,6 @@
 			);
 			target = F1A0B0042F31700000000001 /* ShareWithCiRCLES */;
 		};
-		F1A0B0092F31700000000001 /* Exceptions for "Database" folder in "ShareWithCiRCLES" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Database.swift,
-				"Database+Download.swift",
-				"Database+Fetchers.swift",
-				Tables/ComiketBlock.swift,
-				Tables/ComiketCircle.swift,
-				Tables/ComiketCircleExtendedInformation.swift,
-				Tables/ComiketDate.swift,
-				Tables/ComiketEvent.swift,
-				Tables/ComiketGenre.swift,
-				Tables/ComiketLayout.swift,
-				Tables/ComiketMap.swift,
-				Types/CircleCutConfiguration.swift,
-				Types/MapConfiguration.swift,
-				Types/Point.swift,
-				Types/Size.swift,
-			);
-			target = F1A0B0042F31700000000001 /* ShareWithCiRCLES */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -100,17 +122,14 @@
 			path = ci_scripts;
 			sourceTree = "<group>";
 		};
-		E489B5522F315E8200ED193F /* Database */ = {
+		E41642F72F5D2F5200708895 /* RADiUS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				F1A0B0092F31700000000001 /* Exceptions for "Database" folder in "ShareWithCiRCLES" target */,
-			);
-			path = Database;
+			path = RADiUS;
 			sourceTree = "<group>";
 		};
-		E489B5652F31606400ED193F /* API */ = {
+		E41643082F5D2F6200708895 /* AXiS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = API;
+			path = AXiS;
 			sourceTree = "<group>";
 		};
 		E489B5772F31607D00ED193F /* Swift Data */ = {
@@ -129,6 +148,23 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		E41642F32F5D2F5200708895 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E41643042F5D2F6200708895 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A1B2C3012F5D300000000001 /* SQLite in Frameworks */,
+				A1B2C3032F5D300000000002 /* ZIPFoundation in Frameworks */,
+				A1B2C3052F5D300000000003 /* RADiUS.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E4A769432C21A20A00BE3491 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -138,7 +174,9 @@
 				E4D74B892C8CAEA70014CD16 /* Reachability in Frameworks */,
 				E405A48F2C21B157006FE791 /* Komponents in Frameworks */,
 				E40623022DEBE238002D3E28 /* WebP in Frameworks */,
+				E41642FC2F5D2F5300708895 /* RADiUS.framework in Frameworks */,
 				E480AAA62C44BB77009C1445 /* ZIPFoundation in Frameworks */,
+				E416430D2F5D2F6200708895 /* AXiS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -147,6 +185,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F1A0B0012F31700000000001 /* SQLite in Frameworks */,
+				A1B2C3062F5D300000000004 /* AXiS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,10 +198,10 @@
 				E4D74B982C8D7D5B0014CD16 /* README.md */,
 				E4065E1B2DECA30700AB7E20 /* ci_scripts */,
 				E4065DC02DECA30200AB7E20 /* App */,
-				E489B5522F315E8200ED193F /* Database */,
 				E489B5772F31607D00ED193F /* Swift Data */,
-				E489B5652F31606400ED193F /* API */,
 				F1A0B00A2F31700000000001 /* Share Extension */,
+				E41642F72F5D2F5200708895 /* RADiUS */,
+				E41643082F5D2F6200708895 /* AXiS */,
 				E4A769472C21A20A00BE3491 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -172,13 +211,81 @@
 			children = (
 				E4A769462C21A20A00BE3491 /* CiRCLES.app */,
 				F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */,
+				E41642F62F5D2F5200708895 /* RADiUS.framework */,
+				E41643072F5D2F6200708895 /* AXiS.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
+/* Begin PBXHeadersBuildPhase section */
+		E41642F12F5D2F5200708895 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E41643022F5D2F6200708895 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
 /* Begin PBXNativeTarget section */
+		E41642F52F5D2F5200708895 /* RADiUS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E41642FE2F5D2F5300708895 /* Build configuration list for PBXNativeTarget "RADiUS" */;
+			buildPhases = (
+				E41642F12F5D2F5200708895 /* Headers */,
+				E41642F22F5D2F5200708895 /* Sources */,
+				E41642F32F5D2F5200708895 /* Frameworks */,
+				E41642F42F5D2F5200708895 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E41642F72F5D2F5200708895 /* RADiUS */,
+			);
+			name = RADiUS;
+			packageProductDependencies = (
+			);
+			productName = RADiUS;
+			productReference = E41642F62F5D2F5200708895 /* RADiUS.framework */;
+			productType = "com.apple.product-type.framework";
+		};
+		E41643062F5D2F6200708895 /* AXiS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E416430F2F5D2F6200708895 /* Build configuration list for PBXNativeTarget "AXiS" */;
+			buildPhases = (
+				E41643022F5D2F6200708895 /* Headers */,
+				E41643032F5D2F6200708895 /* Sources */,
+				E41643042F5D2F6200708895 /* Frameworks */,
+				E41643052F5D2F6200708895 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A1B2C3072F5D300000000005 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				E41643082F5D2F6200708895 /* AXiS */,
+			);
+			name = AXiS;
+			packageProductDependencies = (
+				A1B2C3022F5D300000000001 /* SQLite */,
+				A1B2C3042F5D300000000002 /* ZIPFoundation */,
+			);
+			productName = AXiS;
+			productReference = E41643072F5D2F6200708895 /* AXiS.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 		E4A769452C21A20A00BE3491 /* CiRCLES */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E4A769562C21A20B00BE3491 /* Build configuration list for PBXNativeTarget "CiRCLES" */;
@@ -188,16 +295,17 @@
 				E4A769442C21A20A00BE3491 /* Resources */,
 				E480AA922C449C04009C1445 /* ShellScript */,
 				F1A0B0052F31700000000001 /* Embed Foundation Extensions */,
+				E41643012F5D2F5300708895 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				F1A0B00C2F31700000000001 /* PBXTargetDependency */,
+				E41642FB2F5D2F5300708895 /* PBXTargetDependency */,
+				E416430C2F5D2F6200708895 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				E4065DC02DECA30200AB7E20 /* App */,
-				E489B5522F315E8200ED193F /* Database */,
-				E489B5652F31606400ED193F /* API */,
 				E489B5772F31607D00ED193F /* Swift Data */,
 			);
 			name = CiRCLES;
@@ -226,7 +334,6 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				E489B5522F315E8200ED193F /* Database */,
 				F1A0B00A2F31700000000001 /* Share Extension */,
 			);
 			name = ShareWithCiRCLES;
@@ -244,9 +351,15 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 2600;
+				LastSwiftUpdateCheck = 2630;
+				LastUpgradeCheck = 2630;
 				TargetAttributes = {
+					E41642F52F5D2F5200708895 = {
+						CreatedOnToolsVersion = 26.3;
+					};
+					E41643062F5D2F6200708895 = {
+						CreatedOnToolsVersion = 26.3;
+					};
 					E4A769452C21A20A00BE3491 = {
 						CreatedOnToolsVersion = 15.4;
 					};
@@ -282,11 +395,27 @@
 			targets = (
 				E4A769452C21A20A00BE3491 /* CiRCLES */,
 				F1A0B0042F31700000000001 /* ShareWithCiRCLES */,
+				E41642F52F5D2F5200708895 /* RADiUS */,
+				E41643062F5D2F6200708895 /* AXiS */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		E41642F42F5D2F5200708895 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E41643052F5D2F6200708895 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E4A769442C21A20A00BE3491 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -325,6 +454,20 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		E41642F22F5D2F5200708895 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E41643032F5D2F6200708895 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E4A769422C21A20A00BE3491 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -342,6 +485,21 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		A1B2C3072F5D300000000005 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E41642F52F5D2F5200708895 /* RADiUS */;
+			targetProxy = A1B2C3082F5D300000000006 /* PBXContainerItemProxy */;
+		};
+		E41642FB2F5D2F5300708895 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E41642F52F5D2F5200708895 /* RADiUS */;
+			targetProxy = E41642FA2F5D2F5300708895 /* PBXContainerItemProxy */;
+		};
+		E416430C2F5D2F6200708895 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E41643062F5D2F6200708895 /* AXiS */;
+			targetProxy = E416430B2F5D2F6200708895 /* PBXContainerItemProxy */;
+		};
 		F1A0B00C2F31700000000001 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			platformFilter = ios;
@@ -351,6 +509,198 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		E41642FF2F5D2F5300708895 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.RADiUS;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+				XROS_DEPLOYMENT_TARGET = 2.6;
+			};
+			name = Debug;
+		};
+		E41643002F5D2F5300708895 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.RADiUS;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+				XROS_DEPLOYMENT_TARGET = 2.6;
+			};
+			name = Release;
+		};
+		E41643102F5D2F6200708895 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.AXiS;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+				XROS_DEPLOYMENT_TARGET = 2.6;
+			};
+			name = Debug;
+		};
+		E41643112F5D2F6200708895 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALLOW_TARGET_PLATFORM_SPECIALIZATION = YES;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				ENABLE_MODULE_VERIFIER = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = (
+					"@executable_path/../Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.4;
+				MARKETING_VERSION = 1.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGES = "objective-c objective-c++";
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu17 gnu++20";
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.AXiS;
+				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
+				SDKROOT = auto;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_INSTALL_MODULE = YES;
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+				XROS_DEPLOYMENT_TARGET = 2.6;
+			};
+			name = Release;
+		};
 		E4A769542C21A20B00BE3491 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -505,7 +855,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 107.2.3;
+				MARKETING_VERSION = 107.2.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -547,7 +897,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 107.2.3;
+				MARKETING_VERSION = 107.2.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -570,7 +920,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Share Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "お品書きを添付";
+				INFOPLIST_KEY_CFBundleDisplayName = CiRCLES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -578,7 +928,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 107.2.3;
+				MARKETING_VERSION = 107.2.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -598,7 +948,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Share Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "お品書きを添付";
+				INFOPLIST_KEY_CFBundleDisplayName = CiRCLES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -606,7 +956,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 107.2.3;
+				MARKETING_VERSION = 107.2.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -621,6 +971,24 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		E41642FE2F5D2F5300708895 /* Build configuration list for PBXNativeTarget "RADiUS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E41642FF2F5D2F5300708895 /* Debug */,
+				E41643002F5D2F5300708895 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E416430F2F5D2F6200708895 /* Build configuration list for PBXNativeTarget "AXiS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E41643102F5D2F6200708895 /* Debug */,
+				E41643112F5D2F6200708895 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E4A769412C21A20A00BE3491 /* Build configuration list for PBXProject "CiRCLES" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -702,6 +1070,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		A1B2C3022F5D300000000001 /* SQLite */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */;
+			productName = SQLite;
+		};
+		A1B2C3042F5D300000000002 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E480AAA42C44BB77009C1445 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
 		E405A48E2C21B157006FE791 /* Komponents */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = E405A48D2C21B157006FE791 /* XCRemoteSwiftPackageReference "Komponents" */;

@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftData
+import RADiUS
 
 @Model
 final class CirclesFavorite {

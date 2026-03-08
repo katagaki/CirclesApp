@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import AXiS
 
 let selectedGenresKey = "Circles.SelectedGenreIDs"
 let selectedMapKey = "Circles.SelectedMapID"

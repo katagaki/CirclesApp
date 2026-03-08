@@ -8,6 +8,7 @@
 import Komponents
 import SwiftData
 import SwiftUI
+import AXiS
 
 struct MoreView: View {
     @Environment(Authenticator.self) var authenticator

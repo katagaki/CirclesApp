@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AXiS
 
 struct CircleDetailHero: View {
 

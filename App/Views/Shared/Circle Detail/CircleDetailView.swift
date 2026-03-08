@@ -10,6 +10,8 @@ import SwiftData
 import SwiftUI
 import Translation
 import UIKit
+import RADiUS
+import AXiS
 
 struct CircleDetailView: View {
 
