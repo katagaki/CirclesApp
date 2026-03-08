@@ -66,6 +66,8 @@ struct MapView: View {
                         mapper.scrollToPosition = newValue
                     }
                 }
+            } else if database.maps().isEmpty {
+                ProgressView()
             } else {
                 ContentUnavailableView(
                     "Map.NoMapSelected",

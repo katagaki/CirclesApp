@@ -21,6 +21,11 @@ struct DataLifecycleModifier: ViewModifier {
     @Environment(Unifier.self) var unifier
 
     @State var isReloadingData: Bool = false
+    @State var isDownloadConfirmationShowing: Bool = false
+    @State var estimatedDownloadSize: String = ""
+    @State var pendingDownloadEvent: WebCatalogEvent.Response.Event?
+    @State var previousEventNumber: Int?
+    @State var isRevertingEvent: Bool = false
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
 
@@ -37,12 +42,45 @@ struct DataLifecycleModifier: ViewModifier {
                 }
             }
             .onChange(of: planner.activeEventNumber) { oldValue, _ in
+                if isRevertingEvent {
+                    isRevertingEvent = false
+                    return
+                }
                 if oldValue != -1 {
+                    previousEventNumber = oldValue
                     database.disconnect()
                     planner.activeEventNumberUserDefault = planner.activeEventNumber
                     planner.updateActiveEvent(onlineState: authenticator.onlineState)
                     reloadData(forceDownload: false, shouldResetSelections: true)
                 }
+            }
+            .alert("Alerts.DownloadConfirmation.Title", isPresented: $isDownloadConfirmationShowing) {
+                Button("Shared.Download") {
+                    if let event = pendingDownloadEvent {
+                        oasis.open {
+                            Task.detached {
+                                await loadDataFromDatabase(for: event)
+                                await MainActor.run {
+                                    finishReload(shouldResetSelections: true)
+                                }
+                            }
+                        }
+                    }
+                }
+                Button("Shared.Cancel", role: .cancel) {
+                    if let previousEventNumber {
+                        isRevertingEvent = true
+                        planner.activeEventNumber = previousEventNumber
+                        planner.activeEventNumberUserDefault = previousEventNumber
+                        planner.updateActiveEvent(onlineState: authenticator.onlineState)
+                        if let activeEvent = planner.activeEvent {
+                            database.prepare(for: activeEvent)
+                        }
+                    }
+                    finishReload(shouldResetSelections: false)
+                }
+            } message: {
+                Text("Alerts.DownloadConfirmation.Message \(estimatedDownloadSize)")
             }
     }
 
@@ -64,14 +102,21 @@ struct DataLifecycleModifier: ViewModifier {
 
                 if let activeEvent {
                     if !database.isDownloaded(for: activeEvent) {
-                        oasis.open {
-                            Task.detached {
-                                await loadDataFromDatabase(for: activeEvent)
-                                await MainActor.run {
-                                    finishReload(shouldResetSelections: true)
-                                }
-                            }
+                        let token = authenticator.token ?? OpenIDToken()
+                        let totalBytes = await database.fetchDownloadSizes(
+                            for: activeEvent, authToken: token
+                        )
+                        let sizeString: String
+                        if let totalBytes {
+                            sizeString = ByteCountFormatter.string(
+                                fromByteCount: totalBytes, countStyle: .file
+                            )
+                        } else {
+                            sizeString = String(localized: "Shared.Unknown")
                         }
+                        pendingDownloadEvent = activeEvent
+                        estimatedDownloadSize = sizeString
+                        isDownloadConfirmationShowing = true
                     } else {
                         Task.detached {
                             await loadDataFromDatabase(for: activeEvent)

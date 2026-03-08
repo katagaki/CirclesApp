@@ -90,6 +90,44 @@ extension Database {
         return nil
     }
 
+    public func fetchDownloadSizes(
+        for event: WebCatalogEvent.Response.Event,
+        authToken: OpenIDToken
+    ) async -> Int64? {
+        var request = urlRequestForWebCatalogAPI("All", authToken: authToken)
+        let parameters: [String: String] = ["event_id": String(event.id), "event_no": String(event.number)]
+        request.httpBody = parameters
+            .map { "\($0.key)=\($0.value)" }
+            .joined(separator: "&")
+            .data(using: .utf8)
+
+        guard let (data, _) = try? await URLSession.shared.data(for: request),
+              let info = try? JSONDecoder().decode(WebCatalogDatabase.self, from: data) else {
+            return nil
+        }
+
+        self.databaseInformation = info
+
+        let urls = [
+            info.response.databaseForText(),
+            info.response.databaseFor211By300Images()
+        ].compactMap { $0 }
+
+        var totalSize: Int64 = 0
+        for url in urls {
+            var headRequest = URLRequest(url: url)
+            headRequest.httpMethod = "HEAD"
+            if let (_, response) = try? await URLSession.shared.data(for: headRequest),
+               let httpResponse = response as? HTTPURLResponse,
+               let contentLength = httpResponse.value(forHTTPHeaderField: "Content-Length"),
+               let length = Int64(contentLength) {
+                totalSize += length
+            }
+        }
+
+        return totalSize > 0 ? totalSize : nil
+    }
+
     public func isDownloaded(for event: WebCatalogEvent.Response.Event) -> Bool {
         if let dataStoreURL {
             let textDatabaseURL = dataStoreURL.appending(path: "webcatalog\(event.number).db")

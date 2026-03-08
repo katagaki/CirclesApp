@@ -20,6 +20,8 @@ struct MoreDatabaseAdministratiion: View {
     @Environment(Oasis.self) var oasis
 
     @State var files: [String: URL] = [:]
+    @State var isDownloadConfirmationShowing: Bool = false
+    @State var estimatedDownloadSize: String = ""
 
     @AppStorage(wrappedValue: false, "More.DBAdmin.SkipDownload") var willSkipDownload: Bool
 
@@ -28,9 +30,15 @@ struct MoreDatabaseAdministratiion: View {
             Section {
                 Toggle("More.DBAdmin.SkipDownload", isOn: $willSkipDownload)
                 Button("More.DBAdmin.RepairData", role: .destructive) {
-                    oasis.open {
+                    if willSkipDownload {
+                        oasis.open {
+                            Task {
+                                await repairData()
+                            }
+                        }
+                    } else {
                         Task {
-                            await repairData()
+                            await fetchRepairSize()
                         }
                     }
                 }
@@ -82,6 +90,20 @@ struct MoreDatabaseAdministratiion: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             refreshDownloadedDataList()
+        }
+        .alert("Alerts.DownloadConfirmation.Title", isPresented: $isDownloadConfirmationShowing) {
+            Button("Shared.Download") {
+                oasis.open {
+                    Task {
+                        await repairData()
+                    }
+                }
+            }
+            Button("Shared.Cancel", role: .cancel) {
+                // No action needed.
+            }
+        } message: {
+            Text("Alerts.DownloadConfirmation.Message \(estimatedDownloadSize)")
         }
     }
 
@@ -144,6 +166,32 @@ struct MoreDatabaseAdministratiion: View {
             return ByteCountFormatter.string(fromByteCount: Int64(totalSize), countStyle: .file)
         }
         return nil
+    }
+
+    func fetchRepairSize() async {
+        guard let token = authenticator.token else { return }
+        var eventToCheck: WebCatalogEvent.Response.Event?
+        if let activeEvent = events.activeEvent {
+            eventToCheck = activeEvent
+        } else if let eventData = await WebCatalog.events(authToken: token),
+                  let activeEvent = eventData.list.first(
+                    where: { $0.number == events.activeEventNumber }
+                  ) {
+            eventToCheck = WebCatalogEvent.Response.Event(
+                id: activeEvent.id,
+                number: events.activeEventNumber
+            )
+        }
+
+        if let eventToCheck,
+           let totalBytes = await database.fetchDownloadSizes(for: eventToCheck, authToken: token) {
+            estimatedDownloadSize = ByteCountFormatter.string(
+                fromByteCount: totalBytes, countStyle: .file
+            )
+        } else {
+            estimatedDownloadSize = String(localized: "Shared.Unknown")
+        }
+        isDownloadConfirmationShowing = true
     }
 
     func repairData() async {
