@@ -5,16 +5,42 @@
 //  Created by シン・ジャスティン on 2025/11/08.
 //
 
-import Komponents
 import SwiftUI
 
 struct MoreLicensesView: View {
-    @Environment(Unifier.self) var unifier
-
     var body: some View {
-        LicensesView(
-            licenses: [
-                License(libraryName: "KeychainAccess", text: """
+        List {
+            ForEach(Dependency.all) { dependency in
+                Section {
+                    Text(dependency.licenseText)
+                        .font(.caption)
+                        .monospaced()
+                        .listRowBackground(Color.clear)
+                } header: {
+                    Text(dependency.name)
+                }
+            }
+        }
+        .listStyle(.grouped)
+        .navigationTitle("More.Attributions")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+// swiftlint:disable type_body_length
+private struct Dependency: Identifiable {
+    let id: String
+    let name: String
+    let licenseText: String
+
+    init(name: String, licenseText: String) {
+        self.id = name
+        self.name = name
+        self.licenseText = licenseText
+    }
+
+    static let all: [Dependency] = [
+        Dependency(name: "KeychainAccess", licenseText: """
 The MIT License (MIT)
 
 Copyright (c) 2014 kishikawa katsumi
@@ -37,7 +63,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """),
-                License(libraryName: "libwebp", text: """
+        Dependency(name: "libwebp", licenseText: """
 Copyright (c) 2010, Google Inc. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -68,7 +94,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """),
-                License(libraryName: "Reachability.swift", text: """
+        Dependency(name: "Reachability.swift", licenseText: """
 Copyright (c) 2016 Ashley Mills
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -89,7 +115,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 """),
-                License(libraryName: "SQlite.swift", text: """
+        Dependency(name: "SQlite.swift", licenseText: """
 (The MIT License)
 
 Copyright (c) 2014-2015 Stephen Celis (<stephen@stephencelis.com>)
@@ -112,7 +138,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """),
-                License(libraryName: "Swift-WebP", text: """
+        Dependency(name: "Swift-WebP", licenseText: """
 MIT License
 
 Copyright (c) 2016 Satoshi Namai
@@ -135,7 +161,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """),
-                License(libraryName: "ZIPFoundation", text: """
+        Dependency(name: "ZIPFoundation", licenseText: """
 MIT License
 
 Copyright (c) 2017-2024 Thomas Zoechling (https://www.peakstep.com)
@@ -158,7 +184,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """)
-            ]
-        )
-    }
+    ]
 }
+// swiftlint:enable type_body_length
