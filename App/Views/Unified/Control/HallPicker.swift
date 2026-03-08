@@ -7,6 +7,7 @@
 
 import SwiftData
 import SwiftUI
+import AXiS
 
 struct HallPicker: View {
     @Environment(UserSelections.self) var selections

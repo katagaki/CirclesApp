@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AXiS
 
 extension MapView {
     func updateCanvasSize(_ image: UIImage) {

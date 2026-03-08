@@ -80,9 +80,8 @@ class ImageCache {
                 ImageCache.saveImage(data, named: String(id))
                 finalImage = image
                 finalData = data
-            } else if let cgImage = try? WebPDecoder().decode(data, options: WebPDecoderOptions()) {
+            } else if let image = try? WebPDecoder().decodeUIImage(from: data, options: WebPDecoderOptions()) {
                 // WebP
-                let image = UIImage(cgImage: cgImage)
                 var nonWebpData: Data?
                 if let convertedData = image.pngData() {
                     nonWebpData = convertedData
@@ -91,7 +90,7 @@ class ImageCache {
                 }
                 if let nonWebpData {
                     ImageCache.saveImage(nonWebpData, named: String(id))
-                    finalImage = UIImage(cgImage: cgImage)
+                    finalImage = image
                     finalData = nonWebpData
                 }
             }

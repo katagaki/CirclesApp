@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import RADiUS
+import AXiS
 
 typealias View = SwiftUI.View
 
@@ -17,7 +19,9 @@ struct MoreDatabaseAdministratiion: View {
     @Environment(ImageCache.self) var imageCache
     @Environment(Oasis.self) var oasis
 
-    @State var files: [String: URL] = [:]
+    @State var files: [String: [URL]] = [:]
+    @State var isDownloadConfirmationShowing: Bool = false
+    @State var estimatedDownloadSize: String = ""
 
     @AppStorage(wrappedValue: false, "More.DBAdmin.SkipDownload") var willSkipDownload: Bool
 
@@ -26,9 +30,15 @@ struct MoreDatabaseAdministratiion: View {
             Section {
                 Toggle("More.DBAdmin.SkipDownload", isOn: $willSkipDownload)
                 Button("More.DBAdmin.RepairData", role: .destructive) {
-                    oasis.open {
+                    if willSkipDownload {
+                        oasis.open {
+                            Task {
+                                await repairData()
+                            }
+                        }
+                    } else {
                         Task {
-                            await repairData()
+                            await fetchRepairSize()
                         }
                     }
                 }
@@ -54,19 +64,26 @@ struct MoreDatabaseAdministratiion: View {
                     HStack {
                         Text(fileName)
                         Spacer()
-                        if let fileURL = files[fileName], let fileSizeString = fileSize(of: fileURL.path()) {
-                            Text(fileSizeString)
-                                .foregroundStyle(.secondary)
+                        if let fileURLs = files[fileName] {
+                            let totalSize = fileURLs.compactMap({ fileSizeBytes(of: $0.path()) }).reduce(0, +)
+                            if totalSize > 0 {
+                                Text(ByteCountFormatter.string(fromByteCount: Int64(totalSize), countStyle: .file))
+                                    .foregroundStyle(.secondary)
+                            }
                         }
                     }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button("Shared.Delete", role: .destructive) {
-                                if let fileURL = files[fileName] {
-                                    do {
-                                        try FileManager.default.removeItem(at: fileURL)
+                            if fileName != "C\(events.activeEventNumber)" {
+                                Button("Shared.Delete", role: .destructive) {
+                                    if let fileURLs = files[fileName] {
+                                        for fileURL in fileURLs {
+                                            do {
+                                                try FileManager.default.removeItem(at: fileURL)
+                                            } catch {
+                                                debugPrint(error.localizedDescription)
+                                            }
+                                        }
                                         files.removeValue(forKey: fileName)
-                                    } catch {
-                                        debugPrint(error.localizedDescription)
                                     }
                                 }
                             }
@@ -81,10 +98,24 @@ struct MoreDatabaseAdministratiion: View {
         .onAppear {
             refreshDownloadedDataList()
         }
+        .alert("Alerts.DownloadConfirmation.Title", isPresented: $isDownloadConfirmationShowing) {
+            Button("Shared.Download") {
+                oasis.open {
+                    Task {
+                        await repairData()
+                    }
+                }
+            }
+            Button("Shared.Cancel", role: .cancel) {
+                // No action needed.
+            }
+        } message: {
+            Text("Alerts.DownloadConfirmation.Message \(estimatedDownloadSize)")
+        }
     }
 
     func refreshDownloadedDataList() {
-        var files: [String: URL] = [:]
+        var files: [String: [URL]] = [:]
         if let dataStoreURL = database.dataStoreURL,
            let downloadedFiles = try? FileManager.default.contentsOfDirectory(
             at: dataStoreURL,
@@ -92,17 +123,11 @@ struct MoreDatabaseAdministratiion: View {
             options: .skipsHiddenFiles
            ) {
             for file in downloadedFiles where file.isFileURL && file.pathExtension == "db" {
-                var fileName = file.lastPathComponent
-                fileName = fileName.replacingOccurrences(of: "webcatalog", with: "C")
-                fileName = fileName.replacingOccurrences(
-                    of: "Image1.db",
-                    with: String(localized: "More.DBAdmin.ImageData")
-                )
-                fileName = fileName.replacingOccurrences(
-                    of: ".db",
-                    with: String(localized: "More.DBAdmin.TextData")
-                )
-                files[fileName] = file
+                let eventName = file.lastPathComponent
+                    .replacingOccurrences(of: "webcatalog", with: "C")
+                    .replacingOccurrences(of: "Image1.db", with: "")
+                    .replacingOccurrences(of: ".db", with: "")
+                files[eventName, default: []].append(file)
             }
         }
         withAnimation(.smooth.speed(2.0)) {
@@ -110,12 +135,10 @@ struct MoreDatabaseAdministratiion: View {
         }
     }
 
-    func fileSize(of path: String) -> String? {
+    func fileSizeBytes(of path: String) -> UInt64? {
         do {
             let attributes = try FileManager.default.attributesOfItem(atPath: path)
-            if let size = attributes[.size] as? UInt64 {
-                return ByteCountFormatter.string(fromByteCount: Int64(size), countStyle: .file)
-            }
+            return attributes[.size] as? UInt64
         } catch {
             debugPrint(error.localizedDescription)
         }
@@ -142,6 +165,32 @@ struct MoreDatabaseAdministratiion: View {
             return ByteCountFormatter.string(fromByteCount: Int64(totalSize), countStyle: .file)
         }
         return nil
+    }
+
+    func fetchRepairSize() async {
+        guard let token = authenticator.token else { return }
+        var eventToCheck: WebCatalogEvent.Response.Event?
+        if let activeEvent = events.activeEvent {
+            eventToCheck = activeEvent
+        } else if let eventData = await WebCatalog.events(authToken: token),
+                  let activeEvent = eventData.list.first(
+                    where: { $0.number == events.activeEventNumber }
+                  ) {
+            eventToCheck = WebCatalogEvent.Response.Event(
+                id: activeEvent.id,
+                number: events.activeEventNumber
+            )
+        }
+
+        if let eventToCheck,
+           let totalBytes = await database.fetchDownloadSizes(for: eventToCheck, authToken: token) {
+            estimatedDownloadSize = ByteCountFormatter.string(
+                fromByteCount: totalBytes, countStyle: .file
+            )
+        } else {
+            estimatedDownloadSize = String(localized: "Shared.Unknown")
+        }
+        isDownloadConfirmationShowing = true
     }
 
     func repairData() async {

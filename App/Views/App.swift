@@ -9,6 +9,7 @@ import BackgroundTasks
 import Komponents
 import SwiftUI
 import SwiftData
+import AXiS
 
 @main
 struct CirclesApp: App {

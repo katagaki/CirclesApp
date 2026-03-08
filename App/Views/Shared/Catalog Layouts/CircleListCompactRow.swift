@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AXiS
 
 struct CircleListCompactRow: View {
     @Environment(Database.self) var database

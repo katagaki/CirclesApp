@@ -8,6 +8,7 @@
 import Komponents
 import SwiftData
 import SwiftUI
+import AXiS
 
 struct CatalogView: View {
 
