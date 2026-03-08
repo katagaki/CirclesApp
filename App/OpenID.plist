@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>client_secret_prod</key>
+	<string>eTXAvBEfqVDsATAW5vRvHugAC43nFvZQWz44RfmV</string>
+	<key>client_secret_sandbox</key>
+	<string>WzG95epqaUgxiPGcGFrQCXr9N1NRKvYwK6HctKz6</string>
+	<key>client_secret</key>
+	<string>eTXAvBEfqVDsATAW5vRvHugAC43nFvZQWz44RfmV</string>
+	<key>client_id</key>
+	<string>CiRCLESnyBdMD3yqnH6x069ok6iialtaCt8hmmd6</string>
+	<key>redirect_url</key>
+	<string>circles-app://</string>
+</dict>
+</plist>

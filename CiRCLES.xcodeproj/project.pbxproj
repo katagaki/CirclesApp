@@ -48,7 +48,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		E4030C162E5953410000DDC2 /* Exceptions for "CiRCLES" folder in "CiRCLES" target */ = {
+		E4030C162E5953410000DDC2 /* Exceptions for "App" folder in "CiRCLES" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -87,12 +87,12 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		E4065DC02DECA30200AB7E20 /* CiRCLES */ = {
+		E4065DC02DECA30200AB7E20 /* App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				E4030C162E5953410000DDC2 /* Exceptions for "CiRCLES" folder in "CiRCLES" target */,
+				E4030C162E5953410000DDC2 /* Exceptions for "App" folder in "CiRCLES" target */,
 			);
-			path = CiRCLES;
+			path = App;
 			sourceTree = "<group>";
 		};
 		E4065E1B2DECA30700AB7E20 /* ci_scripts */ = {
@@ -158,7 +158,7 @@
 			children = (
 				E4D74B982C8D7D5B0014CD16 /* README.md */,
 				E4065E1B2DECA30700AB7E20 /* ci_scripts */,
-				E4065DC02DECA30200AB7E20 /* CiRCLES */,
+				E4065DC02DECA30200AB7E20 /* App */,
 				E489B5522F315E8200ED193F /* Database */,
 				E489B5772F31607D00ED193F /* Swift Data */,
 				E489B5652F31606400ED193F /* API */,
@@ -195,7 +195,7 @@
 				F1A0B00C2F31700000000001 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				E4065DC02DECA30200AB7E20 /* CiRCLES */,
+				E4065DC02DECA30200AB7E20 /* App */,
 				E489B5522F315E8200ED193F /* Database */,
 				E489B5652F31606400ED193F /* API */,
 				E489B5772F31607D00ED193F /* Swift Data */,
@@ -484,7 +484,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = CiRCLES/CiRCLES.entitlements;
+				CODE_SIGN_ENTITLEMENTS = App/CiRCLES.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
@@ -492,7 +492,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CiRCLES/Info.plist;
+				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -526,7 +526,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = CiRCLES/CiRCLES.entitlements;
+				CODE_SIGN_ENTITLEMENTS = App/CiRCLES.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_APP_SANDBOX = YES;
@@ -534,7 +534,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = CiRCLES/Info.plist;
+				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.navigation";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
