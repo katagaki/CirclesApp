@@ -344,11 +344,13 @@ fun CircleDetailView(
                     .height(172.dp)
             ) {
                 val isPrivacyMode by selections.isPrivacyMode.collectAsState()
+                val showWebCuts by selections.showWebCuts.collectAsState()
                 CircleCutImage(
                     circle = circle,
                     database = database,
                     favorites = favorites,
-                    isPrivacyMode = isPrivacyMode
+                    isPrivacyMode = isPrivacyMode,
+                    showWebCuts = showWebCuts
                 )
             }
 

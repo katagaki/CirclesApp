@@ -26,6 +26,7 @@ class UserSelections(context: Context) {
         private const val DARKEN_MAP_IN_DARK_MODE_KEY = "Circles.DarkenMapInDarkMode"
         private const val USE_HIGH_RESOLUTION_MAPS_KEY = "Circles.UseHighResolutionMaps"
         private const val MAP_ZOOM_LEVEL_KEY = "Circles.MapZoomLevel"
+        private const val SHOW_WEB_CUTS_KEY = "Circles.ShowWebCuts"
     }
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -77,6 +78,11 @@ class UserSelections(context: Context) {
     )
     val mapZoomLevel: StateFlow<Float> = _mapZoomLevel
 
+    private val _showWebCuts = MutableStateFlow(
+        prefs.getBoolean(SHOW_WEB_CUTS_KEY, false)
+    )
+    val showWebCuts: StateFlow<Boolean> = _showWebCuts
+
     private val _displayMode = MutableStateFlow(
         CircleDisplayMode.entries.find {
             it.value == prefs.getInt(CIRCLE_DISPLAY_MODE_KEY, CircleDisplayMode.GRID.value)
@@ -87,6 +93,11 @@ class UserSelections(context: Context) {
     fun setShowSpaceName(show: Boolean) {
         _showSpaceName.value = show
         prefs.edit { putBoolean(SHOW_SPACE_NAME_KEY, show) }
+    }
+
+    fun setShowWebCuts(show: Boolean) {
+        _showWebCuts.value = show
+        prefs.edit { putBoolean(SHOW_WEB_CUTS_KEY, show) }
     }
 
     fun setShowDay(show: Boolean) {

@@ -35,7 +35,8 @@ fun ColorGroupedCircleGrid(
     showDay: Boolean = false,
     showsOverlayWhenEmpty: Boolean = true,
     onSelect: (ComiketCircle) -> Unit,
-    isPrivacyMode: Boolean = false
+    isPrivacyMode: Boolean = false,
+    showWebCuts: Boolean = false
 ) {
     val minSize = when (displayMode) {
         GridDisplayMode.BIG -> 110.dp
@@ -71,7 +72,8 @@ fun ColorGroupedCircleGrid(
                             displayMode = displayMode,
                             showSpaceName = showSpaceName,
                             showDay = showDay,
-                            isPrivacyMode = isPrivacyMode
+                            isPrivacyMode = isPrivacyMode,
+                            showWebCuts = showWebCuts
                         )
                     }
                 }

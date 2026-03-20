@@ -139,12 +139,14 @@ fun MapPopoverLayer(
                                     .height(57.dp)
                             ) {
                                 val isPrivacyMode by selections.isPrivacyMode.collectAsState()
+                                val showWebCuts by selections.showWebCuts.collectAsState()
                                 CircleCutImage(
                                     circle = circle,
                                     database = database,
                                     favorites = favorites,
                                     displayMode = com.tsubuzaki.circlesgo.state.GridDisplayMode.SMALL,
-                                    isPrivacyMode = isPrivacyMode
+                                    isPrivacyMode = isPrivacyMode,
+                                    showWebCuts = showWebCuts
                                 )
                             }
                             Spacer(modifier = Modifier.width(8.dp))

@@ -118,6 +118,7 @@ fun FavoritesView(
                 val isPrivacyMode by selections.isPrivacyMode.collectAsState()
                 val showSpaceName by selections.showSpaceName.collectAsState()
                 val showDay by selections.showDay.collectAsState()
+                val showWebCuts by selections.showWebCuts.collectAsState()
                 if (isGroupedByColor) {
                     ColorGroupedCircleGrid(
                         groups = circles,
@@ -130,7 +131,8 @@ fun FavoritesView(
                         onSelect = { circle ->
                             unifier.showCircleDetail(circle)
                         },
-                        isPrivacyMode = isPrivacyMode
+                        isPrivacyMode = isPrivacyMode,
+                        showWebCuts = showWebCuts
                     )
                 } else {
                     val flatCircles = circles.values
@@ -147,7 +149,8 @@ fun FavoritesView(
                         onSelect = { circle ->
                             unifier.showCircleDetail(circle)
                         },
-                        isPrivacyMode = isPrivacyMode
+                        isPrivacyMode = isPrivacyMode,
+                        showWebCuts = showWebCuts
                     )
                 }
             }

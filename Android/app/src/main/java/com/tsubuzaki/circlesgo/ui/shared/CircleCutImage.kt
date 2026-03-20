@@ -42,18 +42,30 @@ fun CircleCutImage(
     displayMode: GridDisplayMode = GridDisplayMode.MEDIUM,
     showSpaceName: Boolean = false,
     showDay: Boolean = false,
-    isPrivacyMode: Boolean = false
+    isPrivacyMode: Boolean = false,
+    showWebCuts: Boolean = false
 ) {
-    val cachedBitmap = remember(circle.id) {
-        database.cachedCircleImage(circle.id)?.asImageBitmap()
+    val cachedBitmap = remember(circle.id, showWebCuts) {
+        if (showWebCuts) {
+            database.cachedWebCutImage(circle.id)?.asImageBitmap()
+                ?: database.cachedCircleImage(circle.id)?.asImageBitmap()
+        } else {
+            database.cachedCircleImage(circle.id)?.asImageBitmap()
+        }
     }
     val imageBitmap by produceState(
         initialValue = cachedBitmap,
-        key1 = circle.id
+        key1 = circle.id,
+        key2 = showWebCuts
     ) {
         if (value == null) {
             value = withContext(Dispatchers.IO) {
-                database.circleImage(circle.id)?.asImageBitmap()
+                if (showWebCuts) {
+                    database.webCutImage(circle.id)?.asImageBitmap()
+                        ?: database.circleImage(circle.id)?.asImageBitmap()
+                } else {
+                    database.circleImage(circle.id)?.asImageBitmap()
+                }
             }
         }
     }

@@ -42,7 +42,8 @@ fun CircleList(
     isLoadingMore: Boolean = false,
     onSelect: (ComiketCircle) -> Unit,
     onLoadMore: () -> Unit = {},
-    isPrivacyMode: Boolean = false
+    isPrivacyMode: Boolean = false,
+    showWebCuts: Boolean = false
 ) {
     val listState = androidx.compose.foundation.lazy.rememberLazyListState()
 
@@ -77,7 +78,8 @@ fun CircleList(
                             showSpaceName = showSpaceName,
                             showDay = showDay,
                             onClick = { onSelect(circle) },
-                            isPrivacyMode = isPrivacyMode
+                            isPrivacyMode = isPrivacyMode,
+                            showWebCuts = showWebCuts
                         )
                         HorizontalDivider(
                             modifier = Modifier.padding(start = 100.dp)
@@ -92,7 +94,8 @@ fun CircleList(
                             showSpaceName = showSpaceName,
                             showDay = showDay,
                             onClick = { onSelect(circle) },
-                            isPrivacyMode = isPrivacyMode
+                            isPrivacyMode = isPrivacyMode,
+                            showWebCuts = showWebCuts
                         )
                         HorizontalDivider(
                             modifier = Modifier.padding(start = 58.dp)
@@ -142,7 +145,8 @@ fun CircleListRegularRow(
     showSpaceName: Boolean,
     showDay: Boolean,
     onClick: () -> Unit,
-    isPrivacyMode: Boolean = false
+    isPrivacyMode: Boolean = false,
+    showWebCuts: Boolean = false
 ) {
     Row(
         modifier = Modifier
@@ -160,7 +164,8 @@ fun CircleListRegularRow(
                 circle = circle,
                 database = database,
                 favorites = favorites,
-                isPrivacyMode = isPrivacyMode
+                isPrivacyMode = isPrivacyMode,
+                showWebCuts = showWebCuts
             )
         }
         Spacer(modifier = Modifier.width(10.dp))
@@ -202,7 +207,8 @@ fun CircleListCompactRow(
     showSpaceName: Boolean,
     showDay: Boolean,
     onClick: () -> Unit,
-    isPrivacyMode: Boolean = false
+    isPrivacyMode: Boolean = false,
+    showWebCuts: Boolean = false
 ) {
     Row(
         modifier = Modifier
@@ -220,7 +226,8 @@ fun CircleListCompactRow(
                 circle = circle,
                 database = database,
                 favorites = favorites,
-                isPrivacyMode = isPrivacyMode
+                isPrivacyMode = isPrivacyMode,
+                showWebCuts = showWebCuts
             )
         }
         Spacer(modifier = Modifier.width(10.dp))

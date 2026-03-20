@@ -125,6 +125,7 @@ fun CatalogView(
     val isPrivacyMode by selections.isPrivacyMode.collectAsState()
     val showSpaceName by selections.showSpaceName.collectAsState()
     val showDay by selections.showDay.collectAsState()
+    val showWebCuts by selections.showWebCuts.collectAsState()
     SearchBar(
         modifier = Modifier
             .fillMaxWidth()
@@ -188,7 +189,8 @@ fun CatalogView(
                 },
                 onLoadMore = onLoadMore,
                 isLoadingMore = isCurrentlyLoadingMore,
-                isPrivacyMode = isPrivacyMode
+                isPrivacyMode = isPrivacyMode,
+                showWebCuts = showWebCuts
             )
         } else if (currentSearched != null) {
             CircleList(
@@ -204,7 +206,8 @@ fun CatalogView(
                 },
                 onLoadMore = onLoadMore,
                 isLoadingMore = isCurrentlyLoadingMore,
-                isPrivacyMode = isPrivacyMode
+                isPrivacyMode = isPrivacyMode,
+                showWebCuts = showWebCuts
             )
         } else if (searchTerm.isNotEmpty()) {
             Box(
@@ -264,7 +267,8 @@ fun CatalogView(
                         },
                         onLoadMore = onLoadMore,
                         isLoadingMore = isCurrentlyLoadingMore,
-                        isPrivacyMode = isPrivacyMode
+                        isPrivacyMode = isPrivacyMode,
+                        showWebCuts = showWebCuts
                     )
                 } else {
                     CircleList(
@@ -279,7 +283,8 @@ fun CatalogView(
                         },
                         onLoadMore = onLoadMore,
                         isLoadingMore = isCurrentlyLoadingMore,
-                        isPrivacyMode = isPrivacyMode
+                        isPrivacyMode = isPrivacyMode,
+                        showWebCuts = showWebCuts
                     )
                 }
             }

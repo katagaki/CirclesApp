@@ -13,6 +13,7 @@ import androidx.compose.material.icons.outlined.Hd
 import androidx.compose.material.icons.outlined.PhoneIphone
 import androidx.compose.material.icons.outlined.TableRestaurant
 import androidx.compose.material.icons.outlined.TheaterComedy
+import androidx.compose.material.icons.outlined.Web
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -167,6 +168,24 @@ fun UnifiedMoreMenu(
                 Switch(
                     checked = showDay,
                     onCheckedChange = { selections.setShowDay(it) }
+                )
+            }
+        )
+        // Show Web Cuts toggle
+        val showWebCuts by selections.showWebCuts.collectAsState()
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.show_web_cuts)) },
+            onClick = { selections.setShowWebCuts(!showWebCuts) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Web,
+                    contentDescription = null
+                )
+            },
+            trailingIcon = {
+                Switch(
+                    checked = showWebCuts,
+                    onCheckedChange = { selections.setShowWebCuts(it) }
                 )
             }
         )
