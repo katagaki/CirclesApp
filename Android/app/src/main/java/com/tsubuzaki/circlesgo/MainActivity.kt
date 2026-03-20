@@ -15,10 +15,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.lifecycleScope
+import androidx.compose.runtime.CompositionLocalProvider
 import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.auth.Authenticator
 import com.tsubuzaki.circlesgo.data.local.FavoritesCache
+import com.tsubuzaki.circlesgo.data.local.WebCutImageCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
+import com.tsubuzaki.circlesgo.ui.shared.LocalAuthenticator
+import com.tsubuzaki.circlesgo.ui.shared.LocalWebCutImageCache
 import com.tsubuzaki.circlesgo.state.CatalogCache
 import com.tsubuzaki.circlesgo.state.DataManager
 import com.tsubuzaki.circlesgo.state.Events
@@ -55,6 +59,7 @@ class MainActivity : ComponentActivity() {
 
         val favoritesCache = FavoritesCache(this)
         val favoritesAPI = FavoritesAPI(favoritesCache)
+        val webCutImageCache = WebCutImageCache(this)
 
         val dataManager = DataManager(
             context = this,
@@ -74,68 +79,73 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CirclesGoTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
+                CompositionLocalProvider(
+                    LocalAuthenticator provides auth,
+                    LocalWebCutImageCache provides webCutImageCache
                 ) {
-                    val isAuthenticating by auth.isAuthenticating.collectAsState()
-                    val isReady by auth.isReady.collectAsState()
-                    val token by auth.token.collectAsState()
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                    ) {
+                        val isAuthenticating by auth.isAuthenticating.collectAsState()
+                        val isReady by auth.isReady.collectAsState()
+                        val token by auth.token.collectAsState()
 
-                    if (isAuthenticating || token == null) {
-                        LoginView(
-                            authURL = auth.authURL
-                        )
-                    } else {
-                        // Trigger data reload when authenticator becomes ready
-                        // or when transitioning from authenticating to authenticated
-                        var hasTriggeredInitialLoad by rememberSaveable {
-                            mutableStateOf(false)
-                        }
-
-                        LaunchedEffect(isReady, isAuthenticating, token) {
-                            if (isReady && !isAuthenticating && token != null && !hasTriggeredInitialLoad) {
-                                hasTriggeredInitialLoad = true
-                                dataManager.reloadData(shouldResetSelections = false)
+                        if (isAuthenticating || token == null) {
+                            LoginView(
+                                authURL = auth.authURL
+                            )
+                        } else {
+                            // Trigger data reload when authenticator becomes ready
+                            // or when transitioning from authenticating to authenticated
+                            var hasTriggeredInitialLoad by rememberSaveable {
+                                mutableStateOf(false)
                             }
-                        }
 
-                        // Watch for active event changes
-                        val activeEvent by events.activeEvent.collectAsState()
-                        var previousActiveEventNumber by rememberSaveable {
-                            mutableStateOf<Int?>(
-                                null
+                            LaunchedEffect(isReady, isAuthenticating, token) {
+                                if (isReady && !isAuthenticating && token != null && !hasTriggeredInitialLoad) {
+                                    hasTriggeredInitialLoad = true
+                                    dataManager.reloadData(shouldResetSelections = false)
+                                }
+                            }
+
+                            // Watch for active event changes
+                            val activeEvent by events.activeEvent.collectAsState()
+                            var previousActiveEventNumber by rememberSaveable {
+                                mutableStateOf<Int?>(
+                                    null
+                                )
+                            }
+
+                            LaunchedEffect(activeEvent) {
+                                val currentNumber = activeEvent?.number
+                                if (currentNumber != null) {
+                                    if (previousActiveEventNumber != null && previousActiveEventNumber != currentNumber) {
+                                        dataManager.reloadData(shouldResetSelections = true)
+                                    }
+                                    previousActiveEventNumber = currentNumber
+                                }
+                            }
+
+                            UnifiedView(
+                                unifier = unifier,
+                                mapper = mapper,
+                                database = database,
+                                selections = selections,
+                                events = events,
+                                favorites = favorites,
+                                catalogCache = catalogCache,
+                                oasis = oasis,
+                                favoritesAPI = favoritesAPI,
+                                authenticator = auth,
+                                onLogout = {
+                                    hasTriggeredInitialLoad = false
+                                    database.delete()
+                                    selections.resetSelections()
+                                    unifier.close()
+                                    auth.resetAuthentication()
+                                }
                             )
                         }
-
-                        LaunchedEffect(activeEvent) {
-                            val currentNumber = activeEvent?.number
-                            if (currentNumber != null) {
-                                if (previousActiveEventNumber != null && previousActiveEventNumber != currentNumber) {
-                                    dataManager.reloadData(shouldResetSelections = true)
-                                }
-                                previousActiveEventNumber = currentNumber
-                            }
-                        }
-
-                        UnifiedView(
-                            unifier = unifier,
-                            mapper = mapper,
-                            database = database,
-                            selections = selections,
-                            events = events,
-                            favorites = favorites,
-                            catalogCache = catalogCache,
-                            oasis = oasis,
-                            favoritesAPI = favoritesAPI,
-                            authenticator = auth,
-                            onLogout = {
-                                hasTriggeredInitialLoad = false
-                                database.delete()
-                                selections.resetSelections()
-                                unifier.close()
-                                auth.resetAuthentication()
-                            }
-                        )
                     }
                 }
             }

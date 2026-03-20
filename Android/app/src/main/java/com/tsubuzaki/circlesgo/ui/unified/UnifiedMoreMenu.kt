@@ -135,6 +135,24 @@ fun UnifiedMoreMenu(
 
         HorizontalDivider()
 
+        // Show Web Cuts toggle
+        val showWebCuts by selections.showWebCuts.collectAsState()
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.show_web_cuts)) },
+            onClick = { selections.setShowWebCuts(!showWebCuts) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Web,
+                    contentDescription = null
+                )
+            },
+            trailingIcon = {
+                Switch(
+                    checked = showWebCuts,
+                    onCheckedChange = { selections.setShowWebCuts(it) }
+                )
+            }
+        )
         // Show Space Name toggle
         val showSpaceName by selections.showSpaceName.collectAsState()
         DropdownMenuItem(
@@ -168,24 +186,6 @@ fun UnifiedMoreMenu(
                 Switch(
                     checked = showDay,
                     onCheckedChange = { selections.setShowDay(it) }
-                )
-            }
-        )
-        // Show Web Cuts toggle
-        val showWebCuts by selections.showWebCuts.collectAsState()
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.show_web_cuts)) },
-            onClick = { selections.setShowWebCuts(!showWebCuts) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Web,
-                    contentDescription = null
-                )
-            },
-            trailingIcon = {
-                Switch(
-                    checked = showWebCuts,
-                    onCheckedChange = { selections.setShowWebCuts(it) }
                 )
             }
         )

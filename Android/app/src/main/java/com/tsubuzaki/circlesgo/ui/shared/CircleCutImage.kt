@@ -25,7 +25,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
+import com.tsubuzaki.circlesgo.api.OnlineState
 import com.tsubuzaki.circlesgo.api.catalog.UserFavorites
+import com.tsubuzaki.circlesgo.api.catalog.WebCatalogAPI
 import com.tsubuzaki.circlesgo.api.catalog.WebCatalogColor
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
@@ -45,30 +47,71 @@ fun CircleCutImage(
     isPrivacyMode: Boolean = false,
     showWebCuts: Boolean = false
 ) {
-    val cachedBitmap = remember(circle.id, showWebCuts) {
-        if (showWebCuts) {
-            database.cachedWebCutImage(circle.id)?.asImageBitmap()
-                ?: database.cachedCircleImage(circle.id)?.asImageBitmap()
-        } else {
-            database.cachedCircleImage(circle.id)?.asImageBitmap()
-        }
+    val authenticator = LocalAuthenticator.current
+    val webCutImageCache = LocalWebCutImageCache.current
+    val onlineState by authenticator.onlineState.collectAsState()
+    val authToken by authenticator.token.collectAsState()
+
+    val catalogBitmap = remember(circle.id) {
+        database.cachedCircleImage(circle.id)?.asImageBitmap()
     }
-    val imageBitmap by produceState(
-        initialValue = cachedBitmap,
-        key1 = circle.id,
-        key2 = showWebCuts
+
+    // Load catalog image from database (always needed as fallback)
+    val catalogImageBitmap by produceState(
+        initialValue = catalogBitmap,
+        key1 = circle.id
     ) {
         if (value == null) {
             value = withContext(Dispatchers.IO) {
-                if (showWebCuts) {
-                    database.webCutImage(circle.id)?.asImageBitmap()
-                        ?: database.circleImage(circle.id)?.asImageBitmap()
-                } else {
-                    database.circleImage(circle.id)?.asImageBitmap()
-                }
+                database.circleImage(circle.id)?.asImageBitmap()
             }
         }
     }
+
+    // Load web cut image from API cache / network
+    val webCutBitmap = remember(circle.id) {
+        webCutImageCache.getCached(circle.id)?.asImageBitmap()
+    }
+    val webCutImageBitmap by produceState(
+        initialValue = webCutBitmap,
+        key1 = circle.id,
+        key2 = showWebCuts
+    ) {
+        if (!showWebCuts) {
+            value = null
+            return@produceState
+        }
+        if (value != null) return@produceState
+
+        // Try disk cache first
+        val cached = withContext(Dispatchers.IO) {
+            webCutImageCache.getCached(circle.id)?.asImageBitmap()
+        }
+        if (cached != null) {
+            value = cached
+            return@produceState
+        }
+
+        // Already fetched but no image available
+        if (webCutImageCache.isFetched(circle.id)) return@produceState
+
+        // Fetch from API if online
+        if (onlineState != OnlineState.ONLINE) return@produceState
+        val token = authToken ?: return@produceState
+        val webCatalogID = circle.extendedInformation?.webCatalogID ?: return@produceState
+
+        val circleResponse = WebCatalogAPI.circle(webCatalogID, token)
+        val cutWebURL = circleResponse?.response?.circle?.cutWebURL
+        if (cutWebURL != null && cutWebURL.isNotEmpty()) {
+            val bitmap = webCutImageCache.download(circle.id, cutWebURL)
+            if (bitmap != null) {
+                value = bitmap.asImageBitmap()
+            }
+        }
+    }
+
+    val imageBitmap = if (showWebCuts) webCutImageBitmap ?: catalogImageBitmap else catalogImageBitmap
+
     val wcIDMappedItems by favorites.wcIDMappedItems.collectAsState()
 
     Box(

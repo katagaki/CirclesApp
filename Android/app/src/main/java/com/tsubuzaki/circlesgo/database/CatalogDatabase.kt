@@ -381,45 +381,6 @@ class CatalogDatabase(private val context: Context) {
         return imageCache.get(id.toString())
     }
 
-    fun cachedWebCutImage(id: Int): Bitmap? {
-        return imageCache.get("webcut_$id")
-    }
-
-    fun webCutImage(id: Int): Bitmap? {
-        val cacheKey = "webcut_$id"
-        imageCache.get(cacheKey)?.let { return it }
-
-        val db = getImageDatabase() ?: return null
-        try {
-            val cursor = db.rawQuery(
-                "SELECT cutWebImage FROM ComiketCircleImage WHERE id = ?",
-                arrayOf(id.toString())
-            )
-            cursor.use {
-                if (it.moveToFirst()) {
-                    val colIndex = it.getColumnIndex("cutWebImage")
-                    if (colIndex >= 0 && !it.isNull(colIndex)) {
-                        val data = it.getBlob(colIndex)
-                        if (data != null && data.isNotEmpty()) {
-                            val options = BitmapFactory.Options().apply {
-                                inPreferredConfig = Bitmap.Config.RGB_565
-                            }
-                            val bitmap =
-                                BitmapFactory.decodeByteArray(data, 0, data.size, options)
-                            if (bitmap != null) {
-                                imageCache.put(cacheKey, bitmap)
-                            }
-                            return bitmap
-                        }
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to load web cut image $id", e)
-        }
-        return null
-    }
-
     fun circleImage(id: Int): Bitmap? {
         val cacheKey = id.toString()
         imageCache.get(cacheKey)?.let { return it }
