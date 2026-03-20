@@ -40,6 +40,8 @@ jobs:
           EOF
 
       - name: Build release AAB
+        env:
+          VERSION_CODE: ${{ github.run_number }}
         run: ./gradlew bundleRelease
 
       - name: Upload to Play Store (internal track)

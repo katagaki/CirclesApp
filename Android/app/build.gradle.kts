@@ -28,7 +28,7 @@ android {
         applicationId = "com.tsubuzaki.circlesgo"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
+        versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 3
         versionName = "1.0"
     }
 
