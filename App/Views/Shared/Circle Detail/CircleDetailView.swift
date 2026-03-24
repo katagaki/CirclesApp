@@ -64,6 +64,7 @@ struct CircleDetailView: View {
             ForEach(visibleSections) { section in
                 sectionContent(for: section)
             }
+            CircleDetailBuysSection(circle: circle)
             Section {
                 NavigationLink {
                     CircleDetailSectionEditor()

@@ -106,15 +106,11 @@ struct CatalogView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                HStack {
-                    DisplayModeSwitcher(mode: $displayModeState)
-                    if displayModeState == .list {
-                        ListModeSwitcher(mode: $listDisplayModeState)
-                    }
-                    if displayModeState == .grid {
-                        GridModeSwitcher(mode: $gridDisplayModeState)
-                    }
-                }
+                DisplaySettingsMenu(
+                    displayMode: $displayModeState,
+                    listDisplayMode: $listDisplayModeState,
+                    gridDisplayMode: $gridDisplayModeState
+                )
             }
             CatalogToolbar()
         }

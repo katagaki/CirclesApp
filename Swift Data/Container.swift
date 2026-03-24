@@ -10,7 +10,8 @@ import SwiftData
 let sharedModelContainer: ModelContainer = {
     let schema = Schema([
         CirclesFavorite.self,
-        CirclesVisitEntry.self
+        CirclesVisitEntry.self,
+        CirclesBuyEntry.self
     ])
 
     let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
