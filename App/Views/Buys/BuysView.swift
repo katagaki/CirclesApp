@@ -20,12 +20,16 @@ struct BuysView: View {
     @Namespace var namespace
 
     var buyEntries: [CirclesBuyEntry] {
-        allBuyEntries.filter { $0.eventNumber == planner.activeEventNumber && !$0.items.isEmpty }
+        allBuyEntries.filter {
+            $0.eventNumber == planner.activeEventNumber &&
+            $0.items.contains(where: { !$0.name.trimmingCharacters(in: .whitespaces).isEmpty })
+        }
     }
 
     var totalCost: Int {
         buyEntries.reduce(0) { total, entry in
-            total + entry.items.reduce(0) { $0 + $1.cost }
+            total + entry.items.filter { !$0.name.trimmingCharacters(in: .whitespaces).isEmpty }
+                .reduce(0) { $0 + $1.cost }
         }
     }
 

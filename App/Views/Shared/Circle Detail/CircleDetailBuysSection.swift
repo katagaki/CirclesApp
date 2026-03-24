@@ -19,11 +19,11 @@ struct CircleDetailBuysSection: View {
 
     @Query var allBuyEntries: [CirclesBuyEntry]
 
-    @State private var newItemName: String = ""
-    @State private var newItemCost: String = ""
     @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var editingImageItemID: UUID?
     @State private var pendingImage: UIImage?
     @State private var isCropperPresented: Bool = false
+    @State private var isPhotoPickerPresented: Bool = false
 
     var buyEntry: CirclesBuyEntry? {
         allBuyEntries.first {
@@ -34,74 +34,22 @@ struct CircleDetailBuysSection: View {
     var body: some View {
         Section("Buys.Section.Title") {
             if let buyEntry, !buyEntry.items.isEmpty {
-                ForEach(buyEntry.items) { item in
-                    buyItemRow(item)
-                }
-                .onDelete { indexSet in
-                    deleteItems(at: indexSet)
+                ForEach(Array(buyEntry.items.enumerated()), id: \.element.id) { index, item in
+                    buyItemRow(buyEntry: buyEntry, index: index, item: item)
                 }
             }
-            addItemRow()
-        }
-    }
-
-    @ViewBuilder
-    func buyItemRow(_ item: CirclesBuyEntry.BuyItem) -> some View {
-        HStack(spacing: 8.0) {
-            if let imageData = item.imageData, let uiImage = UIImage(data: imageData) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 36.0, height: 36.0)
-                    .clipShape(RoundedRectangle(cornerRadius: 6.0))
-            }
-            Text(item.name)
-            Spacer()
-            Text("Buys.CostValue.\(item.cost)")
-                .foregroundStyle(.secondary)
-        }
-    }
-
-    @ViewBuilder
-    func addItemRow() -> some View {
-        VStack(spacing: 8.0) {
-            HStack(spacing: 8.0) {
-                TextField("Buys.ItemName.Placeholder", text: $newItemName)
-                    .textFieldStyle(.roundedBorder)
-                TextField("Buys.ItemCost.Placeholder", text: $newItemCost)
-                    .textFieldStyle(.roundedBorder)
-                    .keyboardType(.numberPad)
-                    .frame(width: 80.0)
-            }
-            HStack {
-                PhotosPicker(
-                    selection: $selectedPhotoItem,
-                    matching: .images,
-                    photoLibrary: .shared()
-                ) {
-                    Label("Buys.SelectImage", systemImage: "photo")
-                        .font(.subheadline)
-                }
-                .buttonStyle(.bordered)
-
-                if pendingImage != nil {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                }
-
-                Spacer()
-
-                Button {
-                    addItem()
-                } label: {
-                    Label("Buys.AddItem", systemImage: "plus.circle.fill")
-                        .font(.subheadline)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(newItemName.trimmingCharacters(in: .whitespaces).isEmpty)
+            Button {
+                addBlankItem()
+            } label: {
+                Label("Buys.AddItem", systemImage: "plus.circle.fill")
             }
         }
-        .padding(.vertical, 4.0)
+        .photosPicker(
+            isPresented: $isPhotoPickerPresented,
+            selection: $selectedPhotoItem,
+            matching: .images,
+            photoLibrary: .shared()
+        )
         .onChange(of: selectedPhotoItem) { _, newPhotoItem in
             Task {
                 if let newPhotoItem,
@@ -122,11 +70,12 @@ struct CircleDetailBuysSection: View {
                 ImageCropView(
                     image: pendingImage,
                     onCrop: { croppedImage in
-                        self.pendingImage = croppedImage
+                        applyImage(croppedImage)
                         isCropperPresented = false
                     },
                     onCancel: {
                         self.pendingImage = nil
+                        editingImageItemID = nil
                         isCropperPresented = false
                     }
                 )
@@ -134,22 +83,53 @@ struct CircleDetailBuysSection: View {
         }
     }
 
-    func addItem() {
-        let name = newItemName.trimmingCharacters(in: .whitespaces)
-        guard !name.isEmpty else { return }
-        let cost = Int(newItemCost) ?? 0
-
-        var imageData: Data?
-        if let pendingImage {
-            imageData = pendingImage.jpegData(compressionQuality: 0.7)
+    @ViewBuilder
+    func buyItemRow(buyEntry: CirclesBuyEntry, index: Int, item: CirclesBuyEntry.BuyItem) -> some View {
+        HStack(spacing: 8.0) {
+            if let imageData = item.imageData, let uiImage = UIImage(data: imageData) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 36.0, height: 36.0)
+                    .clipShape(RoundedRectangle(cornerRadius: 6.0))
+            }
+            TextField("Buys.ItemName.Placeholder", text: Binding(
+                get: { item.name },
+                set: { newValue in
+                    buyEntry.items[index].name = newValue
+                }
+            ))
+            TextField("Buys.ItemCost.Placeholder", text: Binding(
+                get: { item.cost == 0 && item.name.isEmpty ? "" : String(item.cost) },
+                set: { newValue in
+                    buyEntry.items[index].cost = Int(newValue) ?? 0
+                }
+            ))
+            .keyboardType(.numberPad)
+            .frame(width: 70.0)
+            .multilineTextAlignment(.trailing)
+            .foregroundStyle(.secondary)
         }
+        .swipeActions(edge: .leading) {
+            Button {
+                editingImageItemID = item.id
+                isPhotoPickerPresented = true
+            } label: {
+                Label("Buys.SelectImage", systemImage: "photo")
+            }
+            .tint(.blue)
+        }
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive) {
+                deleteItem(at: index)
+            } label: {
+                Label("Shared.Delete", systemImage: "trash")
+            }
+        }
+    }
 
-        let newItem = CirclesBuyEntry.BuyItem(
-            name: name,
-            cost: cost,
-            imageData: imageData
-        )
-
+    func addBlankItem() {
+        let newItem = CirclesBuyEntry.BuyItem(name: "", cost: 0)
         if let buyEntry {
             buyEntry.items.append(newItem)
         } else {
@@ -160,17 +140,26 @@ struct CircleDetailBuysSection: View {
             )
             modelContext.insert(entry)
         }
-
-        newItemName = ""
-        newItemCost = ""
-        self.pendingImage = nil
     }
 
-    func deleteItems(at offsets: IndexSet) {
+    func deleteItem(at index: Int) {
         guard let buyEntry else { return }
-        buyEntry.items.remove(atOffsets: offsets)
+        buyEntry.items.remove(at: index)
         if buyEntry.items.isEmpty {
             modelContext.delete(buyEntry)
         }
+    }
+
+    func applyImage(_ image: UIImage) {
+        guard let buyEntry, let itemID = editingImageItemID else {
+            pendingImage = nil
+            editingImageItemID = nil
+            return
+        }
+        if let index = buyEntry.items.firstIndex(where: { $0.id == itemID }) {
+            buyEntry.items[index].imageData = image.jpegData(compressionQuality: 0.7)
+        }
+        pendingImage = nil
+        editingImageItemID = nil
     }
 }
