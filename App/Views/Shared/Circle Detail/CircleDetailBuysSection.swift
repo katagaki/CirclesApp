@@ -19,6 +19,7 @@ struct CircleDetailBuysSection: View {
 
     @Query var allBuyEntries: [CirclesBuyEntry]
 
+    @State private var isEditing: Bool = false
     @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var editingImageItemID: UUID?
     @State private var pendingImage: UIImage?
@@ -32,16 +33,34 @@ struct CircleDetailBuysSection: View {
     }
 
     var body: some View {
-        Section("Buys.Section.Title") {
+        Section {
             if let buyEntry, !buyEntry.items.isEmpty {
                 ForEach(Array(buyEntry.items.enumerated()), id: \.element.id) { index, item in
-                    buyItemRow(buyEntry: buyEntry, index: index, item: item)
+                    if isEditing {
+                        editableItemRow(buyEntry: buyEntry, index: index, item: item)
+                    } else {
+                        readOnlyItemRow(buyEntry: buyEntry, index: index, item: item)
+                    }
                 }
             }
-            Button {
-                addBlankItem()
-            } label: {
-                Label("Buys.AddItem", systemImage: "plus.circle.fill")
+            if isEditing {
+                Button {
+                    addBlankItem()
+                } label: {
+                    Label("Buys.AddItem", systemImage: "plus.circle.fill")
+                }
+            }
+        } header: {
+            HStack {
+                Text("Buys.Section.Title")
+                Spacer()
+                Button {
+                    isEditing.toggle()
+                } label: {
+                    Text(isEditing ? "Shared.Done" : "Shared.Edit")
+                        .font(.subheadline)
+                        .textCase(nil)
+                }
             }
         }
         .photosPicker(
@@ -84,7 +103,38 @@ struct CircleDetailBuysSection: View {
     }
 
     @ViewBuilder
-    func buyItemRow(buyEntry: CirclesBuyEntry, index: Int, item: CirclesBuyEntry.BuyItem) -> some View {
+    func readOnlyItemRow(buyEntry: CirclesBuyEntry, index: Int, item: CirclesBuyEntry.BuyItem) -> some View {
+        Button {
+            withAnimation(.smooth.speed(2.0)) {
+                buyEntry.items[index].status = item.status.next
+            }
+        } label: {
+            HStack(spacing: 8.0) {
+                if let imageData = item.imageData, let uiImage = UIImage(data: imageData) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 36.0, height: 36.0)
+                        .clipShape(RoundedRectangle(cornerRadius: 6.0))
+                }
+                Text(item.name)
+                    .strikethrough(item.status == .cancelled)
+                    .foregroundStyle(item.status == .cancelled ? .secondary : .primary)
+                Spacer()
+                Text("Buys.CostValue.\(item.cost)")
+                    .foregroundStyle(.secondary)
+                    .strikethrough(item.status == .cancelled)
+                if item.status == .bought {
+                    Image(systemName: "checkmark")
+                        .foregroundStyle(.green)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    func editableItemRow(buyEntry: CirclesBuyEntry, index: Int, item: CirclesBuyEntry.BuyItem) -> some View {
         HStack(spacing: 8.0) {
             if let imageData = item.imageData, let uiImage = UIImage(data: imageData) {
                 Image(uiImage: uiImage)
@@ -110,7 +160,12 @@ struct CircleDetailBuysSection: View {
             .multilineTextAlignment(.trailing)
             .foregroundStyle(.secondary)
         }
-        .swipeActions(edge: .leading) {
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+            Button(role: .destructive) {
+                deleteItem(at: index)
+            } label: {
+                Label("Shared.Delete", systemImage: "trash")
+            }
             Button {
                 editingImageItemID = item.id
                 isPhotoPickerPresented = true
@@ -118,13 +173,6 @@ struct CircleDetailBuysSection: View {
                 Label("Buys.SelectImage", systemImage: "photo")
             }
             .tint(.blue)
-        }
-        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-            Button(role: .destructive) {
-                deleteItem(at: index)
-            } label: {
-                Label("Shared.Delete", systemImage: "trash")
-            }
         }
     }
 

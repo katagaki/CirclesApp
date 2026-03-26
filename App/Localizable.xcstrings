@@ -5779,6 +5779,22 @@
         }
       }
     },
+    "Shared.Edit" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "編集"
+          }
+        }
+      }
+    },
     "Shared.EditFavorites" : {
       "localizations" : {
         "en" : {

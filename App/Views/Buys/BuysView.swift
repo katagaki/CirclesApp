@@ -28,7 +28,11 @@ struct BuysView: View {
 
     var totalCost: Int {
         buyEntries.reduce(0) { total, entry in
-            total + entry.items.filter { !$0.name.trimmingCharacters(in: .whitespaces).isEmpty }
+            total + entry.items
+                .filter {
+                    !$0.name.trimmingCharacters(in: .whitespaces).isEmpty &&
+                    $0.status != .cancelled
+                }
                 .reduce(0) { $0 + $1.cost }
         }
     }
@@ -70,14 +74,30 @@ struct BuysView: View {
         let circle = circles.first
 
         Section {
-            ForEach(entry.items) { item in
-                HStack {
-                    Text(item.name)
-                    Spacer()
-                    Text("Buys.CostValue.\(item.cost)")
-                        .foregroundStyle(.secondary)
+            ForEach(Array(entry.items.enumerated()), id: \.element.id) { index, item in
+                if !item.name.trimmingCharacters(in: .whitespaces).isEmpty {
+                    Button {
+                        withAnimation(.smooth.speed(2.0)) {
+                            entry.items[index].status = item.status.next
+                        }
+                    } label: {
+                        HStack {
+                            Text(item.name)
+                                .strikethrough(item.status == .cancelled)
+                                .foregroundStyle(item.status == .cancelled ? .secondary : .primary)
+                            Spacer()
+                            Text("Buys.CostValue.\(item.cost)")
+                                .foregroundStyle(.secondary)
+                                .strikethrough(item.status == .cancelled)
+                            if item.status == .bought {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(.green)
+                            }
+                        }
+                        .font(.subheadline)
+                    }
+                    .buttonStyle(.plain)
                 }
-                .font(.subheadline)
             }
         } header: {
             if let circle {

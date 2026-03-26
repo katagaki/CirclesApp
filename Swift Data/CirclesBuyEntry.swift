@@ -20,17 +20,33 @@ final class CirclesBuyEntry {
         self.items = items
     }
 
+    enum BuyItemStatus: Int, Codable, Hashable {
+        case pending = 0
+        case bought = 1
+        case cancelled = 2
+
+        var next: BuyItemStatus {
+            switch self {
+            case .pending: .bought
+            case .bought: .cancelled
+            case .cancelled: .pending
+            }
+        }
+    }
+
     struct BuyItem: Codable, Identifiable, Hashable {
         var id: UUID
         var name: String
         var cost: Int
         var imageData: Data?
+        var status: BuyItemStatus
 
-        init(id: UUID = UUID(), name: String, cost: Int, imageData: Data? = nil) {
+        init(id: UUID = UUID(), name: String, cost: Int, imageData: Data? = nil, status: BuyItemStatus = .pending) {
             self.id = id
             self.name = name
             self.cost = cost
             self.imageData = imageData
+            self.status = status
         }
     }
 }
