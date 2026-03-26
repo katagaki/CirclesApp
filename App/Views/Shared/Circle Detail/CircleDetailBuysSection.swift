@@ -5,7 +5,6 @@
 //  Created by Claude on 2026/03/24.
 //
 
-import PhotosUI
 import SwiftData
 import SwiftUI
 import AXiS
@@ -20,11 +19,8 @@ struct CircleDetailBuysSection: View {
     @Query var allBuyEntries: [CirclesBuyEntry]
 
     @State private var isEditing: Bool = false
-    @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var editingImageItemID: UUID?
-    @State private var pendingImage: UIImage?
-    @State private var isCropperPresented: Bool = false
-    @State private var isPhotoPickerPresented: Bool = false
+    @State private var isImageFlowPresented: Bool = false
 
     var buyEntry: CirclesBuyEntry? {
         allBuyEntries.first {
@@ -42,9 +38,16 @@ struct CircleDetailBuysSection: View {
                         readOnlyItemRow(buyEntry: buyEntry, index: index, item: item)
                     }
                 }
+                .onMove { from, destination in
+                    buyEntry.items.move(fromOffsets: from, toOffset: destination)
+                }
+                .moveDisabled(!isEditing)
             }
-            if isEditing {
+            if isEditing || buyEntry == nil || buyEntry?.items.isEmpty == true {
                 Button {
+                    if !isEditing {
+                        isEditing = true
+                    }
                     addBlankItem()
                 } label: {
                     Label("Buys.AddItem", systemImage: "plus.circle.fill")
@@ -63,42 +66,17 @@ struct CircleDetailBuysSection: View {
                 }
             }
         }
-        .photosPicker(
-            isPresented: $isPhotoPickerPresented,
-            selection: $selectedPhotoItem,
-            matching: .images,
-            photoLibrary: .shared()
-        )
-        .onChange(of: selectedPhotoItem) { _, newPhotoItem in
-            Task {
-                if let newPhotoItem,
-                   let photoData = try? await newPhotoItem.loadTransferable(type: Data.self),
-                   let loadedImage = UIImage(data: photoData) {
-                    await MainActor.run {
-                        pendingImage = loadedImage
-                        isCropperPresented = true
-                    }
+        .fullScreenCover(isPresented: $isImageFlowPresented) {
+            ImagePickerFlowView(
+                onComplete: { croppedImage in
+                    applyImage(croppedImage)
+                    isImageFlowPresented = false
+                },
+                onCancel: {
+                    editingImageItemID = nil
+                    isImageFlowPresented = false
                 }
-                await MainActor.run {
-                    selectedPhotoItem = nil
-                }
-            }
-        }
-        .sheet(isPresented: $isCropperPresented) {
-            if let pendingImage {
-                ImageCropView(
-                    image: pendingImage,
-                    onCrop: { croppedImage in
-                        applyImage(croppedImage)
-                        isCropperPresented = false
-                    },
-                    onCancel: {
-                        self.pendingImage = nil
-                        editingImageItemID = nil
-                        isCropperPresented = false
-                    }
-                )
-            }
+            )
         }
     }
 
@@ -124,11 +102,13 @@ struct CircleDetailBuysSection: View {
                 Text("Buys.CostValue.\(item.cost)")
                     .foregroundStyle(.secondary)
                     .strikethrough(item.status == .cancelled)
+                    .monospacedDigit()
                 if item.status == .bought {
                     Image(systemName: "checkmark")
                         .foregroundStyle(.green)
                 }
             }
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }
@@ -168,7 +148,7 @@ struct CircleDetailBuysSection: View {
             }
             Button {
                 editingImageItemID = item.id
-                isPhotoPickerPresented = true
+                isImageFlowPresented = true
             } label: {
                 Label("Buys.SelectImage", systemImage: "photo")
             }
@@ -200,14 +180,12 @@ struct CircleDetailBuysSection: View {
 
     func applyImage(_ image: UIImage) {
         guard let buyEntry, let itemID = editingImageItemID else {
-            pendingImage = nil
             editingImageItemID = nil
             return
         }
         if let index = buyEntry.items.firstIndex(where: { $0.id == itemID }) {
             buyEntry.items[index].imageData = image.jpegData(compressionQuality: 0.7)
         }
-        pendingImage = nil
         editingImageItemID = nil
     }
 }

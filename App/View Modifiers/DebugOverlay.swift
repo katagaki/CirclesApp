@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2025/07/21.
 //
 
+import AXiS
 import SwiftUI
 
 #if DEBUG

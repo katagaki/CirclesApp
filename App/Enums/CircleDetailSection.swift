@@ -13,6 +13,7 @@ enum CircleDetailSection: Int, CaseIterable, Codable, Identifiable {
     case tags = 2
     case memo = 3
     case attachments = 4
+    case buys = 5
 
     var id: Int { rawValue }
 
@@ -23,6 +24,7 @@ enum CircleDetailSection: Int, CaseIterable, Codable, Identifiable {
         case .tags: "CircleDetailSection.Tags"
         case .memo: "CircleDetailSection.Memo"
         case .attachments: "CircleDetailSection.Attachments"
+        case .buys: "CircleDetailSection.Buys"
         }
     }
 

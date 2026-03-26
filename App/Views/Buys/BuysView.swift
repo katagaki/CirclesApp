@@ -57,6 +57,7 @@ struct BuysView: View {
                             Spacer()
                             Text("Buys.CostValue.\(totalCost)")
                                 .fontWeight(.bold)
+                                .monospacedDigit()
                         }
                     }
                 }
@@ -89,12 +90,14 @@ struct BuysView: View {
                             Text("Buys.CostValue.\(item.cost)")
                                 .foregroundStyle(.secondary)
                                 .strikethrough(item.status == .cancelled)
+                                .monospacedDigit()
                             if item.status == .bought {
                                 Image(systemName: "checkmark")
                                     .foregroundStyle(.green)
                             }
                         }
                         .font(.subheadline)
+                        .contentShape(.rect)
                     }
                     .buttonStyle(.plain)
                 }
