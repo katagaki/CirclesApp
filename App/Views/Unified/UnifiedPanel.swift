@@ -53,6 +53,7 @@ struct UnifiedPanel: View {
         }
         .presentationBackgroundInteraction(.enabled)
         .presentationDetentsForUnifiedView($unifier.selectedDetent)
+        .presentationContentInteraction(.scrolls)
         .interactiveDismissDisabled()
     }
 
