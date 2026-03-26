@@ -20,6 +20,11 @@ struct UnifiedPanel: View {
                 self.unifier.view()
             }
             .toolbar {
+                if unifier.current == .buys {
+                    ToolbarItem(placement: .topBarLeading) {
+                        EmptyView()
+                    }
+                }
                 ToolbarItem(placement: .principal) {
                     if #available(iOS 26.0, *) {
                         viewPicker()
