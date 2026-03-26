@@ -63,6 +63,11 @@ struct BuysView: View {
         }
         .navigationTitle("ViewTitle.Buys")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                EmptyView()
+            }
+        }
         .onAppear {
             reloadEntries()
         }
