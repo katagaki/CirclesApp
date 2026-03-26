@@ -178,6 +178,40 @@
         }
       }
     },
+    "Alerts.UpdateDataConfirmation.Message" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This will redownload the current event's data. This may take some time."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "現在のイベントのデータを再ダウンロードします。しばらく時間がかかる場合があります。"
+          }
+        }
+      }
+    },
+    "Alerts.UpdateDataConfirmation.Title" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Event Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "イベントデータを更新"
+          }
+        }
+      }
+    },
     "Alerts.FirstCircle.Title" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3184,6 +3218,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "更多"
+          }
+        }
+      }
+    },
+    "More.UpdateData" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データを更新"
           }
         }
       }

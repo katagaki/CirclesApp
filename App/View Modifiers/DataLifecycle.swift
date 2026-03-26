@@ -41,6 +41,12 @@ struct DataLifecycleModifier: ViewModifier {
                     reloadData(shouldResetSelections: true)
                 }
             }
+            .onChange(of: unifier.shouldUpdateData) { _, newValue in
+                if newValue {
+                    unifier.shouldUpdateData = false
+                    updateData()
+                }
+            }
             .onChange(of: planner.activeEventNumber) { oldValue, _ in
                 if isRevertingEvent {
                     isRevertingEvent = false
@@ -82,6 +88,22 @@ struct DataLifecycleModifier: ViewModifier {
             } message: {
                 Text("Alerts.DownloadConfirmation.Message \(estimatedDownloadSize)")
             }
+    }
+
+    func updateData() {
+        guard !isReloadingData, let activeEvent = planner.activeEvent else { return }
+        isReloadingData = true
+        database.reset()
+        database.delete(event: activeEvent)
+        unifier.hide()
+        oasis.open {
+            Task.detached {
+                await loadDataFromDatabase(for: activeEvent)
+                await MainActor.run {
+                    finishReload(shouldResetSelections: true)
+                }
+            }
+        }
     }
 
     func reloadData(forceDownload: Bool = false, shouldResetSelections: Bool = false) {
