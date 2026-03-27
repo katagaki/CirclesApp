@@ -16,10 +16,10 @@ struct CircleDetailBuysSection: View {
 
     @State private var buyEntry: BuyEntry?
     @State private var isEditing: Bool = false
-    @State private var editingImageItemID: String?
-    @State private var isAttachmentPickerPresented: Bool = false
-    @State private var pendingImage: UIImage?
-    @State private var isCropperPresented: Bool = false
+
+    @Binding var buysAttachmentPickerCircle: ComiketCircle?
+    @Binding var buysCropImage: UIImage?
+    @Binding var buysCropItemID: String?
 
     var body: some View {
         Section {
@@ -65,39 +65,14 @@ struct CircleDetailBuysSection: View {
                 }
             }
         }
-        .sheet(isPresented: $isAttachmentPickerPresented) {
-            AttachmentPickerView(
-                circle: circle,
-                onSelect: { image in
-                    pendingImage = image
-                    isAttachmentPickerPresented = false
-                    isCropperPresented = true
-                },
-                onCancel: {
-                    editingImageItemID = nil
-                    isAttachmentPickerPresented = false
-                }
-            )
-        }
-        .fullScreenCover(isPresented: $isCropperPresented) {
-            if let pendingImage {
-                ImageCropView(
-                    image: pendingImage,
-                    onCrop: { croppedImage in
-                        applyImage(croppedImage)
-                        isCropperPresented = false
-                        self.pendingImage = nil
-                    },
-                    onCancel: {
-                        self.pendingImage = nil
-                        editingImageItemID = nil
-                        isCropperPresented = false
-                    }
-                )
-            }
-        }
         .onAppear {
             reloadEntry()
+        }
+        .onChange(of: buysCropImage) {
+            // When crop image is cleared after a crop completes, reload
+            if buysCropImage == nil && buysCropItemID == nil {
+                reloadEntry()
+            }
         }
     }
 
@@ -177,8 +152,7 @@ struct CircleDetailBuysSection: View {
                 Label("Shared.Delete", systemImage: "trash")
             }
             Button {
-                editingImageItemID = item.id
-                selectImageFromAttachments()
+                selectImageFromAttachments(for: item.id)
             } label: {
                 Label("Buys.SelectImage", systemImage: "photo")
             }
@@ -186,17 +160,17 @@ struct CircleDetailBuysSection: View {
         }
     }
 
-    func selectImageFromAttachments() {
+    func selectImageFromAttachments(for itemID: String) {
         let attachments = AttachmentsDatabase.shared.attachments(
             eventNumber: circle.eventNumber,
             circleID: circle.id
         )
+        buysCropItemID = itemID
         if attachments.count == 1,
            let image = UIImage(data: attachments[0].attachmentBlob) {
-            pendingImage = image
-            isCropperPresented = true
+            buysCropImage = image
         } else {
-            isAttachmentPickerPresented = true
+            buysAttachmentPickerCircle = circle
         }
     }
 
@@ -208,19 +182,6 @@ struct CircleDetailBuysSection: View {
 
     func deleteItem(id: String) {
         BuysDatabase.shared.deleteItem(id: id, eventNumber: planner.activeEventNumber)
-        reloadEntry()
-    }
-
-    func applyImage(_ image: UIImage) {
-        guard let itemID = editingImageItemID,
-              let entry = buyEntry,
-              var item = entry.items.first(where: { $0.id == itemID }) else {
-            editingImageItemID = nil
-            return
-        }
-        item.imageData = image.jpegData(compressionQuality: 0.7)
-        BuysDatabase.shared.updateItem(item, eventNumber: planner.activeEventNumber)
-        editingImageItemID = nil
         reloadEntry()
     }
 
