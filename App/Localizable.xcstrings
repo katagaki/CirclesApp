@@ -519,6 +519,38 @@
         }
       }
     },
+    "Buys.NoAttachments": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Attachments"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添付ファイルがありません"
+          }
+        }
+      }
+    },
+    "Buys.NoAttachments.Description": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This circle has no attachments to select from."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このサークルには添付ファイルがありません。"
+          }
+        }
+      }
+    },
     "Buys.Section.Title": {
       "localizations": {
         "en": {
@@ -549,6 +581,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "구매 목록"
+          }
+        }
+      }
+    },
+    "Buys.SelectFromAttachments": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select from Attachments"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添付ファイルから選択"
           }
         }
       }

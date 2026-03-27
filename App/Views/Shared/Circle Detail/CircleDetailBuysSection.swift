@@ -5,7 +5,6 @@
 //  Created by Claude on 2026/03/24.
 //
 
-import PhotosUI
 import SwiftUI
 import AXiS
 
@@ -17,9 +16,8 @@ struct CircleDetailBuysSection: View {
 
     @State private var buyEntry: BuyEntry?
     @State private var isEditing: Bool = false
-    @State private var selectedPhotoItem: PhotosPickerItem?
     @State private var editingImageItemID: String?
-    @State private var isPhotoPickerPresented: Bool = false
+    @State private var isAttachmentPickerPresented: Bool = false
     @State private var pendingImage: UIImage?
     @State private var isCropperPresented: Bool = false
 
@@ -67,26 +65,19 @@ struct CircleDetailBuysSection: View {
                 }
             }
         }
-        .photosPicker(
-            isPresented: $isPhotoPickerPresented,
-            selection: $selectedPhotoItem,
-            matching: .images,
-            photoLibrary: .shared()
-        )
-        .onChange(of: selectedPhotoItem) { _, newPhotoItem in
-            Task {
-                if let newPhotoItem,
-                   let photoData = try? await newPhotoItem.loadTransferable(type: Data.self),
-                   let loadedImage = UIImage(data: photoData) {
-                    await MainActor.run {
-                        pendingImage = loadedImage
-                        isCropperPresented = true
-                    }
+        .sheet(isPresented: $isAttachmentPickerPresented) {
+            AttachmentPickerView(
+                circle: circle,
+                onSelect: { image in
+                    pendingImage = image
+                    isAttachmentPickerPresented = false
+                    isCropperPresented = true
+                },
+                onCancel: {
+                    editingImageItemID = nil
+                    isAttachmentPickerPresented = false
                 }
-                await MainActor.run {
-                    selectedPhotoItem = nil
-                }
-            }
+            )
         }
         .fullScreenCover(isPresented: $isCropperPresented) {
             if let pendingImage {
@@ -187,7 +178,7 @@ struct CircleDetailBuysSection: View {
             }
             Button {
                 editingImageItemID = item.id
-                isPhotoPickerPresented = true
+                isAttachmentPickerPresented = true
             } label: {
                 Label("Buys.SelectImage", systemImage: "photo")
             }
