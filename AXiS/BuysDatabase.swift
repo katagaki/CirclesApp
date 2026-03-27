@@ -238,8 +238,14 @@ public final class BuysDatabase: Sendable {
 
     public func moveItems(circleID: Int, eventNumber: Int, fromOffsets: IndexSet, toOffset: Int) {
         guard var entry = entry(for: circleID, eventNumber: eventNumber) else { return }
-        entry.items.move(fromOffsets: fromOffsets, toOffset: toOffset)
-        for (index, item) in entry.items.enumerated() {
+        var items = entry.items
+        let moving = fromOffsets.map { items[$0] }
+        for index in fromOffsets.sorted().reversed() {
+            items.remove(at: index)
+        }
+        let insertAt = min(toOffset, items.count)
+        items.insert(contentsOf: moving, at: insertAt)
+        for (index, item) in items.enumerated() {
             var updated = item
             updated.sortOrder = index
             updateItem(updated, eventNumber: eventNumber)
