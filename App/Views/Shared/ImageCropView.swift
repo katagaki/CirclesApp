@@ -17,13 +17,14 @@ struct ImageCropView: View {
     @State private var lastScale: CGFloat = 1.0
     @State private var offset: CGSize = .zero
     @State private var lastOffset: CGSize = .zero
+    @State private var viewSize: CGSize = .zero
 
     var body: some View {
         NavigationStack {
             GeometryReader { geometry in
                 let cropSize = min(geometry.size.width, geometry.size.height) * 0.8
                 ZStack {
-                    Color.black.ignoresSafeArea()
+                    Color.black
                     Image(uiImage: image)
                         .resizable()
                         .scaledToFit()
@@ -68,7 +69,14 @@ struct ImageCropView: View {
                         .frame(width: cropSize, height: cropSize)
                         .allowsHitTesting(false)
                 }
+                .onAppear {
+                    viewSize = geometry.size
+                }
+                .onChange(of: geometry.size) {
+                    viewSize = geometry.size
+                }
             }
+            .ignoresSafeArea()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Shared.Cancel") {
@@ -81,16 +89,28 @@ struct ImageCropView: View {
                     }
                 }
             }
+            .toolbarBackground(.hidden, for: .navigationBar)
         }
     }
 
     private func cropImage() {
+        let cropSize = min(viewSize.width, viewSize.height) * 0.8
+        let renderScale = 300.0 / cropSize
+        let scaledOffset = CGSize(
+            width: offset.width * renderScale,
+            height: offset.height * renderScale
+        )
+        let renderSize = CGSize(
+            width: viewSize.width * renderScale,
+            height: viewSize.height * renderScale
+        )
         let renderer = ImageRenderer(content:
             Image(uiImage: image)
                 .resizable()
                 .scaledToFit()
                 .scaleEffect(scale)
-                .offset(offset)
+                .offset(scaledOffset)
+                .frame(width: renderSize.width, height: renderSize.height)
                 .frame(width: 300, height: 300)
                 .clipped()
         )

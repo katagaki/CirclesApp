@@ -16,6 +16,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>circles-app</string>
+				<string>circles</string>
 			</array>
 		</dict>
 	</array>

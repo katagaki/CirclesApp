@@ -89,7 +89,15 @@ struct BuysView: View {
                             reloadEntries()
                         }
                     } label: {
-                        HStack {
+                        HStack(spacing: 8.0) {
+                            if let imageData = item.imageData,
+                               let uiImage = UIImage(data: imageData) {
+                                Image(uiImage: uiImage)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 36.0, height: 36.0)
+                                    .clipShape(RoundedRectangle(cornerRadius: 6.0))
+                            }
                             Text(item.name)
                                 .strikethrough(item.status == .cancelled)
                                 .foregroundStyle(item.status == .cancelled ? .secondary : .primary)
