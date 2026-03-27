@@ -19,9 +19,8 @@ struct LoginView: View {
                 Text("Login.Title")
                     .fontWeight(.black)
                     .font(.largeTitle)
-                    .foregroundStyle(
-                        LinearGradient(colors: [.accent, .primary], startPoint: .leading, endPoint: .trailing)
-                    )
+                    .foregroundStyle(.accent)
+                    .padding(.top, 24.0)
                 Spacer()
                 VStack(alignment: .leading, spacing: 32.0) {
                     LoginFeatureHero(imageName: "Hero.Map",
@@ -33,6 +32,9 @@ struct LoginView: View {
                     LoginFeatureHero(imageName: "Hero.Favorites",
                                      title: "Hero.Favorites.Title",
                                      description: "Hero.Favorites.Description")
+                    LoginFeatureHero(imageName: "Hero.Buys",
+                                     title: "Hero.Buys.Title",
+                                     description: "Hero.Buys.Description")
                 }
                 Spacer()
                 Divider()
@@ -41,6 +43,23 @@ struct LoginView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(18.0)
+        }
+        .background {
+            ZStack(alignment: .bottom) {
+                LinearGradient(
+                    colors: [.accent.opacity(0.12), .clear],
+                    startPoint: .top,
+                    endPoint: .center
+                )
+                .ignoresSafeArea()
+                Image("TokyoBigSight")
+                    .resizable()
+                    .scaledToFit()
+                    .tint(.accent)
+                    .opacity(0.07)
+                    .ignoresSafeArea(edges: .bottom)
+                    .offset(y: 50.0)
+            }
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             VStack {
