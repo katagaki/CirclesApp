@@ -48,6 +48,14 @@ struct UnifiedMoreMenu: View {
     var body: some View {
         Menu("Tab.More", systemImage: "ellipsis") {
             Section {
+                Button("More.UpdateData", systemImage: "arrow.triangle.2.circlepath") {
+                    unifier.shouldUpdateData = true
+                }
+                .disabled(authenticator.onlineState == .offline ||
+                          authenticator.onlineState == .undetermined ||
+                          planner.activeEvent == nil)
+            }
+            Section {
                 if authenticator.onlineState == .offline {
                     Text("My.Events.OfflineMode")
                 } else {

@@ -26,6 +26,7 @@ struct DataLifecycleModifier: ViewModifier {
     @State var pendingDownloadEvent: WebCatalogEvent.Response.Event?
     @State var previousEventNumber: Int?
     @State var isRevertingEvent: Bool = false
+    @State var isUpdatingData: Bool = false
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
 
@@ -39,6 +40,12 @@ struct DataLifecycleModifier: ViewModifier {
             .onChange(of: authenticator.isAuthenticating) { oldValue, newValue in
                 if oldValue == true && newValue == false && authenticator.token != nil {
                     reloadData(shouldResetSelections: true)
+                }
+            }
+            .onChange(of: unifier.shouldUpdateData) { _, newValue in
+                if newValue {
+                    unifier.shouldUpdateData = false
+                    updateData()
                 }
             }
             .onChange(of: planner.activeEventNumber) { oldValue, _ in
@@ -57,10 +64,15 @@ struct DataLifecycleModifier: ViewModifier {
             .alert("Alerts.DownloadConfirmation.Title", isPresented: $isDownloadConfirmationShowing) {
                 Button("Shared.Download") {
                     if let event = pendingDownloadEvent {
+                        if isUpdatingData {
+                            database.reset()
+                            database.delete(event: event)
+                        }
                         oasis.open {
                             Task.detached {
                                 await loadDataFromDatabase(for: event)
                                 await MainActor.run {
+                                    isUpdatingData = false
                                     finishReload(shouldResetSelections: true)
                                 }
                             }
@@ -68,20 +80,48 @@ struct DataLifecycleModifier: ViewModifier {
                     }
                 }
                 Button("Shared.Cancel", role: .cancel) {
-                    if let previousEventNumber {
-                        isRevertingEvent = true
-                        planner.activeEventNumber = previousEventNumber
-                        planner.activeEventNumberUserDefault = previousEventNumber
-                        planner.updateActiveEvent(onlineState: authenticator.onlineState)
-                        if let activeEvent = planner.activeEvent {
-                            database.prepare(for: activeEvent)
+                    if isUpdatingData {
+                        isUpdatingData = false
+                        isReloadingData = false
+                    } else {
+                        if let previousEventNumber {
+                            isRevertingEvent = true
+                            planner.activeEventNumber = previousEventNumber
+                            planner.activeEventNumberUserDefault = previousEventNumber
+                            planner.updateActiveEvent(onlineState: authenticator.onlineState)
+                            if let activeEvent = planner.activeEvent {
+                                database.prepare(for: activeEvent)
+                            }
                         }
+                        finishReload(shouldResetSelections: false)
                     }
-                    finishReload(shouldResetSelections: false)
                 }
             } message: {
                 Text("Alerts.DownloadConfirmation.Message \(estimatedDownloadSize)")
             }
+    }
+
+    func updateData() {
+        guard !isReloadingData, let activeEvent = planner.activeEvent else { return }
+        isReloadingData = true
+        isUpdatingData = true
+        Task {
+            let token = authenticator.token ?? OpenIDToken()
+            let totalBytes = await database.fetchDownloadSizes(
+                for: activeEvent, authToken: token
+            )
+            let sizeString: String
+            if let totalBytes {
+                sizeString = ByteCountFormatter.string(
+                    fromByteCount: totalBytes, countStyle: .file
+                )
+            } else {
+                sizeString = String(localized: "Shared.Unknown")
+            }
+            pendingDownloadEvent = activeEvent
+            estimatedDownloadSize = sizeString
+            isDownloadConfirmationShowing = true
+        }
     }
 
     func reloadData(forceDownload: Bool = false, shouldResetSelections: Bool = false) {
