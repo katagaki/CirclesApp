@@ -28,7 +28,6 @@ struct UnifiedMoreMenu: View {
     @Environment(Unifier.self) var unifier
 
     @State var activeEventNumber: Int = -1
-    @State var isUpdateDataConfirmationShowing: Bool = false
 
     // Map Settings
 
@@ -50,7 +49,7 @@ struct UnifiedMoreMenu: View {
         Menu("Tab.More", systemImage: "ellipsis") {
             Section {
                 Button("More.UpdateData", systemImage: "arrow.triangle.2.circlepath") {
-                    isUpdateDataConfirmationShowing = true
+                    unifier.shouldUpdateData = true
                 }
                 .disabled(authenticator.onlineState == .offline ||
                           authenticator.onlineState == .undetermined ||
@@ -176,16 +175,6 @@ struct UnifiedMoreMenu: View {
             }
         }
         .menuActionDismissBehavior(.disabled)
-        .alert("Alerts.UpdateDataConfirmation.Title", isPresented: $isUpdateDataConfirmationShowing) {
-            Button("More.UpdateData") {
-                unifier.shouldUpdateData = true
-            }
-            Button("Shared.Cancel", role: .cancel) {
-                // No action needed.
-            }
-        } message: {
-            Text("Alerts.UpdateDataConfirmation.Message")
-        }
         .task {
             activeEventNumber = planner.activeEventNumber
         }
