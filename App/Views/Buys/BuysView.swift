@@ -5,7 +5,6 @@
 //  Created by Claude on 2026/03/24.
 //
 
-import SwiftData
 import SwiftUI
 import AXiS
 
@@ -15,19 +14,16 @@ struct BuysView: View {
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
 
-    @Query var allBuyEntries: [CirclesBuyEntry]
+    @State var buyEntries: [BuyEntry] = []
 
-    @Namespace var namespace
-
-    var buyEntries: [CirclesBuyEntry] {
-        allBuyEntries.filter {
-            $0.eventNumber == planner.activeEventNumber &&
+    var visibleEntries: [BuyEntry] {
+        buyEntries.filter {
             $0.items.contains(where: { !$0.name.trimmingCharacters(in: .whitespaces).isEmpty })
         }
     }
 
     var totalCost: Int {
-        buyEntries.reduce(0) { total, entry in
+        visibleEntries.reduce(0) { total, entry in
             total + entry.items
                 .filter {
                     !$0.name.trimmingCharacters(in: .whitespaces).isEmpty &&
@@ -39,7 +35,7 @@ struct BuysView: View {
 
     var body: some View {
         Group {
-            if buyEntries.isEmpty {
+            if visibleEntries.isEmpty {
                 ContentUnavailableView(
                     "Buys.NoBuys",
                     systemImage: "bag",
@@ -47,7 +43,7 @@ struct BuysView: View {
                 )
             } else {
                 List {
-                    ForEach(buyEntries, id: \.circleID) { entry in
+                    ForEach(visibleEntries) { entry in
                         buyEntrySection(entry)
                     }
                     Section {
@@ -67,10 +63,18 @@ struct BuysView: View {
         }
         .navigationTitle("ViewTitle.Buys")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                EmptyView()
+            }
+        }
+        .onAppear {
+            reloadEntries()
+        }
     }
 
     @ViewBuilder
-    func buyEntrySection(_ entry: CirclesBuyEntry) -> some View {
+    func buyEntrySection(_ entry: BuyEntry) -> some View {
         let circles = database.circles([entry.circleID])
         let circle = circles.first
 
@@ -78,8 +82,11 @@ struct BuysView: View {
             ForEach(Array(entry.items.enumerated()), id: \.element.id) { index, item in
                 if !item.name.trimmingCharacters(in: .whitespaces).isEmpty {
                     Button {
+                        var updated = item
+                        updated.status = item.status.next
+                        BuysDatabase.shared.updateItem(updated, eventNumber: planner.activeEventNumber)
                         withAnimation(.smooth.speed(2.0)) {
-                            entry.items[index].status = item.status.next
+                            reloadEntries()
                         }
                     } label: {
                         HStack {
@@ -124,5 +131,9 @@ struct BuysView: View {
                 Text("Buys.UnknownCircle.\(entry.circleID)")
             }
         }
+    }
+
+    func reloadEntries() {
+        buyEntries = BuysDatabase.shared.entries(for: planner.activeEventNumber)
     }
 }

@@ -5,45 +5,40 @@
 //  Created by Claude on 2026/03/24.
 //
 
-import PhotosUI
-import SwiftData
 import SwiftUI
 import AXiS
 
 struct CircleDetailBuysSection: View {
 
-    @Environment(\.modelContext) private var modelContext
     @Environment(Events.self) var planner
 
     let circle: ComiketCircle
 
-    @Query var allBuyEntries: [CirclesBuyEntry]
-
+    @State private var buyEntry: BuyEntry?
     @State private var isEditing: Bool = false
-    @State private var selectedPhotoItem: PhotosPickerItem?
-    @State private var editingImageItemID: UUID?
-    @State private var isPhotoPickerPresented: Bool = false
-    @State private var pendingImage: UIImage?
-    @State private var isCropperPresented: Bool = false
 
-    var buyEntry: CirclesBuyEntry? {
-        allBuyEntries.first {
-            $0.circleID == circle.id && $0.eventNumber == planner.activeEventNumber
-        }
-    }
+    @Binding var buysAttachmentPickerCircle: ComiketCircle?
+    @Binding var buysCropImage: UIImage?
+    @Binding var buysCropItemID: String?
 
     var body: some View {
         Section {
             if let buyEntry, !buyEntry.items.isEmpty {
                 ForEach(Array(buyEntry.items.enumerated()), id: \.element.id) { index, item in
                     if isEditing {
-                        editableItemRow(buyEntry: buyEntry, index: index, item: item)
+                        editableItemRow(index: index, item: item)
                     } else {
-                        readOnlyItemRow(buyEntry: buyEntry, index: index, item: item)
+                        readOnlyItemRow(item: item)
                     }
                 }
                 .onMove { from, destination in
-                    buyEntry.items.move(fromOffsets: from, toOffset: destination)
+                    BuysDatabase.shared.moveItems(
+                        circleID: circle.id,
+                        eventNumber: planner.activeEventNumber,
+                        fromOffsets: from,
+                        toOffset: destination
+                    )
+                    reloadEntry()
                 }
                 .moveDisabled(!isEditing)
             }
@@ -70,51 +65,25 @@ struct CircleDetailBuysSection: View {
                 }
             }
         }
-        .photosPicker(
-            isPresented: $isPhotoPickerPresented,
-            selection: $selectedPhotoItem,
-            matching: .images,
-            photoLibrary: .shared()
-        )
-        .onChange(of: selectedPhotoItem) { _, newPhotoItem in
-            Task {
-                if let newPhotoItem,
-                   let photoData = try? await newPhotoItem.loadTransferable(type: Data.self),
-                   let loadedImage = UIImage(data: photoData) {
-                    await MainActor.run {
-                        pendingImage = loadedImage
-                        isCropperPresented = true
-                    }
-                }
-                await MainActor.run {
-                    selectedPhotoItem = nil
-                }
-            }
+        .onAppear {
+            reloadEntry()
         }
-        .fullScreenCover(isPresented: $isCropperPresented) {
-            if let pendingImage {
-                ImageCropView(
-                    image: pendingImage,
-                    onCrop: { croppedImage in
-                        applyImage(croppedImage)
-                        isCropperPresented = false
-                        self.pendingImage = nil
-                    },
-                    onCancel: {
-                        self.pendingImage = nil
-                        editingImageItemID = nil
-                        isCropperPresented = false
-                    }
-                )
+        .onChange(of: buysCropImage) {
+            // When crop image is cleared after a crop completes, reload
+            if buysCropImage == nil && buysCropItemID == nil {
+                reloadEntry()
             }
         }
     }
 
     @ViewBuilder
-    func readOnlyItemRow(buyEntry: CirclesBuyEntry, index: Int, item: CirclesBuyEntry.BuyItem) -> some View {
+    func readOnlyItemRow(item: BuyItem) -> some View {
         Button {
+            var updated = item
+            updated.status = item.status.next
+            BuysDatabase.shared.updateItem(updated, eventNumber: planner.activeEventNumber)
             withAnimation(.smooth.speed(2.0)) {
-                buyEntry.items[index].status = item.status.next
+                reloadEntry()
             }
         } label: {
             HStack(spacing: 8.0) {
@@ -144,7 +113,7 @@ struct CircleDetailBuysSection: View {
     }
 
     @ViewBuilder
-    func editableItemRow(buyEntry: CirclesBuyEntry, index: Int, item: CirclesBuyEntry.BuyItem) -> some View {
+    func editableItemRow(index: Int, item: BuyItem) -> some View {
         HStack(spacing: 8.0) {
             if let imageData = item.imageData, let uiImage = UIImage(data: imageData) {
                 Image(uiImage: uiImage)
@@ -156,13 +125,19 @@ struct CircleDetailBuysSection: View {
             TextField("Buys.ItemName.Placeholder", text: Binding(
                 get: { item.name },
                 set: { newValue in
-                    buyEntry.items[index].name = newValue
+                    var updated = item
+                    updated.name = newValue
+                    BuysDatabase.shared.updateItem(updated, eventNumber: planner.activeEventNumber)
+                    reloadEntry()
                 }
             ))
             TextField("Buys.ItemCost.Placeholder", text: Binding(
                 get: { item.cost == 0 && item.name.isEmpty ? "" : String(item.cost) },
                 set: { newValue in
-                    buyEntry.items[index].cost = Int(newValue) ?? 0
+                    var updated = item
+                    updated.cost = Int(newValue) ?? 0
+                    BuysDatabase.shared.updateItem(updated, eventNumber: planner.activeEventNumber)
+                    reloadEntry()
                 }
             ))
             .keyboardType(.numberPad)
@@ -172,13 +147,12 @@ struct CircleDetailBuysSection: View {
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive) {
-                deleteItem(at: index)
+                deleteItem(id: item.id)
             } label: {
                 Label("Shared.Delete", systemImage: "trash")
             }
             Button {
-                editingImageItemID = item.id
-                isPhotoPickerPresented = true
+                selectImageFromAttachments(for: item.id)
             } label: {
                 Label("Buys.SelectImage", systemImage: "photo")
             }
@@ -186,36 +160,32 @@ struct CircleDetailBuysSection: View {
         }
     }
 
-    func addBlankItem() {
-        let newItem = CirclesBuyEntry.BuyItem(name: "", cost: 0)
-        if let buyEntry {
-            buyEntry.items.append(newItem)
+    func selectImageFromAttachments(for itemID: String) {
+        let attachments = AttachmentsDatabase.shared.attachments(
+            eventNumber: circle.eventNumber,
+            circleID: circle.id
+        )
+        buysCropItemID = itemID
+        if attachments.count == 1,
+           let image = UIImage(data: attachments[0].attachmentBlob) {
+            buysCropImage = image
         } else {
-            let entry = CirclesBuyEntry(
-                circleID: circle.id,
-                eventNumber: planner.activeEventNumber,
-                items: [newItem]
-            )
-            modelContext.insert(entry)
+            buysAttachmentPickerCircle = circle
         }
     }
 
-    func deleteItem(at index: Int) {
-        guard let buyEntry else { return }
-        buyEntry.items.remove(at: index)
-        if buyEntry.items.isEmpty {
-            modelContext.delete(buyEntry)
-        }
+    func addBlankItem() {
+        let newItem = BuyItem(name: "", cost: 0)
+        BuysDatabase.shared.addItem(newItem, circleID: circle.id, eventNumber: planner.activeEventNumber)
+        reloadEntry()
     }
 
-    func applyImage(_ image: UIImage) {
-        guard let buyEntry, let itemID = editingImageItemID else {
-            editingImageItemID = nil
-            return
-        }
-        if let index = buyEntry.items.firstIndex(where: { $0.id == itemID }) {
-            buyEntry.items[index].imageData = image.jpegData(compressionQuality: 0.7)
-        }
-        editingImageItemID = nil
+    func deleteItem(id: String) {
+        BuysDatabase.shared.deleteItem(id: id, eventNumber: planner.activeEventNumber)
+        reloadEntry()
+    }
+
+    func reloadEntry() {
+        buyEntry = BuysDatabase.shared.entry(for: circle.id, eventNumber: planner.activeEventNumber)
     }
 }
