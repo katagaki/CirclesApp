@@ -178,11 +178,25 @@ struct CircleDetailBuysSection: View {
             }
             Button {
                 editingImageItemID = item.id
-                isAttachmentPickerPresented = true
+                selectImageFromAttachments()
             } label: {
                 Label("Buys.SelectImage", systemImage: "photo")
             }
             .tint(.blue)
+        }
+    }
+
+    func selectImageFromAttachments() {
+        let attachments = AttachmentsDatabase.shared.attachments(
+            eventNumber: circle.eventNumber,
+            circleID: circle.id
+        )
+        if attachments.count == 1,
+           let image = UIImage(data: attachments[0].attachmentBlob) {
+            pendingImage = image
+            isCropperPresented = true
+        } else {
+            isAttachmentPickerPresented = true
         }
     }
 
