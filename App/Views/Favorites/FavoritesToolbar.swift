@@ -18,15 +18,11 @@ struct FavoritesToolbar: ToolbarContent {
     var body: some ToolbarContent {
 
         ToolbarItem(placement: .topBarLeading) {
-            HStack {
-                DisplayModeSwitcher(mode: $displayMode)
-                if displayMode == .list {
-                    ListModeSwitcher(mode: $listDisplayMode)
-                }
-                if displayMode == .grid {
-                    GridModeSwitcher(mode: $gridDisplayMode)
-                }
-            }
+            DisplaySettingsMenu(
+                displayMode: $displayMode,
+                listDisplayMode: $listDisplayMode,
+                gridDisplayMode: $gridDisplayMode
+            )
         }
 
         if #available(iOS 26.0, *) {

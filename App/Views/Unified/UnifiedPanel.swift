@@ -51,9 +51,9 @@ struct UnifiedPanel: View {
                 path.view()
             }
         }
-        .presentationContentInteraction(.scrolls)
         .presentationBackgroundInteraction(.enabled)
         .presentationDetentsForUnifiedView($unifier.selectedDetent)
+        .presentationContentInteraction(.scrolls)
         .interactiveDismissDisabled()
     }
 
@@ -67,6 +67,8 @@ struct UnifiedPanel: View {
                 Text("ViewTitle.Favorites")
                     .tag(UnifiedPath.favorites)
             }
+            Text("ViewTitle.Buys")
+                .tag(UnifiedPath.buys)
         } label: {
             // Label intentionally left empty; the picker uses segmented style.
         }

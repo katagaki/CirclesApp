@@ -5,7 +5,6 @@
 //  Created by シン・ジャスティン on 2025/08/18.
 //
 
-import Komponents
 import StoreKit
 import SwiftUI
 import TipKit
