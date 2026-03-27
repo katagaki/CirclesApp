@@ -59,6 +59,9 @@ class Unifier {
     // Alerts
     var isGoingToSignOut: Bool = false
 
+    // Data update trigger
+    var shouldUpdateData: Bool = false
+
     @MainActor
     func show() {
         // Only set isPresented on phone, iPad sidebar is always visible
