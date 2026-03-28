@@ -16,7 +16,9 @@ struct URLSchemeHandlerModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onOpenURL { url in
-                if url.scheme == "circles-app" && url.host() == "attach-product-list",
+                if url.scheme == "circles-app" && url.host() == "sixseven" {
+                    authenticator.isAuthenticating = true
+                } else if url.scheme == "circles-app" && url.host() == "attach-product-list",
                    let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
                    let base64 = components.queryItems?.first(where: { $0.name == "image" })?.value,
                    let data = Data(base64Encoded: base64) {
