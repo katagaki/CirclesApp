@@ -452,10 +452,72 @@
       }
     },
     "Buys.NoAttachments" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Attachments"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添付ファイルがありません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첨부파일 없음"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有附件"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有附件"
+          }
+        }
+      }
     },
     "Buys.NoAttachments.Description" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This circle has no attachments yet."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このサークルにはまだ添付ファイルがありません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 서클에는 아직 첨부파일이 없습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "该社团还没有附件。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "該社團還沒有附件。"
+          }
+        }
+      }
     },
     "Buys.NoBuys" : {
       "localizations" : {
@@ -560,38 +622,35 @@
       }
     },
     "Buys.SelectFromAttachments" : {
-
-    },
-    "Buys.SelectImage" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Image"
+            "value" : "Select From Attachments"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "画像"
+            "value" : "添付ファイルから選択"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "이미지"
+            "value" : "첨부파일에서 선택"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "图片"
+            "value" : "从附件中选择"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "圖片"
+            "value" : "從附件中選擇"
           }
         }
       }
@@ -2573,7 +2632,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "購入したいものをメモして、合計予算を管理しましょう"
+            "value" : "購入したいものをメモして、合計予算を管理する"
           }
         },
         "ko" : {
@@ -4050,41 +4109,6 @@
         }
       }
     },
-    "More.UpdateData" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Update Data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データを更新"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "데이터 업데이트"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "更新数据"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "更新資料"
-          }
-        }
-      }
-    },
     "More.Navigate" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4290,6 +4314,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "資料由Comiket Web Catalog提供"
+          }
+        }
+      }
+    },
+    "More.UpdateData" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データを更新"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "데이터 업데이트"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新数据"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新資料"
           }
         }
       }
