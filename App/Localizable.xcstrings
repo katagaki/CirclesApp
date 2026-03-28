@@ -452,10 +452,72 @@
       }
     },
     "Buys.NoAttachments" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No Attachments"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添付ファイルがありません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첨부파일 없음"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没有附件"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "沒有附件"
+          }
+        }
+      }
     },
     "Buys.NoAttachments.Description" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add attachments to this circle first, then select one as the item image."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "先にこのサークルに添付ファイルを追加してから、アイテム画像として選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "먼저 이 서클에 첨부파일을 추가한 후 아이템 이미지로 선택하세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请先为此社团添加附件，然后选择一个作为物品图片。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "請先為此社團新增附件，然後選擇一個作為物品圖片。"
+          }
+        }
+      }
     },
     "Buys.NoBuys" : {
       "localizations" : {
@@ -560,7 +622,38 @@
       }
     },
     "Buys.SelectFromAttachments" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select from Attachments"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添付ファイルから選択"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첨부파일에서 선택"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从附件中选择"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "從附件中選擇"
+          }
+        }
+      }
     },
     "Buys.SelectImage" : {
       "localizations" : {
@@ -7827,6 +7920,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "下午入場"
+          }
+        }
+      }
+    },
+    "Tip.AttachmentAndBuys.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add photos of product lists as attachments, then track individual items you want to buy in the Buys section."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "お品書きの写真を添付ファイルとして追加し、宝物セクションで購入予定のアイテムを管理できます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "상품 목록 사진을 첨부파일로 추가한 후, 구매 목록 섹션에서 구매할 아이템을 관리하세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "将商品列表的照片添加为附件，然后在宝贝区域中跟踪您想购买的物品。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "將商品列表的照片新增為附件，然後在寶藏區域中追蹤您想購買的物品。"
+          }
+        }
+      }
+    },
+    "Tip.AttachmentAndBuys.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attachments & Buys"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "添付ファイルと宝物"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "첨부파일 및 구매 목록"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "附件与宝贝"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "附件與寶藏"
           }
         }
       }

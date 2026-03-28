@@ -8,6 +8,7 @@
 import Komponents
 import SwiftData
 import SwiftUI
+import TipKit
 import Translation
 import UIKit
 import RADiUS
@@ -228,6 +229,7 @@ struct CircleDetailView: View {
                 } label: {
                     Label("Circles.Attachments.Add", systemImage: "plus.circle.fill")
                 }
+                .popoverTip(AttachmentAndBuysTip())
             }
         case .buys:
             CircleDetailBuysSection(

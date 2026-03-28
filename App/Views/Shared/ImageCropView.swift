@@ -34,18 +34,21 @@ struct ImageCropView: View {
                             SimultaneousGesture(
                                 MagnifyGesture()
                                     .onChanged { value in
-                                        scale = lastScale * value.magnification
+                                        scale = max(1.0, lastScale * value.magnification)
                                     }
                                     .onEnded { _ in
                                         lastScale = max(1.0, scale)
                                         scale = lastScale
+                                        offset = clampedOffset(offset, viewSize: geometry.size, cropSize: cropSize)
+                                        lastOffset = offset
                                     },
                                 DragGesture()
                                     .onChanged { value in
-                                        offset = CGSize(
+                                        let proposed = CGSize(
                                             width: lastOffset.width + value.translation.width,
                                             height: lastOffset.height + value.translation.height
                                         )
+                                        offset = clampedOffset(proposed, viewSize: geometry.size, cropSize: cropSize)
                                     }
                                     .onEnded { _ in
                                         lastOffset = offset
@@ -79,8 +82,14 @@ struct ImageCropView: View {
             .ignoresSafeArea()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Shared.Cancel") {
-                        onCancel()
+                    if #available(iOS 26.0, *) {
+                        Button(role: .cancel) {
+                            onCancel()
+                        }
+                    } else {
+                        Button("Shared.Cancel") {
+                            onCancel()
+                        }
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
@@ -91,6 +100,33 @@ struct ImageCropView: View {
             }
             .toolbarBackground(.hidden, for: .navigationBar)
         }
+    }
+
+    private func clampedOffset(_ proposed: CGSize, viewSize: CGSize, cropSize: CGFloat) -> CGSize {
+        let imageAspect = image.size.width / image.size.height
+        let viewAspect = viewSize.width / viewSize.height
+
+        let fittedSize: CGSize
+        if imageAspect > viewAspect {
+            let width = viewSize.width
+            let height = width / imageAspect
+            fittedSize = CGSize(width: width, height: height)
+        } else {
+            let height = viewSize.height
+            let width = height * imageAspect
+            fittedSize = CGSize(width: width, height: height)
+        }
+
+        let scaledWidth = fittedSize.width * scale
+        let scaledHeight = fittedSize.height * scale
+
+        let maxOffsetX = max(0, (scaledWidth - cropSize) / 2.0)
+        let maxOffsetY = max(0, (scaledHeight - cropSize) / 2.0)
+
+        return CGSize(
+            width: min(maxOffsetX, max(-maxOffsetX, proposed.width)),
+            height: min(maxOffsetY, max(-maxOffsetY, proposed.height))
+        )
     }
 
     private func cropImage() {
