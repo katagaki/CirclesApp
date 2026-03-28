@@ -90,14 +90,19 @@ struct CircleDetailBuysSection: View {
             buyItemThumbnail(item: item)
                 .overlay {
                     if item.status == .bought {
+                        Color.black.opacity(0.3)
+                            .clipShape(RoundedRectangle(cornerRadius: 6.0))
                         Circle()
-                            .fill(.ultraThinMaterial)
+                            .fill(Color.accentColor)
                             .frame(width: 20.0, height: 20.0)
                             .overlay {
+                                Circle()
+                                    .strokeBorder(.white, lineWidth: 1.5)
                                 Image(systemName: "checkmark")
                                     .font(.system(size: 10.0, weight: .bold))
-                                    .foregroundStyle(.green)
+                                    .foregroundStyle(.white)
                             }
+                            .shadow(color: .black.opacity(0.3), radius: 2.0, y: 1.0)
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                     }
                 }
