@@ -16,7 +16,7 @@ struct URLSchemeHandlerModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onOpenURL { url in
-                if url.scheme == "circles" && url.host() == "sixseven" {
+                if url.scheme == "circles-app" && url.host() == "sixseven" {
                     authenticator.isAuthenticating = true
                 } else if url.scheme == "circles-app" && url.host() == "attach-product-list",
                    let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
