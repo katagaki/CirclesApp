@@ -34,6 +34,7 @@ struct CircleDetailView: View {
 
     @State var attachments: [CircleAttachment] = []
     @State var selectedAttachment: CircleAttachment?
+    @State var isAddingAttachment: Bool = false
 
     @State var isFirstCircleAlertShowing: Bool = false
     @State var isLastCircleAlertShowing: Bool = false
@@ -81,6 +82,17 @@ struct CircleDetailView: View {
         }
         .fullScreenCover(item: $selectedAttachment) { attachment in
             AttachmentViewer(attachment: attachment)
+        }
+        .fullScreenCover(isPresented: $isAddingAttachment) {
+            ImagePickerFlowView(
+                onComplete: { image in
+                    addAttachment(image)
+                    isAddingAttachment = false
+                },
+                onCancel: {
+                    isAddingAttachment = false
+                }
+            )
         }
         .sheet(item: $buysAttachmentPickerCircle) { pickerCircle in
             AttachmentPickerView(
@@ -186,8 +198,8 @@ struct CircleDetailView: View {
                 )
             }
         case .attachments:
-            if !attachments.isEmpty {
-                Section("Circles.Attachments") {
+            Section("Circles.Attachments") {
+                if !attachments.isEmpty {
                     ForEach(attachments) { attachment in
                         if let image = UIImage(data: attachment.attachmentBlob) {
                             Button {
@@ -210,6 +222,11 @@ struct CircleDetailView: View {
                             }
                         }
                     }
+                }
+                Button {
+                    isAddingAttachment = true
+                } label: {
+                    Label("Circles.Attachments.Add", systemImage: "plus.circle.fill")
                 }
             }
         case .buys:
@@ -273,6 +290,18 @@ struct CircleDetailView: View {
                 circleID: circle.id
             )
         }
+    }
+
+    func addAttachment(_ image: UIImage) {
+        guard let data = image.jpegData(compressionQuality: 0.8) else { return }
+        AttachmentsDatabase.shared.insert(
+            eventNumber: circle.eventNumber,
+            circleID: circle.id,
+            attachmentType: "image",
+            type: "productList",
+            attachmentBlob: data
+        )
+        loadAttachments()
     }
 
     func deleteAttachment(_ attachment: CircleAttachment) {
