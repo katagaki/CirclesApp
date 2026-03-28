@@ -21,6 +21,8 @@ struct CircleDetailBuysSection: View {
     @Binding var buysCropImage: UIImage?
     @Binding var buysCropItemID: String?
 
+    @State private var viewerImage: UIImage?
+
     var body: some View {
         Section {
             if let buyEntry, !buyEntry.items.isEmpty {
@@ -74,14 +76,40 @@ struct CircleDetailBuysSection: View {
                 reloadEntry()
             }
         }
+        .fullScreenCover(item: Binding(
+            get: { viewerImage.map { BuyImageViewerItem(image: $0) } },
+            set: { if $0 == nil { viewerImage = nil } }
+        )) { item in
+            BuyImageViewer(image: item.image)
+        }
     }
 
     @ViewBuilder
     func readOnlyItemRow(item: BuyItem) -> some View {
         HStack(spacing: 8.0) {
             buyItemThumbnail(item: item)
+                .overlay {
+                    if item.status == .bought {
+                        Color.black.opacity(0.3)
+                            .clipShape(RoundedRectangle(cornerRadius: 6.0))
+                        Circle()
+                            .fill(Color.accentColor)
+                            .frame(width: 20.0, height: 20.0)
+                            .overlay {
+                                Circle()
+                                    .strokeBorder(.white, lineWidth: 1.5)
+                                Image(systemName: "checkmark")
+                                    .font(.system(size: 10.0, weight: .bold))
+                                    .foregroundStyle(.white)
+                            }
+                            .shadow(color: .black.opacity(0.3), radius: 2.0, y: 1.0)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                    }
+                }
                 .onTapGesture {
-                    selectImageFromAttachments(for: item.id)
+                    if let imageData = item.imageData, let image = UIImage(data: imageData) {
+                        viewerImage = image
+                    }
                 }
             Button {
                 var updated = item
@@ -94,16 +122,12 @@ struct CircleDetailBuysSection: View {
                 HStack(spacing: 8.0) {
                     Text(item.name)
                         .strikethrough(item.status == .cancelled)
-                        .foregroundStyle(item.status == .cancelled ? .secondary : .primary)
+                        .foregroundStyle(item.status != .pending ? .secondary : .primary)
                     Spacer()
                     Text("Buys.CostValue.\(item.cost)")
                         .foregroundStyle(.secondary)
                         .strikethrough(item.status == .cancelled)
                         .monospacedDigit()
-                    if item.status == .bought {
-                        Image(systemName: "checkmark")
-                            .foregroundStyle(.green)
-                    }
                 }
                 .contentShape(Rectangle())
             }
@@ -194,5 +218,52 @@ struct CircleDetailBuysSection: View {
 
     func reloadEntry() {
         buyEntry = BuysDatabase.shared.entry(for: circle.id, eventNumber: planner.activeEventNumber)
+    }
+}
+
+struct BuyImageViewerItem: Identifiable {
+    let id = UUID()
+    let image: UIImage
+}
+
+struct BuyImageViewer: View {
+
+    @Environment(\.dismiss) var dismiss
+
+    let image: UIImage
+
+    @State var currentScale: CGFloat = 1.0
+    @State var anchor: UnitPoint = .center
+
+    var body: some View {
+        NavigationStack {
+            GeometryReader { geometry in
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFit()
+                    .scaleEffect(currentScale, anchor: anchor)
+                    .frame(width: geometry.size.width, height: geometry.size.height)
+                    .gesture(
+                        MagnifyGesture()
+                            .onChanged { value in
+                                currentScale = value.magnification
+                                anchor = value.startAnchor
+                            }
+                            .onEnded { _ in
+                                withAnimation(.smooth.speed(2.0)) {
+                                    currentScale = 1.0
+                                }
+                            }
+                    )
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Shared.Back", systemImage: "chevron.left") {
+                        dismiss()
+                    }
+                }
+            }
+        }
     }
 }
