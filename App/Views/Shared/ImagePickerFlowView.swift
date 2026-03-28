@@ -13,33 +13,16 @@ struct ImagePickerFlowView: View {
     let onComplete: (UIImage) -> Void
     let onCancel: () -> Void
 
-    @State private var selectedPhotoItem: PhotosPickerItem?
-    @State private var pickedImage: UIImage?
-
     var body: some View {
-        Group {
-            if let pickedImage {
-                ImageCropView(
-                    image: pickedImage,
-                    onCrop: { croppedImage in
-                        onComplete(croppedImage)
-                    },
-                    onCancel: {
-                        onCancel()
-                    }
-                )
-            } else {
-                PhotoPickerRepresentable(
-                    onPick: { image in
-                        pickedImage = image
-                    },
-                    onCancel: {
-                        onCancel()
-                    }
-                )
-                .ignoresSafeArea()
+        PhotoPickerRepresentable(
+            onPick: { image in
+                onComplete(image)
+            },
+            onCancel: {
+                onCancel()
             }
-        }
+        )
+        .ignoresSafeArea()
     }
 }
 
