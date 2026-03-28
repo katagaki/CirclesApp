@@ -78,50 +78,46 @@ struct CircleDetailBuysSection: View {
 
     @ViewBuilder
     func readOnlyItemRow(item: BuyItem) -> some View {
-        Button {
-            var updated = item
-            updated.status = item.status.next
-            BuysDatabase.shared.updateItem(updated, eventNumber: planner.activeEventNumber)
-            withAnimation(.smooth.speed(2.0)) {
-                reloadEntry()
-            }
-        } label: {
-            HStack(spacing: 8.0) {
-                if let imageData = item.imageData, let uiImage = UIImage(data: imageData) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 36.0, height: 36.0)
-                        .clipShape(RoundedRectangle(cornerRadius: 6.0))
+        HStack(spacing: 8.0) {
+            buyItemThumbnail(item: item)
+                .onTapGesture {
+                    selectImageFromAttachments(for: item.id)
                 }
-                Text(item.name)
-                    .strikethrough(item.status == .cancelled)
-                    .foregroundStyle(item.status == .cancelled ? .secondary : .primary)
-                Spacer()
-                Text("Buys.CostValue.\(item.cost)")
-                    .foregroundStyle(.secondary)
-                    .strikethrough(item.status == .cancelled)
-                    .monospacedDigit()
-                if item.status == .bought {
-                    Image(systemName: "checkmark")
-                        .foregroundStyle(.green)
+            Button {
+                var updated = item
+                updated.status = item.status.next
+                BuysDatabase.shared.updateItem(updated, eventNumber: planner.activeEventNumber)
+                withAnimation(.smooth.speed(2.0)) {
+                    reloadEntry()
                 }
+            } label: {
+                HStack(spacing: 8.0) {
+                    Text(item.name)
+                        .strikethrough(item.status == .cancelled)
+                        .foregroundStyle(item.status == .cancelled ? .secondary : .primary)
+                    Spacer()
+                    Text("Buys.CostValue.\(item.cost)")
+                        .foregroundStyle(.secondary)
+                        .strikethrough(item.status == .cancelled)
+                        .monospacedDigit()
+                    if item.status == .bought {
+                        Image(systemName: "checkmark")
+                            .foregroundStyle(.green)
+                    }
+                }
+                .contentShape(Rectangle())
             }
-            .contentShape(Rectangle())
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
     }
 
     @ViewBuilder
     func editableItemRow(index: Int, item: BuyItem) -> some View {
         HStack(spacing: 8.0) {
-            if let imageData = item.imageData, let uiImage = UIImage(data: imageData) {
-                Image(uiImage: uiImage)
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 36.0, height: 36.0)
-                    .clipShape(RoundedRectangle(cornerRadius: 6.0))
-            }
+            buyItemThumbnail(item: item)
+                .onTapGesture {
+                    selectImageFromAttachments(for: item.id)
+                }
             TextField("Buys.ItemName.Placeholder", text: Binding(
                 get: { item.name },
                 set: { newValue in
@@ -144,19 +140,30 @@ struct CircleDetailBuysSection: View {
             .frame(width: 70.0)
             .multilineTextAlignment(.trailing)
             .foregroundStyle(.secondary)
-        }
-        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive) {
                 deleteItem(id: item.id)
             } label: {
-                Label("Shared.Delete", systemImage: "trash")
+                Image(systemName: "trash")
+                    .font(.caption)
             }
-            Button {
-                selectImageFromAttachments(for: item.id)
-            } label: {
-                Label("Buys.SelectImage", systemImage: "photo")
-            }
-            .tint(.blue)
+        }
+    }
+
+    @ViewBuilder
+    func buyItemThumbnail(item: BuyItem) -> some View {
+        if let imageData = item.imageData, let uiImage = UIImage(data: imageData) {
+            Image(uiImage: uiImage)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 36.0, height: 36.0)
+                .clipShape(RoundedRectangle(cornerRadius: 6.0))
+        } else {
+            Image(systemName: "photo")
+                .font(.system(size: 14.0))
+                .foregroundStyle(.secondary)
+                .frame(width: 36.0, height: 36.0)
+                .background(Color(.systemGray5))
+                .clipShape(RoundedRectangle(cornerRadius: 6.0))
         }
     }
 
