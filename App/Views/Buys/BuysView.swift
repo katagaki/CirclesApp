@@ -15,6 +15,7 @@ struct BuysView: View {
     @Environment(Unifier.self) var unifier
 
     @State var buyEntries: [BuyEntry] = []
+    @State var expandedImage: UIImage?
 
     var visibleEntries: [BuyEntry] {
         buyEntries.filter {
@@ -61,6 +62,12 @@ struct BuysView: View {
                 .listSectionSpacing(.compact)
             }
         }
+        .fullScreenCover(item: Binding(
+            get: { expandedImage.map { ExpandedBuyImage(image: $0) } },
+            set: { if $0 == nil { expandedImage = nil } }
+        )) { item in
+            BuyItemImageViewer(image: item.image)
+        }
         .navigationTitle("ViewTitle.Buys")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -81,40 +88,52 @@ struct BuysView: View {
         Section {
             ForEach(Array(entry.items.enumerated()), id: \.element.id) { index, item in
                 if !item.name.trimmingCharacters(in: .whitespaces).isEmpty {
-                    Button {
-                        var updated = item
-                        updated.status = item.status.next
-                        BuysDatabase.shared.updateItem(updated, eventNumber: planner.activeEventNumber)
-                        withAnimation(.smooth.speed(2.0)) {
-                            reloadEntries()
-                        }
-                    } label: {
-                        HStack(spacing: 8.0) {
-                            if let imageData = item.imageData,
-                               let uiImage = UIImage(data: imageData) {
-                                Image(uiImage: uiImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 36.0, height: 36.0)
-                                    .clipShape(RoundedRectangle(cornerRadius: 6.0))
-                            }
-                            Text(item.name)
-                                .strikethrough(item.status == .cancelled)
-                                .foregroundStyle(item.status == .cancelled ? .secondary : .primary)
-                            Spacer()
-                            Text("Buys.CostValue.\(item.cost)")
+                    HStack(spacing: 8.0) {
+                        if let imageData = item.imageData,
+                           let uiImage = UIImage(data: imageData) {
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 36.0, height: 36.0)
+                                .clipShape(RoundedRectangle(cornerRadius: 6.0))
+                                .onTapGesture {
+                                    expandedImage = uiImage
+                                }
+                        } else {
+                            Image(systemName: "photo")
+                                .font(.system(size: 14.0))
                                 .foregroundStyle(.secondary)
-                                .strikethrough(item.status == .cancelled)
-                                .monospacedDigit()
-                            if item.status == .bought {
-                                Image(systemName: "checkmark")
-                                    .foregroundStyle(.green)
-                            }
+                                .frame(width: 36.0, height: 36.0)
+                                .background(Color(.systemGray5))
+                                .clipShape(RoundedRectangle(cornerRadius: 6.0))
                         }
-                        .font(.subheadline)
-                        .contentShape(.rect)
+                        Button {
+                            var updated = item
+                            updated.status = item.status.next
+                            BuysDatabase.shared.updateItem(updated, eventNumber: planner.activeEventNumber)
+                            withAnimation(.smooth.speed(2.0)) {
+                                reloadEntries()
+                            }
+                        } label: {
+                            HStack(spacing: 8.0) {
+                                Text(item.name)
+                                    .strikethrough(item.status == .cancelled)
+                                    .foregroundStyle(item.status == .cancelled ? .secondary : .primary)
+                                Spacer()
+                                Text("Buys.CostValue.\(item.cost)")
+                                    .foregroundStyle(.secondary)
+                                    .strikethrough(item.status == .cancelled)
+                                    .monospacedDigit()
+                                if item.status == .bought {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(.green)
+                                }
+                            }
+                            .contentShape(.rect)
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
+                    .font(.subheadline)
                 }
             }
         } header: {
@@ -144,4 +163,9 @@ struct BuysView: View {
     func reloadEntries() {
         buyEntries = BuysDatabase.shared.entries(for: planner.activeEventNumber)
     }
+}
+
+struct ExpandedBuyImage: Identifiable {
+    let id = UUID()
+    let image: UIImage
 }
