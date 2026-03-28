@@ -490,31 +490,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Add attachments to this circle first, then select one as the item image."
+            "value" : "This circle has no attachments yet."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "先にこのサークルに添付ファイルを追加してから、アイテム画像として選択してください。"
+            "value" : "このサークルにはまだ添付ファイルがありません。"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "먼저 이 서클에 첨부파일을 추가한 후 아이템 이미지로 선택하세요."
+            "value" : "이 서클에는 아직 첨부파일이 없습니다."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "请先为此社团添加附件，然后选择一个作为物品图片。"
+            "value" : "该社团还没有附件。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "請先為此社團新增附件，然後選擇一個作為物品圖片。"
+            "value" : "該社團還沒有附件。"
           }
         }
       }
@@ -626,7 +626,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Select from Attachments"
+            "value" : "Select From Attachments"
           }
         },
         "ja" : {
@@ -651,40 +651,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "從附件中選擇"
-          }
-        }
-      }
-    },
-    "Buys.SelectImage" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Image"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "画像"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "이미지"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "图片"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "圖片"
           }
         }
       }
@@ -2666,7 +2632,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "購入したいものをメモして、合計予算を管理しましょう"
+            "value" : "購入したいものをメモして、合計予算を管理する"
           }
         },
         "ko" : {
@@ -4143,41 +4109,6 @@
         }
       }
     },
-    "More.UpdateData" : {
-      "extractionState" : "manual",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Update Data"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "データを更新"
-          }
-        },
-        "ko" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "데이터 업데이트"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "更新数据"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "更新資料"
-          }
-        }
-      }
-    },
     "More.Navigate" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -4383,6 +4314,41 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "資料由Comiket Web Catalog提供"
+          }
+        }
+      }
+    },
+    "More.UpdateData" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update Data"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "データを更新"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "데이터 업데이트"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新数据"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "更新資料"
           }
         }
       }
