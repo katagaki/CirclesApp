@@ -164,11 +164,12 @@ struct CircleDetailBuysSection: View {
             .frame(width: 70.0)
             .multilineTextAlignment(.trailing)
             .foregroundStyle(.secondary)
+        }
+        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive) {
                 deleteItem(id: item.id)
             } label: {
-                Image(systemName: "trash")
-                    .font(.caption)
+                Label("Shared.Delete", systemImage: "trash")
             }
         }
     }

@@ -45,7 +45,8 @@ struct AttachmentPickerView: View {
                                         Image(uiImage: image)
                                             .resizable()
                                             .scaledToFill()
-                                            .frame(minHeight: 120.0)
+                                            .frame(width: 120.0, height: 120.0)
+                                            .clipped()
                                             .clipShape(RoundedRectangle(cornerRadius: 8.0))
                                     }
                                 }
@@ -59,8 +60,14 @@ struct AttachmentPickerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Shared.Cancel") {
-                        onCancel()
+                    if #available(iOS 26.0, *) {
+                        Button(role: .cancel) {
+                            onCancel()
+                        }
+                    } else {
+                        Button("Shared.Cancel") {
+                            onCancel()
+                        }
                     }
                 }
             }
