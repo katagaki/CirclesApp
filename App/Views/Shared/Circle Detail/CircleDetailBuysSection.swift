@@ -96,7 +96,6 @@ struct CircleDetailBuysSection: View {
                                     .foregroundStyle(.white)
                             }
                             .shadow(color: .black.opacity(0.3), radius: 2.0, y: 1.0)
-                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
                     }
                 }
                 .onTapGesture {

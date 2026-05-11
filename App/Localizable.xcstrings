@@ -383,6 +383,74 @@
         }
       }
     },
+    "Buys.Info.Description" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To add items to your Buys list, open a circle's detail screen, tap 'Edit' in the 'Buys' section, and add your items.\nIf you add a catalog to 'Attachments', you can also crop product images directly from the catalog."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "宝物リストに商品を追加するには、サークルの詳細画面を開き、「宝物」セクションの「編集」押下し、商品を追加してください。\n「添付ファイル」にお品書きを追加すると、商品の画像をお品書きから切り取ることもできます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "보물 목록에 상품을 추가하려면 서클 상세 화면을 열고 '보물' 섹션의 '편집'을 눌러 상품을 추가하세요.\n'첨부 파일'에 카탈로그를 추가하면 카탈로그에서 상품 이미지를 잘라낼 수도 있습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要将商品添加到宝贝清单，请打开社团详情页面，点击「宝贝」栏目中的「编辑」，然后添加商品。\n在「附件」中添加目录后，还可以从目录中裁切商品图片。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "若要將商品加入寶藏清單，請開啟社團詳情頁面，點選「寶藏」區塊中的「編輯」並新增商品。\n在「附件」中新增目錄後，也可以從目錄中裁切商品圖片。"
+          }
+        }
+      }
+    },
+    "Buys.Info.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "How to Manage Your Buys"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "宝物リストの管理方法"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "보물 목록 관리 방법"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "宝贝清单管理方法"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "寶藏清單管理方法"
+          }
+        }
+      }
+    },
     "Buys.ItemCost.Placeholder" : {
       "localizations" : {
         "en" : {
@@ -421,31 +489,31 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Item name"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "アイテム名"
+            "value" : "商品名"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "아이템 이름"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "物品名称"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "物品名稱"
           }
         }
@@ -557,31 +625,31 @@
       "localizations" : {
         "en" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Add items you want to buy from circle detail views."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サークル詳細から購入予定のアイテムを追加してください。"
+            "value" : "サークル詳細から購入予定の商品を追加できます。"
           }
         },
         "ko" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "서클 상세 페이지에서 구매할 아이템을 추가하세요."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "请在社团详情中添加想要购买的物品。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "請在社團詳情中新增想要購買的物品。"
           }
         }
