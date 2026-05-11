@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.TableRestaurant
 import androidx.compose.material.icons.outlined.TheaterComedy
 import androidx.compose.material.icons.outlined.Web
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -51,288 +52,290 @@ fun UnifiedMoreMenu(
     var eventSubmenuExpanded by remember { mutableStateOf(false) }
     val showGenreOverlay by selections.showGenreOverlay.collectAsState()
 
-    IconButton(
-        onClick = { expanded = true },
-    ) {
-        Icon(
-            imageVector = Icons.Default.MoreVert,
-            contentDescription = stringResource(R.string.more)
-        )
-    }
-    DropdownMenu(
-        expanded = expanded,
-        onDismissRequest = { expanded = false }
-    ) {
-        // Event Picker (submenu)
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.select_event)) },
-            onClick = { eventSubmenuExpanded = true },
-            trailingIcon = {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowRight,
-                    contentDescription = null
-                )
-            }
-        )
-
-        HorizontalDivider()
-
-        // Genre overlay toggle
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.show_genre_overlay)) },
-            onClick = { selections.setShowGenreOverlay(!showGenreOverlay) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.TheaterComedy,
-                    contentDescription = null
-                )
-            },
-            trailingIcon = {
-                Switch(
-                    checked = showGenreOverlay,
-                    onCheckedChange = { selections.setShowGenreOverlay(it) }
-                )
-            }
-        )
-
-        // Darken map in dark mode toggle
-        val darkenMapInDarkMode by selections.darkenMapInDarkMode.collectAsState()
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.darken_map_in_dark_mode)) },
-            onClick = { selections.setDarkenMapInDarkMode(!darkenMapInDarkMode) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.DarkMode,
-                    contentDescription = null
-                )
-            },
-            trailingIcon = {
-                Switch(
-                    checked = darkenMapInDarkMode,
-                    onCheckedChange = { selections.setDarkenMapInDarkMode(it) }
-                )
-            }
-        )
-
-        // High resolution maps toggle
-        val useHighResolutionMaps by selections.useHighResolutionMaps.collectAsState()
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.use_high_resolution_maps)) },
-            onClick = { selections.setUseHighResolutionMaps(!useHighResolutionMaps) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Hd,
-                    contentDescription = null
-                )
-            },
-            trailingIcon = {
-                Switch(
-                    checked = useHighResolutionMaps,
-                    onCheckedChange = { selections.setUseHighResolutionMaps(it) }
-                )
-            }
-        )
-
-        HorizontalDivider()
-
-        // Show Web Cuts toggle
-        val showWebCuts by selections.showWebCuts.collectAsState()
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.show_web_cuts)) },
-            onClick = { selections.setShowWebCuts(!showWebCuts) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Web,
-                    contentDescription = null
-                )
-            },
-            trailingIcon = {
-                Switch(
-                    checked = showWebCuts,
-                    onCheckedChange = { selections.setShowWebCuts(it) }
-                )
-            }
-        )
-        // Show Space Name toggle
-        val showSpaceName by selections.showSpaceName.collectAsState()
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.show_space_name)) },
-            onClick = { selections.setShowSpaceName(!showSpaceName) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.TableRestaurant,
-                    contentDescription = null
-                )
-            },
-            trailingIcon = {
-                Switch(
-                    checked = showSpaceName,
-                    onCheckedChange = { selections.setShowSpaceName(it) }
-                )
-            }
-        )
-        // Show Day toggle
-        val showDay by selections.showDay.collectAsState()
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.show_day)) },
-            onClick = { selections.setShowDay(!showDay) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.CalendarMonth,
-                    contentDescription = null
-                )
-            },
-            trailingIcon = {
-                Switch(
-                    checked = showDay,
-                    onCheckedChange = { selections.setShowDay(it) }
-                )
-            }
-        )
-
-        HorizontalDivider()
-
-        // Links
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.link_web_catalog)) },
-            onClick = {
-                expanded = false
-                val colorSchemeParams = CustomTabColorSchemeParams.Builder()
-                    .setToolbarColor(primaryColor)
-                    .build()
-                val customTabsIntent = CustomTabsIntent.Builder()
-                    .setDefaultColorSchemeParams(colorSchemeParams)
-                    .build()
-                customTabsIntent.launchUrl(context, "https://webcatalog.circle.ms".toUri())
-            },
-        )
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.link_official_site)) },
-            onClick = {
-                expanded = false
-                val colorSchemeParams = CustomTabColorSchemeParams.Builder()
-                    .setToolbarColor(primaryColor)
-                    .build()
-                val customTabsIntent = CustomTabsIntent.Builder()
-                    .setDefaultColorSchemeParams(colorSchemeParams)
-                    .build()
-                customTabsIntent.launchUrl(context, "https://comiket.co.jp".toUri())
-            }
-        )
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.link_floor_map)) },
-            onClick = {
-                expanded = false
-                val colorSchemeParams = CustomTabColorSchemeParams.Builder()
-                    .setToolbarColor(primaryColor)
-                    .build()
-                val customTabsIntent = CustomTabsIntent.Builder()
-                    .setDefaultColorSchemeParams(colorSchemeParams)
-                    .build()
-                customTabsIntent.launchUrl(
-                    context,
-                    "https://www.bigsight.jp/visitor/floormap/".toUri()
-                )
-            }
-        )
-
-        HorizontalDivider()
-
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.link_source_code)) },
-            onClick = {
-                expanded = false
-                val colorSchemeParams = CustomTabColorSchemeParams.Builder()
-                    .setToolbarColor(primaryColor)
-                    .build()
-                val customTabsIntent = CustomTabsIntent.Builder()
-                    .setDefaultColorSchemeParams(colorSchemeParams)
-                    .build()
-                customTabsIntent.launchUrl(context, "https://github.com/katagaki/CirclesGo".toUri())
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Code,
-                    contentDescription = null
-                )
-            },
-        )
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.link_ios_app)) },
-            onClick = {
-                expanded = false
-                val colorSchemeParams = CustomTabColorSchemeParams.Builder()
-                    .setToolbarColor(primaryColor)
-                    .build()
-                val customTabsIntent = CustomTabsIntent.Builder()
-                    .setDefaultColorSchemeParams(colorSchemeParams)
-                    .build()
-                customTabsIntent.launchUrl(
-                    context,
-                    "https://apps.apple.com/app/id6504527248".toUri()
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.PhoneIphone,
-                    contentDescription = null
-                )
-            },
-        )
-
-        HorizontalDivider()
-
-        // Privacy Mode toggle
-        val isPrivacyMode by selections.isPrivacyMode.collectAsState()
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.privacy_mode)) },
-            onClick = { selections.setIsPrivacyMode(!isPrivacyMode) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.VisibilityOff,
-                    contentDescription = null
-                )
-            },
-            trailingIcon = {
-                Switch(
-                    checked = isPrivacyMode,
-                    onCheckedChange = { selections.setIsPrivacyMode(it) }
-                )
-            }
-        )
-
-        // Sign out button
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.sign_out)) },
-            onClick = {
-                expanded = false
-                unifier.setIsGoingToSignOut(true)
-            },
-        )
-    }
-
-    // Event selection submenu
-    DropdownMenu(
-        expanded = eventSubmenuExpanded,
-        onDismissRequest = { eventSubmenuExpanded = false }
-    ) {
-        events.eventData?.list?.sortedByDescending { it.number }?.forEach { event ->
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.comic_market_format, event.number)) },
-                onClick = {
-                    eventSubmenuExpanded = false
-                    expanded = false
-                    events.setActiveEvent(event.number)
-                },
-                leadingIcon = if (event.number == events.activeEventNumber) {
-                    {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Selected"
-                        )
-                    }
-                } else null
+    Box {
+        IconButton(
+            onClick = { expanded = true },
+        ) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.more)
             )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            // Event Picker (submenu)
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.select_event)) },
+                onClick = { eventSubmenuExpanded = true },
+                trailingIcon = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowRight,
+                        contentDescription = null
+                    )
+                }
+            )
+
+            HorizontalDivider()
+
+            // Genre overlay toggle
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_genre_overlay)) },
+                onClick = { selections.setShowGenreOverlay(!showGenreOverlay) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.TheaterComedy,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = showGenreOverlay,
+                        onCheckedChange = { selections.setShowGenreOverlay(it) }
+                    )
+                }
+            )
+
+            // Darken map in dark mode toggle
+            val darkenMapInDarkMode by selections.darkenMapInDarkMode.collectAsState()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.darken_map_in_dark_mode)) },
+                onClick = { selections.setDarkenMapInDarkMode(!darkenMapInDarkMode) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.DarkMode,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = darkenMapInDarkMode,
+                        onCheckedChange = { selections.setDarkenMapInDarkMode(it) }
+                    )
+                }
+            )
+
+            // High resolution maps toggle
+            val useHighResolutionMaps by selections.useHighResolutionMaps.collectAsState()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.use_high_resolution_maps)) },
+                onClick = { selections.setUseHighResolutionMaps(!useHighResolutionMaps) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Hd,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = useHighResolutionMaps,
+                        onCheckedChange = { selections.setUseHighResolutionMaps(it) }
+                    )
+                }
+            )
+
+            HorizontalDivider()
+
+            // Show Web Cuts toggle
+            val showWebCuts by selections.showWebCuts.collectAsState()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_web_cuts)) },
+                onClick = { selections.setShowWebCuts(!showWebCuts) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Web,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = showWebCuts,
+                        onCheckedChange = { selections.setShowWebCuts(it) }
+                    )
+                }
+            )
+            // Show Space Name toggle
+            val showSpaceName by selections.showSpaceName.collectAsState()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_space_name)) },
+                onClick = { selections.setShowSpaceName(!showSpaceName) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.TableRestaurant,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = showSpaceName,
+                        onCheckedChange = { selections.setShowSpaceName(it) }
+                    )
+                }
+            )
+            // Show Day toggle
+            val showDay by selections.showDay.collectAsState()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_day)) },
+                onClick = { selections.setShowDay(!showDay) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.CalendarMonth,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = showDay,
+                        onCheckedChange = { selections.setShowDay(it) }
+                    )
+                }
+            )
+
+            HorizontalDivider()
+
+            // Links
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.link_web_catalog)) },
+                onClick = {
+                    expanded = false
+                    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(primaryColor)
+                        .build()
+                    val customTabsIntent = CustomTabsIntent.Builder()
+                        .setDefaultColorSchemeParams(colorSchemeParams)
+                        .build()
+                    customTabsIntent.launchUrl(context, "https://webcatalog.circle.ms".toUri())
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.link_official_site)) },
+                onClick = {
+                    expanded = false
+                    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(primaryColor)
+                        .build()
+                    val customTabsIntent = CustomTabsIntent.Builder()
+                        .setDefaultColorSchemeParams(colorSchemeParams)
+                        .build()
+                    customTabsIntent.launchUrl(context, "https://comiket.co.jp".toUri())
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.link_floor_map)) },
+                onClick = {
+                    expanded = false
+                    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(primaryColor)
+                        .build()
+                    val customTabsIntent = CustomTabsIntent.Builder()
+                        .setDefaultColorSchemeParams(colorSchemeParams)
+                        .build()
+                    customTabsIntent.launchUrl(
+                        context,
+                        "https://www.bigsight.jp/visitor/floormap/".toUri()
+                    )
+                }
+            )
+
+            HorizontalDivider()
+
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.link_source_code)) },
+                onClick = {
+                    expanded = false
+                    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(primaryColor)
+                        .build()
+                    val customTabsIntent = CustomTabsIntent.Builder()
+                        .setDefaultColorSchemeParams(colorSchemeParams)
+                        .build()
+                    customTabsIntent.launchUrl(context, "https://github.com/katagaki/CirclesGo".toUri())
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Code,
+                        contentDescription = null
+                    )
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.link_ios_app)) },
+                onClick = {
+                    expanded = false
+                    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(primaryColor)
+                        .build()
+                    val customTabsIntent = CustomTabsIntent.Builder()
+                        .setDefaultColorSchemeParams(colorSchemeParams)
+                        .build()
+                    customTabsIntent.launchUrl(
+                        context,
+                        "https://apps.apple.com/app/id6504527248".toUri()
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.PhoneIphone,
+                        contentDescription = null
+                    )
+                },
+            )
+
+            HorizontalDivider()
+
+            // Privacy Mode toggle
+            val isPrivacyMode by selections.isPrivacyMode.collectAsState()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.privacy_mode)) },
+                onClick = { selections.setIsPrivacyMode(!isPrivacyMode) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.VisibilityOff,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = isPrivacyMode,
+                        onCheckedChange = { selections.setIsPrivacyMode(it) }
+                    )
+                }
+            )
+
+            // Sign out button
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.sign_out)) },
+                onClick = {
+                    expanded = false
+                    unifier.setIsGoingToSignOut(true)
+                },
+            )
+        }
+
+        // Event selection submenu
+        DropdownMenu(
+            expanded = eventSubmenuExpanded,
+            onDismissRequest = { eventSubmenuExpanded = false }
+        ) {
+            events.eventData?.list?.sortedByDescending { it.number }?.forEach { event ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.comic_market_format, event.number)) },
+                    onClick = {
+                        eventSubmenuExpanded = false
+                        expanded = false
+                        events.setActiveEvent(event.number)
+                    },
+                    leadingIcon = if (event.number == events.activeEventNumber) {
+                        {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Selected"
+                            )
+                        }
+                    } else null
+                )
+            }
         }
     }
 }

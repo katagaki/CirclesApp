@@ -22,13 +22,13 @@ fun loadProperties(filename: String): Map<String, String> {
 
 android {
     namespace = "com.tsubuzaki.circlesgo"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.tsubuzaki.circlesgo"
         minSdk = 26
-        targetSdk = 36
-        versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 3
+        targetSdk = 37
+        versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 5
         versionName = "1.0"
     }
 
@@ -45,8 +45,8 @@ android {
     buildTypes {
         debug {
             isDebuggable = true
-            buildConfigField("String", "CIRCLEMS_AUTH_ENDPOINT", "\"https://auth1-sandbox.circle.ms\"")
-            buildConfigField("String", "CIRCLEMS_API_ENDPOINT", "\"https://api1-sandbox.circle.ms\"")
+            buildConfigField("String", "CIRCLEMS_AUTH_ENDPOINT", "\"https://auth1.circle.ms\"")
+            buildConfigField("String", "CIRCLEMS_API_ENDPOINT", "\"https://api1.circle.ms\"")
         }
         release {
             isDebuggable = false
