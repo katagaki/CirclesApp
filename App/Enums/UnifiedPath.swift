@@ -55,6 +55,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
 
     @MainActor
     @ViewBuilder
+    // swiftlint:disable:next cyclomatic_complexity
     func view() -> some View {
         switch self {
         case .map: MapView()

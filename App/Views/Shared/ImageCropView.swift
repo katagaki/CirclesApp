@@ -93,8 +93,14 @@ struct ImageCropView: View {
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Shared.Done") {
-                        cropImage()
+                    if #available(iOS 26, *) {
+                        Button(role: .confirm) {
+                            cropImage()
+                        }
+                    } else {
+                        Button("Shared.Done") {
+                            cropImage()
+                        }
                     }
                 }
             }

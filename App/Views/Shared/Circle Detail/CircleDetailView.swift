@@ -40,10 +40,11 @@ struct CircleDetailView: View {
     @State var isFirstCircleAlertShowing: Bool = false
     @State var isLastCircleAlertShowing: Bool = false
 
-    // Buys image selection (hoisted to avoid nested sheet dismissal)
+    // Buys image selection/viewing (hoisted to avoid nested sheet dismissal)
     @State var buysAttachmentPickerCircle: ComiketCircle?
     @State var buysCropImage: UIImage?
     @State var buysCropItemID: String?
+    @State var buysViewerImage: UIImage?
 
     @AppStorage(wrappedValue: "", "Circles.Detail.SectionOrder") var sectionOrderStorage: String
     @AppStorage(wrappedValue: "", "Circles.Detail.HiddenSections") var hiddenSectionsStorage: String
@@ -123,6 +124,12 @@ struct CircleDetailView: View {
                     buysCropItemID = nil
                 }
             )
+        }
+        .fullScreenCover(item: Binding(
+            get: { buysViewerImage.map { BuyImageViewerItem(image: $0) } },
+            set: { if $0 == nil { buysViewerImage = nil } }
+        )) { item in
+            BuyImageViewer(image: item.image)
         }
         .opacity(unifier.isMinimized ? 0.0 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: unifier.selectedDetent)
@@ -236,7 +243,8 @@ struct CircleDetailView: View {
                 circle: circle,
                 buysAttachmentPickerCircle: $buysAttachmentPickerCircle,
                 buysCropImage: $buysCropImage,
-                buysCropItemID: $buysCropItemID
+                buysCropItemID: $buysCropItemID,
+                buysViewerImage: $buysViewerImage
             )
         }
     }

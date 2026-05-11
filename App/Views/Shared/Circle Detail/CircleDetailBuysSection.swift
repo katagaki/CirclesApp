@@ -20,8 +20,7 @@ struct CircleDetailBuysSection: View {
     @Binding var buysAttachmentPickerCircle: ComiketCircle?
     @Binding var buysCropImage: UIImage?
     @Binding var buysCropItemID: String?
-
-    @State private var viewerImage: UIImage?
+    @Binding var buysViewerImage: UIImage?
 
     var body: some View {
         Section {
@@ -76,12 +75,6 @@ struct CircleDetailBuysSection: View {
                 reloadEntry()
             }
         }
-        .fullScreenCover(item: Binding(
-            get: { viewerImage.map { BuyImageViewerItem(image: $0) } },
-            set: { if $0 == nil { viewerImage = nil } }
-        )) { item in
-            BuyImageViewer(image: item.image)
-        }
     }
 
     @ViewBuilder
@@ -108,7 +101,7 @@ struct CircleDetailBuysSection: View {
                 }
                 .onTapGesture {
                     if let imageData = item.imageData, let image = UIImage(data: imageData) {
-                        viewerImage = image
+                        buysViewerImage = image
                     }
                 }
             Button {
