@@ -64,6 +64,7 @@
     <string name="use_high_resolution_maps">高解像度マップを使用</string>
     <string name="show_space_name">スペース番号を表示</string>
     <string name="show_day">開催日を表示</string>
+    <string name="show_web_cuts">ウェブ版画像を表示</string>
     <string name="link_web_catalog">コミケWebカタログ</string>
     <string name="link_official_site">コミックマーケット公式サイト</string>
     <string name="link_floor_map">東京ビッグサイト フロアマップ</string>
