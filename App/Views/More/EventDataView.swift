@@ -58,36 +58,33 @@ struct EventDataView: View {
                 }
             }
 
-            if let inactiveDownloadedEvents, !inactiveDownloadedEvents.isEmpty {
+            if hasOtherEvents {
                 Section {
-                    ForEach(inactiveDownloadedEvents) { downloaded in
-                        DownloadedEventRow(
-                            info: downloaded,
-                            onTap: { pendingSwitchEvent = downloaded }
-                        )
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button("Shared.Delete", role: .destructive) {
-                                deleteDownloadedEvent(downloaded)
+                    if let inactiveDownloadedEvents {
+                        ForEach(inactiveDownloadedEvents) { downloaded in
+                            DownloadedEventRow(
+                                info: downloaded,
+                                onTap: { pendingSwitchEvent = downloaded }
+                            )
+                            .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                Button("Shared.Delete", role: .destructive) {
+                                    deleteDownloadedEvent(downloaded)
+                                }
                             }
                         }
                     }
-                } header: {
-                    Text("More.DBAdmin.DownloadedData")
-                }
-            }
-
-            if let downloadableEvents, !downloadableEvents.isEmpty {
-                Section {
-                    ForEach(downloadableEvents, id: \.id) { event in
-                        DownloadableEventRow(
-                            event: event,
-                            progress: activeDownloads[event.number] ?? nil,
-                            isDownloading: activeDownloads.keys.contains(event.number),
-                            onTap: { Task { await downloadEvent(event) } }
-                        )
+                    if let downloadableEvents, !downloadableEvents.isEmpty {
+                        ForEach(downloadableEvents, id: \.id) { event in
+                            DownloadableEventRow(
+                                event: event,
+                                progress: activeDownloads[event.number] ?? nil,
+                                isDownloading: activeDownloads.keys.contains(event.number),
+                                onTap: { Task { await downloadEvent(event) } }
+                            )
+                        }
                     }
                 } header: {
-                    Text("More.DownloadEventData")
+                    Text("More.OtherEvents")
                 } footer: {
                     Text("More.ProvidedBy")
                 }
@@ -131,6 +128,10 @@ struct EventDataView: View {
         return list
             .filter { !downloadedNumbers.contains($0.number) }
             .sorted(by: { $0.number > $1.number })
+    }
+
+    private var hasOtherEvents: Bool {
+        (inactiveDownloadedEvents?.isEmpty == false) || (downloadableEvents?.isEmpty == false)
     }
 
     private func refresh() async {
