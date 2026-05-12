@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import RADiUS
 
 private let navigateMapsJPURL = "maps://?saddr=現在地&daddr=東京ビッグサイト"
 private let navigateGoogleMapsJPURL = "comgooglemaps://?saddr=現在地&daddr=東京ビッグサイト"
@@ -19,15 +18,12 @@ private let bigSightMapJPURL = "https://www.bigsight.jp/visitor/floormap/"
 private let webCatalogENURL = "https://int.webcatalog.circle.ms/en/catalog"
 private let bigSightMapENURL = "https://www.bigsight.jp/english/visitor/floormap/"
 private let deleteAccountURL = "https://auth2.circle.ms/Account/WithDraw1"
+private let sourceCodeURL = "https://github.com/katagaki/CirclesApp"
 
 struct UnifiedMoreMenu: View {
 
     @Environment(\.openURL) var openURL
-    @Environment(Authenticator.self) var authenticator
-    @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
-
-    @State var activeEventNumber: Int = -1
 
     // Map Settings
 
@@ -48,30 +44,9 @@ struct UnifiedMoreMenu: View {
     var body: some View {
         Menu("Tab.More", systemImage: "ellipsis") {
             Section {
-                Button("More.UpdateData", systemImage: "arrow.triangle.2.circlepath") {
-                    unifier.shouldUpdateData = true
-                }
-                .disabled(authenticator.onlineState == .offline ||
-                          authenticator.onlineState == .undetermined ||
-                          planner.activeEvent == nil)
-            }
-            Section {
-                if authenticator.onlineState == .offline {
-                    Text("My.Events.OfflineMode")
-                } else {
-                    if let eventData = planner.eventData {
-                        Picker(selection: $activeEventNumber) {
-                            ForEach(eventData.list.sorted(by: {$0.number > $1.number}), id: \.id) { event in
-                                Text("Shared.Event.\(event.number)")
-                                    .tag(event.number)
-                            }
-                        } label: {
-                            Text("My.Events.SelectEvent")
-                        }
-                        .pickerStyle(.menu)
-                        .disabled(authenticator.onlineState == .offline ||
-                                  authenticator.onlineState == .undetermined)
-                    }
+                Button("ViewTitle.More.DBAdmin", systemImage: "externaldrive") {
+                    unifier.hide()
+                    unifier.stackPath.append(.moreEventData)
                 }
             }
 
@@ -166,22 +141,17 @@ struct UnifiedMoreMenu: View {
             Section {
                 Toggle("More.PrivacyMode.On", systemImage: "eye.slash",
                        isOn: $isPrivacyModeOn)
-                Button("More.More", systemImage: "ellipsis") {
+                Button("More.GitHub", systemImage: "chevron.left.forwardslash.chevron.right") {
+                    openURL(URL(string: sourceCodeURL)!)
+                }
+                Button("More.Attributions") {
                     unifier.hide()
-                    unifier.stackPath.append(.more)
+                    unifier.stackPath.append(.moreAttributions)
                 }
             } header: {
                 Text("More.More")
             }
         }
         .menuActionDismissBehavior(.disabled)
-        .task {
-            activeEventNumber = planner.activeEventNumber
-        }
-        .onChange(of: activeEventNumber) { oldValue, _ in
-            if oldValue != -1 {
-                planner.activeEventNumber = activeEventNumber
-            }
-        }
     }
 }

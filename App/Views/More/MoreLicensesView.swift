@@ -185,4 +185,3 @@ SOFTWARE.
 """)
     ]
 }
-// swiftlint:enable type_body_length
