@@ -62,28 +62,52 @@ struct LoginView: View {
             }
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
-            VStack {
+            VStack(spacing: 12.0) {
+                if let message = authenticator.authBroadcastMessage, !message.isEmpty {
+                    Text(message)
+                        .font(.caption)
+                        .fontWeight(.bold)
+                        .foregroundStyle(.red)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity)
+                }
                 Button {
-                    #if !targetEnvironment(macCatalyst) && !os(visionOS)
-                    authenticator.isWaitingForAuthenticationCode = true
-                    #else
-                    openURL(authenticator.authURL)
-                    #endif
+                    if authenticator.canLogin {
+                        #if !targetEnvironment(macCatalyst) && !os(visionOS)
+                        authenticator.isWaitingForAuthenticationCode = true
+                        #else
+                        if let authURL = authenticator.authURL {
+                            openURL(authURL)
+                        }
+                        #endif
+                    } else {
+                        Task {
+                            await authenticator.refreshBroadcastMessage()
+                            await authenticator.refreshClientConfigIfNeeded()
+                        }
+                    }
                 } label: {
-                    Text("Shared.Login")
+                    Text(authenticator.canLogin ? "Shared.Login" : "Shared.Retry")
                         .fontWeight(.bold)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 6.0)
                 }
                 .clipShape(.capsule)
+                .tint(.accent)
                 .buttonStyleGlassProminentIfSupported()
             }
             .padding()
         }
+        .task {
+            await authenticator.refreshBroadcastMessage()
+            await authenticator.refreshClientConfigIfNeeded()
+        }
         #if !os(visionOS)
         .sheet(isPresented: $authenticator.isWaitingForAuthenticationCode) {
-            SafariView(url: authenticator.authURL)
-                .ignoresSafeArea()
+            if let authURL = authenticator.authURL {
+                SafariView(url: authURL)
+                    .ignoresSafeArea()
+            }
         }
         #endif
     }

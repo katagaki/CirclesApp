@@ -5,6 +5,7 @@
 //  Created by シン・ジャスティン on 2024/07/09.
 //
 
+import CloudKit
 import Foundation
 import KeychainAccess
 import Reachability
@@ -16,7 +17,10 @@ class Authenticator {
 
     @ObservationIgnored let keychain = Keychain(service: "com.tsubuzaki.CiRCLES")
     @ObservationIgnored let keychainAuthTokenKey: String = "CircleMsAuthToken"
+    @ObservationIgnored let keychainClientKey: String = "OpenIDClientConfig"
     @ObservationIgnored let tokenExpiryDateKey: String = "Auth.TokenExpiryDate"
+    @ObservationIgnored let remoteConfigFetchDateKey: String = "RemoteConfig.LastFetchDate"
+    @ObservationIgnored let remoteConfigFetchInterval: TimeInterval = 604800
     @ObservationIgnored let reachability = try? Reachability()
 
     var isAuthenticating: Bool = false
@@ -28,9 +32,18 @@ class Authenticator {
     var token: OpenIDToken?
     var tokenExpiryDate: Date = .distantFuture
 
-    @ObservationIgnored let client: OpenIDClient
+    var authBroadcastMessage: String?
+    var isLoginAvailable: Bool = true
+    var isAuthEnabled: Bool = true
 
-    var authURL: URL {
+    @ObservationIgnored var client: OpenIDClient?
+
+    var canLogin: Bool {
+        isAuthEnabled && isLoginAvailable && client != nil
+    }
+
+    var authURL: URL? {
+        guard let client else { return nil }
         let baseURL = circleMsAuthEndpoint.appending(path: "OAuth2")
         let responseType = "code"
         let clientID = client.id
@@ -47,19 +60,80 @@ class Authenticator {
             URLQueryItem(name: "scope", value: scope)
         ]
 
-        return (components?.url)!
+        return components?.url
     }
 
     init() {
-        // Read OpenID information from OpenID.plist
-        let url = Bundle.main.url(forResource: "OpenID", withExtension: "plist")!
-        do {
-            let data = try Data(contentsOf: url)
-            let result = try PropertyListDecoder().decode(OpenIDClient.self, from: data)
-            self.client = result
-        } catch {
-            fatalError("OpenID client initialization failed. Did you set up your OpenID.plist file yet?")
+        self.client = nil
+        self.client = restoreClientFromKeychain()
+    }
+
+    func refreshBroadcastMessage() async {
+        let provider = RemoteConfigProvider()
+
+        guard await provider.accountStatus() == .available else {
+            let isJapanese = Locale.current.language.languageCode?.identifier == "ja"
+            self.authBroadcastMessage = isJapanese
+                ? "ログインするには、iCloudにサインインしてください。"
+                : "Please sign in to iCloud to continue."
+            return
         }
+
+        switch await provider.fetchBroadcastMessage() {
+        case .found(let message, let authEnabled):
+            self.authBroadcastMessage = message
+            self.isLoginAvailable = true
+            self.isAuthEnabled = authEnabled
+        case .notFound:
+            let isJapanese = Locale.current.language.languageCode?.identifier == "ja"
+            self.authBroadcastMessage = isJapanese
+                ? "現在ログインはご利用いただけません。しばらくしてからもう一度お試しください。"
+                : "Login is currently unavailable. Please try again later."
+            self.isLoginAvailable = false
+        case .failed:
+            break
+        }
+    }
+
+    func refreshClientConfigIfNeeded() async {
+        if client != nil,
+           let lastFetch = UserDefaults.standard.object(forKey: remoteConfigFetchDateKey) as? Date,
+           lastFetch.addingTimeInterval(remoteConfigFetchInterval) > .now {
+            return
+        }
+
+        let provider = RemoteConfigProvider()
+        guard await provider.accountStatus() == .available else { return }
+
+        do {
+            let config = try await provider.fetch()
+            if let id = config.clientID,
+               let secret = config.clientSecret,
+               let redirectURL = config.redirectURL {
+                let client = OpenIDClient(id: id, secret: secret, redirectURL: redirectURL)
+                self.client = client
+                cacheClientToKeychain(client)
+            }
+            UserDefaults.standard.set(Date.now, forKey: remoteConfigFetchDateKey)
+        } catch {
+            debugPrint("Remote config fetch failed: \(error.localizedDescription)")
+        }
+    }
+
+    private func cacheClientToKeychain(_ client: OpenIDClient) {
+        if let data = try? JSONEncoder().encode(client),
+           let string = String(data: data, encoding: .utf8) {
+            try? keychain.set(string, key: keychainClientKey)
+        }
+    }
+
+    private func restoreClientFromKeychain() -> OpenIDClient? {
+        if let string = try? keychain.get(keychainClientKey),
+           let data = string.data(using: .utf8),
+           let client = try? JSONDecoder().decode(OpenIDClient.self, from: data) {
+            return client
+        }
+        return nil
     }
 
     func setupReachability() {
@@ -211,8 +285,8 @@ class Authenticator {
         let endpoint = URL(string: "\(circleMsAuthEndpoint)/OAuth2/Token")!
 
         var parameters: [String: String] = parameters
-        parameters["client_id"] = client.id
-        parameters["client_secret"] = client.secret
+        parameters["client_id"] = client?.id
+        parameters["client_secret"] = client?.secret
 
         var request = URLRequest(url: endpoint, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 2.0)
         request.httpMethod = "POST"
