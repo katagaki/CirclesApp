@@ -127,7 +127,7 @@ fun CircleList(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "No circles found.\nTry adjusting filters.",
+                    text = stringResource(R.string.no_circles_found_filters),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(16.dp)

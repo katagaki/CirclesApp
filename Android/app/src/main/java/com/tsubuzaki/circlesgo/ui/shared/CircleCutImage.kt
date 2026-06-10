@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -52,60 +54,51 @@ fun CircleCutImage(
     val onlineState by authenticator.onlineState.collectAsState()
     val authToken by authenticator.token.collectAsState()
 
-    val catalogBitmap = remember(circle.id) {
-        database.cachedCircleImage(circle.id)?.asImageBitmap()
-    }
-
     // Load catalog image from database (always needed as fallback)
-    val catalogImageBitmap by produceState(
-        initialValue = catalogBitmap,
-        key1 = circle.id
-    ) {
-        if (value == null) {
-            value = withContext(Dispatchers.IO) {
+    // State must be keyed on circle.id so a reused composable slot
+    // doesn't keep showing the previous circle's cut
+    var catalogImageBitmap by remember(circle.id) {
+        mutableStateOf(database.cachedCircleImage(circle.id)?.asImageBitmap())
+    }
+    LaunchedEffect(circle.id) {
+        if (catalogImageBitmap == null) {
+            catalogImageBitmap = withContext(Dispatchers.IO) {
                 database.circleImage(circle.id)?.asImageBitmap()
             }
         }
     }
 
     // Load web cut image from API cache / network
-    val webCutBitmap = remember(circle.id) {
-        webCutImageCache.getCached(circle.id)?.asImageBitmap()
+    var webCutImageBitmap by remember(circle.id) {
+        mutableStateOf(webCutImageCache.getCached(circle.id)?.asImageBitmap())
     }
-    val webCutImageBitmap by produceState(
-        initialValue = webCutBitmap,
-        key1 = circle.id,
-        key2 = showWebCuts
-    ) {
-        if (!showWebCuts) {
-            value = null
-            return@produceState
-        }
-        if (value != null) return@produceState
+    LaunchedEffect(circle.id, showWebCuts) {
+        if (!showWebCuts) return@LaunchedEffect
+        if (webCutImageBitmap != null) return@LaunchedEffect
 
         // Try disk cache first
         val cached = withContext(Dispatchers.IO) {
             webCutImageCache.getCached(circle.id)?.asImageBitmap()
         }
         if (cached != null) {
-            value = cached
-            return@produceState
+            webCutImageBitmap = cached
+            return@LaunchedEffect
         }
 
         // Already fetched but no image available
-        if (webCutImageCache.isFetched(circle.id)) return@produceState
+        if (webCutImageCache.isFetched(circle.id)) return@LaunchedEffect
 
         // Fetch from API if online
-        if (onlineState != OnlineState.ONLINE) return@produceState
-        val token = authToken ?: return@produceState
-        val webCatalogID = circle.extendedInformation?.webCatalogID ?: return@produceState
+        if (onlineState != OnlineState.ONLINE) return@LaunchedEffect
+        val token = authToken ?: return@LaunchedEffect
+        val webCatalogID = circle.extendedInformation?.webCatalogID ?: return@LaunchedEffect
 
         val circleResponse = WebCatalogAPI.circle(webCatalogID, token)
         val cutWebURL = circleResponse?.response?.circle?.cutWebURL
         if (cutWebURL != null && cutWebURL.isNotEmpty()) {
             val bitmap = webCutImageCache.download(circle.id, cutWebURL)
             if (bitmap != null) {
-                value = bitmap.asImageBitmap()
+                webCutImageBitmap = bitmap.asImageBitmap()
             }
         }
     }

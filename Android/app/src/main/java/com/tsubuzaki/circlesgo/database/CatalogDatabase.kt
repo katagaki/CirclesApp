@@ -155,6 +155,9 @@ class CatalogDatabase(private val context: Context) {
         Log.d(TAG, "Resetting...")
         textDatabaseFile = null
         imageDatabaseFile = null
+        // Database information is event-specific; keeping it around would make
+        // the downloader reuse the previous event's download URLs
+        databaseInformation = null
         disconnect()
         imageCache.evictAll()
         commonImages.clear()
@@ -173,9 +176,13 @@ class CatalogDatabase(private val context: Context) {
     }
 
     fun isDownloaded(event: WebCatalogEvent.Response.Event): Boolean {
+        return isDownloaded(event.number)
+    }
+
+    fun isDownloaded(eventNumber: Int): Boolean {
         val dir = dataStoreDir
-        val textFile = File(dir, "webcatalog${event.number}.db")
-        val imageFile = File(dir, "webcatalog${event.number}Image1.db")
+        val textFile = File(dir, "webcatalog${eventNumber}.db")
+        val imageFile = File(dir, "webcatalog${eventNumber}Image1.db")
         return textFile.exists() && imageFile.exists()
     }
 
@@ -185,6 +192,26 @@ class CatalogDatabase(private val context: Context) {
             DatabaseType.IMAGES -> "Image1"
         }
         return "webcatalog${event.number}${suffix}.db"
+    }
+
+    /**
+     * Returns the on-disk size of each downloaded event's databases,
+     * keyed by event number.
+     */
+    fun downloadedEventSizes(): Map<Int, Long> {
+        val perEvent = mutableMapOf<Int, Long>()
+        dataStoreDir.listFiles()?.forEach { file ->
+            if (!file.isFile) return@forEach
+            val name = file.name
+            if (!name.startsWith("webcatalog") || !name.endsWith(".db")) return@forEach
+            val eventNumber = name
+                .removePrefix("webcatalog")
+                .removeSuffix("Image1.db")
+                .removeSuffix(".db")
+                .toIntOrNull() ?: return@forEach
+            perEvent[eventNumber] = (perEvent[eventNumber] ?: 0L) + file.length()
+        }
+        return perEvent
     }
 
     // MARK: Loading

@@ -70,7 +70,8 @@ class MainActivity : ComponentActivity() {
             favorites = favorites,
             unifier = unifier,
             oasis = oasis,
-            favoritesAPI = favoritesAPI
+            favoritesAPI = favoritesAPI,
+            catalogCache = catalogCache
         )
 
         handleDeepLink(intent)

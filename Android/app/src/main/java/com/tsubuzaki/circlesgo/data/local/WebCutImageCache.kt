@@ -90,6 +90,10 @@ class WebCutImageCache(context: Context) {
         }
     }
 
+    fun diskUsageBytes(): Long {
+        return cacheDir.listFiles()?.sumOf { it.length() } ?: 0L
+    }
+
     fun clear() {
         memoryCache.evictAll()
         cacheDir.listFiles()?.forEach { it.delete() }

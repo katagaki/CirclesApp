@@ -107,10 +107,18 @@ fun UnifiedView(
 
     // Open bottom sheet to standard size when circle detail is pushed (e.g. from map popover)
     LaunchedEffect(sheetPath) {
-        if (sheetPath.lastOrNull() == UnifiedPath.CIRCLE_DETAIL
-            && bottomSheetState.currentValue == SheetValue.Hidden
-        ) {
-            bottomSheetState.partialExpand()
+        when (sheetPath.lastOrNull()) {
+            UnifiedPath.CIRCLE_DETAIL -> {
+                if (bottomSheetState.currentValue == SheetValue.Hidden) {
+                    bottomSheetState.partialExpand()
+                }
+            }
+
+            UnifiedPath.MORE_DB_ADMIN -> {
+                bottomSheetState.expand()
+            }
+
+            else -> {}
         }
     }
 
@@ -187,7 +195,8 @@ fun UnifiedView(
                     mapper = mapper,
                     catalogCache = catalogCache,
                     favoritesAPI = favoritesAPI,
-                    authenticator = authenticator
+                    authenticator = authenticator,
+                    events = events
                 )
             },
             sheetShape = RoundedCornerShape(
@@ -259,7 +268,6 @@ fun UnifiedView(
                     )
                     UnifiedMoreMenu(
                         unifier = unifier,
-                        events = events,
                         selections = selections
                     )
                 }

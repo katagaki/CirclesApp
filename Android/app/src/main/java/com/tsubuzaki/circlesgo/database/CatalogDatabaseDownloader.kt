@@ -28,7 +28,7 @@ class CatalogDatabaseDownloader(
         authToken: OpenIDToken,
         updateProgress: suspend (Double?) -> Unit
     ) {
-        val file = download(event, DatabaseType.TEXT, authToken, updateProgress)
+        val file = download(event, DatabaseType.TEXT, authToken, updateProgress = updateProgress)
         if (file != null) {
             catalogDatabase.setTextDatabaseFile(file)
         }
@@ -39,16 +39,78 @@ class CatalogDatabaseDownloader(
         authToken: OpenIDToken,
         updateProgress: suspend (Double?) -> Unit
     ) {
-        val file = download(event, DatabaseType.IMAGES, authToken, updateProgress)
+        val file = download(event, DatabaseType.IMAGES, authToken, updateProgress = updateProgress)
         if (file != null) {
             catalogDatabase.setImageDatabaseFile(file)
         }
+    }
+
+    /**
+     * Downloads the text and image databases for any event without
+     * repointing the active database connections. Used for downloading
+     * event data in the background while another event stays active.
+     */
+    suspend fun downloadEventData(
+        event: WebCatalogEvent.Response.Event,
+        databaseInformation: WebCatalogDatabase,
+        authToken: OpenIDToken,
+        updateProgress: suspend (Double?) -> Unit
+    ): Boolean {
+        val textFile = download(event, DatabaseType.TEXT, authToken, databaseInformation) { progress ->
+            updateProgress(progress?.times(0.1))
+        }
+        updateProgress(0.1)
+        val imageFile = download(event, DatabaseType.IMAGES, authToken, databaseInformation) { progress ->
+            updateProgress(progress?.let { 0.1 + it * 0.9 })
+        }
+        return textFile != null && imageFile != null
+    }
+
+    /**
+     * Returns the expected download size in bytes for the given event's
+     * databases, or null if it could not be determined.
+     */
+    suspend fun estimateDownloadSize(
+        databaseInformation: WebCatalogDatabase
+    ): Long? = withContext(Dispatchers.IO) {
+        val urls = listOfNotNull(
+            databaseInformation.response.databaseForText(),
+            databaseInformation.response.databaseFor211By300Images()
+        )
+        if (urls.isEmpty()) return@withContext null
+
+        var total = 0L
+        for (urlString in urls) {
+            val connection = try {
+                (URL(urlString).openConnection() as HttpURLConnection).apply {
+                    requestMethod = "HEAD"
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to estimate download size", e)
+                return@withContext null
+            }
+            try {
+                if (connection.responseCode != HttpURLConnection.HTTP_OK) {
+                    return@withContext null
+                }
+                val length = connection.contentLengthLong
+                if (length <= 0) return@withContext null
+                total += length
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to estimate download size", e)
+                return@withContext null
+            } finally {
+                connection.disconnect()
+            }
+        }
+        total
     }
 
     private suspend fun download(
         event: WebCatalogEvent.Response.Event,
         type: DatabaseType,
         authToken: OpenIDToken,
+        databaseInformationOverride: WebCatalogDatabase? = null,
         updateProgress: suspend (Double?) -> Unit
     ): File? = withContext(Dispatchers.IO) {
         val dataStoreDir = catalogDatabase.dataStoreDir
@@ -63,15 +125,16 @@ class CatalogDatabaseDownloader(
             dataStoreDir.mkdirs()
         }
 
-        // Fetch database information if not already present
-        if (catalogDatabase.databaseInformation == null) {
-            val info = fetchDatabaseInformation(event, authToken)
-            if (info != null) {
-                catalogDatabase.setDatabaseInformation(info)
+        val databaseInfo = databaseInformationOverride ?: run {
+            // Fetch database information if not already present
+            if (catalogDatabase.databaseInformation == null) {
+                val info = fetchDatabaseInformation(event, authToken)
+                if (info != null) {
+                    catalogDatabase.setDatabaseInformation(info)
+                }
             }
-        }
-
-        val databaseInfo = catalogDatabase.databaseInformation ?: return@withContext null
+            catalogDatabase.databaseInformation
+        } ?: return@withContext null
 
         val downloadURL = when (type) {
             DatabaseType.TEXT -> databaseInfo.response.databaseForText()
@@ -95,7 +158,7 @@ class CatalogDatabaseDownloader(
         unzip(zippedFile, dataStoreDir, updateProgress)
     }
 
-    private suspend fun fetchDatabaseInformation(
+    suspend fun fetchDatabaseInformation(
         event: WebCatalogEvent.Response.Event,
         authToken: OpenIDToken
     ): WebCatalogDatabase? = withContext(Dispatchers.IO) {

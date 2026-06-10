@@ -19,6 +19,8 @@
     <string name="clear">Clear</string>
     <string name="search_min_characters">Type at least 2 characters to search.</string>
     <string name="no_filter_selected">Select a hall and filters\nto browse circles.</string>
+    <string name="no_circles_found">No circles found.</string>
+    <string name="no_circles_found_filters">No circles found.\nTry adjusting filters.</string>
 
     <!-- Circle Detail -->
     <string name="back">Back</string>
@@ -58,7 +60,7 @@
     <!-- More Menu -->
     <string name="comic_market_format">Comic Market %1$d</string>
     <string name="more">More</string>
-    <string name="select_event">Select Event</string>
+    <string name="manage_event_data">Manage Event Data</string>
     <string name="show_genre_overlay">Show Genre Overlay</string>
     <string name="darken_map_in_dark_mode">Darken Map in Dark Mode</string>
     <string name="use_high_resolution_maps">Use High Definition Map</string>
@@ -71,6 +73,29 @@
     <string name="link_floor_map">Tokyo Big Sight Floor Map</string>
     <string name="link_source_code">Source Code</string>
     <string name="link_ios_app">Preview iOS Version</string>
+
+    <!-- Event Data Management -->
+    <string name="event_data_title">Event Data</string>
+    <string name="storage_header">Storage</string>
+    <string name="storage_disclaimer">Comic Market, Circle.ms, and Tokyo Big Sight bear no responsibility for any issues that may arise with this app.</string>
+    <string name="storage_provided_by">Data provided by Comiket Web Catalog</string>
+    <string name="storage_image_cache">Image Cache</string>
+    <string name="storage_other_apps">Other Apps</string>
+    <string name="storage_free">Free</string>
+    <string name="selected_event_header">Selected Event</string>
+    <string name="other_events_header">Other Events</string>
+    <string name="downloaded_indicator">Downloaded</string>
+    <string name="download_event_data">Download event data</string>
+    <string name="delete_event_data">Delete event data</string>
+    <string name="switch_event_title">Change Event?</string>
+    <string name="switch_event_message">The selected event will be changed to Comic Market %1$d.</string>
+    <string name="switch_event_action">Change</string>
+    <string name="download_event_title">Download Event Data?</string>
+    <string name="download_event_message">Approximately %2$s of data will be downloaded for Comic Market %1$d.</string>
+    <string name="download_event_message_unknown_size">Event data for Comic Market %1$d will be downloaded. The download size could not be determined.</string>
+    <string name="download_event_estimating">Checking download size…</string>
+    <string name="download_event_info_failed">Could not retrieve the event data information. Check your connection and try again.</string>
+    <string name="download_action">Download</string>
 
     <!-- Toolbar Filters -->
     <string name="genre_filter">Genre</string>

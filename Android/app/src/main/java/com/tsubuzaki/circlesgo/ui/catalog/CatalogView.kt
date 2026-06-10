@@ -75,8 +75,10 @@ fun CatalogView(
         unifier.setIsSearchActive(searchExpanded)
     }
 
-    // Reload circles when selection changes
-    LaunchedEffect(selectedMap, selectedDate, selectedGenres, selectedBlocks) {
+    // Reload circles when selection changes or the cache is invalidated
+    // (e.g. after switching the active event)
+    val catalogGeneration by catalogCache.generation.collectAsState()
+    LaunchedEffect(selectedMap, selectedDate, selectedGenres, selectedBlocks, catalogGeneration) {
         val catalogSelectionID = selections.catalogSelectionID
         if (catalogCache.invalidationID != catalogSelectionID) {
             reloadDisplayedCircles(catalogCache, selections, database)

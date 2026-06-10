@@ -19,6 +19,8 @@
     <string name="clear">クリア</string>
     <string name="search_min_characters">2文字以上入力して検索してください。</string>
     <string name="no_filter_selected">サークルを閲覧するには、ジャンルまたは棟を選択してください。</string>
+    <string name="no_circles_found">サークルが見つかりませんでした。</string>
+    <string name="no_circles_found_filters">サークルが見つかりませんでした。\nフィルターを調整してみてください。</string>
 
     <!-- Circle Detail -->
     <string name="back">戻る</string>
@@ -58,7 +60,7 @@
     <!-- More Menu -->
     <string name="comic_market_format">コミックマーケット%1$d</string>
     <string name="more">その他</string>
-    <string name="select_event">イベントを選択</string>
+    <string name="manage_event_data">イベントデータを管理</string>
     <string name="show_genre_overlay">ジャンルを表示</string>
     <string name="darken_map_in_dark_mode">ダークモードに従う</string>
     <string name="use_high_resolution_maps">高解像度マップを使用</string>
@@ -70,6 +72,29 @@
     <string name="link_floor_map">東京ビッグサイト フロアマップ</string>
     <string name="link_source_code">ソースコード</string>
     <string name="link_ios_app">iOS版をプレビュー</string>
+
+    <!-- Event Data Management -->
+    <string name="event_data_title">イベントデータ</string>
+    <string name="storage_header">ストレージ</string>
+    <string name="storage_disclaimer">本アプリの不具合について、コミケット、Circle.ms、東京ビッグサイトは責任を一切負いません。</string>
+    <string name="storage_provided_by">データ提供元：コミケWebカタログ</string>
+    <string name="storage_image_cache">画像キャッシュ</string>
+    <string name="storage_other_apps">その他のアプリ</string>
+    <string name="storage_free">空き容量</string>
+    <string name="selected_event_header">選択されたイベント</string>
+    <string name="other_events_header">その他のイベント</string>
+    <string name="downloaded_indicator">ダウンロード済み</string>
+    <string name="download_event_data">イベントデータをダウンロード</string>
+    <string name="delete_event_data">イベントデータを削除</string>
+    <string name="switch_event_title">イベントを切り替えますか？</string>
+    <string name="switch_event_message">選択中のイベントを「コミックマーケット%1$d」に切り替えます。</string>
+    <string name="switch_event_action">切り替え</string>
+    <string name="download_event_title">イベントデータをダウンロードしますか？</string>
+    <string name="download_event_message">「コミックマーケット%1$d」のデータ（約%2$s）をダウンロードします。</string>
+    <string name="download_event_message_unknown_size">「コミックマーケット%1$d」のデータをダウンロードします。データサイズを取得できませんでした。</string>
+    <string name="download_event_estimating">ダウンロードサイズを確認中…</string>
+    <string name="download_event_info_failed">イベントデータの情報を取得できませんでした。通信環境を確認して、もう一度お試しください。</string>
+    <string name="download_action">ダウンロード</string>
 
     <!-- Toolbar Filters -->
     <string name="privacy_mode">プライバシーモード</string>

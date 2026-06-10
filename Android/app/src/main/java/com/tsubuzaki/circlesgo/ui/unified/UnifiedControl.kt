@@ -67,7 +67,10 @@ private fun DatePickerButton(
     onDateSelected: (ComiketDate) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val dates = remember { database.dates() }
+    // Keyed on the database load count so the picker refreshes when the
+    // active event changes
+    val commonImagesLoadCount by database.commonImagesLoadCount.collectAsState()
+    val dates = remember(commonImagesLoadCount) { database.dates() }
     val dateFormatter = remember { SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()) }
 
     TextButton(
@@ -120,7 +123,8 @@ private fun HallPickerButton(
     onMapSelected: (ComiketMap) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val maps = remember { database.maps() }
+    val commonImagesLoadCount by database.commonImagesLoadCount.collectAsState()
+    val maps = remember(commonImagesLoadCount) { database.maps() }
     val accentColor = accentColorForMap(selectedMap)
 
     TextButton(

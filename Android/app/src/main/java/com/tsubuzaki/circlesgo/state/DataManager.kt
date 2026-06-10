@@ -21,7 +21,8 @@ class DataManager(
     private val favorites: FavoritesState,
     private val unifier: Unifier,
     private val oasis: Oasis,
-    private val favoritesAPI: FavoritesAPI
+    private val favoritesAPI: FavoritesAPI,
+    private val catalogCache: CatalogCache
 ) {
 
     companion object {
@@ -52,6 +53,8 @@ class DataManager(
                 isDatabaseInitialized = false
             }
             unifier.hide()
+            // Drop anything that references the previous event's data
+            unifier.clearSheetContent()
 
             // Step 1: Fetch events list from API
             val authToken = authenticator.token.value ?: OpenIDToken()
@@ -92,6 +95,9 @@ class DataManager(
         if (shouldResetSelections) {
             selections.resetSelections()
         }
+
+        // Force the catalog to refetch circles from the (possibly new) database
+        catalogCache.invalidate()
 
         // Set default selections from database
         if (shouldResetSelections || selections.date.value == null) {

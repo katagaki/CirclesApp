@@ -17,6 +17,7 @@ import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.auth.Authenticator
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.state.CatalogCache
+import com.tsubuzaki.circlesgo.state.Events
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.Mapper
 import com.tsubuzaki.circlesgo.state.UnifiedPath
@@ -25,6 +26,7 @@ import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.ui.catalog.CatalogView
 import com.tsubuzaki.circlesgo.ui.circledetail.CircleDetailView
 import com.tsubuzaki.circlesgo.ui.favorites.FavoritesView
+import com.tsubuzaki.circlesgo.ui.more.EventDataView
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -36,7 +38,8 @@ fun UnifiedPanel(
     mapper: Mapper,
     catalogCache: CatalogCache,
     favoritesAPI: FavoritesAPI,
-    authenticator: Authenticator
+    authenticator: Authenticator,
+    events: Events
 ) {
     val currentPath by unifier.currentPath.collectAsState()
     val sheetPath by unifier.sheetPath.collectAsState()
@@ -50,7 +53,14 @@ fun UnifiedPanel(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        if (isShowingCircleDetail) {
+        if (sheetPath.lastOrNull() == UnifiedPath.MORE_DB_ADMIN) {
+            // Event data management view (pushed on top)
+            EventDataView(
+                database = database,
+                events = events,
+                unifier = unifier
+            )
+        } else if (isShowingCircleDetail) {
             // Circle detail view (pushed on top)
             CircleDetailView(
                 circle = selectedCircle!!,

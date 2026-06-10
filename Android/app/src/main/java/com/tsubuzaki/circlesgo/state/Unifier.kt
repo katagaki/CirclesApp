@@ -81,6 +81,11 @@ class Unifier {
         _selectedCircle.value = null
     }
 
+    fun clearSheetContent() {
+        _sheetPath.value = emptyList()
+        _selectedCircle.value = null
+    }
+
     fun setIsSearchActive(value: Boolean) {
         _isSearchActive.value = value
     }

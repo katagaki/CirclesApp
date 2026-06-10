@@ -59,8 +59,12 @@ fun CatalogToolbar(
     var selectableGenres by remember { mutableStateOf<List<ComiketGenre>?>(null) }
     var selectableBlocks by remember { mutableStateOf<List<ComiketBlock>?>(null) }
 
+    // Keyed on the database load count so filters refresh when the active
+    // event changes, even if the selection IDs stay the same
+    val commonImagesLoadCount by database.commonImagesLoadCount.collectAsState()
+
     // Reload selectable genres when map or date changes
-    LaunchedEffect(selectedMap, selectedDate) {
+    LaunchedEffect(selectedMap, selectedDate, commonImagesLoadCount) {
         val mapID = selectedMap?.id
         val dayID = selectedDate?.id
         if (mapID != null && dayID != null) {
@@ -78,7 +82,7 @@ fun CatalogToolbar(
     }
 
     // Reload selectable blocks when map, date, or genres change
-    LaunchedEffect(selectedMap, selectedDate, selectedGenres) {
+    LaunchedEffect(selectedMap, selectedDate, selectedGenres, commonImagesLoadCount) {
         val mapID = selectedMap?.id
         val dayID = selectedDate?.id
         if (mapID != null && dayID != null) {

@@ -77,6 +77,16 @@ class Events(private val context: Context) {
         }
     }
 
+    /**
+     * Re-fetches the event list from the API (falling back to the cached
+     * response when offline) and updates the latest event accordingly.
+     */
+    suspend fun refreshEventList(authToken: OpenIDToken) {
+        val fetched = WebCatalogAPI.events(authToken, context) ?: return
+        eventData = fetched
+        latestEvent = fetched.list.firstOrNull { it.id == fetched.latestEventID }
+    }
+
     fun updateActiveEvent(onlineState: OnlineState) {
         when (onlineState) {
             OnlineState.ONLINE -> {

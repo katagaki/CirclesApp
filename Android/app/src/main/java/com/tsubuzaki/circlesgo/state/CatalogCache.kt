@@ -17,6 +17,9 @@ class CatalogCache {
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _generation = MutableStateFlow(0)
+    val generation: StateFlow<Int> = _generation
+
     var invalidationID: String = ""
 
     val hasMoreDisplayedCircles: Boolean
@@ -67,6 +70,21 @@ class CatalogCache {
 
     fun setIsLoading(loading: Boolean) {
         _isLoading.value = loading
+    }
+
+    /**
+     * Drops all cached circles so they get refetched from the current
+     * database. Required when the active event changes, because the
+     * selection IDs (map, date, genres, blocks) of the new event can be
+     * identical to the previous one's.
+     */
+    fun invalidate() {
+        invalidationID = ""
+        allFilterResultIDs = emptyList()
+        allSearchResultIDs = null
+        _displayedCircles.value = emptyList()
+        _searchedCircles.value = null
+        _generation.value += 1
     }
 
     companion object {
