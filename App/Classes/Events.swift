@@ -104,28 +104,46 @@ class Events {
 
     @MainActor
     func prepare(authToken: OpenIDToken) async {
-        if let eventData, let latestEvent {
-            // Set active event to latest event if active event number is not specified
-            if activeEventNumber == -1 {
-                activeEventNumber = latestEvent.number
-                activeEventNumberUserDefault = activeEventNumber
-                isActiveEventLatest = true
+        if eventData == nil {
+            // Use cached event data if available, and refresh it in the background
+            if let cachedEventData = WebCatalog.cachedEvents() {
+                setEventData(cachedEventData)
+                Task {
+                    if let freshEventData = await WebCatalog.events(authToken: authToken) {
+                        self.setEventData(freshEventData)
+                    }
+                }
+            } else {
+                // Fetch event data from API
+                if let freshEventData = await WebCatalog.events(authToken: authToken) {
+                    setEventData(freshEventData)
+                }
             }
-            isActiveEventLatest = activeEventNumber == eventData.latestEventNumber
-
-            // Set specified active event using active event number
-            if let eventInList = eventData.list.first(where: {$0.number == activeEventNumber}) {
-                activeEvent = WebCatalogEvent.Response.Event(
-                    id: eventInList.id,
-                    number: activeEventNumber
-                )
-            }
-        } else {
-            // Fetch event data from API
-            eventData = await WebCatalog.events(authToken: authToken)
-            latestEvent = eventData?.list.first(where: {$0.id == eventData?.latestEventID})
-            await prepare(authToken: authToken)
         }
+
+        guard let eventData, let latestEvent else { return }
+
+        // Set active event to latest event if active event number is not specified
+        if activeEventNumber == -1 {
+            activeEventNumber = latestEvent.number
+            activeEventNumberUserDefault = activeEventNumber
+            isActiveEventLatest = true
+        }
+        isActiveEventLatest = activeEventNumber == eventData.latestEventNumber
+
+        // Set specified active event using active event number
+        if let eventInList = eventData.list.first(where: {$0.number == activeEventNumber}) {
+            activeEvent = WebCatalogEvent.Response.Event(
+                id: eventInList.id,
+                number: activeEventNumber
+            )
+        }
+    }
+
+    @MainActor
+    private func setEventData(_ response: WebCatalogEvent.Response) {
+        eventData = response
+        latestEvent = response.list.first(where: {$0.id == response.latestEventID})
     }
 
     func updateActiveEvent(onlineState: OnlineState) {

@@ -18,6 +18,10 @@ public class WebCatalog {
             UserDefaults.standard.set(data, forKey: eventCacheKey)
             return events.response
         }
+        return cachedEvents()
+    }
+
+    public static func cachedEvents() -> WebCatalogEvent.Response? {
         if let data = UserDefaults.standard.data(forKey: eventCacheKey),
            let events = try? JSONDecoder().decode(WebCatalogEvent.self, from: data) {
             return events.response

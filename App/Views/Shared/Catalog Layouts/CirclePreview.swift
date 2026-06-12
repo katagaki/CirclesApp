@@ -14,7 +14,7 @@ struct CirclePreview: View {
 
     var circle: ComiketCircle
 
-    @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
+    @AppStorage(wrappedValue: true, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 

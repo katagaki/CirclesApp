@@ -20,7 +20,7 @@ struct CircleGrid: View {
     var onSelect: ((ComiketCircle) -> Void)
     var onDoubleTap: ((ComiketCircle) -> Void)?
 
-    @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
+    @AppStorage(wrappedValue: true, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 

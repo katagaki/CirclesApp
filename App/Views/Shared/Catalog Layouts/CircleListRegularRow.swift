@@ -15,7 +15,7 @@ struct CircleListRegularRow: View {
     var circle: ComiketCircle
     var namespace: Namespace.ID
 
-    @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
+    @AppStorage(wrappedValue: true, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 

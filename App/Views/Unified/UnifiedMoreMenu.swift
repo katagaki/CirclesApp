@@ -33,10 +33,11 @@ struct UnifiedMoreMenu: View {
     @AppStorage(wrappedValue: .none, "Map.ScrollType") var scrollType: MapAutoScrollType
 
     // Circle Display Settings
-    @AppStorage(wrappedValue: false, "Customization.ShowSpaceName") var showSpaceName: Bool
+    @AppStorage(wrappedValue: true, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
     @AppStorage(wrappedValue: true, "Customization.DoubleTapToVisit") var isDoubleTapToVisitEnabled: Bool
+    @AppStorage(wrappedValue: true, "Customization.UseZoomTransition") var useZoomTransition: Bool
 
     // Others
     @AppStorage(wrappedValue: false, "PrivacyMode.On") var isPrivacyModeOn: Bool
@@ -51,32 +52,34 @@ struct UnifiedMoreMenu: View {
             }
 
             Section {
-                Toggle("More.Customization.Map.ShowsGenreOverlays", systemImage: "theatermasks",
-                       isOn: $showGenreOverlay)
-                Toggle("More.Customization.Map.UseDarkModeMap", systemImage: "moon",
-                       isOn: $useDarkModeMaps)
-                Toggle("More.Customization.Map.UseHighDefinitionMap", systemImage: "square.resize.up",
-                       isOn: $useHighResolutionMaps)
-                Toggle("More.Customization.Map.ScrollToSelection",
-                       systemImage: "arrow.up.and.down.and.arrow.left.and.right",
-                       isOn: Binding(
-                           get: { scrollType == .popover },
-                           set: { scrollType = $0 ? .popover : .none }
-                       ))
-            } header: {
-                Text("More.Customization.Map")
-            }
-            Section {
-                Toggle("More.Customization.Circles.ShowWebCut", systemImage: "text.rectangle.page",
-                       isOn: $showWebCut)
-                Toggle("More.Customization.Circles.ShowHallAndBlock", systemImage: "table.furniture",
-                       isOn: $showSpaceName)
-                Toggle("More.Customization.Circles.ShowDay", systemImage: "calendar",
-                       isOn: $showDay)
-                Toggle("More.Customization.Circles.DoubleTapToVisit", systemImage: "hand.tap",
-                       isOn: $isDoubleTapToVisitEnabled)
-            } header: {
-                Text("More.Customization.Circles")
+                Menu("More.Customization.Map", systemImage: "map") {
+                    Toggle("More.Customization.Map.ShowsGenreOverlays", systemImage: "theatermasks",
+                           isOn: $showGenreOverlay)
+                    Toggle("More.Customization.Map.UseDarkModeMap", systemImage: "moon",
+                           isOn: $useDarkModeMaps)
+                    Toggle("More.Customization.Map.UseHighDefinitionMap", systemImage: "square.resize.up",
+                           isOn: $useHighResolutionMaps)
+                    Toggle("More.Customization.Map.ScrollToSelection",
+                           systemImage: "arrow.up.and.down.and.arrow.left.and.right",
+                           isOn: Binding(
+                               get: { scrollType == .popover },
+                               set: { scrollType = $0 ? .popover : .none }
+                           ))
+                }
+                .menuActionDismissBehavior(.disabled)
+                Menu("More.Customization.Circles", systemImage: "square.grid.2x2") {
+                    Toggle("More.Customization.Circles.ShowWebCut", systemImage: "text.rectangle.page",
+                           isOn: $showWebCut)
+                    Toggle("More.Customization.Circles.ShowHallAndBlock", systemImage: "table.furniture",
+                           isOn: $showSpaceName)
+                    Toggle("More.Customization.Circles.ShowDay", systemImage: "calendar",
+                           isOn: $showDay)
+                    Toggle("More.Customization.Circles.DoubleTapToVisit", systemImage: "hand.tap",
+                           isOn: $isDoubleTapToVisitEnabled)
+                    Toggle("More.Customization.Circles.UseZoomTransition", systemImage: "arrow.up.backward.and.arrow.down.forward",
+                           isOn: $useZoomTransition)
+                }
+                .menuActionDismissBehavior(.disabled)
             }
             Section {
                 if Locale.current.language.languageCode == .japanese {

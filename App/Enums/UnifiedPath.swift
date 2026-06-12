@@ -67,7 +67,8 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
         case .namespacedCircleDetail(
             let circle, let previousCircle, let nextCircle, let namespace
         ):
-            if UIDevice.current.userInterfaceIdiom == .phone {
+            if UIDevice.current.userInterfaceIdiom == .phone,
+               UserDefaults.standard.object(forKey: "Customization.UseZoomTransition") as? Bool ?? true {
                 CircleDetailView(
                     circle: circle,
                     previousCircle: previousCircle,

@@ -82,16 +82,26 @@ struct LoginView: View {
                         #endif
                     } else {
                         Task {
-                            await authenticator.refreshBroadcastMessage()
-                            await authenticator.refreshClientConfigIfNeeded()
+                            await authenticator.refreshLoginInformation()
                         }
                     }
                 } label: {
-                    Text(authenticator.canLogin ? "Shared.Login" : "Shared.Retry")
-                        .fontWeight(.bold)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 6.0)
+                    Group {
+                        if authenticator.canLogin {
+                            Text("Shared.Login")
+                        } else if authenticator.isFetchingLoginInformation {
+                            ProgressView()
+                                .progressViewStyle(.circular)
+                                .tint(.white)
+                        } else {
+                            Text("Shared.Retry")
+                        }
+                    }
+                    .fontWeight(.bold)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 6.0)
                 }
+                .disabled(!authenticator.canLogin && authenticator.isFetchingLoginInformation)
                 .clipShape(.capsule)
                 .tint(.accent)
                 .buttonStyleGlassProminentIfSupported()
@@ -99,8 +109,7 @@ struct LoginView: View {
             .padding()
         }
         .task {
-            await authenticator.refreshBroadcastMessage()
-            await authenticator.refreshClientConfigIfNeeded()
+            await authenticator.refreshLoginInformation()
         }
         #if !os(visionOS)
         .sheet(isPresented: $authenticator.isWaitingForAuthenticationCode) {

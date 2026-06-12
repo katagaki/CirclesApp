@@ -35,6 +35,7 @@ class Authenticator {
     var authBroadcastMessage: String?
     var isLoginAvailable: Bool = true
     var isAuthEnabled: Bool = true
+    var isFetchingLoginInformation: Bool = false
 
     @ObservationIgnored var client: OpenIDClient?
 
@@ -68,14 +69,26 @@ class Authenticator {
         self.client = restoreClientFromKeychain()
     }
 
+    func refreshLoginInformation() async {
+        guard !isFetchingLoginInformation else { return }
+        isFetchingLoginInformation = true
+        defer { isFetchingLoginInformation = false }
+        async let broadcastMessage: Void = refreshBroadcastMessage()
+        async let clientConfig: Void = refreshClientConfigIfNeeded()
+        _ = await (broadcastMessage, clientConfig)
+    }
+
     func refreshBroadcastMessage() async {
         let provider = RemoteConfigProvider()
 
         guard await provider.accountStatus() == .available else {
-            let isJapanese = Locale.current.language.languageCode?.identifier == "ja"
-            self.authBroadcastMessage = isJapanese
-                ? "ログインするには、iCloudにサインインしてください。"
-                : "Please sign in to iCloud to continue."
+            // Login only requires iCloud when the client configuration has not been cached yet
+            if client == nil {
+                let isJapanese = Locale.current.language.languageCode?.identifier == "ja"
+                self.authBroadcastMessage = isJapanese
+                    ? "ログインするには、iCloudにサインインしてください。"
+                    : "Please sign in to iCloud to continue."
+            }
             return
         }
 
@@ -85,11 +98,13 @@ class Authenticator {
             self.isLoginAvailable = true
             self.isAuthEnabled = authEnabled
         case .notFound:
-            let isJapanese = Locale.current.language.languageCode?.identifier == "ja"
-            self.authBroadcastMessage = isJapanese
-                ? "現在ログインはご利用いただけません。しばらくしてからもう一度お試しください。"
-                : "Login is currently unavailable. Please try again later."
-            self.isLoginAvailable = false
+            if client == nil {
+                let isJapanese = Locale.current.language.languageCode?.identifier == "ja"
+                self.authBroadcastMessage = isJapanese
+                    ? "現在ログインはご利用いただけません。しばらくしてからもう一度お試しください。"
+                    : "Login is currently unavailable. Please try again later."
+                self.isLoginAvailable = false
+            }
         case .failed:
             break
         }
@@ -164,8 +179,12 @@ class Authenticator {
                 self.resetAuthentication()
                 self.isReady = true
             } else {
-                // Refresh authentication token if not expired
-                await self.refreshAuthenticationToken()
+                // Refresh authentication token in the background if close to expiry
+                if self.tokenExpiryDate.addingTimeInterval(-3600) < .now {
+                    Task {
+                        await self.refreshAuthenticationToken()
+                    }
+                }
                 self.isReady = true
             }
         }
