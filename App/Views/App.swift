@@ -129,7 +129,7 @@ struct CirclesApp: App {
             selections.resetSelections()
         }
         .backgroundTask(.appRefresh("RefreshAuthToken")) {
-            await authenticator.refreshAuthenticationToken()
+            await authenticator.refreshAuthenticationTokenInBackground()
             await registerBackgroundRefreshTask()
         }
     }
@@ -139,7 +139,10 @@ struct CirclesApp: App {
         #if DEBUG
         request.earliestBeginDate = .now.addingTimeInterval(15)
         #else
-        request.earliestBeginDate = .now.addingTimeInterval(12 * 3600)
+        request.earliestBeginDate = min(
+            .now.addingTimeInterval(22 * 3600),
+            authenticator.tokenExpiryDate.addingTimeInterval(-3600)
+        )
         #endif
         try? BGTaskScheduler.shared.submit(request)
     }

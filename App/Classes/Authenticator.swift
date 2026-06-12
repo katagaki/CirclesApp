@@ -276,6 +276,20 @@ class Authenticator {
         }
     }
 
+    func refreshAuthenticationTokenInBackground() async {
+        if token == nil {
+            _ = restoreAuthenticationFromKeychainAndDefaults()
+        }
+        guard let refreshToken = token?.refreshToken else { return }
+        let request = urlRequestForToken(parameters: [
+            "grant_type": "refresh_token",
+            "refresh_token": refreshToken
+        ])
+        if let (data, _) = try? await URLSession.shared.data(for: request) {
+            _ = decodeAuthenticationToken(data: data)
+        }
+    }
+
     func decodeAuthenticationToken(data: Data) -> Bool {
         if let token = try? JSONDecoder().decode(OpenIDToken.self, from: data) {
             self.token = token
