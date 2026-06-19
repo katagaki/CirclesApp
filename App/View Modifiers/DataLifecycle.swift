@@ -254,9 +254,8 @@ struct DataLifecycleModifier: ViewModifier {
     }
 
     func loadImages() async {
-        async let commonLoad: Void = database.loadCommonImages()
-        async let circleLoad: Void = database.loadCircleImages()
-        _ = await (commonLoad, circleLoad)
+        await database.loadCommonImages()
+        await database.loadCircleImages()
     }
 
     func loadFavorites() async {
