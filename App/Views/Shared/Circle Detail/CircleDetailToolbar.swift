@@ -1,10 +1,3 @@
-//
-//  CircleDetailToolbar.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/07.
-//
-
 import Komponents
 import SwiftUI
 import RADiUS
@@ -62,19 +55,11 @@ struct CircleDetailToolbar: ToolbarContent {
         }
 
         // Spacer
-        if #available(iOS 26.0, *) {
-            ToolbarSpacer(.flexible, placement: .bottomBar)
-        } else {
-            ToolbarItem(placement: .bottomBar) {
-                Spacer()
-            }
-        }
+        ToolbarSpacer(.flexible, placement: .bottomBar)
 
         // Links menu (only show if there are links)
         if let webCatalogInformation, !webCatalogInformation.onlineStores.isEmpty {
-            if #available(iOS 26.0, *) {
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-            }
+            ToolbarSpacer(.fixed, placement: .bottomBar)
 
             ToolbarItem(placement: .bottomBar) {
                 Menu {
@@ -95,9 +80,7 @@ struct CircleDetailToolbar: ToolbarContent {
         if extendedInformation.twitterURL != nil ||
            extendedInformation.pixivURL != nil ||
            extendedInformation.circleMsPortalURL != nil {
-            if #available(iOS 26.0, *) {
-                ToolbarSpacer(.fixed, placement: .bottomBar)
-            }
+            ToolbarSpacer(.fixed, placement: .bottomBar)
 
             if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
                 ToolbarItem(placement: .bottomBar) {

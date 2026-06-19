@@ -1,10 +1,3 @@
-//
-//  AttachProductListView.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/02/28.
-//
-
 import SwiftUI
 import AXiS
 
@@ -93,14 +86,8 @@ struct AttachProductListView: View {
             )
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    if #available(iOS 26.0, *) {
-                        Button(role: .cancel) {
-                            dismiss()
-                        }
-                    } else {
-                        Button("Shared.Cancel") {
-                            dismiss()
-                        }
+                    Button(role: .cancel) {
+                        dismiss()
                     }
                 }
             }
@@ -174,14 +161,8 @@ struct AttachProductListView: View {
 
 struct SaveButtonStyle: ViewModifier {
     func body(content: Content) -> some View {
-        if #available(iOS 26.0, *) {
-            content
-                .buttonStyle(.glassProminent)
-                .clipShape(Capsule())
-        } else {
-            content
-                .buttonStyle(.borderedProminent)
-                .clipShape(Capsule())
-        }
+        content
+            .buttonStyle(.glassProminent)
+            .clipShape(Capsule())
     }
 }

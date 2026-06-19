@@ -1,10 +1,3 @@
-//
-//  UnifiedView.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/08/18.
-//
-
 import StoreKit
 import SwiftUI
 import TipKit
@@ -69,21 +62,12 @@ struct UnifiedView: View {
                 .toolbar {
                     UnifiedToolbar(namespace: namespace)
                 }
-                .adaptiveNavigationBar()
                 .unifierPanel(namespace: namespace)
                 .sheet(isPresented: $unifier.isMyComiketPresenting) {
-                    Group {
-                        if #available(iOS 26.0, *) {
-                            NavigationStack {
-                                MyView()
-                            }
-                            .navigationTransition(.zoom(sourceID: "My.View", in: namespace))
-                        } else {
-                            NavigationStack {
-                                MyView()
-                            }
-                        }
+                    NavigationStack {
+                        MyView()
                     }
+                    .navigationTransition(.zoom(sourceID: "My.View", in: namespace))
                     .presentationDetents([.large])
                 }
                 .navigationDestination(for: UnifiedPath.self) { path in
@@ -120,7 +104,7 @@ struct UnifiedView: View {
                                 width: orientation.isPortrait ? reader.size.width - 40.0 : sidebarWidth,
                                 height: orientation.isPortrait ? sidebarHeight : reader.size.height * 0.85
                             )
-                            .adaptiveGlass(.regular, cornerRadius: 20.0)
+                            .glassEffect(.regular, in: .rect(cornerRadius: 20.0))
                             .clipShape(.rect(cornerRadius: 20.0))
                             .padding(20.0)
                             .shadow(color: .black.opacity(0.1), radius: 16.0, y: 2.0)
@@ -129,18 +113,8 @@ struct UnifiedView: View {
                 }
             }
         }
-        .onChange(of: unifier.isMyComiketPresenting) { _, newValue in
-            if #unavailable(iOS 26.0), !newValue {
-                unifier.show()
-            }
-        }
         .onChange(of: unifier.sheetPath) { _, newValue in
             if !newValue.isEmpty && !unifier.isPresenting {
-                unifier.show()
-            }
-        }
-        .onChange(of: unifier.stackPath) { _, newValue in
-            if #unavailable(iOS 26.0), newValue.isEmpty {
                 unifier.show()
             }
         }

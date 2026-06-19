@@ -1,10 +1,3 @@
-//
-//  FavoritePopover.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/08/04.
-//
-
 import SwiftUI
 import RADiUS
 
@@ -21,14 +14,6 @@ struct FavoritePopover: View {
     @State private var selectedColor: WebCatalogColor?
     @State private var memo: String
     let colors: [WebCatalogColor] = WebCatalogColor.allCases
-
-    var cornerRadius: CGFloat {
-        if #available(iOS 26.0, *) {
-            return 12.0
-        } else {
-            return 8.0
-        }
-    }
 
     init(
         initialColor: WebCatalogColor?,
@@ -63,9 +48,9 @@ struct FavoritePopover: View {
                             } label: {
                                 color.backgroundColor()
                                     .aspectRatio(1.0, contentMode: .fit)
-                                    .clipShape(.rect(cornerRadius: cornerRadius))
+                                    .clipShape(.rect(cornerRadius: 12.0))
                                     .overlay {
-                                        RoundedRectangle(cornerRadius: cornerRadius)
+                                        RoundedRectangle(cornerRadius: 12.0)
                                             .stroke(Color.primary.opacity(0.3))
                                     }
                                     .overlay {
@@ -84,10 +69,10 @@ struct FavoritePopover: View {
                     Text("Shared.Memo.Placeholder")
                         .fontWeight(.semibold)
                     TextEditor(text: $memo)
-                        .clipShape(.rect(cornerRadius: cornerRadius))
+                        .clipShape(.rect(cornerRadius: 12.0))
                         .frame(height: 64.0)
                         .overlay {
-                            RoundedRectangle(cornerRadius: cornerRadius)
+                            RoundedRectangle(cornerRadius: 12.0)
                                 .stroke(Color.primary.opacity(0.3))
                         }
                 }
@@ -130,7 +115,7 @@ struct FavoritePopover: View {
                     }
                     #endif
                 }
-                .buttonStyleGlassProminentIfSupported()
+                .buttonStyle(.glassProminent)
             }
             .padding()
         }

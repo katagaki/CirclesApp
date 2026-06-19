@@ -1,10 +1,3 @@
-//
-//  FavoriteButton.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/01.
-//
-
 import SwiftUI
 
 struct FavoriteButton: View {
@@ -47,7 +40,7 @@ struct FavoriteButton: View {
             }
         }
         .clipShape(.capsule)
-        .buttonStyleGlassProminentIfSupported()
+        .buttonStyle(.glassProminent)
         .tint(color?.secondary)
     }
 }

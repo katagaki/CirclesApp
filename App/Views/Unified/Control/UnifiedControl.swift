@@ -1,10 +1,3 @@
-//
-//  UnifiedControl.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/07/21.
-//
-
 import SwiftData
 import SwiftUI
 import AXiS
@@ -15,31 +8,13 @@ struct UnifiedControl: View {
     var body: some View {
         Group {
             if selections.date != nil && selections.map != nil {
-                if #available(iOS 26.0, *) {
-                    HStack {
-                        DatePicker()
-                            .padding([.leading], 12.0)
-                        Spacer()
-                        HallPicker()
-                            .background(accentColorForMap(selections.map))
-                            .clipShape(.capsule)
-                    }
-                } else {
-                    HStack {
-                        DatePicker()
-                            .padding([.leading], 12.0)
-                        Spacer()
-                        HallPicker()
-                            .background(accentColorForMap(selections.map))
-                            .clipShape(.capsule)
-                    }
-                    .padding(.horizontal, 1.5)
-                    .background(Material.bar)
-                    .clipShape(.capsule)
-                    .overlay {
-                        Capsule()
-                            .stroke(.primary.opacity(0.2), lineWidth: 1 / 3)
-                    }
+                HStack {
+                    DatePicker()
+                        .padding([.leading], 12.0)
+                    Spacer()
+                    HallPicker()
+                        .background(accentColorForMap(selections.map))
+                        .clipShape(.capsule)
                 }
             }
         }

@@ -1,10 +1,3 @@
-//
-//  FavoritesToolbar.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/11/16.
-//
-
 import SwiftData
 import SwiftUI
 
@@ -25,9 +18,7 @@ struct FavoritesToolbar: ToolbarContent {
             )
         }
 
-        if #available(iOS 26.0, *) {
-            ToolbarSpacer(.fixed, placement: .bottomBar)
-        }
+        ToolbarSpacer(.fixed, placement: .bottomBar)
         ToolbarItem(placement: .bottomBar) {
             Button {
                 withAnimation(.smooth.speed(2.0)) {
@@ -42,13 +33,7 @@ struct FavoritesToolbar: ToolbarContent {
                 )
             }
         }
-        if #available(iOS 26.0, *) {
-            ToolbarSpacer(.flexible, placement: .bottomBar)
-            ToolbarSpacer(.fixed, placement: .bottomBar)
-        } else {
-            ToolbarItem(placement: .bottomBar) {
-                Spacer()
-            }
-        }
+        ToolbarSpacer(.flexible, placement: .bottomBar)
+        ToolbarSpacer(.fixed, placement: .bottomBar)
     }
 }

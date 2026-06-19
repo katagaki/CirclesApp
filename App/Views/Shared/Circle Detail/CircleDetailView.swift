@@ -1,10 +1,3 @@
-//
-//  CircleDetailView.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/07/21.
-//
-
 import Komponents
 import SwiftData
 import SwiftUI
@@ -135,7 +128,9 @@ struct CircleDetailView: View {
         .animation(.easeInOut(duration: 0.2), value: unifier.selectedDetent)
         .contentMargins(.top, 0.0)
         .listSectionSpacing(.compact)
-        .subtitledTitle(circle.circleName, subtitle: circle.penName)
+        .navigationTitle(circle.circleName)
+        .navigationSubtitle(circle.penName)
+        .toolbarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Circles.ShowOnMap", systemImage: "mappin.and.ellipse") {
@@ -143,9 +138,7 @@ struct CircleDetailView: View {
                 }
                 .disabled(mapper.highlightTarget != nil)
             }
-            if #available(iOS 26.0, *) {
-                ToolbarSpacer(.fixed, placement: .topBarTrailing)
-            }
+            ToolbarSpacer(.fixed, placement: .topBarTrailing)
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button("Circles.GoPrevious", systemImage: "chevron.left") {
                     goToPreviousCircle()

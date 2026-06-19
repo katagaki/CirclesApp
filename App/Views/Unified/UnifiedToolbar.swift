@@ -1,10 +1,3 @@
-//
-//  UnifiedToolbar.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/08.
-//
-
 import SwiftUI
 
 struct UnifiedToolbar: ToolbarContent {
@@ -27,14 +20,14 @@ struct UnifiedToolbar: ToolbarContent {
             ToolbarItem(placement: .principal) {
                 UnifiedControl()
                     .foregroundStyle(.primary)
-                    .glassEffectInteractiveIfSupported()
+                    .glassEffect(.regular.interactive())
                     .adaptiveShadow()
             }
             ToolbarItem(placement: .topBarTrailing) {
                 UnifiedMoreMenu()
             }
         }
-        if #available(iOS 26.0, *), UIDevice.current.userInterfaceIdiom == .phone {
+        if UIDevice.current.userInterfaceIdiom == .phone {
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
                 Button("Shared.OpenPanel", systemImage: "chevron.up") {

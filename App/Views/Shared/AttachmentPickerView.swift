@@ -1,10 +1,3 @@
-//
-//  AttachmentPickerView.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/03/27.
-//
-
 import SwiftUI
 import AXiS
 
@@ -60,14 +53,8 @@ struct AttachmentPickerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    if #available(iOS 26.0, *) {
-                        Button(role: .cancel) {
-                            onCancel()
-                        }
-                    } else {
-                        Button("Shared.Cancel") {
-                            onCancel()
-                        }
+                    Button(role: .cancel) {
+                        onCancel()
                     }
                 }
             }

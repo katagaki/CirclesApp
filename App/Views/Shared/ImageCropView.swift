@@ -1,10 +1,3 @@
-//
-//  ImageCropView.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/03/24.
-//
-
 import SwiftUI
 
 struct ImageCropView: View {
@@ -82,25 +75,13 @@ struct ImageCropView: View {
             .ignoresSafeArea()
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    if #available(iOS 26.0, *) {
-                        Button(role: .cancel) {
-                            onCancel()
-                        }
-                    } else {
-                        Button("Shared.Cancel") {
-                            onCancel()
-                        }
+                    Button(role: .cancel) {
+                        onCancel()
                     }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    if #available(iOS 26, *) {
-                        Button(role: .confirm) {
-                            cropImage()
-                        }
-                    } else {
-                        Button("Shared.Done") {
-                            cropImage()
-                        }
+                    Button(role: .confirm) {
+                        cropImage()
                     }
                 }
             }

@@ -1,10 +1,3 @@
-//
-//  MapPopover.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/02.
-//
-
 import SwiftUI
 
 struct MapPopover<Content: View>: View {
@@ -25,7 +18,7 @@ struct MapPopover<Content: View>: View {
         content()
             .padding(16.0)
             .frame(width: mapper.popoverWidth, height: mapper.popoverHeight)
-            .adaptiveGlass(.regular)
+            .glassEffect(.regular, in: .rect(cornerRadius: 20.0))
             .scaleEffect((0.3 + (0.7 * animationProgress)) / zoomScale)
             .opacity(animationProgress)
             .position(animatedPosition())

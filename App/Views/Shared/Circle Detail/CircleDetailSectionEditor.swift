@@ -1,10 +1,3 @@
-//
-//  CircleDetailSectionEditor.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/03/01.
-//
-
 import SwiftUI
 
 struct CircleDetailSectionEditor: View {
@@ -42,14 +35,8 @@ struct CircleDetailSectionEditor: View {
         .navigationTitle("Circles.Detail.SectionEditor.Title")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                if #available(iOS 26.0, *) {
-                    Button(role: .confirm) {
-                        save()
-                    }
-                } else {
-                    Button("Shared.Save") {
-                        save()
-                    }
+                Button(role: .confirm) {
+                    save()
                 }
             }
         }

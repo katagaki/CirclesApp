@@ -1,10 +1,3 @@
-//
-//  ToolbarButtonLabel.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/08.
-//
-
 import SwiftUI
 
 enum ToolbarButtonLabelImageType {
@@ -17,14 +10,6 @@ struct ToolbarButtonLabel: View {
     let image: ToolbarButtonLabelImageType
     let forceLabelStyle: Bool
 
-    var padding: CGFloat {
-        if #available(iOS 26.0, *) {
-            return 8.0
-        } else {
-            return 0.0
-        }
-    }
-
     init(
         _ text: LocalizedStringKey, image: ToolbarButtonLabelImageType,
         forceLabelStyle: Bool = false
@@ -35,7 +20,7 @@ struct ToolbarButtonLabel: View {
     }
 
     var body: some View {
-        if #available(iOS 26.0, *), !forceLabelStyle {
+        if !forceLabelStyle {
             switch image {
             case .system(let imageName):
                 Label(text, systemImage: imageName)
@@ -57,7 +42,7 @@ struct ToolbarButtonLabel: View {
                     .fontWeight(.bold)
                     .truncationMode(.middle)
             }
-            .padding(.horizontal, padding)
+            .padding(.horizontal, 8.0)
         }
     }
 }

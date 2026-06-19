@@ -1,10 +1,3 @@
-//
-//  CatalogToolbar.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/07.
-//
-
 import SwiftData
 import SwiftUI
 import AXiS
@@ -22,24 +15,12 @@ struct CatalogToolbar: ToolbarContent {
     @State var selectableBlocks: [ComiketBlock]?
 
     var body: some ToolbarContent {
-        if #available(iOS 26.0, *) {
-            ToolbarItemGroup(placement: .bottomBar) {
-                genreMenu()
-                blockMenu()
-            }
-            ToolbarSpacer(.fixed, placement: .bottomBar)
-            DefaultToolbarItem(kind: .search, placement: .bottomBar)
-        } else {
-            ToolbarItem(placement: .bottomBar) {
-                genreMenu()
-            }
-            ToolbarItem(placement: .bottomBar) {
-                blockMenu()
-            }
-            ToolbarItem(placement: .bottomBar) {
-                Spacer()
-            }
+        ToolbarItemGroup(placement: .bottomBar) {
+            genreMenu()
+            blockMenu()
         }
+        ToolbarSpacer(.fixed, placement: .bottomBar)
+        DefaultToolbarItem(kind: .search, placement: .bottomBar)
     }
 
     @ViewBuilder
@@ -95,7 +76,7 @@ struct CatalogToolbar: ToolbarContent {
                     LocalizedStringKey(genreName),
                     image: .asset("Button.R18")
                 )
-            case "ブルーアーカイブ":
+            case "ブルーアーカイブ":
                 ToolbarButtonLabel(
                     LocalizedStringKey(genreName),
                     image: .system("scope")

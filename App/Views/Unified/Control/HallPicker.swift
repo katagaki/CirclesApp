@@ -1,10 +1,3 @@
-//
-//  HallPicker.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/09/21.
-//
-
 import SwiftData
 import SwiftUI
 import AXiS
@@ -34,29 +27,13 @@ struct HallPicker: View {
                     Text("Shared.Placeholder.NoBlock")
                 }
             }
-            .padding(.vertical, verticalPadding())
-            .padding(.horizontal, horizontalPadding())
+            .padding(.vertical, 12.0)
+            .padding(.horizontal, 16.0)
             .foregroundStyle(.white)
 
         }
         .task {
             maps = database.maps()
-        }
-    }
-
-    func horizontalPadding() -> CGFloat {
-        if #available(iOS 26.0, *) {
-            16.0
-        } else {
-            12.0
-        }
-    }
-
-    func verticalPadding() -> CGFloat {
-        if #available(iOS 26.0, *) {
-            12.0
-        } else {
-            4.0
         }
     }
 }

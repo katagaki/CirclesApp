@@ -1,10 +1,3 @@
-//
-//  SNSButton.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/01.
-//
-
 import SwiftUI
 
 private let pixivMemberURLPrefix = "https://www.pixiv.net/member.php?id="
@@ -24,21 +17,15 @@ struct SNSButton: View {
     }
 
     var body: some View {
-        if #available(iOS 26.0, *) {
-            #if targetEnvironment(macCatalyst)
-            buttonWithIcon()
-                .foregroundStyle(.white)
-                .buttonStyle(.borderedProminent)
-            #else
-            buttonWithIcon()
-                .foregroundStyle(.white)
-                .buttonStyle(.glassProminent)
-            #endif
-        } else {
-            buttonWithIcon()
-                .clipShape(showsLabel ? AnyShape(.capsule) : AnyShape(.circle))
-                .buttonStyle(.borderedProminent)
-        }
+        #if targetEnvironment(macCatalyst)
+        buttonWithIcon()
+            .foregroundStyle(.white)
+            .buttonStyle(.borderedProminent)
+        #else
+        buttonWithIcon()
+            .foregroundStyle(.white)
+            .buttonStyle(.glassProminent)
+        #endif
     }
 
     @ViewBuilder

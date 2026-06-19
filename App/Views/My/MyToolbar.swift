@@ -1,11 +1,3 @@
-//
-//  MyToolbar.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/08.
-//
-
-import Komponents
 import SwiftUI
 
 struct MyToolbar: ToolbarContent {
@@ -26,14 +18,8 @@ struct MyToolbar: ToolbarContent {
             }
         }
         ToolbarItem(placement: .topBarLeading) {
-            if #available(iOS 26.0, *) {
-                Button(role: .close) {
-                    dismiss()
-                }
-            } else {
-                CloseButton {
-                    dismiss()
-                }
+            Button(role: .close) {
+                dismiss()
             }
         }
     }

@@ -1,10 +1,3 @@
-//
-//  LoginView.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/06/19.
-//
-
 import SwiftUI
 
 struct LoginView: View {
@@ -104,7 +97,7 @@ struct LoginView: View {
                 .disabled(!authenticator.canLogin && authenticator.isFetchingLoginInformation)
                 .clipShape(.capsule)
                 .tint(.accent)
-                .buttonStyleGlassProminentIfSupported()
+                .buttonStyle(.glassProminent)
             }
             .padding()
         }

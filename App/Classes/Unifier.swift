@@ -1,10 +1,3 @@
-//
-//  Unifier.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/08/18.
-//
-
 import Observation
 import SwiftUI
 
@@ -36,11 +29,7 @@ class Unifier {
             case .height(360): height = 360.0
             default: height = 0.0
             }
-            if #available(iOS 26.0, *) {
-                return max(0.0, height - 60.0) + 20.0
-            } else {
-                return height
-            }
+            return max(0.0, height - 60.0) + 20.0
         }
     }
 
@@ -62,13 +51,23 @@ class Unifier {
     // Data update trigger
     var shouldUpdateData: Bool = false
 
+    var animatesReload: Bool = true
+
     @MainActor
-    func show() {
+    func show(animated: Bool = true) {
         // Only set isPresented on phone, iPad sidebar is always visible
         if UIDevice.current.userInterfaceIdiom == .phone {
             // Don't show unified sheet while attachment search is open
             guard pendingAttachmentData == nil else { return }
-            self.isPresenting = true
+            if animated {
+                self.isPresenting = true
+            } else {
+                var transaction = Transaction()
+                transaction.disablesAnimations = true
+                withTransaction(transaction) {
+                    self.isPresenting = true
+                }
+            }
         }
     }
 

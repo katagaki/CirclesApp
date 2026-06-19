@@ -155,9 +155,10 @@ struct CatalogView: View {
     }
 
     func reloadDisplayedCircles() {
-        withAnimation(.smooth.speed(2.0)) {
-            catalogCache.isLoading = true
-        } completion: {
+        let animated = unifier.animatesReload
+        unifier.animatesReload = true
+
+        let loadCircles = {
             catalogCache.invalidationID = selections.catalogSelectionID
             let selectedGenreIDs = selections.genres.isEmpty ? nil :
                 Array(selections.genres.map({ (genre: ComiketGenre) in genre.id }))
@@ -175,14 +176,29 @@ struct CatalogView: View {
                 )
 
                 await MainActor.run {
-                    var displayedCircles: [ComiketCircle] = []
-                    displayedCircles = database.circles(circleIdentifiers)
-                    withAnimation(.smooth.speed(2.0)) {
+                    let displayedCircles = database.circles(circleIdentifiers)
+                    if animated {
+                        withAnimation(.smooth.speed(2.0)) {
+                            catalogCache.displayedCircles = displayedCircles
+                            catalogCache.isLoading = false
+                        }
+                    } else {
                         catalogCache.displayedCircles = displayedCircles
                         catalogCache.isLoading = false
                     }
                 }
             }
+        }
+
+        if animated {
+            withAnimation(.smooth.speed(2.0)) {
+                catalogCache.isLoading = true
+            } completion: {
+                loadCircles()
+            }
+        } else {
+            catalogCache.isLoading = true
+            loadCircles()
         }
     }
 

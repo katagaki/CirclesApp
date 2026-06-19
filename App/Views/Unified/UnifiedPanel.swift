@@ -1,10 +1,3 @@
-//
-//  UnifiedPanel.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/08.
-//
-
 import SwiftUI
 
 struct UnifiedPanel: View {
@@ -21,14 +14,9 @@ struct UnifiedPanel: View {
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    if #available(iOS 26.0, *) {
-                        viewPicker()
-                    } else {
-                        viewPicker()
-                            .fixedSize()
-                    }
+                    viewPicker()
                 }
-                if #available(iOS 26.0, *), UIDevice.current.userInterfaceIdiom == .phone {
+                if UIDevice.current.userInterfaceIdiom == .phone {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Shared.ClosePanel", systemImage: "chevron.down") {
                             self.unifier.hide()
@@ -52,7 +40,7 @@ struct UnifiedPanel: View {
             }
         }
         .presentationBackgroundInteraction(.enabled)
-        .presentationDetentsForUnifiedView($unifier.selectedDetent)
+        .presentationDetents([.height(150), .height(360), .large], selection: $unifier.selectedDetent)
         .presentationContentInteraction(.scrolls)
         .interactiveDismissDisabled()
     }

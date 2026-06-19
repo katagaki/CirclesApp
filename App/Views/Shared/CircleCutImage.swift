@@ -142,6 +142,11 @@ struct CircleCutImage: View {
         .onAppear {
             prepareCutImage()
         }
+        .onChange(of: database.circleImagesLoadCount) {
+            if cutImage == nil {
+                cutImage = database.circleImage(for: circle.id)
+            }
+        }
         .onChange(of: circle.id) {
             cutImage = nil
             prepareCutImage()

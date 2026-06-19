@@ -1,10 +1,3 @@
-//
-//  UnifierSheet.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/09.
-//
-
 import SwiftUI
 
 struct UnifierPanelModifier: ViewModifier {
@@ -17,12 +10,8 @@ struct UnifierPanelModifier: ViewModifier {
         if UIDevice.current.userInterfaceIdiom == .phone {
             content
                 .sheet(isPresented: $unifier.isPresenting) {
-                    if #available(iOS 26.0, *) {
-                        UnifiedPanel()
-                            .navigationTransition(.zoom(sourceID: "BottomPanel", in: namespace))
-                    } else {
-                        UnifiedPanel()
-                    }
+                    UnifiedPanel()
+                        .navigationTransition(.zoom(sourceID: "BottomPanel", in: namespace))
                 }
         } else {
             content

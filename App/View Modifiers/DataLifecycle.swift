@@ -34,12 +34,12 @@ struct DataLifecycleModifier: ViewModifier {
         content
             .onChange(of: authenticator.isReady) { _, newValue in
                 if newValue && !authenticator.isAuthenticating {
-                    reloadData()
+                    reloadData(animated: false)
                 }
             }
             .onChange(of: authenticator.isAuthenticating) { oldValue, newValue in
                 if oldValue == true && newValue == false && authenticator.token != nil {
-                    reloadData(shouldResetSelections: true)
+                    reloadData(shouldResetSelections: true, animated: false)
                 }
             }
             .onChange(of: unifier.shouldUpdateData) { _, newValue in
@@ -124,9 +124,10 @@ struct DataLifecycleModifier: ViewModifier {
         }
     }
 
-    func reloadData(forceDownload: Bool = false, shouldResetSelections: Bool = false) {
+    func reloadData(forceDownload: Bool = false, shouldResetSelections: Bool = false, animated: Bool = true) {
         if !isReloadingData {
             isReloadingData = true
+            unifier.animatesReload = animated
             database.reset()
             if forceDownload {
                 isDatabaseInitialized = false
@@ -200,9 +201,12 @@ struct DataLifecycleModifier: ViewModifier {
         }
 
         if !authenticator.isAuthenticating {
-            unifier.show()
+            unifier.show(animated: unifier.animatesReload)
         }
         isReloadingData = false
+        Task.detached(priority: .userInitiated) {
+            await loadImages()
+        }
         Task.detached(priority: .background) {
             await loadFavorites()
         }
@@ -244,12 +248,15 @@ struct DataLifecycleModifier: ViewModifier {
             }
 
             database.imageCache.removeAll()
-            async let commonLoad: Void = database.loadCommonImages()
-            async let circleLoad: Void = database.loadCircleImages()
-            _ = await (commonLoad, circleLoad)
         }
 
         UIApplication.shared.isIdleTimerDisabled = false
+    }
+
+    func loadImages() async {
+        async let commonLoad: Void = database.loadCommonImages()
+        async let circleLoad: Void = database.loadCircleImages()
+        _ = await (commonLoad, circleLoad)
     }
 
     func loadFavorites() async {
