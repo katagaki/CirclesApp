@@ -14,6 +14,8 @@ import AXiS
 @main
 struct CirclesApp: App {
 
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     @Environment(\.scenePhase) private var scenePhase
 
     @State var orientation = Orientation()
