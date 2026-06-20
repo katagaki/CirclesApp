@@ -70,12 +70,16 @@ struct BuysView: View {
         .navigationTitle("ViewTitle.Buys")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                Button {
-                    isShowingInfoAlert = true
-                } label: {
-                    Image(systemName: "info.circle")
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                ToolbarItem(placement: .topBarLeading) {
+                    infoButton()
                 }
+            } else {
+                ToolbarSpacer(.flexible, placement: .bottomBar)
+                ToolbarItem(placement: .bottomBar) {
+                    infoButton()
+                }
+                SidebarPositionToolbarItem()
             }
         }
         .alert("Buys.Info.Title", isPresented: $isShowingInfoAlert) {
@@ -85,6 +89,15 @@ struct BuysView: View {
         }
         .onAppear {
             reloadEntries()
+        }
+    }
+
+    @ViewBuilder
+    func infoButton() -> some View {
+        Button {
+            isShowingInfoAlert = true
+        } label: {
+            Image(systemName: "info.circle")
         }
     }
 

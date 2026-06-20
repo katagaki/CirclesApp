@@ -10,12 +10,10 @@ struct FavoritesToolbar: ToolbarContent {
 
     var body: some ToolbarContent {
 
-        ToolbarItem(placement: .topBarLeading) {
-            DisplaySettingsMenu(
-                displayMode: $displayMode,
-                listDisplayMode: $listDisplayMode,
-                gridDisplayMode: $gridDisplayMode
-            )
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            ToolbarItem(placement: .topBarLeading) {
+                displaySettingsMenu()
+            }
         }
 
         ToolbarSpacer(.fixed, placement: .bottomBar)
@@ -34,6 +32,22 @@ struct FavoritesToolbar: ToolbarContent {
             }
         }
         ToolbarSpacer(.flexible, placement: .bottomBar)
-        ToolbarSpacer(.fixed, placement: .bottomBar)
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+        } else {
+            ToolbarItem(placement: .bottomBar) {
+                displaySettingsMenu()
+            }
+            SidebarPositionToolbarItem()
+        }
+    }
+
+    @ViewBuilder
+    func displaySettingsMenu() -> some View {
+        DisplaySettingsMenu(
+            displayMode: $displayMode,
+            listDisplayMode: $listDisplayMode,
+            gridDisplayMode: $gridDisplayMode
+        )
     }
 }

@@ -104,14 +104,19 @@ struct CatalogView: View {
         .navigationTitle("ViewTitle.Circles")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarLeading) {
-                DisplaySettingsMenu(
-                    displayMode: $displayModeState,
-                    listDisplayMode: $listDisplayModeState,
-                    gridDisplayMode: $gridDisplayModeState
-                )
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                ToolbarItem(placement: .topBarLeading) {
+                    displaySettingsMenu()
+                }
             }
             CatalogToolbar()
+            if UIDevice.current.userInterfaceIdiom != .phone {
+                ToolbarSpacer(.flexible, placement: .bottomBar)
+                ToolbarItem(placement: .bottomBar) {
+                    displaySettingsMenu()
+                }
+                SidebarPositionToolbarItem()
+            }
         }
         .searchable(
             text: $searchTerm,
@@ -152,6 +157,15 @@ struct CatalogView: View {
                 catalogCache.displayedCircles.removeAll()
             }
         }
+    }
+
+    @ViewBuilder
+    func displaySettingsMenu() -> some View {
+        DisplaySettingsMenu(
+            displayMode: $displayModeState,
+            listDisplayMode: $listDisplayModeState,
+            gridDisplayMode: $gridDisplayModeState
+        )
     }
 
     func reloadDisplayedCircles() {
