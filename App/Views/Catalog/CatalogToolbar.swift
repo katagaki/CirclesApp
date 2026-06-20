@@ -167,6 +167,9 @@ struct CatalogToolbar: ToolbarContent {
     }
 
     func reloadSelectableGenres() {
+        if genres.isEmpty {
+            genres = database.genres()
+        }
         if let mapID = selections.map?.id, let dayID = selections.date?.id {
             Task {
                 let genreIDs = await CatalogCache.fetchGenreIDs(
@@ -188,6 +191,9 @@ struct CatalogToolbar: ToolbarContent {
     }
 
     func reloadSelectableBlocks() {
+        if blocks.isEmpty {
+            blocks = database.blocks()
+        }
         if let mapID = selections.map?.id, let dayID = selections.date?.id {
             let selectedGenreIDs = selections.genres.isEmpty ? nil :
                 Array(selections.genres.map({ (genre: ComiketGenre) in genre.id }))
