@@ -284,7 +284,7 @@ class Authenticator {
         let request = urlRequestForToken(parameters: [
             "grant_type": "refresh_token",
             "refresh_token": refreshToken
-        ])
+        ], timeoutInterval: 10.0)
         if let (data, _) = try? await URLSession.shared.data(for: request) {
             _ = decodeAuthenticationToken(data: data)
         }
@@ -314,14 +314,18 @@ class Authenticator {
         self.tokenExpiryDate = tokenExpiryDate
     }
 
-    func urlRequestForToken(parameters: [String: String]) -> URLRequest {
+    func urlRequestForToken(parameters: [String: String], timeoutInterval: TimeInterval = 2.0) -> URLRequest {
         let endpoint = URL(string: "\(circleMsAuthEndpoint)/OAuth2/Token")!
 
         var parameters: [String: String] = parameters
         parameters["client_id"] = client?.id
         parameters["client_secret"] = client?.secret
 
-        var request = URLRequest(url: endpoint, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 2.0)
+        var request = URLRequest(
+            url: endpoint,
+            cachePolicy: .reloadIgnoringLocalCacheData,
+            timeoutInterval: timeoutInterval
+        )
         request.httpMethod = "POST"
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpBody = parameters
