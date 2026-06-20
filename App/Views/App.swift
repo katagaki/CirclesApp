@@ -143,7 +143,7 @@ struct CirclesApp: App {
         #else
         request.earliestBeginDate = min(
             .now.addingTimeInterval(22 * 3600),
-            authenticator.tokenExpiryDate.addingTimeInterval(-3600)
+            authenticator.tokenExpiryDate
         )
         #endif
         try? BGTaskScheduler.shared.submit(request)
