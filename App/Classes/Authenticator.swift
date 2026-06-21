@@ -164,6 +164,14 @@ class Authenticator {
         }
         do {
             try reachability.startNotifier()
+            // The notifier normally fires an initial callback that calls bootstrap,
+            // but if it never does the app would hang on the loading screen forever.
+            // Fall back to a connectivity-agnostic bootstrap after a short grace period.
+            Task { [weak self] in
+                try? await Task.sleep(for: .seconds(3))
+                guard let self, !self.isReady else { return }
+                self.bootstrap(isConnected: self.onlineState == .online)
+            }
         } catch {
             debugPrint(error.localizedDescription)
             bootstrap(isConnected: false)
