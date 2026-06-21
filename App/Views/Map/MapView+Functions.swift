@@ -59,8 +59,9 @@ extension MapView {
     func reloadMapLayouts(mapID: Int, selectedDate: Int?, useHighResolutionMaps: Bool) async {
         var layoutWebCatalogIDMappings: [LayoutCatalogMapping: [Int]] = [:]
         if let selectedDate {
-            // Fetch map layouts
-            let actor = DataFetcher(database: database.getTextDatabase())
+            // Fetch map layouts on a dedicated connection so this heavy query doesn't serialize
+            // behind (or block) the catalog hydration on the shared connection.
+            let actor = DataFetcher(database: database.newReadOnlyTextConnection())
             let layoutCatalogMappings = await actor.layoutMappings(
                 inMap: mapID,
                 useHighResolutionMaps: useHighResolutionMaps

@@ -186,8 +186,7 @@ extension Database {
         if let cachedImage = cachedDecodedImage(key) {
             return cachedImage
         }
-        guard commonImageNames.contains(imageName),
-              let imageDatabase = getImageDatabase(),
+        guard let imageDatabase = getImageDatabase(),
               let imageData = Database.readCommonImageData(from: imageDatabase, name: imageName),
               let image = UIImage(data: imageData) else {
             return nil

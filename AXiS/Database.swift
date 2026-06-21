@@ -81,7 +81,6 @@ public class Database {
             debugPrint("Database: Connecting to image database at \(imageDatabaseURL.path(percentEncoded: false))")
             #endif
             imageDatabase = try? Connection(imageDatabaseURL.path(percentEncoded: false), readonly: true)
-            applyReadOnlyPragmas(to: imageDatabase)
         }
         return imageDatabase
     }
@@ -98,6 +97,17 @@ public class Database {
             PRAGMA query_only = ON;
             """
         )
+    }
+
+    // A fresh, independent read-only connection to the text database. Lets concurrent readers
+    // (e.g. the catalog/search fetch) run in parallel instead of serializing behind heavy work
+    // on the shared connection (e.g. the map's layout query). The connection closes when its
+    // owning DataFetcher is released.
+    public func newReadOnlyTextConnection() -> Connection? {
+        guard let textDatabaseURL else { return nil }
+        let connection = try? Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
+        applyReadOnlyPragmas(to: connection)
+        return connection
     }
 
     public func disconnect() {
