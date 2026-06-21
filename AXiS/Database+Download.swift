@@ -199,14 +199,30 @@ extension Database {
     public func prepareIndexes(for event: WebCatalogEvent.Response.Event) async {
         let flagKey = "Database.Indexed.\(event.number)"
         if UserDefaults.standard.bool(forKey: flagKey) { return }
-        guard let textDatabaseURL else { return }
-        let path = textDatabaseURL.path(percentEncoded: false)
+        let textPath = textDatabaseURL?.path(percentEncoded: false)
+        let imagePath = imageDatabaseURL?.path(percentEncoded: false)
         let didBuild = await Task.detached(priority: .userInitiated) {
-            Self.buildIndexes(atPath: path)
+            var builtText = false
+            if let textPath {
+                builtText = Self.buildIndexes(atPath: textPath)
+            }
+            if let imagePath {
+                _ = Self.buildImageIndexes(atPath: imagePath)
+            }
+            return builtText
         }.value
         if didBuild {
             UserDefaults.standard.set(true, forKey: flagKey)
         }
+    }
+
+    // Guarantees the lazy per-id / per-name image lookups are indexed lookups rather than full
+    // scans (harmless no-op if the columns are already primary keys).
+    private nonisolated static func buildImageIndexes(atPath path: String) -> Bool {
+        guard let database = try? Connection(path, readonly: false) else { return false }
+        try? database.run("CREATE INDEX IF NOT EXISTS idx_circleimage_id ON ComiketCircleImage(id)")
+        try? database.run("CREATE INDEX IF NOT EXISTS idx_commonimage_name ON ComiketCommonImage(name)")
+        return true
     }
 
     private nonisolated static func buildIndexes(atPath path: String) -> Bool {
