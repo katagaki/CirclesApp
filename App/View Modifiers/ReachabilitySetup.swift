@@ -14,6 +14,9 @@ struct ReachabilitySetupModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .task {
+                // Make the app usable from on-disk data immediately, independent of connectivity,
+                // then start observing live network changes.
+                authenticator.bootstrap()
                 authenticator.setupReachability()
             }
     }

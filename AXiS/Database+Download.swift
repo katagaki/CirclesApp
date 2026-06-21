@@ -115,7 +115,7 @@ extension Database {
 
         var totalSize: Int64 = 0
         for url in urls {
-            var headRequest = URLRequest(url: url)
+            var headRequest = URLRequest(url: url, timeoutInterval: circleMsHeadTimeout)
             headRequest.httpMethod = "HEAD"
             if let (_, response) = try? await URLSession.shared.data(for: headRequest),
                let httpResponse = response as? HTTPURLResponse,
@@ -182,7 +182,7 @@ extension Database {
     public func urlRequestForWebCatalogAPI(_ endpoint: String, authToken: OpenIDToken) -> URLRequest {
         let endpoint = URL(string: "\(circleMsAPIEndpoint)/CatalogBase/\(endpoint)/")!
 
-        var request = URLRequest(url: endpoint)
+        var request = URLRequest(url: endpoint, timeoutInterval: circleMsAPITimeout)
         request.httpMethod = "POST"
         request.setValue("Bearer \(authToken.accessToken)", forHTTPHeaderField: "Authorization")
 

@@ -156,12 +156,13 @@ class Events {
                     number: activeEventNumber
                 )
             }
-        case .offline:
+        case .offline, .undetermined:
+            // Even when connectivity is unknown, fall back to the on-disk event so already
+            // downloaded data can load instead of dead-ending on a blank screen.
             activeEvent = WebCatalogEvent.Response.Event(
                 id: activeEventNumber,
                 number: activeEventNumber
             )
-        case .undetermined: break
         }
     }
 

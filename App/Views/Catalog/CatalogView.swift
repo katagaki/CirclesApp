@@ -144,8 +144,12 @@ struct CatalogView: View {
         .onChange(of: selections.catalogSelectionID) {
             reloadDisplayedCircles()
         }
-        .onChange(of: searchTerm) {
-            searchCircles()
+        .task(id: searchTerm) {
+            // Debounce: SwiftUI cancels the prior task when searchTerm changes, so only the
+            // final keystroke runs the full-table scan instead of one scan per character.
+            try? await Task.sleep(for: .milliseconds(250))
+            if Task.isCancelled { return }
+            await searchCircles()
         }
         .onChange(of: isSearchActive) {
             if isSearchActive && unifier.isMinimized {
@@ -190,14 +194,14 @@ struct CatalogView: View {
                 )
 
                 await MainActor.run {
-                    let displayedCircles = database.circles(circleIdentifiers)
+                    // Assign the (potentially large) array without animation; reserve the
+                    // animation for the loading-spinner crossfade only.
+                    catalogCache.displayedCircles = database.circles(circleIdentifiers)
                     if animated {
                         withAnimation(.smooth.speed(2.0)) {
-                            catalogCache.displayedCircles = displayedCircles
                             catalogCache.isLoading = false
                         }
                     } else {
-                        catalogCache.displayedCircles = displayedCircles
                         catalogCache.isLoading = false
                     }
                 }
@@ -225,25 +229,14 @@ struct CatalogView: View {
         }
     }
 
-    func searchCircles() {
-        Task.detached {
-            let circleIdentifiers = await CatalogCache.searchCircles(searchTerm, database: database)
-
-            if let circleIdentifiers {
-                await MainActor.run {
-                    let searchedCircles = database.circles(circleIdentifiers)
-                    withAnimation(.smooth.speed(2.0)) {
-                        catalogCache.searchedCircles = searchedCircles
-                    }
-                }
-            } else {
-                await MainActor.run {
-                    withAnimation(.smooth.speed(2.0)) {
-                        catalogCache.searchedCircles = nil
-                    }
-                }
-            }
+    func searchCircles() async {
+        let circleIdentifiers = await CatalogCache.searchCircles(searchTerm, database: database)
+        if Task.isCancelled { return }
+        // Assign results without animating the whole collection (avoids a full diff/animate per query).
+        if let circleIdentifiers {
+            catalogCache.searchedCircles = database.circles(circleIdentifiers)
+        } else {
+            catalogCache.searchedCircles = nil
         }
-
     }
 }

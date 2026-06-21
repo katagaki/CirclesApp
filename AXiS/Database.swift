@@ -44,6 +44,7 @@ public class Database {
             debugPrint("Database: Connecting to text database at \(textDatabaseURL.path(percentEncoded: false))")
             #endif
             textDatabase = try? Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
+            applyReadOnlyPragmas(to: textDatabase)
         }
         return textDatabase
     }
@@ -54,8 +55,23 @@ public class Database {
             debugPrint("Database: Connecting to image database at \(imageDatabaseURL.path(percentEncoded: false))")
             #endif
             imageDatabase = try? Connection(imageDatabaseURL.path(percentEncoded: false), readonly: true)
+            applyReadOnlyPragmas(to: imageDatabase)
         }
         return imageDatabase
+    }
+
+    // Tuning for read-only catalog connections: larger page cache + memory-mapped IO reduce
+    // page-read syscalls (fewer wakeups / less battery) on the large full-table reads and scans.
+    private func applyReadOnlyPragmas(to connection: Connection?) {
+        guard let connection else { return }
+        try? connection.execute(
+            """
+            PRAGMA cache_size = -8000;
+            PRAGMA mmap_size = 268435456;
+            PRAGMA temp_store = MEMORY;
+            PRAGMA query_only = ON;
+            """
+        )
     }
 
     public func disconnect() {

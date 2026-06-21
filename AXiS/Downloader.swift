@@ -75,6 +75,10 @@ public class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelega
         if let error {
             continuation?.resume(throwing: error)
         }
+        // Each download uses a background session with a unique identifier; invalidate it once the
+        // task finishes so we don't leak nsurlsessiond sessions (and the delegate retain) for the
+        // app's lifetime.
+        session.finishTasksAndInvalidate()
     }
     // swiftlint:enable unused_parameter
 }

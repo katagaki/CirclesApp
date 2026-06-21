@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import RADiUS
 import SwiftUI
 import UIKit
 import WebP
@@ -72,7 +73,8 @@ class ImageCache {
 
     static func download(id: Int, url: URL) async -> (UIImage?, Data?) {
         do {
-            let (data, _) = try await URLSession.shared.data(from: url)
+            let request = URLRequest(url: url, timeoutInterval: circleMsAPITimeout)
+            let (data, _) = try await URLSession.shared.data(for: request)
             var finalImage: UIImage?
             var finalData: Data?
             if let image = UIImage(data: data) {
