@@ -24,7 +24,10 @@ extension Database {
                     on: circlesTable[id] == circleExtendedInformationTable[id]
                 )
 
-                let query = joinedTable.filter(identifiers.contains(circlesTable[id]))
+                // Order in SQL (PK) so we don't sort the hydrated array in Swift on the main actor.
+                let query = joinedTable
+                    .filter(identifiers.contains(circlesTable[id]))
+                    .order(reversed ? circlesTable[id].desc : circlesTable[id].asc)
                 let circles = try textDatabase.prepare(query).map { row in
                     let circle = ComiketCircle(from: row)
                     let extendedInformation = ComiketCircleExtendedInformation(from: row)
@@ -46,11 +49,7 @@ extension Database {
                     }
                 }
 
-                if reversed {
-                    return circles.sorted(by: { $0.id > $1.id })
-                } else {
-                    return circles.sorted(by: { $0.id < $1.id })
-                }
+                return circles
             } catch {
                 debugPrint(error.localizedDescription)
             }
