@@ -143,21 +143,6 @@ extension Database {
         await commonImageAsync(named: "\(usingHighDefinition ? "LWGR" : "WGR")\(day)\(hall.rawValue)")
     }
 
-    public func circleImage(for id: Int) -> UIImage? {
-        let key = "circle:\(id)"
-        if let cachedImage = cachedDecodedImage(key) {
-            return cachedImage
-        }
-        guard circleImageIDs.contains(id),
-              let imageDatabase = getImageDatabase(),
-              let circleImageData = Database.readCircleImageData(from: imageDatabase, id: id),
-              let circleImage = UIImage(data: circleImageData) else {
-            return nil
-        }
-        cacheDecodedImage(circleImage, key: key, cost: decodedCost(of: circleImage))
-        return circleImage
-    }
-
     public func cachedCircleImage(for id: Int) -> UIImage? {
         cachedDecodedImage("circle:\(id)")
     }
