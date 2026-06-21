@@ -151,16 +151,34 @@ class Authenticator {
         return nil
     }
 
-    // Bring the app to a usable state without waiting for any Reachability callback.
-    // The on-disk catalog must always load, even when Reachability cannot be created or
-    // its notifier never fires. Connectivity is resolved synchronously here (best-effort);
-    // live changes are handled afterwards by the notifier.
-    func bootstrap() {
-        guard !isReady else { return }
+    func setupReachability() {
+        guard let reachability else {
+            // No reachability monitor available: bootstrap immediately (best-effort offline) so the
+            // app never waits on a callback that will never arrive.
+            bootstrap(isConnected: false)
+            return
+        }
+        reachability.whenReachable = { [weak self] _ in
+            Task { await self?.handleReachable() }
+        }
+        reachability.whenUnreachable = { [weak self] _ in
+            Task { self?.handleUnreachable() }
+        }
+        do {
+            // startNotifier performs the initial flag read, which fires whenReachable/whenUnreachable
+            // and drives the first bootstrap — so launch pays for no synchronous connectivity query.
+            try reachability.startNotifier()
+        } catch {
+            debugPrint(error.localizedDescription)
+            bootstrap(isConnected: false)
+        }
+    }
 
-        // Best-effort synchronous connectivity read; default to offline when unknown so the
-        // app never hangs and always falls back to already-downloaded data.
-        let isConnected = (reachability?.connection ?? .unavailable) != .unavailable
+    // Brings the app to a usable state exactly once, independent of whether any later Reachability
+    // callback arrives. The connectivity result is supplied by the caller (the reachability callback,
+    // or a best-effort default on failure) so the launch path does no synchronous flag read.
+    func bootstrap(isConnected: Bool) {
+        guard !isReady else { return }
         onlineState = isConnected ? .online : .offline
 
         if restoreAuthenticationFromKeychainAndDefaults() {
@@ -170,8 +188,7 @@ class Authenticator {
             }
         } else if !isConnected {
             // OFFLINE: keep whatever token we have (or an empty placeholder) so already
-            // downloaded data stays browsable; never raise a login wall we can't complete
-            // without a network.
+            // downloaded data stays browsable; never raise a login wall we can't complete.
             if let storedToken = loadStoredToken(), !storedToken.accessToken.isEmpty {
                 token = storedToken
                 tokenExpiryDate = (UserDefaults.standard.object(forKey: tokenExpiryDateKey) as? Date) ?? .distantPast
@@ -181,37 +198,16 @@ class Authenticator {
         } else {
             // ONLINE without a fresh token (first run, expired, or revoked): require login so the
             // user can authenticate before anything that needs the network — notably downloads.
-            // Keeping a stale token here would silently break the size probe and the download.
             resetAuthentication()
         }
 
         isReady = true
     }
 
-    func setupReachability() {
-        if let reachability {
-            reachability.whenReachable = { [weak self] _ in
-                Task {
-                    await self?.handleReachable()
-                }
-            }
-            reachability.whenUnreachable = { [weak self] _ in
-                Task {
-                    self?.handleUnreachable()
-                }
-            }
-            do {
-                try reachability.startNotifier()
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
-        }
-    }
-
     private func handleReachable() async {
         onlineState = .online
         if !isReady {
-            bootstrap()
+            bootstrap(isConnected: true)
             return
         }
         // Came online after bootstrap: silently refresh if our token is near/over expiry.
@@ -224,7 +220,7 @@ class Authenticator {
     private func handleUnreachable() {
         onlineState = .offline
         if !isReady {
-            bootstrap()
+            bootstrap(isConnected: false)
             return
         }
         useOfflineAuthenticationToken()

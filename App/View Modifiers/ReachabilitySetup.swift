@@ -14,9 +14,8 @@ struct ReachabilitySetupModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .task {
-                // Make the app usable from on-disk data immediately, independent of connectivity,
-                // then start observing live network changes.
-                authenticator.bootstrap()
+                // Starting the notifier performs the single connectivity read and drives the
+                // initial bootstrap from its callback — no extra synchronous work on the launch path.
                 authenticator.setupReachability()
             }
     }
