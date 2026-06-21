@@ -135,6 +135,14 @@ extension Database {
         return commonImage(named: "\(usingHighDefinition ? "LWGR" : "WGR")\(day)\(hall.rawValue)")
     }
 
+    public func mapImageAsync(for hall: ComiketHall, on day: Int, usingHighDefinition: Bool) async -> UIImage? {
+        await commonImageAsync(named: "\(usingHighDefinition ? "LWMP" : "WMP")\(day)\(hall.rawValue)")
+    }
+
+    public func genreImageAsync(for hall: ComiketHall, on day: Int, usingHighDefinition: Bool) async -> UIImage? {
+        await commonImageAsync(named: "\(usingHighDefinition ? "LWGR" : "WGR")\(day)\(hall.rawValue)")
+    }
+
     public func circleImage(for id: Int) -> UIImage? {
         let key = "circle:\(id)"
         if let cachedImage = cachedDecodedImage(key) {
@@ -186,6 +194,24 @@ extension Database {
         }
         cacheDecodedImage(image, key: key, cost: decodedCost(of: image))
         return image
+    }
+
+    public func commonImageAsync(named imageName: String) async -> UIImage? {
+        let key = "common:\(imageName)"
+        if let cachedImage = cachedDecodedImage(key) {
+            return cachedImage
+        }
+        guard let imageDatabase = getImageDatabase() else { return nil }
+        let decoded = await Task.detached(priority: .userInitiated) {
+            guard let data = Database.readCommonImageData(from: imageDatabase, name: imageName),
+                  let image = UIImage(data: data) else {
+                return nil as UIImage?
+            }
+            return image.preparingForDisplay() ?? image
+        }.value
+        guard let decoded else { return nil }
+        cacheDecodedImage(decoded, key: key, cost: decodedCost(of: decoded))
+        return decoded
     }
 
     private func decodedCost(of image: UIImage) -> Int {

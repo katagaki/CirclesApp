@@ -19,8 +19,10 @@ extension MapView {
     func reloadAll() {
         withAnimation(.smooth.speed(2.0)) {
             mapper.removeAllLayouts()
-            reloadMapImage()
+            mapImage = nil
+            genreImage = nil
         } completion: {
+            Task { await reloadMapImage() }
             if let map = selections.map {
                 let mapID = map.id
                 let selectedDate = selections.date?.id
@@ -36,23 +38,27 @@ extension MapView {
         }
     }
 
-    func reloadMapImage() {
-        if let date = selections.date,
-           let map = selections.map,
-           let selectedHall = ComiketHall(rawValue: map.filename) {
-            mapImage = database.mapImage(
-                for: selectedHall,
-                on: date.id,
-                usingHighDefinition: useHighResolutionMaps
-            )
-            genreImage = database.genreImage(
-                for: selectedHall,
-                on: date.id,
-                usingHighDefinition: useHighResolutionMaps
-            )
-        } else {
+    func reloadMapImage() async {
+        guard let date = selections.date,
+              let map = selections.map,
+              let selectedHall = ComiketHall(rawValue: map.filename) else {
             mapImage = nil
             genreImage = nil
+            return
+        }
+        let newMapImage = await database.mapImageAsync(
+            for: selectedHall,
+            on: date.id,
+            usingHighDefinition: useHighResolutionMaps
+        )
+        let newGenreImage = await database.genreImageAsync(
+            for: selectedHall,
+            on: date.id,
+            usingHighDefinition: useHighResolutionMaps
+        )
+        withAnimation(.smooth.speed(2.0)) {
+            mapImage = newMapImage
+            genreImage = newGenreImage
         }
     }
 
