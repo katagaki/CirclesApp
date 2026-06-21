@@ -319,6 +319,9 @@ class Authenticator {
             }
             _ = decodeAuthenticationToken(data: data)
         } catch {
+            // Transient failure (timeout, offline, captive portal): keep the existing
+            // token and retry later rather than forcing re-login. Only a decisive 4xx
+            // (handled above) clears authentication.
         }
     }
 
