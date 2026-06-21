@@ -138,26 +138,39 @@ extension Database {
     }
 
     public func circleImage(for id: Int) -> UIImage? {
-        if let cachedImage = imageCache[String(id)] {
+        let key = "circle:\(id)"
+        if let cachedImage = cachedDecodedImage(key) {
             return cachedImage
         }
-        if let circleImageData = circleImages[id] {
-            let circleImage = UIImage(data: circleImageData)
-            imageCache[String(id)] = circleImage
-            return circleImage
+        guard circleImageIDs.contains(id),
+              let imageDatabase = getImageDatabase(),
+              let circleImageData = Database.readCircleImageData(from: imageDatabase, id: id),
+              let circleImage = UIImage(data: circleImageData) else {
+            return nil
         }
-        return nil
+        cacheDecodedImage(circleImage, key: key, cost: decodedCost(of: circleImage))
+        return circleImage
     }
 
     public func commonImage(named imageName: String) -> UIImage? {
-        if let cachedImage = imageCache[imageName] {
+        let key = "common:\(imageName)"
+        if let cachedImage = cachedDecodedImage(key) {
             return cachedImage
         }
-        if let imageData = commonImages[imageName] {
-            let image = UIImage(data: imageData)
-            imageCache[imageName] = image
-            return image
+        guard commonImageNames.contains(imageName),
+              let imageDatabase = getImageDatabase(),
+              let imageData = Database.readCommonImageData(from: imageDatabase, name: imageName),
+              let image = UIImage(data: imageData) else {
+            return nil
         }
-        return nil
+        cacheDecodedImage(image, key: key, cost: decodedCost(of: image))
+        return image
+    }
+
+    private func decodedCost(of image: UIImage) -> Int {
+        if let cgImage = image.cgImage {
+            return cgImage.bytesPerRow * cgImage.height
+        }
+        return Int(image.size.width * image.size.height * 4.0)
     }
 }

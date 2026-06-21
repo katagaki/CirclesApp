@@ -71,7 +71,7 @@ struct CircleCutImage: View {
         }
         .aspectRatio(180.0 / 256.0, contentMode: .fit)
         .overlay {
-            if database.circleImage(for: circle.id) != nil {
+            if database.hasCircleImage(circle.id) {
                 Canvas { context, size in
                     // Favorite color
                     if let favorites = favorites.wcIDMappedItems,

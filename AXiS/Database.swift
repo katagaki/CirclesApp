@@ -20,9 +20,17 @@ public class Database {
     @ObservationIgnored public var imageDatabase: Connection?
     @ObservationIgnored public var textDatabaseURL: URL?
     @ObservationIgnored public var imageDatabaseURL: URL?
-    @ObservationIgnored public var commonImages: [String: Data] = [:]
-    @ObservationIgnored public var circleImages: [Int: Data] = [:]
-    @ObservationIgnored public var imageCache: [String: UIImage] = [:]
+    // Presence sets only — no image blobs are held in RAM. Blobs are read lazily per key when an
+    // image is actually displayed, and the decoded UIImages live in a bounded NSCache that evicts
+    // under memory pressure. This avoids loading tens of thousands of cut blobs at startup and the
+    // unbounded decoded-image growth that previously led to jetsam termination.
+    @ObservationIgnored public var commonImageNames: Set<String> = []
+    @ObservationIgnored public var circleImageIDs: Set<Int> = []
+    @ObservationIgnored private let decodedImageCache: NSCache<NSString, UIImage> = {
+        let cache = NSCache<NSString, UIImage>()
+        cache.totalCostLimit = 64 * 1024 * 1024
+        return cache
+    }()
 
     public var commonImagesLoadCount: Int = 0
     public var circleImagesLoadCount: Int = 0
@@ -34,6 +42,24 @@ public class Database {
 
     public init() {
         // No initialization required; properties are set lazily or by callers.
+    }
+
+    // Bounded decoded-image cache accessors (the NSCache itself stays private to this file).
+    func cachedDecodedImage(_ key: String) -> UIImage? {
+        decodedImageCache.object(forKey: key as NSString)
+    }
+
+    func cacheDecodedImage(_ image: UIImage, key: String, cost: Int) {
+        decodedImageCache.setObject(image, forKey: key as NSString, cost: cost)
+    }
+
+    // Clears decoded images held in RAM. On-disk blobs remain and are re-fetched lazily.
+    public func clearDecodedImages() {
+        decodedImageCache.removeAllObjects()
+    }
+
+    public func hasCircleImage(_ id: Int) -> Bool {
+        circleImageIDs.contains(id)
     }
 
     // MARK: Database Connection
@@ -143,9 +169,9 @@ public class Database {
             databaseInformation = nil
             textDatabase = nil
             imageDatabase = nil
-            commonImages.removeAll()
-            circleImages.removeAll()
-            imageCache.removeAll()
+            commonImageNames.removeAll()
+            circleImageIDs.removeAll()
+            decodedImageCache.removeAllObjects()
             try? FileManager.default.removeItem(at: dataStoreURL)
         }
     }
@@ -165,9 +191,9 @@ public class Database {
             if imageDatabaseURL == targetImageDatabaseURL {
                 imageDatabase = nil
                 imageDatabaseURL = nil
-                commonImages.removeAll()
-                circleImages.removeAll()
-                imageCache.removeAll()
+                commonImageNames.removeAll()
+                circleImageIDs.removeAll()
+                decodedImageCache.removeAllObjects()
             }
 
             try? FileManager.default.removeItem(at: targetTextDatabaseURL)
@@ -186,9 +212,9 @@ public class Database {
         imageDatabaseURL = nil
         textDatabase = nil
         imageDatabase = nil
-        imageCache.removeAll()
-        commonImages.removeAll()
-        circleImages.removeAll()
+        decodedImageCache.removeAllObjects()
+        commonImageNames.removeAll()
+        circleImageIDs.removeAll()
     }
 
     // MARK: Loading
@@ -196,10 +222,10 @@ public class Database {
     public func loadCommonImages() async {
         guard let imageDatabase = getImageDatabase() else { return }
         let loaded = await Task.detached(priority: .userInitiated) {
-            Self.readCommonImages(from: imageDatabase)
+            Self.readCommonImageNames(from: imageDatabase)
         }.value
         if let loaded {
-            self.commonImages = loaded
+            self.commonImageNames = loaded
             self.commonImagesLoadCount += 1
         }
     }
@@ -207,36 +233,57 @@ public class Database {
     public func loadCircleImages() async {
         guard let imageDatabase = getImageDatabase() else { return }
         let loaded = await Task.detached(priority: .userInitiated) {
-            Self.readCircleImages(from: imageDatabase)
+            Self.readCircleImageIDs(from: imageDatabase)
         }.value
         if let loaded {
-            self.circleImages = loaded
+            self.circleImageIDs = loaded
             self.circleImagesLoadCount += 1
         }
     }
 
-    private nonisolated static func readCommonImages(from imageDatabase: Connection) -> [String: Data]? {
+    // Presence sets are cheap to load (keys only, no blobs); they gate the lazy blob fetches below.
+    private nonisolated static func readCommonImageNames(from imageDatabase: Connection) -> Set<String>? {
         do {
             let colName = Expression<String>("name")
-            let colImage = Expression<Data>("image")
-            let table = Table("ComiketCommonImage").select(colName, colImage)
-            return try imageDatabase.prepare(table).reduce(into: [:]) { partialResult, row in
-                partialResult[row[colName]] = row[colImage]
-            }
+            let table = Table("ComiketCommonImage").select(colName)
+            return try Set(imageDatabase.prepare(table).map { $0[colName] })
         } catch {
             debugPrint(error.localizedDescription)
             return nil
         }
     }
 
-    private nonisolated static func readCircleImages(from imageDatabase: Connection) -> [Int: Data]? {
+    private nonisolated static func readCircleImageIDs(from imageDatabase: Connection) -> Set<Int>? {
+        do {
+            let colID = Expression<Int>("id")
+            let table = Table("ComiketCircleImage").select(colID)
+            return try Set(imageDatabase.prepare(table).map { $0[colID] })
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
+    }
+
+    // Lazy single-row blob reads (indexed primary-key / name lookups), used on demand by the
+    // image accessors in Database+Fetchers when a specific image is actually displayed.
+    static func readCircleImageData(from imageDatabase: Connection, id: Int) -> Data? {
         do {
             let colID = Expression<Int>("id")
             let colCutImage = Expression<Data>("cutImage")
-            let table = Table("ComiketCircleImage").select(colID, colCutImage)
-            return try imageDatabase.prepare(table).reduce(into: [:]) { partialResult, row in
-                partialResult[row[colID]] = row[colCutImage]
-            }
+            let query = Table("ComiketCircleImage").select(colCutImage).filter(colID == id)
+            return try imageDatabase.pluck(query)?[colCutImage]
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
+    }
+
+    static func readCommonImageData(from imageDatabase: Connection, name: String) -> Data? {
+        do {
+            let colName = Expression<String>("name")
+            let colImage = Expression<Data>("image")
+            let query = Table("ComiketCommonImage").select(colImage).filter(colName == name)
+            return try imageDatabase.pluck(query)?[colImage]
         } catch {
             debugPrint(error.localizedDescription)
             return nil

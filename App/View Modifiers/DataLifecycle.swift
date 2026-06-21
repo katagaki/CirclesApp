@@ -247,7 +247,7 @@ struct DataLifecycleModifier: ViewModifier {
                 isDatabaseInitialized = true
             }
 
-            database.imageCache.removeAll()
+            database.clearDecodedImages()
         }
 
         UIApplication.shared.isIdleTimerDisabled = false
