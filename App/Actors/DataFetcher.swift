@@ -130,25 +130,56 @@ actor DataFetcher {
     }
 
     func circles(containing searchTerm: String) -> [Int] {
-        if let database {
-            do {
-                let table = Table("ComiketCircleWC")
-                let colID = Expression<Int>("id")
-                let colCircleName = Expression<String>("circleName")
-                let colCircleNameKana = Expression<String>("circleKana")
-                let colPenName = Expression<String>("penName")
-
-                let query = table.select(colID).filter(
-                    colCircleName.like("%\(searchTerm)%") ||
-                    colCircleNameKana.like("%\(searchTerm)%") ||
-                    colPenName.like("%\(searchTerm)%")
-                )
-                return try database.prepare(query).map { $0[colID] }
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
+        guard let database else { return [] }
+        let term = searchTerm.trimmingCharacters(in: .whitespaces)
+        guard !term.isEmpty else { return [] }
+        // FTS5 trigram requires >= 3 characters; use the index when possible, otherwise fall back
+        // to a LIKE scan (also used when the FTS table isn't present on this catalog).
+        if term.count >= 3, let ftsResults = ftsSearch(term, in: database) {
+            return ftsResults
         }
-        return []
+        return likeSearch(term, in: database)
+    }
+
+    private func ftsSearch(_ term: String, in database: Connection) -> [Int]? {
+        let escaped = term.replacingOccurrences(of: "\"", with: "\"\"")
+        let matchQuery = "\"\(escaped)\""
+        do {
+            let statement = try database.prepare(
+                "SELECT rowid FROM CircleSearchFTS WHERE CircleSearchFTS MATCH ? ORDER BY rowid",
+                matchQuery
+            )
+            var ids: [Int] = []
+            for row in statement {
+                if let value = row[0] as? Int64 {
+                    ids.append(Int(value))
+                }
+            }
+            return ids
+        } catch {
+            // FTS table missing/unavailable on this catalog; signal a LIKE fallback.
+            return nil
+        }
+    }
+
+    private func likeSearch(_ term: String, in database: Connection) -> [Int] {
+        do {
+            let table = Table("ComiketCircleWC")
+            let colID = Expression<Int>("id")
+            let colCircleName = Expression<String>("circleName")
+            let colCircleNameKana = Expression<String>("circleKana")
+            let colPenName = Expression<String>("penName")
+
+            let query = table.select(colID).filter(
+                colCircleName.like("%\(term)%") ||
+                colCircleNameKana.like("%\(term)%") ||
+                colPenName.like("%\(term)%")
+            )
+            return try database.prepare(query).map { $0[colID] }
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
     }
 
     func circles(

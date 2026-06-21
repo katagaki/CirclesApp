@@ -6,6 +6,7 @@
 //
 
 import RADiUS
+import SQLite
 import UIKit
 import ZIPFoundation
 
@@ -187,6 +188,72 @@ extension Database {
         request.setValue("Bearer \(authToken.accessToken)", forHTTPHeaderField: "Authorization")
 
         return request
+    }
+
+    // MARK: Indexing
+
+    // One-time, idempotent: builds secondary indexes on the hot filter columns and an FTS5 trigram
+    // table for circle search. The catalog DB ships without these, so every filter is otherwise a
+    // full table scan and search is a triple leading-wildcard LIKE. Runs once per event (gated by a
+    // flag) on a background connection so it never blocks the main thread.
+    public func prepareIndexes(for event: WebCatalogEvent.Response.Event) async {
+        let flagKey = "Database.Indexed.\(event.number)"
+        if UserDefaults.standard.bool(forKey: flagKey) { return }
+        guard let textDatabaseURL else { return }
+        let path = textDatabaseURL.path(percentEncoded: false)
+        let didBuild = await Task.detached(priority: .userInitiated) {
+            Self.buildIndexes(atPath: path)
+        }.value
+        if didBuild {
+            UserDefaults.standard.set(true, forKey: flagKey)
+        }
+    }
+
+    private nonisolated static func buildIndexes(atPath path: String) -> Bool {
+        guard let database = try? Connection(path, readonly: false) else { return false }
+        let indexStatements = [
+            "CREATE INDEX IF NOT EXISTS idx_circlewc_block ON ComiketCircleWC(blockId)",
+            "CREATE INDEX IF NOT EXISTS idx_circlewc_genre ON ComiketCircleWC(genreId)",
+            "CREATE INDEX IF NOT EXISTS idx_circlewc_day ON ComiketCircleWC(day)",
+            "CREATE INDEX IF NOT EXISTS idx_circlewc_day_block ON ComiketCircleWC(day, blockId)",
+            "CREATE INDEX IF NOT EXISTS idx_extend_wcid ON ComiketCircleExtend(WCId)",
+            "CREATE INDEX IF NOT EXISTS idx_mapping_map ON ComiketMappingWC(mapId)",
+            "CREATE INDEX IF NOT EXISTS idx_mapping_block ON ComiketMappingWC(blockId)",
+            "CREATE INDEX IF NOT EXISTS idx_layout_map ON ComiketLayoutWC(mapId)"
+        ]
+        // Each statement is isolated so one missing column can't abort the rest.
+        for statement in indexStatements {
+            try? database.run(statement)
+        }
+
+        // FTS5 trigram for substring search. Best-effort: if the tokenizer is unavailable the
+        // search path falls back to LIKE, so failure here is non-fatal.
+        let rawCount = try? database.scalar(
+            "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='CircleSearchFTS'"
+        )
+        let ftsExists = ((rawCount ?? nil) as? Int64) ?? 0
+        if ftsExists == 0 {
+            do {
+                try database.run(
+                    """
+                    CREATE VIRTUAL TABLE CircleSearchFTS USING fts5(
+                        circleName, circleKana, penName,
+                        content='ComiketCircleWC', content_rowid='id', tokenize='trigram'
+                    )
+                    """
+                )
+                try database.run(
+                    """
+                    INSERT INTO CircleSearchFTS(rowid, circleName, circleKana, penName)
+                    SELECT id, circleName, circleKana, penName FROM ComiketCircleWC
+                    """
+                )
+            } catch {
+                // Leave no half-built table behind: drop it so search cleanly falls back to LIKE.
+                try? database.run("DROP TABLE IF EXISTS CircleSearchFTS")
+            }
+        }
+        return true
     }
 
 }
