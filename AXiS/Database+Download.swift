@@ -198,14 +198,14 @@ extension Database {
         let textPath = textDatabaseURL?.path(percentEncoded: false)
         let imagePath = imageDatabaseURL?.path(percentEncoded: false)
         let didBuild = await Task.detached(priority: .userInitiated) {
-            var builtText = false
+            var success = true
             if let textPath {
-                builtText = Self.buildIndexes(atPath: textPath)
+                success = Self.buildIndexes(atPath: textPath) && success
             }
             if let imagePath {
-                _ = Self.buildImageIndexes(atPath: imagePath)
+                success = Self.buildImageIndexes(atPath: imagePath) && success
             }
-            return builtText
+            return success
         }.value
         if didBuild {
             UserDefaults.standard.set(true, forKey: flagKey)
