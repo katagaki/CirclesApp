@@ -235,12 +235,22 @@ extension Database {
             try? database.execute(statement)
         }
 
-        let rawCount = try? database.scalar(
-            "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='CircleSearchFTS'"
-        )
-        let ftsExists = ((rawCount ?? nil) as? Int64) ?? 0
-        if ftsExists == 0 {
-            do {
+        Self.buildSearchIndex(in: database)
+        return true
+    }
+
+    private nonisolated static func buildSearchIndex(in database: Connection) {
+        let sourceCount = Self.rowCount(in: database, of: "ComiketCircleWC")
+        if Self.tableExists("CircleSearchFTS", in: database) {
+            // A table left empty by an interrupted build silently breaks search,
+            // since ftsSearch then returns [] instead of falling back to LIKE.
+            if Self.rowCount(in: database, of: "CircleSearchFTS") == sourceCount {
+                return
+            }
+            try? database.execute("DROP TABLE IF EXISTS CircleSearchFTS")
+        }
+        do {
+            try database.transaction {
                 try database.run(
                     """
                     CREATE VIRTUAL TABLE CircleSearchFTS USING fts5(
@@ -255,11 +265,22 @@ extension Database {
                     SELECT id, circleName, circleKana, penName FROM ComiketCircleWC
                     """
                 )
-            } catch {
-                try? database.execute("DROP TABLE IF EXISTS CircleSearchFTS")
             }
+        } catch {
+            try? database.execute("DROP TABLE IF EXISTS CircleSearchFTS")
         }
-        return true
+    }
+
+    private nonisolated static func tableExists(_ name: String, in database: Connection) -> Bool {
+        let rawCount = try? database.scalar(
+            "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?", name
+        )
+        return (((rawCount ?? nil) as? Int64) ?? 0) > 0
+    }
+
+    private nonisolated static func rowCount(in database: Connection, of table: String) -> Int64 {
+        let rawCount = try? database.scalar("SELECT count(*) FROM \"\(table)\"")
+        return ((rawCount ?? nil) as? Int64) ?? -1
     }
 
 }
