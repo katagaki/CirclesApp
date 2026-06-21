@@ -40,6 +40,12 @@ public class Database {
         // No initialization required; properties are set lazily or by callers.
     }
 
+    static let indexedFlagKeyPrefix = "Database.Indexed."
+
+    static func indexedFlagKey(forEvent number: Int) -> String {
+        "\(indexedFlagKeyPrefix)\(number)"
+    }
+
     func cachedDecodedImage(_ key: String) -> UIImage? {
         decodedImageCache.object(forKey: key as NSString)
     }
@@ -170,6 +176,10 @@ public class Database {
             commonImageNames.removeAll()
             circleImageIDs.removeAll()
             decodedImageCache.removeAllObjects()
+            for key in UserDefaults.standard.dictionaryRepresentation().keys
+            where key.hasPrefix(Database.indexedFlagKeyPrefix) {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
             try? FileManager.default.removeItem(at: dataStoreURL)
         }
     }
@@ -193,6 +203,8 @@ public class Database {
                 circleImageIDs.removeAll()
                 decodedImageCache.removeAllObjects()
             }
+
+            UserDefaults.standard.removeObject(forKey: Database.indexedFlagKey(forEvent: event.number))
 
             try? FileManager.default.removeItem(at: targetTextDatabaseURL)
             try? FileManager.default.removeItem(at: targetImageDatabaseURL)

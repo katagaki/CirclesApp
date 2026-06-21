@@ -193,7 +193,7 @@ extension Database {
     // MARK: Indexing
 
     public func prepareIndexes(for event: WebCatalogEvent.Response.Event) async {
-        let flagKey = "Database.Indexed.\(event.number)"
+        let flagKey = Database.indexedFlagKey(forEvent: event.number)
         if UserDefaults.standard.bool(forKey: flagKey) { return }
         let textPath = textDatabaseURL?.path(percentEncoded: false)
         let imagePath = imageDatabaseURL?.path(percentEncoded: false)
