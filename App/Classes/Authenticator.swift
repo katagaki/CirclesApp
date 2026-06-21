@@ -168,23 +168,21 @@ class Authenticator {
             if isConnected && tokenExpiryDate.addingTimeInterval(-3600) < .now {
                 Task { await refreshAuthenticationToken() }
             }
-        } else if let storedToken = loadStoredToken(), !storedToken.refreshToken.isEmpty {
-            // We have a (possibly expired) token with a refresh token. Keep it so on-disk data
-            // stays browsable; attempt a silent refresh when online instead of forcing login.
-            token = storedToken
-            if let storedExpiry = UserDefaults.standard.object(forKey: tokenExpiryDateKey) as? Date {
-                tokenExpiryDate = storedExpiry
-            }
-            if isConnected {
-                Task { await refreshAuthenticationToken() }
-            }
-        } else {
-            // No usable credentials.
-            if isConnected {
-                resetAuthentication()
+        } else if !isConnected {
+            // OFFLINE: keep whatever token we have (or an empty placeholder) so already
+            // downloaded data stays browsable; never raise a login wall we can't complete
+            // without a network.
+            if let storedToken = loadStoredToken(), !storedToken.accessToken.isEmpty {
+                token = storedToken
+                tokenExpiryDate = (UserDefaults.standard.object(forKey: tokenExpiryDateKey) as? Date) ?? .distantPast
             } else {
                 useOfflineAuthenticationToken()
             }
+        } else {
+            // ONLINE without a fresh token (first run, expired, or revoked): require login so the
+            // user can authenticate before anything that needs the network — notably downloads.
+            // Keeping a stale token here would silently break the size probe and the download.
+            resetAuthentication()
         }
 
         isReady = true
