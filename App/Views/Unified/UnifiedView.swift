@@ -140,8 +140,6 @@ struct UnifiedView: View {
         launchCount += 1
         guard launchCount > 2, !hasReviewBeenPrompted else { return }
         Task {
-            // Don't interrupt startup-to-find: wait until the app has settled, and only prompt
-            // once data is loaded and nothing else is in the way.
             try? await Task.sleep(for: .seconds(8))
             guard authenticator.isReady, !authenticator.isAuthenticating, !oasis.isShowing else { return }
             requestReview()

@@ -161,11 +161,7 @@ struct CircleCutImage: View {
         }
     }
 
-    // Loads the catalog cut off the main thread. `force` overwrites an existing image (used when
-    // switching back to the catalog cut); otherwise it only fills an empty slot so it never clobbers
-    // a freshly fetched web cut.
     func loadCatalogCut(force: Bool = false) {
-        // Fast path: an already-decoded cut is returned synchronously from the in-memory cache.
         if let cached = database.cachedCircleImage(for: circle.id) {
             cutImage = cached
             return

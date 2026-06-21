@@ -20,10 +20,6 @@ public class Database {
     @ObservationIgnored public var imageDatabase: Connection?
     @ObservationIgnored public var textDatabaseURL: URL?
     @ObservationIgnored public var imageDatabaseURL: URL?
-    // Presence sets only — no image blobs are held in RAM. Blobs are read lazily per key when an
-    // image is actually displayed, and the decoded UIImages live in a bounded NSCache that evicts
-    // under memory pressure. This avoids loading tens of thousands of cut blobs at startup and the
-    // unbounded decoded-image growth that previously led to jetsam termination.
     @ObservationIgnored public var commonImageNames: Set<String> = []
     @ObservationIgnored public var circleImageIDs: Set<Int> = []
     @ObservationIgnored private let decodedImageCache: NSCache<NSString, UIImage> = {
@@ -44,7 +40,6 @@ public class Database {
         // No initialization required; properties are set lazily or by callers.
     }
 
-    // Bounded decoded-image cache accessors (the NSCache itself stays private to this file).
     func cachedDecodedImage(_ key: String) -> UIImage? {
         decodedImageCache.object(forKey: key as NSString)
     }
@@ -53,7 +48,6 @@ public class Database {
         decodedImageCache.setObject(image, forKey: key as NSString, cost: cost)
     }
 
-    // Clears decoded images held in RAM. On-disk blobs remain and are re-fetched lazily.
     public func clearDecodedImages() {
         decodedImageCache.removeAllObjects()
     }
@@ -85,8 +79,6 @@ public class Database {
         return imageDatabase
     }
 
-    // Tuning for read-only catalog connections: larger page cache + memory-mapped IO reduce
-    // page-read syscalls (fewer wakeups / less battery) on the large full-table reads and scans.
     private func applyReadOnlyPragmas(to connection: Connection?) {
         guard let connection else { return }
         try? connection.execute(
@@ -99,10 +91,6 @@ public class Database {
         )
     }
 
-    // A fresh, independent read-only connection to the text database. Lets concurrent readers
-    // (e.g. the catalog/search fetch) run in parallel instead of serializing behind heavy work
-    // on the shared connection (e.g. the map's layout query). The connection closes when its
-    // owning DataFetcher is released.
     public func newReadOnlyTextConnection() -> Connection? {
         guard let textDatabaseURL else { return nil }
         let connection = try? Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
@@ -251,7 +239,6 @@ public class Database {
         }
     }
 
-    // Presence sets are cheap to load (keys only, no blobs); they gate the lazy blob fetches below.
     private nonisolated static func readCommonImageNames(from imageDatabase: Connection) -> Set<String>? {
         do {
             let colName = Expression<String>("name")
@@ -274,8 +261,6 @@ public class Database {
         }
     }
 
-    // Lazy single-row blob reads (indexed primary-key / name lookups), used on demand by the
-    // image accessors in Database+Fetchers when a specific image is actually displayed.
     nonisolated static func readCircleImageData(from imageDatabase: Connection, id: Int) -> Data? {
         do {
             let colID = Expression<Int>("id")

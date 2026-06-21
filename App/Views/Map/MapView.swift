@@ -33,8 +33,6 @@ struct MapView: View {
     }
 
     var mapInvalidationID: String {
-        // Note: not keyed on commonImagesLoadCount — common images now load lazily on demand, so
-        // the map no longer needs to rebuild (and re-run the heavy layout query) when they finish.
         "M\(selections.fullMapID)_R\(useHighResolutionMaps ? "H" : "L")"
     }
 

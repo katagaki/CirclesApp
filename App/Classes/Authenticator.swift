@@ -153,8 +153,6 @@ class Authenticator {
 
     func setupReachability() {
         guard let reachability else {
-            // No reachability monitor available: bootstrap immediately (best-effort offline) so the
-            // app never waits on a callback that will never arrive.
             bootstrap(isConnected: false)
             return
         }
@@ -165,8 +163,6 @@ class Authenticator {
             Task { self?.handleUnreachable() }
         }
         do {
-            // startNotifier performs the initial flag read, which fires whenReachable/whenUnreachable
-            // and drives the first bootstrap — so launch pays for no synchronous connectivity query.
             try reachability.startNotifier()
         } catch {
             debugPrint(error.localizedDescription)
@@ -174,21 +170,15 @@ class Authenticator {
         }
     }
 
-    // Brings the app to a usable state exactly once, independent of whether any later Reachability
-    // callback arrives. The connectivity result is supplied by the caller (the reachability callback,
-    // or a best-effort default on failure) so the launch path does no synchronous flag read.
     func bootstrap(isConnected: Bool) {
         guard !isReady else { return }
         onlineState = isConnected ? .online : .offline
 
         if restoreAuthenticationFromKeychainAndDefaults() {
-            // Fresh token restored; refresh ahead of expiry only when actually online.
             if isConnected && tokenExpiryDate.addingTimeInterval(-3600) < .now {
                 Task { await refreshAuthenticationToken() }
             }
         } else if !isConnected {
-            // OFFLINE: keep whatever token we have (or an empty placeholder) so already
-            // downloaded data stays browsable; never raise a login wall we can't complete.
             if let storedToken = loadStoredToken(), !storedToken.accessToken.isEmpty {
                 token = storedToken
                 tokenExpiryDate = (UserDefaults.standard.object(forKey: tokenExpiryDateKey) as? Date) ?? .distantPast
@@ -196,8 +186,6 @@ class Authenticator {
                 useOfflineAuthenticationToken()
             }
         } else {
-            // ONLINE without a fresh token (first run, expired, or revoked): require login so the
-            // user can authenticate before anything that needs the network — notably downloads.
             resetAuthentication()
         }
 
@@ -210,7 +198,6 @@ class Authenticator {
             bootstrap(isConnected: true)
             return
         }
-        // Came online after bootstrap: silently refresh if our token is near/over expiry.
         if let token, !token.accessToken.isEmpty,
            tokenExpiryDate.addingTimeInterval(-3600) < .now {
             await refreshAuthenticationToken()
@@ -240,7 +227,6 @@ class Authenticator {
         return false
     }
 
-    // Loads the stored token regardless of expiry (used for silent refresh / offline browsing).
     func loadStoredToken() -> OpenIDToken? {
         if let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),
            let tokenData = tokenInKeychain.data(using: .utf8),
@@ -253,8 +239,6 @@ class Authenticator {
     func resetAuthentication() {
         code = nil
         token = nil
-        // Remove only the auth token, preserving the cached OpenID client config so the user
-        // can re-login without depending on a fresh CloudKit fetch.
         try? keychain.remove(keychainAuthTokenKey)
         UserDefaults.standard.removeObject(forKey: tokenExpiryDateKey)
         tokenExpiryDate = .distantFuture
@@ -290,19 +274,16 @@ class Authenticator {
             if decodeAuthenticationToken(data: data) {
                 self.isAuthenticating = false
             } else {
-                // Exchange returned a non-token body (bad code / captive portal): stay on login.
                 self.code = nil
                 self.token = nil
                 self.isAuthenticating = true
             }
         } catch {
-            // Network failure during interactive login: keep the login sheet up for retry.
             self.isAuthenticating = true
         }
     }
 
     func useOfflineAuthenticationToken() {
-        // Never overwrite a valid restored token with an empty placeholder.
         if token == nil {
             self.token = OpenIDToken()
         }
@@ -310,7 +291,6 @@ class Authenticator {
 
     func refreshAuthenticationToken() async {
         guard let refreshToken = token?.refreshToken, !refreshToken.isEmpty else {
-            // No refresh token to use; only force interactive login when we are actually online.
             if onlineState == .online {
                 self.isAuthenticating = true
             }
@@ -326,15 +306,11 @@ class Authenticator {
             let (data, response) = try await URLSession.shared.data(for: request)
             if let httpResponse = response as? HTTPURLResponse,
                (400..<500).contains(httpResponse.statusCode) {
-                // Decisive auth rejection (e.g. revoked / invalid_grant): require fresh login.
                 resetAuthentication()
                 return
             }
-            // On success, the token is updated. On a non-decodable 2xx (captive portal HTML, etc.)
-            // we deliberately keep the existing token so local data stays usable offline.
             _ = decodeAuthenticationToken(data: data)
         } catch {
-            // Transient network failure: keep the existing token; do not force a login wall.
         }
     }
 
@@ -345,7 +321,6 @@ class Authenticator {
                 tokenExpiryDate = storedExpiry
             }
         }
-        // Skip the network round-trip entirely when the token is still fresh (battery).
         if tokenExpiryDate.addingTimeInterval(-3600) > .now {
             return
         }

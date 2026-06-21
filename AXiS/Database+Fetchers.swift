@@ -24,7 +24,6 @@ extension Database {
                     on: circlesTable[id] == circleExtendedInformationTable[id]
                 )
 
-                // Order in SQL (PK) so we don't sort the hydrated array in Swift on the main actor.
                 let query = joinedTable
                     .filter(identifiers.contains(circlesTable[id]))
                     .order(reversed ? circlesTable[id].desc : circlesTable[id].asc)
@@ -151,15 +150,10 @@ extension Database {
         return circleImage
     }
 
-    // Synchronous in-memory cache lookup only (no DB read). Lets cells render an already-decoded
-    // cut immediately without spawning a task.
     public func cachedCircleImage(for id: Int) -> UIImage? {
         cachedDecodedImage("circle:\(id)")
     }
 
-    // Off-main variant for list/grid cells: the BLOB read and the (otherwise main-thread, at-draw)
-    // decode both happen on a background task so scrolling the catalog stays smooth. Returns cached
-    // results instantly on subsequent calls.
     public func circleImageAsync(for id: Int) async -> UIImage? {
         let key = "circle:\(id)"
         if let cachedImage = cachedDecodedImage(key) {
@@ -173,7 +167,6 @@ extension Database {
                   let image = UIImage(data: data) else {
                 return nil as UIImage?
             }
-            // Force-decode off the main thread so SwiftUI doesn't decode at draw time.
             return image.preparingForDisplay() ?? image
         }.value
         guard let decoded else { return nil }

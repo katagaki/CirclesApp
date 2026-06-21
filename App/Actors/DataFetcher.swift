@@ -133,8 +133,6 @@ actor DataFetcher {
         guard let database else { return [] }
         let term = searchTerm.trimmingCharacters(in: .whitespaces)
         guard !term.isEmpty else { return [] }
-        // FTS5 trigram requires >= 3 characters; use the index when possible, otherwise fall back
-        // to a LIKE scan (also used when the FTS table isn't present on this catalog).
         if term.count >= 3, let ftsResults = ftsSearch(term, in: database) {
             return ftsResults
         }
@@ -157,7 +155,6 @@ actor DataFetcher {
             }
             return ids
         } catch {
-            // FTS table missing/unavailable on this catalog; signal a LIKE fallback.
             return nil
         }
     }

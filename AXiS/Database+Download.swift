@@ -192,10 +192,6 @@ extension Database {
 
     // MARK: Indexing
 
-    // One-time, idempotent: builds secondary indexes on the hot filter columns and an FTS5 trigram
-    // table for circle search. The catalog DB ships without these, so every filter is otherwise a
-    // full table scan and search is a triple leading-wildcard LIKE. Runs once per event (gated by a
-    // flag) on a background connection so it never blocks the main thread.
     public func prepareIndexes(for event: WebCatalogEvent.Response.Event) async {
         let flagKey = "Database.Indexed.\(event.number)"
         if UserDefaults.standard.bool(forKey: flagKey) { return }
@@ -216,12 +212,10 @@ extension Database {
         }
     }
 
-    // Guarantees the lazy per-id / per-name image lookups are indexed lookups rather than full
-    // scans (harmless no-op if the columns are already primary keys).
     private nonisolated static func buildImageIndexes(atPath path: String) -> Bool {
         guard let database = try? Connection(path, readonly: false) else { return false }
-        try? database.run("CREATE INDEX IF NOT EXISTS idx_circleimage_id ON ComiketCircleImage(id)")
-        try? database.run("CREATE INDEX IF NOT EXISTS idx_commonimage_name ON ComiketCommonImage(name)")
+        try? database.execute("CREATE INDEX IF NOT EXISTS idx_circleimage_id ON ComiketCircleImage(id)")
+        try? database.execute("CREATE INDEX IF NOT EXISTS idx_commonimage_name ON ComiketCommonImage(name)")
         return true
     }
 
@@ -237,13 +231,10 @@ extension Database {
             "CREATE INDEX IF NOT EXISTS idx_mapping_block ON ComiketMappingWC(blockId)",
             "CREATE INDEX IF NOT EXISTS idx_layout_map ON ComiketLayoutWC(mapId)"
         ]
-        // Each statement is isolated so one missing column can't abort the rest.
         for statement in indexStatements {
-            try? database.run(statement)
+            try? database.execute(statement)
         }
 
-        // FTS5 trigram for substring search. Best-effort: if the tokenizer is unavailable the
-        // search path falls back to LIKE, so failure here is non-fatal.
         let rawCount = try? database.scalar(
             "SELECT count(*) FROM sqlite_master WHERE type='table' AND name='CircleSearchFTS'"
         )
@@ -265,8 +256,7 @@ extension Database {
                     """
                 )
             } catch {
-                // Leave no half-built table behind: drop it so search cleanly falls back to LIKE.
-                try? database.run("DROP TABLE IF EXISTS CircleSearchFTS")
+                try? database.execute("DROP TABLE IF EXISTS CircleSearchFTS")
             }
         }
         return true

@@ -145,8 +145,6 @@ struct CatalogView: View {
             reloadDisplayedCircles()
         }
         .task(id: searchTerm) {
-            // Debounce: SwiftUI cancels the prior task when searchTerm changes, so only the
-            // final keystroke runs the full-table scan instead of one scan per character.
             try? await Task.sleep(for: .milliseconds(250))
             if Task.isCancelled { return }
             await searchCircles()
@@ -194,8 +192,6 @@ struct CatalogView: View {
                 )
 
                 await MainActor.run {
-                    // Assign the (potentially large) array without animation; reserve the
-                    // animation for the loading-spinner crossfade only.
                     catalogCache.displayedCircles = database.circles(circleIdentifiers)
                     if animated {
                         withAnimation(.smooth.speed(2.0)) {
@@ -232,7 +228,6 @@ struct CatalogView: View {
     func searchCircles() async {
         let circleIdentifiers = await CatalogCache.searchCircles(searchTerm, database: database)
         if Task.isCancelled { return }
-        // Assign results without animating the whole collection (avoids a full diff/animate per query).
         if let circleIdentifiers {
             catalogCache.searchedCircles = database.circles(circleIdentifiers)
         } else {

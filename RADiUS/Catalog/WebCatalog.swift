@@ -62,7 +62,11 @@ public class WebCatalog {
         }
 
         if let endpoint = endpointComponents.url {
-            var request = URLRequest(url: endpoint, cachePolicy: .returnCacheDataElseLoad, timeoutInterval: circleMsAPITimeout)
+            var request = URLRequest(
+                url: endpoint,
+                cachePolicy: .returnCacheDataElseLoad,
+                timeoutInterval: circleMsAPITimeout
+            )
             request.httpMethod = "POST"
             request.setValue("Bearer \(authToken.accessToken)", forHTTPHeaderField: "Authorization")
             return request

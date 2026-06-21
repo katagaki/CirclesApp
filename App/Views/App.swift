@@ -99,10 +99,6 @@ struct CirclesApp: App {
                 switch newValue {
                 case .active:
                     if authenticator.token != nil && authenticator.onlineState == .online {
-                        // Silently refresh at/within an hour of expiry. refreshAuthenticationToken()
-                        // only escalates to interactive login on a decisive auth rejection, so an
-                        // expired token on a slow/broken network no longer walls the user off from
-                        // already-downloaded data.
                         if authenticator.tokenExpiryDate.addingTimeInterval(-3600) < .now {
                             Task {
                                 await authenticator.refreshAuthenticationToken()

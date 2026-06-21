@@ -14,8 +14,6 @@ struct ReachabilitySetupModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .task {
-                // Starting the notifier performs the single connectivity read and drives the
-                // initial bootstrap from its callback — no extra synchronous work on the launch path.
                 authenticator.setupReachability()
             }
     }
