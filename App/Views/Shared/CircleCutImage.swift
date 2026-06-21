@@ -144,7 +144,7 @@ struct CircleCutImage: View {
         }
         .onChange(of: database.circleImagesLoadCount) {
             if cutImage == nil {
-                cutImage = database.circleImage(for: circle.id)
+                loadCatalogCut()
             }
         }
         .onChange(of: circle.id) {
@@ -154,9 +154,27 @@ struct CircleCutImage: View {
         .onChange(of: cutType) { _, newValue in
             switch newValue {
             case .catalog:
-                cutImage = database.circleImage(for: circle.id)
+                loadCatalogCut(force: true)
             case .web:
                 prepareCutImage()
+            }
+        }
+    }
+
+    // Loads the catalog cut off the main thread. `force` overwrites an existing image (used when
+    // switching back to the catalog cut); otherwise it only fills an empty slot so it never clobbers
+    // a freshly fetched web cut.
+    func loadCatalogCut(force: Bool = false) {
+        // Fast path: an already-decoded cut is returned synchronously from the in-memory cache.
+        if let cached = database.cachedCircleImage(for: circle.id) {
+            cutImage = cached
+            return
+        }
+        let circleID = circle.id
+        Task {
+            let image = await database.circleImageAsync(for: circleID)
+            if circle.id == circleID, force || cutImage == nil {
+                cutImage = image
             }
         }
     }
@@ -164,7 +182,7 @@ struct CircleCutImage: View {
     func prepareCutImage() {
         // Set the catalog cut as the default
         if cutImage == nil {
-            cutImage = database.circleImage(for: circle.id)
+            loadCatalogCut()
         }
         // Only fetch web cut when cutType is .web and we're online
         if cutType == .web && authenticator.onlineState == .online,

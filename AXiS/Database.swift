@@ -266,7 +266,7 @@ public class Database {
 
     // Lazy single-row blob reads (indexed primary-key / name lookups), used on demand by the
     // image accessors in Database+Fetchers when a specific image is actually displayed.
-    static func readCircleImageData(from imageDatabase: Connection, id: Int) -> Data? {
+    nonisolated static func readCircleImageData(from imageDatabase: Connection, id: Int) -> Data? {
         do {
             let colID = Expression<Int>("id")
             let colCutImage = Expression<Data>("cutImage")
@@ -278,7 +278,7 @@ public class Database {
         }
     }
 
-    static func readCommonImageData(from imageDatabase: Connection, name: String) -> Data? {
+    nonisolated static func readCommonImageData(from imageDatabase: Connection, name: String) -> Data? {
         do {
             let colName = Expression<String>("name")
             let colImage = Expression<Data>("image")

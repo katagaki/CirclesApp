@@ -151,6 +151,36 @@ extension Database {
         return circleImage
     }
 
+    // Synchronous in-memory cache lookup only (no DB read). Lets cells render an already-decoded
+    // cut immediately without spawning a task.
+    public func cachedCircleImage(for id: Int) -> UIImage? {
+        cachedDecodedImage("circle:\(id)")
+    }
+
+    // Off-main variant for list/grid cells: the BLOB read and the (otherwise main-thread, at-draw)
+    // decode both happen on a background task so scrolling the catalog stays smooth. Returns cached
+    // results instantly on subsequent calls.
+    public func circleImageAsync(for id: Int) async -> UIImage? {
+        let key = "circle:\(id)"
+        if let cachedImage = cachedDecodedImage(key) {
+            return cachedImage
+        }
+        guard circleImageIDs.contains(id), let imageDatabase = getImageDatabase() else {
+            return nil
+        }
+        let decoded = await Task.detached(priority: .userInitiated) {
+            guard let data = Database.readCircleImageData(from: imageDatabase, id: id),
+                  let image = UIImage(data: data) else {
+                return nil as UIImage?
+            }
+            // Force-decode off the main thread so SwiftUI doesn't decode at draw time.
+            return image.preparingForDisplay() ?? image
+        }.value
+        guard let decoded else { return nil }
+        cacheDecodedImage(decoded, key: key, cost: decodedCost(of: decoded))
+        return decoded
+    }
+
     public func commonImage(named imageName: String) -> UIImage? {
         let key = "common:\(imageName)"
         if let cachedImage = cachedDecodedImage(key) {
