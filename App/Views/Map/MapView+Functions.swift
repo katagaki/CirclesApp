@@ -21,19 +21,20 @@ extension MapView {
             mapper.removeAllLayouts()
             mapImage = nil
             genreImage = nil
-        } completion: {
-            Task { await reloadMapImage() }
-            if let map = selections.map {
-                let mapID = map.id
-                let selectedDate = selections.date?.id
-                let useHighResolutionMaps = useHighResolutionMaps
-                Task.detached {
-                    await reloadMapLayouts(
-                        mapID: mapID,
-                        selectedDate: selectedDate,
-                        useHighResolutionMaps: useHighResolutionMaps
-                    )
-                }
+        }
+        // Kick off the image and layout loads immediately rather than waiting for the
+        // clear animation to finish, so the map and its overlays appear as soon as possible.
+        Task { await reloadMapImage() }
+        if let map = selections.map {
+            let mapID = map.id
+            let selectedDate = selections.date?.id
+            let useHighResolutionMaps = useHighResolutionMaps
+            Task.detached {
+                await reloadMapLayouts(
+                    mapID: mapID,
+                    selectedDate: selectedDate,
+                    useHighResolutionMaps: useHighResolutionMaps
+                )
             }
         }
     }
@@ -46,18 +47,33 @@ extension MapView {
             genreImage = nil
             return
         }
+        // Show the base map (and everything layered on it, including the filter dim) as
+        // soon as it decodes — don't block it behind the optional genre overlay.
         let newMapImage = await database.mapImageAsync(
-            for: selectedHall,
-            on: date.id,
-            usingHighDefinition: useHighResolutionMaps
-        )
-        let newGenreImage = await database.genreImageAsync(
             for: selectedHall,
             on: date.id,
             usingHighDefinition: useHighResolutionMaps
         )
         withAnimation(.smooth.speed(2.0)) {
             mapImage = newMapImage
+        }
+        await reloadGenreImage()
+    }
+
+    func reloadGenreImage() async {
+        guard showGenreOverlay,
+              let date = selections.date,
+              let map = selections.map,
+              let selectedHall = ComiketHall(rawValue: map.filename) else {
+            genreImage = nil
+            return
+        }
+        let newGenreImage = await database.genreImageAsync(
+            for: selectedHall,
+            on: date.id,
+            usingHighDefinition: useHighResolutionMaps
+        )
+        withAnimation(.smooth.speed(2.0)) {
             genreImage = newGenreImage
         }
     }

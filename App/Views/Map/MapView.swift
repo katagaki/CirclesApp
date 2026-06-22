@@ -98,6 +98,9 @@ struct MapView: View {
                 updateCanvasSize(mapImage)
             }
         }
+        .onChange(of: showGenreOverlay) {
+            Task { await reloadGenreImage() }
+        }
         .onChange(of: mapper.highlightTarget) { oldValue, newValue in
             if oldValue == nil && newValue != nil {
                 Task {
