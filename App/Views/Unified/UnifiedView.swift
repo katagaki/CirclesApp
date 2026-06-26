@@ -12,6 +12,7 @@ struct UnifiedView: View {
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
     @Environment(Orientation.self) var orientation
+    @Environment(Oasis.self) var oasis
 
     @Namespace var namespace
 
@@ -137,7 +138,10 @@ struct UnifiedView: View {
 
     func showReviewPromptIfLaunchedEnoughTimes() {
         launchCount += 1
-        if launchCount > 2 && !hasReviewBeenPrompted {
+        guard launchCount > 2, !hasReviewBeenPrompted else { return }
+        Task {
+            try? await Task.sleep(for: .seconds(8))
+            guard authenticator.isReady, !authenticator.isAuthenticating, !oasis.isShowing else { return }
             requestReview()
             hasReviewBeenPrompted = true
         }

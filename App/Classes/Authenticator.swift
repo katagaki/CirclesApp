@@ -152,50 +152,73 @@ class Authenticator {
     }
 
     func setupReachability() {
-        if let reachability {
-            reachability.whenReachable = { [weak self] _ in
-                Task {
-                    await self?.handleReachable()
-                }
+        guard let reachability else {
+            bootstrap(isConnected: false)
+            return
+        }
+        reachability.whenReachable = { [weak self] _ in
+            Task { await self?.handleReachable() }
+        }
+        reachability.whenUnreachable = { [weak self] _ in
+            Task { self?.handleUnreachable() }
+        }
+        do {
+            try reachability.startNotifier()
+            // The notifier normally fires an initial callback that calls bootstrap,
+            // but if it never does the app would hang on the loading screen forever.
+            // Fall back to a connectivity-agnostic bootstrap after a short grace period.
+            Task { [weak self] in
+                try? await Task.sleep(for: .seconds(3))
+                guard let self, !self.isReady else { return }
+                self.bootstrap(isConnected: self.onlineState == .online)
             }
-            reachability.whenUnreachable = { [weak self] _ in
-                Task {
-                    self?.handleUnreachable()
-                }
-            }
-            do {
-                try reachability.startNotifier()
-            } catch {
-                debugPrint(error.localizedDescription)
-            }
+        } catch {
+            debugPrint(error.localizedDescription)
+            bootstrap(isConnected: false)
         }
     }
 
-    private func handleReachable() async {
-        self.onlineState = .online
-        if !self.isReady {
-            // Restore previous authentication token
-            if !self.restoreAuthenticationFromKeychainAndDefaults() {
-                self.resetAuthentication()
-                self.isReady = true
-            } else {
-                // Refresh authentication token in the background if close to expiry
-                if self.tokenExpiryDate.addingTimeInterval(-3600) < .now {
-                    Task {
-                        await self.refreshAuthenticationToken()
-                    }
-                }
-                self.isReady = true
+    func bootstrap(isConnected: Bool) {
+        guard !isReady else { return }
+        onlineState = isConnected ? .online : .offline
+
+        if restoreAuthenticationFromKeychainAndDefaults() {
+            if isConnected && tokenExpiryDate.addingTimeInterval(-3600) < .now {
+                Task { await refreshAuthenticationToken() }
             }
+        } else if !isConnected {
+            if let storedToken = loadStoredToken(), !storedToken.accessToken.isEmpty {
+                token = storedToken
+                tokenExpiryDate = (UserDefaults.standard.object(forKey: tokenExpiryDateKey) as? Date) ?? .distantPast
+            } else {
+                useOfflineAuthenticationToken()
+            }
+        } else {
+            resetAuthentication()
+        }
+
+        isReady = true
+    }
+
+    private func handleReachable() async {
+        onlineState = .online
+        if !isReady {
+            bootstrap(isConnected: true)
+            return
+        }
+        if let token, !token.accessToken.isEmpty,
+           tokenExpiryDate.addingTimeInterval(-3600) < .now {
+            await refreshAuthenticationToken()
         }
     }
 
     private func handleUnreachable() {
-        self.onlineState = .offline
-        self.useOfflineAuthenticationToken()
-        if !self.isReady {
-            self.isReady = true
+        onlineState = .offline
+        if !isReady {
+            bootstrap(isConnected: false)
+            return
         }
+        useOfflineAuthenticationToken()
     }
 
     func restoreAuthenticationFromKeychainAndDefaults() -> Bool {
@@ -212,11 +235,21 @@ class Authenticator {
         return false
     }
 
+    func loadStoredToken() -> OpenIDToken? {
+        if let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),
+           let tokenData = tokenInKeychain.data(using: .utf8),
+           let token = try? JSONDecoder().decode(OpenIDToken.self, from: tokenData) {
+            return token
+        }
+        return nil
+    }
+
     func resetAuthentication() {
         code = nil
         token = nil
-        try? keychain.removeAll()
-        UserDefaults.standard.removeObject(forKey: keychainAuthTokenKey)
+        try? keychain.remove(keychainAuthTokenKey)
+        UserDefaults.standard.removeObject(forKey: tokenExpiryDateKey)
+        tokenExpiryDate = .distantFuture
         isAuthenticating = true
     }
 
@@ -244,67 +277,90 @@ class Authenticator {
             "code": code ?? ""
         ])
 
-        if let (data, _) = try? await URLSession.shared.data(for: request) {
-            let isSuccessful = decodeAuthenticationToken(data: data)
-            if isSuccessful {
+        do {
+            let (data, _) = try await URLSession.shared.data(for: request)
+            if decodeAuthenticationToken(data: data) {
                 self.isAuthenticating = false
+            } else {
+                self.code = nil
+                self.token = nil
+                self.isAuthenticating = true
             }
-        } else {
-            self.token = nil
+        } catch {
             self.isAuthenticating = true
         }
     }
 
     func useOfflineAuthenticationToken() {
-        self.token = OpenIDToken()
+        if token == nil {
+            self.token = OpenIDToken()
+        }
     }
 
     func refreshAuthenticationToken() async {
-        if let refreshToken = token?.refreshToken {
-            let request = urlRequestForToken(parameters: [
-                "grant_type": "refresh_token",
-                "refresh_token": refreshToken
-            ])
-
-            if let (data, _) = try? await URLSession.shared.data(for: request) {
-                _ = decodeAuthenticationToken(data: data)
-            } else {
+        guard let refreshToken = token?.refreshToken, !refreshToken.isEmpty else {
+            if onlineState == .online {
                 self.isAuthenticating = true
             }
-        } else {
-            self.isAuthenticating = true
+            return
+        }
+
+        let request = urlRequestForToken(parameters: [
+            "grant_type": "refresh_token",
+            "refresh_token": refreshToken
+        ])
+
+        do {
+            let (data, response) = try await URLSession.shared.data(for: request)
+            if let httpResponse = response as? HTTPURLResponse,
+               (400..<500).contains(httpResponse.statusCode) {
+                resetAuthentication()
+                return
+            }
+            _ = decodeAuthenticationToken(data: data)
+        } catch {
+            // Transient failure (timeout, offline, captive portal): keep the existing
+            // token and retry later rather than forcing re-login. Only a decisive 4xx
+            // (handled above) clears authentication.
         }
     }
 
     func refreshAuthenticationTokenInBackground() async {
         if token == nil {
-            _ = restoreAuthenticationFromKeychainAndDefaults()
+            token = loadStoredToken()
+            if let storedExpiry = UserDefaults.standard.object(forKey: tokenExpiryDateKey) as? Date {
+                tokenExpiryDate = storedExpiry
+            }
         }
-        guard let refreshToken = token?.refreshToken else { return }
+        if tokenExpiryDate.addingTimeInterval(-3600) > .now {
+            return
+        }
+        guard let refreshToken = token?.refreshToken, !refreshToken.isEmpty else { return }
         let request = urlRequestForToken(parameters: [
             "grant_type": "refresh_token",
             "refresh_token": refreshToken
         ], timeoutInterval: 10.0)
-        if let (data, _) = try? await URLSession.shared.data(for: request) {
+        if let (data, response) = try? await URLSession.shared.data(for: request) {
+            if let httpResponse = response as? HTTPURLResponse,
+               (400..<500).contains(httpResponse.statusCode) {
+                return
+            }
             _ = decodeAuthenticationToken(data: data)
         }
     }
 
+    @discardableResult
     func decodeAuthenticationToken(data: Data) -> Bool {
-        if let token = try? JSONDecoder().decode(OpenIDToken.self, from: data) {
-            self.token = token
-            self.updateTokenExpiryDate(from: token)
-            if let tokenEncoded = try? JSONEncoder().encode(token),
-               let tokenString = String(data: tokenEncoded, encoding: .utf8) {
-                try? keychain.set(tokenString, key: keychainAuthTokenKey)
-            }
-            return true
-        } else {
-            self.code = nil
-            self.token = nil
-            self.isAuthenticating = true
+        guard let token = try? JSONDecoder().decode(OpenIDToken.self, from: data) else {
             return false
         }
+        self.token = token
+        self.updateTokenExpiryDate(from: token)
+        if let tokenEncoded = try? JSONEncoder().encode(token),
+           let tokenString = String(data: tokenEncoded, encoding: .utf8) {
+            try? keychain.set(tokenString, key: keychainAuthTokenKey)
+        }
+        return true
     }
 
     func updateTokenExpiryDate(from token: OpenIDToken) {
@@ -314,7 +370,7 @@ class Authenticator {
         self.tokenExpiryDate = tokenExpiryDate
     }
 
-    func urlRequestForToken(parameters: [String: String], timeoutInterval: TimeInterval = 2.0) -> URLRequest {
+    func urlRequestForToken(parameters: [String: String], timeoutInterval: TimeInterval = circleMsTokenTimeout) -> URLRequest {
         let endpoint = URL(string: "\(circleMsAuthEndpoint)/OAuth2/Token")!
 
         var parameters: [String: String] = parameters

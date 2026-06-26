@@ -99,17 +99,11 @@ struct CirclesApp: App {
                 switch newValue {
                 case .active:
                     if authenticator.token != nil && authenticator.onlineState == .online {
-                        // Require authentication when token expires
-                        if authenticator.tokenExpiryDate < .now {
-                            unifier.hide()
-                            authenticator.isAuthenticating = true
-                        // Refresh authentication token 1 hour before expiry
-                        } else if authenticator.tokenExpiryDate.addingTimeInterval(-3600) < .now {
+                        if authenticator.tokenExpiryDate.addingTimeInterval(-3600) < .now {
                             Task {
                                 await authenticator.refreshAuthenticationToken()
                             }
                         }
-                        // Do nothing in any other case
                     }
                 case .background:
                     registerBackgroundRefreshTask()

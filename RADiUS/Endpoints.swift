@@ -18,3 +18,7 @@ public let circleMsAPIEndpoint: URL = URL(string: "https://api1.circle.ms")! // 
 public let circleMsCancelURLSchema: String = """
 circles-app:/?error=access_denied&error_description=user%20access%20denied&state=auth
 """
+
+public let circleMsAPITimeout: TimeInterval = 10.0
+public let circleMsTokenTimeout: TimeInterval = 15.0
+public let circleMsHeadTimeout: TimeInterval = 5.0

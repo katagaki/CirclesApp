@@ -156,12 +156,11 @@ class Events {
                     number: activeEventNumber
                 )
             }
-        case .offline:
+        case .offline, .undetermined:
             activeEvent = WebCatalogEvent.Response.Event(
                 id: activeEventNumber,
                 number: activeEventNumber
             )
-        case .undetermined: break
         }
     }
 

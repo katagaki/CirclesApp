@@ -6,6 +6,7 @@
 //
 
 import RADiUS
+import SQLite
 import UIKit
 import ZIPFoundation
 
@@ -115,7 +116,7 @@ extension Database {
 
         var totalSize: Int64 = 0
         for url in urls {
-            var headRequest = URLRequest(url: url)
+            var headRequest = URLRequest(url: url, timeoutInterval: circleMsHeadTimeout)
             headRequest.httpMethod = "HEAD"
             if let (_, response) = try? await URLSession.shared.data(for: headRequest),
                let httpResponse = response as? HTTPURLResponse,
@@ -182,11 +183,104 @@ extension Database {
     public func urlRequestForWebCatalogAPI(_ endpoint: String, authToken: OpenIDToken) -> URLRequest {
         let endpoint = URL(string: "\(circleMsAPIEndpoint)/CatalogBase/\(endpoint)/")!
 
-        var request = URLRequest(url: endpoint)
+        var request = URLRequest(url: endpoint, timeoutInterval: circleMsAPITimeout)
         request.httpMethod = "POST"
         request.setValue("Bearer \(authToken.accessToken)", forHTTPHeaderField: "Authorization")
 
         return request
+    }
+
+    // MARK: Indexing
+
+    public func prepareIndexes(for event: WebCatalogEvent.Response.Event) async {
+        let flagKey = Database.indexedFlagKey(forEvent: event.number)
+        if UserDefaults.standard.bool(forKey: flagKey) { return }
+        let textPath = textDatabaseURL?.path(percentEncoded: false)
+        let imagePath = imageDatabaseURL?.path(percentEncoded: false)
+        let didBuild = await Task.detached(priority: .userInitiated) {
+            var success = true
+            if let textPath {
+                success = Self.buildIndexes(atPath: textPath) && success
+            }
+            if let imagePath {
+                success = Self.buildImageIndexes(atPath: imagePath) && success
+            }
+            return success
+        }.value
+        if didBuild {
+            UserDefaults.standard.set(true, forKey: flagKey)
+        }
+    }
+
+    private nonisolated static func buildImageIndexes(atPath path: String) -> Bool {
+        guard let database = try? Connection(path, readonly: false) else { return false }
+        try? database.execute("CREATE INDEX IF NOT EXISTS idx_circleimage_id ON ComiketCircleImage(id)")
+        try? database.execute("CREATE INDEX IF NOT EXISTS idx_commonimage_name ON ComiketCommonImage(name)")
+        return true
+    }
+
+    private nonisolated static func buildIndexes(atPath path: String) -> Bool {
+        guard let database = try? Connection(path, readonly: false) else { return false }
+        let indexStatements = [
+            "CREATE INDEX IF NOT EXISTS idx_circlewc_block ON ComiketCircleWC(blockId)",
+            "CREATE INDEX IF NOT EXISTS idx_circlewc_genre ON ComiketCircleWC(genreId)",
+            "CREATE INDEX IF NOT EXISTS idx_circlewc_day ON ComiketCircleWC(day)",
+            "CREATE INDEX IF NOT EXISTS idx_circlewc_day_block ON ComiketCircleWC(day, blockId)",
+            "CREATE INDEX IF NOT EXISTS idx_extend_wcid ON ComiketCircleExtend(WCId)",
+            "CREATE INDEX IF NOT EXISTS idx_mapping_map ON ComiketMappingWC(mapId)",
+            "CREATE INDEX IF NOT EXISTS idx_mapping_block ON ComiketMappingWC(blockId)",
+            "CREATE INDEX IF NOT EXISTS idx_layout_map ON ComiketLayoutWC(mapId)"
+        ]
+        for statement in indexStatements {
+            try? database.execute(statement)
+        }
+
+        Self.buildSearchIndex(in: database)
+        return true
+    }
+
+    private nonisolated static func buildSearchIndex(in database: Connection) {
+        let sourceCount = Self.rowCount(in: database, of: "ComiketCircleWC")
+        if Self.tableExists("CircleSearchFTS", in: database) {
+            // A table left empty by an interrupted build silently breaks search,
+            // since ftsSearch then returns [] instead of falling back to LIKE.
+            if Self.rowCount(in: database, of: "CircleSearchFTS") == sourceCount {
+                return
+            }
+            try? database.execute("DROP TABLE IF EXISTS CircleSearchFTS")
+        }
+        do {
+            try database.transaction {
+                try database.run(
+                    """
+                    CREATE VIRTUAL TABLE CircleSearchFTS USING fts5(
+                        circleName, circleKana, penName,
+                        content='ComiketCircleWC', content_rowid='id', tokenize='trigram'
+                    )
+                    """
+                )
+                try database.run(
+                    """
+                    INSERT INTO CircleSearchFTS(rowid, circleName, circleKana, penName)
+                    SELECT id, circleName, circleKana, penName FROM ComiketCircleWC
+                    """
+                )
+            }
+        } catch {
+            try? database.execute("DROP TABLE IF EXISTS CircleSearchFTS")
+        }
+    }
+
+    private nonisolated static func tableExists(_ name: String, in database: Connection) -> Bool {
+        let rawCount = try? database.scalar(
+            "SELECT count(*) FROM sqlite_master WHERE type='table' AND name=?", name
+        )
+        return (((rawCount ?? nil) as? Int64) ?? 0) > 0
+    }
+
+    private nonisolated static func rowCount(in database: Connection, of table: String) -> Int64 {
+        let rawCount = try? database.scalar("SELECT count(*) FROM \"\(table)\"")
+        return ((rawCount ?? nil) as? Int64) ?? -1
     }
 
 }

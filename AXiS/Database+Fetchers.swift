@@ -24,7 +24,9 @@ extension Database {
                     on: circlesTable[id] == circleExtendedInformationTable[id]
                 )
 
-                let query = joinedTable.filter(identifiers.contains(circlesTable[id]))
+                let query = joinedTable
+                    .filter(identifiers.contains(circlesTable[id]))
+                    .order(reversed ? circlesTable[id].desc : circlesTable[id].asc)
                 let circles = try textDatabase.prepare(query).map { row in
                     let circle = ComiketCircle(from: row)
                     let extendedInformation = ComiketCircleExtendedInformation(from: row)
@@ -46,11 +48,7 @@ extension Database {
                     }
                 }
 
-                if reversed {
-                    return circles.sorted(by: { $0.id > $1.id })
-                } else {
-                    return circles.sorted(by: { $0.id < $1.id })
-                }
+                return circles
             } catch {
                 debugPrint(error.localizedDescription)
             }
@@ -137,27 +135,74 @@ extension Database {
         return commonImage(named: "\(usingHighDefinition ? "LWGR" : "WGR")\(day)\(hall.rawValue)")
     }
 
-    public func circleImage(for id: Int) -> UIImage? {
-        if let cachedImage = imageCache[String(id)] {
+    public func mapImageAsync(for hall: ComiketHall, on day: Int, usingHighDefinition: Bool) async -> UIImage? {
+        await commonImageAsync(named: "\(usingHighDefinition ? "LWMP" : "WMP")\(day)\(hall.rawValue)")
+    }
+
+    public func genreImageAsync(for hall: ComiketHall, on day: Int, usingHighDefinition: Bool) async -> UIImage? {
+        await commonImageAsync(named: "\(usingHighDefinition ? "LWGR" : "WGR")\(day)\(hall.rawValue)")
+    }
+
+    public func cachedCircleImage(for id: Int) -> UIImage? {
+        cachedDecodedImage("circle:\(id)")
+    }
+
+    public func circleImageAsync(for id: Int) async -> UIImage? {
+        let key = "circle:\(id)"
+        if let cachedImage = cachedDecodedImage(key) {
             return cachedImage
         }
-        if let circleImageData = circleImages[id] {
-            let circleImage = UIImage(data: circleImageData)
-            imageCache[String(id)] = circleImage
-            return circleImage
+        guard circleImageIDs.contains(id), let imageDatabase = getImageDatabase() else {
+            return nil
         }
-        return nil
+        let decoded = await Task.detached(priority: .userInitiated) {
+            guard let data = Database.readCircleImageData(from: imageDatabase, id: id),
+                  let image = UIImage(data: data) else {
+                return nil as UIImage?
+            }
+            return image.preparingForDisplay() ?? image
+        }.value
+        guard let decoded else { return nil }
+        cacheDecodedImage(decoded, key: key, cost: decodedCost(of: decoded))
+        return decoded
     }
 
     public func commonImage(named imageName: String) -> UIImage? {
-        if let cachedImage = imageCache[imageName] {
+        let key = "common:\(imageName)"
+        if let cachedImage = cachedDecodedImage(key) {
             return cachedImage
         }
-        if let imageData = commonImages[imageName] {
-            let image = UIImage(data: imageData)
-            imageCache[imageName] = image
-            return image
+        guard let imageDatabase = getImageDatabase(),
+              let imageData = Database.readCommonImageData(from: imageDatabase, name: imageName),
+              let image = UIImage(data: imageData) else {
+            return nil
         }
-        return nil
+        cacheDecodedImage(image, key: key, cost: decodedCost(of: image))
+        return image
+    }
+
+    public func commonImageAsync(named imageName: String) async -> UIImage? {
+        let key = "common:\(imageName)"
+        if let cachedImage = cachedDecodedImage(key) {
+            return cachedImage
+        }
+        guard let imageDatabase = getImageDatabase() else { return nil }
+        let decoded = await Task.detached(priority: .userInitiated) {
+            guard let data = Database.readCommonImageData(from: imageDatabase, name: imageName),
+                  let image = UIImage(data: data) else {
+                return nil as UIImage?
+            }
+            return image.preparingForDisplay() ?? image
+        }.value
+        guard let decoded else { return nil }
+        cacheDecodedImage(decoded, key: key, cost: decodedCost(of: decoded))
+        return decoded
+    }
+
+    private func decodedCost(of image: UIImage) -> Int {
+        if let cgImage = image.cgImage {
+            return cgImage.bytesPerRow * cgImage.height
+        }
+        return Int(image.size.width * image.size.height * 4.0)
     }
 }

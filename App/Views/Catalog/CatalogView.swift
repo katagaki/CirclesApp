@@ -144,8 +144,10 @@ struct CatalogView: View {
         .onChange(of: selections.catalogSelectionID) {
             reloadDisplayedCircles()
         }
-        .onChange(of: searchTerm) {
-            searchCircles()
+        .task(id: searchTerm) {
+            try? await Task.sleep(for: .milliseconds(250))
+            if Task.isCancelled { return }
+            await searchCircles()
         }
         .onChange(of: isSearchActive) {
             if isSearchActive && unifier.isMinimized {
@@ -190,14 +192,12 @@ struct CatalogView: View {
                 )
 
                 await MainActor.run {
-                    let displayedCircles = database.circles(circleIdentifiers)
+                    catalogCache.displayedCircles = database.circles(circleIdentifiers)
                     if animated {
                         withAnimation(.smooth.speed(2.0)) {
-                            catalogCache.displayedCircles = displayedCircles
                             catalogCache.isLoading = false
                         }
                     } else {
-                        catalogCache.displayedCircles = displayedCircles
                         catalogCache.isLoading = false
                     }
                 }
@@ -225,25 +225,13 @@ struct CatalogView: View {
         }
     }
 
-    func searchCircles() {
-        Task.detached {
-            let circleIdentifiers = await CatalogCache.searchCircles(searchTerm, database: database)
-
-            if let circleIdentifiers {
-                await MainActor.run {
-                    let searchedCircles = database.circles(circleIdentifiers)
-                    withAnimation(.smooth.speed(2.0)) {
-                        catalogCache.searchedCircles = searchedCircles
-                    }
-                }
-            } else {
-                await MainActor.run {
-                    withAnimation(.smooth.speed(2.0)) {
-                        catalogCache.searchedCircles = nil
-                    }
-                }
-            }
+    func searchCircles() async {
+        let circleIdentifiers = await CatalogCache.searchCircles(searchTerm, database: database)
+        if Task.isCancelled { return }
+        if let circleIdentifiers {
+            catalogCache.searchedCircles = database.circles(circleIdentifiers)
+        } else {
+            catalogCache.searchedCircles = nil
         }
-
     }
 }

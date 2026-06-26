@@ -31,7 +31,7 @@ public class User {
     public static func urlRequestForUserAPI(endpoint: String, authToken: OpenIDToken) -> URLRequest {
         let endpoint = URL(string: "\(circleMsAPIEndpoint)/User/\(endpoint)/")!
 
-        var request = URLRequest(url: endpoint)
+        var request = URLRequest(url: endpoint, timeoutInterval: circleMsAPITimeout)
         request.httpMethod = "POST"
         request.setValue("Bearer \(authToken.accessToken)", forHTTPHeaderField: "Authorization")
 

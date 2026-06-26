@@ -142,7 +142,7 @@ actor FavoritesActor {
         }
 
         if let endpoint = endpointComponents.url {
-            var request = URLRequest(url: endpoint)
+            var request = URLRequest(url: endpoint, timeoutInterval: circleMsAPITimeout)
             request.httpMethod = method
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
             request.setValue("Bearer \(authToken.accessToken)", forHTTPHeaderField: "Authorization")

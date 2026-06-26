@@ -20,9 +20,13 @@ public class Database {
     @ObservationIgnored public var imageDatabase: Connection?
     @ObservationIgnored public var textDatabaseURL: URL?
     @ObservationIgnored public var imageDatabaseURL: URL?
-    @ObservationIgnored public var commonImages: [String: Data] = [:]
-    @ObservationIgnored public var circleImages: [Int: Data] = [:]
-    @ObservationIgnored public var imageCache: [String: UIImage] = [:]
+    @ObservationIgnored public var commonImageNames: Set<String> = []
+    @ObservationIgnored public var circleImageIDs: Set<Int> = []
+    @ObservationIgnored private let decodedImageCache: NSCache<NSString, UIImage> = {
+        let cache = NSCache<NSString, UIImage>()
+        cache.totalCostLimit = 64 * 1024 * 1024
+        return cache
+    }()
 
     public var commonImagesLoadCount: Int = 0
     public var circleImagesLoadCount: Int = 0
@@ -36,6 +40,28 @@ public class Database {
         // No initialization required; properties are set lazily or by callers.
     }
 
+    static let indexedFlagKeyPrefix = "Database.Indexed."
+
+    static func indexedFlagKey(forEvent number: Int) -> String {
+        "\(indexedFlagKeyPrefix)\(number)"
+    }
+
+    func cachedDecodedImage(_ key: String) -> UIImage? {
+        decodedImageCache.object(forKey: key as NSString)
+    }
+
+    func cacheDecodedImage(_ image: UIImage, key: String, cost: Int) {
+        decodedImageCache.setObject(image, forKey: key as NSString, cost: cost)
+    }
+
+    public func clearDecodedImages() {
+        decodedImageCache.removeAllObjects()
+    }
+
+    public func hasCircleImage(_ id: Int) -> Bool {
+        circleImageIDs.contains(id)
+    }
+
     // MARK: Database Connection
 
     public func getTextDatabase() -> Connection? {
@@ -44,6 +70,7 @@ public class Database {
             debugPrint("Database: Connecting to text database at \(textDatabaseURL.path(percentEncoded: false))")
             #endif
             textDatabase = try? Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
+            applyReadOnlyPragmas(to: textDatabase)
         }
         return textDatabase
     }
@@ -56,6 +83,25 @@ public class Database {
             imageDatabase = try? Connection(imageDatabaseURL.path(percentEncoded: false), readonly: true)
         }
         return imageDatabase
+    }
+
+    private func applyReadOnlyPragmas(to connection: Connection?) {
+        guard let connection else { return }
+        try? connection.execute(
+            """
+            PRAGMA cache_size = -8000;
+            PRAGMA mmap_size = 268435456;
+            PRAGMA temp_store = MEMORY;
+            PRAGMA query_only = ON;
+            """
+        )
+    }
+
+    public func newReadOnlyTextConnection() -> Connection? {
+        guard let textDatabaseURL else { return nil }
+        let connection = try? Connection(textDatabaseURL.path(percentEncoded: false), readonly: true)
+        applyReadOnlyPragmas(to: connection)
+        return connection
     }
 
     public func disconnect() {
@@ -127,9 +173,13 @@ public class Database {
             databaseInformation = nil
             textDatabase = nil
             imageDatabase = nil
-            commonImages.removeAll()
-            circleImages.removeAll()
-            imageCache.removeAll()
+            commonImageNames.removeAll()
+            circleImageIDs.removeAll()
+            decodedImageCache.removeAllObjects()
+            for key in UserDefaults.standard.dictionaryRepresentation().keys
+            where key.hasPrefix(Database.indexedFlagKeyPrefix) {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
             try? FileManager.default.removeItem(at: dataStoreURL)
         }
     }
@@ -149,10 +199,12 @@ public class Database {
             if imageDatabaseURL == targetImageDatabaseURL {
                 imageDatabase = nil
                 imageDatabaseURL = nil
-                commonImages.removeAll()
-                circleImages.removeAll()
-                imageCache.removeAll()
+                commonImageNames.removeAll()
+                circleImageIDs.removeAll()
+                decodedImageCache.removeAllObjects()
             }
+
+            UserDefaults.standard.removeObject(forKey: Database.indexedFlagKey(forEvent: event.number))
 
             try? FileManager.default.removeItem(at: targetTextDatabaseURL)
             try? FileManager.default.removeItem(at: targetImageDatabaseURL)
@@ -170,9 +222,9 @@ public class Database {
         imageDatabaseURL = nil
         textDatabase = nil
         imageDatabase = nil
-        imageCache.removeAll()
-        commonImages.removeAll()
-        circleImages.removeAll()
+        decodedImageCache.removeAllObjects()
+        commonImageNames.removeAll()
+        circleImageIDs.removeAll()
     }
 
     // MARK: Loading
@@ -180,10 +232,10 @@ public class Database {
     public func loadCommonImages() async {
         guard let imageDatabase = getImageDatabase() else { return }
         let loaded = await Task.detached(priority: .userInitiated) {
-            Self.readCommonImages(from: imageDatabase)
+            Self.readCommonImageNames(from: imageDatabase)
         }.value
         if let loaded {
-            self.commonImages = loaded
+            self.commonImageNames = loaded
             self.commonImagesLoadCount += 1
         }
     }
@@ -191,36 +243,54 @@ public class Database {
     public func loadCircleImages() async {
         guard let imageDatabase = getImageDatabase() else { return }
         let loaded = await Task.detached(priority: .userInitiated) {
-            Self.readCircleImages(from: imageDatabase)
+            Self.readCircleImageIDs(from: imageDatabase)
         }.value
         if let loaded {
-            self.circleImages = loaded
+            self.circleImageIDs = loaded
             self.circleImagesLoadCount += 1
         }
     }
 
-    private nonisolated static func readCommonImages(from imageDatabase: Connection) -> [String: Data]? {
+    private nonisolated static func readCommonImageNames(from imageDatabase: Connection) -> Set<String>? {
         do {
             let colName = Expression<String>("name")
-            let colImage = Expression<Data>("image")
-            let table = Table("ComiketCommonImage").select(colName, colImage)
-            return try imageDatabase.prepare(table).reduce(into: [:]) { partialResult, row in
-                partialResult[row[colName]] = row[colImage]
-            }
+            let table = Table("ComiketCommonImage").select(colName)
+            return try Set(imageDatabase.prepare(table).map { $0[colName] })
         } catch {
             debugPrint(error.localizedDescription)
             return nil
         }
     }
 
-    private nonisolated static func readCircleImages(from imageDatabase: Connection) -> [Int: Data]? {
+    private nonisolated static func readCircleImageIDs(from imageDatabase: Connection) -> Set<Int>? {
+        do {
+            let colID = Expression<Int>("id")
+            let table = Table("ComiketCircleImage").select(colID)
+            return try Set(imageDatabase.prepare(table).map { $0[colID] })
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
+    }
+
+    nonisolated static func readCircleImageData(from imageDatabase: Connection, id: Int) -> Data? {
         do {
             let colID = Expression<Int>("id")
             let colCutImage = Expression<Data>("cutImage")
-            let table = Table("ComiketCircleImage").select(colID, colCutImage)
-            return try imageDatabase.prepare(table).reduce(into: [:]) { partialResult, row in
-                partialResult[row[colID]] = row[colCutImage]
-            }
+            let query = Table("ComiketCircleImage").select(colCutImage).filter(colID == id)
+            return try imageDatabase.pluck(query)?[colCutImage]
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
+    }
+
+    nonisolated static func readCommonImageData(from imageDatabase: Connection, name: String) -> Data? {
+        do {
+            let colName = Expression<String>("name")
+            let colImage = Expression<Data>("image")
+            let query = Table("ComiketCommonImage").select(colImage).filter(colName == name)
+            return try imageDatabase.pluck(query)?[colImage]
         } catch {
             debugPrint(error.localizedDescription)
             return nil

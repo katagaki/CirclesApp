@@ -75,6 +75,7 @@ public class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelega
         if let error {
             continuation?.resume(throwing: error)
         }
+        session.finishTasksAndInvalidate()
     }
     // swiftlint:enable unused_parameter
 }

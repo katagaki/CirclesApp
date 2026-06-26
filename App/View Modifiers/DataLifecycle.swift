@@ -235,6 +235,7 @@ struct DataLifecycleModifier: ViewModifier {
             if oasis.isShowing {
                 await oasis.setBodyText("Loading.Database")
             }
+            await database.prepareIndexes(for: activeEvent)
             selections.reloadData(database: database)
 
             if oasis.isShowing {
@@ -247,7 +248,7 @@ struct DataLifecycleModifier: ViewModifier {
                 isDatabaseInitialized = true
             }
 
-            database.imageCache.removeAll()
+            database.clearDecodedImages()
         }
 
         UIApplication.shared.isIdleTimerDisabled = false

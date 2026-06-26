@@ -33,7 +33,7 @@ struct MapView: View {
     }
 
     var mapInvalidationID: String {
-        "M\(selections.fullMapID)_R\(useHighResolutionMaps ? "H" : "L")_D\(database.commonImagesLoadCount)"
+        "M\(selections.fullMapID)_R\(useHighResolutionMaps ? "H" : "L")"
     }
 
     var popoverInvalidationID: String {
@@ -97,6 +97,9 @@ struct MapView: View {
             if let mapImage {
                 updateCanvasSize(mapImage)
             }
+        }
+        .onChange(of: showGenreOverlay) {
+            Task { await reloadGenreImage() }
         }
         .onChange(of: mapper.highlightTarget) { oldValue, newValue in
             if oldValue == nil && newValue != nil {
