@@ -12,6 +12,12 @@
     <string name="login_hero_favorites_description">好きなサークルに色付けて、コミケ当日に簡単に見分ける</string>
     <string name="login_sign_in_prompt">Circle.msでログインするには、コミケWebカタログ・有料プラン（Gold会員）を契約する必要があります。</string>
     <string name="login_sign_in">Circle.msでログイン</string>
+    <string name="login_demo_mode">デモモードを試す</string>
+
+    <!-- Demo Mode -->
+    <string name="demo_unavailable_title">デモモードでは利用できません</string>
+    <string name="demo_unavailable_message">この機能はデモモードでは利用できません。ご利用にはCircle.msでログインしてください。</string>
+    <string name="demo_unavailable_dismiss">OK</string>
 
     <!-- Catalog / Search -->
     <string name="search_circles_placeholder">サークル名、執筆者名、配布誌名</string>

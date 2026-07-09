@@ -11,3 +11,5 @@ val LocalAuthenticator = staticCompositionLocalOf<Authenticator> {
 val LocalWebCutImageCache = staticCompositionLocalOf<WebCutImageCache> {
     error("No WebCutImageCache provided")
 }
+
+val LocalDemoMode = staticCompositionLocalOf { false }

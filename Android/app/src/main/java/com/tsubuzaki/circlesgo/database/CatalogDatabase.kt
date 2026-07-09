@@ -23,6 +23,8 @@ class CatalogDatabase(private val context: Context) {
 
     companion object {
         private const val TAG = "CatalogDatabase"
+        const val DEFAULT_STORE = "databases"
+        const val DEMO_STORE = "databases_demo"
     }
 
     var databaseInformation: WebCatalogDatabase? = null
@@ -51,8 +53,17 @@ class CatalogDatabase(private val context: Context) {
     private val _circleImagesLoadCount = MutableStateFlow(0)
     val circleImagesLoadCount: StateFlow<Int> = _circleImagesLoadCount
 
+    private var storeDirName: String = DEFAULT_STORE
+
     val dataStoreDir: File
-        get() = File(context.filesDir, "databases")
+        get() = File(context.filesDir, storeDirName)
+
+    fun useStoreDirectory(name: String) {
+        if (storeDirName != name) {
+            disconnect()
+            storeDirName = name
+        }
+    }
 
     // MARK: Database Connection
 

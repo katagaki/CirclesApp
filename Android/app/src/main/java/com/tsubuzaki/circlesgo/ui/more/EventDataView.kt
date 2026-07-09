@@ -59,7 +59,9 @@ import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.CatalogDatabaseDownloader
 import com.tsubuzaki.circlesgo.state.Events
 import com.tsubuzaki.circlesgo.state.Unifier
+import com.tsubuzaki.circlesgo.ui.shared.DemoUnavailableDialog
 import com.tsubuzaki.circlesgo.ui.shared.LocalAuthenticator
+import com.tsubuzaki.circlesgo.ui.shared.LocalDemoMode
 import com.tsubuzaki.circlesgo.ui.shared.LocalWebCutImageCache
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -74,6 +76,8 @@ fun EventDataView(
     val context = LocalContext.current
     val authenticator = LocalAuthenticator.current
     val webCutImageCache = LocalWebCutImageCache.current
+    val isDemo = LocalDemoMode.current
+    var showDemoUnavailable by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val authToken by authenticator.token.collectAsState()
     val onlineState by authenticator.onlineState.collectAsState()
@@ -233,11 +237,15 @@ fun EventDataView(
                             if (activeDownloads.containsKey(row.number)) return@EventRow
                             if (row.isDownloaded) {
                                 pendingSwitchEvent = row.number
+                            } else if (isDemo) {
+                                showDemoUnavailable = true
                             } else {
                                 requestDownload(row)
                             }
                         },
-                        onDelete = { deleteEventData(row) }
+                        onDelete = {
+                            if (isDemo) showDemoUnavailable = true else deleteEventData(row)
+                        }
                     )
                 }
                 item {
@@ -334,6 +342,10 @@ fun EventDataView(
                 }
             }
         )
+    }
+
+    if (showDemoUnavailable) {
+        DemoUnavailableDialog(onDismiss = { showDemoUnavailable = false })
     }
 }
 

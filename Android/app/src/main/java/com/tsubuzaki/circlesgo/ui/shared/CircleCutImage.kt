@@ -54,6 +54,10 @@ fun CircleCutImage(
     val onlineState by authenticator.onlineState.collectAsState()
     val authToken by authenticator.token.collectAsState()
 
+    // Web cuts require a signed-in session; demo mode always uses bundled cuts
+    @Suppress("NAME_SHADOWING")
+    val showWebCuts = showWebCuts && !LocalDemoMode.current
+
     // Load catalog image from database (always needed as fallback)
     // State must be keyed on circle.id so a reused composable slot
     // doesn't keep showing the previous circle's cut

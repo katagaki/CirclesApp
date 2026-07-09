@@ -12,6 +12,12 @@
     <string name="login_hero_favorites_description">Assign colors to your favorite circles and easily find them on the day of the Comic Market</string>
     <string name="login_sign_in_prompt">To use CiRCLES, you will need a Comiket Web Catalog Gold Member subscription.</string>
     <string name="login_sign_in">Sign In</string>
+    <string name="login_demo_mode">Try Demo Mode</string>
+
+    <!-- Demo Mode -->
+    <string name="demo_unavailable_title">Not Available in Demo</string>
+    <string name="demo_unavailable_message">This feature isn\'t available in demo mode. Sign in with Circle.ms to use it.</string>
+    <string name="demo_unavailable_dismiss">OK</string>
 
     <!-- Catalog / Search -->
     <string name="search_circles_placeholder">Search circles…</string>

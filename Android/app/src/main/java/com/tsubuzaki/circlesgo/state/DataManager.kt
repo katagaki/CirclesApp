@@ -7,8 +7,10 @@ import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.api.auth.OpenIDToken
 import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.auth.Authenticator
+import com.tsubuzaki.circlesgo.api.catalog.WebCatalogEvent
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.CatalogDatabaseDownloader
+import com.tsubuzaki.circlesgo.demo.DemoData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -22,7 +24,8 @@ class DataManager(
     private val unifier: Unifier,
     private val oasis: Oasis,
     private val favoritesAPI: FavoritesAPI,
-    private val catalogCache: CatalogCache
+    private val catalogCache: CatalogCache,
+    private val demoState: DemoState
 ) {
 
     companion object {
@@ -48,6 +51,7 @@ class DataManager(
         isReloadingData = true
 
         try {
+            database.useStoreDirectory(CatalogDatabase.DEFAULT_STORE)
             database.reset()
             if (forceDownload) {
                 isDatabaseInitialized = false
@@ -84,6 +88,45 @@ class DataManager(
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to reload data", e)
+            oasis.close()
+            isReloadingData = false
+        }
+    }
+
+    suspend fun reloadDemoData(eventNumber: Int) {
+        if (isReloadingData) return
+        isReloadingData = true
+
+        try {
+            demoState.selectedDataset = eventNumber
+
+            database.useStoreDirectory(CatalogDatabase.DEMO_STORE)
+            database.reset()
+            unifier.hide()
+            unifier.clearSheetContent()
+
+            withContext(Dispatchers.IO) {
+                DemoData.install(context, database.dataStoreDir)
+            }
+
+            events.loadDemoData(eventNumber, DemoData.eventList())
+
+            val activeEvent = WebCatalogEvent.Response.Event(id = eventNumber, number = eventNumber)
+            database.prepare(activeEvent)
+            selections.reloadData(database)
+
+            withContext(Dispatchers.IO) {
+                database.loadCommonImages()
+                database.loadCircleImages()
+            }
+
+            // Favorites are unavailable in demo mode; present an empty state.
+            favorites.setItems(emptyList())
+            favorites.setWcIDMappedItems(emptyMap())
+
+            finishReload(shouldResetSelections = true)
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to load demo data", e)
             oasis.close()
             isReloadingData = false
         }

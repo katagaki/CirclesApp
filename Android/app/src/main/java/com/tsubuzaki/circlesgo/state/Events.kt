@@ -78,6 +78,23 @@ class Events(private val context: Context) {
     }
 
     /**
+     * Seeds a fixed event list for demo mode without touching the network.
+     */
+    fun loadDemoData(activeEventNumber: Int, response: WebCatalogEvent.Response) {
+        eventData = response
+        latestEvent = response.list.firstOrNull { it.number == response.latestEventNumber }
+        this.activeEventNumber = activeEventNumber
+        prefs.edit { putInt(ACTIVE_EVENT_NUMBER_KEY, activeEventNumber) }
+        isActiveEventLatest = activeEventNumber == response.latestEventNumber
+
+        val eventInList = response.list.firstOrNull { it.number == activeEventNumber }
+        _activeEvent.value = WebCatalogEvent.Response.Event(
+            id = eventInList?.id ?: activeEventNumber,
+            number = activeEventNumber
+        )
+    }
+
+    /**
      * Re-fetches the event list from the API (falling back to the cached
      * response when offline) and updates the latest event accordingly.
      */

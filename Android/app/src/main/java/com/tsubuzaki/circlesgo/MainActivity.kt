@@ -22,9 +22,11 @@ import com.tsubuzaki.circlesgo.data.local.FavoritesCache
 import com.tsubuzaki.circlesgo.data.local.WebCutImageCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.ui.shared.LocalAuthenticator
+import com.tsubuzaki.circlesgo.ui.shared.LocalDemoMode
 import com.tsubuzaki.circlesgo.ui.shared.LocalWebCutImageCache
 import com.tsubuzaki.circlesgo.state.CatalogCache
 import com.tsubuzaki.circlesgo.state.DataManager
+import com.tsubuzaki.circlesgo.state.DemoState
 import com.tsubuzaki.circlesgo.state.Events
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.Mapper
@@ -56,6 +58,7 @@ class MainActivity : ComponentActivity() {
         val unifier = Unifier()
         val catalogCache = CatalogCache()
         val oasis = Oasis()
+        val demoState = DemoState(this)
 
         val favoritesCache = FavoritesCache(this)
         val favoritesAPI = FavoritesAPI(favoritesCache)
@@ -71,7 +74,8 @@ class MainActivity : ComponentActivity() {
             unifier = unifier,
             oasis = oasis,
             favoritesAPI = favoritesAPI,
-            catalogCache = catalogCache
+            catalogCache = catalogCache,
+            demoState = demoState
         )
 
         handleDeepLink(intent)
@@ -80,9 +84,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CirclesGoTheme {
+                val isDemoActive by demoState.isActive.collectAsState()
                 CompositionLocalProvider(
                     LocalAuthenticator provides auth,
-                    LocalWebCutImageCache provides webCutImageCache
+                    LocalWebCutImageCache provides webCutImageCache,
+                    LocalDemoMode provides isDemoActive
                 ) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
@@ -91,9 +97,62 @@ class MainActivity : ComponentActivity() {
                         val isReady by auth.isReady.collectAsState()
                         val token by auth.token.collectAsState()
 
-                        if (isAuthenticating || token == null) {
+                        if (isDemoActive) {
+                            var hasTriggeredDemoLoad by rememberSaveable {
+                                mutableStateOf(false)
+                            }
+                            var previousDemoEventNumber by rememberSaveable {
+                                mutableStateOf<Int?>(null)
+                            }
+
+                            LaunchedEffect(Unit) {
+                                if (!hasTriggeredDemoLoad) {
+                                    hasTriggeredDemoLoad = true
+                                    val target = demoState.selectedDataset
+                                    previousDemoEventNumber = target
+                                    dataManager.reloadDemoData(target)
+                                }
+                            }
+
+                            val demoActiveEvent by events.activeEvent.collectAsState()
+                            LaunchedEffect(demoActiveEvent) {
+                                val currentNumber = demoActiveEvent?.number
+                                if (currentNumber != null && hasTriggeredDemoLoad) {
+                                    if (previousDemoEventNumber != null &&
+                                        previousDemoEventNumber != currentNumber
+                                    ) {
+                                        previousDemoEventNumber = currentNumber
+                                        dataManager.reloadDemoData(currentNumber)
+                                    } else {
+                                        previousDemoEventNumber = currentNumber
+                                    }
+                                }
+                            }
+
+                            UnifiedView(
+                                unifier = unifier,
+                                mapper = mapper,
+                                database = database,
+                                selections = selections,
+                                events = events,
+                                favorites = favorites,
+                                catalogCache = catalogCache,
+                                oasis = oasis,
+                                favoritesAPI = favoritesAPI,
+                                authenticator = auth,
+                                onLogout = {
+                                    hasTriggeredDemoLoad = false
+                                    previousDemoEventNumber = null
+                                    demoState.deactivate()
+                                    database.delete()
+                                    selections.resetSelections()
+                                    unifier.close()
+                                }
+                            )
+                        } else if (isAuthenticating || token == null) {
                             LoginView(
-                                authURL = auth.authURL
+                                authURL = auth.authURL,
+                                onDemoTapped = { demoState.activate() }
                             )
                         } else {
                             // Trigger data reload when authenticator becomes ready

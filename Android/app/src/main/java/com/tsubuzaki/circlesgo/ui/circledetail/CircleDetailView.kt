@@ -70,6 +70,8 @@ import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.ui.shared.CircleBlockPill
 import com.tsubuzaki.circlesgo.ui.shared.CircleBlockPillSize
 import com.tsubuzaki.circlesgo.ui.shared.CircleCutImage
+import com.tsubuzaki.circlesgo.ui.shared.DemoUnavailableDialog
+import com.tsubuzaki.circlesgo.ui.shared.LocalDemoMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -86,6 +88,8 @@ fun CircleDetailView(
     val context = LocalContext.current
     val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
     val scope = rememberCoroutineScope()
+    val isDemo = LocalDemoMode.current
+    var showDemoUnavailable by remember { mutableStateOf(false) }
     var genre by remember { mutableStateOf<String?>(null) }
 
     // Favorite state
@@ -162,7 +166,9 @@ fun CircleDetailView(
             }
             // Favorite toggle button in toolbar
             if (webCatalogID != null) {
-                IconButton(onClick = { isEditing = !isEditing }) {
+                IconButton(onClick = {
+                    if (isDemo) showDemoUnavailable = true else isEditing = !isEditing
+                }) {
                     if (isFavorited) {
                         val favoriteColor =
                             existingFavorite.favorite.webCatalogColor()?.backgroundColor()
@@ -525,6 +531,10 @@ fun CircleDetailView(
         }
 
         Spacer(modifier = Modifier.height(32.dp))
+    }
+
+    if (showDemoUnavailable) {
+        DemoUnavailableDialog(onDismiss = { showDemoUnavailable = false })
     }
 }
 

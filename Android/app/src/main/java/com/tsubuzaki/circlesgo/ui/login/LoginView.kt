@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,7 +39,8 @@ import com.tsubuzaki.circlesgo.R
 @Composable
 fun LoginView(
     authURL: String,
-    onLoginTapped: () -> Unit = {}
+    onLoginTapped: () -> Unit = {},
+    onDemoTapped: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
@@ -111,6 +113,22 @@ fun LoginView(
         ) {
             Text(
                 text = stringResource(R.string.login_sign_in),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedButton(
+            onClick = onDemoTapped,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(26.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.login_demo_mode),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
