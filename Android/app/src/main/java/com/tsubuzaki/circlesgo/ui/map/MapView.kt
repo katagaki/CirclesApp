@@ -84,6 +84,12 @@ fun MapView(
         }
     }
 
+    // Dismiss the popover when switching to a different map or date
+    LaunchedEffect(selectedDate, selectedMap) {
+        mapper.setPopoverData(null)
+        mapper.setPopoverPosition(null)
+    }
+
     // Update canvas size when map image changes
     LaunchedEffect(mapImage) {
         mapImage?.let {
