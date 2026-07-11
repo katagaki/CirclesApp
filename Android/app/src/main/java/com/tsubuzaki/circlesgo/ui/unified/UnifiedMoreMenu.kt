@@ -38,6 +38,7 @@ import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.state.UnifiedPath
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
+import com.tsubuzaki.circlesgo.ui.shared.LocalDemoMode
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -304,9 +305,16 @@ fun UnifiedMoreMenu(
                 }
             )
 
-            // Sign out button
+            // Sign out / exit demo mode button
+            val isDemoMode = LocalDemoMode.current
             DropdownMenuItem(
-                text = { Text(stringResource(R.string.sign_out)) },
+                text = {
+                    Text(
+                        stringResource(
+                            if (isDemoMode) R.string.exit_demo_mode else R.string.sign_out
+                        )
+                    )
+                },
                 onClick = {
                     expanded = false
                     unifier.setIsGoingToSignOut(true)

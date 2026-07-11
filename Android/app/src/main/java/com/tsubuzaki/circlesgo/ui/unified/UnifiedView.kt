@@ -50,6 +50,7 @@ import com.tsubuzaki.circlesgo.state.UnifiedPath
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.ui.map.MapView
+import com.tsubuzaki.circlesgo.ui.shared.LocalDemoMode
 import com.tsubuzaki.circlesgo.ui.shared.ProgressOverlay
 import kotlinx.coroutines.launch
 
@@ -155,18 +156,32 @@ fun UnifiedView(
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // Sign out dialog
+        // Sign out / exit demo mode dialog
         if (isGoingToSignOut) {
+            val isDemoMode = LocalDemoMode.current
+            val actionLabel = stringResource(
+                if (isDemoMode) R.string.exit_demo_mode else R.string.sign_out
+            )
             AlertDialog(
                 onDismissRequest = { unifier.setIsGoingToSignOut(false) },
-                title = { Text(stringResource(R.string.sign_out)) },
-                text = { Text(stringResource(R.string.sign_out_confirm_message)) },
+                title = { Text(actionLabel) },
+                text = {
+                    Text(
+                        stringResource(
+                            if (isDemoMode) {
+                                R.string.exit_demo_mode_confirm_message
+                            } else {
+                                R.string.sign_out_confirm_message
+                            }
+                        )
+                    )
+                },
                 confirmButton = {
                     TextButton(onClick = {
                         unifier.setIsGoingToSignOut(false)
                         onLogout()
                     }) {
-                        Text(stringResource(R.string.sign_out))
+                        Text(actionLabel)
                     }
                 },
                 dismissButton = {

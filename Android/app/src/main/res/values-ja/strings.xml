@@ -61,6 +61,8 @@
     <!-- Sign Out -->
     <string name="sign_out">ログアウト</string>
     <string name="sign_out_confirm_message">ログアウトしますか？再度ログインすると、マップとサークルデータのダウンロードが再度行われます。</string>
+    <string name="exit_demo_mode">デモモードを終了</string>
+    <string name="exit_demo_mode_confirm_message">デモモードを終了しますか？デモデータはすべて削除されます。</string>
     <string name="cancel">キャンセル</string>
 
     <!-- More Menu -->

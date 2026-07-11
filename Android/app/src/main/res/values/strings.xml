@@ -61,6 +61,8 @@
     <!-- Sign Out -->
     <string name="sign_out">Sign Out</string>
     <string name="sign_out_confirm_message">Are you sure you want to sign out? All downloaded data will be deleted.</string>
+    <string name="exit_demo_mode">Exit Demo Mode</string>
+    <string name="exit_demo_mode_confirm_message">Are you sure you want to exit demo mode? All demo data will be deleted.</string>
     <string name="cancel">Cancel</string>
 
     <!-- More Menu -->
