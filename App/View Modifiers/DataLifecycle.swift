@@ -27,6 +27,7 @@ struct DataLifecycleModifier: ViewModifier {
     @State var previousEventNumber: Int?
     @State var isRevertingEvent: Bool = false
     @State var isUpdatingData: Bool = false
+    @State var isOfflineModeDownloadAlertShowing: Bool = false
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
 
@@ -57,7 +58,7 @@ struct DataLifecycleModifier: ViewModifier {
                     previousEventNumber = oldValue
                     database.disconnect()
                     planner.activeEventNumberUserDefault = planner.activeEventNumber
-                    planner.updateActiveEvent(onlineState: authenticator.onlineState)
+                    planner.updateActiveEvent(onlineState: authenticator.effectiveOnlineState)
                     reloadData(forceDownload: false, shouldResetSelections: true)
                 }
             }
@@ -84,25 +85,37 @@ struct DataLifecycleModifier: ViewModifier {
                         isUpdatingData = false
                         isReloadingData = false
                     } else {
-                        if let previousEventNumber {
-                            isRevertingEvent = true
-                            planner.activeEventNumber = previousEventNumber
-                            planner.activeEventNumberUserDefault = previousEventNumber
-                            planner.updateActiveEvent(onlineState: authenticator.onlineState)
-                            if let activeEvent = planner.activeEvent {
-                                database.prepare(for: activeEvent)
-                            }
-                        }
-                        finishReload(shouldResetSelections: false)
+                        revertToPreviousEvent()
                     }
                 }
             } message: {
                 Text("Alerts.DownloadConfirmation.Message \(estimatedDownloadSize)")
             }
+            .alert("Alerts.OfflineMode.Download.Title", isPresented: $isOfflineModeDownloadAlertShowing) {
+                Button("Shared.OK", role: .cancel) {
+                    revertToPreviousEvent()
+                }
+            } message: {
+                Text("Alerts.OfflineMode.Download.Message")
+            }
+    }
+
+    func revertToPreviousEvent() {
+        if let previousEventNumber {
+            isRevertingEvent = true
+            planner.activeEventNumber = previousEventNumber
+            planner.activeEventNumberUserDefault = previousEventNumber
+            planner.updateActiveEvent(onlineState: authenticator.effectiveOnlineState)
+            if let activeEvent = planner.activeEvent {
+                database.prepare(for: activeEvent)
+            }
+        }
+        finishReload(shouldResetSelections: false)
     }
 
     func updateData() {
-        guard !isReloadingData, let activeEvent = planner.activeEvent else { return }
+        guard !isReloadingData, !authenticator.isOfflineModeActive,
+              let activeEvent = planner.activeEvent else { return }
         isReloadingData = true
         isUpdatingData = true
         Task {
@@ -138,12 +151,14 @@ struct DataLifecycleModifier: ViewModifier {
                 if let authToken = authenticator.token {
                     await planner.prepare(authToken: authToken)
                 }
-                planner.updateActiveEvent(onlineState: authenticator.onlineState)
+                planner.updateActiveEvent(onlineState: authenticator.effectiveOnlineState)
                 let activeEvent = planner.activeEvent
 
                 if let activeEvent {
                     if !database.isDownloaded(for: activeEvent) {
-                        if isDatabaseInitialized {
+                        if authenticator.isOfflineModeActive {
+                            isOfflineModeDownloadAlertShowing = true
+                        } else if isDatabaseInitialized {
                             let token = authenticator.token ?? OpenIDToken()
                             let totalBytes = await database.fetchDownloadSizes(
                                 for: activeEvent, authToken: token
@@ -261,7 +276,13 @@ struct DataLifecycleModifier: ViewModifier {
 
     func loadFavorites() async {
         let actor = FavoritesActor(modelContainer: sharedModelContainer)
-        if let token = authenticator.token {
+        if authenticator.isOfflineModeActive {
+            let (items, wcIDMappedItems) = await actor.cached()
+            await MainActor.run {
+                favorites.items = items
+                favorites.wcIDMappedItems = wcIDMappedItems
+            }
+        } else if let token = authenticator.token {
             let (items, wcIDMappedItems) = await actor.all(authToken: token)
             await MainActor.run {
                 favorites.items = items

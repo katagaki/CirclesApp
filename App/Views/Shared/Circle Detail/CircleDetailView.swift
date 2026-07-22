@@ -149,7 +149,7 @@ struct CircleDetailView: View {
             }
         }
         .toolbar {
-            if let extendedInformation {
+            if !authenticator.isOfflineModeActive, let extendedInformation {
                 CircleDetailToolbar(
                     extendedInformation: extendedInformation,
                     webCatalogInformation: webCatalogInformation,

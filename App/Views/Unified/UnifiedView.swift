@@ -19,6 +19,7 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
 
+
     var isiPad: Bool {
         UIDevice.current.userInterfaceIdiom != .phone
     }
@@ -127,6 +128,32 @@ struct UnifiedView: View {
         } message: {
             Text("Alerts.Logout.Message")
         }
+        .alert("Alerts.OfflineMode.Exit.Title", isPresented: $unifier.isGoingToExitOfflineMode) {
+            Button("Shared.Cancel", role: .cancel) {
+                unifier.show()
+            }
+            Button("More.ExitOfflineMode", action: exitOfflineMode)
+        } message: {
+            Text("Alerts.OfflineMode.Exit.Message")
+        }
+        .onChange(of: authenticator.isAuthenticating) { oldValue, newValue in
+            if oldValue && !newValue && authenticator.isOfflineModeActive {
+                Task {
+                    try? await Task.sleep(for: .seconds(1))
+                    while oasis.isShowing {
+                        try? await Task.sleep(for: .seconds(0.5))
+                    }
+                    unifier.hide()
+                    try? await Task.sleep(for: .seconds(0.6))
+                    unifier.isOfflineModeTipShowing = true
+                }
+            }
+        }
+        .onChange(of: unifier.isOfflineModeTipShowing) { oldValue, newValue in
+            if oldValue && !newValue {
+                unifier.show()
+            }
+        }
     }
 
     func prepareTipKit() {
@@ -145,6 +172,11 @@ struct UnifiedView: View {
             requestReview()
             hasReviewBeenPrompted = true
         }
+    }
+
+    func exitOfflineMode() {
+        unifier.close()
+        authenticator.exitOfflineMode()
     }
 
     func logout() {

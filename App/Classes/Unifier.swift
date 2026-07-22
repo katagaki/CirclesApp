@@ -47,6 +47,8 @@ class Unifier {
 
     // Alerts
     var isGoingToSignOut: Bool = false
+    var isGoingToExitOfflineMode: Bool = false
+    var isOfflineModeTipShowing: Bool = false
 
     // Data update trigger
     var shouldUpdateData: Bool = false

@@ -9,6 +9,7 @@ struct UnifiedToolbar: ToolbarContent {
     let namespace: Namespace.ID
 
     var body: some ToolbarContent {
+        @Bindable var unifier = unifier
         ToolbarItem(placement: .topBarLeading) {
             Button("Tab.My", image: .buttonMy) {
                 unifier.hide()
@@ -25,6 +26,17 @@ struct UnifiedToolbar: ToolbarContent {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 UnifiedMoreMenu()
+                    .popover(isPresented: $unifier.isOfflineModeTipShowing, arrowEdge: .top) {
+                        VStack(alignment: .leading, spacing: 8.0) {
+                            Text("Alerts.OfflineMode.Tip.Title")
+                                .font(.headline)
+                            Text("Alerts.OfflineMode.Tip.Message")
+                                .font(.subheadline)
+                        }
+                        .padding()
+                        .frame(idealWidth: 320.0)
+                        .presentationCompactAdaptation(.popover)
+                    }
             }
         }
         if UIDevice.current.userInterfaceIdiom == .phone {

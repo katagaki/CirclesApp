@@ -117,7 +117,7 @@ struct MyView: View {
                 }
 
             }
-        } else if authenticator.onlineState == .offline {
+        } else if authenticator.effectiveOnlineState == .offline {
             isInitialLoadCompleted = true
         }
     }

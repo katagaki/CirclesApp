@@ -23,7 +23,7 @@ struct CircleDetailToolbar: ToolbarContent {
 
     var body: some ToolbarContent {
         // Favorites button
-        if isActiveEventLatest && authenticator.onlineState == .online {
+        if isActiveEventLatest && authenticator.effectiveOnlineState == .online {
             ToolbarItem(placement: .bottomBar) {
                 if isCallingFavoritesAPI {
                     ProgressView()

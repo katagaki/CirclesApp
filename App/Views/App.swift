@@ -36,7 +36,7 @@ struct CirclesApp: App {
         WindowGroup {
             UnifiedView()
                 .overlay {
-                    if authenticator.onlineState == .offline {
+                    if authenticator.effectiveOnlineState == .offline {
                         ZStack(alignment: .top) {
                             Color.clear
                             LinearGradient(
@@ -98,7 +98,9 @@ struct CirclesApp: App {
             } else {
                 switch newValue {
                 case .active:
-                    if authenticator.token != nil && authenticator.onlineState == .online {
+                    authenticator.enforceOfflineModeExpiry()
+                    if !authenticator.isOfflineModeActive
+                        && authenticator.token != nil && authenticator.onlineState == .online {
                         if authenticator.tokenExpiryDate.addingTimeInterval(-3600) < .now {
                             Task {
                                 await authenticator.refreshAuthenticationToken()

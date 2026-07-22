@@ -5,6 +5,8 @@ struct LoginView: View {
     @Environment(\.openURL) var openURL
     @Environment(Authenticator.self) var authenticator
 
+    @State var isOfflineModeConfirmationShowing: Bool = false
+
     var body: some View {
         @Bindable var authenticator = authenticator
         ScrollView {
@@ -98,8 +100,30 @@ struct LoginView: View {
                 .clipShape(.capsule)
                 .tint(.accent)
                 .buttonStyle(.glassProminent)
+                if authenticator.canUseOfflineMode {
+                    Button {
+                        isOfflineModeConfirmationShowing = true
+                    } label: {
+                        Text("Login.UseOffline")
+                            .fontWeight(.bold)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6.0)
+                    }
+                    .clipShape(.capsule)
+                    .tint(.accent)
+                    .buttonStyle(.glass)
+                }
             }
             .padding()
+        }
+        .alert("Alerts.OfflineMode.Enter.Title", isPresented: $isOfflineModeConfirmationShowing) {
+            Button("Login.UseOffline") {
+                authenticator.enterOfflineMode()
+            }
+            Button("Shared.Cancel", role: .cancel) {
+            }
+        } message: {
+            Text("Alerts.OfflineMode.Enter.Message")
         }
         .task {
             await authenticator.refreshLoginInformation()

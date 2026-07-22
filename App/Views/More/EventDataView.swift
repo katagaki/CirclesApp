@@ -22,7 +22,7 @@ struct EventDataView: View {
     @State private var pendingSwitchEvent: DownloadedEventInfo?
 
     private var isOnline: Bool {
-        authenticator.onlineState == .online
+        authenticator.effectiveOnlineState == .online
     }
 
     var body: some View {
@@ -123,7 +123,7 @@ struct EventDataView: View {
     }
 
     private var downloadableEvents: [WebCatalogEvent.Response.Event]? {
-        guard let list = events.eventData?.list else { return nil }
+        guard isOnline, let list = events.eventData?.list else { return nil }
         let downloadedNumbers = Set(downloadedEvents.map(\.number))
         return list
             .filter { !downloadedNumbers.contains($0.number) }

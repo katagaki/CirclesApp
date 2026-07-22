@@ -315,6 +315,278 @@
         }
       }
     },
+    "Alerts.OfflineMode.Download.Message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data for this event has not been downloaded. Exit offline mode and sign in to download it."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このイベントのデータはダウンロードされていません。オフラインモードを終了してログインすると、ダウンロードできます。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "이 이벤트의 데이터가 다운로드되어 있지 않습니다. 오프라인 모드를 종료하고 로그인하면 다운로드할 수 있습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未下载此活动的数据。退出离线模式并登录后即可下载。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未下載此活動的資料。結束離線模式並登入後即可下載。"
+          }
+        }
+      }
+    },
+    "Alerts.OfflineMode.Download.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Downloads Unavailable In Offline Mode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフラインモードではダウンロードできません"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오프라인 모드에서는 다운로드할 수 없습니다"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "离线模式下无法下载"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "離線模式下無法下載"
+          }
+        }
+      }
+    },
+    "Alerts.OfflineMode.Enter.Message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "In offline mode, you can use CiRCLES for 3 days with previously downloaded event data. After that, you will need to sign in again. Favorites cannot be edited in offline mode."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフラインモードでは、事前にダウンロードしたイベントデータを使用して、3日間サークルズをご利用いただけます。期限が過ぎると、再度ログインが必要になります。なお、オフラインモードではお気に入りの編集はできません。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오프라인 모드에서는 미리 다운로드한 이벤트 데이터를 사용하여 3일 동안 CiRCLES를 이용할 수 있습니다. 기간이 지나면 다시 로그인해야 합니다. 오프라인 모드에서는 즐겨찾기를 편집할 수 없습니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在离线模式下，您可以使用事先下载的活动数据继续使用CiRCLES 3天。到期后需要重新登录。离线模式下无法编辑收藏。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在離線模式下，您可以使用事先下載的活動資料繼續使用CiRCLES 3天。到期後需要重新登入。離線模式下無法編輯收藏。"
+          }
+        }
+      }
+    },
+    "Alerts.OfflineMode.Enter.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Are You At The Venue?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "会場にいますか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "행사장에 계신가요?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您在会场吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "您在會場嗎？"
+          }
+        }
+      }
+    },
+    "Alerts.OfflineMode.Exit.Message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You will need to sign in again after exiting offline mode."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "終了すると、再度ログインが必要になります。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "종료하면 다시 로그인해야 합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出后需要重新登录。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "結束後需要重新登入。"
+          }
+        }
+      }
+    },
+    "Alerts.OfflineMode.Exit.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exit Offline Mode?"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフラインモードを終了しますか？"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오프라인 모드를 종료하시겠습니까?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要退出离线模式吗？"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要結束離線模式嗎？"
+          }
+        }
+      }
+    },
+    "Alerts.OfflineMode.Tip.Message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To exit offline mode, select \"Exit Offline Mode\" from the \"…\" menu in the top right corner."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフラインモードを終了するには、右上の「…」メニューから「オフラインモードを終了」を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오프라인 모드를 종료하려면 오른쪽 상단의 '…' 메뉴에서 '오프라인 모드 종료'를 선택하세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要退出离线模式，请从右上角的“…”菜单中选择“退出离线模式”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要結束離線模式，請從右上角的「…」選單中選擇「結束離線模式」。"
+          }
+        }
+      }
+    },
+    "Alerts.OfflineMode.Tip.Title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Offline Mode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフラインモード"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오프라인 모드"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "离线模式"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "離線模式"
+          }
+        }
+      }
+    },
     "Alerts.SwitchEvent.Action" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -3316,6 +3588,40 @@
         }
       }
     },
+    "Login.UseOffline" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Offline"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフラインで使用"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오프라인으로 사용"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "离线使用"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "離線使用"
+          }
+        }
+      }
+    },
     "Map.NoMapSelected" : {
       "localizations" : {
         "en" : {
@@ -4172,6 +4478,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Comic Market、Circle.ms和東京Big Sight對於本應用程式可能產生的任何問題概不負責。"
+          }
+        }
+      }
+    },
+    "More.ExitOfflineMode" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exit Offline Mode"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "オフラインモードを終了"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오프라인 모드 종료"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出离线模式"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "結束離線模式"
           }
         }
       }

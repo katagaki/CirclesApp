@@ -19,6 +19,10 @@ class Authenticator {
     @ObservationIgnored let keychainAuthTokenKey: String = "CircleMsAuthToken"
     @ObservationIgnored let keychainClientKey: String = "OpenIDClientConfig"
     @ObservationIgnored let tokenExpiryDateKey: String = "Auth.TokenExpiryDate"
+    @ObservationIgnored let hasAuthenticatedOnceKey: String = "Auth.HasAuthenticatedOnce"
+    @ObservationIgnored let databaseInitializedKey: String = "Database.Initialized"
+    @ObservationIgnored let offlineModeExpiryDateKey: String = "OfflineMode.ExpiryDate"
+    @ObservationIgnored let offlineModeDuration: TimeInterval = 259200
     @ObservationIgnored let remoteConfigFetchDateKey: String = "RemoteConfig.LastFetchDate"
     @ObservationIgnored let remoteConfigFetchInterval: TimeInterval = 604800
     @ObservationIgnored let reachability = try? Reachability()
@@ -27,6 +31,7 @@ class Authenticator {
     var isWaitingForAuthenticationCode: Bool = false
     var isReady: Bool = false
     var onlineState: OnlineState = .undetermined
+    var isOfflineModeActive: Bool = false
 
     var code: String?
     var token: OpenIDToken?
@@ -67,6 +72,13 @@ class Authenticator {
     init() {
         self.client = nil
         self.client = restoreClientFromKeychain()
+        if let offlineModeExpiryDate = UserDefaults.standard.object(forKey: offlineModeExpiryDateKey) as? Date {
+            if offlineModeExpiryDate > .now {
+                isOfflineModeActive = true
+            } else {
+                exitOfflineMode()
+            }
+        }
     }
 
     func refreshLoginInformation() async {
@@ -182,6 +194,12 @@ class Authenticator {
         guard !isReady else { return }
         onlineState = isConnected ? .online : .offline
 
+        if isOfflineModeActive {
+            restoreOfflineModeSession()
+            isReady = true
+            return
+        }
+
         if restoreAuthenticationFromKeychainAndDefaults() {
             if isConnected && tokenExpiryDate.addingTimeInterval(-3600) < .now {
                 Task { await refreshAuthenticationToken() }
@@ -206,7 +224,8 @@ class Authenticator {
             bootstrap(isConnected: true)
             return
         }
-        if let token, !token.accessToken.isEmpty,
+        if !isOfflineModeActive,
+           let token, !token.accessToken.isEmpty,
            tokenExpiryDate.addingTimeInterval(-3600) < .now {
             await refreshAuthenticationToken()
         }
@@ -230,6 +249,7 @@ class Authenticator {
            let token = try? JSONDecoder().decode(OpenIDToken.self, from: tokenData) {
             self.token = token
             self.tokenExpiryDate = tokenExpiryDate
+            UserDefaults.standard.set(true, forKey: hasAuthenticatedOnceKey)
             return true
         }
         return false
@@ -326,6 +346,7 @@ class Authenticator {
     }
 
     func refreshAuthenticationTokenInBackground() async {
+        guard !isOfflineModeActive else { return }
         if token == nil {
             token = loadStoredToken()
             if let storedExpiry = UserDefaults.standard.object(forKey: tokenExpiryDateKey) as? Date {
@@ -360,6 +381,7 @@ class Authenticator {
            let tokenString = String(data: tokenEncoded, encoding: .utf8) {
             try? keychain.set(tokenString, key: keychainAuthTokenKey)
         }
+        UserDefaults.standard.set(true, forKey: hasAuthenticatedOnceKey)
         return true
     }
 

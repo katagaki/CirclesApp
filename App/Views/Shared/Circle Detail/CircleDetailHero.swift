@@ -38,7 +38,7 @@ struct CircleDetailHero: View {
                 )
                 .frame(width: 120.0, height: 172.0)
                 .onTapGesture {
-                    if authenticator.onlineState == .online {
+                    if authenticator.effectiveOnlineState == .online {
                         withAnimation(.smooth.speed(2.0)) {
                             toggleCutType()
                         }

@@ -177,8 +177,14 @@ struct FavoritesView: View {
     }
 
     func reloadFavorites() async {
-        if let token = authenticator.token {
-            let actor = FavoritesActor(modelContainer: sharedModelContainer)
+        let actor = FavoritesActor(modelContainer: sharedModelContainer)
+        if authenticator.isOfflineModeActive {
+            let (items, wcIDMappedItems) = await actor.cached()
+            await MainActor.run {
+                favorites.items = items
+                favorites.wcIDMappedItems = wcIDMappedItems
+            }
+        } else if let token = authenticator.token {
             let (items, wcIDMappedItems) = await actor.all(authToken: token)
             await MainActor.run {
                 favorites.items = items

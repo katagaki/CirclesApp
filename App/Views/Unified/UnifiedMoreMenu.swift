@@ -23,6 +23,7 @@ private let sourceCodeURL = "https://github.com/katagaki/CirclesApp"
 struct UnifiedMoreMenu: View {
 
     @Environment(\.openURL) var openURL
+    @Environment(Authenticator.self) var authenticator
     @Environment(Unifier.self) var unifier
 
     // Map Settings
@@ -81,62 +82,74 @@ struct UnifiedMoreMenu: View {
                 }
                 .menuActionDismissBehavior(.disabled)
             }
-            Section {
-                if Locale.current.language.languageCode == .japanese {
-                    if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
-                        ExternalLink(navigateMapsJPURL,
-                                     title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
+            if !authenticator.isOfflineModeActive {
+                Section {
+                    if Locale.current.language.languageCode == .japanese {
+                        if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
+                            ExternalLink(navigateMapsJPURL,
+                                         title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
+                        }
+                        if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
+                            ExternalLink(navigateGoogleMapsJPURL,
+                                         title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
+                        }
+                        if UIApplication.shared.canOpenURL(URL(string: "yjmap://")!) {
+                            ExternalLink(navigateYahooMapJPURL,
+                                         title: "More.Navigate.YahooMap", image: "ListIcon.YahooMap")
+                        }
+                    } else {
+                        if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
+                            ExternalLink(navigateMapsENURL,
+                                         title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
+                        }
+                        if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
+                            ExternalLink(navigateGoogleMapsENURL,
+                                         title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
+                        }
                     }
-                    if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
-                        ExternalLink(navigateGoogleMapsJPURL,
-                                     title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
-                    }
-                    if UIApplication.shared.canOpenURL(URL(string: "yjmap://")!) {
-                        ExternalLink(navigateYahooMapJPURL,
-                                     title: "More.Navigate.YahooMap", image: "ListIcon.YahooMap")
-                    }
-                } else {
-                    if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
-                        ExternalLink(navigateMapsENURL,
-                                     title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
-                    }
-                    if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
-                        ExternalLink(navigateGoogleMapsENURL,
-                                     title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
-                    }
+                } header: {
+                    Text("More.Navigate")
                 }
-            } header: {
-                Text("More.Navigate")
+                Section {
+                    if Locale.current.language.languageCode == .japanese {
+                        SafariLink(webCatalogJPURL,
+                                   title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
+                        SafariLink(comiketURL,
+                                   title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
+                        SafariLink(bigSightMapJPURL,
+                                   title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
+                    } else {
+                        SafariLink(webCatalogENURL,
+                                   title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
+                        SafariLink(comiketURL,
+                                   title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
+                        SafariLink(bigSightMapENURL,
+                                   title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
+                    }
+                } header: {
+                    Text("More.UsefulResources")
+                }
             }
             Section {
-                if Locale.current.language.languageCode == .japanese {
-                    SafariLink(webCatalogJPURL,
-                               title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
-                    SafariLink(comiketURL,
-                               title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
-                    SafariLink(bigSightMapJPURL,
-                               title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
-                } else {
-                    SafariLink(webCatalogENURL,
-                               title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
-                    SafariLink(comiketURL,
-                               title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
-                    SafariLink(bigSightMapENURL,
-                               title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
-                }
-            } header: {
-                Text("More.UsefulResources")
-            }
-            Section {
-                Button("Shared.Logout") {
-                    unifier.hide()
-                    Task {
-                        try? await Task.sleep(for: .seconds(0.5))
-                        unifier.isGoingToSignOut = true
+                if authenticator.isOfflineModeActive {
+                    Button("More.ExitOfflineMode") {
+                        unifier.hide()
+                        Task {
+                            try? await Task.sleep(for: .seconds(0.5))
+                            unifier.isGoingToExitOfflineMode = true
+                        }
                     }
-                }
-                Button("More.DeleteAccount", role: .destructive) {
-                    openURL(URL(string: deleteAccountURL)!)
+                } else {
+                    Button("Shared.Logout") {
+                        unifier.hide()
+                        Task {
+                            try? await Task.sleep(for: .seconds(0.5))
+                            unifier.isGoingToSignOut = true
+                        }
+                    }
+                    Button("More.DeleteAccount", role: .destructive) {
+                        openURL(URL(string: deleteAccountURL)!)
+                    }
                 }
             } header: {
                 Text("More.Account")

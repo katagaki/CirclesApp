@@ -51,6 +51,25 @@ actor FavoritesActor {
         return (items, wcIDMappedItems)
     }
 
+    func cached() -> (
+        items: [UserFavorites.Response.FavoriteItem],
+        wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem]
+    ) {
+        var wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
+        var items: [UserFavorites.Response.FavoriteItem] = []
+        if let cachedFavorites: [CirclesFavorite] = try? modelContext.fetch(FetchDescriptor<CirclesFavorite>()) {
+            items = cachedFavorites
+                .map({ $0.favoriteItem() })
+                .sorted(by: {
+                    $0.favorite.color.rawValue < $1.favorite.color.rawValue
+                })
+            for favorite in cachedFavorites {
+                wcIDMappedItems[favorite.webCatalogID] = favorite.favoriteItem()
+            }
+        }
+        return (items, wcIDMappedItems)
+    }
+
     func add(
         _ webCatalogID: Int,
         to color: WebCatalogColor,

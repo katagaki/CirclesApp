@@ -181,7 +181,7 @@ struct CircleCutImage: View {
             loadCatalogCut()
         }
         // Only fetch web cut when cutType is .web and we're online
-        if cutType == .web && authenticator.onlineState == .online,
+        if cutType == .web && authenticator.effectiveOnlineState == .online,
            let extendedInformation = circle.extendedInformation {
             let circleID = circle.id
             let webCatalogID = extendedInformation.webCatalogID
