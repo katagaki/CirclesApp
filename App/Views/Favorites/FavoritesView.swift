@@ -28,6 +28,8 @@ struct FavoritesView: View {
     @State var listDisplayModeState: ListDisplayMode = .regular
     @State var gridDisplayModeState: GridDisplayMode = .medium
 
+    @State var gridID = UUID()
+
     @AppStorage(wrappedValue: true, "Customization.DoubleTapToVisit") var isDoubleTapToVisitEnabled: Bool
 
     @Namespace var namespace
@@ -110,6 +112,7 @@ struct FavoritesView: View {
                         }
                     }
                 }
+                .id(gridID)
                 .overlay {
                     if favoriteCircles.isEmpty {
                         ContentUnavailableView(
@@ -137,6 +140,7 @@ struct FavoritesView: View {
         .refreshable {
             await reloadFavorites()
             await prepareCircles(using: favorites.items ?? [])
+            gridID = UUID()
         }
         .onAppear {
             let dateSelectionID = "D\(selections.date?.id ?? -1)"
