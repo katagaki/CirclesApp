@@ -31,6 +31,7 @@ struct CircleCutImage: View {
     var showVisitStatus: Bool
 
     @State var cutImage: UIImage?
+    @State var isWebCutLoaded: Bool = false
 
     init(
         _ circle: ComiketCircle,
@@ -149,7 +150,13 @@ struct CircleCutImage: View {
         }
         .onChange(of: circle.id) {
             cutImage = nil
+            isWebCutLoaded = false
             prepareCutImage()
+        }
+        .onChange(of: authenticator.effectiveOnlineState) { _, newValue in
+            if newValue == .online && cutType == .web && !isWebCutLoaded {
+                prepareCutImage()
+            }
         }
         .onChange(of: cutType) { _, newValue in
             switch newValue {
@@ -190,6 +197,7 @@ struct CircleCutImage: View {
                     await MainActor.run {
                         if let image {
                             self.cutImage = image
+                            self.isWebCutLoaded = true
                         }
                         if let data {
                             imageCache.set(circleID, data: data)
