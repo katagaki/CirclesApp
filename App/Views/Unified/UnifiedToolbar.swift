@@ -39,7 +39,7 @@ struct UnifiedToolbar: ToolbarContent {
                     }
             }
         }
-        if UIDevice.current.userInterfaceIdiom == .phone {
+        if unifier.displayMode == .sheet {
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
                 Button("Shared.OpenPanel", systemImage: "chevron.up") {

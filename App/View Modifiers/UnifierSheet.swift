@@ -7,7 +7,7 @@ struct UnifierPanelModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         @Bindable var unifier = unifier
-        if UIDevice.current.userInterfaceIdiom == .phone {
+        if unifier.displayMode == .sheet {
             content
                 .sheet(isPresented: $unifier.isPresenting) {
                     UnifiedPanel()

@@ -2,7 +2,6 @@ import SwiftUI
 
 struct UnifiedPanel: View {
 
-    @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
 
     var body: some View {
@@ -13,9 +12,9 @@ struct UnifiedPanel: View {
             }
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    viewPicker()
+                    UnifiedViewPicker()
                 }
-                if UIDevice.current.userInterfaceIdiom == .phone {
+                if unifier.displayMode == .sheet {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button("Shared.ClosePanel", systemImage: "chevron.down") {
                             self.unifier.hide()
@@ -31,24 +30,5 @@ struct UnifiedPanel: View {
         .presentationDetents([.height(150), .height(360), .large], selection: $unifier.selectedDetent)
         .presentationContentInteraction(.scrolls)
         .interactiveDismissDisabled()
-    }
-
-    @ViewBuilder
-    func viewPicker() -> some View {
-        @Bindable var unifier = unifier // NOSONAR - needed for $ binding access
-        Picker(selection: $unifier.current) {
-            Text("ViewTitle.Circles")
-                .tag(UnifiedPath.circles)
-            if planner.isActiveEventLatest {
-                Text("ViewTitle.Favorites")
-                    .tag(UnifiedPath.favorites)
-            }
-            Text("ViewTitle.Buys")
-                .tag(UnifiedPath.buys)
-        } label: {
-            // Label intentionally left empty; the picker uses segmented style.
-        }
-            .id("Unifier.Picker")
-            .pickerStyle(.segmented)
     }
 }

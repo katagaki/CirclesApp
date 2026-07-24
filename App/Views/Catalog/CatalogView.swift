@@ -121,7 +121,9 @@ struct CatalogView: View {
         .searchable(
             text: $searchTerm,
             isPresented: $isSearchActive,
-            placement: .toolbar,
+            placement: unifier.displayMode == .panel && unifier.isPanelSideDocked
+                ? .navigationBarDrawer(displayMode: .always)
+                : .toolbar,
             prompt: "Circles.Search.Prompt"
         )
         .onAppear {

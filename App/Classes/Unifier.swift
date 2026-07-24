@@ -1,6 +1,11 @@
 import Observation
 import SwiftUI
 
+enum UnifiedDisplayMode {
+    case sheet
+    case panel
+}
+
 enum SidebarPosition {
     case leading
     case trailing
@@ -9,14 +14,26 @@ enum SidebarPosition {
 @Observable
 class Unifier {
 
+    var displayMode: UnifiedDisplayMode
+
     var isPresenting: Bool = false
     var sidebarPosition: SidebarPosition = .leading
+
+    var windowSize: CGSize = .zero
+    var isPanelSideDocked: Bool {
+        windowSize.width > windowSize.height
+    }
+
+    @MainActor
+    init() {
+        self.displayMode = UIDevice.current.userInterfaceIdiom == .phone ? .sheet : .panel
+    }
 
     // Currently displayed sheet's data representation
     var current: UnifiedPath? = .circles
     var selectedDetent: PresentationDetent = .height(360)
     var isMinimized: Bool {
-        selectedDetent != .height(360) && selectedDetent != .large
+        displayMode == .sheet && selectedDetent != .height(360) && selectedDetent != .large
     }
     var safeAreaHeight: CGFloat {
         if !isPresenting {
@@ -57,8 +74,11 @@ class Unifier {
 
     @MainActor
     func show(animated: Bool = true) {
-        // Only set isPresented on phone, iPad sidebar is always visible
-        if UIDevice.current.userInterfaceIdiom == .phone {
+        if current == nil {
+            current = .circles
+        }
+        // Only set isPresented in sheet mode, the iPad panel is always visible
+        if displayMode == .sheet {
             // Don't show unified sheet while attachment search is open
             guard pendingAttachmentData == nil else { return }
             if animated {
@@ -75,16 +95,15 @@ class Unifier {
 
     @MainActor
     func hide() {
-        // Only hide on phone, iPad sidebar is always visible
-        if UIDevice.current.userInterfaceIdiom == .phone {
+        // Only hide in sheet mode, the iPad panel is always visible
+        if displayMode == .sheet {
             self.isPresenting = false
         }
     }
 
     @MainActor
     func close() {
-        // Only close on phone, iPad sidebar is always visible
-        if UIDevice.current.userInterfaceIdiom == .phone {
+        if displayMode == .sheet {
             self.isPresenting = false
         }
         self.current = nil
@@ -107,8 +126,7 @@ class Unifier {
     func append(_ newPath: UnifiedPath) {
         if self.current != nil {
             self.sheetPath.append(newPath)
-            // Only set isPresented on phone, iPad sidebar is always visible
-            if UIDevice.current.userInterfaceIdiom == .phone {
+            if displayMode == .sheet {
                 self.isPresenting = true
             }
         } else {
@@ -121,5 +139,26 @@ class Unifier {
         withAnimation(.smooth.speed(2.0)) {
             sidebarPosition = sidebarPosition == .leading ? .trailing : .leading
         }
+    }
+
+    @MainActor
+    func updateDisplayMode(_ newMode: UnifiedDisplayMode) {
+        guard newMode != displayMode else { return }
+        displayMode = newMode
+        switch newMode {
+        case .sheet:
+            show()
+        case .panel:
+            isPresenting = false
+            selectedDetent = .height(360)
+            if current == nil {
+                current = .circles
+            }
+        }
+    }
+
+    @MainActor
+    func updateWindowSize(_ size: CGSize) {
+        windowSize = size
     }
 }

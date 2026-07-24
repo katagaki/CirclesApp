@@ -6,12 +6,12 @@ import AXiS
 struct UnifiedView: View {
 
     @Environment(\.requestReview) var requestReview
+    @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
     @Environment(ImageCache.self) var imageCache
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
-    @Environment(Orientation.self) var orientation
     @Environment(Oasis.self) var oasis
 
     @Namespace var namespace
@@ -19,35 +19,34 @@ struct UnifiedView: View {
     @AppStorage(wrappedValue: false, "Review.IsPrompted", store: .standard) var hasReviewBeenPrompted: Bool
     @AppStorage(wrappedValue: 0, "Review.LaunchCount", store: .standard) var launchCount: Int
 
+    let sidebarWidth: CGFloat = 360.0
+    let sidebarHeight: CGFloat = 400.0
 
     var isiPad: Bool {
         UIDevice.current.userInterfaceIdiom != .phone
     }
 
-    let sidebarWidth: CGFloat = 360.0
-    let sidebarHeight: CGFloat = 400.0
+    var displayMode: UnifiedDisplayMode {
+        isiPad && horizontalSizeClass == .regular ? .panel : .sheet
+    }
 
     var mapLeadingPadding: CGFloat {
-        guard isiPad else { return 0.0 }
-        if orientation.isPortrait {
-            return 0.0
-        } else {
-            return unifier.sidebarPosition == .leading ? (sidebarWidth + 40.0) : 0.0
-        }
+        guard unifier.displayMode == .panel, unifier.isPanelSideDocked else { return 0.0 }
+        return unifier.sidebarPosition == .leading ? (sidebarWidth + 40.0) : 0.0
     }
 
     var mapTrailingPadding: CGFloat {
-        guard isiPad else { return 0.0 }
-        if orientation.isPortrait {
-            return 0.0
-        } else {
-            return unifier.sidebarPosition == .trailing ? (sidebarWidth + 40.0) : 0.0
-        }
+        guard unifier.displayMode == .panel, unifier.isPanelSideDocked else { return 0.0 }
+        return unifier.sidebarPosition == .trailing ? (sidebarWidth + 40.0) : 0.0
     }
 
     var mapBottomPadding: CGFloat {
-        guard isiPad else { return unifier.safeAreaHeight }
-        return orientation.isPortrait ? (sidebarHeight + 40.0) : 0.0
+        switch unifier.displayMode {
+        case .sheet:
+            return unifier.safeAreaHeight
+        case .panel:
+            return unifier.isPanelSideDocked ? 0.0 : (sidebarHeight + 40.0)
+        }
     }
 
     var body: some View {
@@ -90,11 +89,24 @@ struct UnifiedView: View {
         #if DEBUG
         .debugOverlay()
         #endif
+        .onChange(of: horizontalSizeClass, initial: true) { _, _ in
+            unifier.updateDisplayMode(displayMode)
+        }
+        .background {
+            Color.clear
+                .onGeometryChange(for: CGSize.self) { proxy in
+                    proxy.size
+                } action: { newValue in
+                    unifier.updateWindowSize(newValue)
+                }
+                .ignoresSafeArea()
+        }
         .overlay {
-            if isiPad {
+            if unifier.displayMode == .panel {
                 GeometryReader { reader in
+                    let isSideDocked = unifier.isPanelSideDocked
                     let alignment: Alignment = {
-                        if orientation.isPortrait {
+                        if !isSideDocked {
                             return .bottom
                         } else {
                             return unifier.sidebarPosition == .leading ? .bottomLeading : .bottomTrailing
@@ -103,8 +115,8 @@ struct UnifiedView: View {
                     ZStack(alignment: alignment) {
                         UnifiedPanel()
                             .frame(
-                                width: orientation.isPortrait ? reader.size.width - 40.0 : sidebarWidth,
-                                height: orientation.isPortrait ? sidebarHeight : reader.size.height * 0.85
+                                width: isSideDocked ? sidebarWidth : reader.size.width - 40.0,
+                                height: isSideDocked ? reader.size.height * 0.85 : sidebarHeight
                             )
                             .glassEffect(.regular, in: .rect(cornerRadius: 20.0))
                             .clipShape(.rect(cornerRadius: 20.0))

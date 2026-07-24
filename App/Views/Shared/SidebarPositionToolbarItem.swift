@@ -3,10 +3,9 @@ import SwiftUI
 struct SidebarPositionToolbarItem: ToolbarContent {
 
     @Environment(Unifier.self) var unifier
-    @Environment(Orientation.self) var orientation
 
     var body: some ToolbarContent {
-        if UIDevice.current.userInterfaceIdiom != .phone && orientation.isLandscape {
+        if unifier.displayMode == .panel && unifier.isPanelSideDocked {
             ToolbarItem(placement: .bottomBar) {
                 Button(
                     "Shared.ToggleSidebarPosition",
