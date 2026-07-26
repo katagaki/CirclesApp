@@ -183,12 +183,16 @@ struct CircleCutImage: View {
     }
 
     func prepareCutImage() {
-        // Set the catalog cut as the default
-        if cutImage == nil {
+        let isOnline = authenticator.effectiveOnlineState == .online
+        // Use the cached web cut when available, otherwise fall back to the catalog cut
+        if cutType == .web, !(isOnline && forceReload), let cachedWebCut = cachedWebCut() {
+            cutImage = cachedWebCut
+            isWebCutLoaded = true
+        } else if cutImage == nil {
             loadCatalogCut()
         }
         // Only fetch web cut when cutType is .web and we're online
-        if cutType == .web && authenticator.effectiveOnlineState == .online,
+        if cutType == .web && isOnline,
            let extendedInformation = circle.extendedInformation {
             let circleID = circle.id
             let webCatalogID = extendedInformation.webCatalogID
@@ -206,6 +210,11 @@ struct CircleCutImage: View {
                 }
             }
         }
+    }
+
+    func cachedWebCut() -> UIImage? {
+        let (isWebCutFetched, image) = imageCache.image(circle.id)
+        return isWebCutFetched ? image : nil
     }
 
     func webCut(
