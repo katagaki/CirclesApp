@@ -140,6 +140,14 @@ struct UnifiedView: View {
         } message: {
             Text("Alerts.Logout.Message")
         }
+        .alert("Alerts.OfflineMode.Enter.Title", isPresented: $unifier.isGoingToEnterOfflineMode) {
+            Button("Shared.Cancel", role: .cancel) {
+                unifier.show()
+            }
+            Button("More.EnterOfflineMode", action: enterOfflineMode)
+        } message: {
+            Text("Alerts.OfflineMode.Enter.Message")
+        }
         .alert("Alerts.OfflineMode.Exit.Title", isPresented: $unifier.isGoingToExitOfflineMode) {
             Button("Shared.Cancel", role: .cancel) {
                 unifier.show()
@@ -184,6 +192,11 @@ struct UnifiedView: View {
             requestReview()
             hasReviewBeenPrompted = true
         }
+    }
+
+    func enterOfflineMode() {
+        unifier.close()
+        authenticator.enterOfflineMode()
     }
 
     func exitOfflineMode() {

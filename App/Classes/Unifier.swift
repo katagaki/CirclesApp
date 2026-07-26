@@ -64,6 +64,7 @@ class Unifier {
 
     // Alerts
     var isGoingToSignOut: Bool = false
+    var isGoingToEnterOfflineMode: Bool = false
     var isGoingToExitOfflineMode: Bool = false
     var isOfflineModeTipShowing: Bool = false
 

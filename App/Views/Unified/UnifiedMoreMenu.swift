@@ -140,6 +140,15 @@ struct UnifiedMoreMenu: View {
                         }
                     }
                 } else {
+                    if authenticator.canUseOfflineMode {
+                        Button("More.EnterOfflineMode") {
+                            unifier.hide()
+                            Task {
+                                try? await Task.sleep(for: .seconds(0.5))
+                                unifier.isGoingToEnterOfflineMode = true
+                            }
+                        }
+                    }
                     Button("Shared.Logout") {
                         unifier.hide()
                         Task {
