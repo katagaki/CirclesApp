@@ -16,7 +16,7 @@ struct FavoritePopover: View {
     let colors: [WebCatalogColor] = WebCatalogColor.assignable
 
     private var colorGridHeight: CGFloat {
-        let rows = CGFloat((colors.count + 2) / 3)
+        let rows = CGFloat((colors.count + 3) / 4)
         return (rows * 64.0) + ((rows - 1) * 8.0)
     }
 
@@ -44,6 +44,7 @@ struct FavoritePopover: View {
                         .fontWeight(.semibold)
                     LazyVGrid(
                         columns: [.init(.fixed(64.0), spacing: 8.0),
+                                  .init(.fixed(64.0), spacing: 8.0),
                                   .init(.fixed(64.0), spacing: 8.0),
                                   .init(.fixed(64.0), spacing: 8.0)],
                         spacing: 8.0
