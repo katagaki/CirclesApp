@@ -93,6 +93,9 @@ struct EventDataView: View {
         .listSectionSpacing(.compact)
         .navigationTitle("ViewTitle.More.DBAdmin")
         .navigationBarTitleDisplayMode(.inline)
+        .refreshable {
+            await refresh()
+        }
         .task {
             await refresh()
         }
@@ -135,13 +138,20 @@ struct EventDataView: View {
     }
 
     private func refresh() async {
-        let collected = await Task.detached(priority: .utility) {
+        async let collected = Task.detached(priority: .utility) {
             collectStorage()
         }.value
+        async let eventListReload: Void = reloadEventList()
+        let (storage, _) = await (collected, eventListReload)
         withAnimation(.smooth.speed(2.0)) {
-            stats = collected.stats
-            downloadedEvents = collected.downloaded
+            stats = storage.stats
+            downloadedEvents = storage.downloaded
         }
+    }
+
+    private func reloadEventList() async {
+        guard isOnline, let token = authenticator.token else { return }
+        await events.reloadEventList(authToken: token)
     }
 
     private nonisolated func collectStorage() -> (stats: EventDataStorageStats, downloaded: [DownloadedEventInfo]) {

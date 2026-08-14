@@ -141,6 +141,13 @@ class Events {
     }
 
     @MainActor
+    func reloadEventList(authToken: OpenIDToken) async {
+        if let freshEventData = await WebCatalog.events(authToken: authToken) {
+            setEventData(freshEventData)
+        }
+    }
+
+    @MainActor
     private func setEventData(_ response: WebCatalogEvent.Response) {
         eventData = response
         latestEvent = response.list.first(where: {$0.id == response.latestEventID})
