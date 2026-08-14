@@ -34,6 +34,10 @@ struct FavoritesView: View {
 
     @Namespace var namespace
 
+    #if DEBUG
+    @State var isShowingDebugView: Bool = false
+    #endif
+
     var body: some View {
         @Bindable var favorites = favorites
 
@@ -137,6 +141,20 @@ struct FavoritesView: View {
                 gridDisplayMode: $gridDisplayModeState
             )
         }
+        #if DEBUG
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isShowingDebugView = true
+                } label: {
+                    Image(systemName: "ladybug")
+                }
+            }
+        }
+        .sheet(isPresented: $isShowingDebugView) {
+            FavoritesDebugView()
+        }
+        #endif
         .refreshable {
             await reloadFavorites()
             await prepareCircles(using: favorites.items ?? [])
