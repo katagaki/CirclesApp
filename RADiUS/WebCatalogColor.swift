@@ -32,6 +32,8 @@ public enum WebCatalogColor: Int, CaseIterable, Codable, Sendable {
         allCases.filter({ $0 != .uncolored })
     }
 
+    // TODO: Show favorites with invalid colors as having no color instead of gray,
+    // while still populating them in Favorites
     public init(from decoder: Decoder) throws {
         let rawValue = try decoder.singleValueContainer().decode(Int.self)
         self = WebCatalogColor(rawValue: rawValue) ?? .uncolored
