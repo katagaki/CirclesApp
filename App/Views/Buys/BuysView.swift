@@ -10,16 +10,24 @@ import AXiS
 
 struct BuysView: View {
 
+    @Environment(Database.self) var database
     @Environment(Events.self) var planner
+    @Environment(UserSelections.self) var selections
 
     @State var buyEntries: [BuyEntry] = []
+    @State var dayMappedCircleIDs: [Int: Int] = [:]
     @State var expandedImage: UIImage?
     @State var isShowingInfoAlert: Bool = false
 
-    var visibleEntries: [BuyEntry] {
+    var entriesWithItems: [BuyEntry] {
         buyEntries.filter {
             $0.items.contains(where: { !$0.name.trimmingCharacters(in: .whitespaces).isEmpty })
         }
+    }
+
+    var visibleEntries: [BuyEntry] {
+        guard let selectedDayID = selections.date?.id else { return entriesWithItems }
+        return entriesWithItems.filter { dayMappedCircleIDs[$0.circleID] == selectedDayID }
     }
 
     var totalCost: Int {
@@ -36,11 +44,19 @@ struct BuysView: View {
     var body: some View {
         ZStack {
             if visibleEntries.isEmpty {
-                ContentUnavailableView(
-                    "Buys.NoBuys",
-                    systemImage: "bag",
-                    description: Text("Buys.NoBuys.Description")
-                )
+                if entriesWithItems.isEmpty {
+                    ContentUnavailableView(
+                        "Buys.NoBuys",
+                        systemImage: "bag",
+                        description: Text("Buys.NoBuys.Description")
+                    )
+                } else {
+                    ContentUnavailableView(
+                        "Buys.NoBuysOnDay",
+                        systemImage: "bag",
+                        description: Text("Buys.NoBuysOnDay.Description")
+                    )
+                }
             } else {
                 List {
                     ForEach(visibleEntries) { entry in
@@ -103,6 +119,12 @@ struct BuysView: View {
 
     func reloadEntries() {
         buyEntries = BuysDatabase.shared.entries(for: planner.activeEventNumber)
+        reloadDayMappedCircleIDs()
+    }
+
+    func reloadDayMappedCircleIDs() {
+        let circles = database.circles(buyEntries.map({ $0.circleID }))
+        dayMappedCircleIDs = Dictionary(circles.map({ ($0.id, $0.day) }), uniquingKeysWith: { first, _ in first })
     }
 }
 
