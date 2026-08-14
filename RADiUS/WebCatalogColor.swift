@@ -18,8 +18,6 @@ public enum WebCatalogColor: Int, CaseIterable, Codable, Sendable {
     case blue = 7
     case lime = 8
     case red = 9
-    // Colors 10-18 are the second page of the official Web Catalog's
-    // 18-color picker, in the order they appear in its grid.
     case darkOrange = 10
     case darkPurple = 11
     case teal = 12
@@ -30,14 +28,10 @@ public enum WebCatalogColor: Int, CaseIterable, Codable, Sendable {
     case crimson = 17
     case deepPink = 18
 
-    /// Colors that can be assigned to a favorite from the color picker.
     public static var assignable: [WebCatalogColor] {
         allCases.filter({ $0 != .uncolored })
     }
 
-    // The Web Catalog can return favorites with no color (0), and may introduce
-    // new colors; treat any unknown value as colorless instead of failing the
-    // decode of the entire favorites response.
     public init(from decoder: Decoder) throws {
         let rawValue = try decoder.singleValueContainer().decode(Int.self)
         self = WebCatalogColor(rawValue: rawValue) ?? .uncolored

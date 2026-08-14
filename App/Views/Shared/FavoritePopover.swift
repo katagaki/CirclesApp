@@ -32,8 +32,6 @@ struct FavoritePopover: View {
         self.isExistingFavorite = isExistingFavorite
         self.onSave = onSave
         self.onDelete = onDelete
-        // A colorless favorite has no swatch in the picker; require the user to
-        // pick a color before saving instead of preselecting an invalid one.
         self._selectedColor = State(initialValue: initialColor == .uncolored ? nil : initialColor)
         self._memo = State(initialValue: initialMemo)
     }

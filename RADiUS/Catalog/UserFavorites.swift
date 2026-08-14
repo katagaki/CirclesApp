@@ -31,8 +31,6 @@ public struct UserFavorites: Codable {
             case list = "list"
         }
 
-        // A single malformed favorite must not fail the decode of the entire
-        // response: skip elements that cannot be decoded instead of throwing.
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             self.count = try container.decode(Int.self, forKey: .count)

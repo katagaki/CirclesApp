@@ -50,9 +50,6 @@ actor FavoritesActor {
                 try? modelContext.save()
             }
         } else if let cachedFavorites: [CirclesFavorite] = try? modelContext.fetch(FetchDescriptor<CirclesFavorite>()) {
-            // The request failed, returned an error status, or the body could not
-            // be decoded: keep showing the cached favorites instead of an empty
-            // list, and leave the cache untouched.
             items = cachedFavorites
                 .map({ $0.favoriteItem() })
                 .sorted(by: {
