@@ -109,9 +109,7 @@ class Events {
             if let cachedEventData = WebCatalog.cachedEvents() {
                 setEventData(cachedEventData)
                 Task {
-                    if let freshEventData = await WebCatalog.events(authToken: authToken) {
-                        self.setEventData(freshEventData)
-                    }
+                    await self.refresh(authToken: authToken)
                 }
             } else {
                 // Fetch event data from API
@@ -121,6 +119,25 @@ class Events {
             }
         }
 
+        applyEventData()
+    }
+
+    /// Re-fetches the event list from the API and applies it when the request succeeds, so that
+    /// events added since the last fetch show up without needing to reinstall the app.
+    /// Previously loaded data is left untouched when the request fails.
+    @MainActor
+    @discardableResult
+    func refresh(authToken: OpenIDToken) async -> Bool {
+        guard let freshEventData = await WebCatalog.refreshedEvents(authToken: authToken) else {
+            return false
+        }
+        setEventData(freshEventData)
+        applyEventData()
+        return true
+    }
+
+    @MainActor
+    private func applyEventData() {
         guard let eventData, let latestEvent else { return }
 
         // Set active event to latest event if active event number is not specified

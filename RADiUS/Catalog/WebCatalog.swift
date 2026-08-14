@@ -12,13 +12,24 @@ public class WebCatalog {
     public static let eventCacheKey = "WebCatalog.Events"
 
     public static func events(authToken: OpenIDToken) async -> WebCatalogEvent.Response? {
-        let request = urlRequestForWebCatalogAPI(endpoint: "GetEventList", authToken: authToken)
+        return await refreshedEvents(authToken: authToken) ?? cachedEvents()
+    }
+
+    /// Fetches the event list from the API, bypassing the local URL cache so that newly added events
+    /// are always picked up. Returns `nil` when the request fails, letting callers tell a successful
+    /// refresh apart from a fallback to previously stored data.
+    public static func refreshedEvents(authToken: OpenIDToken) async -> WebCatalogEvent.Response? {
+        let request = urlRequestForWebCatalogAPI(
+            endpoint: "GetEventList",
+            cachePolicy: .reloadIgnoringLocalCacheData,
+            authToken: authToken
+        )
         if let (data, _) = try? await URLSession.shared.data(for: request),
            let events = try? JSONDecoder().decode(WebCatalogEvent.self, from: data) {
             UserDefaults.standard.set(data, forKey: eventCacheKey)
             return events.response
         }
-        return cachedEvents()
+        return nil
     }
 
     public static func cachedEvents() -> WebCatalogEvent.Response? {
@@ -49,6 +60,7 @@ public class WebCatalog {
         endpoint: String,
         method _: String = "POST",
         parameters: [String: String] = [:],
+        cachePolicy: URLRequest.CachePolicy = .returnCacheDataElseLoad,
         authToken: OpenIDToken
     ) -> URLRequest {
         var endpointComponents = URLComponents(string: "\(circleMsAPIEndpoint)/WebCatalog/\(endpoint)")!
@@ -64,7 +76,7 @@ public class WebCatalog {
         if let endpoint = endpointComponents.url {
             var request = URLRequest(
                 url: endpoint,
-                cachePolicy: .returnCacheDataElseLoad,
+                cachePolicy: cachePolicy,
                 timeoutInterval: circleMsAPITimeout
             )
             request.httpMethod = "POST"

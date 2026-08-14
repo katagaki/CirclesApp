@@ -95,6 +95,11 @@ struct EventDataView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await refresh()
+            await reloadEventList()
+        }
+        .refreshable {
+            await reloadEventList()
+            await refresh()
         }
         .alert(
             "Alerts.SwitchEvent.Title",
@@ -132,6 +137,11 @@ struct EventDataView: View {
 
     private var hasOtherEvents: Bool {
         (inactiveDownloadedEvents?.isEmpty == false) || (downloadableEvents?.isEmpty == false)
+    }
+
+    private func reloadEventList() async {
+        guard isOnline, let token = authenticator.token else { return }
+        await events.refresh(authToken: token)
     }
 
     private func refresh() async {
