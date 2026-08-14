@@ -8,6 +8,7 @@
 import SwiftUI
 
 public enum WebCatalogColor: Int, CaseIterable, Codable, Sendable {
+    case uncolored = 0
     case orange = 1
     case pink = 2
     case yellow = 3
@@ -18,8 +19,22 @@ public enum WebCatalogColor: Int, CaseIterable, Codable, Sendable {
     case lime = 8
     case red = 9
 
+    /// Colors that can be assigned to a favorite from the color picker.
+    public static var assignable: [WebCatalogColor] {
+        allCases.filter({ $0 != .uncolored })
+    }
+
+    // The Web Catalog can return favorites with no color (0), and may introduce
+    // new colors; treat any unknown value as colorless instead of failing the
+    // decode of the entire favorites response.
+    public init(from decoder: Decoder) throws {
+        let rawValue = try decoder.singleValueContainer().decode(Int.self)
+        self = WebCatalogColor(rawValue: rawValue) ?? .uncolored
+    }
+
     public func backgroundColor() -> Color {
         switch self {
+        case .uncolored: return Color(red: 0.56, green: 0.56, blue: 0.58)
         case .orange: return Color(red: 1.0, green: 0.58, blue: 0.29)
         case .pink: return Color(red: 1.0, green: 0.0, blue: 1.0)
         case .yellow: return Color(red: 1.0, green: 0.97, blue: 0.0)
@@ -34,13 +49,14 @@ public enum WebCatalogColor: Int, CaseIterable, Codable, Sendable {
 
     public func foregroundColor() -> Color {
         switch self {
-        case .orange, .pink, .green, .purple, .blue, .red: return .white
+        case .uncolored, .orange, .pink, .green, .purple, .blue, .red: return .white
         case .yellow, .cyan, .lime: return .black
         }
     }
 
     public func name() -> String {
         switch self {
+        case .uncolored: return String(localized: "Color.None")
         case .orange: return String(localized: "Color.Orange")
         case .pink: return String(localized: "Color.Pink")
         case .yellow: return String(localized: "Color.Yellow")

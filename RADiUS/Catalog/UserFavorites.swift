@@ -30,6 +30,28 @@ public struct UserFavorites: Codable {
             case maxCount = "maxcount"
             case list = "list"
         }
+
+        // A single malformed favorite must not fail the decode of the entire
+        // response: skip elements that cannot be decoded instead of throwing.
+        public init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            self.count = try container.decode(Int.self, forKey: .count)
+            self.maxCount = try container.decode(Int.self, forKey: .maxCount)
+            var listContainer = try container.nestedUnkeyedContainer(forKey: .list)
+            var list: [FavoriteItem] = []
+            while !listContainer.isAtEnd {
+                if let item = try? listContainer.decode(FavoriteItem.self) {
+                    list.append(item)
+                } else if (try? listContainer.decode(SkippedElement.self)) == nil {
+                    break
+                }
+            }
+            self.list = list
+        }
     }
+}
+
+private struct SkippedElement: Decodable {
+    init(from decoder: Decoder) throws {}
 }
 // swiftlint:enable nesting

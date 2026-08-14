@@ -13,7 +13,7 @@ struct FavoritePopover: View {
 
     @State private var selectedColor: WebCatalogColor?
     @State private var memo: String
-    let colors: [WebCatalogColor] = WebCatalogColor.allCases
+    let colors: [WebCatalogColor] = WebCatalogColor.assignable
 
     init(
         initialColor: WebCatalogColor?,
@@ -27,7 +27,9 @@ struct FavoritePopover: View {
         self.isExistingFavorite = isExistingFavorite
         self.onSave = onSave
         self.onDelete = onDelete
-        self._selectedColor = State(initialValue: initialColor)
+        // A colorless favorite has no swatch in the picker; require the user to
+        // pick a color before saving instead of preselecting an invalid one.
+        self._selectedColor = State(initialValue: initialColor == .uncolored ? nil : initialColor)
         self._memo = State(initialValue: initialMemo)
     }
 
