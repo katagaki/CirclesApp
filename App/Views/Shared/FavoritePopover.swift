@@ -13,7 +13,12 @@ struct FavoritePopover: View {
 
     @State private var selectedColor: WebCatalogColor?
     @State private var memo: String
-    let colors: [WebCatalogColor] = WebCatalogColor.allCases
+    let colors: [WebCatalogColor] = WebCatalogColor.assignable
+
+    private var colorGridHeight: CGFloat {
+        let rows = CGFloat((colors.count + 3) / 4)
+        return (rows * 64.0) + ((rows - 1) * 8.0)
+    }
 
     init(
         initialColor: WebCatalogColor?,
@@ -27,7 +32,7 @@ struct FavoritePopover: View {
         self.isExistingFavorite = isExistingFavorite
         self.onSave = onSave
         self.onDelete = onDelete
-        self._selectedColor = State(initialValue: initialColor)
+        self._selectedColor = State(initialValue: initialColor == .uncolored ? nil : initialColor)
         self._memo = State(initialValue: initialMemo)
     }
 
@@ -40,7 +45,9 @@ struct FavoritePopover: View {
                     LazyVGrid(
                         columns: [.init(.fixed(64.0), spacing: 8.0),
                                   .init(.fixed(64.0), spacing: 8.0),
-                                  .init(.fixed(64.0), spacing: 8.0)]
+                                  .init(.fixed(64.0), spacing: 8.0),
+                                  .init(.fixed(64.0), spacing: 8.0)],
+                        spacing: 8.0
                     ) {
                         ForEach(colors, id: \.self) { color in
                             Button {
@@ -63,7 +70,7 @@ struct FavoritePopover: View {
                             }
                         }
                     }
-                    .frame(height: ((64.0 * 3) + (8.0 * 2)))
+                    .frame(height: colorGridHeight)
                 }
                 VStack(alignment: .leading, spacing: 8.0) {
                     Text("Shared.Memo.Placeholder")
