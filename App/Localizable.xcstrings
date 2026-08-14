@@ -3415,6 +3415,76 @@
         }
       }
     },
+    "Favorites.WebCatalogFavorites" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "About favorites added from the Web Catalog"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webカタログからの登録について"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web 카탈로그에서 등록한 즐겨찾기에 대하여"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关于从Web Catalog添加的收藏"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關於從Web Catalog新增的收藏"
+          }
+        }
+      }
+    },
+    "Favorites.WebCatalogFavorites.Description" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colors chosen from the Web Catalog's 18-color palette are not shown correctly in the app. Sorry for the inconvenience, but please select the color again in the app."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Webカタログの18色を選択した場合、アプリ内では正しく表示されません。お手数ですが、再度アプリで色を選択してください。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Web 카탈로그의 18색 중에서 선택한 색상은 앱에서 올바르게 표시되지 않습니다. 번거로우시겠지만 앱에서 색상을 다시 선택해 주세요."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在Web Catalog中选择的18色无法在App内正确显示。麻烦您在App内重新选择颜色。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在Web Catalog中選擇的18色無法在App內正確顯示。麻煩您在App內重新選擇顏色。"
+          }
+        }
+      }
+    },
     "Hero.Buys.Description" : {
       "extractionState" : "manual",
       "localizations" : {

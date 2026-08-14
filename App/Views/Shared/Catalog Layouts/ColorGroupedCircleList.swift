@@ -24,6 +24,9 @@ struct ColorGroupedCircleList: View {
             LazyVStack(spacing: 0.0, pinnedViews: [.sectionHeaders]) {
                 ForEach(WebCatalogColor.allCases, id: \.self) { color in
                     if let circles = groups[String(color.rawValue)] {
+                        if color == .uncolored {
+                            WebCatalogFavoriteNotice()
+                        }
                         Section {
                             ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
                                 Group {
