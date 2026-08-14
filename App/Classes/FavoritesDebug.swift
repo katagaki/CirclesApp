@@ -5,7 +5,6 @@
 //  Created by Claude on 2026/08/14.
 //
 
-#if DEBUG
 import Foundation
 import RADiUS
 
@@ -142,7 +141,8 @@ final class FavoritesDebug {
 
     private(set) var captures: [FavoritesDebugCapture] = []
 
-    private let captureLimit: Int = 10
+    // Captures hold the full response body, so keep only a short history.
+    private let captureLimit: Int = 5
 
     func record(_ capture: FavoritesDebugCapture) {
         captures.insert(capture, at: 0)
@@ -155,4 +155,3 @@ final class FavoritesDebug {
         captures.removeAll()
     }
 }
-#endif

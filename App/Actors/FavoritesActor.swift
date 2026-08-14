@@ -21,12 +21,10 @@ actor FavoritesActor {
         var wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
         var items: [UserFavorites.Response.FavoriteItem] = []
         if let (data, _) = try? await URLSession.shared.data(for: request) {
-            #if DEBUG
             let capture = FavoritesDebugCapture.capture(from: data, source: .network)
             await MainActor.run {
                 FavoritesDebug.shared.record(capture)
             }
-            #endif
             if let favorites = try? JSONDecoder().decode(UserFavorites.self, from: data) {
                 items = favorites.response.list.sorted(by: {
                     $0.favorite.color.rawValue < $1.favorite.color.rawValue
@@ -53,7 +51,6 @@ actor FavoritesActor {
             for favorite in cachedFavorites {
                 wcIDMappedItems[favorite.webCatalogID] = favorite.favoriteItem()
             }
-            #if DEBUG
             let capture = FavoritesDebugCapture.capture(
                 from: items,
                 source: .cache,
@@ -62,7 +59,6 @@ actor FavoritesActor {
             await MainActor.run {
                 FavoritesDebug.shared.record(capture)
             }
-            #endif
         }
         return (items, wcIDMappedItems)
     }
@@ -82,7 +78,6 @@ actor FavoritesActor {
             for favorite in cachedFavorites {
                 wcIDMappedItems[favorite.webCatalogID] = favorite.favoriteItem()
             }
-            #if DEBUG
             let capture = FavoritesDebugCapture.capture(
                 from: items,
                 source: .cache,
@@ -91,7 +86,6 @@ actor FavoritesActor {
             await MainActor.run {
                 FavoritesDebug.shared.record(capture)
             }
-            #endif
         }
         return (items, wcIDMappedItems)
     }

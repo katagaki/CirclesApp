@@ -7,6 +7,7 @@ struct FavoritesToolbar: ToolbarContent {
     @Binding var displayMode: CircleDisplayMode
     @Binding var listDisplayMode: ListDisplayMode
     @Binding var gridDisplayMode: GridDisplayMode
+    @Binding var isShowingDebugView: Bool
 
     var body: some ToolbarContent {
 
@@ -29,6 +30,13 @@ struct FavoritesToolbar: ToolbarContent {
                     "paintpalette.fill" : "paintpalette"),
                     forceLabelStyle: true
                 )
+            }
+        }
+        ToolbarItem(placement: .bottomBar) {
+            Button {
+                isShowingDebugView = true
+            } label: {
+                Image(systemName: "ladybug")
             }
         }
         ToolbarSpacer(.flexible, placement: .bottomBar)

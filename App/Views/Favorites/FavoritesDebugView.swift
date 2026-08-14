@@ -5,11 +5,10 @@
 //  Created by Claude on 2026/08/14.
 //
 
-#if DEBUG
 import SwiftUI
 import RADiUS
 
-// Debug-only, so strings are intentionally verbatim and not localized.
+// Diagnostic view, so strings are intentionally verbatim and not localized.
 @MainActor
 struct FavoritesDebugView: View {
 
@@ -338,4 +337,3 @@ struct FavoritesDebugRawJSONView: View {
         }
     }
 }
-#endif
