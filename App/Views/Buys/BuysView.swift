@@ -31,7 +31,15 @@ struct BuysView: View {
     }
 
     var totalCost: Int {
-        visibleEntries.reduce(0) { total, entry in
+        cost(of: visibleEntries)
+    }
+
+    var grandTotalCost: Int {
+        cost(of: entriesWithItems)
+    }
+
+    func cost(of entries: [BuyEntry]) -> Int {
+        entries.reduce(0) { total, entry in
             total + entry.items
                 .filter {
                     !$0.name.trimmingCharacters(in: .whitespaces).isEmpty &&
@@ -70,6 +78,16 @@ struct BuysView: View {
                             Text("Buys.CostValue.\(totalCost)")
                                 .fontWeight(.bold)
                                 .monospacedDigit()
+                        }
+                        if selections.date != nil {
+                            HStack {
+                                Text("Buys.GrandTotal")
+                                    .foregroundStyle(.secondary)
+                                Spacer()
+                                Text("Buys.CostValue.\(grandTotalCost)")
+                                    .foregroundStyle(.secondary)
+                                    .monospacedDigit()
+                            }
                         }
                     }
                 }
