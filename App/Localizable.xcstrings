@@ -771,7 +771,7 @@
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "総合合計"
+            "value" : "総合計"
           }
         },
         "ko" : {
@@ -783,13 +783,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "总合计"
+            "value" : "总计"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "總合計"
+            "value" : "總計"
           }
         }
       }
