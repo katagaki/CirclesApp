@@ -132,7 +132,8 @@ struct CircleDetailView: View {
         .navigationSubtitle(circle.penName)
         .toolbarTitleDisplayMode(.inline)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                CircleDetailVisitButton(circle: circle)
                 Button("Circles.ShowOnMap", systemImage: "mappin.and.ellipse") {
                     showOnMap()
                 }
