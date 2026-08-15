@@ -59,11 +59,23 @@ struct BuysView: View {
                         description: Text("Buys.NoBuys.Description")
                     )
                 } else {
-                    ContentUnavailableView(
-                        "Buys.NoBuysOnDay",
-                        systemImage: "bag",
-                        description: Text("Buys.NoBuysOnDay.Description")
-                    )
+                    VStack(spacing: 0.0) {
+                        ContentUnavailableView(
+                            "Buys.NoBuysOnDay",
+                            systemImage: "bag",
+                            description: Text("Buys.NoBuysOnDay.Description")
+                        )
+                        HStack {
+                            Text("Buys.GrandTotal")
+                                .fontWeight(.bold)
+                            Spacer()
+                            Text("Buys.CostValue.\(grandTotalCost)")
+                                .fontWeight(.bold)
+                                .monospacedDigit()
+                        }
+                        .padding([.horizontal], 20.0)
+                        .padding([.bottom], 20.0)
+                    }
                 }
             } else {
                 List {
