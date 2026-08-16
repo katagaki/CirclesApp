@@ -155,5 +155,10 @@
 
     <!-- Circle Detail -->
     <string name="show_on_map">マップで表示</string>
+    <string name="previous_circle">前のサークル</string>
+    <string name="next_circle">次のサークル</string>
+    <string name="first_circle_message">最初のサークルです。</string>
+    <string name="last_circle_message">最後のサークルです。</string>
+    <string name="ok">OK</string>
 
 </resources>

@@ -23,6 +23,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Star
@@ -30,6 +32,7 @@ import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.PinDrop
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
@@ -41,6 +44,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -84,7 +88,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun CircleDetailView(
-    circle: ComiketCircle,
+    initialCircle: ComiketCircle,
     database: CatalogDatabase,
     favorites: FavoritesState,
     unifier: Unifier,
@@ -102,6 +106,10 @@ fun CircleDetailView(
     val isDemo = LocalDemoMode.current
     var showDemoUnavailable by remember { mutableStateOf(false) }
     var genre by remember { mutableStateOf<String?>(null) }
+
+    // Currently shown circle; changes with previous/next navigation
+    var circle by remember(initialCircle) { mutableStateOf(initialCircle) }
+    var boundaryAlertMessage by remember { mutableStateOf<Int?>(null) }
 
     // Favorite state
     val wcIDMappedItems by favorites.wcIDMappedItems.collectAsState()
@@ -174,6 +182,37 @@ fun CircleDetailView(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
+            }
+            // Previous / next circle navigation
+            IconButton(onClick = {
+                scope.launch(Dispatchers.IO) {
+                    val previous = database.circles(listOf(circle.id - 1)).firstOrNull()
+                    if (previous != null) {
+                        circle = previous
+                    } else {
+                        boundaryAlertMessage = R.string.first_circle_message
+                    }
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = stringResource(R.string.previous_circle)
+                )
+            }
+            IconButton(onClick = {
+                scope.launch(Dispatchers.IO) {
+                    val next = database.circles(listOf(circle.id + 1)).firstOrNull()
+                    if (next != null) {
+                        circle = next
+                    } else {
+                        boundaryAlertMessage = R.string.last_circle_message
+                    }
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = stringResource(R.string.next_circle)
+                )
             }
             // Mark visited toggle
             if (visitsState != null && events != null) {
@@ -596,6 +635,18 @@ fun CircleDetailView(
 
     if (showDemoUnavailable) {
         DemoUnavailableDialog(onDismiss = { showDemoUnavailable = false })
+    }
+
+    boundaryAlertMessage?.let { messageRes ->
+        AlertDialog(
+            onDismissRequest = { boundaryAlertMessage = null },
+            text = { Text(stringResource(messageRes)) },
+            confirmButton = {
+                TextButton(onClick = { boundaryAlertMessage = null }) {
+                    Text(stringResource(R.string.ok))
+                }
+            }
+        )
     }
 }
 

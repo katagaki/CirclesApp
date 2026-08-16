@@ -68,7 +68,7 @@ fun UnifiedPanel(
         } else if (isShowingCircleDetail) {
             // Circle detail view (pushed on top)
             CircleDetailView(
-                circle = selectedCircle!!,
+                initialCircle = selectedCircle!!,
                 database = database,
                 favorites = favorites,
                 unifier = unifier,

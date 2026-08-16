@@ -157,5 +157,10 @@
 
     <!-- Circle Detail -->
     <string name="show_on_map">Show on Map</string>
+    <string name="previous_circle">Previous circle</string>
+    <string name="next_circle">Next circle</string>
+    <string name="first_circle_message">This is the first circle.</string>
+    <string name="last_circle_message">This is the last circle.</string>
+    <string name="ok">OK</string>
 
 </resources>
