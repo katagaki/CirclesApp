@@ -4,6 +4,7 @@ import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Code
 import androidx.compose.material.icons.outlined.DarkMode
@@ -64,6 +65,21 @@ fun UnifiedMoreMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
+            // My page
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.my_title)) },
+                onClick = {
+                    expanded = false
+                    unifier.append(UnifiedPath.MY)
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.AccountCircle,
+                        contentDescription = null
+                    )
+                }
+            )
+
             // Event data management
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.manage_event_data)) },

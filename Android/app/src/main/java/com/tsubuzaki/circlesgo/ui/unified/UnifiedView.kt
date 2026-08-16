@@ -119,7 +119,7 @@ fun UnifiedView(
                 }
             }
 
-            UnifiedPath.MORE_DB_ADMIN -> {
+            UnifiedPath.MORE_DB_ADMIN, UnifiedPath.MY -> {
                 bottomSheetState.expand()
             }
 
