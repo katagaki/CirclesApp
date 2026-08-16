@@ -68,6 +68,7 @@ import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.api.catalog.WebCatalogColor
 import com.tsubuzaki.circlesgo.auth.Authenticator
+import com.tsubuzaki.circlesgo.api.catalog.WebCatalogAPI
 import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.DataFetcher
@@ -139,6 +140,19 @@ fun CircleDetailView(
         scope.launch(Dispatchers.IO) {
             val fetcher = DataFetcher(database.getTextDatabase())
             genre = fetcher.genre(circle.genreID)
+        }
+    }
+
+    // Fetch web catalog tags
+    var tags by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(circle.id) {
+        tags = null
+        val token = authToken ?: return@LaunchedEffect
+        val wcID = circle.extendedInformation?.webCatalogID ?: return@LaunchedEffect
+        if (isDemo) return@LaunchedEffect
+        scope.launch(Dispatchers.IO) {
+            val response = WebCatalogAPI.circle(wcID, token)
+            tags = response?.response?.circle?.tag?.takeIf { it.isNotBlank() }
         }
     }
 
@@ -501,6 +515,16 @@ fun CircleDetailView(
         genre?.let {
             InfoSection(
                 title = stringResource(R.string.genre_label),
+                content = it,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+            )
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
+        }
+
+        // Tags section (from web catalog)
+        tags?.let {
+            InfoSection(
+                title = stringResource(R.string.tags_label),
                 content = it,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
             )
