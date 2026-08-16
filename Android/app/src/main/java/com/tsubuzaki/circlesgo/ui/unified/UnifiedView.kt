@@ -30,7 +30,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -113,6 +116,7 @@ fun UnifiedView(
     }
 
     // Open bottom sheet to standard size when circle detail is pushed (e.g. from map popover)
+    var previousSheetPath by remember { mutableStateOf<List<UnifiedPath>>(emptyList()) }
     LaunchedEffect(sheetPath) {
         when (sheetPath.lastOrNull()) {
             UnifiedPath.CIRCLE_DETAIL -> {
@@ -125,8 +129,20 @@ fun UnifiedView(
                 bottomSheetState.expand()
             }
 
-            else -> {}
+            else -> {
+                // Collapse back to the standard size when a full-height
+                // pushed page (Event Data / My / Licenses) is popped
+                val popped = previousSheetPath.lastOrNull()
+                if (sheetPath.isEmpty() &&
+                    (popped == UnifiedPath.MORE_DB_ADMIN ||
+                            popped == UnifiedPath.MY ||
+                            popped == UnifiedPath.MORE_ATTRIBUTIONS)
+                ) {
+                    bottomSheetState.partialExpand()
+                }
+            }
         }
+        previousSheetPath = sheetPath
     }
 
     // Collapse the sheet when requested (e.g. Show on Map)
