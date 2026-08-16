@@ -7,7 +7,6 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Code
-import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.DarkMode
 import androidx.compose.material.icons.outlined.Hd
 import androidx.compose.material.icons.outlined.PhoneIphone
@@ -91,21 +90,6 @@ fun UnifiedMoreMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Outlined.Storage,
-                        contentDescription = null
-                    )
-                }
-            )
-
-            // Licenses
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.attributions_title)) },
-                onClick = {
-                    expanded = false
-                    unifier.append(UnifiedPath.MORE_ATTRIBUTIONS)
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Outlined.Description,
                         contentDescription = null
                     )
                 }

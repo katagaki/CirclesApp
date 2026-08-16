@@ -184,7 +184,4 @@
 
     <!-- Tags -->
     <string name="tags_label">Tags</string>
-
-    <!-- Attributions -->
-    <string name="attributions_title">Licenses</string>
 </resources>
