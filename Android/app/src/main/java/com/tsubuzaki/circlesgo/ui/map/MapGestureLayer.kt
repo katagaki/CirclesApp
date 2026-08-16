@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.database.tables.LayoutCatalogMapping
 import com.tsubuzaki.circlesgo.database.types.LayoutType
 import com.tsubuzaki.circlesgo.state.Mapper
@@ -65,9 +66,15 @@ fun MapGestureLayer(
     LaunchedEffect(scrollToPosition, currentZoom, viewportSize, canvasWidth, canvasHeight) {
         scrollToPosition?.let {
             if (viewportSize != IntSize.Zero && canvasWidth.value > 0 && canvasHeight.value > 0) {
+                // The target position is in map (dp) units while the viewport
+                // is in pixels, so convert before offsetting. Bias the target
+                // above the vertical centre as well: the bottom sheet covers
+                // the lower part of the map and a centred target lands behind it
+                val targetX = with(density) { it.x.dp.toPx() } * currentZoom
+                val targetY = with(density) { it.y.dp.toPx() } * currentZoom
                 val newOffset = Offset(
-                    x = (viewportSize.width / 2) - (it.x * currentZoom),
-                    y = (viewportSize.height / 2) - (it.y * currentZoom)
+                    x = (viewportSize.width / 2) - targetX,
+                    y = (viewportSize.height * 0.32f) - targetY
                 )
                 offset = getCoercedOffset(newOffset)
                 onScrollCompleted()

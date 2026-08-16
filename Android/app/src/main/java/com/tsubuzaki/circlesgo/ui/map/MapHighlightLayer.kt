@@ -35,11 +35,17 @@ fun MapHighlightLayer(
     LaunchedEffect(highlightData) {
         val data = highlightData
         if (data != null && data.shouldBlink) {
+            // Hold solid first so the target is always seen even if the map is
+            // still settling, then pulse, then hold once more before clearing
             isVisible = true
-            repeat(7) {
-                delay(160)
-                isVisible = !isVisible
+            delay(500)
+            repeat(3) {
+                isVisible = false
+                delay(180)
+                isVisible = true
+                delay(180)
             }
+            delay(400)
             mapper.setHighlightData(null)
             mapper.setHighlightTarget(null)
         } else {
@@ -55,7 +61,7 @@ fun MapHighlightLayer(
                 .height(canvasHeight)
         ) {
             drawRect(
-                color = Color.Black.copy(alpha = 0.9f),
+                color = Color.White,
                 topLeft = Offset(
                     data.sourceRect.left.dp.toPx(),
                     data.sourceRect.top.dp.toPx()

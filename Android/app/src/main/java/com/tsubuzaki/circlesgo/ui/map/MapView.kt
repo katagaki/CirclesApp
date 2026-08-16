@@ -128,8 +128,9 @@ fun MapView(
         if (target != null) {
             val success = mapper.highlightCircle(spaceSize)
             if (!success) {
-                // Try to switch to the correct map/date
-                withContext(Dispatchers.IO) {
+                // Try to switch to the correct map/date; keep the target alive
+                // so the highlight retries once the new layouts are loaded
+                val isSwitchingMap = withContext(Dispatchers.IO) {
                     val fetcher = DataFetcher(database.getTextDatabase())
                     val mapID = fetcher.mapID(target.blockID)
                     if (mapID != null) {
@@ -137,16 +138,19 @@ fun MapView(
                         val dates = database.dates()
                         val newMap = maps.firstOrNull { it.id == mapID }
                         val newDate = dates.firstOrNull { it.id == target.day }
-                        if (newMap != null && newDate != null) {
-                            if (selectedMap?.id != newMap.id || selectedDate?.id != newDate.id) {
-                                selections.setMap(newMap)
-                                selections.setDate(newDate)
-                                return@withContext
-                            }
+                        if (newMap != null && newDate != null &&
+                            (selectedMap?.id != newMap.id || selectedDate?.id != newDate.id)
+                        ) {
+                            selections.setMap(newMap)
+                            selections.setDate(newDate)
+                            return@withContext true
                         }
                     }
+                    false
                 }
-                mapper.setHighlightTarget(null)
+                if (!isSwitchingMap) {
+                    mapper.setHighlightTarget(null)
+                }
             }
         }
     }
