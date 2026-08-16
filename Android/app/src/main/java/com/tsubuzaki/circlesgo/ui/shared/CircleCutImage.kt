@@ -22,7 +22,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -139,7 +144,7 @@ fun CircleCutImage(
             }
         }
 
-        // Favorite color indicator overlay
+        // Favorite color indicator and visited checkmark overlay
         if (currentBitmap != null) {
             val favoriteItem: UserFavorites.Response.FavoriteItem? = remember(
                 circle.extendedInformation?.webCatalogID, wcIDMappedItems
@@ -148,21 +153,63 @@ fun CircleCutImage(
                     wcIDMappedItems?.get(wcID)
                 }
             }
+            val favoriteColor = favoriteItem?.let {
+                WebCatalogColor.fromValue(it.favorite.color)
+            }
 
-            if (favoriteItem != null) {
-                val favoriteColor = WebCatalogColor.fromValue(favoriteItem.favorite.color)
-                if (favoriteColor != null) {
-                    Canvas(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .aspectRatio(180f / 256f)
-                    ) {
+            val visitsState = LocalVisitsState.current
+            val events = LocalEvents.current
+            val isVisited = if (visitsState != null && events != null) {
+                val visits by visitsState.visits.collectAsState()
+                visits.any {
+                    it.circleID == circle.id && it.eventNumber == events.activeEventNumber
+                }
+            } else {
+                false
+            }
+
+            if (favoriteColor != null || isVisited) {
+                Canvas(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .aspectRatio(180f / 256f)
+                ) {
+                    if (favoriteColor != null) {
                         val squareSize = 0.23f * size.width
                         val squareOffset = 0.03f * size.width
                         drawRect(
                             color = favoriteColor.backgroundColor(),
                             topLeft = Offset(squareOffset, squareOffset),
                             size = Size(squareSize, squareSize)
+                        )
+                    }
+                    if (isVisited) {
+                        val checkmarkSize = 0.20f * size.width
+                        val checkmarkOffset = 0.045f * size.width
+                        val checkmarkColor = favoriteColor?.foregroundColor()
+                            ?: Color.Black.copy(alpha = 0.9f)
+                        val path = Path().apply {
+                            moveTo(
+                                checkmarkOffset + checkmarkSize * 0.05f,
+                                checkmarkOffset + checkmarkSize * 0.55f
+                            )
+                            lineTo(
+                                checkmarkOffset + checkmarkSize * 0.38f,
+                                checkmarkOffset + checkmarkSize * 0.90f
+                            )
+                            lineTo(
+                                checkmarkOffset + checkmarkSize * 0.95f,
+                                checkmarkOffset + checkmarkSize * 0.12f
+                            )
+                        }
+                        drawPath(
+                            path = path,
+                            color = checkmarkColor,
+                            style = Stroke(
+                                width = checkmarkSize * 0.18f,
+                                cap = StrokeCap.Round,
+                                join = StrokeJoin.Round
+                            )
                         )
                     }
                 }

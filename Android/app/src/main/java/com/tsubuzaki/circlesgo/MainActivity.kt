@@ -26,6 +26,8 @@ import com.tsubuzaki.circlesgo.data.local.WebCutImageCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.ui.shared.LocalAuthenticator
 import com.tsubuzaki.circlesgo.ui.shared.LocalDemoMode
+import com.tsubuzaki.circlesgo.ui.shared.LocalEvents
+import com.tsubuzaki.circlesgo.ui.shared.LocalVisitsState
 import com.tsubuzaki.circlesgo.ui.shared.LocalWebCutImageCache
 import com.tsubuzaki.circlesgo.state.CatalogCache
 import com.tsubuzaki.circlesgo.state.DataManager
@@ -95,7 +97,9 @@ class MainActivity : ComponentActivity() {
                 CompositionLocalProvider(
                     LocalAuthenticator provides auth,
                     LocalWebCutImageCache provides webCutImageCache,
-                    LocalDemoMode provides isDemoActive
+                    LocalDemoMode provides isDemoActive,
+                    LocalVisitsState provides visitsState,
+                    LocalEvents provides events
                 ) {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
