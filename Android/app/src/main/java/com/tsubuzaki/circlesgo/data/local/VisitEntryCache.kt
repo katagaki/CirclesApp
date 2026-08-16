@@ -22,6 +22,10 @@ class VisitEntryCache(context: Context) {
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+    fun all(): List<VisitEntry> {
+        return loadAll()
+    }
+
     fun getVisits(eventNumber: Int, circleID: Int): List<VisitEntry> {
         return loadAll().filter { it.eventNumber == eventNumber && it.circleID == circleID }
     }
