@@ -31,6 +31,7 @@ import com.tsubuzaki.circlesgo.ui.catalog.CatalogView
 import com.tsubuzaki.circlesgo.ui.circledetail.CircleDetailView
 import com.tsubuzaki.circlesgo.ui.favorites.FavoritesView
 import com.tsubuzaki.circlesgo.ui.more.EventDataView
+import com.tsubuzaki.circlesgo.ui.more.LicensesView
 import com.tsubuzaki.circlesgo.ui.my.MyView
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -68,6 +69,9 @@ fun UnifiedPanel(
                 events = events,
                 unifier = unifier
             )
+        } else if (sheetPath.lastOrNull() == UnifiedPath.MORE_ATTRIBUTIONS) {
+            // Licenses view (pushed on top)
+            LicensesView(unifier = unifier)
         } else if (sheetPath.lastOrNull() == UnifiedPath.MY) {
             // My page (pushed on top)
             MyView(

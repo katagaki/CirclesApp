@@ -121,7 +121,7 @@ fun UnifiedView(
                 }
             }
 
-            UnifiedPath.MORE_DB_ADMIN, UnifiedPath.MY -> {
+            UnifiedPath.MORE_DB_ADMIN, UnifiedPath.MY, UnifiedPath.MORE_ATTRIBUTIONS -> {
                 bottomSheetState.expand()
             }
 

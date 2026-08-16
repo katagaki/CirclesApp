@@ -183,4 +183,6 @@
     <!-- Tags -->
     <string name="tags_label">タグ</string>
 
+    <!-- Attributions -->
+    <string name="attributions_title">ライセンス</string>
 </resources>
