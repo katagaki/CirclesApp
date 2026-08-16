@@ -103,6 +103,7 @@
     <string name="download_event_estimating">ダウンロードサイズを確認中…</string>
     <string name="download_event_info_failed">イベントデータの情報を取得できませんでした。通信環境を確認して、もう一度お試しください。</string>
     <string name="download_action">ダウンロード</string>
+    <string name="refresh">更新</string>
 
     <!-- Toolbar Filters -->
     <string name="privacy_mode">プライバシーモード</string>

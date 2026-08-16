@@ -104,6 +104,7 @@
     <string name="download_event_estimating">Checking download size…</string>
     <string name="download_event_info_failed">Could not retrieve the event data information. Check your connection and try again.</string>
     <string name="download_action">Download</string>
+    <string name="refresh">Refresh</string>
 
     <!-- Toolbar Filters -->
     <string name="genre_filter">Genre</string>

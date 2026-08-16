@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.DownloadDone
 import androidx.compose.material.icons.outlined.FileDownload
@@ -89,6 +90,7 @@ fun EventDataView(
     var activeDownloads by remember { mutableStateOf<Map<Int, Double?>>(emptyMap()) }
     var pendingSwitchEvent by remember { mutableStateOf<Int?>(null) }
     var pendingDownload by remember { mutableStateOf<PendingDownload?>(null) }
+    var isRefreshing by remember { mutableStateOf(false) }
 
     val activeEventNumber = events.activeEventNumber
 
@@ -189,8 +191,35 @@ fun EventDataView(
             Text(
                 text = stringResource(R.string.event_data_title),
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f)
             )
+            // Refresh button: re-fetches the event list and local storage stats
+            if (isRefreshing) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .size(24.dp),
+                    strokeWidth = 2.dp
+                )
+            } else {
+                IconButton(onClick = {
+                    scope.launch {
+                        isRefreshing = true
+                        val token = authToken
+                        if (token != null && onlineState == OnlineState.ONLINE) {
+                            events.refreshEventList(token)
+                        }
+                        refreshLocalData()
+                        isRefreshing = false
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Refresh,
+                        contentDescription = stringResource(R.string.refresh)
+                    )
+                }
+            }
         }
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
