@@ -250,6 +250,17 @@ fun MapView(
                         }
                     }
 
+                    // Layer 4: Filter dim overlay
+                    MapFilterLayer(
+                        layouts = layouts,
+                        selections = selections,
+                        darkenInDarkMode = darkenMapInDarkMode,
+                        spaceSize = spaceSize,
+                        canvasWidth = canvasWidth,
+                        canvasHeight = canvasHeight,
+                        database = database
+                    )
+
                     // Layer 5: Visited checkmarks
                     if (visitsState != null && events != null) {
                         val visits by visitsState.visits.collectAsState()
@@ -271,7 +282,7 @@ fun MapView(
                         canvasHeight = canvasHeight
                     )
 
-                    // Layer 4: Layout interaction layer
+                    // Layer 7: Layout interaction layer
                     MapLayoutLayer(
                         canvasWidth = canvasWidth,
                         canvasHeight = canvasHeight,
