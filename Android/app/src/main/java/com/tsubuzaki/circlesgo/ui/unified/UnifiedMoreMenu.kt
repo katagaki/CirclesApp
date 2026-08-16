@@ -96,6 +96,21 @@ fun UnifiedMoreMenu(
                 }
             )
 
+            // Licenses
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.attributions_title)) },
+                onClick = {
+                    expanded = false
+                    unifier.append(UnifiedPath.MORE_ATTRIBUTIONS)
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Description,
+                        contentDescription = null
+                    )
+                }
+            )
+
             HorizontalDivider()
 
             // Genre overlay toggle
@@ -274,19 +289,6 @@ fun UnifiedMoreMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Outlined.Code,
-                        contentDescription = null
-                    )
-                },
-            )
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.attributions_title)) },
-                onClick = {
-                    expanded = false
-                    unifier.append(UnifiedPath.MORE_ATTRIBUTIONS)
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Outlined.Description,
                         contentDescription = null
                     )
                 },
