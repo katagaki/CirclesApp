@@ -175,6 +175,11 @@
     <string name="my_demo_user">デモユーザー</string>
     <string name="my_loading">プロフィールを読み込み中…</string>
 
+    <!-- Attachments -->
+    <string name="attachments_title">添付ファイル</string>
+    <string name="attachments_add">添付ファイルを追加</string>
+    <string name="attachments_delete">添付ファイルを削除</string>
+
     <!-- Tags -->
     <string name="tags_label">タグ</string>
 

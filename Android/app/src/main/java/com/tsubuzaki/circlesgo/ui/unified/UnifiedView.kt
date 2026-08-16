@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.auth.Authenticator
+import com.tsubuzaki.circlesgo.data.local.AttachmentsCache
 import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.state.VisitsState
@@ -71,6 +72,7 @@ fun UnifiedView(
     authenticator: Authenticator,
     buysCache: BuysCache,
     visitsState: VisitsState,
+    attachmentsCache: AttachmentsCache,
     onLogout: () -> Unit
 ) {
     val isGoingToSignOut by unifier.isGoingToSignOut.collectAsState()
@@ -225,7 +227,8 @@ fun UnifiedView(
                     authenticator = authenticator,
                     events = events,
                     buysCache = buysCache,
-                    visitsState = visitsState
+                    visitsState = visitsState,
+                    attachmentsCache = attachmentsCache
                 )
             },
             sheetShape = RoundedCornerShape(

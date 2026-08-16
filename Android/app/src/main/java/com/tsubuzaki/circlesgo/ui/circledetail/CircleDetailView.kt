@@ -69,6 +69,7 @@ import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.api.catalog.WebCatalogColor
 import com.tsubuzaki.circlesgo.auth.Authenticator
 import com.tsubuzaki.circlesgo.api.catalog.WebCatalogAPI
+import com.tsubuzaki.circlesgo.data.local.AttachmentsCache
 import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.DataFetcher
@@ -99,7 +100,8 @@ fun CircleDetailView(
     visitsState: VisitsState? = null,
     buysCache: BuysCache? = null,
     events: Events? = null,
-    mapper: Mapper? = null
+    mapper: Mapper? = null,
+    attachmentsCache: AttachmentsCache? = null
 ) {
     val context = LocalContext.current
     val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
@@ -547,6 +549,17 @@ fun CircleDetailView(
                 circleID = circle.id,
                 eventNumber = events.activeEventNumber,
                 buysCache = buysCache,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+            )
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
+        }
+
+        // Attachments section
+        if (attachmentsCache != null && events != null) {
+            CircleDetailAttachmentsSection(
+                circleID = circle.id,
+                eventNumber = events.activeEventNumber,
+                attachmentsCache = attachmentsCache,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))

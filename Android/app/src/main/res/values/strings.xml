@@ -177,6 +177,11 @@
     <string name="my_demo_user">Demo User</string>
     <string name="my_loading">Loading profile…</string>
 
+    <!-- Attachments -->
+    <string name="attachments_title">Attachments</string>
+    <string name="attachments_add">Add Attachment</string>
+    <string name="attachments_delete">Delete attachment</string>
+
     <!-- Tags -->
     <string name="tags_label">Tags</string>
 

@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.auth.Authenticator
+import com.tsubuzaki.circlesgo.data.local.AttachmentsCache
 import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.state.CatalogCache
@@ -45,7 +46,8 @@ fun UnifiedPanel(
     authenticator: Authenticator,
     events: Events,
     buysCache: BuysCache,
-    visitsState: VisitsState
+    visitsState: VisitsState,
+    attachmentsCache: AttachmentsCache
 ) {
     val currentPath by unifier.currentPath.collectAsState()
     val sheetPath by unifier.sheetPath.collectAsState()
@@ -87,7 +89,8 @@ fun UnifiedPanel(
                 visitsState = visitsState,
                 buysCache = buysCache,
                 events = events,
-                mapper = mapper
+                mapper = mapper,
+                attachmentsCache = attachmentsCache
             )
         } else {
             // Tab row: Circles / Favorites / Buys
