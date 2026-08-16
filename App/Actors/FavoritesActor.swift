@@ -20,33 +20,30 @@ actor FavoritesActor {
 
         var wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
         var items: [UserFavorites.Response.FavoriteItem] = []
-        if let (data, _) = try? await URLSession.shared.data(for: request) {
-            if let favorites = try? JSONDecoder().decode(UserFavorites.self, from: data) {
-                items = favorites.response.list.sorted(by: {
-                    $0.favorite.color.rawValue < $1.favorite.color.rawValue
-                })
-                for favorite in items {
-                    wcIDMappedItems[favorite.circle.webCatalogID] = favorite
-                }
-                try? modelContext.transaction {
-                    try? modelContext.delete(model: CirclesFavorite.self)
-                    wcIDMappedItems.keys.forEach { webCatalogID in
-                        if let favoriteItem = wcIDMappedItems[webCatalogID] {
-                            let favorite = CirclesFavorite(
-                                webCatalogID: webCatalogID,
-                                favoriteItem: favoriteItem
-                            )
-                            modelContext.insert(favorite)
-                        }
+        if let (data, response) = try? await URLSession.shared.data(for: request),
+           (response as? HTTPURLResponse).map({ (200..<300).contains($0.statusCode) }) ?? true,
+           let favorites = try? JSONDecoder().decode(UserFavorites.self, from: data) {
+            items = favorites.response.list.sorted(by: {
+                $0.favorite.color.rawValue < $1.favorite.color.rawValue
+            })
+            for favorite in items {
+                wcIDMappedItems[favorite.circle.webCatalogID] = favorite
+            }
+            try? modelContext.transaction {
+                try? modelContext.delete(model: CirclesFavorite.self)
+                wcIDMappedItems.keys.forEach { webCatalogID in
+                    if let favoriteItem = wcIDMappedItems[webCatalogID] {
+                        let favorite = CirclesFavorite(
+                            webCatalogID: webCatalogID,
+                            favoriteItem: favoriteItem
+                        )
+                        modelContext.insert(favorite)
                     }
-                    try? modelContext.save()
                 }
+                try? modelContext.save()
             }
-        } else if let cachedFavorites: [CirclesFavorite] = try? modelContext.fetch(FetchDescriptor<CirclesFavorite>()) {
-            items = cachedFavorites.map({ $0.favoriteItem() })
-            for favorite in cachedFavorites {
-                wcIDMappedItems[favorite.webCatalogID] = favorite.favoriteItem()
-            }
+        } else {
+            return cached()
         }
         return (items, wcIDMappedItems)
     }
