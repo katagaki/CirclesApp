@@ -29,7 +29,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 5
-        versionName = "1.0"
+        versionName = "108.1"
     }
 
     signingConfigs {
