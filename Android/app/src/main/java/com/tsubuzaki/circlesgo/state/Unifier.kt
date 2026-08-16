@@ -57,13 +57,13 @@ class Unifier {
     }
 
     fun append(newPath: UnifiedPath) {
-        if (_currentPath.value != null) {
-            _sheetPath.value = _sheetPath.value + newPath
-            _isPresenting.value = true
-        } else {
-            _currentPath.value = newPath
-            show()
+        // After close() the tab selection is null; restore the default tab so
+        // pushed content renders on top of the tab row instead of replacing it
+        if (_currentPath.value == null) {
+            _currentPath.value = UnifiedPath.CIRCLES
         }
+        _sheetPath.value = _sheetPath.value + newPath
+        _isPresenting.value = true
     }
 
     fun popSheetPath() {
