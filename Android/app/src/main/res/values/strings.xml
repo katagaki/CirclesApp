@@ -131,4 +131,24 @@
     <string name="no_map_selected">No map selected</string>
     <string name="switch_to_list">Switch to List</string>
     <string name="switch_to_grid">Switch to Grid</string>
+
+    <!-- Buys -->
+    <string name="tab_buys">Buys</string>
+    <string name="buys_section_title">Buys</string>
+    <string name="buys_add_item">Add Item</string>
+    <string name="buys_item_name_placeholder">Item name</string>
+    <string name="buys_item_cost_placeholder">Cost</string>
+    <string name="buys_total">Total</string>
+    <string name="buys_grand_total">Grand Total (All Days)</string>
+    <string name="buys_cost_value">%1$d yen</string>
+    <string name="buys_no_buys">No Buys</string>
+    <string name="buys_no_buys_description">Add items you plan to buy from a circle\'s detail page.</string>
+    <string name="buys_no_buys_on_day">No Buys On This Day</string>
+    <string name="buys_no_buys_on_day_description">You have no planned buys for the selected day.</string>
+    <string name="buys_info_title">About Buys</string>
+    <string name="buys_info_description">Track items you plan to buy from each circle. Tap an item to cycle its status: to buy, bought, or cancelled.</string>
+    <string name="buys_edit">Edit</string>
+    <string name="buys_done">Done</string>
+    <string name="buys_delete">Delete</string>
+
 </resources>

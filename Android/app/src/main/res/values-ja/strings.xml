@@ -129,4 +129,24 @@
     <string name="downloading_image_database">画像データをダウンロード中…</string>
     <string name="switch_to_list">リスト表示に切り替える</string>
     <string name="switch_to_grid">グリッド表示に切り替える</string>
+
+    <!-- Buys -->
+    <string name="tab_buys">買い物</string>
+    <string name="buys_section_title">買い物リスト</string>
+    <string name="buys_add_item">アイテムを追加</string>
+    <string name="buys_item_name_placeholder">アイテム名</string>
+    <string name="buys_item_cost_placeholder">金額</string>
+    <string name="buys_total">合計</string>
+    <string name="buys_grand_total">総合計(全日程)</string>
+    <string name="buys_cost_value">%1$d円</string>
+    <string name="buys_no_buys">買い物リストがありません</string>
+    <string name="buys_no_buys_description">サークルの詳細ページから購入予定のアイテムを追加できます。</string>
+    <string name="buys_no_buys_on_day">この日の買い物はありません</string>
+    <string name="buys_no_buys_on_day_description">選択中の日に購入予定のアイテムはありません。</string>
+    <string name="buys_info_title">買い物リストについて</string>
+    <string name="buys_info_description">各サークルで購入予定のアイテムを管理できます。アイテムをタップすると「購入予定」「購入済み」「キャンセル」の順に切り替わります。</string>
+    <string name="buys_edit">編集</string>
+    <string name="buys_done">完了</string>
+    <string name="buys_delete">削除</string>
+
 </resources>

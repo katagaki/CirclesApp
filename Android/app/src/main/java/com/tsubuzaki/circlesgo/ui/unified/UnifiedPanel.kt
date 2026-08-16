@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.auth.Authenticator
+import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.state.CatalogCache
 import com.tsubuzaki.circlesgo.state.Events
@@ -23,6 +24,7 @@ import com.tsubuzaki.circlesgo.state.Mapper
 import com.tsubuzaki.circlesgo.state.UnifiedPath
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
+import com.tsubuzaki.circlesgo.ui.buys.BuysView
 import com.tsubuzaki.circlesgo.ui.catalog.CatalogView
 import com.tsubuzaki.circlesgo.ui.circledetail.CircleDetailView
 import com.tsubuzaki.circlesgo.ui.favorites.FavoritesView
@@ -39,7 +41,8 @@ fun UnifiedPanel(
     catalogCache: CatalogCache,
     favoritesAPI: FavoritesAPI,
     authenticator: Authenticator,
-    events: Events
+    events: Events,
+    buysCache: BuysCache
 ) {
     val currentPath by unifier.currentPath.collectAsState()
     val sheetPath by unifier.sheetPath.collectAsState()
@@ -69,11 +72,13 @@ fun UnifiedPanel(
                 unifier = unifier,
                 favoritesAPI = favoritesAPI,
                 authenticator = authenticator,
-                selections = selections
+                selections = selections,
+                buysCache = buysCache,
+                events = events
             )
         } else {
-            // Tab row: Circles / Favorites
-            val tabs = listOf(UnifiedPath.CIRCLES, UnifiedPath.FAVORITES)
+            // Tab row: Circles / Favorites / Buys
+            val tabs = listOf(UnifiedPath.CIRCLES, UnifiedPath.FAVORITES, UnifiedPath.BUYS)
             val selectedIndex = tabs.indexOf(currentPath).coerceAtLeast(0)
 
             SecondaryTabRow(
@@ -89,6 +94,11 @@ fun UnifiedPanel(
                     selected = currentPath == UnifiedPath.FAVORITES,
                     onClick = { unifier.setCurrentPath(UnifiedPath.FAVORITES) },
                     text = { Text(stringResource(R.string.tab_favorites)) },
+                )
+                Tab(
+                    selected = currentPath == UnifiedPath.BUYS,
+                    onClick = { unifier.setCurrentPath(UnifiedPath.BUYS) },
+                    text = { Text(stringResource(R.string.tab_buys)) },
                 )
             }
 
@@ -106,6 +116,14 @@ fun UnifiedPanel(
                 UnifiedPath.FAVORITES -> FavoritesView(
                     database = database,
                     favorites = favorites,
+                    selections = selections,
+                    unifier = unifier
+                )
+
+                UnifiedPath.BUYS -> BuysView(
+                    database = database,
+                    buysCache = buysCache,
+                    events = events,
                     selections = selections,
                     unifier = unifier
                 )

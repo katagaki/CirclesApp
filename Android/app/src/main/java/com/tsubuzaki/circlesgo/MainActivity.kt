@@ -18,6 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.compose.runtime.CompositionLocalProvider
 import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.auth.Authenticator
+import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.data.local.FavoritesCache
 import com.tsubuzaki.circlesgo.data.local.WebCutImageCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
@@ -63,6 +64,7 @@ class MainActivity : ComponentActivity() {
         val favoritesCache = FavoritesCache(this)
         val favoritesAPI = FavoritesAPI(favoritesCache)
         val webCutImageCache = WebCutImageCache(this)
+        val buysCache = BuysCache(this)
 
         val dataManager = DataManager(
             context = this,
@@ -140,6 +142,7 @@ class MainActivity : ComponentActivity() {
                                 oasis = oasis,
                                 favoritesAPI = favoritesAPI,
                                 authenticator = auth,
+                                buysCache = buysCache,
                                 onLogout = {
                                     hasTriggeredDemoLoad = false
                                     previousDemoEventNumber = null
@@ -197,6 +200,7 @@ class MainActivity : ComponentActivity() {
                                 oasis = oasis,
                                 favoritesAPI = favoritesAPI,
                                 authenticator = auth,
+                                buysCache = buysCache,
                                 onLogout = {
                                     hasTriggeredInitialLoad = false
                                     database.delete()

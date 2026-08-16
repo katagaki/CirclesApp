@@ -4,6 +4,7 @@ enum class UnifiedPath(val identifier: String) {
     MAP("Map"),
     CIRCLES("Circles"),
     FAVORITES("Favorites"),
+    BUYS("Buys"),
     CIRCLE_DETAIL("CircleDetail"),
     MY("My"),
     MORE("More"),

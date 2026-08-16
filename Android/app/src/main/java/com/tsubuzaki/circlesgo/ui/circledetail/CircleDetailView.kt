@@ -61,9 +61,11 @@ import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.api.catalog.WebCatalogColor
 import com.tsubuzaki.circlesgo.auth.Authenticator
+import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.DataFetcher
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
+import com.tsubuzaki.circlesgo.state.Events
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
@@ -83,7 +85,9 @@ fun CircleDetailView(
     unifier: Unifier,
     favoritesAPI: FavoritesAPI,
     authenticator: Authenticator,
-    selections: UserSelections
+    selections: UserSelections,
+    buysCache: BuysCache? = null,
+    events: Events? = null
 ) {
     val context = LocalContext.current
     val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
@@ -423,6 +427,17 @@ fun CircleDetailView(
             InfoSection(
                 title = stringResource(R.string.circle_memo),
                 content = circle.memo,
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+            )
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
+        }
+
+        // Buys section
+        if (buysCache != null && events != null) {
+            CircleDetailBuysSection(
+                circleID = circle.id,
+                eventNumber = events.activeEventNumber,
+                buysCache = buysCache,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
