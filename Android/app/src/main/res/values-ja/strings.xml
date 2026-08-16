@@ -153,5 +153,7 @@
     <string name="mark_visited">訪問済みにする</string>
     <string name="mark_not_visited">未訪問にする</string>
 
+    <!-- Circle Detail -->
+    <string name="show_on_map">マップで表示</string>
 
 </resources>

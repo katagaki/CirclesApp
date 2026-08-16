@@ -264,6 +264,13 @@ fun MapView(
                         )
                     }
 
+                    // Layer 6: Highlight blink overlay (Show on Map)
+                    MapHighlightLayer(
+                        mapper = mapper,
+                        canvasWidth = canvasWidth,
+                        canvasHeight = canvasHeight
+                    )
+
                     // Layer 4: Layout interaction layer
                     MapLayoutLayer(
                         canvasWidth = canvasWidth,

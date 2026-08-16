@@ -29,6 +29,15 @@ class Unifier {
     private val _isSearchActive = MutableStateFlow(false)
     val isSearchActive: StateFlow<Boolean> = _isSearchActive
 
+    // Incremented to ask the sheet to collapse to its partial height
+    // (e.g. after tapping Show on Map in the circle detail view)
+    private val _sheetCollapseRequest = MutableStateFlow(0)
+    val sheetCollapseRequest: StateFlow<Int> = _sheetCollapseRequest
+
+    fun requestSheetCollapse() {
+        _sheetCollapseRequest.value += 1
+    }
+
     fun show() {
         _isPresenting.value = true
     }

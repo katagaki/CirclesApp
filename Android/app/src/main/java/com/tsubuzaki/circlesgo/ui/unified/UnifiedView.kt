@@ -127,6 +127,14 @@ fun UnifiedView(
         }
     }
 
+    // Collapse the sheet when requested (e.g. Show on Map)
+    val sheetCollapseRequest by unifier.sheetCollapseRequest.collectAsState()
+    LaunchedEffect(sheetCollapseRequest) {
+        if (sheetCollapseRequest > 0) {
+            bottomSheetState.partialExpand()
+        }
+    }
+
     // Handle system back gesture: navigate within the bottom sheet before closing the app
     val sheetValue = scaffoldState.bottomSheetState.currentValue
     BackHandler(

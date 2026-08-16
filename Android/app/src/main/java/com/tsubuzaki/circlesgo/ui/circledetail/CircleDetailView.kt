@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.outlined.PinDrop
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.ButtonDefaults
@@ -69,6 +70,7 @@ import com.tsubuzaki.circlesgo.database.DataFetcher
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
 import com.tsubuzaki.circlesgo.state.Events
 import com.tsubuzaki.circlesgo.state.FavoritesState
+import com.tsubuzaki.circlesgo.state.Mapper
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.state.VisitsState
@@ -91,7 +93,8 @@ fun CircleDetailView(
     selections: UserSelections,
     visitsState: VisitsState? = null,
     buysCache: BuysCache? = null,
-    events: Events? = null
+    events: Events? = null,
+    mapper: Mapper? = null
 ) {
     val context = LocalContext.current
     val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
@@ -195,6 +198,19 @@ fun CircleDetailView(
                         } else {
                             MaterialTheme.colorScheme.onSurfaceVariant
                         }
+                    )
+                }
+            }
+            // Show on map
+            if (mapper != null) {
+                IconButton(onClick = {
+                    mapper.setHighlightTarget(circle)
+                    unifier.requestSheetCollapse()
+                }) {
+                    Icon(
+                        imageVector = Icons.Outlined.PinDrop,
+                        contentDescription = stringResource(R.string.show_on_map),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

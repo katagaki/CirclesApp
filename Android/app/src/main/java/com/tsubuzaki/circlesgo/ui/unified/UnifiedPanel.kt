@@ -77,7 +77,8 @@ fun UnifiedPanel(
                 selections = selections,
                 visitsState = visitsState,
                 buysCache = buysCache,
-                events = events
+                events = events,
+                mapper = mapper
             )
         } else {
             // Tab row: Circles / Favorites / Buys
