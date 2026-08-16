@@ -161,20 +161,6 @@
     <string name="last_circle_message">最後のサークルです。</string>
     <string name="ok">OK</string>
 
-    <!-- My -->
-    <string name="my_title">マイ</string>
-    <string name="my_profile_header">プロフィール</string>
-    <string name="my_participation_header">参加予定</string>
-    <string name="my_participation_day_format">%1$d日目</string>
-    <string name="my_participation_none">未定</string>
-    <string name="my_participation_early">アーリー入場</string>
-    <string name="my_participation_changing_room">更衣室</string>
-    <string name="my_participation_am">午前入場</string>
-    <string name="my_participation_pm">午後入場</string>
-    <string name="my_participation_circle">サークル入場</string>
-    <string name="my_demo_user">デモユーザー</string>
-    <string name="my_loading">プロフィールを読み込み中…</string>
-
     <!-- Attachments -->
     <string name="attachments_title">添付ファイル</string>
     <string name="attachments_add">添付ファイルを追加</string>

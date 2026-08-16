@@ -125,17 +125,15 @@ fun UnifiedView(
                 }
             }
 
-            UnifiedPath.MORE_DB_ADMIN, UnifiedPath.MY -> {
+            UnifiedPath.MORE_DB_ADMIN -> {
                 bottomSheetState.expand()
             }
 
             else -> {
                 // Collapse back to the standard size when a full-height
-                // pushed page (Event Data / My) is popped
+                // pushed page (Event Data) is popped
                 val popped = previousSheetPath.lastOrNull()
-                if (sheetPath.isEmpty() &&
-                    (popped == UnifiedPath.MORE_DB_ADMIN || popped == UnifiedPath.MY)
-                ) {
+                if (sheetPath.isEmpty() && popped == UnifiedPath.MORE_DB_ADMIN) {
                     bottomSheetState.partialExpand()
                 }
             }
