@@ -27,6 +27,8 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedButton
@@ -69,6 +71,7 @@ import com.tsubuzaki.circlesgo.state.Events
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
+import com.tsubuzaki.circlesgo.state.VisitsState
 import com.tsubuzaki.circlesgo.ui.shared.CircleBlockPill
 import com.tsubuzaki.circlesgo.ui.shared.CircleBlockPillSize
 import com.tsubuzaki.circlesgo.ui.shared.CircleCutImage
@@ -86,6 +89,7 @@ fun CircleDetailView(
     favoritesAPI: FavoritesAPI,
     authenticator: Authenticator,
     selections: UserSelections,
+    visitsState: VisitsState? = null,
     buysCache: BuysCache? = null,
     events: Events? = null
 ) {
@@ -165,6 +169,32 @@ fun CircleDetailView(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+            // Mark visited toggle
+            if (visitsState != null && events != null) {
+                val visits by visitsState.visits.collectAsState()
+                val isVisited = visits.any {
+                    it.circleID == circle.id && it.eventNumber == events.activeEventNumber
+                }
+                IconButton(onClick = {
+                    visitsState.toggleVisit(circle.id, events.activeEventNumber)
+                }) {
+                    Icon(
+                        imageVector = if (isVisited) {
+                            Icons.Outlined.VisibilityOff
+                        } else {
+                            Icons.Outlined.Visibility
+                        },
+                        contentDescription = stringResource(
+                            if (isVisited) R.string.mark_not_visited else R.string.mark_visited
+                        ),
+                        tint = if (isVisited) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        }
                     )
                 }
             }

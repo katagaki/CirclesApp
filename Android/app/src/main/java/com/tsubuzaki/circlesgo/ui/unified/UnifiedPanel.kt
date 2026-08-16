@@ -24,6 +24,7 @@ import com.tsubuzaki.circlesgo.state.Mapper
 import com.tsubuzaki.circlesgo.state.UnifiedPath
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
+import com.tsubuzaki.circlesgo.state.VisitsState
 import com.tsubuzaki.circlesgo.ui.buys.BuysView
 import com.tsubuzaki.circlesgo.ui.catalog.CatalogView
 import com.tsubuzaki.circlesgo.ui.circledetail.CircleDetailView
@@ -42,7 +43,8 @@ fun UnifiedPanel(
     favoritesAPI: FavoritesAPI,
     authenticator: Authenticator,
     events: Events,
-    buysCache: BuysCache
+    buysCache: BuysCache,
+    visitsState: VisitsState
 ) {
     val currentPath by unifier.currentPath.collectAsState()
     val sheetPath by unifier.sheetPath.collectAsState()
@@ -73,6 +75,7 @@ fun UnifiedPanel(
                 favoritesAPI = favoritesAPI,
                 authenticator = authenticator,
                 selections = selections,
+                visitsState = visitsState,
                 buysCache = buysCache,
                 events = events
             )

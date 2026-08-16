@@ -20,6 +20,7 @@ import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.auth.Authenticator
 import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.data.local.FavoritesCache
+import com.tsubuzaki.circlesgo.data.local.VisitEntryCache
 import com.tsubuzaki.circlesgo.data.local.WebCutImageCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.ui.shared.LocalAuthenticator
@@ -34,6 +35,7 @@ import com.tsubuzaki.circlesgo.state.Mapper
 import com.tsubuzaki.circlesgo.state.Oasis
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
+import com.tsubuzaki.circlesgo.state.VisitsState
 import com.tsubuzaki.circlesgo.ui.login.LoginView
 import com.tsubuzaki.circlesgo.ui.theme.CirclesGoTheme
 import com.tsubuzaki.circlesgo.ui.unified.UnifiedView
@@ -65,6 +67,7 @@ class MainActivity : ComponentActivity() {
         val favoritesAPI = FavoritesAPI(favoritesCache)
         val webCutImageCache = WebCutImageCache(this)
         val buysCache = BuysCache(this)
+        val visitsState = VisitsState(VisitEntryCache(this))
 
         val dataManager = DataManager(
             context = this,
@@ -143,6 +146,7 @@ class MainActivity : ComponentActivity() {
                                 favoritesAPI = favoritesAPI,
                                 authenticator = auth,
                                 buysCache = buysCache,
+                                visitsState = visitsState,
                                 onLogout = {
                                     hasTriggeredDemoLoad = false
                                     previousDemoEventNumber = null
@@ -201,6 +205,7 @@ class MainActivity : ComponentActivity() {
                                 favoritesAPI = favoritesAPI,
                                 authenticator = auth,
                                 buysCache = buysCache,
+                                visitsState = visitsState,
                                 onLogout = {
                                     hasTriggeredInitialLoad = false
                                     database.delete()

@@ -42,6 +42,7 @@ import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.auth.Authenticator
 import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
+import com.tsubuzaki.circlesgo.state.VisitsState
 import com.tsubuzaki.circlesgo.state.CatalogCache
 import com.tsubuzaki.circlesgo.state.Events
 import com.tsubuzaki.circlesgo.state.FavoritesState
@@ -69,6 +70,7 @@ fun UnifiedView(
     favoritesAPI: FavoritesAPI,
     authenticator: Authenticator,
     buysCache: BuysCache,
+    visitsState: VisitsState,
     onLogout: () -> Unit
 ) {
     val isGoingToSignOut by unifier.isGoingToSignOut.collectAsState()
@@ -214,7 +216,8 @@ fun UnifiedView(
                     favoritesAPI = favoritesAPI,
                     authenticator = authenticator,
                     events = events,
-                    buysCache = buysCache
+                    buysCache = buysCache,
+                    visitsState = visitsState
                 )
             },
             sheetShape = RoundedCornerShape(
@@ -238,6 +241,8 @@ fun UnifiedView(
                     favorites = favorites,
                     useHighResolutionMaps = useHighResolutionMaps,
                     showGenreOverlay = showGenreOverlay,
+                    visitsState = visitsState,
+                    events = events,
                     onCircleTapped = { circle ->
                         unifier.showCircleDetail(circle)
                     }

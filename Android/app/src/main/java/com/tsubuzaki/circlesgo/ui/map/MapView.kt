@@ -26,10 +26,12 @@ import com.tsubuzaki.circlesgo.database.DataFetcher
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
 import com.tsubuzaki.circlesgo.database.tables.LayoutCatalogMapping
 import com.tsubuzaki.circlesgo.state.ComiketHall
+import com.tsubuzaki.circlesgo.state.Events
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.MapAutoScrollType
 import com.tsubuzaki.circlesgo.state.Mapper
 import com.tsubuzaki.circlesgo.state.UserSelections
+import com.tsubuzaki.circlesgo.state.VisitsState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -42,6 +44,8 @@ fun MapView(
     useHighResolutionMaps: Boolean = true,
     showGenreOverlay: Boolean = false,
     scrollType: MapAutoScrollType = MapAutoScrollType.NONE,
+    visitsState: VisitsState? = null,
+    events: Events? = null,
     onCircleTapped: (ComiketCircle) -> Unit = {}
 ) {
     val selectedDate by selections.date.collectAsState()
@@ -244,6 +248,20 @@ fun MapView(
                                 darkenInDarkMode = darkenMapInDarkMode
                             )
                         }
+                    }
+
+                    // Layer 5: Visited checkmarks
+                    if (visitsState != null && events != null) {
+                        val visits by visitsState.visits.collectAsState()
+                        MapVisitedLayer(
+                            layouts = layouts,
+                            visits = visits,
+                            eventNumber = events.activeEventNumber,
+                            spaceSize = spaceSize,
+                            canvasWidth = canvasWidth,
+                            canvasHeight = canvasHeight,
+                            database = database
+                        )
                     }
 
                     // Layer 4: Layout interaction layer

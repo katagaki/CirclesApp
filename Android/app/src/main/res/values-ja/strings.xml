@@ -149,4 +149,9 @@
     <string name="buys_done">完了</string>
     <string name="buys_delete">削除</string>
 
+    <!-- Visits -->
+    <string name="mark_visited">訪問済みにする</string>
+    <string name="mark_not_visited">未訪問にする</string>
+
+
 </resources>

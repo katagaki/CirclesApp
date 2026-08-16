@@ -151,4 +151,9 @@
     <string name="buys_done">Done</string>
     <string name="buys_delete">Delete</string>
 
+    <!-- Visits -->
+    <string name="mark_visited">Mark Visited</string>
+    <string name="mark_not_visited">Mark Not Visited</string>
+
+
 </resources>
