@@ -11,7 +11,16 @@ enum class WebCatalogColor(val value: Int) {
     PURPLE(6),
     BLUE(7),
     LIME(8),
-    RED(9);
+    RED(9),
+    DARK_ORANGE(10),
+    DARK_PURPLE(11),
+    TEAL(12),
+    MAROON(13),
+    VIOLET(14),
+    GOLD(15),
+    DARK_GREEN(16),
+    CRIMSON(17),
+    DEEP_PINK(18);
 
     fun backgroundColor(): Color {
         return when (this) {
@@ -24,13 +33,25 @@ enum class WebCatalogColor(val value: Int) {
             BLUE -> Color(0.0f, 0.0f, 1.0f)
             LIME -> Color(0.0f, 1.0f, 0.0f)
             RED -> Color(1.0f, 0.0f, 0.0f)
+            DARK_ORANGE -> Color(0.91f, 0.45f, 0.13f)
+            DARK_PURPLE -> Color(0.48f, 0.18f, 0.56f)
+            TEAL -> Color(0.17f, 0.52f, 0.53f)
+            MAROON -> Color(0.63f, 0.17f, 0.18f)
+            VIOLET -> Color(0.42f, 0.35f, 0.8f)
+            GOLD -> Color(0.78f, 0.63f, 0.15f)
+            DARK_GREEN -> Color(0.2f, 0.49f, 0.32f)
+            CRIMSON -> Color(0.8f, 0.16f, 0.19f)
+            DEEP_PINK -> Color(0.91f, 0.15f, 0.42f)
         }
     }
 
     fun foregroundColor(): Color {
         return when (this) {
-            ORANGE, PINK, GREEN, PURPLE, BLUE, RED -> Color.White
-            YELLOW, CYAN, LIME -> Color.Black
+            ORANGE, PINK, GREEN, PURPLE, BLUE, RED,
+            DARK_ORANGE, DARK_PURPLE, TEAL, MAROON, VIOLET,
+            DARK_GREEN, CRIMSON, DEEP_PINK -> Color.White
+
+            YELLOW, CYAN, LIME, GOLD -> Color.Black
         }
     }
 
