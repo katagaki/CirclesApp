@@ -3,24 +3,27 @@ package com.tsubuzaki.circlesgo.ui.unified
 import android.os.Build
 import android.view.RoundedCorner
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -223,9 +226,23 @@ fun UnifiedView(
             sheetPeekHeight = 400.dp,
             sheetDragHandle = {
                 val isExpanded = scaffoldState.bottomSheetState.targetValue == SheetValue.Expanded
-                BottomSheetDefaults.DragHandle(
-                    modifier = if (isExpanded) Modifier.statusBarsPadding() else Modifier
-                )
+                // Compact handle: the Material default reserves ~48dp of height,
+                // which wastes space in a sheet that is mostly content
+                Box(
+                    modifier = (if (isExpanded) Modifier.statusBarsPadding() else Modifier)
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(width = 32.dp, height = 4.dp)
+                            .background(
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                                shape = RoundedCornerShape(2.dp)
+                            )
+                    )
+                }
             },
             sheetContent = {
                 UnifiedPanel(
