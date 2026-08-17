@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -272,7 +271,7 @@ fun UnifiedView(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(if (isSheetHidden) PaddingValues(bottom = (FloatingToolbarDefaults.ScreenOffset + (96).dp)) else innerPadding)
+                    .padding(if (isSheetHidden) PaddingValues() else innerPadding)
             ) {
                 MapView(
                     database = database,
@@ -290,13 +289,14 @@ fun UnifiedView(
             }
         }
 
-        // Floating toolbar
+        // Floating toolbar, docked at the top like the iOS navigation bar so the
+        // bottom area stays clear for the sheet
         if (scaffoldState.bottomSheetState.targetValue != SheetValue.Expanded) {
             HorizontalFloatingToolbar(
                 modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .offset(y = -FloatingToolbarDefaults.ScreenOffset)
-                    .padding(16.dp),
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
                 colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(),
                 expanded = true,
                 floatingActionButton = {
