@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.auth.Authenticator
@@ -46,7 +47,10 @@ fun UnifiedPanel(
     events: Events,
     buysCache: BuysCache,
     visitsState: VisitsState,
-    attachmentsCache: AttachmentsCache
+    attachmentsCache: AttachmentsCache,
+    /** Visible height of the sheet, forwarded to pages that pin content
+     *  to their bottom edge. */
+    visibleHeight: Dp? = null
 ) {
     val currentPath by unifier.currentPath.collectAsState()
     val sheetPath by unifier.sheetPath.collectAsState()
@@ -81,7 +85,8 @@ fun UnifiedPanel(
                 buysCache = buysCache,
                 events = events,
                 mapper = mapper,
-                attachmentsCache = attachmentsCache
+                attachmentsCache = attachmentsCache,
+                visibleHeight = visibleHeight
             )
         } else {
             // Tab row: Circles / Favorites / Buys

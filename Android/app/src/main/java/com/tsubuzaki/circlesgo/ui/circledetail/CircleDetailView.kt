@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -62,6 +63,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.tsubuzaki.circlesgo.R
@@ -101,7 +103,10 @@ fun CircleDetailView(
     buysCache: BuysCache? = null,
     events: Events? = null,
     mapper: Mapper? = null,
-    attachmentsCache: AttachmentsCache? = null
+    attachmentsCache: AttachmentsCache? = null,
+    /** Height of the visible part of the sheet, so the bottom toolbar stays
+     *  on screen while the sheet is only partially expanded. */
+    visibleHeight: Dp? = null
 ) {
     val context = LocalContext.current
     val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
@@ -161,9 +166,13 @@ fun CircleDetailView(
     val extInfo = circle.extendedInformation
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+        modifier = if (visibleHeight != null) {
+            Modifier
+                .fillMaxWidth()
+                .height(visibleHeight)
+        } else {
+            Modifier.fillMaxSize()
+        }
     ) {
         // Top bar with back button and circle name
         Row(
@@ -269,30 +278,14 @@ fun CircleDetailView(
                     )
                 }
             }
-            // Favorite toggle button in toolbar
-            if (webCatalogID != null) {
-                IconButton(onClick = {
-                    if (isDemo) showDemoUnavailable = true else isEditing = !isEditing
-                }) {
-                    if (isFavorited) {
-                        val favoriteColor =
-                            existingFavorite.favorite.webCatalogColor()?.backgroundColor()
-                                ?: MaterialTheme.colorScheme.primary
-                        Icon(
-                            imageVector = Icons.Filled.Star,
-                            contentDescription = stringResource(R.string.edit_favorite),
-                            tint = favoriteColor
-                        )
-                    } else {
-                        Icon(
-                            imageVector = Icons.Filled.StarBorder,
-                            contentDescription = stringResource(R.string.add_to_favorites),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-            }
         }
+
+        // Scrollable detail content
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
+        ) {
 
         // Favorite editing section
         if (isEditing && webCatalogID != null) {
@@ -567,69 +560,6 @@ fun CircleDetailView(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // SNS links
-        if (extInfo != null && extInfo.hasAccessibleURLs()) {
-            Text(
-                text = stringResource(R.string.links),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                extInfo.twitterURL?.let { url ->
-                    SNSLinkButton(
-                        label = stringResource(R.string.sns_twitter),
-                        color = Color(0xFF1DA1F2),
-                        onClick = {
-                            val colorSchemeParams = CustomTabColorSchemeParams.Builder()
-                                .setToolbarColor(primaryColor)
-                                .build()
-                            val customTabsIntent = CustomTabsIntent.Builder()
-                                .setDefaultColorSchemeParams(colorSchemeParams)
-                                .build()
-                            customTabsIntent.launchUrl(context, url.toUri())
-                        }
-                    )
-                }
-                extInfo.pixivURL?.let { url ->
-                    SNSLinkButton(
-                        label = stringResource(R.string.sns_pixiv),
-                        color = Color(0xFF0096FA),
-                        onClick = {
-                            val colorSchemeParams = CustomTabColorSchemeParams.Builder()
-                                .setToolbarColor(primaryColor)
-                                .build()
-                            val customTabsIntent = CustomTabsIntent.Builder()
-                                .setDefaultColorSchemeParams(colorSchemeParams)
-                                .build()
-                            customTabsIntent.launchUrl(context, url.toUri())
-                        }
-                    )
-                }
-                extInfo.circleMsPortalURL?.let { url ->
-                    SNSLinkButton(
-                        label = stringResource(R.string.sns_circlems),
-                        color = Color(0xFF4CAF50),
-                        onClick = {
-                            val colorSchemeParams = CustomTabColorSchemeParams.Builder()
-                                .setToolbarColor(primaryColor)
-                                .build()
-                            val customTabsIntent = CustomTabsIntent.Builder()
-                                .setDefaultColorSchemeParams(colorSchemeParams)
-                                .build()
-                            customTabsIntent.launchUrl(context, url.toUri())
-                        }
-                    )
-                }
-
-            }
-        }
-
         // URL link
         circle.url?.let { url ->
             if (url.isNotEmpty()) {
@@ -668,6 +598,81 @@ fun CircleDetailView(
         }
 
         Spacer(modifier = Modifier.height(32.dp))
+        } // end scrollable content
+
+        // Persistent bottom toolbar: favorite action on the leading edge,
+        // SNS links trailing, mirroring the iOS circle detail bottom bar
+        HorizontalDivider()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (webCatalogID != null) {
+                val favoriteTint = if (isFavorited) {
+                    existingFavorite.favorite.webCatalogColor()?.backgroundColor()
+                        ?: MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
+                TextButton(onClick = {
+                    if (isDemo) showDemoUnavailable = true else isEditing = !isEditing
+                }) {
+                    Icon(
+                        imageVector = if (isFavorited) Icons.Filled.Star else Icons.Filled.StarBorder,
+                        contentDescription = null,
+                        tint = favoriteTint,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(
+                            if (isFavorited) R.string.edit_favorite else R.string.add_to_favorites
+                        ),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = favoriteTint
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            // SNS buttons
+            if (extInfo != null && extInfo.hasAccessibleURLs()) {
+                fun openURL(url: String) {
+                    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(primaryColor)
+                        .build()
+                    CustomTabsIntent.Builder()
+                        .setDefaultColorSchemeParams(colorSchemeParams)
+                        .build()
+                        .launchUrl(context, url.toUri())
+                }
+                extInfo.circleMsPortalURL?.let { url ->
+                    SNSIconButton(
+                        label = stringResource(R.string.sns_circlems),
+                        color = Color(0xFF4CAF50),
+                        onClick = { openURL(url) }
+                    )
+                }
+                extInfo.pixivURL?.let { url ->
+                    SNSIconButton(
+                        label = stringResource(R.string.sns_pixiv),
+                        color = Color(0xFF0096FA),
+                        onClick = { openURL(url) }
+                    )
+                }
+                extInfo.twitterURL?.let { url ->
+                    SNSIconButton(
+                        label = stringResource(R.string.sns_twitter),
+                        color = Color(0xFF1DA1F2),
+                        onClick = { openURL(url) }
+                    )
+                }
+            }
+        }
     }
 
     if (showDemoUnavailable) {
@@ -707,8 +712,11 @@ private fun InfoSection(
     }
 }
 
+/**
+ * Compact SNS pill for the circle detail bottom toolbar.
+ */
 @Composable
-private fun SNSLinkButton(
+private fun SNSIconButton(
     label: String,
     color: Color,
     onClick: () -> Unit
@@ -719,12 +727,17 @@ private fun SNSLinkButton(
             containerColor = color,
             contentColor = Color.White
         ),
-        shape = RoundedCornerShape(20.dp)
+        shape = RoundedCornerShape(16.dp),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+        modifier = Modifier
+            .height(32.dp)
+            .padding(start = 6.dp)
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            maxLines = 1
         )
     }
 }

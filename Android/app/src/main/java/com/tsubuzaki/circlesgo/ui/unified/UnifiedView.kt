@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -220,9 +221,10 @@ fun UnifiedView(
             )
         }
 
+        val sheetPeekHeight = 400.dp
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
-            sheetPeekHeight = 400.dp,
+            sheetPeekHeight = sheetPeekHeight,
             sheetDragHandle = {
                 val isExpanded = scaffoldState.bottomSheetState.targetValue == SheetValue.Expanded
                 // Compact handle: the Material default reserves ~48dp of height,
@@ -256,7 +258,10 @@ fun UnifiedView(
                     events = events,
                     buysCache = buysCache,
                     visitsState = visitsState,
-                    attachmentsCache = attachmentsCache
+                    attachmentsCache = attachmentsCache,
+                    visibleHeight = if (
+                        scaffoldState.bottomSheetState.targetValue == SheetValue.Expanded
+                    ) null else sheetPeekHeight - 20.dp
                 )
             },
             sheetShape = RoundedCornerShape(
