@@ -80,8 +80,6 @@ struct CircleDetailToolbar: ToolbarContent {
         if extendedInformation.twitterURL != nil ||
            extendedInformation.pixivURL != nil ||
            extendedInformation.circleMsPortalURL != nil {
-            ToolbarSpacer(.fixed, placement: .bottomBar)
-
             if let circleMsPortalURL = extendedInformation.circleMsPortalURL {
                 ToolbarItem(placement: .bottomBar) {
                     SNSButton(circleMsPortalURL, showsLabel: false, type: .circleMs)
