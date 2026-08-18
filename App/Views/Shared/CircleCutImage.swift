@@ -20,6 +20,7 @@ struct CircleCutImage: View {
 
     @Binding var showSpaceName: Bool
     @Binding var showDay: Bool
+    @Binding var displayedCutType: CircleCutType
 
     @Query var visits: [CirclesVisitEntry]
 
@@ -41,7 +42,8 @@ struct CircleCutImage: View {
         displayMode: GridDisplayMode = .medium,
         showVisitStatus: Bool = true,
         showSpaceName: Binding<Bool>,
-        showDay: Binding<Bool>
+        showDay: Binding<Bool>,
+        displayedCutType: Binding<CircleCutType> = .constant(.catalog)
     ) {
         self.circle = circle
         self.namespace = namespace
@@ -51,6 +53,7 @@ struct CircleCutImage: View {
         self.showVisitStatus = showVisitStatus
         self._showSpaceName = showSpaceName
         self._showDay = showDay
+        self._displayedCutType = displayedCutType
         let circleID = circle.id
         self._visits = Query(
             filter: #Predicate {
@@ -171,6 +174,7 @@ struct CircleCutImage: View {
     func loadCatalogCut(force: Bool = false) {
         if let cached = database.cachedCircleImage(for: circle.id) {
             cutImage = cached
+            displayedCutType = .catalog
             return
         }
         let circleID = circle.id
@@ -178,6 +182,7 @@ struct CircleCutImage: View {
             let image = await database.circleImageAsync(for: circleID)
             if circle.id == circleID, force || cutImage == nil {
                 cutImage = image
+                displayedCutType = .catalog
             }
         }
     }
@@ -187,6 +192,7 @@ struct CircleCutImage: View {
         // Use the cached web cut when available, otherwise fall back to the catalog cut
         if cutType == .web, !(isOnline && forceReload), let cachedWebCut = cachedWebCut() {
             cutImage = cachedWebCut
+            displayedCutType = .web
             isWebCutLoaded = true
         } else if cutImage == nil {
             loadCatalogCut()
@@ -201,6 +207,7 @@ struct CircleCutImage: View {
                     await MainActor.run {
                         if let image {
                             self.cutImage = image
+                            self.displayedCutType = .web
                             self.isWebCutLoaded = true
                         }
                         if let data {

@@ -10,7 +10,6 @@ import AXiS
 
 struct CircleDetailHero: View {
 
-    @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
 
     @Binding var circle: ComiketCircle
@@ -18,6 +17,7 @@ struct CircleDetailHero: View {
     @Binding var favoriteMemo: String
 
     @State var currentCutType: CircleCutType = .catalog
+    @State var displayedCutType: CircleCutType = .catalog
     @State var hasShownWebCutOnce: Bool = false
 
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
@@ -34,21 +34,20 @@ struct CircleDetailHero: View {
                     cutType: currentCutType,
                     forceReload: currentCutType == .web && !hasShownWebCutOnce,
                     showSpaceName: .constant(false),
-                    showDay: .constant(false)
+                    showDay: .constant(false),
+                    displayedCutType: $displayedCutType
                 )
                 .frame(width: 120.0, height: 172.0)
                 .onTapGesture {
-                    if authenticator.effectiveOnlineState == .online {
-                        withAnimation(.smooth.speed(2.0)) {
-                            toggleCutType()
-                        }
+                    withAnimation(.smooth.speed(2.0)) {
+                        toggleCutType()
                     }
                 }
                 .overlay(alignment: .topLeading) {
                     CircleDetailVisitToggle(circle: circle, size: 44.0)
                 }
                 Group {
-                    switch currentCutType {
+                    switch displayedCutType {
                     case .catalog:
                         Text("Circles.Image.Catalog")
                     case .web:
