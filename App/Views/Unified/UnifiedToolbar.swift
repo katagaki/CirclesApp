@@ -39,12 +39,15 @@ struct UnifiedToolbar: ToolbarContent {
                     }
             }
         }
-        if unifier.displayMode == .sheet && !unifier.isPresenting {
+        if unifier.displayMode == .sheet {
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
                 Button("Shared.OpenPanel", systemImage: "chevron.up") {
                     unifier.show()
                 }
+                .opacity(unifier.isPresenting ? 0.0 : 1.0)
+                .disabled(unifier.isPresenting)
+                .animation(.easeInOut(duration: 0.2), value: unifier.isPresenting)
             }
             .matchedTransitionSource(id: "BottomPanel", in: namespace)
         }
