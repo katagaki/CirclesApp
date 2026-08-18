@@ -22,6 +22,8 @@ struct MyProfileSection: View {
     @State var selectedPhotoItem: PhotosPickerItem?
 
     @AppStorage("My.ProfilePicture") var profilePicture: Data?
+    @AppStorage("My.LastKnownNickname") var lastKnownNickname: String?
+    @AppStorage(wrappedValue: 0, "My.LastKnownPID") var lastKnownPID: Int
     @State var profilePictureState: Image?
 
     var body: some View {
@@ -53,6 +55,8 @@ struct MyProfileSection: View {
                     Group {
                         if let userInfo {
                             Text(userInfo.nickname)
+                        } else if let lastKnownNickname, !lastKnownNickname.isEmpty {
+                            Text(lastKnownNickname)
                         } else if authenticator.effectiveOnlineState == .offline {
                             Text("My.User.OfflineMode")
                                 .foregroundStyle(.secondary)
@@ -67,7 +71,7 @@ struct MyProfileSection: View {
                         isShowingUserPID.toggle()
                     }
                     if isShowingUserPID {
-                        Text("PID " + String(userInfo?.pid ?? 0))
+                        Text("PID " + String(userInfo?.pid ?? lastKnownPID))
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

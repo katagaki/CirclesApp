@@ -36,6 +36,8 @@ struct MyView: View {
     @State var isDeletingAccount: Bool = false
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
+    @AppStorage("My.LastKnownNickname") var lastKnownNickname: String?
+    @AppStorage(wrappedValue: 0, "My.LastKnownPID") var lastKnownPID: Int
 
     var body: some View {
         List {
@@ -146,6 +148,10 @@ struct MyView: View {
         }
 
         await MainActor.run {
+            if let userInfo {
+                lastKnownNickname = userInfo.nickname
+                lastKnownPID = userInfo.pid
+            }
             withAnimation(.smooth.speed(2.0)) {
                 self.userInfo = userInfo
                 self.userEvents = userEvents
