@@ -39,7 +39,7 @@ struct UnifiedToolbar: ToolbarContent {
                     }
             }
         }
-        if unifier.displayMode == .sheet {
+        if unifier.displayMode == .sheet && !unifier.isPresenting {
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
                 Button("Shared.OpenPanel", systemImage: "chevron.up") {

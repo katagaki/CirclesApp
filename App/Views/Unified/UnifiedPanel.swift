@@ -16,18 +16,26 @@ struct UnifiedPanel: View {
                 }
                 if unifier.displayMode == .sheet {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button("Shared.ClosePanel", systemImage: "chevron.down") {
-                            self.unifier.hide()
+                        Button("Shared.CollapsePanel", systemImage: "chevron.down") {
+                            self.unifier.collapse()
                         }
                     }
                 }
             }
+            .toolbarVisibility(unifier.isMinimized ? .hidden : .visible, for: .navigationBar, .bottomBar)
             .navigationDestination(for: UnifiedPath.self) { path in
                 path.view()
+                    .toolbarVisibility(unifier.isMinimized ? .hidden : .visible, for: .navigationBar, .bottomBar)
             }
         }
+        .overlay(alignment: .top) {
+            UnifiedQuickAccessBar()
+                .opacity(unifier.isMinimized ? 1.0 : 0.0)
+                .allowsHitTesting(unifier.isMinimized)
+        }
+        .animation(.easeInOut(duration: 0.2), value: unifier.isMinimized)
         .presentationBackgroundInteraction(.enabled)
-        .presentationDetents([.height(150), .height(360), .large], selection: $unifier.selectedDetent)
+        .presentationDetents([unifier.compactDetent, .height(360), .large], selection: $unifier.selectedDetent)
         .presentationContentInteraction(.scrolls)
         .interactiveDismissDisabled()
     }

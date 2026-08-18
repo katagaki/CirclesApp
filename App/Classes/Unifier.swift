@@ -35,16 +35,19 @@ class Unifier {
     var isMinimized: Bool {
         displayMode == .sheet && selectedDetent != .height(360) && selectedDetent != .large
     }
+    var compactBarHeight: CGFloat = 76.0
+    var compactDetent: PresentationDetent {
+        .height(compactBarHeight)
+    }
     var safeAreaHeight: CGFloat {
         if !isPresenting {
             return 0
         } else {
             var height: CGFloat = .zero
-            switch self.selectedDetent {
-            case .height(100): height = 100.0
-            case .height(150): height = 150.0
-            case .height(360): height = 360.0
-            default: height = 0.0
+            if selectedDetent == .height(360) {
+                height = 360.0
+            } else if selectedDetent != .large {
+                height = compactBarHeight
             }
             return max(0.0, height - 60.0) + 20.0
         }
@@ -67,6 +70,9 @@ class Unifier {
     var isGoingToEnterOfflineMode: Bool = false
     var isGoingToExitOfflineMode: Bool = false
     var isOfflineModeTipShowing: Bool = false
+
+    // Quick access bar search request
+    var isSearchRequested: Bool = false
 
     // Data update trigger
     var shouldUpdateData: Bool = false
@@ -92,6 +98,38 @@ class Unifier {
                 }
             }
         }
+    }
+
+    @MainActor
+    func updateCompactBarHeight(_ newValue: CGFloat) {
+        let newHeight = max(60.0, newValue.rounded())
+        guard newHeight != compactBarHeight else { return }
+        let previousHeight = compactBarHeight
+        compactBarHeight = newHeight
+        if selectedDetent == .height(previousHeight) {
+            selectedDetent = .height(newHeight)
+        }
+    }
+
+    @MainActor
+    func collapse() {
+        guard displayMode == .sheet else { return }
+        selectedDetent = compactDetent
+    }
+
+    @MainActor
+    func expand() {
+        guard displayMode == .sheet, isMinimized else { return }
+        selectedDetent = .height(360)
+    }
+
+    @MainActor
+    func requestSearch() {
+        if current != .circles {
+            current = .circles
+        }
+        expand()
+        isSearchRequested = true
     }
 
     @MainActor

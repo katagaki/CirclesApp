@@ -133,6 +133,10 @@ struct CatalogView: View {
             displayModeState = displayMode
             listDisplayModeState = listDisplayMode
             gridDisplayModeState = gridDisplayMode
+            consumeSearchRequest()
+        }
+        .onChange(of: unifier.isSearchRequested) {
+            consumeSearchRequest()
         }
         .onChange(of: displayModeState) {
             displayMode = displayModeState
@@ -170,6 +174,15 @@ struct CatalogView: View {
             listDisplayMode: $listDisplayModeState,
             gridDisplayMode: $gridDisplayModeState
         )
+    }
+
+    func consumeSearchRequest() {
+        guard unifier.isSearchRequested else { return }
+        unifier.isSearchRequested = false
+        Task {
+            try? await Task.sleep(for: .milliseconds(350))
+            isSearchActive = true
+        }
     }
 
     func reloadDisplayedCircles() {
