@@ -106,7 +106,7 @@ struct RouteCard: View {
             if isVisited {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 12.0))
-                    .foregroundStyle(.green)
+                    .foregroundStyle(Color.accentColor)
             }
         }
     }
@@ -126,7 +126,7 @@ struct RouteCard: View {
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
-            .tint(isVisited ? .gray : .green)
+            .tint(isVisited ? Color.secondary : Color.accentColor)
         }
         .font(.footnote)
     }

@@ -32,6 +32,8 @@ targets:
         INFOPLIST_KEY_WKApplication: YES
         INFOPLIST_KEY_WKWatchOnly: YES
         INFOPLIST_KEY_CFBundleDisplayName: CiRCLES Proto
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ASSETCATALOG_COMPILER_APPICON_NAME: ""
         SWIFT_EMIT_LOC_STRINGS: NO
 
   RouteWidget:
@@ -42,6 +44,8 @@ targets:
       - path: Sources/Data
       - path: Sources/Map
       - path: Resources/webcatalog999.db
+        buildPhase: resources
+      - path: Sources/Assets.xcassets
         buildPhase: resources
     dependencies:
       - sdk: libsqlite3.tbd
@@ -56,4 +60,6 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.tsubuzaki.circlesproto.watchkitapp.widget
         PRODUCT_NAME: RouteWidget
         GENERATE_INFOPLIST_FILE: NO
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        ASSETCATALOG_COMPILER_APPICON_NAME: ""
         SWIFT_EMIT_LOC_STRINGS: NO

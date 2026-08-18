@@ -112,10 +112,10 @@ struct StepMapView: View {
                 Image(systemName: "chevron.down")
                     .font(.system(size: 8.0, weight: .bold))
             }
-            .foregroundStyle(.white)
+            .foregroundStyle(Color.accentColor)
             .padding(.horizontal, 8.0)
             .padding(.vertical, 4.0)
-            .background(.white.opacity(0.2), in: Capsule())
+            .background(.black.opacity(0.55), in: Capsule())
         }
         .buttonStyle(.plain)
         .padding(.leading, 8.0)
@@ -174,7 +174,7 @@ struct StepMapView: View {
                                     Spacer()
                                     if map.id == mapID && day.id == dayID {
                                         Image(systemName: "checkmark")
-                                            .foregroundStyle(.tint)
+                                            .foregroundStyle(Color.accentColor)
                                     }
                                 }
                             }

@@ -45,7 +45,7 @@ struct BuyRow: View {
         } label: {
             HStack {
                 Image(systemName: item.isBought ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(item.isBought ? .green : .secondary)
+                    .foregroundStyle(item.isBought ? Color.accentColor : Color.secondary)
                 VStack(alignment: .leading, spacing: 0.0) {
                     Text(item.name)
                         .strikethrough(item.isBought)
