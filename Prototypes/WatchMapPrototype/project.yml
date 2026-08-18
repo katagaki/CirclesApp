@@ -1,0 +1,59 @@
+name: WatchMapPrototype
+options:
+  bundleIdPrefix: com.tsubuzaki.circlesproto
+  deploymentTarget:
+    watchOS: "11.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    CODE_SIGN_ENTITLEMENTS: App.entitlements
+targets:
+  WatchMapPrototype:
+    type: application
+    platform: watchOS
+    sources:
+      - path: Sources
+      - path: Widget/NextStopView.swift
+      - path: Widget/NextStopEntry.swift
+      - path: Resources
+        buildPhase: resources
+    dependencies:
+      - sdk: libsqlite3.tbd
+      - target: RouteWidget
+        embed: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tsubuzaki.circlesproto.watchkitapp
+        PRODUCT_NAME: WatchMapPrototype
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_WKApplication: YES
+        INFOPLIST_KEY_WKWatchOnly: YES
+        INFOPLIST_KEY_CFBundleDisplayName: CiRCLES Proto
+        SWIFT_EMIT_LOC_STRINGS: NO
+
+  RouteWidget:
+    type: app-extension
+    platform: watchOS
+    sources:
+      - path: Widget
+      - path: Sources/Data
+      - path: Sources/Map
+      - path: Resources/webcatalog999.db
+        buildPhase: resources
+    dependencies:
+      - sdk: libsqlite3.tbd
+    info:
+      path: Widget/Info.plist
+      properties:
+        CFBundleDisplayName: Next Stop
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tsubuzaki.circlesproto.watchkitapp.widget
+        PRODUCT_NAME: RouteWidget
+        GENERATE_INFOPLIST_FILE: NO
+        SWIFT_EMIT_LOC_STRINGS: NO
