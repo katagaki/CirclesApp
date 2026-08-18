@@ -87,6 +87,13 @@ enum FavoriteColor: Int, CaseIterable {
         }
     }
 
+    var foreground: Color {
+        switch self {
+        case .yellow, .cyan, .lime: return .black
+        case .orange, .pink, .green, .purple, .blue, .red: return .white
+        }
+    }
+
     var name: String {
         switch self {
         case .orange: return "Orange"

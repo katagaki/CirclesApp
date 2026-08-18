@@ -13,7 +13,10 @@ struct DirectionsView: View {
                     .font(.system(size: 40.0, weight: .heavy, design: .rounded))
                     .minimumScaleFactor(0.5)
                     .lineLimit(1)
-                    .foregroundStyle(favorite.color.color)
+                    .foregroundStyle(favorite.color.foreground)
+                    .padding(.horizontal, 12.0)
+                    .padding(.vertical, 2.0)
+                    .background(Capsule().fill(favorite.color.color))
 
                 Text(store.map(id: favorite.mapID)?.name ?? "")
                     .font(.headline)

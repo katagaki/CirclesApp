@@ -50,6 +50,9 @@ final class CatalogStore {
         buildDemoFavorites()
         buildDemoBuys()
         visitedIDs = SharedState.visitedIDs
+        if let seed = UserDefaults.standard.string(forKey: "Prototype.VisitFirst").flatMap({ Int($0) }) {
+            visitedIDs.formUnion(favorites(on: SharedState.day).prefix(seed).map { $0.id })
+        }
     }
 
     private func loadDays() {

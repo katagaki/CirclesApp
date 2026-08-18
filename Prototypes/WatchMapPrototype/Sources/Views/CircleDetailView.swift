@@ -10,9 +10,14 @@ struct CircleDetailView: View {
         List {
             Section {
                 VStack(alignment: .leading, spacing: 2.0) {
-                    Text(favorite.spaceLabel)
-                        .font(.system(.title2, design: .rounded, weight: .bold))
-                        .foregroundStyle(favorite.color.color)
+                    HStack(spacing: 5.0) {
+                        Circle()
+                            .fill(favorite.color.color)
+                            .frame(width: 10.0, height: 10.0)
+                        Text(favorite.spaceLabel)
+                            .font(.system(.title2, design: .rounded, weight: .bold))
+                            .foregroundStyle(.primary)
+                    }
                     Text(favorite.circle.name)
                         .font(.body)
                     Text(favorite.circle.penName)

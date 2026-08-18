@@ -24,8 +24,11 @@ struct RouteView: View {
         .tabViewStyle(.verticalPage)
         .toolbar(.hidden, for: .navigationBar)
         .onAppear {
+            let seed = UserDefaults.standard.string(forKey: "Prototype.RouteIndex").flatMap { Int($0) }
             if UserDefaults.standard.string(forKey: "Prototype.RouteSelection") == "menu" {
                 selection = -1
+            } else if let seed, seed < route.count {
+                selection = route[seed].id
             } else if selection == 0,
                       let first = route.first(where: { !store.isVisited($0.id) }) ?? route.first {
                 selection = first.id
@@ -58,11 +61,18 @@ struct RouteCard: View {
             Spacer(minLength: 0.0)
 
             Text(favorite.spaceLabel)
-                .font(.system(size: 46.0, weight: .heavy, design: .rounded))
+                .font(.system(size: 42.0, weight: .heavy, design: .rounded))
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
                 .strikethrough(isVisited, pattern: .solid, color: .secondary)
-                .foregroundStyle(isVisited ? .secondary : favorite.color.color)
+                .foregroundStyle(isVisited ? AnyShapeStyle(.secondary) : AnyShapeStyle(favorite.color.foreground))
+                .padding(.horizontal, 12.0)
+                .padding(.vertical, 2.0)
+                .background(
+                    Capsule().fill(
+                        isVisited ? AnyShapeStyle(.quaternary) : AnyShapeStyle(favorite.color.color)
+                    )
+                )
 
             Text(store.map(id: favorite.mapID)?.name ?? "")
                 .font(.system(.headline, design: .rounded))
@@ -92,7 +102,7 @@ struct RouteCard: View {
         .padding(.horizontal, 6.0)
         .padding(.bottom, 4.0)
         .containerBackground(
-            favorite.color.color.gradient.opacity(isLuminanceReduced ? 0.0 : 0.28),
+            favorite.color.color.gradient.opacity(isLuminanceReduced ? 0.0 : 0.16),
             for: .tabView
         )
     }

@@ -62,7 +62,17 @@ Additional debug arguments, since the crown and taps cannot be driven headlessly
 - `-Prototype.RouteSelection menu` opens the route's menu page
 - `-Prototype.StepIndex <n>` seeds which circle `step` starts on
 - `-Prototype.ShowMapPicker YES` opens the map picker on launch
+- `-Prototype.RouteIndex <n>` opens the route on card `n`
+- `-Prototype.VisitFirst <n>` marks the first `n` favorites of the day visited
 - `-Prototype.SelfTest YES` prints app-group status and tap hit-test assertions to the console
+
+## Colour
+
+Chrome follows the app accent colour (`AccentColor` is copied from `App/Assets.xcassets`).
+Favourite colours are catalog data, not theme, so they keep their exact `WebCatalogColor`
+values — but they are only ever used as **fills** paired with `FavoriteColor.foreground`,
+matching how the iOS app uses `backgroundColor()`/`foregroundColor()`. Never as text on a dark
+background: `blue` is `rgb(0, 0, 1)` and is unreadable that way on an always-dark watch screen.
 
 ## Approaches
 
