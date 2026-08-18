@@ -99,10 +99,24 @@ struct MyView: View {
                 reloadDataInBackground()
             }
         }
+        .onChange(of: authenticator.token?.accessToken) { _, _ in
+            if userInfo == nil {
+                reloadDataInBackground()
+            }
+        }
+        .onChange(of: authenticator.effectiveOnlineState) { _, _ in
+            if userInfo == nil {
+                reloadDataInBackground()
+            }
+        }
     }
 
     func reloadDataInBackground(forceReload: Bool = false) {
-        if let token = authenticator.token,
+        if authenticator.effectiveOnlineState == .offline {
+            isInitialLoadCompleted = true
+            return
+        }
+        if let token = authenticator.token, !token.accessToken.isEmpty,
            forceReload || userInfo == nil || userEvents.isEmpty || eventData == nil || eventDates == nil {
             Task.detached {
                 await reloadData(using: token)
@@ -117,8 +131,6 @@ struct MyView: View {
                 }
 
             }
-        } else if authenticator.effectiveOnlineState == .offline {
-            isInitialLoadCompleted = true
         }
     }
 

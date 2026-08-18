@@ -13,6 +13,8 @@ private let myPortalURL = "https://myportal.circle.ms/"
 
 struct MyProfileSection: View {
 
+    @Environment(Authenticator.self) var authenticator
+
     @Binding var userInfo: UserInfo.Response?
 
     @State var isShowingUserPID: Bool = false
@@ -51,9 +53,12 @@ struct MyProfileSection: View {
                     Group {
                         if let userInfo {
                             Text(userInfo.nickname)
-                        } else {
+                        } else if authenticator.effectiveOnlineState == .offline {
                             Text("My.User.OfflineMode")
                                 .foregroundStyle(.secondary)
+                        } else {
+                            Text(verbatim: " ")
+                                .redacted(reason: .placeholder)
                         }
                     }
                     .font(.largeTitle)
