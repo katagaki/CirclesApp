@@ -17,7 +17,7 @@ struct FavoritePopover: View {
 
     private var colorGridHeight: CGFloat {
         let rows = CGFloat((colors.count + 3) / 4)
-        return (rows * 64.0) + ((rows - 1) * 8.0)
+        return (rows * 56.0) + ((rows - 1) * 8.0)
     }
 
     init(
@@ -43,10 +43,10 @@ struct FavoritePopover: View {
                     Text("Shared.SelectColor")
                         .fontWeight(.semibold)
                     LazyVGrid(
-                        columns: [.init(.fixed(64.0), spacing: 8.0),
-                                  .init(.fixed(64.0), spacing: 8.0),
-                                  .init(.fixed(64.0), spacing: 8.0),
-                                  .init(.fixed(64.0), spacing: 8.0)],
+                        columns: [.init(.fixed(56.0), spacing: 8.0),
+                                  .init(.fixed(56.0), spacing: 8.0),
+                                  .init(.fixed(56.0), spacing: 8.0),
+                                  .init(.fixed(56.0), spacing: 8.0)],
                         spacing: 8.0
                     ) {
                         ForEach(colors, id: \.self) { color in
@@ -55,16 +55,17 @@ struct FavoritePopover: View {
                             } label: {
                                 color.backgroundColor()
                                     .aspectRatio(1.0, contentMode: .fit)
-                                    .clipShape(.rect(cornerRadius: 12.0))
+                                    .clipShape(.circle)
                                     .overlay {
-                                        RoundedRectangle(cornerRadius: 12.0)
+                                        Circle()
                                             .stroke(Color.primary.opacity(0.3))
                                     }
                                     .overlay {
                                         if color.rawValue == selectedColor?.rawValue {
-                                            Image(systemName: "checkmark.circle.fill")
-                                                .foregroundStyle(.white)
-                                                .font(.title2)
+                                            Image(systemName: "checkmark")
+                                                .foregroundStyle(color.foregroundColor())
+                                                .font(.title3)
+                                                .fontWeight(.bold)
                                         }
                                     }
                             }
