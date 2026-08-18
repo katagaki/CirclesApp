@@ -44,6 +44,9 @@ struct CircleDetailHero: View {
                         }
                     }
                 }
+                .overlay(alignment: .topLeading) {
+                    CircleDetailVisitToggle(circle: circle, size: 44.0)
+                }
                 Group {
                     switch currentCutType {
                     case .catalog:
