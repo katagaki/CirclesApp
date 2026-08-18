@@ -113,11 +113,9 @@ struct StepMapView: View {
                     .font(.system(size: 8.0, weight: .bold))
             }
             .foregroundStyle(Color.accentColor)
-            .padding(.horizontal, 8.0)
-            .padding(.vertical, 4.0)
-            .background(.black.opacity(0.55), in: Capsule())
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.glass)
+        .fixedSize()
         .padding(.leading, 8.0)
         .padding(.top, 6.0)
     }

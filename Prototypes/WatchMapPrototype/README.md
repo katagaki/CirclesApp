@@ -66,6 +66,16 @@ Additional debug arguments, since the crown and taps cannot be driven headlessly
 - `-Prototype.VisitFirst <n>` marks the first `n` favorites of the day visited
 - `-Prototype.SelfTest YES` prints app-group status and tap hit-test assertions to the console
 
+## Liquid Glass
+
+Buttons use `.buttonStyle(.glass)` / `.glassProminent`, which requires the watchOS 26.0
+deployment target this project is set to.
+
+Note that watchOS does **not** get the free-form glass APIs: `glassEffect(_:in:)` and
+`GlassEffectContainer` appear nowhere in the watchOS SDK's SwiftUI interface — they are
+iOS/macOS/tvOS only. Glass is available for button styles and nothing else here, so the
+non-button chrome (map counter chip, captions) still uses plain material capsules.
+
 ## Colour
 
 Chrome follows the app accent colour (`AccentColor` is copied from `App/Assets.xcassets`).

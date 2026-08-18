@@ -2,7 +2,7 @@ name: WatchMapPrototype
 options:
   bundleIdPrefix: com.tsubuzaki.circlesproto
   deploymentTarget:
-    watchOS: "11.0"
+    watchOS: "26.0"
   createIntermediateGroups: true
 settings:
   base:

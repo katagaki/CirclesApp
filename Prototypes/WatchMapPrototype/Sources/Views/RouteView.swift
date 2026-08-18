@@ -121,22 +121,29 @@ struct RouteCard: View {
         }
     }
 
+    @ViewBuilder
+    private var visitButton: some View {
+        let label = Image(systemName: isVisited ? "arrow.uturn.backward" : "checkmark")
+            .frame(maxWidth: .infinity)
+        if isVisited {
+            Button { store.toggleVisited(favorite.id) } label: { label }
+                .buttonStyle(.glass)
+        } else {
+            Button { store.toggleVisited(favorite.id) } label: { label }
+                .buttonStyle(.glassProminent)
+                .tint(Color.accentColor)
+        }
+    }
+
     private var actions: some View {
         HStack(spacing: 6.0) {
             NavigationLink(value: MapRoute(favorite: favorite)) {
                 Image(systemName: "map.fill")
                     .frame(maxWidth: .infinity)
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.glass)
 
-            Button {
-                store.toggleVisited(favorite.id)
-            } label: {
-                Image(systemName: isVisited ? "arrow.uturn.backward" : "checkmark")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(isVisited ? Color.secondary : Color.accentColor)
+            visitButton
         }
         .font(.footnote)
     }

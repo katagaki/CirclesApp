@@ -85,9 +85,7 @@ struct PanZoomMapView: View {
             Image(systemName: "scope")
                 .font(.footnote)
         }
-        .buttonStyle(.plain)
-        .padding(6.0)
-        .background(.black.opacity(0.6), in: Circle())
+        .buttonStyle(.glass)
         .padding(4.0)
     }
 
