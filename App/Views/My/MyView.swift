@@ -100,7 +100,7 @@ struct MyView: View {
             )
         }
         .task {
-            if !isInitialLoadCompleted {
+            if !isInitialLoadCompleted || userInfo == nil {
                 reloadDataInBackground()
             }
         }
