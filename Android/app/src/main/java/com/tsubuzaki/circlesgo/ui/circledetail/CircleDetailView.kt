@@ -5,6 +5,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,8 +32,6 @@ import androidx.compose.material.icons.filled.Link
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.outlined.PinDrop
-import androidx.compose.material.icons.outlined.Visibility
-import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -44,7 +43,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -61,7 +59,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -262,32 +263,6 @@ fun CircleDetailView(
                     contentDescription = stringResource(R.string.next_circle)
                 )
             }
-            // Mark visited toggle
-            if (visitsState != null && events != null) {
-                val visits by visitsState.visits.collectAsState()
-                val isVisited = visits.any {
-                    it.circleID == circle.id && it.eventNumber == events.activeEventNumber
-                }
-                IconButton(onClick = {
-                    visitsState.toggleVisit(circle.id, events.activeEventNumber)
-                }) {
-                    Icon(
-                        imageVector = if (isVisited) {
-                            Icons.Outlined.VisibilityOff
-                        } else {
-                            Icons.Outlined.Visibility
-                        },
-                        contentDescription = stringResource(
-                            if (isVisited) R.string.mark_not_visited else R.string.mark_visited
-                        ),
-                        tint = if (isVisited) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        }
-                    )
-                }
-            }
             // Show on map
             if (mapper != null) {
                 IconButton(onClick = {
@@ -309,153 +284,6 @@ fun CircleDetailView(
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
         ) {
-
-        // Favorite editing section
-        if (isEditing && webCatalogID != null) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                Text(
-                    text = if (isFavorited) stringResource(R.string.edit_favorite)
-                    else stringResource(R.string.add_to_favorites),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold
-                )
-
-                // Color grid (3x3) beside memo input
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // 3x3 Color grid
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        WebCatalogColor.assignable.chunked(3).forEach { rowColors ->
-                            Row(
-                                horizontalArrangement = Arrangement.spacedBy(6.dp)
-                            ) {
-                                rowColors.forEach { color ->
-                                    Box(
-                                        modifier = Modifier
-                                            .size(36.dp)
-                                            .clip(CircleShape)
-                                            .background(color.backgroundColor())
-                                            .then(
-                                                if (color == selectedColor) {
-                                                    Modifier.border(
-                                                        3.dp,
-                                                        MaterialTheme.colorScheme.onSurface,
-                                                        CircleShape
-                                                    )
-                                                } else {
-                                                    Modifier
-                                                }
-                                            )
-                                            .clickable { selectedColor = color },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        if (color == selectedColor) {
-                                            Icon(
-                                                imageVector = Icons.Filled.Check,
-                                                contentDescription = null,
-                                                tint = color.foregroundColor(),
-                                                modifier = Modifier.size(18.dp)
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    // Memo input
-                    OutlinedTextField(
-                        value = memo,
-                        onValueChange = { memo = it },
-                        label = { Text(stringResource(R.string.favorite_memo)) },
-                        placeholder = { Text(stringResource(R.string.favorite_memo_placeholder)) },
-                        modifier = Modifier.weight(1f),
-                        singleLine = false,
-                        maxLines = 3
-                    )
-                }
-
-                // Action buttons
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Remove button (only if already favorited)
-                    if (isFavorited) {
-                        OutlinedButton(
-                            onClick = {
-                                val token = authToken ?: return@OutlinedButton
-                                isSaving = true
-                                scope.launch(Dispatchers.IO) {
-                                    val success = favoritesAPI.delete(webCatalogID, token)
-                                    if (success) {
-                                        val (items, wcIDMapped) = favoritesAPI.all(token)
-                                        favorites.setItems(items)
-                                        favorites.setWcIDMappedItems(wcIDMapped)
-                                    }
-                                    isSaving = false
-                                    isEditing = false
-                                }
-                            },
-                            enabled = !isSaving,
-                            modifier = Modifier.height(48.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = MaterialTheme.colorScheme.error
-                            )
-                        ) {
-                            Text(stringResource(R.string.remove_from_favorites))
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    // Save / Add button (larger variant)
-                    FilledTonalButton(
-                        onClick = {
-                            val token = authToken ?: return@FilledTonalButton
-                            isSaving = true
-                            scope.launch(Dispatchers.IO) {
-                                val success =
-                                    favoritesAPI.add(webCatalogID, selectedColor, memo, token)
-                                if (success) {
-                                    val (items, wcIDMapped) = favoritesAPI.all(token)
-                                    favorites.setItems(items)
-                                    favorites.setWcIDMappedItems(wcIDMapped)
-                                }
-                                isSaving = false
-                                isEditing = false
-                            }
-                        },
-                        enabled = !isSaving,
-                        modifier = Modifier.height(48.dp),
-                        contentPadding = PaddingValues(horizontal = 24.dp, vertical = 0.dp)
-                    ) {
-                        if (isSaving) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(18.dp),
-                                strokeWidth = 2.dp
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
-                        Text(
-                            stringResource(R.string.add_to_favorites),
-                            style = MaterialTheme.typography.titleSmall
-                        )
-                    }
-                }
-            }
-
-            HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
-        }
 
         // Hero section: cut image + info
         Row(
@@ -493,6 +321,30 @@ fun CircleDetailView(
                         isPrivacyMode = isPrivacyMode,
                         showWebCuts = showWebCutInHero && canToggleCut
                     )
+                    // Invisible tap target over the checkmark corner that
+                    // toggles visited, like the iOS hero cut
+                    if (visitsState != null && events != null) {
+                        val haptics = LocalHapticFeedback.current
+                        Box(
+                            modifier = Modifier
+                                .size(44.dp)
+                                .align(Alignment.TopStart)
+                                .clickable(
+                                    interactionSource = remember {
+                                        MutableInteractionSource()
+                                    },
+                                    indication = null,
+                                    onClickLabel = stringResource(R.string.mark_visited)
+                                ) {
+                                    haptics.performHapticFeedback(
+                                        HapticFeedbackType.LongPress
+                                    )
+                                    visitsState.toggleVisit(
+                                        circle.id, events.activeEventNumber
+                                    )
+                                }
+                        )
+                    }
                 }
                 if (canToggleCut) {
                     Text(
@@ -745,6 +597,7 @@ fun CircleDetailView(
                 extInfo.circleMsPortalURL?.let { url ->
                     SNSIconButton(
                         label = stringResource(R.string.sns_circlems),
+                        iconRes = R.drawable.ic_sns_circlems,
                         color = Color(0xFF4CAF50),
                         onClick = { openURL(url) }
                     )
@@ -752,6 +605,7 @@ fun CircleDetailView(
                 extInfo.pixivURL?.let { url ->
                     SNSIconButton(
                         label = stringResource(R.string.sns_pixiv),
+                        iconRes = R.drawable.ic_sns_pixiv,
                         color = Color(0xFF0096FA),
                         onClick = { openURL(url) }
                     )
@@ -759,7 +613,8 @@ fun CircleDetailView(
                 extInfo.twitterURL?.let { url ->
                     SNSIconButton(
                         label = stringResource(R.string.sns_twitter),
-                        color = Color(0xFF1DA1F2),
+                        iconRes = R.drawable.ic_sns_twitter,
+                        color = Color(0xFF0D0D0D),
                         onClick = { openURL(url) }
                     )
                 }
@@ -769,6 +624,51 @@ fun CircleDetailView(
 
     if (showDemoUnavailable) {
         DemoUnavailableDialog(onDismiss = { showDemoUnavailable = false })
+    }
+
+    // Favorite editor, shown as a popover dialog like the iOS favorite popover
+    if (isEditing && webCatalogID != null) {
+        FavoriteEditorDialog(
+            isFavorited = isFavorited,
+            selectedColor = selectedColor,
+            onColorSelected = { selectedColor = it },
+            memo = memo,
+            onMemoChange = { memo = it },
+            isSaving = isSaving,
+            onSave = {
+                val token = authToken
+                if (token != null) {
+                    isSaving = true
+                    scope.launch(Dispatchers.IO) {
+                        val success = favoritesAPI.add(webCatalogID, selectedColor, memo, token)
+                        if (success) {
+                            val (items, wcIDMapped) = favoritesAPI.all(token)
+                            favorites.setItems(items)
+                            favorites.setWcIDMappedItems(wcIDMapped)
+                        }
+                        isSaving = false
+                        isEditing = false
+                    }
+                }
+            },
+            onRemove = {
+                val token = authToken
+                if (token != null) {
+                    isSaving = true
+                    scope.launch(Dispatchers.IO) {
+                        val success = favoritesAPI.delete(webCatalogID, token)
+                        if (success) {
+                            val (items, wcIDMapped) = favoritesAPI.all(token)
+                            favorites.setItems(items)
+                            favorites.setWcIDMappedItems(wcIDMapped)
+                        }
+                        isSaving = false
+                        isEditing = false
+                    }
+                }
+            },
+            onDismiss = { if (!isSaving) isEditing = false }
+        )
     }
 
     boundaryAlertMessage?.let { messageRes ->
@@ -805,11 +705,13 @@ private fun InfoSection(
 }
 
 /**
- * Compact SNS pill for the circle detail bottom toolbar.
+ * Round-rect, icon-only SNS button for the circle detail bottom toolbar,
+ * matching the iOS SNSButton with showsLabel disabled.
  */
 @Composable
 private fun SNSIconButton(
     label: String,
+    iconRes: Int,
     color: Color,
     onClick: () -> Unit
 ) {
@@ -819,17 +721,136 @@ private fun SNSIconButton(
             containerColor = color,
             contentColor = Color.White
         ),
-        shape = RoundedCornerShape(16.dp),
-        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+        shape = RoundedCornerShape(12.dp),
+        contentPadding = PaddingValues(0.dp),
         modifier = Modifier
-            .height(32.dp)
+            .size(width = 52.dp, height = 40.dp)
             .padding(start = 6.dp)
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = label,
+            tint = Color.White,
+            modifier = Modifier.size(18.dp)
         )
     }
+}
+
+/**
+ * Popover-style dialog for adding or editing a favorite, with the 18-color
+ * palette grid and a memo field.
+ */
+@Composable
+private fun FavoriteEditorDialog(
+    isFavorited: Boolean,
+    selectedColor: WebCatalogColor,
+    onColorSelected: (WebCatalogColor) -> Unit,
+    memo: String,
+    onMemoChange: (String) -> Unit,
+    isSaving: Boolean,
+    onSave: () -> Unit,
+    onRemove: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                stringResource(
+                    if (isFavorited) R.string.edit_favorite else R.string.add_to_favorites
+                )
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // 4-wide color grid over the assignable palette
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    WebCatalogColor.assignable.chunked(4).forEach { rowColors ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            rowColors.forEach { color ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(44.dp)
+                                        .clip(CircleShape)
+                                        .background(color.backgroundColor())
+                                        .then(
+                                            if (color == selectedColor) {
+                                                Modifier.border(
+                                                    3.dp,
+                                                    MaterialTheme.colorScheme.onSurface,
+                                                    CircleShape
+                                                )
+                                            } else {
+                                                Modifier
+                                            }
+                                        )
+                                        .clickable { onColorSelected(color) },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    if (color == selectedColor) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Check,
+                                            contentDescription = null,
+                                            tint = color.foregroundColor(),
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                OutlinedTextField(
+                    value = memo,
+                    onValueChange = onMemoChange,
+                    label = { Text(stringResource(R.string.favorite_memo)) },
+                    placeholder = { Text(stringResource(R.string.favorite_memo_placeholder)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = false,
+                    maxLines = 3
+                )
+            }
+        },
+        confirmButton = {
+            FilledTonalButton(
+                onClick = onSave,
+                enabled = !isSaving
+            ) {
+                if (isSaving) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+                Text(
+                    stringResource(
+                        if (isFavorited) R.string.save_favorite else R.string.add_to_favorites
+                    )
+                )
+            }
+        },
+        dismissButton = {
+            if (isFavorited) {
+                TextButton(
+                    onClick = onRemove,
+                    enabled = !isSaving,
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text(stringResource(R.string.remove_from_favorites))
+                }
+            } else {
+                TextButton(onClick = onDismiss, enabled = !isSaving) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        }
+    )
 }

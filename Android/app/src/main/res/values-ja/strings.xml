@@ -48,6 +48,7 @@
     <string name="add_to_favorites">お気に入りに追加</string>
     <string name="edit_favorite">お気に入りを編集</string>
     <string name="remove_from_favorites">お気に入りから削除</string>
+    <string name="save_favorite">お気に入りを保存</string>
     <string name="favorite_color">色</string>
     <string name="favorite_memo">メモ</string>
     <string name="favorite_memo_placeholder">メモを入力…</string>
