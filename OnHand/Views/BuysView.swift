@@ -46,18 +46,8 @@ struct CircleBuysView: View {
     var body: some View {
         List {
             if let favorite {
-                Section {
-                    SpacePill(
-                        label: favorite.spaceLabel,
-                        color: OnHandColor(value: favorite.colorValue),
-                        fontSize: 24.0
-                    )
-                    .listRowBackground(Color.clear)
-                }
-                Section {
-                    ForEach(favorite.items) { item in
-                        BuyRow(circleID: favorite.id, item: item)
-                    }
+                ForEach(favorite.items) { item in
+                    BuyRow(circleID: favorite.id, item: item)
                 }
             }
         }
@@ -73,12 +63,13 @@ struct BuyRow: View {
     let circleID: Int
     let item: OnHandBuyItem
 
+    var isBought: Bool { item.statusValue == 1 }
+    var isCancelled: Bool { item.statusValue == 2 }
+
     var symbolName: String {
-        switch item.statusValue {
-        case 1: return "checkmark.circle.fill"
-        case 2: return "xmark.circle.fill"
-        default: return "circle"
-        }
+        if isBought { return "checkmark.circle.fill" }
+        if isCancelled { return "xmark.circle.fill" }
+        return "circle"
     }
 
     var body: some View {
@@ -87,12 +78,14 @@ struct BuyRow: View {
         } label: {
             HStack {
                 Image(systemName: symbolName)
-                    .foregroundStyle(item.statusValue == 1 ? Color.accentColor : Color.secondary)
+                    .foregroundStyle(isBought ? AnyShapeStyle(Color.accentColor) : AnyShapeStyle(.secondary))
                 VStack(alignment: .leading, spacing: 0.0) {
                     Text(item.name)
-                        .strikethrough(item.statusValue != 0)
+                        .strikethrough(isCancelled)
+                        .foregroundStyle(isCancelled ? AnyShapeStyle(.secondary) : AnyShapeStyle(.primary))
                     Text("¥\(item.cost)")
                         .font(.caption2)
+                        .strikethrough(isCancelled)
                         .foregroundStyle(.secondary)
                 }
             }
