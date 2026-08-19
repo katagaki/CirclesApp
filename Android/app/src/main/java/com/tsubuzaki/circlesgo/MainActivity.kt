@@ -216,8 +216,16 @@ class MainActivity : ComponentActivity() {
                                 attachmentsCache = attachmentsCache,
                                 onLogout = {
                                     hasTriggeredInitialLoad = false
+                                    // Wipe all local data, caches, and preferences
                                     database.delete()
-                                    selections.resetSelections()
+                                    webCutImageCache.clear()
+                                    favoritesCache.clear()
+                                    buysCache.clearAll()
+                                    visitsState.clearAll()
+                                    attachmentsCache.clearAll()
+                                    favorites.reset()
+                                    selections.wipeAll()
+                                    events.reset()
                                     unifier.close()
                                     auth.resetAuthentication()
                                 }

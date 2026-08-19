@@ -40,6 +40,12 @@ class VisitsState(private val cache: VisitEntryCache) {
         reload()
     }
 
+    /** Removes every visit entry (sign-out wipe). */
+    fun clearAll() {
+        cache.clear()
+        reload()
+    }
+
     private fun reload() {
         _visits.value = cache.all()
     }

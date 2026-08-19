@@ -30,6 +30,12 @@ class AttachmentsCache(context: Context) {
         return files.filter { it.isFile }.sortedBy { it.name }
     }
 
+    /** Removes every event's attachments (sign-out wipe). */
+    fun clearAll() {
+        baseDir.deleteRecursively()
+        _version.value += 1
+    }
+
     fun load(file: File): Bitmap? {
         return try {
             BitmapFactory.decodeFile(file.path)

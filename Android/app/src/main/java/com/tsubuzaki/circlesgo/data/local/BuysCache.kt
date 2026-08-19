@@ -102,6 +102,12 @@ class BuysCache(context: Context) {
         saveAll(eventNumber, all)
     }
 
+    /** Removes every event's shopping list (sign-out wipe). */
+    fun clearAll() {
+        prefs.edit { clear() }
+        _version.value += 1
+    }
+
     private fun key(eventNumber: Int) = "buys_$eventNumber"
 
     private fun loadAll(eventNumber: Int): List<BuyEntry> {

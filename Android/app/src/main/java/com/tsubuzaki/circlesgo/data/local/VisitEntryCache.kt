@@ -42,6 +42,11 @@ class VisitEntryCache(context: Context) {
         saveAll(all)
     }
 
+    /** Removes every visit entry (sign-out wipe). */
+    fun clear() {
+        prefs.edit { clear() }
+    }
+
     private fun loadAll(): List<VisitEntry> {
         val encoded = prefs.getString(ENTRIES_KEY, null) ?: return emptyList()
         return try {
