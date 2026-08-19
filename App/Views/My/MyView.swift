@@ -52,6 +52,9 @@ struct MyView: View {
                 )
             }
         }
+        .refreshable {
+            await refreshUserInfo()
+        }
         .contentMargins(.top, 0.0)
         .listSectionSpacing(.compact)
         .scrollContentBackground(.hidden)
@@ -136,6 +139,20 @@ struct MyView: View {
         }
     }
 
+    func refreshUserInfo() async {
+        guard let token = authenticator.token, !token.accessToken.isEmpty else { return }
+        let userInfo = await User.info(authToken: token)
+        await MainActor.run {
+            if let userInfo {
+                lastKnownNickname = userInfo.nickname
+                lastKnownPID = userInfo.pid
+                withAnimation(.smooth.speed(2.0)) {
+                    self.userInfo = userInfo
+                }
+            }
+        }
+    }
+
     func reloadData(using token: OpenIDToken) async {
         let userInfo = await User.info(authToken: token)
         let userEvents = await User.events(authToken: token)
@@ -153,7 +170,9 @@ struct MyView: View {
                 lastKnownPID = userInfo.pid
             }
             withAnimation(.smooth.speed(2.0)) {
-                self.userInfo = userInfo
+                if let userInfo {
+                    self.userInfo = userInfo
+                }
                 self.userEvents = userEvents
                 self.eventData = eventData
                 self.eventDates = eventDates
