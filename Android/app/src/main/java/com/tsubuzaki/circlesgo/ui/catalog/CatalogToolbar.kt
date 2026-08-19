@@ -37,6 +37,8 @@ import com.tsubuzaki.circlesgo.database.tables.ComiketBlock
 import com.tsubuzaki.circlesgo.database.tables.ComiketGenre
 import com.tsubuzaki.circlesgo.state.CatalogCache
 import com.tsubuzaki.circlesgo.state.CircleDisplayMode
+import com.tsubuzaki.circlesgo.state.GridDisplayMode
+import com.tsubuzaki.circlesgo.state.ListDisplayMode
 import com.tsubuzaki.circlesgo.state.UserSelections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,7 +52,6 @@ fun CatalogToolbar(
     val selectedDate by selections.date.collectAsState()
     val selectedGenres by selections.genres.collectAsState()
     val selectedBlocks by selections.blocks.collectAsState()
-    val displayMode by selections.displayMode.collectAsState()
 
     val scope = rememberCoroutineScope()
 
@@ -135,25 +136,84 @@ fun CatalogToolbar(
             onClearAll = { selections.setBlocks(emptySet()) }
         )
         Spacer(modifier = Modifier.weight(1f))
-        IconButton(onClick = {
-            val newMode = if (displayMode == CircleDisplayMode.GRID) {
-                CircleDisplayMode.LIST
-            } else {
-                CircleDisplayMode.GRID
-            }
-            selections.setDisplayMode(newMode)
-        }) {
+        DisplayOptionsMenu(selections = selections)
+    }
+}
+
+/**
+ * Grid/list switch plus the per-layout size options, mirroring the iOS
+ * display customization (grid big/medium/small, list regular/compact).
+ */
+@Composable
+fun DisplayOptionsMenu(selections: UserSelections) {
+    val displayMode by selections.displayMode.collectAsState()
+    val gridSize by selections.gridSize.collectAsState()
+    val listSize by selections.listSize.collectAsState()
+    var expanded by remember { mutableStateOf(false) }
+
+    Box {
+        IconButton(onClick = { expanded = true }) {
             Icon(
                 imageVector = if (displayMode == CircleDisplayMode.GRID) {
-                    Icons.Outlined.TableRows
-                } else {
                     Icons.Outlined.GridView
+                } else {
+                    Icons.Outlined.TableRows
                 },
-                contentDescription = stringResource(
-                    if (displayMode == CircleDisplayMode.GRID) R.string.switch_to_list
-                    else R.string.switch_to_grid
-                )
+                contentDescription = stringResource(R.string.display_options)
             )
+        }
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.display_grid)) },
+                onClick = { selections.setDisplayMode(CircleDisplayMode.GRID) },
+                trailingIcon = {
+                    if (displayMode == CircleDisplayMode.GRID) {
+                        Icon(imageVector = Icons.Filled.Check, contentDescription = null)
+                    }
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.display_list)) },
+                onClick = { selections.setDisplayMode(CircleDisplayMode.LIST) },
+                trailingIcon = {
+                    if (displayMode == CircleDisplayMode.LIST) {
+                        Icon(imageVector = Icons.Filled.Check, contentDescription = null)
+                    }
+                }
+            )
+            HorizontalDivider()
+            if (displayMode == CircleDisplayMode.GRID) {
+                for ((size, label) in listOf(
+                    GridDisplayMode.BIG to R.string.grid_size_big,
+                    GridDisplayMode.MEDIUM to R.string.grid_size_medium,
+                    GridDisplayMode.SMALL to R.string.grid_size_small
+                )) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(label)) },
+                        onClick = { selections.setGridSize(size) },
+                        trailingIcon = {
+                            if (gridSize == size) {
+                                Icon(imageVector = Icons.Filled.Check, contentDescription = null)
+                            }
+                        }
+                    )
+                }
+            } else {
+                for ((size, label) in listOf(
+                    ListDisplayMode.REGULAR to R.string.list_style_regular,
+                    ListDisplayMode.COMPACT to R.string.list_style_compact
+                )) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(label)) },
+                        onClick = { selections.setListSize(size) },
+                        trailingIcon = {
+                            if (listSize == size) {
+                                Icon(imageVector = Icons.Filled.Check, contentDescription = null)
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
 }

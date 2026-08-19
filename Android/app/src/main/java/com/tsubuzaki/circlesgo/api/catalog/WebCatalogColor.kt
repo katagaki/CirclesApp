@@ -3,6 +3,7 @@ package com.tsubuzaki.circlesgo.api.catalog
 import androidx.compose.ui.graphics.Color
 
 enum class WebCatalogColor(val value: Int) {
+    UNCOLORED(0),
     ORANGE(1),
     PINK(2),
     YELLOW(3),
@@ -24,6 +25,7 @@ enum class WebCatalogColor(val value: Int) {
 
     fun backgroundColor(): Color {
         return when (this) {
+            UNCOLORED -> Color(0.56f, 0.56f, 0.58f)
             ORANGE -> Color(1.0f, 0.58f, 0.29f)
             PINK -> Color(1.0f, 0.0f, 1.0f)
             YELLOW -> Color(1.0f, 0.97f, 0.0f)
@@ -47,7 +49,7 @@ enum class WebCatalogColor(val value: Int) {
 
     fun foregroundColor(): Color {
         return when (this) {
-            ORANGE, PINK, GREEN, PURPLE, BLUE, RED,
+            UNCOLORED, ORANGE, PINK, GREEN, PURPLE, BLUE, RED,
             DARK_ORANGE, DARK_PURPLE, TEAL, MAROON, VIOLET,
             DARK_GREEN, CRIMSON, DEEP_PINK -> Color.White
 
@@ -56,8 +58,12 @@ enum class WebCatalogColor(val value: Int) {
     }
 
     companion object {
-        fun fromValue(value: Int): WebCatalogColor? {
-            return entries.find { it.value == value }
+        /** Colors a user can assign to a favorite; excludes [UNCOLORED]. */
+        val assignable: List<WebCatalogColor> = entries.filter { it != UNCOLORED }
+
+        // Out-of-palette Web Catalog colors decode as UNCOLORED
+        fun fromValue(value: Int): WebCatalogColor {
+            return entries.find { it.value == value } ?: UNCOLORED
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.tsubuzaki.circlesgo.state
 
 import com.tsubuzaki.circlesgo.api.catalog.UserFavorites
+import com.tsubuzaki.circlesgo.api.catalog.WebCatalogColor
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.DataFetcher
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
@@ -22,9 +23,6 @@ class FavoritesState {
     private val _circles = MutableStateFlow<Map<String, List<ComiketCircle>>?>(null)
     val circles: StateFlow<Map<String, List<ComiketCircle>>?> = _circles
 
-    private val _isGroupedByColor = MutableStateFlow(true)
-    val isGroupedByColor: StateFlow<Boolean> = _isGroupedByColor
-
     var invalidationID: String = ""
 
     fun setItems(items: List<UserFavorites.Response.FavoriteItem>) {
@@ -39,8 +37,11 @@ class FavoritesState {
         _circles.value = circles
     }
 
-    fun toggleGroupByColor() {
-        _isGroupedByColor.value = !_isGroupedByColor.value
+    fun reset() {
+        _items.value = null
+        _wcIDMappedItems.value = null
+        _circles.value = null
+        invalidationID = ""
     }
 
     fun contains(webCatalogID: Int): Boolean {
@@ -52,8 +53,10 @@ class FavoritesState {
             favoriteItems: List<UserFavorites.Response.FavoriteItem>,
             database: CatalogDatabase
         ): Map<Int, List<Int>> = withContext(Dispatchers.IO) {
-            // Group favorite items by color
-            val groupedByColor = favoriteItems.groupBy { it.favorite.color }
+            // Group favorite items by color, normalizing unknown colors
+            val groupedByColor = favoriteItems.groupBy {
+                WebCatalogColor.fromValue(it.favorite.color).value
+            }
 
             val fetcher = DataFetcher(database.getTextDatabase())
             val result = mutableMapOf<Int, List<Int>>()

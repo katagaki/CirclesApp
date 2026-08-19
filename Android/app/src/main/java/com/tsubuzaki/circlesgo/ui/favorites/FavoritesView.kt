@@ -10,45 +10,65 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.outlined.GridView
+import androidx.compose.material.icons.outlined.TableRows
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tsubuzaki.circlesgo.R
+import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
+import com.tsubuzaki.circlesgo.auth.Authenticator
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
+import com.tsubuzaki.circlesgo.state.CircleDisplayMode
 import com.tsubuzaki.circlesgo.state.FavoritesState
-import com.tsubuzaki.circlesgo.state.GridDisplayMode
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.ui.catalog.CircleGrid
+import com.tsubuzaki.circlesgo.ui.catalog.CircleList
 import com.tsubuzaki.circlesgo.ui.catalog.ColorGroupedCircleGrid
+import com.tsubuzaki.circlesgo.ui.catalog.ColorGroupedCircleList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoritesView(
     database: CatalogDatabase,
     favorites: FavoritesState,
     selections: UserSelections,
-    unifier: Unifier
+    unifier: Unifier,
+    favoritesAPI: FavoritesAPI,
+    authenticator: Authenticator
 ) {
     val scope = rememberCoroutineScope()
     val favoriteCircles by favorites.circles.collectAsState()
     val favoriteItems by favorites.items.collectAsState()
-    val isGroupedByColor by favorites.isGroupedByColor.collectAsState()
+    val isGroupedByColor by selections.favoritesGroupByColor.collectAsState()
+    val displayMode by selections.favoritesDisplayMode.collectAsState()
     val selectedDate by selections.date.collectAsState()
+    val authToken by authenticator.token.collectAsState()
+
+    var isRefreshing by remember { mutableStateOf(false) }
 
     // Prepare circles when favorite items or selected date changes
     LaunchedEffect(favoriteItems, selectedDate) {
@@ -59,7 +79,7 @@ fun FavoritesView(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Toolbar row: group by color toggle
+        // Toolbar row: group by color toggle + display mode toggle
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -67,7 +87,9 @@ fun FavoritesView(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            TextButton(onClick = { favorites.toggleGroupByColor() }) {
+            TextButton(onClick = {
+                selections.setFavoritesGroupByColor(!isGroupedByColor)
+            }) {
                 Icon(
                     imageVector = Icons.Filled.Palette,
                     contentDescription = null,
@@ -80,10 +102,45 @@ fun FavoritesView(
                     fontSize = 13.sp
                 )
             }
+            IconButton(onClick = {
+                selections.setFavoritesDisplayMode(
+                    if (displayMode == CircleDisplayMode.GRID) CircleDisplayMode.LIST
+                    else CircleDisplayMode.GRID
+                )
+            }) {
+                Icon(
+                    imageVector = if (displayMode == CircleDisplayMode.GRID) {
+                        Icons.Outlined.TableRows
+                    } else {
+                        Icons.Outlined.GridView
+                    },
+                    contentDescription = stringResource(
+                        if (displayMode == CircleDisplayMode.GRID) R.string.switch_to_list
+                        else R.string.switch_to_grid
+                    )
+                )
+            }
         }
 
-        // Content area
-        Box(modifier = Modifier.fillMaxSize()) {
+        // Content area; pull to refresh re-syncs favorites from the API
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                val token = authToken
+                if (token != null && !isRefreshing) {
+                    isRefreshing = true
+                    scope.launch {
+                        withContext(Dispatchers.IO) {
+                            val (items, wcIDMapped) = favoritesAPI.all(token)
+                            favorites.setItems(items)
+                            favorites.setWcIDMappedItems(wcIDMapped)
+                        }
+                        isRefreshing = false
+                    }
+                }
+            },
+            modifier = Modifier.fillMaxSize()
+        ) {
             val circles = favoriteCircles
             if (circles == null) {
                 // Loading or no favorites loaded yet
@@ -119,39 +176,76 @@ fun FavoritesView(
                 val showSpaceName by selections.showSpaceName.collectAsState()
                 val showDay by selections.showDay.collectAsState()
                 val showWebCuts by selections.showWebCuts.collectAsState()
-                if (isGroupedByColor) {
+                val gridSize by selections.gridSize.collectAsState()
+                val listSize by selections.listSize.collectAsState()
+
+                // Previous/next in the detail view walks the tapped
+                // circle's color group
+                val onSelect: (ComiketCircle) -> Unit = { circle ->
+                    val groupIDs = circles.entries
+                        .firstOrNull { entry -> entry.value.any { it.id == circle.id } }
+                        ?.value?.map { it.id }
+                    unifier.showCircleDetail(circle, groupIDs)
+                }
+
+                if (isGroupedByColor && displayMode == CircleDisplayMode.GRID) {
                     ColorGroupedCircleGrid(
                         groups = circles,
-                        displayMode = GridDisplayMode.MEDIUM,
+                        displayMode = gridSize,
                         database = database,
                         favorites = favorites,
                         showSpaceName = showSpaceName,
                         showDay = showDay,
                         showsOverlayWhenEmpty = false,
-                        onSelect = { circle ->
-                            unifier.showCircleDetail(circle)
-                        },
+                        showUncoloredNotice = true,
+                        onSelect = onSelect,
                         isPrivacyMode = isPrivacyMode,
                         showWebCuts = showWebCuts
+                    )
+                } else if (isGroupedByColor) {
+                    ColorGroupedCircleList(
+                        groups = circles,
+                        displayMode = listSize,
+                        database = database,
+                        favorites = favorites,
+                        showSpaceName = showSpaceName,
+                        showDay = showDay,
+                        showsOverlayWhenEmpty = false,
+                        showUncoloredNotice = true,
+                        onSelect = onSelect,
+                        isPrivacyMode = isPrivacyMode
                     )
                 } else {
                     val flatCircles = circles.values
                         .flatten()
                         .sortedBy { it.id }
-                    CircleGrid(
-                        circles = flatCircles,
-                        displayMode = GridDisplayMode.MEDIUM,
-                        database = database,
-                        favorites = favorites,
-                        showSpaceName = showSpaceName,
-                        showDay = showDay,
-                        showsOverlayWhenEmpty = false,
-                        onSelect = { circle ->
-                            unifier.showCircleDetail(circle)
-                        },
-                        isPrivacyMode = isPrivacyMode,
-                        showWebCuts = showWebCuts
-                    )
+                    if (displayMode == CircleDisplayMode.GRID) {
+                        CircleGrid(
+                            circles = flatCircles,
+                            displayMode = gridSize,
+                            database = database,
+                            favorites = favorites,
+                            showSpaceName = showSpaceName,
+                            showDay = showDay,
+                            showsOverlayWhenEmpty = false,
+                            onSelect = onSelect,
+                            isPrivacyMode = isPrivacyMode,
+                            showWebCuts = showWebCuts
+                        )
+                    } else {
+                        CircleList(
+                            circles = flatCircles,
+                            displayMode = listSize,
+                            database = database,
+                            favorites = favorites,
+                            showSpaceName = showSpaceName,
+                            showDay = showDay,
+                            showsOverlayWhenEmpty = false,
+                            onSelect = onSelect,
+                            isPrivacyMode = isPrivacyMode,
+                            showWebCuts = showWebCuts
+                        )
+                    }
                 }
             }
         }

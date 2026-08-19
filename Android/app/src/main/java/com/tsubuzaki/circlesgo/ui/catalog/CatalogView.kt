@@ -65,6 +65,8 @@ fun CatalogView(
     val selectedMap by selections.map.collectAsState()
     val selectedDate by selections.date.collectAsState()
     val displayMode by selections.displayMode.collectAsState()
+    val gridSize by selections.gridSize.collectAsState()
+    val listSize by selections.listSize.collectAsState()
 
     // Search state
     var searchTerm by remember { mutableStateOf("") }
@@ -180,7 +182,7 @@ fun CatalogView(
         if (currentSearched != null && displayMode == CircleDisplayMode.GRID) {
             CircleGrid(
                 circles = currentSearched,
-                displayMode = GridDisplayMode.MEDIUM,
+                displayMode = gridSize,
                 database = database,
                 favorites = favorites,
                 showSpaceName = showSpaceName,
@@ -197,7 +199,7 @@ fun CatalogView(
         } else if (currentSearched != null) {
             CircleList(
                 circles = currentSearched,
-                displayMode = ListDisplayMode.REGULAR,
+                displayMode = listSize,
                 database = database,
                 favorites = favorites,
                 showSpaceName = showSpaceName,
@@ -259,7 +261,7 @@ fun CatalogView(
                 } else if (displayMode == CircleDisplayMode.GRID) {
                     CircleGrid(
                         circles = displayedCircles,
-                        displayMode = GridDisplayMode.MEDIUM,
+                        displayMode = gridSize,
                         database = database,
                         favorites = favorites,
                         showSpaceName = showSpaceName,
@@ -275,7 +277,7 @@ fun CatalogView(
                 } else {
                     CircleList(
                         circles = displayedCircles,
-                        displayMode = ListDisplayMode.REGULAR,
+                        displayMode = listSize,
                         database = database,
                         favorites = favorites,
                         showSpaceName = showSpaceName,

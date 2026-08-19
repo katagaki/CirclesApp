@@ -27,6 +27,10 @@ class UserSelections(context: Context) {
         private const val USE_HIGH_RESOLUTION_MAPS_KEY = "Circles.UseHighResolutionMaps"
         private const val MAP_ZOOM_LEVEL_KEY = "Circles.MapZoomLevel"
         private const val SHOW_WEB_CUTS_KEY = "Circles.ShowWebCuts"
+        private const val GRID_SIZE_KEY = "Circles.GridSize"
+        private const val LIST_SIZE_KEY = "Circles.ListSize"
+        private const val FAVORITES_DISPLAY_MODE_KEY = "Favorites.DisplayMode"
+        private const val FAVORITES_GROUP_BY_COLOR_KEY = "Favorites.GroupByColor"
     }
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -89,6 +93,52 @@ class UserSelections(context: Context) {
         } ?: CircleDisplayMode.GRID
     )
     val displayMode: StateFlow<CircleDisplayMode> = _displayMode
+
+    private val _gridSize = MutableStateFlow(
+        GridDisplayMode.entries.find {
+            it.value == prefs.getInt(GRID_SIZE_KEY, GridDisplayMode.MEDIUM.value)
+        } ?: GridDisplayMode.MEDIUM
+    )
+    val gridSize: StateFlow<GridDisplayMode> = _gridSize
+
+    private val _listSize = MutableStateFlow(
+        ListDisplayMode.entries.find {
+            it.value == prefs.getInt(LIST_SIZE_KEY, ListDisplayMode.REGULAR.value)
+        } ?: ListDisplayMode.REGULAR
+    )
+    val listSize: StateFlow<ListDisplayMode> = _listSize
+
+    private val _favoritesDisplayMode = MutableStateFlow(
+        CircleDisplayMode.entries.find {
+            it.value == prefs.getInt(FAVORITES_DISPLAY_MODE_KEY, CircleDisplayMode.GRID.value)
+        } ?: CircleDisplayMode.GRID
+    )
+    val favoritesDisplayMode: StateFlow<CircleDisplayMode> = _favoritesDisplayMode
+
+    private val _favoritesGroupByColor = MutableStateFlow(
+        prefs.getBoolean(FAVORITES_GROUP_BY_COLOR_KEY, true)
+    )
+    val favoritesGroupByColor: StateFlow<Boolean> = _favoritesGroupByColor
+
+    fun setGridSize(size: GridDisplayMode) {
+        _gridSize.value = size
+        prefs.edit { putInt(GRID_SIZE_KEY, size.value) }
+    }
+
+    fun setListSize(size: ListDisplayMode) {
+        _listSize.value = size
+        prefs.edit { putInt(LIST_SIZE_KEY, size.value) }
+    }
+
+    fun setFavoritesDisplayMode(mode: CircleDisplayMode) {
+        _favoritesDisplayMode.value = mode
+        prefs.edit { putInt(FAVORITES_DISPLAY_MODE_KEY, mode.value) }
+    }
+
+    fun setFavoritesGroupByColor(grouped: Boolean) {
+        _favoritesGroupByColor.value = grouped
+        prefs.edit { putBoolean(FAVORITES_GROUP_BY_COLOR_KEY, grouped) }
+    }
 
     fun setShowSpaceName(show: Boolean) {
         _showSpaceName.value = show
@@ -214,5 +264,30 @@ class UserSelections(context: Context) {
         }
         _genres.value = emptySet()
         _blocks.value = emptySet()
+    }
+
+    /**
+     * Clears every persisted preference and resets in-memory state to
+     * defaults, mirroring the iOS sign-out which wipes all UserDefaults.
+     */
+    fun wipeAll() {
+        prefs.edit { clear() }
+        _date.value = null
+        _map.value = null
+        _blocks.value = emptySet()
+        _genres.value = emptySet()
+        _showGenreOverlay.value = false
+        _isPrivacyMode.value = false
+        _showSpaceName.value = false
+        _showDay.value = false
+        _darkenMapInDarkMode.value = true
+        _useHighResolutionMaps.value = true
+        _mapZoomLevel.value = 1.0f
+        _showWebCuts.value = false
+        _displayMode.value = CircleDisplayMode.GRID
+        _gridSize.value = GridDisplayMode.MEDIUM
+        _listSize.value = ListDisplayMode.REGULAR
+        _favoritesDisplayMode.value = CircleDisplayMode.GRID
+        _favoritesGroupByColor.value = true
     }
 }

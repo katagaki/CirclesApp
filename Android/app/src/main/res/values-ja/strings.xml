@@ -169,4 +169,22 @@
 
     <!-- Tags -->
     <string name="tags_label">タグ</string>
+
+    <!-- Circle Cut Types -->
+    <string name="cut_catalog">カタログカット</string>
+    <string name="cut_web">Webカット</string>
+
+    <!-- Web Catalog Favorites Notice -->
+    <string name="favorites_web_catalog_notice_title">Webカタログからの登録について</string>
+    <string name="favorites_web_catalog_notice_description">Webカタログの18色を選択した場合、アプリ内では正しく表示されません。お手数ですが、再度アプリで色を選択してください。</string>
+
+    <!-- Display Options -->
+    <string name="display_options">表示オプション</string>
+    <string name="display_grid">グリッド</string>
+    <string name="display_list">リスト</string>
+    <string name="grid_size_big">大</string>
+    <string name="grid_size_medium">中</string>
+    <string name="grid_size_small">小</string>
+    <string name="list_style_regular">標準</string>
+    <string name="list_style_compact">コンパクト</string>
 </resources>

@@ -171,4 +171,22 @@
 
     <!-- Tags -->
     <string name="tags_label">Tags</string>
+
+    <!-- Circle Cut Types -->
+    <string name="cut_catalog">Catalog Cut</string>
+    <string name="cut_web">Web Cut</string>
+
+    <!-- Web Catalog Favorites Notice -->
+    <string name="favorites_web_catalog_notice_title">About favorites added from the Web Catalog</string>
+    <string name="favorites_web_catalog_notice_description">Colors chosen from the Web Catalog\'s 18-color palette are not shown correctly in the app. Sorry for the inconvenience, but please select the color again in the app.</string>
+
+    <!-- Display Options -->
+    <string name="display_options">Display options</string>
+    <string name="display_grid">Grid</string>
+    <string name="display_list">List</string>
+    <string name="grid_size_big">Large</string>
+    <string name="grid_size_medium">Medium</string>
+    <string name="grid_size_small">Small</string>
+    <string name="list_style_regular">Regular</string>
+    <string name="list_style_compact">Compact</string>
 </resources>

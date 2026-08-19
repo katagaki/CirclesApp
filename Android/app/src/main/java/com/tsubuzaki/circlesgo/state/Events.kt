@@ -32,11 +32,28 @@ class Events(private val context: Context) {
     var activeEventNumber: Int = prefs.getInt(ACTIVE_EVENT_NUMBER_KEY, -1)
         private set
 
+    private val _isActiveEventLatestFlow = MutableStateFlow(
+        prefs.getBoolean(ACTIVE_EVENT_IS_LATEST_KEY, false)
+    )
+
+    /** Reactive view of [isActiveEventLatest] for Compose consumers. */
+    val isActiveEventLatestFlow: StateFlow<Boolean> = _isActiveEventLatestFlow
+
     var isActiveEventLatest: Boolean
         get() = prefs.getBoolean(ACTIVE_EVENT_IS_LATEST_KEY, false)
         set(value) {
             prefs.edit { putBoolean(ACTIVE_EVENT_IS_LATEST_KEY, value) }
+            _isActiveEventLatestFlow.value = value
         }
+
+    /** Clears all in-memory event state after a sign-out wipe. */
+    fun reset() {
+        eventData = null
+        latestEvent = null
+        activeEventNumber = -1
+        _activeEvent.value = null
+        _isActiveEventLatestFlow.value = false
+    }
 
     fun setActiveEvent(number: Int) {
         if (activeEventNumber != number) {

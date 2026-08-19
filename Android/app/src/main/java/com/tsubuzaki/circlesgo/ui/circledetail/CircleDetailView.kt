@@ -36,6 +36,8 @@ import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
@@ -71,6 +73,8 @@ import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.api.catalog.WebCatalogColor
 import com.tsubuzaki.circlesgo.auth.Authenticator
 import com.tsubuzaki.circlesgo.api.catalog.WebCatalogAPI
+import com.tsubuzaki.circlesgo.api.catalog.WebCatalogCircle
+import com.tsubuzaki.circlesgo.api.OnlineState
 import com.tsubuzaki.circlesgo.data.local.AttachmentsCache
 import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
@@ -104,6 +108,9 @@ fun CircleDetailView(
     events: Events? = null,
     mapper: Mapper? = null,
     attachmentsCache: AttachmentsCache? = null,
+    /** Ordered circle IDs constraining previous/next navigation (e.g. within
+     *  a favorite color group); null falls back to circle.id ± 1. */
+    navigationCircleIDs: List<Int>? = null,
     /** Height of the visible part of the sheet, so the bottom toolbar stays
      *  on screen while the sheet is only partially expanded. */
     visibleHeight: Dp? = null
@@ -130,7 +137,9 @@ fun CircleDetailView(
     var isEditing by remember { mutableStateOf(false) }
     var selectedColor by remember {
         mutableStateOf(
-            existingFavorite?.favorite?.webCatalogColor() ?: WebCatalogColor.ORANGE
+            existingFavorite?.favorite?.webCatalogColor()
+                ?.takeIf { it != WebCatalogColor.UNCOLORED }
+                ?: WebCatalogColor.ORANGE
         )
     }
     var memo by remember { mutableStateOf(existingFavorite?.favorite?.memo ?: "") }
@@ -138,7 +147,9 @@ fun CircleDetailView(
 
     // Update editing state when favorite data changes
     LaunchedEffect(existingFavorite) {
-        selectedColor = existingFavorite?.favorite?.webCatalogColor() ?: WebCatalogColor.ORANGE
+        selectedColor = existingFavorite?.favorite?.webCatalogColor()
+            ?.takeIf { it != WebCatalogColor.UNCOLORED }
+            ?: WebCatalogColor.ORANGE
         memo = existingFavorite?.favorite?.memo ?: ""
     }
 
@@ -150,16 +161,22 @@ fun CircleDetailView(
         }
     }
 
-    // Fetch web catalog tags
+    // Fetch web catalog tags and online store links
     var tags by remember { mutableStateOf<String?>(null) }
+    var onlineStores by remember {
+        mutableStateOf<List<WebCatalogCircle.OnlineStore>>(emptyList())
+    }
     LaunchedEffect(circle.id) {
         tags = null
+        onlineStores = emptyList()
         val token = authToken ?: return@LaunchedEffect
         val wcID = circle.extendedInformation?.webCatalogID ?: return@LaunchedEffect
         if (isDemo) return@LaunchedEffect
         scope.launch(Dispatchers.IO) {
             val response = WebCatalogAPI.circle(wcID, token)
             tags = response?.response?.circle?.tag?.takeIf { it.isNotBlank() }
+            onlineStores = response?.response?.circle?.onlineStores.orEmpty()
+                .filter { it.link.isNotBlank() }
         }
     }
 
@@ -208,16 +225,29 @@ fun CircleDetailView(
                     )
                 }
             }
-            // Previous / next circle navigation
-            IconButton(onClick = {
+            // Previous / next circle navigation; walks the navigation list
+            // when one is set, otherwise circle.id ± 1
+            fun navigate(step: Int, boundaryMessage: Int) {
                 scope.launch(Dispatchers.IO) {
-                    val previous = database.circles(listOf(circle.id - 1)).firstOrNull()
-                    if (previous != null) {
-                        circle = previous
+                    val targetID = if (navigationCircleIDs != null) {
+                        val index = navigationCircleIDs.indexOf(circle.id)
+                        navigationCircleIDs.getOrNull(index + step)
+                            .takeIf { index != -1 }
                     } else {
-                        boundaryAlertMessage = R.string.first_circle_message
+                        circle.id + step
+                    }
+                    val target = targetID?.let {
+                        database.circles(listOf(it)).firstOrNull()
+                    }
+                    if (target != null) {
+                        circle = target
+                    } else {
+                        boundaryAlertMessage = boundaryMessage
                     }
                 }
+            }
+            IconButton(onClick = {
+                navigate(-1, R.string.first_circle_message)
             }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -225,14 +255,7 @@ fun CircleDetailView(
                 )
             }
             IconButton(onClick = {
-                scope.launch(Dispatchers.IO) {
-                    val next = database.circles(listOf(circle.id + 1)).firstOrNull()
-                    if (next != null) {
-                        circle = next
-                    } else {
-                        boundaryAlertMessage = R.string.last_circle_message
-                    }
-                }
+                navigate(1, R.string.last_circle_message)
             }) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -311,7 +334,7 @@ fun CircleDetailView(
                     Column(
                         verticalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        WebCatalogColor.entries.chunked(3).forEach { rowColors ->
+                        WebCatalogColor.assignable.chunked(3).forEach { rowColors ->
                             Row(
                                 horizontalArrangement = Arrangement.spacedBy(6.dp)
                             ) {
@@ -441,21 +464,46 @@ fun CircleDetailView(
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.Start
         ) {
-            // Cut image
-            Box(
-                modifier = Modifier
-                    .width(120.dp)
-                    .height(172.dp)
-            ) {
+            // Cut image; tapping toggles between the catalog and web cut
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 val isPrivacyMode by selections.isPrivacyMode.collectAsState()
                 val showWebCuts by selections.showWebCuts.collectAsState()
-                CircleCutImage(
-                    circle = circle,
-                    database = database,
-                    favorites = favorites,
-                    isPrivacyMode = isPrivacyMode,
-                    showWebCuts = showWebCuts
-                )
+                val canToggleCut = !isDemo && authToken != null
+                var showWebCutInHero by remember(circle.id) {
+                    mutableStateOf(showWebCuts)
+                }
+                Box(
+                    modifier = Modifier
+                        .width(120.dp)
+                        .height(172.dp)
+                        .then(
+                            if (canToggleCut) {
+                                Modifier.clickable {
+                                    showWebCutInHero = !showWebCutInHero
+                                }
+                            } else {
+                                Modifier
+                            }
+                        )
+                ) {
+                    CircleCutImage(
+                        circle = circle,
+                        database = database,
+                        favorites = favorites,
+                        isPrivacyMode = isPrivacyMode,
+                        showWebCuts = showWebCutInHero && canToggleCut
+                    )
+                }
+                if (canToggleCut) {
+                    Text(
+                        text = stringResource(
+                            if (showWebCutInHero) R.string.cut_web else R.string.cut_catalog
+                        ),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.width(12.dp))
@@ -477,6 +525,15 @@ fun CircleDetailView(
                             size = CircleBlockPillSize.LARGE
                         )
                     }
+                }
+
+                // Favorite memo
+                existingFavorite?.favorite?.memo?.takeIf { it.isNotBlank() }?.let { favoriteMemo ->
+                    Text(
+                        text = favoriteMemo,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
 
                 // Description
@@ -610,10 +667,16 @@ fun CircleDetailView(
                 .padding(horizontal = 12.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (webCatalogID != null) {
+            // Favorites can only be edited for the latest event while online
+            val onlineState by authenticator.onlineState.collectAsState()
+            val isActiveEventLatest = events?.isActiveEventLatestFlow
+                ?.collectAsState()?.value ?: true
+            val canShowFavoriteAction = webCatalogID != null &&
+                    isActiveEventLatest &&
+                    (isDemo || onlineState == OnlineState.ONLINE)
+            if (canShowFavoriteAction) {
                 val favoriteTint = if (isFavorited) {
-                    existingFavorite.favorite.webCatalogColor()?.backgroundColor()
-                        ?: MaterialTheme.colorScheme.primary
+                    existingFavorite.favorite.webCatalogColor().backgroundColor()
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
                 }
@@ -639,17 +702,46 @@ fun CircleDetailView(
 
             Spacer(modifier = Modifier.weight(1f))
 
+            fun openURL(url: String) {
+                val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                    .setToolbarColor(primaryColor)
+                    .build()
+                CustomTabsIntent.Builder()
+                    .setDefaultColorSchemeParams(colorSchemeParams)
+                    .build()
+                    .launchUrl(context, url.toUri())
+            }
+
+            // Online store links from the Web Catalog
+            if (onlineStores.isNotEmpty()) {
+                var linksExpanded by remember { mutableStateOf(false) }
+                Box {
+                    IconButton(onClick = { linksExpanded = true }) {
+                        Icon(
+                            imageVector = Icons.Filled.Link,
+                            contentDescription = stringResource(R.string.links),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    DropdownMenu(
+                        expanded = linksExpanded,
+                        onDismissRequest = { linksExpanded = false }
+                    ) {
+                        onlineStores.forEach { store ->
+                            DropdownMenuItem(
+                                text = { Text(store.name.ifBlank { store.link }) },
+                                onClick = {
+                                    linksExpanded = false
+                                    openURL(store.link)
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
             // SNS buttons
             if (extInfo != null && extInfo.hasAccessibleURLs()) {
-                fun openURL(url: String) {
-                    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
-                        .setToolbarColor(primaryColor)
-                        .build()
-                    CustomTabsIntent.Builder()
-                        .setDefaultColorSchemeParams(colorSchemeParams)
-                        .build()
-                        .launchUrl(context, url.toUri())
-                }
                 extInfo.circleMsPortalURL?.let { url ->
                     SNSIconButton(
                         label = stringResource(R.string.sns_circlems),

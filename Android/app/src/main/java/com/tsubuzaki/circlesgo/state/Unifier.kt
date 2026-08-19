@@ -81,13 +81,20 @@ class Unifier {
         _isGoingToSignOut.value = value
     }
 
-    fun showCircleDetail(circle: ComiketCircle) {
+    // Ordered circle IDs constraining previous/next navigation in the
+    // detail view (e.g. within a favorite color group); null = id ± 1
+    private val _detailNavigationIDs = MutableStateFlow<List<Int>?>(null)
+    val detailNavigationIDs: StateFlow<List<Int>?> = _detailNavigationIDs
+
+    fun showCircleDetail(circle: ComiketCircle, navigationIDs: List<Int>? = null) {
         _selectedCircle.value = circle
+        _detailNavigationIDs.value = navigationIDs
         append(UnifiedPath.CIRCLE_DETAIL)
     }
 
     fun clearCircleDetail() {
         _selectedCircle.value = null
+        _detailNavigationIDs.value = null
     }
 
     fun clearSheetContent() {

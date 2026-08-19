@@ -7,6 +7,7 @@ import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -55,6 +56,16 @@ fun UnifiedPanel(
     val currentPath by unifier.currentPath.collectAsState()
     val sheetPath by unifier.sheetPath.collectAsState()
     val selectedCircle by unifier.selectedCircle.collectAsState()
+    val detailNavigationIDs by unifier.detailNavigationIDs.collectAsState()
+
+    // Favorites only apply to the latest event, so hide the tab when
+    // browsing an older Comiket
+    val isActiveEventLatest by events.isActiveEventLatestFlow.collectAsState()
+    LaunchedEffect(isActiveEventLatest) {
+        if (!isActiveEventLatest && currentPath == UnifiedPath.FAVORITES) {
+            unifier.setCurrentPath(UnifiedPath.CIRCLES)
+        }
+    }
 
     // Check if circle detail is showing (in sheet path stack)
     val isShowingCircleDetail =
@@ -86,32 +97,39 @@ fun UnifiedPanel(
                 events = events,
                 mapper = mapper,
                 attachmentsCache = attachmentsCache,
+                navigationCircleIDs = detailNavigationIDs,
                 visibleHeight = visibleHeight
             )
         } else {
-            // Tab row: Circles / Favorites / Buys
-            val tabs = listOf(UnifiedPath.CIRCLES, UnifiedPath.FAVORITES, UnifiedPath.BUYS)
+            // Tab row: Circles / Favorites (latest event only) / Buys
+            val tabs = if (isActiveEventLatest) {
+                listOf(UnifiedPath.CIRCLES, UnifiedPath.FAVORITES, UnifiedPath.BUYS)
+            } else {
+                listOf(UnifiedPath.CIRCLES, UnifiedPath.BUYS)
+            }
             val selectedIndex = tabs.indexOf(currentPath).coerceAtLeast(0)
 
             SecondaryTabRow(
                 selectedTabIndex = selectedIndex,
                 containerColor = Color.Transparent
             ) {
-                Tab(
-                    selected = currentPath == UnifiedPath.CIRCLES,
-                    onClick = { unifier.setCurrentPath(UnifiedPath.CIRCLES) },
-                    text = { Text(stringResource(R.string.tab_circles)) },
-                )
-                Tab(
-                    selected = currentPath == UnifiedPath.FAVORITES,
-                    onClick = { unifier.setCurrentPath(UnifiedPath.FAVORITES) },
-                    text = { Text(stringResource(R.string.tab_favorites)) },
-                )
-                Tab(
-                    selected = currentPath == UnifiedPath.BUYS,
-                    onClick = { unifier.setCurrentPath(UnifiedPath.BUYS) },
-                    text = { Text(stringResource(R.string.tab_buys)) },
-                )
+                for (tab in tabs) {
+                    Tab(
+                        selected = currentPath == tab,
+                        onClick = { unifier.setCurrentPath(tab) },
+                        text = {
+                            Text(
+                                stringResource(
+                                    when (tab) {
+                                        UnifiedPath.FAVORITES -> R.string.tab_favorites
+                                        UnifiedPath.BUYS -> R.string.tab_buys
+                                        else -> R.string.tab_circles
+                                    }
+                                )
+                            )
+                        },
+                    )
+                }
             }
 
             // Content based on current path
@@ -129,7 +147,9 @@ fun UnifiedPanel(
                     database = database,
                     favorites = favorites,
                     selections = selections,
-                    unifier = unifier
+                    unifier = unifier,
+                    favoritesAPI = favoritesAPI,
+                    authenticator = authenticator
                 )
 
                 UnifiedPath.BUYS -> BuysView(

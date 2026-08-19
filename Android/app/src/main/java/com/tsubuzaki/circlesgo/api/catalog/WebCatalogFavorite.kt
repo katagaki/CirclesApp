@@ -12,7 +12,7 @@ data class WebCatalogFavorite(
     val free: String? = null,
     @SerialName("update_date") val updateDate: String
 ) {
-    fun webCatalogColor(): WebCatalogColor? = WebCatalogColor.fromValue(color)
+    fun webCatalogColor(): WebCatalogColor = WebCatalogColor.fromValue(color)
 
     @Serializable
     data class Request(
