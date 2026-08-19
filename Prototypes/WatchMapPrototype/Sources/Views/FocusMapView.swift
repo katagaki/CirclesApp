@@ -21,9 +21,8 @@ struct FocusMapView: View {
                     scale: scale,
                     center: CGPoint(x: rect.midX, y: rect.midY)
                 )
-                .overlay(alignment: .bottom) {
-                    caption
-                }
+                .overlay(alignment: .bottom) { bottomScrim }
+                .overlay(alignment: .bottom) { caption }
                 .focusable()
                 .focused($isCrownFocused)
                 .digitalCrownRotation(
@@ -43,17 +42,24 @@ struct FocusMapView: View {
         .ignoresSafeArea(edges: .bottom)
     }
 
+
+    private var bottomScrim: some View {
+        LinearGradient(
+            colors: [.black.opacity(0.85), .clear],
+            startPoint: .bottom,
+            endPoint: .top
+        )
+        .frame(height: 62.0)
+        .allowsHitTesting(false)
+    }
+
     private var caption: some View {
-        VStack(spacing: 1.0) {
-            Text(favorite.spaceLabel)
-                .font(.system(.title3, design: .rounded, weight: .bold))
+        VStack(spacing: 2.0) {
+            SpacePill(label: favorite.spaceLabel, color: favorite.color, fontSize: 22.0)
             Text(store.map(id: favorite.mapID)?.name ?? "")
                 .font(.caption2)
                 .foregroundStyle(.secondary)
         }
-        .padding(.horizontal, 8.0)
-        .padding(.vertical, 3.0)
-        .background(.black.opacity(0.65), in: Capsule())
         .padding(.bottom, 4.0)
     }
 

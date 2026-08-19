@@ -60,19 +60,12 @@ struct RouteCard: View {
 
             Spacer(minLength: 0.0)
 
-            Text(favorite.spaceLabel)
-                .font(.system(size: 42.0, weight: .heavy, design: .rounded))
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
-                .strikethrough(isVisited, pattern: .solid, color: .secondary)
-                .foregroundStyle(isVisited ? AnyShapeStyle(.secondary) : AnyShapeStyle(favorite.color.foreground))
-                .padding(.horizontal, 12.0)
-                .padding(.vertical, 2.0)
-                .background(
-                    Capsule().fill(
-                        isVisited ? AnyShapeStyle(.quaternary) : AnyShapeStyle(favorite.color.color)
-                    )
-                )
+            SpacePill(
+                label: favorite.spaceLabel,
+                color: favorite.color,
+                fontSize: 42.0,
+                isVisited: isVisited
+            )
 
             Text(store.map(id: favorite.mapID)?.name ?? "")
                 .font(.system(.headline, design: .rounded))
@@ -145,7 +138,7 @@ struct RouteCard: View {
 
             visitButton
         }
-        .font(.footnote)
+        .font(.system(size: 22.0, weight: .semibold))
     }
 }
 

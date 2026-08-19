@@ -38,6 +38,7 @@ struct OverviewMapView: View {
                     markerMinimumSize: 7.0,
                     drawsMarkersAsDots: true
                 )
+                .overlay(alignment: .bottom) { bottomScrim }
                 .overlay(alignment: .bottom) { caption }
                 .focusable()
                 .focused($isCrownFocused)
@@ -66,20 +67,27 @@ struct OverviewMapView: View {
         .ignoresSafeArea(edges: .bottom)
     }
 
+
+    private var bottomScrim: some View {
+        LinearGradient(
+            colors: [.black.opacity(0.85), .clear],
+            startPoint: .bottom,
+            endPoint: .top
+        )
+        .frame(height: 62.0)
+        .allowsHitTesting(false)
+    }
+
     @ViewBuilder
     private var caption: some View {
         if let selected {
-            VStack(spacing: 1.0) {
-                Text(selected.spaceLabel)
-                    .font(.system(.headline, design: .rounded, weight: .bold))
+            VStack(spacing: 2.0) {
+                SpacePill(label: selected.spaceLabel, color: selected.color, fontSize: 18.0)
                 Text(selected.circle.name)
                     .font(.caption2)
                     .lineLimit(1)
                     .foregroundStyle(.secondary)
             }
-            .padding(.horizontal, 8.0)
-            .padding(.vertical, 3.0)
-            .background(.black.opacity(0.65), in: Capsule())
             .padding(.bottom, 4.0)
         }
     }

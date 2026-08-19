@@ -135,17 +135,12 @@ struct StepMapView: View {
     private var caption: some View {
         if let circle = selectedCircle {
             let matched = store.favorite(forCircle: circle.id)
-            VStack(spacing: 1.0) {
-                HStack(spacing: 4.0) {
-                    if let matched {
-                        Circle()
-                            .fill(matched.color.color)
-                            .frame(width: 8.0, height: 8.0)
-                    }
-                    Text("\(store.blockName(circle.blockID))\(circle.spaceNumberCombined)")
-                        .font(.system(.title3, design: .rounded, weight: .bold))
-                        .foregroundStyle(.primary)
-                }
+            VStack(spacing: 2.0) {
+                SpacePill(
+                    label: "\(store.blockName(circle.blockID))\(circle.spaceNumberCombined)",
+                    color: matched?.color,
+                    fontSize: 22.0
+                )
                 Text(circle.name)
                     .font(.caption2)
                     .lineLimit(1)
