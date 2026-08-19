@@ -13,12 +13,13 @@ import RADiUS
 enum OnHandPayloadBuilder {
 
     static func build(
-        favorites: Favorites,
+        favoriteItems: [UserFavorites.Response.FavoriteItem],
+        wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem],
         database: Database,
         events: Events,
         visitedCircleIDs: Set<Int>
     ) async -> OnHandPayload? {
-        guard let favoriteItems = favorites.items, !favoriteItems.isEmpty else { return nil }
+        guard !favoriteItems.isEmpty else { return nil }
 
         let eventNumber = events.activeEventNumber
         guard eventNumber > 0 else { return nil }
@@ -29,7 +30,7 @@ enum OnHandPayloadBuilder {
 
         let circles = database.circles(circleIdentifiers)
         let maps = database.maps()
-        let colorsByWebCatalogID = favorites.wcIDMappedItems ?? [:]
+        let colorsByWebCatalogID = wcIDMappedItems
 
         var mapNamesByBlockID: [Int: String] = [:]
         for blockID in Set(circles.map { $0.blockID }) {

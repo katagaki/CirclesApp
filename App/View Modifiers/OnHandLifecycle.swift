@@ -8,6 +8,7 @@
 import SwiftData
 import SwiftUI
 import AXiS
+import RADiUS
 
 struct OnHandLifecycle: ViewModifier {
 
@@ -46,15 +47,17 @@ struct OnHandLifecycle: ViewModifier {
         isSyncing = true
         defer { isSyncing = false }
 
+        let (items, mapped) = await favoriteItems()
         let payload = await OnHandPayloadBuilder.build(
-            favorites: favorites,
+            favoriteItems: items,
+            wcIDMappedItems: mapped,
             database: database,
             events: events,
             visitedCircleIDs: visitedCircleIDs()
         )
         guard let payload else {
             #if DEBUG
-            debugPrint("OnHand: no payload built (favorites: \(favorites.items?.count ?? -1), event: \(events.activeEventNumber))")
+            debugPrint("OnHand: no payload built (favorites: \(items.count), event: \(events.activeEventNumber))")
             #endif
             return
         }
@@ -62,6 +65,17 @@ struct OnHandLifecycle: ViewModifier {
         debugPrint("OnHand: sending \(payload.favorites.count) favorites for event \(payload.eventNumber)")
         #endif
         OnHandSync.shared.send(payload)
+    }
+
+    func favoriteItems() async -> (
+        [UserFavorites.Response.FavoriteItem],
+        [Int: UserFavorites.Response.FavoriteItem]
+    ) {
+        if let items = favorites.items, !items.isEmpty {
+            return (items, favorites.wcIDMappedItems ?? [:])
+        }
+        let actor = FavoritesActor(modelContainer: sharedModelContainer)
+        return await actor.cached()
     }
 
     func visitedCircleIDs() -> Set<Int> {
