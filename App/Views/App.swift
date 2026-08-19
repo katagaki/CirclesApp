@@ -79,6 +79,7 @@ struct CirclesApp: App {
                 .onRotate { newOrientation in
                     orientation.update(to: newOrientation)
                 }
+                .onHandLifecycle()
         }
         .modelContainer(sharedModelContainer)
         .environment(orientation)
