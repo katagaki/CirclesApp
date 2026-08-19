@@ -89,13 +89,14 @@ struct RouteCard: View {
             }
 
             Spacer(minLength: 0.0)
-
-            if !isLuminanceReduced {
-                actions
-            }
         }
         .padding(.horizontal, 6.0)
-        .padding(.bottom, 4.0)
+        .safeAreaInset(edge: .bottom, spacing: 4.0) {
+            if !isLuminanceReduced {
+                actions
+                    .padding(.horizontal, 6.0)
+            }
+        }
         .containerBackground(
             color.background.gradient.opacity(isLuminanceReduced ? 0.0 : 0.16),
             for: .tabView
@@ -117,34 +118,41 @@ struct RouteCard: View {
     }
 
     var actions: some View {
-        HStack(spacing: 6.0) {
-            NavigationLink(value: favorite) {
-                Image(systemName: "cart.fill")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.glass)
-            .disabled(favorite.items.isEmpty)
+        GlassEffectContainer(spacing: 6.0) {
+            HStack(spacing: 6.0) {
+                NavigationLink(value: favorite) {
+                    actionLabel("cart.fill")
+                }
+                .buttonStyle(.plain)
+                .disabled(favorite.items.isEmpty)
+                .opacity(favorite.items.isEmpty ? 0.4 : 1.0)
+                .glassEffect(.regular.interactive(), in: .capsule)
 
-            visitButton
+                Button {
+                    store.toggleVisited(favorite.id)
+                } label: {
+                    actionLabel(favorite.isVisited ? "arrow.uturn.backward" : "checkmark")
+                }
+                .buttonStyle(.plain)
+                .glassEffect(
+                    favorite.isVisited
+                        ? .regular.interactive()
+                        : .regular.tint(Color.accentColor).interactive(),
+                    in: .capsule
+                )
+            }
         }
-        .font(.system(size: 22.0, weight: .semibold))
         .navigationDestination(for: OnHandFavorite.self) { favorite in
             CircleBuysView(circleID: favorite.id)
         }
     }
 
-    @ViewBuilder
-    var visitButton: some View {
-        let label = Image(systemName: favorite.isVisited ? "arrow.uturn.backward" : "checkmark")
+    func actionLabel(_ symbolName: String) -> some View {
+        Image(systemName: symbolName)
+            .font(.system(size: 20.0, weight: .semibold))
             .frame(maxWidth: .infinity)
-        if favorite.isVisited {
-            Button { store.toggleVisited(favorite.id) } label: { label }
-                .buttonStyle(.glass)
-        } else {
-            Button { store.toggleVisited(favorite.id) } label: { label }
-                .buttonStyle(.glassProminent)
-                .tint(Color.accentColor)
-        }
+            .frame(height: 42.0)
+            .contentShape(.capsule)
     }
 }
 

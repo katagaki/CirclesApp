@@ -71,10 +71,10 @@ Additional debug arguments, since the crown and taps cannot be driven headlessly
 Buttons use `.buttonStyle(.glass)` / `.glassProminent`, which requires the watchOS 26.0
 deployment target this project is set to.
 
-Note that watchOS does **not** get the free-form glass APIs: `glassEffect(_:in:)` and
-`GlassEffectContainer` appear nowhere in the watchOS SDK's SwiftUI interface — they are
-iOS/macOS/tvOS only. Glass is available for button styles and nothing else here, so the
-non-button chrome (map counter chip, captions) still uses plain material capsules.
+`glassEffect(_:in:)` and `GlassEffectContainer` are also available on watchOS 26 — they are
+declared in `SwiftUICore`, not `SwiftUI`, so grepping only the SwiftUI interface misses them.
+Use `glassEffect(_:in: .capsule)` when an exact shape matters: `buttonBorderShape(.capsule)`
+is not honoured by `.buttonStyle(.glass)`.
 
 ## Colour
 
