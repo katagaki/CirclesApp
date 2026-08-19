@@ -35,17 +35,12 @@ fun MapHighlightLayer(
     LaunchedEffect(highlightData) {
         val data = highlightData
         if (data != null && data.shouldBlink) {
-            // Hold solid first so the target is always seen even if the map is
-            // still settling, then pulse, then hold once more before clearing
+            // Blink 7 times at 160 ms
             isVisible = true
-            delay(500)
-            repeat(3) {
-                isVisible = false
-                delay(180)
-                isVisible = true
-                delay(180)
+            repeat(7) {
+                isVisible = !isVisible
+                delay(160)
             }
-            delay(400)
             mapper.setHighlightData(null)
             mapper.setHighlightTarget(null)
         } else {
