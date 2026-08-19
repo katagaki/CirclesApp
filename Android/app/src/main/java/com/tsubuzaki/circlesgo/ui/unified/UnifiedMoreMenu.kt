@@ -39,6 +39,7 @@ import com.tsubuzaki.circlesgo.state.UnifiedPath
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.ui.shared.LocalDemoMode
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -196,7 +197,9 @@ fun UnifiedMoreMenu(
 
             HorizontalDivider()
 
-            // Links
+            // Links; Japanese users get the JP web catalog and floor map,
+            // everyone else the English variants
+            val isJapanese = Locale.getDefault().language == Locale.JAPANESE.language
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.link_web_catalog)) },
                 onClick = {
@@ -207,7 +210,12 @@ fun UnifiedMoreMenu(
                     val customTabsIntent = CustomTabsIntent.Builder()
                         .setDefaultColorSchemeParams(colorSchemeParams)
                         .build()
-                    customTabsIntent.launchUrl(context, "https://webcatalog.circle.ms".toUri())
+                    val url = if (isJapanese) {
+                        "https://webcatalog.circle.ms"
+                    } else {
+                        "https://int.webcatalog.circle.ms/en/catalog"
+                    }
+                    customTabsIntent.launchUrl(context, url.toUri())
                 },
             )
             DropdownMenuItem(
@@ -233,10 +241,12 @@ fun UnifiedMoreMenu(
                     val customTabsIntent = CustomTabsIntent.Builder()
                         .setDefaultColorSchemeParams(colorSchemeParams)
                         .build()
-                    customTabsIntent.launchUrl(
-                        context,
-                        "https://www.bigsight.jp/visitor/floormap/".toUri()
-                    )
+                    val url = if (isJapanese) {
+                        "https://www.bigsight.jp/visitor/floormap/"
+                    } else {
+                        "https://www.bigsight.jp/english/visitor/floormap/"
+                    }
+                    customTabsIntent.launchUrl(context, url.toUri())
                 }
             )
 
