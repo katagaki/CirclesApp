@@ -40,9 +40,14 @@ extension Authenticator {
 
     func exitOfflineMode() {
         UserDefaults.standard.removeObject(forKey: offlineModeExpiryDateKey)
-        UserDefaults.standard.removeObject(forKey: hasAuthenticatedOnceKey)
         isOfflineModeActive = false
-        resetAuthentication()
+        if restoreAuthenticationFromKeychainAndDefaults() {
+            if onlineState == .online && tokenExpiryDate.addingTimeInterval(-3600) < .now {
+                Task { await refreshAuthenticationToken() }
+            }
+        } else {
+            isAuthenticating = true
+        }
     }
 
     func enforceOfflineModeExpiry() {
