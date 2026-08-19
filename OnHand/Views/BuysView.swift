@@ -29,7 +29,7 @@ struct BuysView: View {
                 }
             }
         }
-        .navigationTitle("Shared.Buys")
+        .navigationTitle("OnHand.Buys")
     }
 }
 

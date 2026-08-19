@@ -165,7 +165,7 @@ struct RouteMenuPage: View {
                     .foregroundStyle(.secondary)
 
                 if store.payload.days.count > 1 {
-                    Picker("Shared.Day", selection: $selectedDay) {
+                    Picker("OnHand.Day", selection: $selectedDay) {
                         ForEach(store.payload.days) { day in
                             Text("\(day.month)/\(day.day)").tag(day.id)
                         }
@@ -176,7 +176,7 @@ struct RouteMenuPage: View {
                 NavigationLink {
                     BuysView()
                 } label: {
-                    Label("Shared.Buys", systemImage: "cart.fill")
+                    Label("OnHand.Buys", systemImage: "cart.fill")
                 }
 
                 Text(store.payload.eventName)

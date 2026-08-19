@@ -28,6 +28,12 @@ final class OnHandSync: NSObject, WCSessionDelegate, @unchecked Sendable {
         return activeSession.isPaired && activeSession.isWatchAppInstalled
     }
 
+    var stateDescription: String {
+        guard let activeSession else { return "unsupported" }
+        return "paired=\(activeSession.isPaired) installed=\(activeSession.isWatchAppInstalled) "
+            + "state=\(activeSession.activationState.rawValue) reachable=\(activeSession.isReachable)"
+    }
+
     func activate() {
         guard let activeSession else { return }
         activeSession.delegate = self

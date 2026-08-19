@@ -27,6 +27,9 @@ struct OnHandLifecycle: ViewModifier {
                 OnHandSync.shared.activate()
                 Task { await pushPayload() }
             }
+            .onChange(of: favorites.items?.count) {
+                Task { await pushPayload() }
+            }
             .onChange(of: favorites.invalidationID) {
                 Task { await pushPayload() }
             }
@@ -36,6 +39,9 @@ struct OnHandLifecycle: ViewModifier {
     }
 
     func pushPayload() async {
+        #if DEBUG
+        debugPrint("OnHand: push requested, \(OnHandSync.shared.stateDescription)")
+        #endif
         guard OnHandSync.shared.isWatchReachable, !isSyncing else { return }
         isSyncing = true
         defer { isSyncing = false }
@@ -46,7 +52,15 @@ struct OnHandLifecycle: ViewModifier {
             events: events,
             visitedCircleIDs: visitedCircleIDs()
         )
-        guard let payload else { return }
+        guard let payload else {
+            #if DEBUG
+            debugPrint("OnHand: no payload built (favorites: \(favorites.items?.count ?? -1), event: \(events.activeEventNumber))")
+            #endif
+            return
+        }
+        #if DEBUG
+        debugPrint("OnHand: sending \(payload.favorites.count) favorites for event \(payload.eventNumber)")
+        #endif
         OnHandSync.shared.send(payload)
     }
 
