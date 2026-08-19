@@ -156,6 +156,20 @@ fun MapPopoverLayer(
                                     style = MaterialTheme.typography.bodyMedium,
                                     maxLines = 2
                                 )
+                                // Favorite memo
+                                val wcIDMappedItems by favorites.wcIDMappedItems.collectAsState()
+                                val favoriteMemo = circle.extendedInformation?.webCatalogID
+                                    ?.let { wcIDMappedItems?.get(it) }
+                                    ?.favorite?.memo
+                                    ?.takeIf { it.isNotBlank() }
+                                favoriteMemo?.let { memo ->
+                                    Text(
+                                        text = memo,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        maxLines = 2
+                                    )
+                                }
                                 circle.spaceName()?.let { space ->
                                     Text(
                                         text = space,
