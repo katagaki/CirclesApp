@@ -1,0 +1,170 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "srgb:0.58122,0.82720,0.99659,1.00000",
+      "srgb:0.44932,0.55699,0.93725,1.00000"
+    ]
+  },
+  "groups" : [
+    {
+      "blend-mode-specializations" : [
+        {
+          "value" : "normal"
+        },
+        {
+          "appearance" : "tinted",
+          "value" : "normal"
+        }
+      ],
+      "blur-material" : null,
+      "layers" : [
+        {
+          "blend-mode-specializations" : [
+            {
+              "value" : "normal"
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "lighten"
+            }
+          ],
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-gray:1.00000,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "linear-gradient" : [
+                  "extended-gray:1.00000,1.00000",
+                  "srgb:0.52157,0.52157,0.52157,1.00000"
+                ]
+              }
+            }
+          ],
+          "glass" : true,
+          "image-name" : "Cloud3.svg",
+          "name" : "Cloud3",
+          "opacity-specializations" : [
+            {
+              "value" : 0.9
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 1
+            }
+          ]
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-gray:1.00000,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "srgb:0.52157,0.52157,0.52157,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Cloud2.svg",
+          "name" : "Cloud2",
+          "opacity-specializations" : [
+            {
+              "value" : 0.7
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 0.95
+            }
+          ]
+        },
+        {
+          "fill-specializations" : [
+            {
+              "value" : {
+                "automatic-gradient" : "extended-gray:1.00000,1.00000"
+              }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : {
+                "solid" : "srgb:0.52157,0.52157,0.52157,1.00000"
+              }
+            }
+          ],
+          "image-name" : "Cloud1.svg",
+          "name" : "Cloud1",
+          "opacity-specializations" : [
+            {
+              "value" : 0.5
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 0.9
+            }
+          ]
+        }
+      ],
+      "lighting" : "combined",
+      "name" : "Clouds",
+      "opacity-specializations" : [
+        {
+          "appearance" : "tinted",
+          "value" : 0.65
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 1
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "blend-mode-specializations" : [
+        {
+          "value" : "normal"
+        },
+        {
+          "appearance" : "dark",
+          "value" : "hard-light"
+        }
+      ],
+      "blur-material" : null,
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "glass" : true,
+          "hidden" : false,
+          "image-name" : "CiRCLES.011 2.png",
+          "name" : "Graphic"
+        }
+      ],
+      "lighting" : "combined",
+      "name" : "Tokyo Big Sight",
+      "shadow" : {
+        "kind" : "layer-color",
+        "opacity" : 0.3
+      },
+      "specular" : true,
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
