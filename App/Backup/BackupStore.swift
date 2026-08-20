@@ -17,20 +17,15 @@ struct BackupPayload: Sendable {
 }
 
 enum BackupError: Error {
-    case noStorageAvailable
+    case iCloudUnavailable
     case noBackupFound
-}
-
-enum BackupLocation: Sendable {
-    case iCloud
-    case local
 }
 
 final class BackupStore: Sendable {
 
     static let shared = BackupStore()
 
-    static let ubiquityContainerIdentifier = "iCloud.com.tsubuzaki.CiRCLES"
+    static let ubiquityContainerIdentifier = "iCloud.com.tsubuzaki.KamiSeries"
     static let appGroupIdentifier = "group.com.tsubuzaki.CiRCLES"
 
     static let rootFolderName = "Backups"
@@ -40,7 +35,7 @@ final class BackupStore: Sendable {
     static let visitsFileName = "Visits.json"
     static let databasesFolderName = "Databases"
 
-    private let cachedICloudRootURL = Mutex<URL??>(nil)
+    private let cachedRootURL = Mutex<URL??>(nil)
 
     private init() {}
 
@@ -51,8 +46,8 @@ final class BackupStore: Sendable {
     }
 
     /// The iCloud Drive visible folder for this app. Resolving this is blocking, never call it on the main thread.
-    var iCloudRootURL: URL? {
-        cachedICloudRootURL.withLock { cached in
+    var rootURL: URL? {
+        cachedRootURL.withLock { cached in
             if let cached { return cached }
             let container = FileManager.default.url(
                 forUbiquityContainerIdentifier: Self.ubiquityContainerIdentifier
@@ -63,61 +58,41 @@ final class BackupStore: Sendable {
         }
     }
 
-    var localRootURL: URL? {
-        groupContainerURL?.appending(path: Self.rootFolderName)
-    }
-
-    func folderURL(for pid: Int, in location: BackupLocation) -> URL? {
-        let root = location == .iCloud ? iCloudRootURL : localRootURL
-        return root?.appending(path: String(pid))
+    func folderURL(for pid: Int) -> URL? {
+        rootURL?.appending(path: String(pid))
     }
 
     // MARK: - Discovery
 
-    /// Whether a backup folder for this PID exists, preferring iCloud Drive over the local mirror.
+    /// Whether a backup folder for this PID exists in iCloud Drive.
     func backupExists(for pid: Int) -> Bool {
-        locationOfBackup(for: pid) != nil
-    }
-
-    func locationOfBackup(for pid: Int) -> BackupLocation? {
-        for location in [BackupLocation.iCloud, .local] {
-            guard let folderURL = folderURL(for: pid, in: location) else { continue }
-            var isDirectory: ObjCBool = false
-            if FileManager.default.fileExists(atPath: folderURL.path(percentEncoded: false),
-                                              isDirectory: &isDirectory), isDirectory.boolValue {
-                return location
-            }
-        }
-        return nil
+        guard let folderURL = folderURL(for: pid) else { return false }
+        var isDirectory: ObjCBool = false
+        let exists = FileManager.default.fileExists(
+            atPath: folderURL.path(percentEncoded: false), isDirectory: &isDirectory
+        )
+        return exists && isDirectory.boolValue
     }
 
     func lastBackupDate(for pid: Int) -> Date? {
-        for location in [BackupLocation.iCloud, .local] {
-            guard let folderURL = folderURL(for: pid, in: location) else { continue }
-            let dateURL = folderURL.appending(path: Self.lastBackupDateFileName)
-            downloadIfNeeded(dateURL)
-            guard let contents = try? String(contentsOf: dateURL, encoding: .utf8) else { continue }
-            if let date = ISO8601DateFormatter().date(from: contents.trimmingCharacters(in: .whitespacesAndNewlines)) {
-                return date
-            }
-        }
-        return nil
+        guard let folderURL = folderURL(for: pid) else { return nil }
+        let dateURL = folderURL.appending(path: Self.lastBackupDateFileName)
+        downloadIfNeeded(dateURL)
+        guard let contents = try? String(contentsOf: dateURL, encoding: .utf8) else { return nil }
+        return ISO8601DateFormatter().date(from: contents.trimmingCharacters(in: .whitespacesAndNewlines))
     }
 
     // MARK: - Writing
 
     func write(_ payload: BackupPayload) throws {
-        guard let localFolderURL = folderURL(for: payload.pid, in: .local) else {
-            throw BackupError.noStorageAvailable
+        guard let folderURL = folderURL(for: payload.pid) else {
+            throw BackupError.iCloudUnavailable
         }
 
-        try writeContents(of: payload, to: localFolderURL)
-
-        guard let iCloudFolderURL = folderURL(for: payload.pid, in: .iCloud) else { return }
         var coordinationError: NSError?
         var writeError: Error?
         NSFileCoordinator().coordinate(
-            writingItemAt: iCloudFolderURL, options: .forMerging, error: &coordinationError
+            writingItemAt: folderURL, options: .forMerging, error: &coordinationError
         ) { url in
             do {
                 try writeContents(of: payload, to: url)
@@ -189,8 +164,7 @@ final class BackupStore: Sendable {
     // MARK: - Reading
 
     func read(for pid: Int) throws -> BackupPayload {
-        guard let location = locationOfBackup(for: pid),
-              let folderURL = folderURL(for: pid, in: location) else {
+        guard backupExists(for: pid), let folderURL = folderURL(for: pid) else {
             throw BackupError.noBackupFound
         }
 
@@ -215,12 +189,11 @@ final class BackupStore: Sendable {
 
     /// Puts the backed up SQLite files back into the app group container.
     func restoreDatabases(for pid: Int) {
-        guard let location = locationOfBackup(for: pid),
-              let folderURL = folderURL(for: pid, in: location),
-              let groupContainerURL else { return }
-        let fileManager = FileManager.default
+        guard let folderURL = folderURL(for: pid), let groupContainerURL else { return }
         let databasesURL = folderURL.appending(path: Self.databasesFolderName)
-        let contents = (try? fileManager.contentsOfDirectory(at: databasesURL, includingPropertiesForKeys: nil)) ?? []
+        let contents = (try? FileManager.default.contentsOfDirectory(
+            at: databasesURL, includingPropertiesForKeys: nil
+        )) ?? []
         for sourceURL in contents where sourceURL.pathExtension == "db" {
             downloadIfNeeded(sourceURL)
             overwrite(groupContainerURL.appending(path: sourceURL.lastPathComponent), with: sourceURL)
