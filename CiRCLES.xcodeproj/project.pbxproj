@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0A11D00C000000000000000C /* OnHand.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0A11D0020000000000000002 /* OnHand.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A1B2C3012F5D300000000001 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3022F5D300000000001 /* SQLite */; };
 		A1B2C3032F5D300000000002 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3042F5D300000000002 /* ZIPFoundation */; };
 		A1B2C3052F5D300000000003 /* RADiUS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E41642F62F5D2F5200708895 /* RADiUS.framework */; };
@@ -26,6 +27,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		0A11D00E000000000000000E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4A7693E2C21A20A00BE3491 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0A11D0010000000000000001;
+			remoteInfo = OnHand;
+		};
 		A1B2C3082F5D300000000006 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E4A7693E2C21A20A00BE3491 /* Project object */;
@@ -57,6 +65,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		0A11D00B000000000000000B /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				0A11D00C000000000000000C /* OnHand.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E41643012F5D2F5300708895 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -83,6 +102,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0A11D0020000000000000002 /* OnHand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OnHand.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E41642F62F5D2F5200708895 /* RADiUS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RADiUS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E41643072F5D2F6200708895 /* AXiS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AXiS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -91,6 +111,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		0A11D00F000000000000000F /* Exceptions for "OnHand" folder in "OnHand" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 0A11D0010000000000000001 /* OnHand */;
+		};
 		E4030C162E5953410000DDC2 /* Exceptions for "App" folder in "CiRCLES" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -108,6 +135,19 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		0A11D0030000000000000003 /* OnHand */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				0A11D00F000000000000000F /* Exceptions for "OnHand" folder in "OnHand" target */,
+			);
+			path = OnHand;
+			sourceTree = "<group>";
+		};
+		0A11D0040000000000000004 /* Shared */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 		E4065DC02DECA30200AB7E20 /* App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -142,6 +182,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		0A11D0060000000000000006 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E41642F32F5D2F5200708895 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -195,6 +242,8 @@
 				F1A0B00A2F31700000000001 /* Share Extension */,
 				E41642F72F5D2F5200708895 /* RADiUS */,
 				E41643082F5D2F6200708895 /* AXiS */,
+				0A11D0040000000000000004 /* Shared */,
+				0A11D0030000000000000003 /* OnHand */,
 				E4A769472C21A20A00BE3491 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -206,6 +255,7 @@
 				F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */,
 				E41642F62F5D2F5200708895 /* RADiUS.framework */,
 				E41643072F5D2F6200708895 /* AXiS.framework */,
+				0A11D0020000000000000002 /* OnHand.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -230,6 +280,29 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		0A11D0010000000000000001 /* OnHand */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0A11D0080000000000000008 /* Build configuration list for PBXNativeTarget "OnHand" */;
+			buildPhases = (
+				0A11D0050000000000000005 /* Sources */,
+				0A11D0060000000000000006 /* Frameworks */,
+				0A11D0070000000000000007 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				0A11D0030000000000000003 /* OnHand */,
+				0A11D0040000000000000004 /* Shared */,
+			);
+			name = OnHand;
+			packageProductDependencies = (
+			);
+			productName = OnHand;
+			productReference = 0A11D0020000000000000002 /* OnHand.app */;
+			productType = "com.apple.product-type.application";
+		};
 		E41642F52F5D2F5200708895 /* RADiUS */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E41642FE2F5D2F5300708895 /* Build configuration list for PBXNativeTarget "RADiUS" */;
@@ -289,6 +362,7 @@
 				E480AA922C449C04009C1445 /* ShellScript */,
 				F1A0B0052F31700000000001 /* Embed Foundation Extensions */,
 				E41643012F5D2F5300708895 /* Embed Frameworks */,
+				0A11D00B000000000000000B /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
@@ -296,8 +370,10 @@
 				F1A0B00C2F31700000000001 /* PBXTargetDependency */,
 				E41642FB2F5D2F5300708895 /* PBXTargetDependency */,
 				E416430C2F5D2F6200708895 /* PBXTargetDependency */,
+				0A11D00D000000000000000D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
+				0A11D0040000000000000004 /* Shared */,
 				E4065DC02DECA30200AB7E20 /* App */,
 				E489B5772F31607D00ED193F /* Swift Data */,
 			);
@@ -347,6 +423,9 @@
 				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 2630;
 				TargetAttributes = {
+					0A11D0010000000000000001 = {
+						CreatedOnToolsVersion = 26.3;
+					};
 					E41642F52F5D2F5200708895 = {
 						CreatedOnToolsVersion = 26.3;
 					};
@@ -390,11 +469,19 @@
 				F1A0B0042F31700000000001 /* ShareWithCiRCLES */,
 				E41642F52F5D2F5200708895 /* RADiUS */,
 				E41643062F5D2F6200708895 /* AXiS */,
+				0A11D0010000000000000001 /* OnHand */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		0A11D0070000000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E41642F42F5D2F5200708895 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -447,6 +534,13 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0A11D0050000000000000005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E41642F22F5D2F5200708895 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -478,6 +572,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		0A11D00D000000000000000D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0A11D0010000000000000001 /* OnHand */;
+			targetProxy = 0A11D00E000000000000000E /* PBXContainerItemProxy */;
+		};
 		A1B2C3072F5D300000000005 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E41642F52F5D2F5200708895 /* RADiUS */;
@@ -502,6 +601,73 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		0A11D0090000000000000009 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OnHand/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OnHand;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.tsubuzaki.CiRCLES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 109.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.OnHand;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Debug;
+		};
+		0A11D00A000000000000000A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OnHand/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OnHand;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.tsubuzaki.CiRCLES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 109.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.OnHand;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "watchos watchsimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
 		E41642FF2F5D2F5300708895 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -849,7 +1015,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 108.2.3;
+				MARKETING_VERSION = 109.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -892,7 +1058,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 108.2.3;
+				MARKETING_VERSION = 109.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -923,7 +1089,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 108.2.3;
+				MARKETING_VERSION = 109.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -951,7 +1117,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 108.2.3;
+				MARKETING_VERSION = 109.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -966,6 +1132,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0A11D0080000000000000008 /* Build configuration list for PBXNativeTarget "OnHand" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0A11D0090000000000000009 /* Debug */,
+				0A11D00A000000000000000A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E41642FE2F5D2F5300708895 /* Build configuration list for PBXNativeTarget "RADiUS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
