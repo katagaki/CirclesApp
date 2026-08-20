@@ -16,6 +16,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
     case buys
     case my // swiftlint:disable:this identifier_name
     case moreEventData
+    case moreBackup
     case moreAttributions
     case circleDetail(
         circle: ComiketCircle
@@ -43,6 +44,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
         case .buys: "Buys"
         case .my: "My"
         case .moreEventData: "More.EventData"
+        case .moreBackup: "More.Backup"
         case .moreAttributions: "More.Attributions"
         case .circleDetail(let circle): "Circles.\(circle.id)"
         case .namespacedCircleDetail(
@@ -53,6 +55,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
 
     @MainActor
     @ViewBuilder
+    // swiftlint:disable:next cyclomatic_complexity
     func view() -> some View {
         switch self {
         case .map: MapView()
@@ -61,6 +64,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
         case .buys: BuysView()
         case .my: MyView()
         case .moreEventData: EventDataView()
+        case .moreBackup: BackupView()
         case .moreAttributions: MoreLicensesView()
         case .circleDetail(let circle):
             CircleDetailView(circle: circle)

@@ -11,9 +11,26 @@ import Synchronization
 struct BackupPayload: Sendable {
     let pid: Int
     let date: Date
+    let deviceName: String
     let settings: Data
     let profilePicture: Data?
     let visits: Data
+}
+
+/// What a backup found in iCloud Drive says about itself, without reading it back in full.
+struct BackupSnapshot: Sendable {
+    let date: Date
+    let deviceName: String?
+}
+
+/// Sizes of the data this device would put into its next backup.
+struct BackupContents: Sendable {
+    let visitBytes: Int64
+    let buysBytes: Int64
+    let attachmentBytes: Int64
+    let settingsBytes: Int64
+
+    var totalBytes: Int64 { visitBytes + buysBytes + attachmentBytes + settingsBytes }
 }
 
 enum BackupError: Error {
@@ -30,6 +47,7 @@ final class BackupStore: Sendable {
 
     static let rootFolderName = "Backups"
     static let lastBackupDateFileName = "LastBackupDate"
+    static let deviceNameFileName = "DeviceName"
     static let settingsFileName = "Settings.plist"
     static let profilePictureFileName = "ProfilePicture.dat"
     static let visitsFileName = "Visits.json"
@@ -82,6 +100,30 @@ final class BackupStore: Sendable {
         return ISO8601DateFormatter().date(from: contents.trimmingCharacters(in: .whitespacesAndNewlines))
     }
 
+    func snapshot(for pid: Int) -> BackupSnapshot? {
+        guard let date = lastBackupDate(for: pid), let folderURL = folderURL(for: pid) else { return nil }
+        let deviceNameURL = folderURL.appending(path: Self.deviceNameFileName)
+        downloadIfNeeded(deviceNameURL)
+        let deviceName = (try? String(contentsOf: deviceNameURL, encoding: .utf8))?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return BackupSnapshot(date: date, deviceName: (deviceName?.isEmpty ?? true) ? nil : deviceName)
+    }
+
+    /// Sizes of the app group databases, split the way the backup screen lists them.
+    func databaseSizes() -> (buys: Int64, attachments: Int64) {
+        var buys: Int64 = 0
+        var attachments: Int64 = 0
+        for url in backupableDatabaseURLs() {
+            let size = Int64((try? url.resourceValues(forKeys: [.fileSizeKey]))?.fileSize ?? 0)
+            if url.lastPathComponent == "Attachments.db" {
+                attachments += size
+            } else {
+                buys += size
+            }
+        }
+        return (buys, attachments)
+    }
+
     // MARK: - Writing
 
     func write(_ payload: BackupPayload) throws {
@@ -125,6 +167,10 @@ final class BackupStore: Sendable {
             guard hasChanged(sourceURL, comparedTo: destinationURL) else { continue }
             overwrite(destinationURL, with: sourceURL)
         }
+
+        try Data(payload.deviceName.utf8).write(
+            to: folderURL.appending(path: Self.deviceNameFileName), options: .atomic
+        )
 
         let dateString = ISO8601DateFormatter().string(from: payload.date)
         try Data(dateString.utf8).write(to: folderURL.appending(path: Self.lastBackupDateFileName), options: .atomic)
@@ -182,8 +228,13 @@ final class BackupStore: Sendable {
             .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         let date = ISO8601DateFormatter().date(from: dateString) ?? .distantPast
 
+        let deviceName = (try? String(contentsOf: folderURL.appending(path: Self.deviceNameFileName),
+                                      encoding: .utf8))?
+            .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+
         return BackupPayload(
-            pid: pid, date: date, settings: settings, profilePicture: profilePicture, visits: visits
+            pid: pid, date: date, deviceName: deviceName,
+            settings: settings, profilePicture: profilePicture, visits: visits
         )
     }
 

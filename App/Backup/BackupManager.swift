@@ -61,6 +61,15 @@ final class BackupManager {
     var restorablePID: Int?
     var isRestorePromptShowing: Bool = false
 
+    /// Sizes shown on the backup screen, and what the backup in iCloud Drive says about itself.
+    var contents: BackupContents?
+    var remoteSnapshot: BackupSnapshot?
+
+    var isSnapshotFromAnotherDevice: Bool {
+        guard let deviceName = remoteSnapshot?.deviceName else { return false }
+        return deviceName != UIDevice.current.name
+    }
+
     @ObservationIgnored var pid: Int?
 
     init() {
@@ -105,6 +114,31 @@ final class BackupManager {
         isRestorePromptShowing = true
     }
 
+    /// Fills in the sizes and the iCloud state the backup screen shows.
+    func loadDetails() async {
+        let settings = settingsData()
+        let profilePicture = UserDefaults.standard.data(forKey: Self.profilePictureKey)
+        let actor = BackupActor(modelContainer: sharedModelContainer)
+        let visitBytes = await actor.visitsSize()
+
+        let pid = self.pid
+        let (sizes, snapshot) = await Task.detached { () -> ((buys: Int64, attachments: Int64), BackupSnapshot?) in
+            let store = BackupStore.shared
+            return (store.databaseSizes(), pid.flatMap { store.snapshot(for: $0) })
+        }.value
+
+        contents = BackupContents(
+            visitBytes: visitBytes,
+            buysBytes: sizes.buys,
+            attachmentBytes: sizes.attachments,
+            settingsBytes: Int64(settings.count + (profilePicture?.count ?? 0))
+        )
+        remoteSnapshot = snapshot
+        if let snapshot {
+            lastBackupDate = snapshot.date
+        }
+    }
+
     func declineRestore() {
         if let restorablePID {
             markRestoreChecked(pid: restorablePID)
@@ -130,7 +164,8 @@ final class BackupManager {
         let actor = BackupActor(modelContainer: sharedModelContainer)
         let visits = await actor.visitsData()
         let payload = BackupPayload(
-            pid: pid, date: .now, settings: settings, profilePicture: profilePicture, visits: visits
+            pid: pid, date: .now, deviceName: UIDevice.current.name,
+            settings: settings, profilePicture: profilePicture, visits: visits
         )
 
         let succeeded = await Task.detached {
@@ -146,7 +181,9 @@ final class BackupManager {
         lastBackupFailed = !succeeded
         if succeeded {
             lastBackupDate = payload.date
+            remoteSnapshot = BackupSnapshot(date: payload.date, deviceName: payload.deviceName)
             markRestoreChecked(pid: pid)
+            await loadDetails()
         }
     }
 

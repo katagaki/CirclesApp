@@ -51,42 +51,10 @@ struct UnifiedMoreMenu: View {
                     unifier.hide()
                     unifier.stackPath.append(.moreEventData)
                 }
-                Menu("More.Backup", systemImage: "icloud") {
-                    Section {
-                        Toggle("More.Backup.Enabled", systemImage: "arrow.trianglehead.2.clockwise.rotate.90.icloud",
-                               isOn: Binding(
-                                   get: { backupManager.isEnabled },
-                                   set: { backupManager.isEnabled = $0 }
-                               ))
-                        .disabled(backupManager.isBackingUp || backupManager.isRestoring)
-                        if backupManager.isEnabled {
-                            Button("More.Backup.Now", systemImage: "arrow.up.circle") {
-                                if let pid = backupManager.pid {
-                                    Task { await backupManager.backup(pid: pid) }
-                                }
-                            }
-                            .disabled(backupManager.pid == nil
-                                      || backupManager.isBackingUp || backupManager.isRestoring)
-                        }
-                        if backupManager.pid != nil && backupManager.lastBackupDate != nil {
-                            Button("More.Backup.Restore", systemImage: "arrow.down.circle") {
-                                backupManager.promptRestore()
-                            }
-                            .disabled(backupManager.isBackingUp || backupManager.isRestoring)
-                        }
-                    } footer: {
-                        if backupManager.lastBackupFailed {
-                            Text("More.Backup.Failed")
-                        } else if let lastBackupDate = backupManager.lastBackupDate {
-                            let formatted = lastBackupDate.formatted(date: .abbreviated, time: .shortened)
-                            Text("More.Backup.LastBackedUp \(formatted)")
-                        } else {
-                            Text("More.Backup.NeverBackedUp")
-                        }
-                    }
+                Button("More.Backup", systemImage: "icloud") {
+                    unifier.hide()
+                    unifier.stackPath.append(.moreBackup)
                 }
-                .labelsVisibility(.visible)
-                .menuActionDismissBehavior(.disabled)
             }
 
             Section {
