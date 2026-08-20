@@ -99,6 +99,12 @@ final class BackupManager {
         isRestorePromptShowing = true
     }
 
+    func promptRestore() {
+        guard let pid else { return }
+        restorablePID = pid
+        isRestorePromptShowing = true
+    }
+
     func declineRestore() {
         if let restorablePID {
             markRestoreChecked(pid: restorablePID)

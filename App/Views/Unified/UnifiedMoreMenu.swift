@@ -99,6 +99,12 @@ struct UnifiedMoreMenu: View {
                             .disabled(backupManager.pid == nil
                                       || backupManager.isBackingUp || backupManager.isRestoring)
                         }
+                        if backupManager.pid != nil && backupManager.lastBackupDate != nil {
+                            Button("More.Backup.Restore", systemImage: "arrow.down.circle") {
+                                backupManager.promptRestore()
+                            }
+                            .disabled(backupManager.isBackingUp || backupManager.isRestoring)
+                        }
                     } footer: {
                         if backupManager.lastBackupFailed {
                             Text("More.Backup.Failed")
