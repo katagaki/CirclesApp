@@ -25,6 +25,7 @@ struct UnifiedMoreMenu: View {
     @Environment(\.openURL) var openURL
     @Environment(Authenticator.self) var authenticator
     @Environment(Unifier.self) var unifier
+    @Environment(BackupManager.self) var backupManager
 
     // Map Settings
 
@@ -81,53 +82,88 @@ struct UnifiedMoreMenu: View {
                            isOn: $useZoomTransition)
                 }
                 .menuActionDismissBehavior(.disabled)
+                Menu("More.Backup", systemImage: "icloud") {
+                    Section {
+                        Toggle("More.Backup.Enabled", systemImage: "arrow.trianglehead.2.clockwise.rotate.90.icloud",
+                               isOn: Binding(
+                                   get: { backupManager.isEnabled },
+                                   set: { backupManager.isEnabled = $0 }
+                               ))
+                        .disabled(backupManager.isBackingUp || backupManager.isRestoring)
+                        if backupManager.isEnabled {
+                            Button("More.Backup.Now", systemImage: "arrow.up.circle") {
+                                if let pid = backupManager.pid {
+                                    Task { await backupManager.backup(pid: pid) }
+                                }
+                            }
+                            .disabled(backupManager.pid == nil
+                                      || backupManager.isBackingUp || backupManager.isRestoring)
+                        }
+                    } footer: {
+                        if backupManager.lastBackupFailed {
+                            Text("More.Backup.Failed")
+                        } else if let lastBackupDate = backupManager.lastBackupDate {
+                            let formatted = lastBackupDate.formatted(date: .abbreviated, time: .shortened)
+                            Text("More.Backup.LastBackedUp \(formatted)")
+                        } else {
+                            Text("More.Backup.NeverBackedUp")
+                        }
+                    }
+                }
+                .labelsVisibility(.visible)
+                .menuActionDismissBehavior(.disabled)
             }
             if !authenticator.isOfflineModeActive {
                 Section {
-                    if Locale.current.language.languageCode == .japanese {
-                        if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
-                            ExternalLink(navigateMapsJPURL,
-                                         title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
+                    Menu("More.UsefulResources", systemImage: "info.circle") {
+                        Section {
+                            if Locale.current.language.languageCode == .japanese {
+                                if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
+                                    ExternalLink(navigateMapsJPURL,
+                                                 title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
+                                }
+                                if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
+                                    ExternalLink(navigateGoogleMapsJPURL,
+                                                 title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
+                                }
+                                if UIApplication.shared.canOpenURL(URL(string: "yjmap://")!) {
+                                    ExternalLink(navigateYahooMapJPURL,
+                                                 title: "More.Navigate.YahooMap", image: "ListIcon.YahooMap")
+                                }
+                            } else {
+                                if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
+                                    ExternalLink(navigateMapsENURL,
+                                                 title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
+                                }
+                                if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
+                                    ExternalLink(navigateGoogleMapsENURL,
+                                                 title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
+                                }
+                            }
+                        } header: {
+                            Text("More.Navigate")
                         }
-                        if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
-                            ExternalLink(navigateGoogleMapsJPURL,
-                                         title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
-                        }
-                        if UIApplication.shared.canOpenURL(URL(string: "yjmap://")!) {
-                            ExternalLink(navigateYahooMapJPURL,
-                                         title: "More.Navigate.YahooMap", image: "ListIcon.YahooMap")
-                        }
-                    } else {
-                        if UIApplication.shared.canOpenURL(URL(string: "maps://")!) {
-                            ExternalLink(navigateMapsENURL,
-                                         title: "More.Navigate.Maps", image: "ListIcon.AppleMaps")
-                        }
-                        if UIApplication.shared.canOpenURL(URL(string: "comgooglemaps://")!) {
-                            ExternalLink(navigateGoogleMapsENURL,
-                                         title: "More.Navigate.GoogleMaps", image: "ListIcon.GoogleMaps")
+                        Section {
+                            if Locale.current.language.languageCode == .japanese {
+                                SafariLink(webCatalogJPURL,
+                                           title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
+                                SafariLink(comiketURL,
+                                           title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
+                                SafariLink(bigSightMapJPURL,
+                                           title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
+                            } else {
+                                SafariLink(webCatalogENURL,
+                                           title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
+                                SafariLink(comiketURL,
+                                           title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
+                                SafariLink(bigSightMapENURL,
+                                           title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
+                            }
+                        } header: {
+                            Text("More.UsefulResources.Links")
                         }
                     }
-                } header: {
-                    Text("More.Navigate")
-                }
-                Section {
-                    if Locale.current.language.languageCode == .japanese {
-                        SafariLink(webCatalogJPURL,
-                                   title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
-                        SafariLink(comiketURL,
-                                   title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
-                        SafariLink(bigSightMapJPURL,
-                                   title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
-                    } else {
-                        SafariLink(webCatalogENURL,
-                                   title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
-                        SafariLink(comiketURL,
-                                   title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
-                        SafariLink(bigSightMapENURL,
-                                   title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
-                    }
-                } header: {
-                    Text("More.UsefulResources")
+                    .labelsVisibility(.visible)
                 }
             }
             Section {

@@ -29,6 +29,7 @@ struct CirclesApp: App {
     @State var selections = UserSelections()
     @State var mapper = Mapper()
     @State var unifier = Unifier()
+    @State var backupManager = BackupManager()
 
     @State var hasAppLaunchedForTheFirstTime: Bool = false
 
@@ -93,6 +94,7 @@ struct CirclesApp: App {
         .environment(selections)
         .environment(mapper)
         .environment(unifier)
+        .environment(backupManager)
         .onChange(of: scenePhase) { _, newValue in
             if !hasAppLaunchedForTheFirstTime {
                 hasAppLaunchedForTheFirstTime = true

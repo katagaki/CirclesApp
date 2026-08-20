@@ -84,6 +84,7 @@ struct UnifiedView: View {
         }
         .loginSheet()
         .dataLifecycle()
+        .backupLifecycle()
         .urlSchemeHandler()
         .reachabilitySetup()
         #if DEBUG
