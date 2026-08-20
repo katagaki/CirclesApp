@@ -98,13 +98,13 @@ struct BackupView: View {
         let contents = backupManager.contents
         return [
             BackupContentItem(id: "Visits", name: "More.Backup.Contents.Visits",
-                              systemImage: "checkmark.circle", bytes: contents?.visitBytes ?? 0),
+                              bytes: contents?.visitBytes ?? 0),
             BackupContentItem(id: "Buys", name: "More.Backup.Contents.Buys",
-                              systemImage: "yensign.circle", bytes: contents?.buysBytes ?? 0),
+                              bytes: contents?.buysBytes ?? 0),
             BackupContentItem(id: "Attachments", name: "Circles.Attachments",
-                              systemImage: "paperclip", bytes: contents?.attachmentBytes ?? 0),
+                              bytes: contents?.attachmentBytes ?? 0),
             BackupContentItem(id: "Settings", name: "More.Backup.Contents.Settings",
-                              systemImage: "gearshape", bytes: contents?.settingsBytes ?? 0)
+                              bytes: contents?.settingsBytes ?? 0)
         ]
     }
 }
@@ -112,7 +112,6 @@ struct BackupView: View {
 private struct BackupContentItem: Identifiable {
     let id: String
     let name: LocalizedStringKey
-    let systemImage: String
     let bytes: Int64
 }
 
@@ -122,9 +121,6 @@ private struct BackupContentRow: View {
 
     var body: some View {
         HStack(spacing: 12.0) {
-            Image(systemName: item.systemImage)
-                .foregroundStyle(.accent)
-                .frame(width: 24.0)
             Text(item.name)
             Spacer()
             Text(ByteCountFormatter.string(fromByteCount: item.bytes, countStyle: .file))
