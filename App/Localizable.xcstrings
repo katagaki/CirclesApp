@@ -9550,31 +9550,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloud Backup"
+            "value" : "Backup"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloudバックアップ"
+            "value" : "バックアップ"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloud 백업"
+            "value" : "백업"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloud备份"
+            "value" : "备份"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "iCloud備份"
+            "value" : "備份"
           }
         }
       }

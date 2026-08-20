@@ -51,37 +51,6 @@ struct UnifiedMoreMenu: View {
                     unifier.hide()
                     unifier.stackPath.append(.moreEventData)
                 }
-            }
-
-            Section {
-                Menu("More.Customization.Map", systemImage: "map") {
-                    Toggle("More.Customization.Map.ShowsGenreOverlays", systemImage: "theatermasks",
-                           isOn: $showGenreOverlay)
-                    Toggle("More.Customization.Map.UseDarkModeMap", systemImage: "moon",
-                           isOn: $useDarkModeMaps)
-                    Toggle("More.Customization.Map.UseHighDefinitionMap", systemImage: "square.resize.up",
-                           isOn: $useHighResolutionMaps)
-                    Toggle("More.Customization.Map.ScrollToSelection",
-                           systemImage: "arrow.up.and.down.and.arrow.left.and.right",
-                           isOn: Binding(
-                               get: { scrollType == .popover },
-                               set: { scrollType = $0 ? .popover : .none }
-                           ))
-                }
-                .menuActionDismissBehavior(.disabled)
-                Menu("More.Customization.Circles", systemImage: "square.grid.2x2") {
-                    Toggle("More.Customization.Circles.ShowWebCut", systemImage: "text.rectangle.page",
-                           isOn: $showWebCut)
-                    Toggle("More.Customization.Circles.ShowHallAndBlock", systemImage: "table.furniture",
-                           isOn: $showSpaceName)
-                    Toggle("More.Customization.Circles.ShowDay", systemImage: "calendar",
-                           isOn: $showDay)
-                    Toggle("More.Customization.Circles.DoubleTapToVisit", systemImage: "hand.tap",
-                           isOn: $isDoubleTapToVisitEnabled)
-                    Toggle("More.Customization.Circles.UseZoomTransition", systemImage: "arrow.up.backward.and.arrow.down.forward",
-                           isOn: $useZoomTransition)
-                }
-                .menuActionDismissBehavior(.disabled)
                 Menu("More.Backup", systemImage: "icloud") {
                     Section {
                         Toggle("More.Backup.Enabled", systemImage: "arrow.trianglehead.2.clockwise.rotate.90.icloud",
@@ -117,6 +86,37 @@ struct UnifiedMoreMenu: View {
                     }
                 }
                 .labelsVisibility(.visible)
+                .menuActionDismissBehavior(.disabled)
+            }
+
+            Section {
+                Menu("More.Customization.Map", systemImage: "map") {
+                    Toggle("More.Customization.Map.ShowsGenreOverlays", systemImage: "theatermasks",
+                           isOn: $showGenreOverlay)
+                    Toggle("More.Customization.Map.UseDarkModeMap", systemImage: "moon",
+                           isOn: $useDarkModeMaps)
+                    Toggle("More.Customization.Map.UseHighDefinitionMap", systemImage: "square.resize.up",
+                           isOn: $useHighResolutionMaps)
+                    Toggle("More.Customization.Map.ScrollToSelection",
+                           systemImage: "arrow.up.and.down.and.arrow.left.and.right",
+                           isOn: Binding(
+                               get: { scrollType == .popover },
+                               set: { scrollType = $0 ? .popover : .none }
+                           ))
+                }
+                .menuActionDismissBehavior(.disabled)
+                Menu("More.Customization.Circles", systemImage: "square.grid.2x2") {
+                    Toggle("More.Customization.Circles.ShowWebCut", systemImage: "text.rectangle.page",
+                           isOn: $showWebCut)
+                    Toggle("More.Customization.Circles.ShowHallAndBlock", systemImage: "table.furniture",
+                           isOn: $showSpaceName)
+                    Toggle("More.Customization.Circles.ShowDay", systemImage: "calendar",
+                           isOn: $showDay)
+                    Toggle("More.Customization.Circles.DoubleTapToVisit", systemImage: "hand.tap",
+                           isOn: $isDoubleTapToVisitEnabled)
+                    Toggle("More.Customization.Circles.UseZoomTransition", systemImage: "arrow.up.backward.and.arrow.down.forward",
+                           isOn: $useZoomTransition)
+                }
                 .menuActionDismissBehavior(.disabled)
             }
             if !authenticator.isOfflineModeActive {
