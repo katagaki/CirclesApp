@@ -28,7 +28,7 @@ struct WaitingForPhoneView: View {
 
     var body: some View {
         ContentUnavailableView {
-            Label("OnHand.NoFavorites", systemImage: "iphone.gen3.radiowaves.left.and.right")
+            Label("OnHand.NoFavorites", systemImage: "iphone")
         } description: {
             Text("OnHand.NoFavorites.Description")
         }
