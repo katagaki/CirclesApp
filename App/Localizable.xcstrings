@@ -5705,7 +5705,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Official X (Twitter)"
+            "value" : "Official X"
           }
         },
         "ja" : {
@@ -5717,19 +5717,19 @@
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "공식 X (구 Twitter)"
+            "value" : "공식 X"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "官方 X（原 Twitter）"
+            "value" : "官方 X"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "官方 X（原 Twitter）"
+            "value" : "官方 X"
           }
         }
       }
