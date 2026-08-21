@@ -17,6 +17,10 @@ private let comiketURL = "https://comiket.co.jp"
 private let bigSightMapJPURL = "https://www.bigsight.jp/visitor/floormap/"
 private let webCatalogENURL = "https://int.webcatalog.circle.ms/en/catalog"
 private let bigSightMapENURL = "https://www.bigsight.jp/english/visitor/floormap/"
+private let corporateBoothsJPURL = "https://webcatalog.circle.ms/Booth"
+private let corporateBoothsENURL = "https://int.webcatalog.circle.ms/en/booth"
+private let officialXJPURL = "https://x.com/comiketofficial"
+private let officialXENURL = "https://x.com/comiket_intl"
 private let deleteAccountURL = "https://auth2.circle.ms/Account/WithDraw1"
 private let sourceCodeURL = "https://github.com/katagaki/CirclesApp"
 
@@ -121,15 +125,25 @@ struct UnifiedMoreMenu: View {
                             if Locale.current.language.languageCode == .japanese {
                                 SafariLink(webCatalogJPURL,
                                            title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
+                                SafariLink(corporateBoothsJPURL,
+                                           title: "More.UsefulResources.CorporateBooths",
+                                           image: "ListIcon.WebCatalog")
                                 SafariLink(comiketURL,
                                            title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
+                                SafariLink(officialXJPURL,
+                                           title: "More.UsefulResources.OfficialX", image: "ListIcon.Comiket")
                                 SafariLink(bigSightMapJPURL,
                                            title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
                             } else {
                                 SafariLink(webCatalogENURL,
                                            title: "More.UsefulResources.WebCatalog", image: "ListIcon.WebCatalog")
+                                SafariLink(corporateBoothsENURL,
+                                           title: "More.UsefulResources.CorporateBooths",
+                                           image: "ListIcon.WebCatalog")
                                 SafariLink(comiketURL,
                                            title: "More.UsefulResources.Comiket", image: "ListIcon.Comiket")
+                                SafariLink(officialXENURL,
+                                           title: "More.UsefulResources.OfficialX", image: "ListIcon.Comiket")
                                 SafariLink(bigSightMapENURL,
                                            title: "More.UsefulResources.BigSightMap", image: "ListIcon.BigSight")
                             }
