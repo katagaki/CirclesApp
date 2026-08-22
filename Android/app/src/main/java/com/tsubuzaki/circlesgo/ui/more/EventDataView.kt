@@ -10,13 +10,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -59,7 +63,6 @@ import com.tsubuzaki.circlesgo.data.local.WebCutImageCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.CatalogDatabaseDownloader
 import com.tsubuzaki.circlesgo.state.Events
-import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.ui.shared.DemoUnavailableDialog
 import com.tsubuzaki.circlesgo.ui.shared.LocalAuthenticator
 import com.tsubuzaki.circlesgo.ui.shared.LocalDemoMode
@@ -72,7 +75,7 @@ import kotlinx.coroutines.withContext
 fun EventDataView(
     database: CatalogDatabase,
     events: Events,
-    unifier: Unifier
+    onClose: () -> Unit
 ) {
     val context = LocalContext.current
     val authenticator = LocalAuthenticator.current
@@ -174,7 +177,11 @@ fun EventDataView(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()
+    ) {
         // Top bar with back button and title
         Row(
             modifier = Modifier
@@ -182,7 +189,7 @@ fun EventDataView(
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = { unifier.popSheetPath() }) {
+            IconButton(onClick = onClose) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                     contentDescription = stringResource(R.string.back)
@@ -222,7 +229,10 @@ fun EventDataView(
             }
         }
 
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = WindowInsets.navigationBars.asPaddingValues()
+        ) {
             // Storage breakdown
             item {
                 SectionHeader(stringResource(R.string.storage_header))

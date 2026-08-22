@@ -35,7 +35,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.net.toUri
 import com.tsubuzaki.circlesgo.R
-import com.tsubuzaki.circlesgo.state.UnifiedPath
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.ui.shared.LocalDemoMode
@@ -70,7 +69,7 @@ fun UnifiedMoreMenu(
                 text = { Text(stringResource(R.string.manage_event_data)) },
                 onClick = {
                     expanded = false
-                    unifier.append(UnifiedPath.MORE_DB_ADMIN)
+                    unifier.setIsEventDataPresenting(true)
                 },
                 leadingIcon = {
                     Icon(

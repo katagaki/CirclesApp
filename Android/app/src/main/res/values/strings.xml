@@ -126,7 +126,6 @@
 
     <!-- Toolbar -->
     <string name="show_catalog">Show catalog</string>
-    <string name="hide_catalog">Hide catalog</string>
 
     <!-- Map -->
     <string name="loading">Loading…</string>

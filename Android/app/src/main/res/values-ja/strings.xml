@@ -121,7 +121,6 @@
     <!-- Toolbar -->
     <string name="loading_database">データを読み込み中…</string>
     <string name="show_catalog">カタログを表示</string>
-    <string name="hide_catalog">カタログを非表示</string>
 
     <!-- Map -->
     <string name="loading">読み込み中…</string>

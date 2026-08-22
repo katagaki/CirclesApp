@@ -29,6 +29,15 @@ class Unifier {
     private val _isSearchActive = MutableStateFlow(false)
     val isSearchActive: StateFlow<Boolean> = _isSearchActive
 
+    // Event data management is presented full screen, on top of the map and
+    // the bottom sheet, instead of being pushed inside the sheet
+    private val _isEventDataPresenting = MutableStateFlow(false)
+    val isEventDataPresenting: StateFlow<Boolean> = _isEventDataPresenting
+
+    fun setIsEventDataPresenting(value: Boolean) {
+        _isEventDataPresenting.value = value
+    }
+
     // Incremented to ask the sheet to collapse to its partial height
     // (e.g. after tapping Show on Map in the circle detail view)
     private val _sheetCollapseRequest = MutableStateFlow(0)

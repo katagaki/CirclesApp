@@ -32,7 +32,6 @@ import com.tsubuzaki.circlesgo.ui.buys.BuysView
 import com.tsubuzaki.circlesgo.ui.catalog.CatalogView
 import com.tsubuzaki.circlesgo.ui.circledetail.CircleDetailView
 import com.tsubuzaki.circlesgo.ui.favorites.FavoritesView
-import com.tsubuzaki.circlesgo.ui.more.EventDataView
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -51,7 +50,13 @@ fun UnifiedPanel(
     attachmentsCache: AttachmentsCache,
     /** Visible height of the sheet, forwarded to pages that pin content
      *  to their bottom edge. */
-    visibleHeight: Dp? = null
+    visibleHeight: Dp? = null,
+    /** True while the sheet is collapsed to its minimal height, where only
+     *  the tab row is visible. */
+    isMinimized: Boolean = false,
+    /** Called when an interaction in the minimal state should grow the sheet
+     *  back to its standard height. */
+    onRequestExpand: () -> Unit = {}
 ) {
     val currentPath by unifier.currentPath.collectAsState()
     val sheetPath by unifier.sheetPath.collectAsState()
@@ -75,14 +80,7 @@ fun UnifiedPanel(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        if (sheetPath.lastOrNull() == UnifiedPath.MORE_DB_ADMIN) {
-            // Event data management view (pushed on top)
-            EventDataView(
-                database = database,
-                events = events,
-                unifier = unifier
-            )
-        } else if (isShowingCircleDetail) {
+        if (isShowingCircleDetail) {
             // Circle detail view (pushed on top)
             CircleDetailView(
                 initialCircle = selectedCircle!!,
@@ -116,7 +114,12 @@ fun UnifiedPanel(
                 for (tab in tabs) {
                     Tab(
                         selected = currentPath == tab,
-                        onClick = { unifier.setCurrentPath(tab) },
+                        onClick = {
+                            unifier.setCurrentPath(tab)
+                            if (isMinimized) {
+                                onRequestExpand()
+                            }
+                        },
                         text = {
                             Text(
                                 stringResource(
