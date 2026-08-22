@@ -39,7 +39,6 @@ import com.tsubuzaki.circlesgo.state.CircleDisplayMode
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.GridDisplayMode
 import com.tsubuzaki.circlesgo.state.ListDisplayMode
-import com.tsubuzaki.circlesgo.state.Mapper
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
 import kotlinx.coroutines.Dispatchers
@@ -51,7 +50,6 @@ fun CatalogView(
     database: CatalogDatabase,
     selections: UserSelections,
     favorites: FavoritesState,
-    mapper: Mapper,
     unifier: Unifier,
     catalogCache: CatalogCache
 ) {

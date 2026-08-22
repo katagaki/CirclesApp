@@ -141,7 +141,6 @@ fun UnifiedPanel(
                     database = database,
                     selections = selections,
                     favorites = favorites,
-                    mapper = mapper,
                     unifier = unifier,
                     catalogCache = catalogCache
                 )
@@ -167,7 +166,6 @@ fun UnifiedPanel(
                     database = database,
                     selections = selections,
                     favorites = favorites,
-                    mapper = mapper,
                     unifier = unifier,
                     catalogCache = catalogCache
                 )
