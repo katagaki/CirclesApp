@@ -262,6 +262,8 @@ class UserSelections(context: Context) {
                 .putStringSet(SELECTED_GENRES_KEY, emptySet())
                 .putStringSet(SELECTED_BLOCKS_KEY, emptySet())
         }
+        _date.value = null
+        _map.value = null
         _genres.value = emptySet()
         _blocks.value = emptySet()
     }

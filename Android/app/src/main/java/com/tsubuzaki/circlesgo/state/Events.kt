@@ -46,13 +46,17 @@ class Events(private val context: Context) {
             _isActiveEventLatestFlow.value = value
         }
 
-    /** Clears all in-memory event state after a sign-out wipe. */
+    /** Clears the event list, active event, and their persisted values. */
     fun reset() {
         eventData = null
         latestEvent = null
         activeEventNumber = -1
         _activeEvent.value = null
         _isActiveEventLatestFlow.value = false
+        prefs.edit {
+            remove(ACTIVE_EVENT_NUMBER_KEY)
+            remove(ACTIVE_EVENT_IS_LATEST_KEY)
+        }
     }
 
     fun setActiveEvent(number: Int) {

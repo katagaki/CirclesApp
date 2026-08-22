@@ -157,9 +157,19 @@ class MainActivity : ComponentActivity() {
                                 onLogout = {
                                     hasTriggeredDemoLoad = false
                                     previousDemoEventNumber = null
-                                    demoState.deactivate()
+                                    // Drop everything the demo session created:
+                                    // its databases, event list, and selections
+                                    demoState.reset()
                                     database.delete()
+                                    database.useStoreDirectory(CatalogDatabase.DEFAULT_STORE)
+                                    buysCache.clearAll()
+                                    visitsState.clearAll()
+                                    attachmentsCache.clearAll()
+                                    favorites.reset()
                                     selections.resetSelections()
+                                    events.reset()
+                                    catalogCache.invalidate()
+                                    unifier.clearSheetContent()
                                     unifier.close()
                                 }
                             )

@@ -40,5 +40,11 @@ class DemoState(context: Context) {
         _isActive.value = false
     }
 
+    /** Leaves demo mode and forgets the dataset that was being previewed. */
+    fun reset() {
+        _isActive.value = false
+        prefs.edit { remove(SELECTED_DATASET_KEY) }
+    }
+
     fun isDataset(eventNumber: Int): Boolean = eventNumber in DATASET_EVENT_NUMBERS
 }
