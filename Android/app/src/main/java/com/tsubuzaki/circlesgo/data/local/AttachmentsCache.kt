@@ -3,6 +3,7 @@ package com.tsubuzaki.circlesgo.data.local
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import java.io.File
@@ -14,6 +15,10 @@ import java.util.UUID
  * internal storage.
  */
 class AttachmentsCache(context: Context) {
+
+    companion object {
+        private const val TAG = "AttachmentsCache"
+    }
 
     private val baseDir = File(context.filesDir, "attachments")
 
@@ -55,7 +60,9 @@ class AttachmentsCache(context: Context) {
     }
 
     fun delete(file: File) {
-        file.delete()
+        if (!file.delete() && file.exists()) {
+            Log.w(TAG, "Failed to delete attachment: ${file.name}")
+        }
         _version.value += 1
     }
 }

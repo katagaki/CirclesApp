@@ -231,7 +231,9 @@ class CatalogDatabaseDownloader(
                 }
             }
             // Clean up the zip file
-            zipFile.delete()
+            if (!zipFile.delete() && zipFile.exists()) {
+                Log.w(TAG, "Failed to delete zip file: ${zipFile.name}")
+            }
             extractedFile
         } catch (e: Exception) {
             Log.e(TAG, "Failed to unzip", e)

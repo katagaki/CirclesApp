@@ -158,8 +158,12 @@ class CatalogDatabase(private val context: Context) {
             imageCache.evictAll()
         }
 
-        targetTextFile.delete()
-        targetImageFile.delete()
+        if (!targetTextFile.delete() && targetTextFile.exists()) {
+            Log.w(TAG, "Failed to delete text database for event ${event.number}")
+        }
+        if (!targetImageFile.delete() && targetImageFile.exists()) {
+            Log.w(TAG, "Failed to delete image database for event ${event.number}")
+        }
     }
 
     fun reset() {
