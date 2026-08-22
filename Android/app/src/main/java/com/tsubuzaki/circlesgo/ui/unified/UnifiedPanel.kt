@@ -137,14 +137,6 @@ fun UnifiedPanel(
 
             // Content based on current path
             when (currentPath) {
-                UnifiedPath.CIRCLES -> CatalogView(
-                    database = database,
-                    selections = selections,
-                    favorites = favorites,
-                    unifier = unifier,
-                    catalogCache = catalogCache
-                )
-
                 UnifiedPath.FAVORITES -> FavoritesView(
                     database = database,
                     favorites = favorites,
@@ -162,6 +154,7 @@ fun UnifiedPanel(
                     unifier = unifier
                 )
 
+                // CIRCLES and any unhandled path
                 else -> CatalogView(
                     database = database,
                     selections = selections,
