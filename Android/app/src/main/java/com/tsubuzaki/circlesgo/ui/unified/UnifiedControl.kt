@@ -1,6 +1,7 @@
 package com.tsubuzaki.circlesgo.ui.unified
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -73,45 +74,49 @@ private fun DatePickerButton(
     val dates = remember(commonImagesLoadCount) { database.dates() }
     val dateFormatter = remember { SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()) }
 
-    TextButton(
-        modifier = Modifier
-            .clip(CircleShape),
-        onClick = { expanded = true }
-    ) {
-        Column {
-            selectedDate?.let { date ->
-                Text(
-                    text = stringResource(R.string.day_format, date.id),
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Text(
-                    text = dateFormatter.format(date.date),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                )
-            } ?: Text(stringResource(R.string.no_day))
+    // The menu anchors to its parent layout, so keep it in a box around the
+    // button instead of letting it align to the whole toolbar
+    Box {
+        TextButton(
+            modifier = Modifier
+                .clip(CircleShape),
+            onClick = { expanded = true }
+        ) {
+            Column {
+                selectedDate?.let { date ->
+                    Text(
+                        text = stringResource(R.string.day_format, date.id),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Text(
+                        text = dateFormatter.format(date.date),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                    )
+                } ?: Text(stringResource(R.string.no_day))
+            }
         }
-    }
 
-    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-        for (date in dates) {
-            DropdownMenuItem(
-                text = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(stringResource(R.string.day_format, date.id))
-                        if (date == selectedDate) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("✓", fontSize = 12.sp)
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            for (date in dates) {
+                DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(stringResource(R.string.day_format, date.id))
+                            if (date == selectedDate) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("✓", fontSize = 12.sp)
+                            }
                         }
+                    },
+                    onClick = {
+                        onDateSelected(date)
+                        expanded = false
                     }
-                },
-                onClick = {
-                    onDateSelected(date)
-                    expanded = false
-                }
-            )
+                )
+            }
         }
     }
 }
@@ -127,49 +132,51 @@ private fun HallPickerButton(
     val maps = remember(commonImagesLoadCount) { database.maps() }
     val accentColor = accentColorForMap(selectedMap)
 
-    TextButton(
-        modifier = Modifier
-            .clip(CircleShape)
-            .background(accentColor)
-            .padding(horizontal = 4.dp),
-        onClick = { expanded = true },
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 4.dp)
+    Box {
+        TextButton(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(accentColor)
+                .padding(horizontal = 4.dp),
+            onClick = { expanded = true },
         ) {
-            Icon(
-                imageVector = Icons.Outlined.Business,
-                contentDescription = null,
-                modifier = Modifier.padding(end = 4.dp),
-                tint = Color.White
-            )
-            Text(
-                text = selectedMap?.name ?: stringResource(R.string.no_hall),
-                color = Color.White,
-                fontWeight = FontWeight.Bold,
-                fontSize = 13.sp
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Business,
+                    contentDescription = null,
+                    modifier = Modifier.padding(end = 4.dp),
+                    tint = Color.White
+                )
+                Text(
+                    text = selectedMap?.name ?: stringResource(R.string.no_hall),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 13.sp
+                )
+            }
         }
-    }
 
-    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-        for (map in maps) {
-            DropdownMenuItem(
-                text = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(map.name)
-                        if (map == selectedMap) {
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("✓", fontSize = 12.sp)
+        DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+            for (map in maps) {
+                DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(map.name)
+                            if (map == selectedMap) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("✓", fontSize = 12.sp)
+                            }
                         }
+                    },
+                    onClick = {
+                        onMapSelected(map)
+                        expanded = false
                     }
-                },
-                onClick = {
-                    onMapSelected(map)
-                    expanded = false
-                }
-            )
+                )
+            }
         }
     }
 }
