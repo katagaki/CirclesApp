@@ -13,6 +13,8 @@ class DataFetcher(private val database: SQLiteDatabase?) {
 
     companion object {
         private const val TAG = "DataFetcher"
+        private const val SELECT_BLOCK_IDS_FOR_MAP =
+            "SELECT blockId FROM ComiketMappingWC WHERE mapId = ?"
     }
 
     suspend fun dates(eventNumber: Int): Map<Int, Date> = withContext(Dispatchers.IO) {
@@ -182,7 +184,7 @@ class DataFetcher(private val database: SQLiteDatabase?) {
             // Filter by map: get block IDs from mapping table
             if (mapID != null) {
                 val mapCursor = db.rawQuery(
-                    "SELECT blockId FROM ComiketMappingWC WHERE mapId = ?",
+                    SELECT_BLOCK_IDS_FOR_MAP,
                     arrayOf(mapID.toString())
                 )
                 val mappedBlockIDs = mutableSetOf<Int>()
@@ -243,7 +245,7 @@ class DataFetcher(private val database: SQLiteDatabase?) {
         val db = database ?: return@withContext emptyList()
         try {
             val mapCursor = db.rawQuery(
-                "SELECT blockId FROM ComiketMappingWC WHERE mapId = ?",
+                SELECT_BLOCK_IDS_FOR_MAP,
                 arrayOf(mapID.toString())
             )
             val mappedBlockIDs = mutableSetOf<Int>()
@@ -282,7 +284,7 @@ class DataFetcher(private val database: SQLiteDatabase?) {
         val db = database ?: return@withContext emptyList()
         try {
             val mapCursor = db.rawQuery(
-                "SELECT blockId FROM ComiketMappingWC WHERE mapId = ?",
+                SELECT_BLOCK_IDS_FOR_MAP,
                 arrayOf(mapID.toString())
             )
             val mappedBlockIDs = mutableSetOf<Int>()
