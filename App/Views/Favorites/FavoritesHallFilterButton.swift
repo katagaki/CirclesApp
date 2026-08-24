@@ -66,7 +66,7 @@ struct FavoritesHallFilterButton: View {
                             }
                         } label: {
                             Text(map.name)
-                                .font(.subheadline)
+                                .font(.body)
                                 .fontWeight(.semibold)
                                 .foregroundStyle(isSelected ? Color.white : Color.primary)
                                 .frame(maxWidth: .infinity)
