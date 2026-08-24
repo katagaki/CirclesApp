@@ -45,7 +45,7 @@ struct ColorGroupedCircleGrid: View {
             VStack(alignment: .leading, spacing: 0.0) {
                 ForEach(WebCatalogColor.allCases, id: \.self) { color in
                     if let circles = groups[String(color.rawValue)] {
-                        if color == .uncolored {
+                        if color == .uncolored && !circles.isEmpty {
                             WebCatalogFavoriteNotice()
                         }
                         LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?

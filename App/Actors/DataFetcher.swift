@@ -288,6 +288,25 @@ actor DataFetcher {
         return []
     }
 
+    func mapIDsByBlockID() -> [Int: Int] {
+        if let database {
+            do {
+                let mappingTable = Table("ComiketMappingWC")
+                let colMapID = Expression<Int>("mapId")
+                let colBlockID = Expression<Int>("blockId")
+
+                var mapIDs: [Int: Int] = [:]
+                for row in try database.prepare(mappingTable.select(colBlockID, colMapID)) {
+                    mapIDs[row[colBlockID]] = row[colMapID]
+                }
+                return mapIDs
+            } catch {
+                debugPrint(error.localizedDescription)
+            }
+        }
+        return [:]
+    }
+
     func circles(withWebCatalogIDs webCatalogIDs: [Int]) -> [Int] {
         if let database {
             do {

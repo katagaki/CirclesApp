@@ -1,8 +1,8 @@
 import SwiftData
 import SwiftUI
+import AXiS
 
 struct FavoritesToolbar: ToolbarContent {
-    @Environment(Favorites.self) var favorites
 
     @Binding var displayMode: CircleDisplayMode
     @Binding var listDisplayMode: ListDisplayMode
@@ -17,19 +17,9 @@ struct FavoritesToolbar: ToolbarContent {
         }
 
         ToolbarSpacer(.fixed, placement: .bottomBar)
-        ToolbarItem(placement: .bottomBar) {
-            Button {
-                withAnimation(.smooth.speed(2.0)) {
-                    favorites.isGroupedByColor.toggle()
-                }
-            } label: {
-                ToolbarButtonLabel(
-                    "Shared.GroupByColor",
-                    image: .system(favorites.isGroupedByColor ?
-                    "paintpalette.fill" : "paintpalette"),
-                    forceLabelStyle: true
-                )
-            }
+        ToolbarItemGroup(placement: .bottomBar) {
+            FavoritesColorFilterButton()
+            FavoritesHallFilterButton()
         }
         ToolbarSpacer(.flexible, placement: .bottomBar)
         if UIDevice.current.userInterfaceIdiom == .phone {

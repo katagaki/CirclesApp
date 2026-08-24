@@ -14,6 +14,7 @@ struct FavoritesView: View {
 
     @Environment(Authenticator.self) var authenticator
     @Environment(Favorites.self) var favorites
+    @Environment(\.favoritesFilters) var filters
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
     @Environment(UserSelections.self) var selections
@@ -35,93 +36,25 @@ struct FavoritesView: View {
     @Namespace var namespace
 
     var body: some View {
-        @Bindable var favorites = favorites
-
         ZStack(alignment: .center) {
             if let favoriteCircles = favorites.circles {
-                Group {
-                    if favorites.isGroupedByColor {
-                        switch displayModeState {
-                        case .grid:
-                            ColorGroupedCircleGrid(
-                                displayMode: gridDisplayModeState,
-                                groups: favoriteCircles,
-                                showsOverlayWhenEmpty: false,
-                                namespace: namespace,
-                                onSelect: { circle in
-                                    unifier.append(.namespacedCircleDetail(
-                                        circle: circle,
-                                        previousCircle: { previousCircle(for: $0) },
-                                        nextCircle: { nextCircle(for: $0) },
-                                        namespace: namespace
-                                    ))
-                                },
-                                onDoubleTap: doubleTapAction
-                            )
-                        case .list:
-                            ColorGroupedCircleList(
-                                groups: favoriteCircles,
-                                showsOverlayWhenEmpty: false,
-                                displayMode: listDisplayModeState,
-                                namespace: namespace,
-                                onSelect: { circle in
-                                    unifier.append(.namespacedCircleDetail(
-                                        circle: circle,
-                                        previousCircle: { previousCircle(for: $0) },
-                                        nextCircle: { nextCircle(for: $0) },
-                                        namespace: namespace
-                                    ))
-                                },
-                                onDoubleTap: doubleTapAction
-                            )
-                        }
-                    } else {
-                        switch displayModeState {
-                        case .grid:
-                            CircleGrid(
-                                displayMode: gridDisplayModeState,
-                                circles: favoriteCircles.values.flatMap({ $0 }).sorted(by: { $0.id < $1.id }),
-                                showsOverlayWhenEmpty: false,
-                                namespace: namespace,
-                                onSelect: { circle in
-                                    unifier.append(.namespacedCircleDetail(
-                                        circle: circle,
-                                        previousCircle: { previousCircle(for: $0) },
-                                        nextCircle: { nextCircle(for: $0) },
-                                        namespace: namespace
-                                    ))
-                                },
-                                onDoubleTap: doubleTapAction
-                            )
-                        case .list:
-                            CircleList(
-                                circles: favoriteCircles.values.flatMap({ $0 }).sorted(by: { $0.id < $1.id }),
-                                showsOverlayWhenEmpty: false,
-                                displayMode: listDisplayModeState,
-                                namespace: namespace,
-                                onSelect: { circle in
-                                    unifier.append(.namespacedCircleDetail(
-                                        circle: circle,
-                                        previousCircle: { previousCircle(for: $0) },
-                                        nextCircle: { nextCircle(for: $0) },
-                                        namespace: namespace
-                                    ))
-                                },
-                                onDoubleTap: doubleTapAction
-                            )
-                        }
-                    }
-                }
+                FavoritesCircleCollection(
+                    groups: favoriteCircles,
+                    displayMode: displayModeState,
+                    listDisplayMode: listDisplayModeState,
+                    gridDisplayMode: gridDisplayModeState,
+                    namespace: namespace,
+                    onSelect: { circle in
+                        unifier.append(.namespacedCircleDetail(
+                            circle: circle,
+                            previousCircle: { previousCircle(for: $0) },
+                            nextCircle: { nextCircle(for: $0) },
+                            namespace: namespace
+                        ))
+                    },
+                    onDoubleTap: doubleTapAction
+                )
                 .id(gridID)
-                .overlay {
-                    if favoriteCircles.isEmpty {
-                        ContentUnavailableView(
-                            "Favorites.NoFavorites",
-                            systemImage: "star.leadinghalf.filled",
-                            description: Text("Favorites.NoFavorites.Description")
-                        )
-                    }
-                }
             } else {
                 ProgressView("Favorites.Loading")
                     .frame(maxHeight: .infinity)
@@ -199,26 +132,40 @@ struct FavoritesView: View {
 
     func prepareCircles(using favoriteItems: [UserFavorites.Response.FavoriteItem]) async {
         let favoriteCircleIdentifiers = await Favorites.mapped(using: favoriteItems, database: database)
+        let mapIDsByBlockID = await mapIDsByBlockID()
 
         await MainActor.run {
             var favoriteCircles: [String: [ComiketCircle]] = [:]
+            var hasUncoloredFavorites: Bool = false
+
             for colorKey in favoriteCircleIdentifiers.keys.sorted() {
                 if let circleIdentifiers = favoriteCircleIdentifiers[colorKey] {
                     var circles = database.circles(circleIdentifiers)
                     circles.sort(by: {$0.id < $1.id})
                     if let selectedDate = selections.date {
-                        favoriteCircles[String(colorKey)] = circles.filter({
-                            $0.day == selectedDate.id
-                        })
-                    } else {
-                        favoriteCircles[String(colorKey)] = circles
+                        circles = circles.filter({ $0.day == selectedDate.id })
                     }
+                    if colorKey == WebCatalogColor.uncolored.rawValue && !circles.isEmpty {
+                        hasUncoloredFavorites = true
+                    }
+                    favoriteCircles[String(colorKey)] = circles
                 }
             }
+
+            self.filters.mapIDsByBlockID = mapIDsByBlockID
+            self.filters.hasUncoloredFavorites = hasUncoloredFavorites
             withAnimation(.smooth.speed(2.0)) {
                 self.favorites.circles = favoriteCircles
             }
         }
+    }
+
+    func mapIDsByBlockID() async -> [Int: Int] {
+        if !filters.mapIDsByBlockID.isEmpty {
+            return filters.mapIDsByBlockID
+        }
+        let actor = DataFetcher(database: await database.newReadOnlyTextConnection())
+        return await actor.mapIDsByBlockID()
     }
 
     func previousCircle(for circle: ComiketCircle) -> ComiketCircle? {
