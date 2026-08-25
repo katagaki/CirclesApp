@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+enum RouteDestination: Hashable {
+    case buys(circleID: Int)
+}
+
 struct RouteView: View {
 
     @Environment(OnHandStore.self) var store
@@ -32,6 +36,11 @@ struct RouteView: View {
         .tabViewStyle(.verticalPage)
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(for: RouteDestination.self) { destination in
+            switch destination {
+            case .buys(let circleID): CircleBuysView(circleID: circleID)
+            }
+        }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button {
@@ -144,7 +153,7 @@ struct RouteCard: View {
     var actions: some View {
         GlassEffectContainer(spacing: 6.0) {
             HStack(spacing: 6.0) {
-                NavigationLink(value: favorite) {
+                NavigationLink(value: RouteDestination.buys(circleID: favorite.id)) {
                     actionLabel("cart.fill")
                 }
                 .buttonStyle(.plain)
@@ -165,9 +174,6 @@ struct RouteCard: View {
                     in: .capsule
                 )
             }
-        }
-        .navigationDestination(for: OnHandFavorite.self) { favorite in
-            CircleBuysView(circleID: favorite.id)
         }
     }
 
