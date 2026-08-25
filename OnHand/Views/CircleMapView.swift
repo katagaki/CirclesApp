@@ -18,6 +18,7 @@ struct CircleMapView: View {
     @State var pan: CGSize = .zero
     @State var panWhenDragStarted: CGSize = .zero
     @State var isPanning: Bool = false
+    @State var isDragging: Bool = false
 
     var favorite: OnHandFavorite? {
         store.payload.favorites.first { $0.id == circleID }
@@ -95,14 +96,19 @@ struct CircleMapView: View {
             .gesture(
                 DragGesture()
                     .onChanged { value in
-                        if !isPanning {
+                        if !isDragging {
+                            isDragging = true
                             isPanning = true
-                            panWhenDragStarted = layout.centeringOffset
+                            panWhenDragStarted = offset
                         }
                         pan = CGSize(
                             width: panWhenDragStarted.width + value.translation.width,
                             height: panWhenDragStarted.height + value.translation.height
                         )
+                    }
+                    .onEnded { _ in
+                        isDragging = false
+                        pan = layout.clamped(pan)
                     }
             )
         }
