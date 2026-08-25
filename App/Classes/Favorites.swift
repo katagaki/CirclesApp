@@ -17,9 +17,30 @@ class Favorites {
 
     var invalidationID: String = ""
 
+    var isRefreshing: Bool = false
+
     init() {
         let defaults = UserDefaults.standard
         self.isGroupedByColor = defaults.object(forKey: "Favorites.GroupByColor") as? Bool ?? true
+    }
+
+    @MainActor
+    func loadFromCache() async {
+        let actor = FavoritesActor(modelContainer: sharedModelContainer)
+        let (items, wcIDMappedItems) = await actor.cached()
+        self.items = items
+        self.wcIDMappedItems = wcIDMappedItems
+    }
+
+    @MainActor
+    func refresh(authToken: OpenIDToken?) async {
+        guard !isRefreshing else { return }
+        isRefreshing = true
+        let actor = FavoritesActor(modelContainer: sharedModelContainer)
+        let (items, wcIDMappedItems) = await actor.all(authToken: authToken ?? OpenIDToken())
+        self.items = items
+        self.wcIDMappedItems = wcIDMappedItems
+        isRefreshing = false
     }
 
     static func mapped(

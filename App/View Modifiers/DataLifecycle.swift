@@ -275,25 +275,9 @@ struct DataLifecycleModifier: ViewModifier {
     }
 
     func loadFavorites() async {
-        let actor = FavoritesActor(modelContainer: sharedModelContainer)
-        if authenticator.isOfflineModeActive {
-            let (items, wcIDMappedItems) = await actor.cached()
-            await MainActor.run {
-                favorites.items = items
-                favorites.wcIDMappedItems = wcIDMappedItems
-            }
-        } else if let token = authenticator.token {
-            let (items, wcIDMappedItems) = await actor.all(authToken: token)
-            await MainActor.run {
-                favorites.items = items
-                favorites.wcIDMappedItems = wcIDMappedItems
-            }
-        } else {
-            let (items, wcIDMappedItems) = await actor.all(authToken: OpenIDToken())
-            await MainActor.run {
-                favorites.items = items
-                favorites.wcIDMappedItems = wcIDMappedItems
-            }
+        await favorites.loadFromCache()
+        if !authenticator.isOfflineModeActive {
+            await favorites.refresh(authToken: authenticator.token)
         }
     }
 }

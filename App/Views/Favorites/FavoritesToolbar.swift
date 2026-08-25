@@ -4,6 +4,9 @@ import AXiS
 
 struct FavoritesToolbar: ToolbarContent {
 
+    @Environment(Authenticator.self) var authenticator
+    @Environment(Favorites.self) var favorites
+
     @Binding var displayMode: CircleDisplayMode
     @Binding var listDisplayMode: ListDisplayMode
     @Binding var gridDisplayMode: GridDisplayMode
@@ -23,13 +26,31 @@ struct FavoritesToolbar: ToolbarContent {
         }
         ToolbarSpacer(.flexible, placement: .bottomBar)
         if UIDevice.current.userInterfaceIdiom == .phone {
-            ToolbarSpacer(.fixed, placement: .bottomBar)
-        } else {
             ToolbarItem(placement: .bottomBar) {
+                refreshButton()
+            }
+        } else {
+            ToolbarItemGroup(placement: .bottomBar) {
                 displaySettingsMenu()
+                refreshButton()
             }
             SidebarPositionToolbarItem()
         }
+    }
+
+    @ViewBuilder
+    func refreshButton() -> some View {
+        Button {
+            Task { await favorites.refresh(authToken: authenticator.token) }
+        } label: {
+            if favorites.isRefreshing {
+                ProgressView()
+            } else {
+                ToolbarButtonLabel("Shared.Refresh", image: .system("arrow.clockwise"))
+            }
+        }
+        .labelStyle(.iconOnly)
+        .disabled(authenticator.isOfflineModeActive || favorites.isRefreshing)
     }
 
     @ViewBuilder

@@ -37,7 +37,7 @@ struct FavoritesView: View {
 
     var body: some View {
         ZStack(alignment: .center) {
-            if let favoriteCircles = favorites.circles {
+            if let favoriteCircles = favorites.circles, !isLoadingInitialContent {
                 FavoritesCircleCollection(
                     groups: favoriteCircles,
                     displayMode: displayModeState,
@@ -70,10 +70,13 @@ struct FavoritesView: View {
                 gridDisplayMode: $gridDisplayModeState
             )
         }
-        .refreshable {
-            await reloadFavorites()
-            await prepareCircles(using: favorites.items ?? [])
-            gridID = UUID()
+        .task {
+            if favorites.items == nil {
+                await favorites.loadFromCache()
+            }
+            if !authenticator.isOfflineModeActive {
+                await favorites.refresh(authToken: authenticator.token)
+            }
         }
         .onAppear {
             let dateSelectionID = "D\(selections.date?.id ?? -1)"
@@ -113,21 +116,8 @@ struct FavoritesView: View {
         }
     }
 
-    func reloadFavorites() async {
-        let actor = FavoritesActor(modelContainer: sharedModelContainer)
-        if authenticator.isOfflineModeActive {
-            let (items, wcIDMappedItems) = await actor.cached()
-            await MainActor.run {
-                favorites.items = items
-                favorites.wcIDMappedItems = wcIDMappedItems
-            }
-        } else if let token = authenticator.token {
-            let (items, wcIDMappedItems) = await actor.all(authToken: token)
-            await MainActor.run {
-                favorites.items = items
-                favorites.wcIDMappedItems = wcIDMappedItems
-            }
-        }
+    var isLoadingInitialContent: Bool {
+        favorites.isRefreshing && (favorites.circles?.allSatisfy({ $0.value.isEmpty }) ?? true)
     }
 
     func prepareCircles(using favoriteItems: [UserFavorites.Response.FavoriteItem]) async {
