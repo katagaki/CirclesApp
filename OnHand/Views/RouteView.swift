@@ -167,6 +167,8 @@ struct RouteCard: View {
                     actionLabel("map.fill")
                 }
                 .buttonStyle(.plain)
+                .disabled(favorite.mapRect == nil)
+                .opacity(favorite.mapRect == nil ? 0.4 : 1.0)
                 .glassEffect(.regular.interactive(), in: .capsule)
 
                 NavigationLink(value: RouteDestination.buys(circleID: favorite.id)) {

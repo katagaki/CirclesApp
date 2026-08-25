@@ -27,8 +27,8 @@ enum OnHandAssets {
         existingURL(named: "cut-\(circleID).jpg")
     }
 
-    static func mapURL(for circleID: Int) -> URL? {
-        existingURL(named: "map-\(circleID).jpg")
+    static func mapURL(forKey mapKey: String) -> URL? {
+        existingURL(named: "map-\(mapKey).jpg")
     }
 
     private static func existingURL(named name: String) -> URL? {
@@ -44,8 +44,8 @@ enum OnHandAssets {
         for (circleID, data) in bundle.circleCuts {
             try? data.write(to: directoryURL.appending(path: "cut-\(circleID).jpg"), options: .atomic)
         }
-        for (circleID, data) in bundle.mapCrops {
-            try? data.write(to: directoryURL.appending(path: "map-\(circleID).jpg"), options: .atomic)
+        for (mapKey, data) in bundle.maps {
+            try? data.write(to: directoryURL.appending(path: "map-\(mapKey).jpg"), options: .atomic)
         }
     }
 

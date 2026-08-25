@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0A11D00C000000000000000C /* OnHand.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0A11D0020000000000000002 /* OnHand.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0A11D00C000000000000000C /* CiRCLES.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0A11D0020000000000000002 /* CiRCLES.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		A1B2C3012F5D300000000001 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3022F5D300000000001 /* SQLite */; };
 		A1B2C3032F5D300000000002 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3042F5D300000000002 /* ZIPFoundation */; };
 		A1B2C3052F5D300000000003 /* RADiUS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E41642F62F5D2F5200708895 /* RADiUS.framework */; };
@@ -71,7 +71,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				0A11D00C000000000000000C /* OnHand.app in Embed Watch Content */,
+				0A11D00C000000000000000C /* CiRCLES.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -102,7 +102,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		0A11D0020000000000000002 /* OnHand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OnHand.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		0A11D0020000000000000002 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E41642F62F5D2F5200708895 /* RADiUS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RADiUS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E41643072F5D2F6200708895 /* AXiS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AXiS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -255,7 +255,7 @@
 				F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */,
 				E41642F62F5D2F5200708895 /* RADiUS.framework */,
 				E41643072F5D2F6200708895 /* AXiS.framework */,
-				0A11D0020000000000000002 /* OnHand.app */,
+				0A11D0020000000000000002 /* CiRCLES.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -300,7 +300,7 @@
 			packageProductDependencies = (
 			);
 			productName = OnHand;
-			productReference = 0A11D0020000000000000002 /* OnHand.app */;
+			productReference = 0A11D0020000000000000002 /* CiRCLES.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E41642F52F5D2F5200708895 /* RADiUS */ = {

@@ -44,10 +44,22 @@ struct OnHandFavorite: Codable, Sendable, Equatable, Identifiable, Hashable {
     var spaceLabel: String
     var hallName: String
     var hallFilename: String
+    var mapKey: String
+    var mapRect: OnHandRect?
     var day: Int
     var colorValue: Int
     var isVisited: Bool
     var items: [OnHandBuyItem]
+}
+
+struct OnHandRect: Codable, Sendable, Equatable, Hashable {
+    var originX: Double
+    var originY: Double
+    var width: Double
+    var height: Double
+
+    var midX: Double { originX + width / 2.0 }
+    var midY: Double { originY + height / 2.0 }
 }
 
 struct OnHandBuyItem: Codable, Sendable, Equatable, Identifiable, Hashable {
@@ -60,7 +72,7 @@ struct OnHandBuyItem: Codable, Sendable, Equatable, Identifiable, Hashable {
 struct OnHandAssetBundle: Codable, Sendable {
     var version: String
     var circleCuts: [String: Data]
-    var mapCrops: [String: Data]
+    var maps: [String: Data]
 
     static func decode(from data: Data) -> OnHandAssetBundle? {
         try? PropertyListDecoder().decode(OnHandAssetBundle.self, from: data)

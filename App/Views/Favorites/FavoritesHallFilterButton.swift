@@ -17,11 +17,8 @@ struct FavoritesHallFilterButton: View {
             label()
         }
         .popover(isPresented: $isPopoverPresented) {
-            popover()
+            FavoritesHallFilterPopover()
                 .presentationCompactAdaptation(.popover)
-                .task {
-                    reloadMaps()
-                }
         }
         .task {
             reloadMaps()
@@ -55,9 +52,18 @@ struct FavoritesHallFilterButton: View {
             )
         }
     }
+}
 
-    @ViewBuilder
-    func popover() -> some View {
+struct FavoritesHallFilterPopover: View {
+
+    @Environment(Database.self) var database
+    @EnvironmentObject var filters: FavoritesFilters
+
+    var maps: [ComiketMap] {
+        database.maps()
+    }
+
+    var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16.0) {
                 LazyVGrid(

@@ -73,7 +73,7 @@ struct OnHandLifecycle: ViewModifier {
         guard !OnHandSync.shared.hasSentAssets(version: version) else { return }
         guard let bundle = await OnHandAssetBuilder.build(payload: payload, database: database) else { return }
         #if DEBUG
-        debugPrint("OnHand: sending \(bundle.circleCuts.count) cuts, \(bundle.mapCrops.count) map crops")
+        debugPrint("OnHand: sending \(bundle.circleCuts.count) cuts, \(bundle.maps.count) hall maps")
         #endif
         OnHandSync.shared.send(bundle)
     }

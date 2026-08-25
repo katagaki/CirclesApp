@@ -42,6 +42,15 @@ enum OnHandPayloadBuilder {
             }
         }
 
+        let hallFilenamesByCircleID = circles.reduce(into: [Int: String]()) { result, circle in
+            result[circle.id] = mapFilenamesByBlockID[circle.blockID]
+        }
+        let placements = await OnHandMapGeometry.placements(
+            for: circles,
+            hallFilenames: hallFilenamesByCircleID,
+            database: database
+        )
+
         var itemsByCircleID: [Int: [OnHandBuyItem]] = [:]
         for entry in BuysDatabase.shared.entries(for: eventNumber) {
             itemsByCircleID[entry.circleID] = entry.items.map { item in
@@ -65,6 +74,11 @@ enum OnHandPayloadBuilder {
                 spaceLabel: spaceLabel,
                 hallName: mapNamesByBlockID[circle.blockID] ?? "",
                 hallFilename: mapFilenamesByBlockID[circle.blockID] ?? "",
+                mapKey: OnHandMapGeometry.mapKey(
+                    day: circle.day,
+                    hallFilename: mapFilenamesByBlockID[circle.blockID] ?? ""
+                ),
+                mapRect: placements[circle.id],
                 day: circle.day,
                 colorValue: color.rawValue,
                 isVisited: visitedCircleIDs.contains(circle.id),
