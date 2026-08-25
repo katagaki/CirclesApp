@@ -14,6 +14,7 @@ struct RouteView: View {
     @AppStorage(wrappedValue: 1, "OnHand.Day") var selectedDay: Int
 
     @State var selection: Int = 0
+    @State var isColorFilterPresented: Bool = false
 
     var route: [OnHandFavorite] {
         store.favorites(on: selectedDay)
@@ -29,7 +30,23 @@ struct RouteView: View {
                 .tag(-1)
         }
         .tabViewStyle(.verticalPage)
-        .toolbar(.hidden, for: .navigationBar)
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button {
+                    isColorFilterPresented = true
+                } label: {
+                    Image(systemName: "paintpalette.fill")
+                        .foregroundStyle(paletteTint)
+                }
+            }
+        }
+        .sheet(isPresented: $isColorFilterPresented) {
+            NavigationStack {
+                ColorFilterView()
+            }
+        }
         .onAppear {
             if selection == 0 {
                 selection = (route.first(where: { !$0.isVisited }) ?? route.first)?.id ?? -1
@@ -38,6 +55,13 @@ struct RouteView: View {
         .onChange(of: selectedDay) {
             selection = route.first?.id ?? -1
         }
+        .onChange(of: store.colorFilter) {
+            selection = (route.first(where: { !$0.isVisited }) ?? route.first)?.id ?? -1
+        }
+    }
+
+    var paletteTint: Color {
+        store.colorFilter < 0 ? .accentColor : OnHandColor(value: store.colorFilter).background
     }
 }
 
@@ -179,6 +203,12 @@ struct RouteMenuPage: View {
                         }
                     }
                     .pickerStyle(.navigationLink)
+                }
+
+                NavigationLink {
+                    ColorFilterView()
+                } label: {
+                    Label("OnHand.Colors", systemImage: "paintpalette.fill")
                 }
 
                 NavigationLink {

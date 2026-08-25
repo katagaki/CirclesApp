@@ -17,6 +17,10 @@ final class OnHandStore {
     var payload: OnHandPayload = .empty
     var hasReceivedPayload: Bool = false
 
+    var colorFilter: Int = UserDefaults.standard.object(forKey: "OnHand.ColorFilter") as? Int ?? -1 {
+        didSet { UserDefaults.standard.set(colorFilter, forKey: "OnHand.ColorFilter") }
+    }
+
     @ObservationIgnored private let connection = OnHandConnection()
 
     init() {
@@ -34,12 +38,21 @@ final class OnHandStore {
         connection.activate()
     }
 
+    var availableColors: [OnHandColor] {
+        let values = Set(payload.favorites.map { $0.colorValue })
+        return OnHandColor.allCases.filter { values.contains($0.rawValue) }
+    }
+
     // MARK: Reading
 
     func favorites(on day: Int) -> [OnHandFavorite] {
         payload.favorites
-            .filter { $0.day == day }
+            .filter { $0.day == day && matchesColorFilter($0) }
             .sorted { $0.spaceLabel < $1.spaceLabel }
+    }
+
+    func matchesColorFilter(_ favorite: OnHandFavorite) -> Bool {
+        colorFilter < 0 || favorite.colorValue == colorFilter
     }
 
     func day(id: Int) -> OnHandDay? {
