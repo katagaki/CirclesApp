@@ -13,7 +13,7 @@ struct SpaceQuery {
     let spaceNumberSuffix: Int?
 
     init?(_ term: String) {
-        let pattern = /^([^\p{Nd}\s\-ー]{1,3})[\s\-ー]*(\d{1,3})[\s\-ー]*([a-c])?$/.ignoresCase()
+        let pattern = /^([^\p{Nd}\s\-ー]{1,3})\s*(\d{1,3})\s*([a-c])?$/.ignoresCase()
         guard let match = Self.halfwidthASCII(term).wholeMatch(of: pattern),
               let spaceNumber = Int(match.2) else { return nil }
         self.blockName = String(match.1)
