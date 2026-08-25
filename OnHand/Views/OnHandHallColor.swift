@@ -46,18 +46,13 @@ struct HallBadge: View {
     }
 
     var body: some View {
-        HStack(spacing: fontSize * 0.28) {
-            Circle()
-                .fill(color)
-                .frame(width: fontSize * 0.5, height: fontSize * 0.5)
-            Text(name)
-                .font(.system(size: fontSize, weight: .semibold, design: .rounded))
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
-        }
-        .foregroundStyle(color)
-        .padding(.horizontal, fontSize * 0.42)
-        .padding(.vertical, fontSize * 0.16)
-        .background(Capsule().fill(color.opacity(0.18)))
+        Text(name)
+            .font(.system(size: fontSize, weight: .semibold, design: .rounded))
+            .lineLimit(1)
+            .minimumScaleFactor(0.6)
+            .foregroundStyle(.white)
+            .padding(.horizontal, fontSize * 0.42)
+            .padding(.vertical, fontSize * 0.16)
+            .background(Capsule().fill(color))
     }
 }
