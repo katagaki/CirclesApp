@@ -14,6 +14,8 @@ struct CatalogToolbar: ToolbarContent {
     @State var selectableGenres: [ComiketGenre]?
     @State var selectableBlocks: [ComiketBlock]?
 
+    @State var isBlockPopoverPresented: Bool = false
+
     var body: some ToolbarContent {
         ToolbarItemGroup(placement: .bottomBar) {
             genreMenu()
@@ -112,49 +114,15 @@ struct CatalogToolbar: ToolbarContent {
 
     @ViewBuilder
     func blockMenu() -> some View {
-        Menu {
-            @Bindable var selections = selections
-            Button("Shared.All") {
-                self.selections.blocks.removeAll()
-            }
-            Divider()
-            ForEach(selectableBlocks ?? blocks) { block in
-
-                Button {
-                    var newBlocks = selections.blocks
-                    if newBlocks.contains(block) {
-                        newBlocks.remove(block)
-                    } else {
-                        newBlocks.insert(block)
-                    }
-                    selections.blocks = newBlocks
-                } label: {
-                    if selections.blocks.contains(block) {
-                        Label(block.name, systemImage: "checkmark")
-                    } else {
-                        Text(block.name)
-                    }
-                }
-            }
+        Button {
+            isBlockPopoverPresented = true
         } label: {
-            if selections.blocks.count == 1, let firstBlock = selections.blocks.first {
-                ToolbarButtonLabel(
-                    LocalizedStringKey(firstBlock.name),
-                    image: .system("rectangle.split.3x1")
-                )
-            } else if selections.blocks.count > 1 {
-                 ToolbarButtonLabel(
-                    "Shared.Block.Multiple",
-                    image: .system("rectangle.split.3x1")
-                )
-            } else {
-                ToolbarButtonLabel(
-                    "Shared.Block",
-                    image: .system("rectangle.split.3x1")
-                )
-            }
+            blockLabel()
         }
-        .menuActionDismissBehavior(.disabled)
+        .popover(isPresented: $isBlockPopoverPresented) {
+            blockPopover()
+                .presentationCompactAdaptation(.popover)
+        }
         .onChange(of: selections.map, initial: true) {
             reloadSelectableBlocks()
         }
@@ -164,6 +132,84 @@ struct CatalogToolbar: ToolbarContent {
         .onChange(of: selections.genres) {
             reloadSelectableBlocks()
         }
+    }
+
+    @ViewBuilder
+    func blockLabel() -> some View {
+        if selections.blocks.count == 1, let firstBlock = selections.blocks.first {
+            ToolbarButtonLabel(
+                LocalizedStringKey(firstBlock.name),
+                image: .system("rectangle.split.3x1")
+            )
+        } else if selections.blocks.count > 1 {
+            ToolbarButtonLabel(
+                "Shared.Block.Multiple",
+                image: .system("rectangle.split.3x1")
+            )
+        } else {
+            ToolbarButtonLabel(
+                "Shared.Block",
+                image: .system("rectangle.split.3x1")
+            )
+        }
+    }
+
+    @ViewBuilder
+    func blockPopover() -> some View {
+        VStack(alignment: .leading, spacing: 16.0) {
+            ScrollView {
+                LazyVGrid(
+                    columns: Array(
+                        repeating: .init(.flexible(), spacing: 8.0),
+                        count: 4
+                    ),
+                    spacing: 8.0
+                ) {
+                    ForEach(selectableBlocks ?? blocks) { block in
+                        let isSelected = selections.blocks.contains(block)
+                        Button {
+                            withAnimation(.smooth.speed(2.0)) {
+                                var newBlocks = selections.blocks
+                                if isSelected {
+                                    newBlocks.remove(block)
+                                } else {
+                                    newBlocks.insert(block)
+                                }
+                                selections.blocks = newBlocks
+                            }
+                        } label: {
+                            Text(block.name)
+                                .font(.body)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(isSelected ? Color.white : Color.primary)
+                                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                .background(
+                                    isSelected ? Color.accentColor : Color.primary.opacity(0.1),
+                                    in: .rect(cornerRadius: 20.0)
+                                )
+                                .aspectRatio(1.0, contentMode: .fit)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding([.horizontal, .top])
+            }
+            .frame(minHeight: 200.0, maxHeight: 360.0)
+            Button {
+                withAnimation(.smooth.speed(2.0)) {
+                    selections.blocks.removeAll()
+                }
+            } label: {
+                Text("Shared.All")
+                    .fontWeight(.bold)
+                    .padding(.vertical, 2.0)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.glassProminent)
+            .disabled(selections.blocks.isEmpty)
+            .padding([.horizontal, .bottom])
+        }
+        .frame(width: 280.0)
     }
 
     func reloadSelectableGenres() {
