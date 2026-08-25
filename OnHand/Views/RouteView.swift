@@ -9,6 +9,7 @@ import SwiftUI
 
 enum RouteDestination: Hashable {
     case buys(circleID: Int)
+    case map(circleID: Int)
 }
 
 struct RouteView: View {
@@ -39,6 +40,7 @@ struct RouteView: View {
         .navigationDestination(for: RouteDestination.self) { destination in
             switch destination {
             case .buys(let circleID): CircleBuysView(circleID: circleID)
+            case .map(let circleID): CircleMapView(circleID: circleID)
             }
         }
         .toolbar {
@@ -161,6 +163,12 @@ struct RouteCard: View {
     var actions: some View {
         GlassEffectContainer(spacing: 6.0) {
             HStack(spacing: 6.0) {
+                NavigationLink(value: RouteDestination.map(circleID: favorite.id)) {
+                    actionLabel("map.fill")
+                }
+                .buttonStyle(.plain)
+                .glassEffect(.regular.interactive(), in: .capsule)
+
                 NavigationLink(value: RouteDestination.buys(circleID: favorite.id)) {
                     actionLabel("cart.fill")
                 }
@@ -187,9 +195,9 @@ struct RouteCard: View {
 
     func actionLabel(_ symbolName: String) -> some View {
         Image(systemName: symbolName)
-            .font(.system(size: 20.0, weight: .semibold))
+            .font(.system(size: 17.0, weight: .semibold))
             .frame(maxWidth: .infinity)
-            .frame(height: 42.0)
+            .frame(height: 38.0)
             .contentShape(.capsule)
     }
 }
