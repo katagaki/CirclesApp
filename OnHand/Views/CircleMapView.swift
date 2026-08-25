@@ -168,7 +168,7 @@ struct MapLayout {
         }
 
         let fitScale = min(viewport.width / imageSize.width, viewport.height / imageSize.height)
-        let readableScale = max(fitScale, 40.0 / max(1.0, target.width * imageSize.width))
+        let readableScale = max(fitScale, 32.0 / max(1.0, target.width * imageSize.width))
         let scale = fitScale * pow(readableScale / fitScale, max(0.0, min(1.0, zoom)))
 
         content = CGSize(width: imageSize.width * scale, height: imageSize.height * scale)
