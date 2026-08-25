@@ -160,7 +160,7 @@ struct CatalogToolbar: ToolbarContent {
             LazyVGrid(
                 columns: Array(
                     repeating: .init(.flexible(), spacing: 8.0),
-                    count: 4
+                    count: 5
                 ),
                 spacing: 8.0
             ) {
@@ -209,7 +209,7 @@ struct CatalogToolbar: ToolbarContent {
             .padding([.horizontal, .bottom])
             .padding(.top, 8.0)
         }
-        .frame(width: 280.0)
+        .frame(width: 344.0)
         .frame(minHeight: 200.0, maxHeight: 360.0)
     }
 
