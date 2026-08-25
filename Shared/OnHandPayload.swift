@@ -41,6 +41,7 @@ struct OnHandFavorite: Codable, Sendable, Equatable, Identifiable, Hashable {
     var circleName: String
     var spaceLabel: String
     var hallName: String
+    var hallFilename: String
     var day: Int
     var colorValue: Int
     var isVisited: Bool

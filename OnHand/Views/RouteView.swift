@@ -104,8 +104,7 @@ struct RouteCard: View {
                 isVisited: favorite.isVisited
             )
 
-            Text(favorite.hallName)
-                .font(.system(.headline, design: .rounded))
+            HallBadge(name: favorite.hallName, filename: favorite.hallFilename)
 
             if !isLuminanceReduced {
                 Text(favorite.circleName)

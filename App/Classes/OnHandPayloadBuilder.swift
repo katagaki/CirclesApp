@@ -33,10 +33,12 @@ enum OnHandPayloadBuilder {
         let colorsByWebCatalogID = wcIDMappedItems
 
         var mapNamesByBlockID: [Int: String] = [:]
+        var mapFilenamesByBlockID: [Int: String] = [:]
         for blockID in Set(circles.map { $0.blockID }) {
             if let mapID = await fetcher.mapID(forBlock: blockID),
                let map = maps.first(where: { $0.id == mapID }) {
                 mapNamesByBlockID[blockID] = map.name
+                mapFilenamesByBlockID[blockID] = map.filename
             }
         }
 
@@ -62,6 +64,7 @@ enum OnHandPayloadBuilder {
                 circleName: circle.circleName,
                 spaceLabel: spaceLabel,
                 hallName: mapNamesByBlockID[circle.blockID] ?? "",
+                hallFilename: mapFilenamesByBlockID[circle.blockID] ?? "",
                 day: circle.day,
                 colorValue: color.rawValue,
                 isVisited: visitedCircleIDs.contains(circle.id),
