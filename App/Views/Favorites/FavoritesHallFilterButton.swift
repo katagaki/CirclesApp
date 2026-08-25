@@ -19,18 +19,19 @@ struct FavoritesHallFilterButton: View {
         .popover(isPresented: $isPopoverPresented) {
             popover()
                 .presentationCompactAdaptation(.popover)
+                .task {
+                    reloadMaps()
+                }
         }
         .task {
-            reloadMaps()
-        }
-        .onAppear {
             reloadMaps()
         }
     }
 
     func reloadMaps() {
-        if maps.isEmpty {
-            maps = database.maps()
+        let maps = database.maps()
+        if !maps.isEmpty {
+            self.maps = maps
         }
     }
 

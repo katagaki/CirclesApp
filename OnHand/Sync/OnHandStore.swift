@@ -44,8 +44,10 @@ final class OnHandStore {
     }
 
     var availableColors: [OnHandColor] {
-        let values = Set(payload.favorites.map { $0.colorValue })
-        return OnHandColor.allCases.filter { values.contains($0.rawValue) }
+        if payload.favorites.contains(where: { $0.colorValue == OnHandColor.uncolored.rawValue }) {
+            return [.uncolored] + OnHandColor.assignable
+        }
+        return OnHandColor.assignable
     }
 
     // MARK: Reading

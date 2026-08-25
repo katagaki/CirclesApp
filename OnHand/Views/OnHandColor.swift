@@ -29,6 +29,10 @@ enum OnHandColor: Int, CaseIterable {
     case crimson = 17
     case deepPink = 18
 
+    static var assignable: [OnHandColor] {
+        allCases.filter { $0 != .uncolored }
+    }
+
     init(value: Int) {
         self = OnHandColor(rawValue: value) ?? .uncolored
     }
