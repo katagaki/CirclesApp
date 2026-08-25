@@ -163,11 +163,6 @@ struct RouteCard: View {
                 .font(.system(size: 12.0, weight: .medium))
                 .foregroundStyle(.secondary)
             Spacer()
-            if favorite.isVisited {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.system(size: 12.0))
-                    .foregroundStyle(Color.accentColor)
-            }
         }
     }
 
