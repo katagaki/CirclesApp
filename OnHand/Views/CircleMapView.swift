@@ -77,13 +77,15 @@ struct CircleMapView: View {
 
                 marker(color: .red, isVisited: false, in: rect, layout: layout)
 
-                Circle()
-                    .stroke(Color.red, lineWidth: 2.0)
-                    .frame(width: 22.0, height: 22.0)
-                    .offset(
-                        x: rect.midX * layout.content.width - 11.0,
-                        y: rect.midY * layout.content.height - 11.0
-                    )
+                if max(rect.width * layout.content.width, rect.height * layout.content.height) < 22.0 {
+                    Circle()
+                        .stroke(Color.red, lineWidth: 2.0)
+                        .frame(width: 22.0, height: 22.0)
+                        .offset(
+                            x: rect.midX * layout.content.width - 11.0,
+                            y: rect.midY * layout.content.height - 11.0
+                        )
+                }
             }
             .frame(width: layout.content.width, height: layout.content.height, alignment: .topLeading)
             .offset(x: offset.width, y: offset.height)
