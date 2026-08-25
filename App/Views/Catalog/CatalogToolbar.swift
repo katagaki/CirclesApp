@@ -156,45 +156,44 @@ struct CatalogToolbar: ToolbarContent {
 
     @ViewBuilder
     func blockPopover() -> some View {
-        VStack(alignment: .leading, spacing: 16.0) {
-            ScrollView {
-                LazyVGrid(
-                    columns: Array(
-                        repeating: .init(.flexible(), spacing: 8.0),
-                        count: 4
-                    ),
-                    spacing: 8.0
-                ) {
-                    ForEach(selectableBlocks ?? blocks) { block in
-                        let isSelected = selections.blocks.contains(block)
-                        Button {
-                            withAnimation(.smooth.speed(2.0)) {
-                                var newBlocks = selections.blocks
-                                if isSelected {
-                                    newBlocks.remove(block)
-                                } else {
-                                    newBlocks.insert(block)
-                                }
-                                selections.blocks = newBlocks
+        ScrollView {
+            LazyVGrid(
+                columns: Array(
+                    repeating: .init(.flexible(), spacing: 8.0),
+                    count: 4
+                ),
+                spacing: 8.0
+            ) {
+                ForEach(selectableBlocks ?? blocks) { block in
+                    let isSelected = selections.blocks.contains(block)
+                    Button {
+                        withAnimation(.smooth.speed(2.0)) {
+                            var newBlocks = selections.blocks
+                            if isSelected {
+                                newBlocks.remove(block)
+                            } else {
+                                newBlocks.insert(block)
                             }
-                        } label: {
-                            Text(block.name)
-                                .font(.body)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(isSelected ? Color.white : Color.primary)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .background(
-                                    isSelected ? Color.accentColor : Color.primary.opacity(0.1),
-                                    in: .rect(cornerRadius: 20.0)
-                                )
-                                .aspectRatio(1.0, contentMode: .fit)
+                            selections.blocks = newBlocks
                         }
-                        .buttonStyle(.plain)
+                    } label: {
+                        Text(block.name)
+                            .font(.body)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(isSelected ? Color.white : Color.primary)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(
+                                isSelected ? Color.accentColor : Color.primary.opacity(0.1),
+                                in: .rect(cornerRadius: 20.0)
+                            )
+                            .aspectRatio(1.0, contentMode: .fit)
                     }
+                    .buttonStyle(.plain)
                 }
-                .padding([.horizontal, .top])
             }
-            .frame(minHeight: 200.0, maxHeight: 360.0)
+            .padding([.horizontal, .top])
+        }
+        .safeAreaInset(edge: .bottom) {
             Button {
                 withAnimation(.smooth.speed(2.0)) {
                     selections.blocks.removeAll()
@@ -208,8 +207,10 @@ struct CatalogToolbar: ToolbarContent {
             .buttonStyle(.glassProminent)
             .disabled(selections.blocks.isEmpty)
             .padding([.horizontal, .bottom])
+            .padding(.top, 8.0)
         }
         .frame(width: 280.0)
+        .frame(minHeight: 200.0, maxHeight: 360.0)
     }
 
     func reloadSelectableGenres() {

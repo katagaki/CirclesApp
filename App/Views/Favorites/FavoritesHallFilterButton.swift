@@ -11,6 +11,7 @@ struct FavoritesHallFilterButton: View {
 
     var body: some View {
         Button {
+            reloadMaps()
             isPopoverPresented = true
         } label: {
             label()
@@ -20,6 +21,15 @@ struct FavoritesHallFilterButton: View {
                 .presentationCompactAdaptation(.popover)
         }
         .task {
+            reloadMaps()
+        }
+        .onAppear {
+            reloadMaps()
+        }
+    }
+
+    func reloadMaps() {
+        if maps.isEmpty {
             maps = database.maps()
         }
     }
