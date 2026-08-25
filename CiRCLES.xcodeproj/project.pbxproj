@@ -614,7 +614,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OnHand/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = OnHand;
+				INFOPLIST_KEY_CFBundleDisplayName = CiRCLES;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.tsubuzaki.CiRCLES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -622,7 +622,7 @@
 				);
 				MARKETING_VERSION = 109.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.OnHand;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = CiRCLES;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
@@ -648,7 +648,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = OnHand/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = OnHand;
+				INFOPLIST_KEY_CFBundleDisplayName = CiRCLES;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.tsubuzaki.CiRCLES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -656,7 +656,7 @@
 				);
 				MARKETING_VERSION = 109.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.OnHand;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = CiRCLES;
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "watchos watchsimulator";
