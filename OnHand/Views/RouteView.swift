@@ -20,6 +20,7 @@ struct RouteView: View {
 
     @State var selection: Int = 0
     @State var isColorFilterPresented: Bool = false
+    @State var isMenuPresented: Bool = false
 
     var route: [OnHandFavorite] {
         store.favorites(on: selectedDay)
@@ -31,8 +32,6 @@ struct RouteView: View {
                 RouteCard(favorite: favorite, position: index + 1, total: route.count)
                     .tag(favorite.id)
             }
-            RouteMenuPage(selectedDay: $selectedDay)
-                .tag(-1)
         }
         .tabViewStyle(.verticalPage)
         .navigationTitle("")
@@ -52,10 +51,22 @@ struct RouteView: View {
                         .foregroundStyle(paletteTint)
                 }
             }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    isMenuPresented = true
+                } label: {
+                    Image(systemName: "ellipsis")
+                }
+            }
         }
         .sheet(isPresented: $isColorFilterPresented) {
             NavigationStack {
                 ColorFilterView()
+            }
+        }
+        .sheet(isPresented: $isMenuPresented) {
+            NavigationStack {
+                RouteMenuView(selectedDay: $selectedDay)
             }
         }
         .onAppear {
@@ -204,7 +215,7 @@ struct RouteCard: View {
     }
 }
 
-struct RouteMenuPage: View {
+struct RouteMenuView: View {
 
     @Environment(OnHandStore.self) var store
 
@@ -213,13 +224,6 @@ struct RouteMenuPage: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 6.0) {
-                let route = store.favorites(on: selectedDay)
-                Text("\(route.filter { $0.isVisited }.count) / \(route.count)")
-                    .font(.system(.title3, design: .rounded, weight: .bold))
-                Text("OnHand.Visited")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-
                 if store.payload.days.count > 1 {
                     Picker("OnHand.Day", selection: $selectedDay) {
                         ForEach(store.payload.days) { day in
@@ -227,12 +231,6 @@ struct RouteMenuPage: View {
                         }
                     }
                     .pickerStyle(.navigationLink)
-                }
-
-                NavigationLink {
-                    ColorFilterView()
-                } label: {
-                    Label("OnHand.Colors", systemImage: "paintpalette.fill")
                 }
 
                 NavigationLink {
