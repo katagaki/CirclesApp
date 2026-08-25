@@ -16,6 +16,7 @@ final class OnHandStore {
 
     var payload: OnHandPayload = .empty
     var hasReceivedPayload: Bool = false
+    var assetsVersion: Int = 0
 
     var colorFilter: Int = UserDefaults.standard.object(forKey: "OnHand.ColorFilter") as? Int ?? -1 {
         didSet { UserDefaults.standard.set(colorFilter, forKey: "OnHand.ColorFilter") }
@@ -34,6 +35,10 @@ final class OnHandStore {
             self.payload = payload
             self.hasReceivedPayload = true
             OnHandPayloadCache.save(payload)
+        }
+        connection.onAssetsReceived = { [weak self] in
+            guard let self else { return }
+            self.assetsVersion += 1
         }
         connection.activate()
     }
@@ -114,6 +119,7 @@ enum OnHandPayloadCache {
 final class OnHandConnection: NSObject, WCSessionDelegate, @unchecked Sendable {
 
     @MainActor var onPayloadReceived: ((OnHandPayload) -> Void)?
+    @MainActor var onAssetsReceived: (() -> Void)?
 
     private var activeSession: WCSession? {
         WCSession.isSupported() ? WCSession.default : nil
@@ -151,6 +157,17 @@ final class OnHandConnection: NSObject, WCSessionDelegate, @unchecked Sendable {
 
     nonisolated func session(_ session: WCSession, didReceiveApplicationContext context: [String: Any]) {
         deliver(context)
+    }
+
+    nonisolated func session(_ session: WCSession, didReceive file: WCSessionFile) {
+        guard let data = try? Data(contentsOf: file.fileURL),
+              let bundle = OnHandAssetBundle.decode(from: data) else {
+            return
+        }
+        OnHandAssets.unpack(bundle)
+        Task { @MainActor in
+            self.onAssetsReceived?()
+        }
     }
 
     private nonisolated func deliver(_ context: [String: Any]) {

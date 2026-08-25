@@ -97,27 +97,36 @@ struct RouteCard: View {
 
             Spacer(minLength: 0.0)
 
-            SpacePill(
-                label: favorite.spaceLabel,
-                color: color,
-                fontSize: 42.0,
-                isVisited: favorite.isVisited
-            )
-
-            HallBadge(name: favorite.hallName, filename: favorite.hallFilename)
-
-            if !isLuminanceReduced {
-                Text(favorite.circleName)
-                    .font(.caption2)
-                    .lineLimit(1)
-                    .foregroundStyle(.secondary)
-
-                if !pendingItems.isEmpty {
-                    Text("\(pendingItems.count) · ¥\(pendingItems.reduce(0) { $0 + $1.cost })")
-                        .font(.caption2)
-                        .foregroundStyle(.tertiary)
-                        .padding(.top, 1.0)
+            HStack(alignment: .center, spacing: 6.0) {
+                if !isLuminanceReduced {
+                    CircleCutImage(circleID: favorite.id)
+                        .frame(width: 44.0)
                 }
+
+                VStack(alignment: .leading, spacing: 2.0) {
+                    SpacePill(
+                        label: favorite.spaceLabel,
+                        color: color,
+                        fontSize: 30.0,
+                        isVisited: favorite.isVisited
+                    )
+
+                    HallBadge(name: favorite.hallName, filename: favorite.hallFilename)
+
+                    if !isLuminanceReduced {
+                        Text(favorite.circleName)
+                            .font(.caption2)
+                            .lineLimit(1)
+                            .foregroundStyle(.secondary)
+
+                        if !pendingItems.isEmpty {
+                            Text("\(pendingItems.count) · ¥\(pendingItems.reduce(0) { $0 + $1.cost })")
+                                .font(.caption2)
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
 
             Spacer(minLength: 0.0)

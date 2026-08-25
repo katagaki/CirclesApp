@@ -14,6 +14,7 @@ final class OnHandSync: NSObject, WCSessionDelegate, @unchecked Sendable {
 
     @MainActor var onIntentReceived: ((OnHandIntent) -> Void)?
     @MainActor private var lastSentPayload: OnHandPayload?
+    @MainActor private var lastSentAssetsVersion: String?
 
     private override init() {
         super.init()
@@ -55,6 +56,35 @@ final class OnHandSync: NSObject, WCSessionDelegate, @unchecked Sendable {
         }
     }
 
+    @MainActor
+    func hasSentAssets(version: String) -> Bool {
+        lastSentAssetsVersion == version
+    }
+
+    @MainActor
+    func send(_ bundle: OnHandAssetBundle) {
+        guard lastSentAssetsVersion != bundle.version else { return }
+        guard let activeSession, activeSession.activationState == .activated else { return }
+        guard let data = bundle.encoded() else { return }
+
+        let fileURL = FileManager.default.temporaryDirectory
+            .appending(path: "OnHandAssets-\(bundle.version).plist")
+        do {
+            try data.write(to: fileURL, options: .atomic)
+        } catch {
+            debugPrint("OnHandSync: Failed to stage assets: \(error.localizedDescription)")
+            return
+        }
+
+        for transfer in activeSession.outstandingFileTransfers
+        where transfer.file.metadata?[OnHandMessage.assetsVersion] as? String != bundle.version {
+            transfer.cancel()
+        }
+
+        activeSession.transferFile(fileURL, metadata: [OnHandMessage.assetsVersion: bundle.version])
+        lastSentAssetsVersion = bundle.version
+    }
+
     // MARK: WCSessionDelegate
 
     nonisolated func session(
@@ -64,6 +94,19 @@ final class OnHandSync: NSObject, WCSessionDelegate, @unchecked Sendable {
     ) {
         if let error {
             debugPrint("OnHandSync: Activation failed: \(error.localizedDescription)")
+        }
+    }
+
+    nonisolated func session(
+        _ session: WCSession,
+        didFinish fileTransfer: WCSessionFileTransfer,
+        error: (any Error)?
+    ) {
+        try? FileManager.default.removeItem(at: fileTransfer.file.fileURL)
+        guard let error else { return }
+        debugPrint("OnHandSync: Asset transfer failed: \(error.localizedDescription)")
+        Task { @MainActor in
+            OnHandSync.shared.lastSentAssetsVersion = nil
         }
     }
 

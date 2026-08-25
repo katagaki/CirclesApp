@@ -11,6 +11,8 @@ import Foundation
 enum OnHandMessage {
     static let payload = "OnHand.Payload"
     static let intent = "OnHand.Intent"
+    static let assets = "OnHand.Assets"
+    static let assetsVersion = "OnHand.AssetsVersion"
 }
 
 struct OnHandPayload: Codable, Sendable, Equatable {
@@ -53,6 +55,22 @@ struct OnHandBuyItem: Codable, Sendable, Equatable, Identifiable, Hashable {
     var name: String
     var cost: Int
     var statusValue: Int
+}
+
+struct OnHandAssetBundle: Codable, Sendable {
+    var version: String
+    var circleCuts: [String: Data]
+    var mapCrops: [String: Data]
+
+    static func decode(from data: Data) -> OnHandAssetBundle? {
+        try? PropertyListDecoder().decode(OnHandAssetBundle.self, from: data)
+    }
+
+    func encoded() -> Data? {
+        let encoder = PropertyListEncoder()
+        encoder.outputFormat = .binary
+        return try? encoder.encode(self)
+    }
 }
 
 struct OnHandIntent: Codable, Sendable, Equatable {

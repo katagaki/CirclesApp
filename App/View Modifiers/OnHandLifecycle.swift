@@ -65,6 +65,17 @@ struct OnHandLifecycle: ViewModifier {
         debugPrint("OnHand: sending \(payload.favorites.count) favorites for event \(payload.eventNumber)")
         #endif
         OnHandSync.shared.send(payload)
+        await pushAssets(for: payload)
+    }
+
+    func pushAssets(for payload: OnHandPayload) async {
+        let version = OnHandAssetBuilder.version(for: payload)
+        guard !OnHandSync.shared.hasSentAssets(version: version) else { return }
+        guard let bundle = await OnHandAssetBuilder.build(payload: payload, database: database) else { return }
+        #if DEBUG
+        debugPrint("OnHand: sending \(bundle.circleCuts.count) cuts, \(bundle.mapCrops.count) map crops")
+        #endif
+        OnHandSync.shared.send(bundle)
     }
 
     func favoriteItems() async -> (
