@@ -80,7 +80,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "カラー"
+            "value": "色"
           }
         },
         "ko": {
@@ -115,7 +115,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "すべてのカラー"
+            "value": "すべての色"
           }
         },
         "ko": {
