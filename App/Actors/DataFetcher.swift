@@ -133,10 +133,48 @@ actor DataFetcher {
         guard let database else { return [] }
         let term = searchTerm.trimmingCharacters(in: .whitespaces)
         guard !term.isEmpty else { return [] }
+        if let spaceQuery = SpaceQuery(term), let spaceResults = spaceSearch(spaceQuery, in: database) {
+            return spaceResults
+        }
         if term.count >= 3, let ftsResults = ftsSearch(term, in: database) {
             return ftsResults
         }
         return likeSearch(term, in: database)
+    }
+
+    private func spaceSearch(_ spaceQuery: SpaceQuery, in database: Connection) -> [Int]? {
+        do {
+            let blockTable = Table("ComiketBlockWC")
+            let colBlockTableID = Expression<Int>("id")
+            let colBlockName = Expression<String>("name")
+
+            let blockIDs = try database.prepare(
+                blockTable.select(colBlockTableID)
+                    .filter(spaceQuery.blockNameCandidates().contains(colBlockName))
+            ).map { $0[colBlockTableID] }
+            guard !blockIDs.isEmpty else { return nil }
+
+            let table = Table("ComiketCircleWC")
+            let colID = Expression<Int>("id")
+            let colBlockID = Expression<Int>("blockId")
+            let colSpaceNumber = Expression<Int>("spaceNo")
+            let colSpaceNumberSuffix = Expression<Int>("spaceNoSub")
+
+            var query = table.select(colID, colSpaceNumberSuffix).filter(
+                blockIDs.contains(colBlockID) && colSpaceNumber == spaceQuery.spaceNumber
+            )
+            if let spaceNumberSuffix = spaceQuery.spaceNumberSuffix {
+                query = query.filter(colSpaceNumberSuffix == spaceNumberSuffix)
+            }
+
+            let circleIdentifiers = try database.prepare(query)
+                .sorted(by: { $0[colSpaceNumberSuffix] < $1[colSpaceNumberSuffix] })
+                .map { $0[colID] }
+            return circleIdentifiers.isEmpty ? nil : circleIdentifiers
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
+        }
     }
 
     private func ftsSearch(_ term: String, in database: Connection) -> [Int]? {
