@@ -15,8 +15,8 @@ struct ColorFilterView: View {
     var body: some View {
         ScrollView {
             LazyVGrid(
-                columns: Array(repeating: GridItem(.flexible(), spacing: 6.0), count: 3),
-                spacing: 6.0
+                columns: Array(repeating: GridItem(.flexible(), spacing: 4.0), count: 4),
+                spacing: 4.0
             ) {
                 ForEach(store.availableColors, id: \.rawValue) { color in
                     Button {
@@ -50,11 +50,11 @@ struct ColorFilterView: View {
                 .fill(color.background)
             if isSelected {
                 Image(systemName: "checkmark")
-                    .font(.system(size: 15.0, weight: .heavy))
+                    .font(.system(size: 13.0, weight: .heavy))
                     .foregroundStyle(color.foreground)
             }
         }
-        .frame(height: 40.0)
+        .aspectRatio(1.0, contentMode: .fit)
         .overlay {
             Circle()
                 .strokeBorder(isSelected ? Color.primary : Color.clear, lineWidth: 2.0)
