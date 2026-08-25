@@ -36,9 +36,13 @@ struct ColorFilterView: View {
                 Text("OnHand.Colors.All")
                     .fontWeight(.bold)
                     .frame(maxWidth: .infinity)
+                    .frame(height: 38.0)
+                    .contentShape(.capsule)
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.plain)
+            .glassEffect(.regular.interactive(), in: .capsule)
             .disabled(store.colorFilter < 0)
+            .opacity(store.colorFilter < 0 ? 0.4 : 1.0)
             .padding(.top, 8.0)
         }
         .navigationTitle("OnHand.Colors")
