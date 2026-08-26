@@ -14,7 +14,7 @@ struct CircleMapView: View {
     let circleID: Int
 
     @State var image: UIImage?
-    @State var zoom: Double = 1.0
+    @State var zoom: Double = 0.5
     @State var pan: CGSize = .zero
     @State var panWhenDragStarted: CGSize = .zero
     @State var isPanning: Bool = false
