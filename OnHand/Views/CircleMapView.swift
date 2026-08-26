@@ -51,6 +51,23 @@ struct CircleMapView: View {
     }
 
     func map(image: UIImage, favorite: OnHandFavorite, rect: OnHandRect) -> some View {
+        ZStack(alignment: .bottom) {
+            canvas(image: image, rect: rect)
+                .ignoresSafeArea()
+
+            HStack(spacing: 4.0) {
+                SpacePill(
+                    label: favorite.spaceLabel,
+                    color: OnHandColor(value: favorite.colorValue),
+                    fontSize: 14.0
+                )
+                HallBadge(name: favorite.hallName, filename: favorite.hallFilename, fontSize: 12.0)
+            }
+            .padding(.bottom, 2.0)
+        }
+    }
+
+    func canvas(image: UIImage, rect: OnHandRect) -> some View {
         GeometryReader { proxy in
             let layout = MapLayout(
                 imageSize: image.size,
@@ -124,17 +141,6 @@ struct CircleMapView: View {
         )
         .onChange(of: zoom) {
             isPanning = false
-        }
-        .safeAreaInset(edge: .bottom) {
-            HStack(spacing: 4.0) {
-                SpacePill(
-                    label: favorite.spaceLabel,
-                    color: OnHandColor(value: favorite.colorValue),
-                    fontSize: 14.0
-                )
-                HallBadge(name: favorite.hallName, filename: favorite.hallFilename, fontSize: 12.0)
-            }
-            .padding(.bottom, 2.0)
         }
     }
 
