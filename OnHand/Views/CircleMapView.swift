@@ -34,7 +34,7 @@ struct CircleMapView: View {
     var body: some View {
         Group {
             if let image, let favorite, let rect = favorite.mapRect {
-                map(image: image, favorite: favorite, rect: rect)
+                map(image: image, rect: rect)
             } else {
                 ContentUnavailableView(
                     "OnHand.Map.Unavailable",
@@ -50,21 +50,28 @@ struct CircleMapView: View {
         }
     }
 
-    func map(image: UIImage, favorite: OnHandFavorite, rect: OnHandRect) -> some View {
-        ZStack(alignment: .bottom) {
-            canvas(image: image, rect: rect)
-                .ignoresSafeArea()
-
-            HStack(spacing: 4.0) {
-                SpacePill(
-                    label: favorite.spaceLabel,
-                    color: OnHandColor(value: favorite.colorValue),
-                    fontSize: 14.0
-                )
-                HallBadge(name: favorite.hallName, filename: favorite.hallFilename, fontSize: 12.0)
+    func map(image: UIImage, rect: OnHandRect) -> some View {
+        canvas(image: image, rect: rect)
+            .ignoresSafeArea()
+            .overlay(alignment: .top) {
+                scrim(startPoint: .top, endPoint: .bottom)
+                    .frame(height: 44.0)
             }
-            .padding(.bottom, 2.0)
-        }
+            .overlay(alignment: .bottom) {
+                scrim(startPoint: .bottom, endPoint: .top)
+                    .frame(height: 28.0)
+            }
+    }
+
+    func scrim(startPoint: UnitPoint, endPoint: UnitPoint) -> some View {
+        LinearGradient(
+            colors: [Color.black.opacity(0.6), Color.black.opacity(0.0)],
+            startPoint: startPoint,
+            endPoint: endPoint
+        )
+        .frame(maxWidth: .infinity)
+        .allowsHitTesting(false)
+        .ignoresSafeArea()
     }
 
     func canvas(image: UIImage, rect: OnHandRect) -> some View {
