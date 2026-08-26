@@ -222,7 +222,13 @@ struct RouteMenuView: View {
                 if store.payload.days.count > 1 {
                     Picker("OnHand.Day", selection: $selectedDay) {
                         ForEach(store.payload.days) { day in
-                            Text("\(day.month)/\(day.day)").tag(day.id)
+                            VStack(alignment: .leading, spacing: 1.0) {
+                                Text("Shared.\(day.id)th.Day")
+                                Text("\(day.month)/\(day.day)")
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .tag(day.id)
                         }
                     }
                     .pickerStyle(.navigationLink)

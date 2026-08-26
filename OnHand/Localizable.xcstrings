@@ -149,7 +149,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "日程"
+            "value": "開催日"
           }
         },
         "ko": {
@@ -409,6 +409,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "已訪問"
+          }
+        }
+      }
+    },
+    "Shared.%lldth.Day": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Day %lld"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld日目"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld일차"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第%lld天"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第%lld天"
           }
         }
       }
