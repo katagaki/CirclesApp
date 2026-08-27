@@ -89,8 +89,7 @@ public class Database {
         guard let connection else { return }
         try? connection.execute(
             """
-            PRAGMA cache_size = -8000;
-            PRAGMA mmap_size = 268435456;
+            PRAGMA cache_size = -16000;
             PRAGMA temp_store = MEMORY;
             PRAGMA query_only = ON;
             """
