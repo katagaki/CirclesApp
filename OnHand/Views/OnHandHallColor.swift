@@ -20,13 +20,9 @@ enum OnHandHall: String, CaseIterable {
 
     var color: Color {
         switch self {
-        case .east123: return Color(red: 0.90, green: 0.29, blue: 0.24)
-        case .east456: return Color(red: 0.95, green: 0.52, blue: 0.16)
-        case .east7, .east78: return Color(red: 0.85, green: 0.68, blue: 0.11)
-        case .west12: return Color(red: 0.16, green: 0.47, blue: 0.86)
-        case .west34: return Color(red: 0.35, green: 0.31, blue: 0.80)
-        case .south12: return Color(red: 0.16, green: 0.61, blue: 0.36)
-        case .south34: return Color(red: 0.11, green: 0.58, blue: 0.58)
+        case .east123, .east456, .east7, .east78: return Color(red: 0.90, green: 0.25, blue: 0.21)
+        case .west12, .west34: return Color(red: 0.20, green: 0.51, blue: 0.93)
+        case .south12, .south34: return Color(red: 0.18, green: 0.68, blue: 0.40)
         }
     }
 
