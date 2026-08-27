@@ -111,10 +111,9 @@ struct RouteCard: View {
             Spacer(minLength: 0.0)
 
             HStack(alignment: .center, spacing: 6.0) {
-                if !isLuminanceReduced {
-                    CircleCutImage(circleID: favorite.id)
-                        .frame(width: 44.0)
-                }
+                CircleCutImage(circleID: favorite.id)
+                    .frame(width: 44.0)
+                    .opacity(isLuminanceReduced ? 0.7 : 1.0)
 
                 VStack(alignment: .leading, spacing: 2.0) {
                     SpacePill(
@@ -126,17 +125,15 @@ struct RouteCard: View {
 
                     HallBadge(name: favorite.hallName, filename: favorite.hallFilename)
 
-                    if !isLuminanceReduced {
-                        Text(favorite.circleName)
-                            .font(.caption2)
-                            .lineLimit(1)
-                            .foregroundStyle(.secondary)
+                    Text(favorite.circleName)
+                        .font(.caption2)
+                        .lineLimit(1)
+                        .foregroundStyle(.secondary)
 
-                        if !pendingItems.isEmpty {
-                            Text("\(pendingItems.count) · ¥\(pendingItems.reduce(0) { $0 + $1.cost })")
-                                .font(.caption2)
-                                .foregroundStyle(.tertiary)
-                        }
+                    if !isLuminanceReduced, !pendingItems.isEmpty {
+                        Text("\(pendingItems.count) · ¥\(pendingItems.reduce(0) { $0 + $1.cost })")
+                            .font(.caption2)
+                            .foregroundStyle(.tertiary)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
