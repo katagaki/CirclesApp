@@ -31,24 +31,17 @@ enum OnHandHall: String, CaseIterable {
     }
 }
 
-struct HallBadge: View {
+struct HallLabel: View {
 
     let name: String
     let filename: String
     var fontSize: CGFloat = 14.0
-
-    var color: Color {
-        OnHandHall.color(for: filename)
-    }
 
     var body: some View {
         Text(name)
             .font(.system(size: fontSize, weight: .semibold, design: .rounded))
             .lineLimit(1)
             .minimumScaleFactor(0.6)
-            .foregroundStyle(.white)
-            .padding(.horizontal, fontSize * 0.42)
-            .padding(.vertical, fontSize * 0.16)
-            .background(Capsule().fill(color))
+            .foregroundStyle(OnHandHall.color(for: filename))
     }
 }

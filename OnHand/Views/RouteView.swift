@@ -116,14 +116,14 @@ struct RouteCard: View {
                     .opacity(isLuminanceReduced ? 0.7 : 1.0)
 
                 VStack(alignment: .leading, spacing: 2.0) {
-                    SpacePill(
+                    SpaceLabel(
                         label: favorite.spaceLabel,
                         color: color,
                         fontSize: 30.0,
                         isVisited: favorite.isVisited
                     )
 
-                    HallBadge(name: favorite.hallName, filename: favorite.hallFilename)
+                    HallLabel(name: favorite.hallName, filename: favorite.hallFilename)
 
                     Text(favorite.circleName)
                         .font(.caption2)

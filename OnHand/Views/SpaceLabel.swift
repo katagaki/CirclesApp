@@ -1,5 +1,5 @@
 //
-//  SpacePill.swift
+//  SpaceLabel.swift
 //  OnHand
 //
 //  Created by シン・ジャスティン on 2026/08/19.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SpacePill: View {
+struct SpaceLabel: View {
 
     let label: String
     let color: OnHandColor
@@ -19,14 +19,7 @@ struct SpacePill: View {
             .font(.system(size: fontSize, weight: .heavy, design: .rounded))
             .minimumScaleFactor(0.5)
             .lineLimit(1)
-            .foregroundStyle(isVisited ? AnyShapeStyle(.secondary) : AnyShapeStyle(color.foreground))
-            .padding(.horizontal, fontSize * 0.32)
-            .padding(.vertical, fontSize * 0.08)
-            .background(
-                Capsule().fill(
-                    isVisited ? AnyShapeStyle(.quaternary) : AnyShapeStyle(color.background)
-                )
-            )
+            .foregroundStyle(color.background.opacity(isVisited ? 0.35 : 1.0))
             .overlay(alignment: .center) {
                 if isVisited {
                     VisitedCheckmark(fontSize: fontSize)
