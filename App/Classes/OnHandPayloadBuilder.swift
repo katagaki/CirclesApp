@@ -35,6 +35,7 @@ enum OnHandPayloadBuilder {
         var mapNamesByBlockID: [Int: String] = [:]
         var mapFilenamesByBlockID: [Int: String] = [:]
         for blockID in Set(circles.map { $0.blockID }) {
+            guard !Task.isCancelled else { return nil }
             if let mapID = await fetcher.mapID(forBlock: blockID),
                let map = maps.first(where: { $0.id == mapID }) {
                 mapNamesByBlockID[blockID] = map.name

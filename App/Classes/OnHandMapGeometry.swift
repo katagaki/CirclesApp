@@ -27,6 +27,7 @@ enum OnHandMapGeometry {
 
         var mapIDsByBlockID: [Int: Int] = [:]
         for blockID in Set(circles.map { $0.blockID }) {
+            guard !Task.isCancelled else { return [:] }
             mapIDsByBlockID[blockID] = await fetcher.mapID(forBlock: blockID)
         }
 
@@ -34,9 +35,11 @@ enum OnHandMapGeometry {
         var occupantCounts: [String: Int] = [:]
         let days = Set(circles.map { $0.day })
         for mapID in Set(mapIDsByBlockID.values) {
+            guard !Task.isCancelled else { return [:] }
             let layouts = await fetcher.layoutMappings(inMap: mapID, useHighResolutionMaps: true)
             layoutsByMapID[mapID] = layouts
             for day in days {
+                guard !Task.isCancelled else { return [:] }
                 let mappings = await fetcher.layoutCatalogMappingToWebCatalogIDs(
                     forMappings: layouts,
                     on: day
@@ -51,6 +54,7 @@ enum OnHandMapGeometry {
         var placements: [Int: OnHandRect] = [:]
 
         for circle in circles {
+            guard !Task.isCancelled else { return placements }
             guard let filename = hallFilenames[circle.id],
                   let hall = ComiketHall(rawValue: filename),
                   let mapID = mapIDsByBlockID[circle.blockID],

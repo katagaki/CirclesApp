@@ -47,6 +47,21 @@ struct OnHandLifecycle: ViewModifier {
         isSyncing = true
         defer { isSyncing = false }
 
+        await withBackgroundAssertion { await buildAndSendPayload() }
+    }
+
+    func withBackgroundAssertion(_ operation: @escaping @MainActor () async -> Void) async {
+        let work = Task { @MainActor in await operation() }
+        let identifier = UIApplication.shared.beginBackgroundTask(withName: "OnHandSync") {
+            work.cancel()
+        }
+        await work.value
+        if identifier != .invalid {
+            UIApplication.shared.endBackgroundTask(identifier)
+        }
+    }
+
+    func buildAndSendPayload() async {
         let (items, mapped) = await favoriteItems()
         let payload = await OnHandPayloadBuilder.build(
             favoriteItems: items,

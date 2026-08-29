@@ -30,6 +30,7 @@ enum OnHandAssetBuilder {
         let circleCuts = await circleCuts(for: circles, database: database)
         let maps = await maps(for: payload, database: database)
 
+        guard !Task.isCancelled else { return nil }
         guard !circleCuts.isEmpty || !maps.isEmpty else { return nil }
 
         return OnHandAssetBundle(
@@ -47,6 +48,7 @@ enum OnHandAssetBuilder {
     ) async -> [String: Data] {
         var circleCuts: [String: Data] = [:]
         for circle in circles {
+            guard !Task.isCancelled else { break }
             guard let image = await database.circleImageAsync(for: circle.id) else { continue }
             guard let data = jpegData(from: image, fittingWithin: circleCutOutputSize) else { continue }
             circleCuts[String(circle.id)] = data
@@ -60,6 +62,7 @@ enum OnHandAssetBuilder {
         var maps: [String: Data] = [:]
         let mapped = payload.favorites.filter { $0.mapRect != nil }
         for favorite in mapped where maps[favorite.mapKey] == nil {
+            guard !Task.isCancelled else { break }
             guard let hall = ComiketHall(rawValue: favorite.hallFilename) else { continue }
             guard let image = await database.mapImageAsync(
                 for: hall,
