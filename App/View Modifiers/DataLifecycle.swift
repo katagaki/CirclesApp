@@ -30,6 +30,7 @@ struct DataLifecycleModifier: ViewModifier {
     @State var isRevertingEvent: Bool = false
     @State var isUpdatingData: Bool = false
     @State var isOfflineModeDownloadAlertShowing: Bool = false
+    @State var isDownloadFailedAlertShowing: Bool = false
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
 
@@ -65,35 +66,14 @@ struct DataLifecycleModifier: ViewModifier {
                 }
             }
             .alert("Alerts.DownloadConfirmation.Title", isPresented: $isDownloadConfirmationShowing) {
-                Button("Shared.Download") {
-                    if let event = pendingDownloadEvent {
-                        if isUpdatingData {
-                            database.reset()
-                            database.delete(event: event)
-                        }
-                        oasis.open {
-                            Task.detached {
-                                await loadDataFromDatabase(for: event)
-                                await MainActor.run {
-                                    isUpdatingData = false
-                                    finishReload(shouldResetSelections: pendingDownloadShouldResetSelections)
-                                }
-                            }
-                        }
-                    }
-                }
-                if !isInitialDownload {
-                    Button("Shared.Cancel", role: .cancel) {
-                        if isUpdatingData {
-                            isUpdatingData = false
-                            isReloadingData = false
-                        } else {
-                            revertToPreviousEvent()
-                        }
-                    }
-                }
+                downloadConfirmationActions()
             } message: {
                 Text("Alerts.DownloadConfirmation.Message \(estimatedDownloadSize)")
+            }
+            .alert("Alerts.DownloadFailed.Title", isPresented: $isDownloadFailedAlertShowing) {
+                downloadFailedActions()
+            } message: {
+                Text("Alerts.DownloadFailed.Message")
             }
             .alert("Alerts.OfflineMode.Download.Title", isPresented: $isOfflineModeDownloadAlertShowing) {
                 Button("Shared.OK", role: .cancel) {
@@ -102,6 +82,63 @@ struct DataLifecycleModifier: ViewModifier {
             } message: {
                 Text("Alerts.OfflineMode.Download.Message")
             }
+    }
+
+    @ViewBuilder
+    func downloadConfirmationActions() -> some View {
+        Button("Shared.Download") {
+            startPendingDownload()
+        }
+        if !isInitialDownload {
+            Button("Shared.Cancel", role: .cancel) {
+                if isUpdatingData {
+                    isUpdatingData = false
+                    isReloadingData = false
+                } else {
+                    revertToPreviousEvent()
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    func downloadFailedActions() -> some View {
+        Button("Shared.Retry") {
+            startPendingDownload()
+        }
+        if !isInitialDownload {
+            Button("Shared.Cancel", role: .cancel) {
+                revertToPreviousEvent()
+            }
+        }
+    }
+}
+
+extension DataLifecycleModifier {
+
+    func startPendingDownload() {
+        guard let event = pendingDownloadEvent else { return }
+        if isUpdatingData {
+            database.reset()
+            database.delete(event: event)
+        }
+        isReloadingData = true
+        oasis.open {
+            Task.detached {
+                let didLoad = await loadDataFromDatabase(for: event)
+                await MainActor.run {
+                    if didLoad {
+                        isUpdatingData = false
+                        finishReload(shouldResetSelections: pendingDownloadShouldResetSelections)
+                    } else {
+                        oasis.close()
+                        isUpdatingData = false
+                        isReloadingData = false
+                        isDownloadFailedAlertShowing = true
+                    }
+                }
+            }
+        }
     }
 
     func revertToPreviousEvent() {
@@ -212,7 +249,8 @@ struct DataLifecycleModifier: ViewModifier {
         }
     }
 
-    func loadDataFromDatabase(for activeEvent: WebCatalogEvent.Response.Event? = nil) async {
+    @discardableResult
+    func loadDataFromDatabase(for activeEvent: WebCatalogEvent.Response.Event? = nil) async -> Bool {
         UIApplication.shared.isIdleTimerDisabled = true
 
         let token = authenticator.token ?? OpenIDToken()
@@ -230,7 +268,7 @@ struct DataLifecycleModifier: ViewModifier {
                 }
                 if !database.isDownloaded(for: activeEvent) {
                     UIApplication.shared.isIdleTimerDisabled = false
-                    return
+                    return false
                 }
             } else {
                 database.prepare(for: activeEvent)
@@ -256,6 +294,7 @@ struct DataLifecycleModifier: ViewModifier {
         }
 
         UIApplication.shared.isIdleTimerDisabled = false
+        return true
     }
 
     func loadImages() async {
@@ -269,6 +308,7 @@ struct DataLifecycleModifier: ViewModifier {
             await favorites.refresh(authToken: authenticator.token)
         }
     }
+
 }
 
 extension View {
