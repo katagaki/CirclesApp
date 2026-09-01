@@ -20,6 +20,10 @@ struct EventDataView: View {
     @State private var downloadedEvents: [DownloadedEventInfo] = []
     @State private var activeDownloads: [Int: Double?] = [:]
     @State private var pendingSwitchEvent: DownloadedEventInfo?
+    @State private var pendingDownloadEvent: WebCatalogEvent.Response.Event?
+    @State private var estimatedDownloadSize: String = ""
+    @State private var isDownloadConfirmationShowing: Bool = false
+    @State private var isDownloadFailedAlertShowing: Bool = false
 
     private var isOnline: Bool {
         authenticator.effectiveOnlineState == .online
@@ -79,7 +83,7 @@ struct EventDataView: View {
                                 event: event,
                                 progress: activeDownloads[event.number] ?? nil,
                                 isDownloading: activeDownloads.keys.contains(event.number),
-                                onTap: { Task { await downloadEvent(event) } }
+                                onTap: { Task { await confirmDownload(of: event) } }
                             )
                         }
                     }
@@ -114,6 +118,26 @@ struct EventDataView: View {
         } message: { event in
             Text("Alerts.SwitchEvent.Message \(event.number)")
         }
+        .alert("Alerts.DownloadConfirmation.Title", isPresented: $isDownloadConfirmationShowing) {
+            downloadActions()
+        } message: {
+            Text("Alerts.DownloadConfirmation.Message \(estimatedDownloadSize)")
+        }
+        .alert("Alerts.DownloadFailed.Title", isPresented: $isDownloadFailedAlertShowing) {
+            downloadActions(label: "Shared.Retry")
+        } message: {
+            Text("Alerts.DownloadFailed.Message")
+        }
+    }
+
+    @ViewBuilder
+    private func downloadActions(label: LocalizedStringKey = "Shared.Download") -> some View {
+        Button(label) {
+            if let event = pendingDownloadEvent {
+                Task { await downloadEvent(event) }
+            }
+        }
+        Button("Shared.Cancel", role: .cancel) {}
     }
 
     private var activeBytes: Int64? {
@@ -153,6 +177,73 @@ struct EventDataView: View {
         guard isOnline, let token = authenticator.token else { return }
         await events.reloadEventList(authToken: token)
     }
+
+    private func deleteDownloadedEvent(_ downloaded: DownloadedEventInfo) {
+        let event = WebCatalogEvent.Response.Event(id: 0, number: downloaded.number)
+        database.delete(event: event)
+        Task { await refresh() }
+    }
+
+    private func switchEvent(to downloaded: DownloadedEventInfo) {
+        guard downloaded.number != events.activeEventNumber else { return }
+        unifier.stackPath.removeAll()
+        events.activeEventNumber = downloaded.number
+    }
+
+    private func confirmDownload(of event: WebCatalogEvent.Response.Event) async {
+        guard let token = authenticator.token else { return }
+        guard !activeDownloads.keys.contains(event.number) else { return }
+
+        activeDownloads.updateValue(nil, forKey: event.number)
+        let totalBytes = await database.fetchDownloadSizes(for: event, authToken: token)
+        activeDownloads.removeValue(forKey: event.number)
+
+        if let totalBytes {
+            estimatedDownloadSize = ByteCountFormatter.string(fromByteCount: totalBytes, countStyle: .file)
+        } else {
+            estimatedDownloadSize = String(localized: "Shared.Unknown")
+        }
+        pendingDownloadEvent = event
+        isDownloadConfirmationShowing = true
+    }
+
+    private func downloadEvent(_ event: WebCatalogEvent.Response.Event) async {
+        guard let token = authenticator.token else { return }
+        guard !activeDownloads.keys.contains(event.number) else { return }
+
+        if activeDownloads.isEmpty {
+            UIApplication.shared.isIdleTimerDisabled = true
+        }
+        activeDownloads[event.number] = 0.0
+
+        _ = await database.download(for: event, of: .text, authToken: token) { progress in
+            await MainActor.run {
+                if let progress {
+                    activeDownloads[event.number] = progress * 0.1
+                }
+            }
+        }
+        activeDownloads[event.number] = 0.1
+        _ = await database.download(for: event, of: .images, authToken: token) { progress in
+            await MainActor.run {
+                if let progress {
+                    activeDownloads[event.number] = 0.1 + progress * 0.9
+                }
+            }
+        }
+
+        activeDownloads.removeValue(forKey: event.number)
+        if activeDownloads.isEmpty {
+            UIApplication.shared.isIdleTimerDisabled = false
+        }
+        if !database.isDownloaded(for: event) {
+            isDownloadFailedAlertShowing = true
+        }
+        await refresh()
+    }
+}
+
+extension EventDataView {
 
     private nonisolated func collectStorage() -> (stats: EventDataStorageStats, downloaded: [DownloadedEventInfo]) {
         let dataStoreURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
@@ -243,139 +334,10 @@ struct EventDataView: View {
         return total
     }
 
-    private func deleteDownloadedEvent(_ downloaded: DownloadedEventInfo) {
-        let event = WebCatalogEvent.Response.Event(id: 0, number: downloaded.number)
-        database.delete(event: event)
-        Task { await refresh() }
-    }
-
-    private func switchEvent(to downloaded: DownloadedEventInfo) {
-        guard downloaded.number != events.activeEventNumber else { return }
-        unifier.stackPath.removeAll()
-        events.activeEventNumber = downloaded.number
-    }
-
-    private func downloadEvent(_ event: WebCatalogEvent.Response.Event) async {
-        guard let token = authenticator.token else { return }
-        guard !activeDownloads.keys.contains(event.number) else { return }
-
-        if activeDownloads.isEmpty {
-            UIApplication.shared.isIdleTimerDisabled = true
-        }
-        activeDownloads[event.number] = 0.0
-
-        _ = await database.download(for: event, of: .text, authToken: token) { progress in
-            await MainActor.run {
-                if let progress {
-                    activeDownloads[event.number] = progress * 0.1
-                }
-            }
-        }
-        activeDownloads[event.number] = 0.1
-        _ = await database.download(for: event, of: .images, authToken: token) { progress in
-            await MainActor.run {
-                if let progress {
-                    activeDownloads[event.number] = 0.1 + progress * 0.9
-                }
-            }
-        }
-
-        activeDownloads.removeValue(forKey: event.number)
-        if activeDownloads.isEmpty {
-            UIApplication.shared.isIdleTimerDisabled = false
-        }
-        await refresh()
-    }
 }
 
 struct DownloadedEventInfo: Identifiable, Equatable {
     var id: Int { number }
     let number: Int
     let bytes: Int64
-}
-
-private struct DownloadedEventRow: View {
-
-    let info: DownloadedEventInfo
-    let onTap: () -> Void
-
-    var body: some View {
-        Button(action: onTap) {
-            HStack(spacing: 8.0) {
-                Text("Shared.Event.\(info.number)")
-                    .foregroundStyle(.primary)
-                Spacer()
-                Text(ByteCountFormatter.string(fromByteCount: info.bytes, countStyle: .file))
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-            }
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-    }
-}
-
-private struct DownloadableEventRow: View {
-
-    let event: WebCatalogEvent.Response.Event
-    let progress: Double?
-    let isDownloading: Bool
-    let onTap: () -> Void
-
-    var body: some View {
-        Button(action: isDownloading ? {} : onTap) {
-            HStack(spacing: 8.0) {
-                Text("Shared.Event.\(event.number)")
-                    .tint(.primary)
-                Spacer()
-                if isDownloading {
-                    DownloadProgressDonut(progress: progress)
-                } else {
-                    Image(systemName: "icloud.and.arrow.down")
-                        .foregroundStyle(.accent)
-                }
-            }
-            .contentShape(Rectangle())
-        }
-    }
-}
-
-private struct DownloadProgressDonut: View {
-
-    let progress: Double?
-
-    private var accent: Color { Color("AccentColor") }
-
-    var body: some View {
-        ZStack {
-            Circle()
-                .stroke(accent.opacity(0.25), lineWidth: 2.0)
-            if let progress {
-                Circle()
-                    .trim(from: 0.0, to: CGFloat(min(max(progress, 0.0), 1.0)))
-                    .stroke(accent, style: StrokeStyle(lineWidth: 2.0, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                    .animation(.easeInOut(duration: 0.15), value: progress)
-            } else {
-                Circle()
-                    .trim(from: 0.0, to: 0.2)
-                    .stroke(accent, style: StrokeStyle(lineWidth: 2.0, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                    .modifier(SpinningModifier())
-            }
-        }
-        .frame(width: 20.0, height: 20.0)
-    }
-}
-
-private struct SpinningModifier: ViewModifier {
-
-    @State private var isSpinning: Bool = false
-
-    func body(content: Content) -> some View {
-        content
-            .rotationEffect(.degrees(isSpinning ? 360.0 : 0.0))
-            .animation(.linear(duration: 1.0).repeatForever(autoreverses: false), value: isSpinning)
-            .onAppear { isSpinning = true }
-    }
 }
