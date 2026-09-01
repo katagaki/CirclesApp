@@ -161,23 +161,40 @@ extension Database {
     }
 
     public func unzip(_ url: URL?) -> URL? {
-        if let url, let dataStoreURL {
-            do {
-                let unzipDestinationURL = dataStoreURL
-                try? FileManager.default.removeItem(at: unzipDestinationURL
-                    .appendingPathComponent(url.deletingPathExtension().lastPathComponent))
-                try FileManager.default.unzipItem(at: url, to: unzipDestinationURL)
-                if let archive = try? Archive(url: url, accessMode: .read, pathEncoding: .utf8),
-                   let firstFileInArchive = archive.first(where: { _ in return true }) {
-                    try? FileManager.default.removeItem(at: url)
-                    return unzipDestinationURL.appending(path: firstFileInArchive.path)
-                }
-            } catch {
-                debugPrint(error.localizedDescription)
+        guard let url, let dataStoreURL else { return nil }
+
+        removeStagingDirectories(in: dataStoreURL)
+
+        let stagingURL = dataStoreURL.appending(path: "\(Database.stagingDirectoryPrefix)\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: stagingURL) }
+
+        do {
+            try FileManager.default.createDirectory(at: stagingURL, withIntermediateDirectories: true)
+            try FileManager.default.unzipItem(at: url, to: stagingURL)
+            guard let archive = try? Archive(url: url, accessMode: .read, pathEncoding: .utf8),
+                  let firstFileInArchive = archive.first(where: { _ in return true }) else {
                 return nil
             }
+            let destinationURL = dataStoreURL.appending(path: firstFileInArchive.path)
+            try? FileManager.default.removeItem(at: destinationURL)
+            try FileManager.default.moveItem(
+                at: stagingURL.appending(path: firstFileInArchive.path), to: destinationURL
+            )
+            try? FileManager.default.removeItem(at: url)
+            return destinationURL
+        } catch {
+            debugPrint(error.localizedDescription)
+            return nil
         }
-        return nil
+    }
+
+    private func removeStagingDirectories(in dataStoreURL: URL) {
+        let contents = (try? FileManager.default.contentsOfDirectory(
+            at: dataStoreURL, includingPropertiesForKeys: nil
+        )) ?? []
+        for url in contents where url.lastPathComponent.hasPrefix(Database.stagingDirectoryPrefix) {
+            try? FileManager.default.removeItem(at: url)
+        }
     }
 
     public func urlRequestForWebCatalogAPI(_ endpoint: String, authToken: OpenIDToken) -> URLRequest {
@@ -195,17 +212,12 @@ extension Database {
     public func prepareIndexes(for event: WebCatalogEvent.Response.Event) async {
         let flagKey = Database.indexedFlagKey(forEvent: event.number)
         if UserDefaults.standard.bool(forKey: flagKey) { return }
-        let textPath = textDatabaseURL?.path(percentEncoded: false)
-        let imagePath = imageDatabaseURL?.path(percentEncoded: false)
+        guard let textPath = textDatabaseURL?.path(percentEncoded: false),
+              let imagePath = imageDatabaseURL?.path(percentEncoded: false) else { return }
         let didBuild = await Task.detached(priority: .userInitiated) {
-            var success = true
-            if let textPath {
-                success = Self.buildIndexes(atPath: textPath) && success
-            }
-            if let imagePath {
-                success = Self.buildImageIndexes(atPath: imagePath) && success
-            }
-            return success
+            let textSuccess = Self.buildIndexes(atPath: textPath)
+            let imageSuccess = Self.buildImageIndexes(atPath: imagePath)
+            return textSuccess && imageSuccess
         }.value
         if didBuild {
             UserDefaults.standard.set(true, forKey: flagKey)

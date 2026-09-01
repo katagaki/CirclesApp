@@ -41,6 +41,7 @@ public class Database {
     }
 
     static let indexedFlagKeyPrefix = "Database.Indexed."
+    static let stagingDirectoryPrefix = ".unzip-"
 
     static func indexedFlagKey(forEvent number: Int) -> String {
         "\(indexedFlagKeyPrefix)\(number)"

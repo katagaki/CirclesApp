@@ -24,6 +24,8 @@ struct DataLifecycleModifier: ViewModifier {
     @State var isDownloadConfirmationShowing: Bool = false
     @State var estimatedDownloadSize: String = ""
     @State var pendingDownloadEvent: WebCatalogEvent.Response.Event?
+    @State var pendingDownloadShouldResetSelections: Bool = true
+    @State var isInitialDownload: Bool = false
     @State var previousEventNumber: Int?
     @State var isRevertingEvent: Bool = false
     @State var isUpdatingData: Bool = false
@@ -74,18 +76,20 @@ struct DataLifecycleModifier: ViewModifier {
                                 await loadDataFromDatabase(for: event)
                                 await MainActor.run {
                                     isUpdatingData = false
-                                    finishReload(shouldResetSelections: true)
+                                    finishReload(shouldResetSelections: pendingDownloadShouldResetSelections)
                                 }
                             }
                         }
                     }
                 }
-                Button("Shared.Cancel", role: .cancel) {
-                    if isUpdatingData {
-                        isUpdatingData = false
-                        isReloadingData = false
-                    } else {
-                        revertToPreviousEvent()
+                if !isInitialDownload {
+                    Button("Shared.Cancel", role: .cancel) {
+                        if isUpdatingData {
+                            isUpdatingData = false
+                            isReloadingData = false
+                        } else {
+                            revertToPreviousEvent()
+                        }
                     }
                 }
             } message: {
@@ -118,23 +122,25 @@ struct DataLifecycleModifier: ViewModifier {
               let activeEvent = planner.activeEvent else { return }
         isReloadingData = true
         isUpdatingData = true
+        pendingDownloadShouldResetSelections = true
+        isInitialDownload = false
         Task {
-            let token = authenticator.token ?? OpenIDToken()
-            let totalBytes = await database.fetchDownloadSizes(
-                for: activeEvent, authToken: token
-            )
-            let sizeString: String
-            if let totalBytes {
-                sizeString = ByteCountFormatter.string(
-                    fromByteCount: totalBytes, countStyle: .file
-                )
-            } else {
-                sizeString = String(localized: "Shared.Unknown")
-            }
-            pendingDownloadEvent = activeEvent
-            estimatedDownloadSize = sizeString
-            isDownloadConfirmationShowing = true
+            await confirmDownload(of: activeEvent)
         }
+    }
+
+    func confirmDownload(of event: WebCatalogEvent.Response.Event) async {
+        let token = authenticator.token ?? OpenIDToken()
+        let totalBytes = await database.fetchDownloadSizes(for: event, authToken: token)
+        let sizeString: String
+        if let totalBytes {
+            sizeString = ByteCountFormatter.string(fromByteCount: totalBytes, countStyle: .file)
+        } else {
+            sizeString = String(localized: "Shared.Unknown")
+        }
+        pendingDownloadEvent = event
+        estimatedDownloadSize = sizeString
+        isDownloadConfirmationShowing = true
     }
 
     func reloadData(forceDownload: Bool = false, shouldResetSelections: Bool = false, animated: Bool = true) {
@@ -158,31 +164,10 @@ struct DataLifecycleModifier: ViewModifier {
                     if !database.isDownloaded(for: activeEvent) {
                         if authenticator.isOfflineModeActive {
                             isOfflineModeDownloadAlertShowing = true
-                        } else if isDatabaseInitialized {
-                            let token = authenticator.token ?? OpenIDToken()
-                            let totalBytes = await database.fetchDownloadSizes(
-                                for: activeEvent, authToken: token
-                            )
-                            let sizeString: String
-                            if let totalBytes {
-                                sizeString = ByteCountFormatter.string(
-                                    fromByteCount: totalBytes, countStyle: .file
-                                )
-                            } else {
-                                sizeString = String(localized: "Shared.Unknown")
-                            }
-                            pendingDownloadEvent = activeEvent
-                            estimatedDownloadSize = sizeString
-                            isDownloadConfirmationShowing = true
                         } else {
-                            oasis.open {
-                                Task.detached {
-                                    await loadDataFromDatabase(for: activeEvent)
-                                    await MainActor.run {
-                                        finishReload(shouldResetSelections: shouldResetSelections)
-                                    }
-                                }
-                            }
+                            pendingDownloadShouldResetSelections = shouldResetSelections
+                            isInitialDownload = !isDatabaseInitialized
+                            await confirmDownload(of: activeEvent)
                         }
                     } else {
                         Task.detached {
@@ -242,6 +227,10 @@ struct DataLifecycleModifier: ViewModifier {
                 await oasis.setBodyText("Loading.DownloadImageDatabase")
                 await database.downloadImageDatabase(for: activeEvent, authToken: token) { progress in
                     await oasis.setProgress(progress)
+                }
+                if !database.isDownloaded(for: activeEvent) {
+                    UIApplication.shared.isIdleTimerDisabled = false
+                    return
                 }
             } else {
                 database.prepare(for: activeEvent)
