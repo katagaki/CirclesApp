@@ -2522,31 +2522,31 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Circle Name, Pen Name, Book Name"
+            "value" : "Circle Name, Space Number, etc."
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "サークル名、執筆者名、配布誌名"
+            "value" : "サークル名、スペース番号など"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "서클명, 필명, 책 제목"
+            "value" : "서클명, 부스 번호 등"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "摊位名称、笔名、书名"
+            "value" : "摊位名称、摊位号等"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "攤位名稱、筆名、書名"
+            "value" : "攤位名稱、攤位號等"
           }
         }
       }
