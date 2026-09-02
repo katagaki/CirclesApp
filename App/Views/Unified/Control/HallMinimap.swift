@@ -15,19 +15,21 @@ struct HallMinimap: View {
     var width: CGFloat = 268.0
     let onSelect: (ComiketMap) -> Void
 
+    @State var pressedMapID: Int?
+
     static let east78Shape: [CGPoint] = [
-        CGPoint(x: 25.5, y: 41.5), CGPoint(x: 32.5, y: 41.5),
-        CGPoint(x: 28.5, y: 55.0), CGPoint(x: 28.5, y: 69.0),
-        CGPoint(x: 15.0, y: 69.0)
+        CGPoint(x: 29.5, y: 41.5), CGPoint(x: 36.5, y: 41.5),
+        CGPoint(x: 32.5, y: 55.0), CGPoint(x: 32.5, y: 69.0),
+        CGPoint(x: 19.0, y: 69.0)
     ]
-    static let east123Frame = CGRect(x: 43.5, y: 41.5, width: 29.0, height: 10.5)
-    static let east456Frame = CGRect(x: 33.0, y: 57.5, width: 29.0, height: 10.5)
-    static let westFrame = CGRect(x: 77.0, y: 24.0, width: 27.0, height: 14.0)
-    static let southFrame = CGRect(x: 91.0, y: 4.0, width: 13.0, height: 18.0)
-    static let conferenceFrame = CGRect(x: 77.0, y: 41.5, width: 27.0, height: 27.5)
+    static let east123Frame = CGRect(x: 47.0, y: 41.5, width: 29.0, height: 12.0)
+    static let east456Frame = CGRect(x: 36.5, y: 57.0, width: 29.0, height: 12.0)
+    static let westFrame = CGRect(x: 80.0, y: 23.5, width: 29.0, height: 14.0)
+    static let southFrame = CGRect(x: 91.0, y: 3.5, width: 18.0, height: 16.0)
+    static let conferenceFrame = CGRect(x: 80.0, y: 41.5, width: 29.0, height: 27.5)
 
     static let floorGap: CGFloat = 1.0
-    static let labelFontSize: CGFloat = 12.0
+    static let labelFontSize: CGFloat = 16.0
 
     static let conferenceColor = Color(red: 0.55, green: 0.49, blue: 0.42)
 
@@ -61,6 +63,41 @@ struct HallMinimap: View {
         return shape.count == 4 && shape.allSatisfy {
             ($0.x == bounds.minX || $0.x == bounds.maxX) && ($0.y == bounds.minY || $0.y == bounds.maxY)
         }
+    }
+
+    static func horizontalSpan(of shape: [CGPoint], at positionY: CGFloat) -> ClosedRange<CGFloat>? {
+        var crossings: [CGFloat] = []
+        for index in shape.indices {
+            let start = shape[index]
+            let end = shape[(index + 1) % shape.count]
+            guard min(start.y, end.y) <= positionY, positionY <= max(start.y, end.y),
+                  start.y != end.y else { continue }
+            let ratio = (positionY - start.y) / (end.y - start.y)
+            crossings.append(start.x + (end.x - start.x) * ratio)
+        }
+        guard let minimumX = crossings.min(), let maximumX = crossings.max(),
+              minimumX < maximumX else { return nil }
+        return minimumX...maximumX
+    }
+
+    // Keeps the caption inside angled halls, where the bounding box is wider than the hall itself.
+    static func labelFrame(of shape: [CGPoint]) -> CGRect {
+        let bounds = bounds(of: shape)
+        guard !isRectangular(shape) else { return bounds }
+        var widest: ClosedRange<CGFloat>?
+        var widestY = bounds.midY
+        for step in stride(from: 0.35, through: 0.8, by: 0.05) {
+            let positionY = bounds.minY + bounds.height * step
+            guard let span = horizontalSpan(of: shape, at: positionY) else { continue }
+            if span.upperBound - span.lowerBound > (widest.map { $0.upperBound - $0.lowerBound } ?? 0.0) {
+                widest = span
+                widestY = positionY
+            }
+        }
+        guard let widest else { return bounds }
+        let height = bounds.height * 0.5
+        return CGRect(x: widest.lowerBound, y: widestY - height / 2.0,
+                      width: widest.upperBound - widest.lowerBound, height: height)
     }
 
     static func path(of shape: [CGPoint]) -> Path {
@@ -163,9 +200,11 @@ struct HallMinimap: View {
                     onSelect(placedMap.map)
                 } label: {
                     Color.clear
-                        .contentShape(.rect)
+                        .contentShape(HallShape(points: placedMap.shape, bounds: frame))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(HallButtonStyle { isPressed in
+                    pressedMapID = isPressed ? placedMap.map.id : nil
+                })
                 .frame(width: frame.width * scale, height: frame.height * scale)
                 .position(x: (frame.midX - contentFrame.minX) * scale,
                           y: (frame.midY - contentFrame.minY) * scale)
@@ -204,12 +243,12 @@ struct HallMinimap: View {
         if showsConference {
             context.fill(
                 Path(Self.conferenceFrame),
-                with: .color(Self.conferenceColor)
+                with: .color(Self.conferenceColor.opacity(0.45))
             )
             drawLabel(
                 Text("Shared.Building.Conference"),
                 in: Self.conferenceFrame,
-                color: .white,
+                color: .white.opacity(0.8),
                 context: context,
                 scale: scale
             )
@@ -220,12 +259,15 @@ struct HallMinimap: View {
             let isSelected = placedMap.map == selection
             let path = Self.path(of: placedMap.shape)
             context.fill(path, with: .color(color))
+            if placedMap.map.id == pressedMapID {
+                context.fill(path, with: .color(.black.opacity(0.25)))
+            }
             if isSelected {
                 context.stroke(path, with: .color(.white), lineWidth: 1.5 / scale)
             }
             drawLabel(
                 Text(placedMap.map.name),
-                in: Self.bounds(of: placedMap.shape),
+                in: Self.labelFrame(of: placedMap.shape),
                 color: .white,
                 context: context,
                 scale: scale
@@ -256,5 +298,36 @@ struct HallMinimap: View {
             resolved = resolve(Self.labelFontSize * factor)
         }
         context.draw(resolved, at: CGPoint(x: frame.midX, y: frame.midY))
+    }
+}
+
+struct HallButtonStyle: ButtonStyle {
+
+    let onPressChange: (Bool) -> Void
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .onChange(of: configuration.isPressed) { _, isPressed in
+                onPressChange(isPressed)
+            }
+    }
+}
+
+struct HallShape: Shape {
+
+    let points: [CGPoint]
+    let bounds: CGRect
+
+    func path(in rect: CGRect) -> Path {
+        guard bounds.width > 0.0, bounds.height > 0.0 else { return Path(rect) }
+        let scaleX = rect.width / bounds.width
+        let scaleY = rect.height / bounds.height
+        var path = Path()
+        path.addLines(points.map {
+            CGPoint(x: rect.minX + ($0.x - bounds.minX) * scaleX,
+                    y: rect.minY + ($0.y - bounds.minY) * scaleY)
+        })
+        path.closeSubpath()
+        return path
     }
 }
