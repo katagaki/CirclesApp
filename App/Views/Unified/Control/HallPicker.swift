@@ -9,7 +9,9 @@ struct HallPicker: View {
 
     var body: some View {
         Button {
-            unifier.isHallMinimapPresenting = true
+            withAnimation(.smooth(duration: 0.25)) {
+                unifier.isHallMinimapPresenting = true
+            }
         } label: {
             HStack(spacing: 10.0) {
                 Image(systemName: "building")
@@ -30,12 +32,20 @@ struct HallPicker: View {
         .background {
             GeometryReader { proxy in
                 Color.clear
-                    .onAppear { unifier.hallPickerFrame = proxy.frame(in: .global) }
+                    .onAppear { updateAnchor(proxy.frame(in: .global)) }
                     .onChange(of: proxy.frame(in: .global)) { _, newValue in
-                        unifier.hallPickerFrame = newValue
+                        updateAnchor(newValue)
                     }
             }
         }
+    }
+}
+
+extension HallPicker {
+    // The menu's source moves with the transition, so keep the anchor frozen while it is open.
+    func updateAnchor(_ frame: CGRect) {
+        guard !unifier.isHallMinimapPresenting else { return }
+        unifier.hallPickerFrame = frame
     }
 }
 
@@ -49,6 +59,7 @@ struct HallMinimapMenu: View {
     let edgePadding: CGFloat = 8.0
 
     @State var animationProgress: CGFloat = 0.0
+    @State var menuHeight: CGFloat = 0.0
 
     var anchor: CGRect {
         unifier.hallPickerFrame
@@ -76,7 +87,11 @@ struct HallMinimapMenu: View {
                 .padding(padding)
                 .frame(width: menuWidth)
                 .glassEffect(.regular, in: .rect(cornerRadius: 20.0))
-                .scaleEffect(0.9 + 0.1 * animationProgress, anchor: .top)
+                .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { menuHeight = $0 }
+                .mask(alignment: .top) {
+                    RoundedRectangle(cornerRadius: 20.0)
+                        .frame(height: menuHeight > 0.0 ? revealHeight : nil)
+                }
                 .opacity(animationProgress)
                 .offset(x: menuOriginX(in: container) - container.minX,
                         y: anchor.minY - edgePadding - container.minY)
@@ -84,10 +99,16 @@ struct HallMinimapMenu: View {
         }
         .ignoresSafeArea()
         .onAppear {
-            withAnimation(.smooth(duration: 0.2)) {
+            withAnimation(.smooth(duration: 0.25)) {
                 animationProgress = 1.0
             }
         }
+    }
+
+    // Unfurls downwards out of the toolbar instead of resizing the minimap itself.
+    var revealHeight: CGFloat {
+        let collapsedHeight = min(anchor.height, menuHeight)
+        return collapsedHeight + (menuHeight - collapsedHeight) * animationProgress
     }
 
     func menuOriginX(in container: CGRect) -> CGFloat {
@@ -98,9 +119,8 @@ struct HallMinimapMenu: View {
     }
 
     func close() {
-        withAnimation(.smooth(duration: 0.15)) {
+        withAnimation(.smooth(duration: 0.25)) {
             animationProgress = 0.0
-        } completion: {
             unifier.isHallMinimapPresenting = false
         }
     }

@@ -4,6 +4,7 @@ import AXiS
 
 struct UnifiedControl: View {
     @Environment(UserSelections.self) var selections
+    @Environment(Unifier.self) var unifier
 
     var body: some View {
         Group {
@@ -20,6 +21,7 @@ struct UnifiedControl: View {
         }
         .frame(minWidth: 100.0, maxWidth: 280.0)
         .padding(6.0)
+        .opacity(unifier.isHallMinimapPresenting ? 0.0 : 1.0)
     }
 
     func accentColorForMap(_ map: ComiketMap?) -> Color? {
