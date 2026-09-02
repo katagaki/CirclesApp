@@ -5,12 +5,11 @@ import AXiS
 struct HallPicker: View {
     @Environment(UserSelections.self) var selections
     @Environment(Database.self) var database
-    @State var isMinimapPresented: Bool = false
-    @State var buttonFrame: CGRect = .zero
+    @Environment(Unifier.self) var unifier
 
     var body: some View {
         Button {
-            isMinimapPresented = true
+            unifier.isHallMinimapPresenting = true
         } label: {
             HStack(spacing: 10.0) {
                 Image(systemName: "building")
@@ -31,20 +30,11 @@ struct HallPicker: View {
         .background {
             GeometryReader { proxy in
                 Color.clear
-                    .onAppear { buttonFrame = proxy.frame(in: .global) }
+                    .onAppear { unifier.hallPickerFrame = proxy.frame(in: .global) }
                     .onChange(of: proxy.frame(in: .global)) { _, newValue in
-                        buttonFrame = newValue
+                        unifier.hallPickerFrame = newValue
                     }
             }
-        }
-        .fullScreenCover(isPresented: $isMinimapPresented) {
-            HallMinimapMenu(anchor: $buttonFrame) { map in
-                selections.map = map
-            }
-            .presentationBackground(.clear)
-        }
-        .transaction { transaction in
-            transaction.disablesAnimations = true
         }
     }
 }
@@ -52,16 +42,17 @@ struct HallPicker: View {
 struct HallMinimapMenu: View {
     @Environment(UserSelections.self) var selections
     @Environment(Database.self) var database
-    @Environment(\.dismiss) var dismiss
-
-    @Binding var anchor: CGRect
-    let onSelect: (ComiketMap) -> Void
+    @Environment(Unifier.self) var unifier
 
     let minimapWidth: CGFloat = 268.0
     let padding: CGFloat = 16.0
     let edgePadding: CGFloat = 8.0
 
     @State var animationProgress: CGFloat = 0.0
+
+    var anchor: CGRect {
+        unifier.hallPickerFrame
+    }
 
     var maps: [ComiketMap] {
         database.maps()
@@ -79,7 +70,7 @@ struct HallMinimapMenu: View {
                     .contentShape(.rect)
                     .onTapGesture { close() }
                 HallMinimap(maps: maps, selection: selections.map, width: minimapWidth) { map in
-                    onSelect(map)
+                    selections.map = map
                     close()
                 }
                 .padding(padding)
@@ -88,7 +79,7 @@ struct HallMinimapMenu: View {
                 .scaleEffect(0.9 + 0.1 * animationProgress, anchor: .top)
                 .opacity(animationProgress)
                 .offset(x: menuOriginX(in: container) - container.minX,
-                        y: anchor.maxY + edgePadding - container.minY)
+                        y: anchor.minY - edgePadding - container.minY)
             }
         }
         .ignoresSafeArea()
@@ -100,7 +91,7 @@ struct HallMinimapMenu: View {
     }
 
     func menuOriginX(in container: CGRect) -> CGFloat {
-        let preferred = anchor.midX - menuWidth / 2.0
+        let preferred = container.midX - menuWidth / 2.0
         let minimumX = container.minX + edgePadding
         let maximumX = container.maxX - menuWidth - edgePadding
         return min(max(preferred, minimumX), max(minimumX, maximumX))
@@ -110,7 +101,7 @@ struct HallMinimapMenu: View {
         withAnimation(.smooth(duration: 0.15)) {
             animationProgress = 0.0
         } completion: {
-            dismiss()
+            unifier.isHallMinimapPresenting = false
         }
     }
 }

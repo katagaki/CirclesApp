@@ -62,6 +62,10 @@ class Unifier {
     // Other sheets
     var isMyComiketPresenting: Bool = false
 
+    // Hall minimap menu, drawn as an overlay so the panel stays open
+    var isHallMinimapPresenting: Bool = false
+    var hallPickerFrame: CGRect = .zero
+
     // Pending attachment from action extension
     var pendingAttachmentData: Data?
 

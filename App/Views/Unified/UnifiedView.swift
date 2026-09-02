@@ -78,6 +78,11 @@ struct UnifiedView: View {
                         .safeAreaPadding(.bottom, mapBottomPadding)
                 }
         }
+        .overlay {
+            if unifier.isHallMinimapPresenting {
+                HallMinimapMenu()
+            }
+        }
         .task {
             prepareTipKit()
             showReviewPromptIfLaunchedEnoughTimes()
