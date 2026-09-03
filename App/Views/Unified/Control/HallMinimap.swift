@@ -30,6 +30,7 @@ struct HallMinimap: View {
 
     static let floorGap: CGFloat = 1.0
     static let labelFontSize: CGFloat = 16.0
+    static let disabledOpacity: CGFloat = 0.3
 
     static let conferenceColor = Color(red: 0.55, green: 0.49, blue: 0.42)
 
@@ -119,66 +120,39 @@ struct HallMinimap: View {
         }
     }
 
-    func shape(for map: ComiketMap) -> [CGPoint]? {
-        let filenames = maps.map { $0.filename }
-        switch map.filename {
-        case "E7", "E78": return Self.east78Shape
-        case "E123": return Self.rectangle(Self.east123Frame)
-        case "E456": return Self.rectangle(Self.east456Frame)
-        case "W34":
-            return Self.rectangle(
-                filenames.contains("W12") ? Self.upperFloor(of: Self.westFrame) : Self.westFrame
-            )
-        case "W12":
-            return Self.rectangle(
-                filenames.contains("W34") ? Self.lowerFloor(of: Self.westFrame) : Self.westFrame
-            )
-        case "S34":
-            return Self.rectangle(
-                filenames.contains("S12") ? Self.upperFloor(of: Self.southFrame) : Self.southFrame
-            )
-        case "S12":
-            return Self.rectangle(
-                filenames.contains("S34") ? Self.lowerFloor(of: Self.southFrame) : Self.southFrame
-            )
-        default:
-            return map.filename.hasPrefix("C") ? Self.rectangle(Self.conferenceFrame) : nil
-        }
-    }
+    // Every hall the venue has, so halls the event does not use can still be shown as disabled.
+    static let slots: [HallSlot] = [
+        HallSlot(filenames: ["E78", "E7"], shape: east78Shape, placeholderName: "東78"),
+        HallSlot(filenames: ["E123"], shape: rectangle(east123Frame), placeholderName: "東123"),
+        HallSlot(filenames: ["E456"], shape: rectangle(east456Frame), placeholderName: "東456"),
+        HallSlot(filenames: ["W34"], shape: rectangle(upperFloor(of: westFrame)), placeholderName: "西34"),
+        HallSlot(filenames: ["W12"], shape: rectangle(lowerFloor(of: westFrame)), placeholderName: "西12"),
+        HallSlot(filenames: ["S34"], shape: rectangle(upperFloor(of: southFrame)), placeholderName: "南34"),
+        HallSlot(filenames: ["S12"], shape: rectangle(lowerFloor(of: southFrame)), placeholderName: "南12")
+    ]
 
-    var placedMaps: [(map: ComiketMap, shape: [CGPoint])] {
-        maps.compactMap { map in
-            guard let shape = shape(for: map) else { return nil }
-            return (map, shape)
+    static let contentFrame: CGRect = {
+        var bounds = conferenceFrame
+        for slot in slots {
+            bounds = bounds.union(HallMinimap.bounds(of: slot.shape))
+        }
+        return bounds.insetBy(dx: -2.0, dy: -2.0)
+    }()
+
+    var halls: [(slot: HallSlot, map: ComiketMap?)] {
+        Self.slots.map { slot in
+            (slot, maps.first(where: { slot.filenames.contains($0.filename) }))
         }
     }
 
     var unplacedMaps: [ComiketMap] {
-        let placedIDs = Set(placedMaps.map { $0.map.id })
+        let placedIDs = Set(halls.compactMap { $0.map?.id })
         return maps.filter { !placedIDs.contains($0.id) }
-    }
-
-    var showsConference: Bool {
-        !placedMaps.isEmpty && !maps.contains(where: { $0.filename.hasPrefix("C") })
-    }
-
-    var contentFrame: CGRect {
-        var frames = placedMaps.map { Self.bounds(of: $0.shape) }
-        if showsConference {
-            frames.append(Self.conferenceFrame)
-        }
-        guard var bounds = frames.first else { return .zero }
-        for frame in frames.dropFirst() {
-            bounds = bounds.union(frame)
-        }
-        return bounds.insetBy(dx: -2.0, dy: -2.0)
     }
 
     var body: some View {
         VStack(spacing: 12.0) {
-            if !contentFrame.isEmpty {
-                minimap(contentFrame: contentFrame)
-            }
+            minimap()
             if !unplacedMaps.isEmpty {
                 ViewThatFits(in: .horizontal) {
                     HStack(spacing: 8.0) { unplacedMapButtons() }
@@ -188,28 +162,31 @@ struct HallMinimap: View {
         }
     }
 
-    func minimap(contentFrame: CGRect) -> some View {
+    func minimap() -> some View {
+        let contentFrame = Self.contentFrame
         let scale = width / contentFrame.width
         return ZStack {
             Canvas { context, _ in
                 draw(in: context, scale: scale)
             }
-            ForEach(placedMaps, id: \.map.id) { placedMap in
-                let frame = Self.bounds(of: placedMap.shape)
-                Button {
-                    onSelect(placedMap.map)
-                } label: {
-                    Color.clear
-                        .contentShape(HallShape(points: placedMap.shape, bounds: frame))
+            ForEach(halls, id: \.slot.id) { hall in
+                if let map = hall.map {
+                    let frame = Self.bounds(of: hall.slot.shape)
+                    Button {
+                        onSelect(map)
+                    } label: {
+                        Color.clear
+                            .contentShape(HallShape(points: hall.slot.shape, bounds: frame))
+                    }
+                    .buttonStyle(HallButtonStyle { isPressed in
+                        pressedMapID = isPressed ? map.id : nil
+                    })
+                    .frame(width: frame.width * scale, height: frame.height * scale)
+                    .position(x: (frame.midX - contentFrame.minX) * scale,
+                              y: (frame.midY - contentFrame.minY) * scale)
+                    .accessibilityLabel(map.name)
+                    .accessibilityAddTraits(map == selection ? [.isSelected] : [])
                 }
-                .buttonStyle(HallButtonStyle { isPressed in
-                    pressedMapID = isPressed ? placedMap.map.id : nil
-                })
-                .frame(width: frame.width * scale, height: frame.height * scale)
-                .position(x: (frame.midX - contentFrame.minX) * scale,
-                          y: (frame.midY - contentFrame.minY) * scale)
-                .accessibilityLabel(placedMap.map.name)
-                .accessibilityAddTraits(placedMap.map == selection ? [.isSelected] : [])
             }
         }
         .frame(width: width, height: contentFrame.height * scale)
@@ -238,41 +215,48 @@ struct HallMinimap: View {
     func draw(in context: GraphicsContext, scale: CGFloat) {
         var context = context
         context.scaleBy(x: scale, y: scale)
-        context.translateBy(x: -contentFrame.minX, y: -contentFrame.minY)
+        context.translateBy(x: -Self.contentFrame.minX, y: -Self.contentFrame.minY)
 
-        if showsConference {
-            context.fill(
-                Path(Self.conferenceFrame),
-                with: .color(Self.conferenceColor.opacity(0.45))
-            )
-            drawLabel(
-                Text("Shared.Building.Conference"),
-                in: Self.conferenceFrame,
-                color: .white.opacity(0.8),
-                context: context,
-                scale: scale
-            )
+        context.fill(
+            Path(Self.conferenceFrame),
+            with: .color(Self.conferenceColor.opacity(Self.disabledOpacity))
+        )
+        drawLabel(
+            Text("Shared.Building.Conference"),
+            in: Self.conferenceFrame,
+            color: .white.opacity(Self.disabledOpacity),
+            context: context,
+            scale: scale
+        )
+
+        for hall in halls {
+            draw(hall, in: context, scale: scale)
         }
+    }
 
-        for placedMap in placedMaps {
-            let color = Self.color(for: placedMap.map.filename)
-            let isSelected = placedMap.map == selection
-            let path = Self.path(of: placedMap.shape)
-            context.fill(path, with: .color(color))
-            if placedMap.map.id == pressedMapID {
+    func draw(
+        _ hall: (slot: HallSlot, map: ComiketMap?),
+        in context: GraphicsContext,
+        scale: CGFloat
+    ) {
+        let color = Self.color(for: hall.slot.id)
+        let path = Self.path(of: hall.slot.shape)
+        context.fill(path, with: .color(color.opacity(hall.map == nil ? Self.disabledOpacity : 1.0)))
+        if let map = hall.map {
+            if map.id == pressedMapID {
                 context.fill(path, with: .color(.black.opacity(0.25)))
             }
-            if isSelected {
+            if map == selection {
                 context.stroke(path, with: .color(.white), lineWidth: 1.5 / scale)
             }
-            drawLabel(
-                Text(placedMap.map.name),
-                in: Self.labelFrame(of: placedMap.shape),
-                color: .white,
-                context: context,
-                scale: scale
-            )
         }
+        drawLabel(
+            Text(hall.map?.name ?? hall.slot.placeholderName),
+            in: Self.labelFrame(of: hall.slot.shape),
+            color: hall.map == nil ? .white.opacity(Self.disabledOpacity) : .white,
+            context: context,
+            scale: scale
+        )
     }
 
     func drawLabel(
@@ -299,6 +283,15 @@ struct HallMinimap: View {
         }
         context.draw(resolved, at: CGPoint(x: frame.midX, y: frame.midY))
     }
+}
+
+struct HallSlot: Identifiable {
+
+    let filenames: [String]
+    let shape: [CGPoint]
+    let placeholderName: String
+
+    var id: String { filenames[0] }
 }
 
 struct HallButtonStyle: ButtonStyle {
