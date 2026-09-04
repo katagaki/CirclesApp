@@ -72,7 +72,7 @@ struct ControlMenu<Content: View>: View {
                     }
                     .opacity(animationProgress)
                     .offset(x: menuOriginX(in: container) - container.minX,
-                            y: anchor.minY - edgePadding - container.minY)
+                            y: anchor.minY - container.minY)
             }
         }
         .ignoresSafeArea()
