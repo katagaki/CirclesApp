@@ -41,9 +41,12 @@ struct DataLifecycleModifier: ViewModifier {
                     reloadData(animated: false)
                 }
             }
-            .onChange(of: authenticator.isAuthenticating) { oldValue, newValue in
-                if oldValue == true && newValue == false && authenticator.token != nil {
-                    reloadData(shouldResetSelections: true, animated: false)
+            .onChange(of: authenticator.didFinishAuthenticating) { _, newValue in
+                if newValue {
+                    authenticator.didFinishAuthenticating = false
+                    if !authenticator.isAuthenticating && authenticator.token != nil {
+                        reloadData(shouldResetSelections: true, animated: false)
+                    }
                 }
             }
             .onChange(of: unifier.shouldUpdateData) { _, newValue in

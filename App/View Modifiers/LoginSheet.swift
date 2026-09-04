@@ -15,6 +15,8 @@ struct LoginSheetModifier: ViewModifier {
         @Bindable var authenticator = authenticator
         content
             .sheet(isPresented: $authenticator.isAuthenticating) {
+                authenticator.didFinishAuthenticating = true
+            } content: {
                 LoginView()
                     .environment(authenticator)
                     .interactiveDismissDisabled()

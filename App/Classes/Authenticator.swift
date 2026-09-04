@@ -28,6 +28,7 @@ class Authenticator {
     @ObservationIgnored let reachability = try? Reachability()
 
     var isAuthenticating: Bool = false
+    var didFinishAuthenticating: Bool = false
     var isWaitingForAuthenticationCode: Bool = false
     var isReady: Bool = false
     var onlineState: OnlineState = .undetermined
