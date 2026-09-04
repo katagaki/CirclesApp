@@ -466,10 +466,10 @@
 			projectRoot = "";
 			targets = (
 				E4A769452C21A20A00BE3491 /* CiRCLES */,
+				0A11D0010000000000000001 /* OnHand */,
 				F1A0B0042F31700000000001 /* ShareWithCiRCLES */,
 				E41642F52F5D2F5200708895 /* RADiUS */,
 				E41643062F5D2F6200708895 /* AXiS */,
-				0A11D0010000000000000001 /* OnHand */,
 			);
 		};
 /* End PBXProject section */
@@ -620,7 +620,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.OnHand;
 				PRODUCT_NAME = CiRCLES;
 				SDKROOT = watchos;
@@ -654,7 +654,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.OnHand;
 				PRODUCT_NAME = CiRCLES;
 				SDKROOT = watchos;
@@ -1016,7 +1016,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -1059,7 +1059,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -1090,7 +1090,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1118,7 +1118,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
