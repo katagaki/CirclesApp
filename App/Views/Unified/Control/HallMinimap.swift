@@ -24,8 +24,8 @@ struct HallMinimap: View {
     ]
     static let east123Frame = CGRect(x: 47.0, y: 41.5, width: 29.0, height: 12.0)
     static let east456Frame = CGRect(x: 36.5, y: 57.0, width: 29.0, height: 12.0)
-    static let westFrame = CGRect(x: 80.0, y: 23.5, width: 29.0, height: 14.0)
-    static let southFrame = CGRect(x: 91.0, y: 3.5, width: 18.0, height: 16.0)
+    static let westFrame = CGRect(x: 80.0, y: 12.5, width: 29.0, height: 25.0)
+    static let southFrame = CGRect(x: 91.0, y: -16.5, width: 18.0, height: 25.0)
     static let conferenceFrame = CGRect(x: 80.0, y: 41.5, width: 29.0, height: 27.5)
 
     static let floorGap: CGFloat = 1.0

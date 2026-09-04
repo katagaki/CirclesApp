@@ -21,7 +21,22 @@ struct UnifiedControl: View {
         }
         .frame(minWidth: 100.0, maxWidth: 280.0)
         .padding(6.0)
-        .opacity(unifier.isHallMinimapPresenting ? 0.0 : 1.0)
+        .background {
+            GeometryReader { proxy in
+                Color.clear
+                    .onAppear { updateControlFrame(proxy.frame(in: .global)) }
+                    .onChange(of: proxy.frame(in: .global)) { _, newValue in
+                        updateControlFrame(newValue)
+                    }
+            }
+        }
+        .opacity(unifier.presentedControlMenu == nil ? 1.0 : 0.0)
+    }
+
+    // The control is hidden while a menu is open, so keep the anchor from drifting.
+    func updateControlFrame(_ frame: CGRect) {
+        guard unifier.presentedControlMenu == nil else { return }
+        unifier.controlFrame = frame
     }
 
     func accentColorForMap(_ map: ComiketMap?) -> Color? {

@@ -79,8 +79,10 @@ struct UnifiedView: View {
                 }
         }
         .overlay {
-            if unifier.isHallMinimapPresenting {
-                HallMinimapMenu()
+            switch unifier.presentedControlMenu {
+            case .date: DateSelectorMenu()
+            case .hall: HallMinimapMenu()
+            case nil: EmptyView()
             }
         }
         .task {

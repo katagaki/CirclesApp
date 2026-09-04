@@ -6,6 +6,11 @@ enum UnifiedDisplayMode {
     case panel
 }
 
+enum UnifiedControlMenu {
+    case date
+    case hall
+}
+
 enum SidebarPosition {
     case leading
     case trailing
@@ -62,9 +67,9 @@ class Unifier {
     // Other sheets
     var isMyComiketPresenting: Bool = false
 
-    // Hall minimap menu, drawn as an overlay so the panel stays open
-    var isHallMinimapPresenting: Bool = false
-    var hallPickerFrame: CGRect = .zero
+    // Date and hall menus, drawn as overlays so the panel stays open
+    var presentedControlMenu: UnifiedControlMenu?
+    var controlFrame: CGRect = .zero
 
     // Pending attachment from action extension
     var pendingAttachmentData: Data?
