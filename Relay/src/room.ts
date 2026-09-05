@@ -290,7 +290,7 @@ export class Room extends DurableObject {
   }
 }
 
-export function chunk(records: Record[]): Record[][] {
+function chunk(records: Record[]): Record[][] {
   if (records.length === 0) return [[]];
   const frames: Record[][] = [];
   let current: Record[] = [];

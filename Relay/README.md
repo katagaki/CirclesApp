@@ -110,3 +110,12 @@ free-plan cap. Exhausting it fails silently for every user at once.
 ## Logging
 
 Counts and error codes only. Never log a blob, a tag, a key, a room id or a full URL.
+
+## Push notifications (later phase)
+
+Not built here. The open question was whether the Worker's outbound APNs/FCM calls would count
+against the 100,000 requests/day allowance. They do not: Cloudflare does not bill subrequests made
+from a Worker, and only the inbound request — for a WebSocket, the initial upgrade — is billable.
+Two limits do apply instead: 50 subrequests per invocation on the free plan, and six connections per
+invocation simultaneously awaiting response headers. A fan-out that pushes to more than 50 devices
+in one message must therefore be batched across invocations rather than looped in place.
