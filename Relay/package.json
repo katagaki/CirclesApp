@@ -1,0 +1,25 @@
+{
+  "name": "circles-relay",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:production": "wrangler deploy --env production",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.22.0",
+    "@cloudflare/workers-types": "^5.20260903.1",
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.0",
+    "wrangler": "^4.0.0"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true,
+    "workerd@1.20260815.1": true,
+    "workerd@1.20260903.1": true
+  }
+}

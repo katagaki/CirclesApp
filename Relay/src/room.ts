@@ -1,0 +1,310 @@
+import { DurableObject } from "cloudflare:workers";
+import {
+  TAG_LEN,
+  b64urlDecode,
+  b64urlEncode,
+  helloInput,
+  importAuthKey,
+  recordInput,
+  tag,
+  timingSafeEqual,
+  toBytes,
+} from "./proto";
+
+export const MAX_FRAME_BYTES = 4096;
+export const MAX_RECORDS_PER_FRAME = 32;
+export const RATE_TOKENS = 20;
+export const RATE_WINDOW_MS = 10_000;
+export const MAX_SOCKETS = 8;
+export const MAX_STORED_RECORDS = 500;
+export const HELLO_SKEW_SECONDS = 300;
+export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
+
+export const CLOSE_RATE = 4001;
+export const CLOSE_PROTOCOL = 4002;
+export const CLOSE_ROOM_FULL = 4003;
+export const CLOSE_AUTH = 4004;
+export const CLOSE_STORAGE_FULL = 4005;
+
+const DEVICE_ID = /^[0-9a-f]{8}$/;
+
+interface Attachment {
+  d: string | null;
+  tk: number;
+  at: number;
+}
+
+interface Record {
+  d: string;
+  n: number;
+  b: string;
+  a: string;
+}
+
+class Fail extends Error {
+  constructor(readonly code: number, readonly reason: string) {
+    super(reason);
+  }
+}
+
+function byteLength(text: string): number {
+  return new TextEncoder().encode(text).byteLength;
+}
+
+function isSeq(value: unknown): value is number {
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
+}
+
+export class Room extends DurableObject {
+  private sql: SqlStorage;
+
+  constructor(ctx: DurableObjectState, env: unknown) {
+    super(ctx, env as never);
+    this.sql = ctx.storage.sql;
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS ops (
+      device TEXT    NOT NULL,
+      seq    INTEGER NOT NULL,
+      blob   BLOB    NOT NULL,
+      tag    BLOB    NOT NULL,
+      ts     INTEGER NOT NULL,
+      PRIMARY KEY (device, seq)
+    )`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS room (
+      id         INTEGER PRIMARY KEY CHECK (id = 1),
+      auth_key   BLOB    NOT NULL,
+      created_at INTEGER NOT NULL
+    )`);
+    ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("ping", "pong"));
+  }
+
+  override async fetch(request: Request): Promise<Response> {
+    if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
+      return new Response("expected websocket", { status: 400 });
+    }
+    const pair = new WebSocketPair();
+    const client = pair[0];
+    const server = pair[1];
+    if (this.ctx.getWebSockets().length >= MAX_SOCKETS) {
+      server.accept();
+      this.reject(server, CLOSE_ROOM_FULL, "full", "room is full");
+      return new Response(null, { status: 101, webSocket: client });
+    }
+    this.ctx.acceptWebSocket(server);
+    server.serializeAttachment({ d: null, tk: RATE_TOKENS, at: Date.now() } satisfies Attachment);
+    return new Response(null, { status: 101, webSocket: client });
+  }
+
+  override async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
+    try {
+      await this.dispatch(ws, message);
+    } catch (error) {
+      if (error instanceof Fail) {
+        this.reject(ws, error.code, error.reason, error.message);
+        return;
+      }
+      console.log("relay: unhandled error");
+      this.reject(ws, CLOSE_PROTOCOL, "internal", "internal error");
+    }
+  }
+
+  override async alarm(): Promise<void> {
+    this.sql.exec("DELETE FROM ops");
+    this.sql.exec("DELETE FROM room");
+    for (const ws of this.ctx.getWebSockets()) ws.close(1001, "room expired");
+  }
+
+  private async dispatch(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
+    if (typeof message !== "string") throw new Fail(CLOSE_PROTOCOL, "text frames only");
+    if (byteLength(message) > MAX_FRAME_BYTES) throw new Fail(CLOSE_PROTOCOL, "frame too large");
+
+    const attachment = this.spend(ws);
+    let frame: Record | { t?: unknown } | null;
+    try {
+      frame = JSON.parse(message);
+    } catch {
+      throw new Fail(CLOSE_PROTOCOL, "malformed frame");
+    }
+    if (!frame || typeof frame !== "object") throw new Fail(CLOSE_PROTOCOL, "malformed frame");
+
+    const type = (frame as { t?: unknown }).t;
+    if (type === "hello") await this.onHello(ws, frame as never, attachment);
+    else if (type === "ops") await this.onOps(ws, frame as never, attachment);
+    else if (type === "bye") ws.close(1000, "bye");
+    else throw new Fail(CLOSE_PROTOCOL, "unknown frame type");
+  }
+
+  private spend(ws: WebSocket): Attachment {
+    const attachment = (ws.deserializeAttachment() ?? { d: null, tk: RATE_TOKENS, at: Date.now() }) as Attachment;
+    const now = Date.now();
+    const refill = ((now - attachment.at) / RATE_WINDOW_MS) * RATE_TOKENS;
+    attachment.tk = Math.min(RATE_TOKENS, attachment.tk + refill);
+    attachment.at = now;
+    if (attachment.tk < 1) throw new Fail(CLOSE_RATE, "too many messages");
+    attachment.tk -= 1;
+    ws.serializeAttachment(attachment);
+    return attachment;
+  }
+
+  private async onHello(
+    ws: WebSocket,
+    frame: { d?: unknown; v?: unknown; k?: unknown; ts?: unknown; a?: unknown },
+    attachment: Attachment,
+  ): Promise<void> {
+    if (attachment.d) throw new Fail(CLOSE_PROTOCOL, "duplicate hello");
+    const device = frame.d;
+    if (typeof device !== "string" || !DEVICE_ID.test(device)) throw new Fail(CLOSE_PROTOCOL, "bad device id");
+    if (!isSeq(frame.ts)) throw new Fail(CLOSE_PROTOCOL, "bad timestamp");
+    if (Math.abs(Math.floor(Date.now() / 1000) - frame.ts) > HELLO_SKEW_SECONDS) {
+      throw new Fail(CLOSE_AUTH, "stale hello");
+    }
+    const offered = b64urlDecode(frame.a);
+    if (!offered || offered.length !== TAG_LEN) throw new Fail(CLOSE_AUTH, "bad tag");
+
+    const existing = this.authKey();
+    let keyBytes = existing;
+    if (!keyBytes) {
+      const registered = b64urlDecode(frame.k);
+      if (!registered || registered.length !== 32) throw new Fail(CLOSE_AUTH, "unknown room");
+      keyBytes = registered;
+    }
+    const key = await importAuthKey(keyBytes);
+    const expected = await tag(key, helloInput(device, frame.ts));
+    if (!timingSafeEqual(expected, offered)) throw new Fail(CLOSE_AUTH, "bad tag");
+
+    if (!existing) {
+      this.sql.exec(
+        "INSERT INTO room (id, auth_key, created_at) VALUES (1, ?, ?)",
+        keyBytes,
+        Math.floor(Date.now() / 1000),
+      );
+      await this.ctx.storage.setAlarm(Date.now() + ROOM_TTL_MS);
+    }
+
+    attachment.d = device;
+    ws.serializeAttachment(attachment);
+    this.send(ws, this.missing(frame.v));
+  }
+
+  private async onOps(
+    ws: WebSocket,
+    frame: { o?: unknown },
+    attachment: Attachment,
+  ): Promise<void> {
+    if (!attachment.d) throw new Fail(CLOSE_PROTOCOL, "hello required");
+    const list = frame.o;
+    if (!Array.isArray(list) || list.length === 0) throw new Fail(CLOSE_PROTOCOL, "no records");
+    if (list.length > MAX_RECORDS_PER_FRAME) throw new Fail(CLOSE_PROTOCOL, "too many records");
+    const keyBytes = this.authKey();
+    if (!keyBytes) throw new Fail(CLOSE_AUTH, "unknown room");
+    const key = await importAuthKey(keyBytes);
+
+    const records: { record: Record; blob: Uint8Array; tag: Uint8Array }[] = [];
+    for (const entry of list) {
+      if (!entry || typeof entry !== "object") throw new Fail(CLOSE_PROTOCOL, "bad record");
+      const { d, n, b, a } = entry as Record;
+      if (typeof d !== "string" || !DEVICE_ID.test(d)) throw new Fail(CLOSE_PROTOCOL, "bad device id");
+      if (!isSeq(n)) throw new Fail(CLOSE_PROTOCOL, "bad seq");
+      const blob = b64urlDecode(b);
+      const offered = b64urlDecode(a);
+      if (!blob || blob.length === 0) throw new Fail(CLOSE_PROTOCOL, "bad blob");
+      if (!offered || offered.length !== TAG_LEN) throw new Fail(CLOSE_AUTH, "bad tag");
+      const expected = await tag(key, recordInput(d, n, blob));
+      if (!timingSafeEqual(expected, offered)) throw new Fail(CLOSE_AUTH, "bad tag");
+      records.push({ record: { d, n, b, a }, blob, tag: offered });
+    }
+
+    const stored = this.count();
+    if (stored + records.length > MAX_STORED_RECORDS) throw new Fail(CLOSE_STORAGE_FULL, "room is full");
+
+    const now = Math.floor(Date.now() / 1000);
+    const fresh: Record[] = [];
+    for (const { record, blob, tag: mac } of records) {
+      const written = this.sql.exec(
+        "INSERT OR IGNORE INTO ops (device, seq, blob, tag, ts) VALUES (?, ?, ?, ?, ?)",
+        record.d,
+        record.n,
+        blob,
+        mac,
+        now,
+      ).rowsWritten;
+      if (written > 0) fresh.push(record);
+    }
+    if (fresh.length === 0) return;
+
+    await this.ctx.storage.setAlarm(Date.now() + ROOM_TTL_MS);
+    for (const peer of this.ctx.getWebSockets()) {
+      if (peer === ws) continue;
+      const peerAttachment = peer.deserializeAttachment() as Attachment | null;
+      if (!peerAttachment?.d) continue;
+      this.send(peer, fresh);
+    }
+  }
+
+  private authKey(): Uint8Array | null {
+    const row = this.sql.exec("SELECT auth_key FROM room WHERE id = 1").toArray()[0];
+    return row ? toBytes(row.auth_key as ArrayBuffer) : null;
+  }
+
+  private count(): number {
+    return Number(this.sql.exec("SELECT COUNT(*) AS c FROM ops").one().c);
+  }
+
+  private missing(vector: unknown): Record[] {
+    const held = (vector && typeof vector === "object" ? vector : {}) as { [device: string]: unknown };
+    const rows = this.sql
+      .exec("SELECT device, seq, blob, tag FROM ops ORDER BY device, seq LIMIT ?", MAX_STORED_RECORDS)
+      .toArray();
+    const out: Record[] = [];
+    for (const row of rows) {
+      const device = row.device as string;
+      const seq = Number(row.seq);
+      const seen = held[device];
+      if (isSeq(seen) && seq <= seen) continue;
+      out.push({
+        d: device,
+        n: seq,
+        b: b64urlEncode(toBytes(row.blob as ArrayBuffer)),
+        a: b64urlEncode(toBytes(row.tag as ArrayBuffer)),
+      });
+    }
+    return out;
+  }
+
+  private send(ws: WebSocket, records: Record[]): void {
+    for (const frame of chunk(records)) {
+      try {
+        ws.send(JSON.stringify({ t: "ops", o: frame }));
+      } catch {
+        return;
+      }
+    }
+  }
+
+  private reject(ws: WebSocket, code: number, reason: string, message: string): void {
+    try {
+      ws.send(JSON.stringify({ t: "err", c: reason, m: message }));
+      ws.close(code, reason);
+    } catch {
+      /* socket already gone */
+    }
+  }
+}
+
+export function chunk(records: Record[]): Record[][] {
+  if (records.length === 0) return [[]];
+  const frames: Record[][] = [];
+  let current: Record[] = [];
+  let size = 16;
+  for (const record of records) {
+    const cost = JSON.stringify(record).length + 1;
+    if (current.length > 0 && size + cost > MAX_FRAME_BYTES) {
+      frames.push(current);
+      current = [];
+      size = 16;
+    }
+    current.push(record);
+    size += cost;
+  }
+  frames.push(current);
+  return frames;
+}

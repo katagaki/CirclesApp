@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "circles-relay",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-08-22",
+  "observability": { "enabled": true },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }],
+  "durable_objects": {
+    "bindings": [{ "name": "ROOM", "class_name": "Room" }]
+  },
+  "env": {
+    "staging": {
+      "observability": { "enabled": true },
+      "durable_objects": {
+        "bindings": [{ "name": "ROOM", "class_name": "Room" }]
+      }
+    },
+    "production": {
+      "observability": { "enabled": true },
+      "durable_objects": {
+        "bindings": [{ "name": "ROOM", "class_name": "Room" }]
+      }
+    }
+  }
+}
