@@ -1,5 +1,5 @@
-declare module "cloudflare:test" {
-  interface ProvidedEnv {
-    ROOM: DurableObjectNamespace;
+declare namespace Cloudflare {
+  interface Env {
+    ROOM: DurableObjectNamespace<import("../src/room").Room>;
   }
 }
