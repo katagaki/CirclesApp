@@ -12,9 +12,10 @@ reaches this service.
 ```
 wss://<host>/r/:roomId      roomId matches /^[0-9a-f]{32}$/
 GET  /health                200 "ok"
+GET  /                      302 to the repository
 ```
 
-Everything else is 400.
+Everything else, including `/` with a query string, is 400.
 
 ## Protocol
 

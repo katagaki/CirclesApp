@@ -22,7 +22,10 @@ function stub(room: string): DurableObjectStub<Room> {
 describe("routing", () => {
   it("serves health and rejects everything else", async () => {
     expect((await SELF.fetch("https://relay.test/health")).status).toBe(200);
-    expect((await SELF.fetch("https://relay.test/")).status).toBe(400);
+    const home = await SELF.fetch("https://relay.test/", { redirect: "manual" });
+    expect(home.status).toBe(302);
+    expect(home.headers.get("Location")).toBe("https://github.com/katagaki/CirclesRelay");
+    expect((await SELF.fetch("https://relay.test/?x=1")).status).toBe(400);
     expect((await SELF.fetch("https://relay.test/r/nothex")).status).toBe(400);
     const upgrade = { headers: { Upgrade: "websocket" } };
     expect((await SELF.fetch(`https://relay.test/r/${roomId()}`, upgrade)).status).toBe(101);
