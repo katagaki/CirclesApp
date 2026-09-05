@@ -69,6 +69,10 @@ not fanned out again. Records are never reordered, rewritten or deduplicated by 
 | Bad, missing or stale auth | — | `4004` |
 | Room lifetime | 48 h sliding from the last write | `1001` |
 
+Every close is preceded by an `err` frame whose `c` is a stable slug for the close code — `rate`
+(4001), `proto` (4002), `full` (4003), `auth` (4004), `storage` (4005) — and whose `m` is human
+text that may change. Match on `c`, never on `m`.
+
 ## Hibernation
 
 The object uses the WebSocket Hibernation API, so an idle room with open sockets bills no duration.

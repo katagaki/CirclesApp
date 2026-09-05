@@ -42,10 +42,18 @@ interface Record {
 }
 
 class Fail extends Error {
-  constructor(readonly code: number, readonly reason: string) {
-    super(reason);
+  constructor(readonly code: number, message: string) {
+    super(message);
   }
 }
+
+const SLUG: { [code: number]: string } = {
+  [CLOSE_RATE]: "rate",
+  [CLOSE_PROTOCOL]: "proto",
+  [CLOSE_ROOM_FULL]: "full",
+  [CLOSE_AUTH]: "auth",
+  [CLOSE_STORAGE_FULL]: "storage",
+};
 
 function byteLength(text: string): number {
   return new TextEncoder().encode(text).byteLength;
@@ -86,7 +94,7 @@ export class Room extends DurableObject {
     const server = pair[1];
     if (this.ctx.getWebSockets().length >= MAX_SOCKETS) {
       server.accept();
-      this.reject(server, CLOSE_ROOM_FULL, "full", "room is full");
+      this.reject(server, CLOSE_ROOM_FULL, "room is full");
       return new Response(null, { status: 101, webSocket: client });
     }
     this.ctx.acceptWebSocket(server);
@@ -99,11 +107,11 @@ export class Room extends DurableObject {
       await this.dispatch(ws, message);
     } catch (error) {
       if (error instanceof Fail) {
-        this.reject(ws, error.code, error.reason, error.message);
+        this.reject(ws, error.code, error.message);
         return;
       }
       console.log("relay: unhandled error");
-      this.reject(ws, CLOSE_PROTOCOL, "internal", "internal error");
+      this.reject(ws, CLOSE_PROTOCOL, "internal error");
     }
   }
 
@@ -280,10 +288,11 @@ export class Room extends DurableObject {
     }
   }
 
-  private reject(ws: WebSocket, code: number, reason: string, message: string): void {
+  private reject(ws: WebSocket, code: number, message: string): void {
+    const slug = SLUG[code] ?? "error";
     try {
-      ws.send(JSON.stringify({ t: "err", c: reason, m: message }));
-      ws.close(code, reason);
+      ws.send(JSON.stringify({ t: "err", c: slug, m: message }));
+      ws.close(code, slug);
     } catch {
       /* socket already gone */
     }
