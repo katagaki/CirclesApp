@@ -14,13 +14,6 @@ struct UnifiedPanel: View {
                 ToolbarItem(placement: .principal) {
                     UnifiedViewPicker()
                 }
-                if unifier.displayMode == .sheet {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Shared.CollapsePanel", systemImage: "chevron.down") {
-                            self.unifier.collapse()
-                        }
-                    }
-                }
             }
             .toolbarVisibility(unifier.isMinimized ? .hidden : .visible, for: .navigationBar, .bottomBar)
             .navigationDestination(for: UnifiedPath.self) { path in
