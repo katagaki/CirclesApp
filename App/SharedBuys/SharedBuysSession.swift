@@ -30,7 +30,14 @@ final class SharedBuysSession {
     private(set) var eventNumber: Int = 0
     private(set) var changes: [SharedBuyChange] = []
     private var lastSeq: Int = 0
+    private var reconnectAttempt: Int = 0
+    private var reconnectTask: Task<Void, Never>?
     private let relay = SharedBuysRelay()
+    private let bluetooth = SharedBuysBluetooth()
+
+    var bluetoothPeers: Int = 0
+    var bluetoothNote: String = ""
+    var isBluetoothEnabled: Bool = true
 
     var isActive: Bool { sessionKey != nil }
 
@@ -81,6 +88,7 @@ final class SharedBuysSession {
         append(.memberJoined, itemID: "-", circleID: 0, text: nickname, value: actorPID)
         note("started room \(roomID ?? "?") as \(deviceID)")
         connect()
+        startBluetooth()
     }
 
     func join(url: URL, nickname: String) {
@@ -100,9 +108,15 @@ final class SharedBuysSession {
         append(.memberJoined, itemID: "-", circleID: 0, text: nickname, value: actorPID)
         note("joined room \(roomID ?? "?") as \(deviceID)")
         connect()
+        startBluetooth()
     }
 
     func leave() {
+        reconnectTask?.cancel()
+        reconnectTask = nil
+        reconnectAttempt = 0
+        bluetooth.stop()
+        bluetoothPeers = 0
         Task { await relay.disconnect() }
         sessionKey = nil
         changes = []
@@ -114,6 +128,8 @@ final class SharedBuysSession {
 
     func connect() {
         guard let sessionKey, let roomID else { return }
+        reconnectTask?.cancel()
+        reconnectTask = nil
         status = .connecting
         let base = relayBaseURL
         let device = deviceID
@@ -131,6 +147,88 @@ final class SharedBuysSession {
                 Task { @MainActor in self.handle(event) }
             }
         }
+    }
+
+    func runSelfTest() {
+        let vector = ["aaaaaaaa": 3, "bbbbbbbb": 1, "cafebabe": 260]
+        let digest = SharedBuysDigest.data(of: vector).map { String(format: "%02x", $0) }.joined()
+        note("digest \(digest)")
+
+        let payload = Data((0..<500).map { UInt8($0 % 251) })
+        let frames = SharedBuysFraming.chunks(of: payload, messageID: 7)
+        var reassembler = SharedBuysFraming.Reassembler()
+        var rebuilt: Data?
+        for frame in frames.shuffled() {
+            if let result = reassembler.accept(frame) { rebuilt = result }
+        }
+        note("framing \(frames.count) chunks, round trip \(rebuilt == payload ? "ok" : "FAILED")")
+
+        if let sessionKey {
+            let tag = SharedBuysProfile.sessionTag(sessionKey: sessionKey)
+                .map { String(format: "%02x", $0) }.joined()
+            note("ble tag \(tag) window \(SharedBuysProfile.window(at: .now))")
+        }
+    }
+
+    func startBluetooth() {
+        guard isBluetoothEnabled, let sessionKey else { return }
+        bluetooth.start(sessionKey: sessionKey, digest: SharedBuysDigest.data(of: versionVector)) { event in
+            switch event {
+            case .peerCount(let count):
+                self.bluetoothPeers = count
+                self.note("bluetooth peers \(count)")
+                if count > 0 { self.sendWant() }
+            case .payload(let payload):
+                self.handleBluetooth(payload)
+            case .unavailable(let reason):
+                self.bluetoothNote = reason
+                self.note("bluetooth: \(reason)")
+            }
+        }
+    }
+
+    func stopBluetooth() {
+        bluetooth.stop()
+        bluetoothPeers = 0
+    }
+
+    private func sendWant() {
+        let frame: [String: Any] = ["t": "want", "v": versionVector]
+        guard let data = try? JSONSerialization.data(withJSONObject: frame) else { return }
+        bluetooth.send(data)
+    }
+
+    private func handleBluetooth(_ payload: Data) {
+        guard let object = try? JSONSerialization.jsonObject(with: payload) as? [String: Any] else { return }
+        switch object["t"] as? String {
+        case "want":
+            let theirs = object["v"] as? [String: Int] ?? [:]
+            let missing = changes.filter { $0.seq > (theirs[$0.device] ?? 0) }
+            sendOverBluetooth(missing)
+        case "ops":
+            let raw = object["o"] as? [[String: Any]] ?? []
+            let records: [RelayRecord] = raw.compactMap { entry in
+                guard let device = entry["d"] as? String,
+                      let seq = entry["n"] as? Int,
+                      let blob = entry["b"] as? String,
+                      let tag = entry["a"] as? String else { return nil }
+                return RelayRecord(device: device, seq: seq, blob: blob, tag: tag)
+            }
+            ingest(records)
+        default:
+            break
+        }
+    }
+
+    private func sendOverBluetooth(_ outgoing: [SharedBuyChange]) {
+        guard !outgoing.isEmpty, bluetoothPeers > 0, let sessionKey, let roomID else { return }
+        let records = outgoing.compactMap { seal($0, sessionKey: sessionKey, roomID: roomID) }
+        guard !records.isEmpty else { return }
+        let frame: [String: Any] = ["t": "ops", "o": records.map {
+            ["d": $0.device, "n": $0.seq, "b": $0.blob, "a": $0.tag]
+        }]
+        guard let data = try? JSONSerialization.data(withJSONObject: frame) else { return }
+        bluetooth.send(data)
     }
 
     func addItem(name: String, cost: Int, circleID: Int) {
@@ -166,6 +264,8 @@ final class SharedBuysSession {
         persist()
         guard let record = seal(change, sessionKey: sessionKey, roomID: roomID) else { return }
         Task { await relay.send(records: [record]) }
+        sendOverBluetooth([change])
+        bluetooth.update(digest: SharedBuysDigest.data(of: versionVector))
     }
 
     private func seal(_ change: SharedBuyChange, sessionKey: Data, roomID: String) -> RelayRecord? {
@@ -197,6 +297,7 @@ final class SharedBuysSession {
         switch event {
         case .connected:
             status = .connected
+            reconnectAttempt = 0
             note("connected")
             resend()
         case .records(let records):
@@ -204,9 +305,29 @@ final class SharedBuysSession {
         case .failed(let reason):
             status = .offline(reason)
             note("failed: \(reason)")
+            scheduleReconnect()
         case .closed(let code):
             status = .offline("closed \(code)")
             note("closed \(code)")
+            scheduleReconnect()
+        }
+    }
+
+    private func scheduleReconnect() {
+        guard isActive, reconnectTask == nil else { return }
+        guard bluetoothPeers == 0 else {
+            note("holding off, bluetooth is carrying")
+            return
+        }
+        reconnectAttempt = min(reconnectAttempt + 1, 6)
+        let backoff = min(pow(2.0, Double(reconnectAttempt)), 30.0)
+        let delay = backoff + Double.random(in: 0...1)
+        note("reconnect in \(String(format: "%.1f", delay))s")
+        reconnectTask = Task { [delay] in
+            try? await Task.sleep(for: .seconds(delay))
+            guard !Task.isCancelled else { return }
+            self.reconnectTask = nil
+            if self.isActive, self.bluetoothPeers == 0 { self.connect() }
         }
     }
 
@@ -241,6 +362,7 @@ final class SharedBuysSession {
         }
         if added > 0 {
             persist()
+            bluetooth.update(digest: SharedBuysDigest.data(of: versionVector))
             note("received \(added)")
         }
     }

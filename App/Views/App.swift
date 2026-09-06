@@ -78,6 +78,7 @@ struct CirclesApp: App {
                 }
                 .onAppear {
                     orientation.update()
+                    sharedBuys.restore()
                 }
                 .onRotate { newOrientation in
                     orientation.update(to: newOrientation)

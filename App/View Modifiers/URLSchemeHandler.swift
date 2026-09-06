@@ -17,7 +17,10 @@ struct URLSchemeHandlerModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onOpenURL { url in
-                if url.scheme == "circles-app" && url.host() == "buys-add",
+                if url.scheme == "circles-app" && url.host() == "buys-selftest" {
+                    sharedBuys.runSelfTest()
+                    unifier.isSharedBuysDebugPresenting = true
+                } else if url.scheme == "circles-app" && url.host() == "buys-add",
                    let components = URLComponents(url: url, resolvingAgainstBaseURL: false) {
                     let name = components.queryItems?.first(where: { $0.name == "name" })?.value ?? ""
                     let cost = Int(components.queryItems?.first(where: { $0.name == "cost" })?.value ?? "") ?? 0

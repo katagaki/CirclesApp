@@ -58,6 +58,13 @@ enum SharedBuysCrypto {
         return Data(HMAC<SHA256>.authenticationCode(for: input, using: relayAuthKey)).prefix(tagLength)
     }
 
+    static func rollingTag(sessionKey: Data, window: Int) -> Data {
+        var input = Data("ble".utf8)
+        input.append(bigEndian(UInt64(bitPattern: Int64(window))))
+        let mac = HMAC<SHA256>.authenticationCode(for: input, using: SymmetricKey(data: sessionKey))
+        return Data(mac).prefix(2)
+    }
+
     static func nonce(deviceID: String, seq: Int) -> Data {
         var value = Data(hex: deviceID) ?? Data(repeating: 0, count: 4)
         value.append(bigEndian(UInt64(seq)))
