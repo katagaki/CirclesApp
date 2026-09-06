@@ -2,7 +2,7 @@ name: SharedBuys
 options:
   bundleIdPrefix: com.tsubuzaki.prototype
   deploymentTarget:
-    iOS: "18.0"
+    iOS: "26.0"
   createIntermediateGroups: true
 targets:
   SharedBuys:

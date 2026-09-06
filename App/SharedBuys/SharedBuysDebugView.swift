@@ -135,7 +135,7 @@ struct SharedBuysDebugView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button(role: .confirm) { dismiss() }
                 }
             }
         }

@@ -24,6 +24,7 @@ final class SharedBuysSession {
     var log: [String] = []
     var relayBaseURL: String = "ws://127.0.0.1:8787"
     var actorPID: Int = 0
+    var nickname: String = ""
 
     private(set) var sessionKey: Data?
     private(set) var deviceID: String = ""
@@ -49,6 +50,7 @@ final class SharedBuysSession {
 
     var items: [SharedBuyItem] { SharedBuyFold.items(from: changes) }
 
+
     var members: [Int: String] { SharedBuyFold.members(from: changes) }
 
     var joinURL: URL? {
@@ -71,6 +73,7 @@ final class SharedBuysSession {
     }
 
     func restore() {
+        adoptIdentity()
         guard let snapshot = SharedBuysStore.load() else { return }
         sessionKey = snapshot.sessionKey
         deviceID = snapshot.deviceID

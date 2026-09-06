@@ -13,11 +13,16 @@ struct BuysView: View {
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
     @Environment(UserSelections.self) var selections
+    @Environment(SharedBuysSession.self) var sharedBuys
 
     @State var buyEntries: [BuyEntry] = []
     @State var dayMappedCircleIDs: [Int: Int] = [:]
     @State var expandedImage: UIImage?
     @State var isShowingInfoAlert: Bool = false
+    @State var isShowingSharedSheet: Bool = false
+    @State var scope: BuysScope = .mine
+    @State var hasChosenScope: Bool = false
+    @State var assignmentTarget: SharedBuyItem?
 
     var entriesWithItems: [BuyEntry] {
         buyEntries.filter {
@@ -50,6 +55,67 @@ struct BuysView: View {
     }
 
     var body: some View {
+        VStack(spacing: 0.0) {
+            Picker("", selection: $scope) {
+                Text("Buys.Scope.Mine").tag(BuysScope.mine)
+                Text("Buys.Scope.Shared").tag(BuysScope.shared)
+            }
+            .pickerStyle(.segmented)
+            .labelsHidden()
+            .padding(.horizontal, 16.0)
+            .padding(.bottom, 8.0)
+            if scope == .mine {
+                privateBuys()
+            } else {
+                sharedBuysList()
+            }
+        }
+        .fullScreenCover(item: Binding(
+            get: { expandedImage.map { ExpandedBuyImage(image: $0) } },
+            set: { if $0 == nil { expandedImage = nil } }
+        )) { item in
+            BuyItemImageViewer(image: item.image)
+        }
+        .navigationTitle("ViewTitle.Buys")
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $isShowingSharedSheet) {
+            SharedBuysSheet()
+        }
+        .sheet(item: $assignmentTarget) { item in
+            SharedBuyAssignSheet(item: item)
+        }
+        .toolbar {
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                ToolbarItem(placement: .topBarLeading) {
+                    infoButton()
+                }
+            } else {
+                ToolbarSpacer(.flexible, placement: .bottomBar)
+                ToolbarItem(placement: .bottomBar) {
+                    infoButton()
+                }
+                SidebarPositionToolbarItem()
+            }
+        }
+        .alert("Buys.Info.Title", isPresented: $isShowingInfoAlert) {
+            Button("Shared.OK", role: .cancel) { }
+        } message: {
+            Text("Buys.Info.Description")
+        }
+        .onAppear {
+            reloadEntries()
+            if sharedBuys.isActive, !hasChosenScope { scope = .shared }
+        }
+        .onChange(of: sharedBuys.isActive) { _, isActive in
+            if isActive, !hasChosenScope { scope = .shared }
+        }
+        .onChange(of: scope) { _, _ in
+            hasChosenScope = true
+        }
+    }
+
+    @ViewBuilder
+    func privateBuys() -> some View {
         ZStack {
             if visibleEntries.isEmpty {
                 if entriesWithItems.isEmpty {
@@ -107,34 +173,93 @@ struct BuysView: View {
                 .listSectionSpacing(.compact)
             }
         }
-        .fullScreenCover(item: Binding(
-            get: { expandedImage.map { ExpandedBuyImage(image: $0) } },
-            set: { if $0 == nil { expandedImage = nil } }
-        )) { item in
-            BuyItemImageViewer(image: item.image)
-        }
-        .navigationTitle("ViewTitle.Buys")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            if UIDevice.current.userInterfaceIdiom == .phone {
-                ToolbarItem(placement: .topBarLeading) {
-                    infoButton()
+    }
+
+    @ViewBuilder
+    func sharedBuysList() -> some View {
+        let circleIDs = Set(sharedBuys.items.map(\.circleID))
+        let circles = database.circles(Array(circleIDs))
+        if !sharedBuys.isActive {
+            ContentUnavailableView {
+                Label("Buys.Shared.NotStarted", systemImage: "person.2")
+            } description: {
+                Text("Buys.Shared.Explain")
+            } actions: {
+                Button("Buys.Shared.Start") {
+                    sharedBuys.adoptIdentity()
+                    sharedBuys.start(
+                        eventNumber: planner.activeEventNumber,
+                        nickname: sharedBuys.nickname
+                    )
+                    isShowingSharedSheet = true
                 }
-            } else {
-                ToolbarSpacer(.flexible, placement: .bottomBar)
-                ToolbarItem(placement: .bottomBar) {
-                    infoButton()
-                }
-                SidebarPositionToolbarItem()
+                .buttonStyle(.borderedProminent)
             }
-        }
-        .alert("Buys.Info.Title", isPresented: $isShowingInfoAlert) {
-            Button("Shared.OK", role: .cancel) { }
-        } message: {
-            Text("Buys.Info.Description")
-        }
-        .onAppear {
-            reloadEntries()
+        } else if sharedBuys.items.isEmpty {
+            VStack(spacing: 0.0) {
+                List {
+                    Section {
+                        SharedWithRow()
+                            .onTapGesture { isShowingSharedSheet = true }
+                    }
+                }
+                .listStyle(.insetGrouped)
+                .listSectionSpacing(.compact)
+                .frame(height: 110.0)
+                ContentUnavailableView(
+                    "Buys.Shared.NoItems",
+                    systemImage: "bag",
+                    description: Text("Buys.Shared.NoItems.Description")
+                )
+            }
+        } else {
+            List {
+                Section {
+                    SharedWithRow()
+                        .onTapGesture { isShowingSharedSheet = true }
+                } footer: {
+                    if sharedBuys.hasUnsentChanges {
+                        Text("Buys.Shared.Pending")
+                    }
+                }
+                ForEach(Array(circleIDs).sorted(), id: \.self) { circleID in
+                    Section {
+                        ForEach(sharedBuys.items.filter { $0.circleID == circleID }) { item in
+                            SharedBuyItemRow(item: item) { assignmentTarget = item }
+                        }
+                    } header: {
+                        if let circle = circles.first(where: { $0.id == circleID }) {
+                            HStack(spacing: 6.0) {
+                                Text(circle.circleName)
+                                    .fontWeight(.semibold)
+                                if let spaceName = circle.spaceName() {
+                                    CircleBlockPill(LocalizedStringKey(spaceName))
+                                }
+                            }
+                        } else {
+                            Text("Buys.UnknownCircle.\(circleID)")
+                        }
+                    }
+                }
+                Section {
+                    HStack {
+                        Text("Buys.Shared.YourShare")
+                        Spacer()
+                        Text("Buys.CostValue.\(sharedBuys.yourShare)")
+                            .monospacedDigit()
+                    }
+                    HStack {
+                        Text("Buys.Shared.GroupTotal")
+                            .fontWeight(.bold)
+                        Spacer()
+                        Text("Buys.CostValue.\(sharedBuys.groupTotal)")
+                            .fontWeight(.bold)
+                            .monospacedDigit()
+                    }
+                }
+            }
+            .listStyle(.insetGrouped)
+            .listSectionSpacing(.compact)
         }
     }
 
@@ -155,6 +280,52 @@ struct BuysView: View {
     func reloadDayMappedCircleIDs() {
         let circles = database.circles(buyEntries.map({ $0.circleID }))
         dayMappedCircleIDs = Dictionary(circles.map({ ($0.id, $0.day) }), uniquingKeysWith: { first, _ in first })
+    }
+}
+
+enum BuysScope: Hashable {
+    case mine
+    case shared
+}
+
+struct SharedWithRow: View {
+
+    @Environment(SharedBuysSession.self) var sharedBuys
+
+    var others: [String] {
+        sharedBuys.members
+            .filter { $0.key != sharedBuys.actorPID }
+            .values
+            .sorted()
+    }
+
+    var title: LocalizedStringKey {
+        switch others.count {
+        case 0: "Buys.Shared.OnlyYou"
+        case 1: "Buys.Shared.With.\(others[0])"
+        case 2: "Buys.Shared.With.\(others[0]).\(others[1])"
+        default: "Buys.Shared.With.Others.\(others.count)"
+        }
+    }
+
+    var body: some View {
+        HStack(spacing: 10.0) {
+            HStack(spacing: -8.0) {
+                ForEach(sharedBuys.members.sorted(by: { $0.value < $1.value }), id: \.key) { member in
+                    MemberInitial(nickname: member.value, size: 26.0)
+                        .overlay {
+                            Circle().strokeBorder(Color(.secondarySystemGroupedBackground), lineWidth: 2.0)
+                        }
+                }
+            }
+            Text(title)
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption2)
+                .foregroundStyle(.tertiary)
+        }
+        .font(.subheadline)
+        .contentShape(.rect)
     }
 }
 

@@ -38,7 +38,7 @@ struct AddItemSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button(role: .cancel) { dismiss() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Add") {

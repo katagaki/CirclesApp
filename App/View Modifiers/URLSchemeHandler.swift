@@ -33,8 +33,10 @@ struct URLSchemeHandlerModifier: ViewModifier {
                 } else if url.scheme == "circles-app" && url.host() == "buys-debug" {
                     unifier.isSharedBuysDebugPresenting = true
                 } else if url.scheme == "circles-app" && url.host() == SharedBuysSession.joinHost {
-                    sharedBuys.join(url: url, nickname: "Tester")
-                    unifier.isSharedBuysDebugPresenting = true
+                    sharedBuys.adoptIdentity()
+                    sharedBuys.join(url: url, nickname: sharedBuys.nickname)
+                    unifier.current = .buys
+                    unifier.expand()
                 } else if url.scheme == "circles-app" && url.host() == "sixseven" {
                     authenticator.isAuthenticating = true
                 } else if url.scheme == "circles-app" && url.host() == "attach-product-list",
