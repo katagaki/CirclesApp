@@ -25,6 +25,8 @@ struct SharedBuysDebugView: View {
                     LabeledContent("Device", value: session.deviceID.isEmpty ? "—" : session.deviceID)
                     LabeledContent("Room", value: session.roomID ?? "—")
                     LabeledContent("Bluetooth peers", value: "\(session.bluetoothPeers)")
+                    LabeledContent("Live Activities", value: "\(session.activityCount)")
+                    LabeledContent("Activities enabled", value: session.activitiesEnabled ? "yes" : "no")
                     TextField("Relay", text: $session.relayBaseURL)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled()

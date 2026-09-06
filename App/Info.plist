@@ -49,6 +49,8 @@
 			<string>Any</string>
 		</dict>
 	</dict>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>共有宝物リストを近くの端末と同期するために使用します。</string>
 	<key>UIBackgroundModes</key>

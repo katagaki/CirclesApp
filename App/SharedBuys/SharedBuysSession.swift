@@ -32,6 +32,7 @@ final class SharedBuysSession {
     private var lastSeq: Int = 0
     private var reconnectAttempt: Int = 0
     private var reconnectTask: Task<Void, Never>?
+    var activity: Any?
     private let relay = SharedBuysRelay()
     private let bluetooth = SharedBuysBluetooth()
 
@@ -76,6 +77,10 @@ final class SharedBuysSession {
         eventNumber = snapshot.eventNumber
         lastSeq = snapshot.lastSeq
         changes = snapshot.changes
+        note("restored room \(roomID ?? "?") as \(deviceID)")
+        adoptActivity()
+        connect()
+        startBluetooth()
     }
 
     func start(eventNumber: Int, nickname: String) {
@@ -89,6 +94,7 @@ final class SharedBuysSession {
         note("started room \(roomID ?? "?") as \(deviceID)")
         connect()
         startBluetooth()
+        startActivity()
     }
 
     func join(url: URL, nickname: String) {
@@ -109,9 +115,11 @@ final class SharedBuysSession {
         note("joined room \(roomID ?? "?") as \(deviceID)")
         connect()
         startBluetooth()
+        startActivity()
     }
 
     func leave() {
+        endActivity()
         reconnectTask?.cancel()
         reconnectTask = nil
         reconnectAttempt = 0
@@ -266,6 +274,7 @@ final class SharedBuysSession {
         Task { await relay.send(records: [record]) }
         sendOverBluetooth([change])
         bluetooth.update(digest: SharedBuysDigest.data(of: versionVector))
+        updateActivity()
     }
 
     private func seal(_ change: SharedBuyChange, sessionKey: Data, roomID: String) -> RelayRecord? {
@@ -363,6 +372,7 @@ final class SharedBuysSession {
         if added > 0 {
             persist()
             bluetooth.update(digest: SharedBuysDigest.data(of: versionVector))
+            updateActivity()
             note("received \(added)")
         }
     }
@@ -380,7 +390,7 @@ final class SharedBuysSession {
         )
     }
 
-    private func note(_ message: String) {
+    func note(_ message: String) {
         log.insert(message, at: 0)
         if log.count > 40 { log.removeLast() }
     }

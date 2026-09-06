@@ -8,10 +8,19 @@
 
 /* Begin PBXBuildFile section */
 		0A11D00C000000000000000C /* CiRCLES.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0A11D0020000000000000002 /* CiRCLES.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		2B6ED3A2BE1197DC6E6BDF3D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F4DDFCCFE0D158B610EDEA8 /* Foundation.framework */; };
+		75D7CED44B17D66CF9B0855E /* SharedBuysLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */; };
+		8C35BA4C2F7CC7A4959DF5BF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2745DAF4DF1C30D56B380624 /* WidgetKit.framework */; };
+		8CB377578DF8C7BC7A089FF8 /* SharedBuysAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02659166FE5A426385EF1DAD /* SharedBuysAttributes.swift */; };
+		94CF64F6B10F21FEE927DC8B /* SharedBuysWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1298D61EBB64136051D35619 /* SharedBuysWidget.appex */; };
 		A1B2C3012F5D300000000001 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3022F5D300000000001 /* SQLite */; };
 		A1B2C3032F5D300000000002 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3042F5D300000000002 /* ZIPFoundation */; };
 		A1B2C3052F5D300000000003 /* RADiUS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E41642F62F5D2F5200708895 /* RADiUS.framework */; };
 		A1B2C3062F5D300000000004 /* AXiS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E41643072F5D2F6200708895 /* AXiS.framework */; };
+		B5102ADCCB6C8B0F4305436D /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46BB8E922640B5602C651A04 /* ActivityKit.framework */; };
+		B532FEDB88215525BB6AD925 /* SharedBuysAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02659166FE5A426385EF1DAD /* SharedBuysAttributes.swift */; };
+		B57D260884AB107CD972E574 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88E5AFDB5874BB1E45D0379C /* SwiftUI.framework */; };
+		D187D843694B57F81185DD5B /* SharedBuysWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171C3A7FD183AE1DE637FC0E /* SharedBuysWidgetBundle.swift */; };
 		E405A48F2C21B157006FE791 /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E405A48E2C21B157006FE791 /* Komponents */; };
 		E40623022DEBE238002D3E28 /* WebP in Frameworks */ = {isa = PBXBuildFile; productRef = E40623012DEBE238002D3E28 /* WebP */; };
 		E41642FC2F5D2F5300708895 /* RADiUS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E41642F62F5D2F5200708895 /* RADiUS.framework */; };
@@ -40,6 +49,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = E41642F52F5D2F5200708895;
 			remoteInfo = RADiUS;
+		};
+		C990AA01109B2B8A4864FD4A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4A7693E2C21A20A00BE3491 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6B3D76C36CF42BDCD8B1F9AC;
+			remoteInfo = SharedBuysWidget;
 		};
 		E41642FA2F5D2F5300708895 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -95,6 +111,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				F1A0B0062F31700000000001 /* ShareWithCiRCLES.appex in Embed Foundation Extensions */,
+				94CF64F6B10F21FEE927DC8B /* SharedBuysWidget.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -102,7 +119,17 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		02659166FE5A426385EF1DAD /* SharedBuysAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedBuysAttributes.swift; sourceTree = "<group>"; };
 		0A11D0020000000000000002 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1298D61EBB64136051D35619 /* SharedBuysWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SharedBuysWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		171C3A7FD183AE1DE637FC0E /* SharedBuysWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedBuysWidgetBundle.swift; sourceTree = "<group>"; };
+		2745DAF4DF1C30D56B380624 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		46BB8E922640B5602C651A04 /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
+		4A21F4CBB6C46E07523E557A /* SharedBuysWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = SharedBuysWidget.entitlements; sourceTree = "<group>"; };
+		516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedBuysLiveActivity.swift; sourceTree = "<group>"; };
+		6F4DDFCCFE0D158B610EDEA8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		88E5AFDB5874BB1E45D0379C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		C6DA6538B4BE7801B0617C90 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E41642F62F5D2F5200708895 /* RADiUS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RADiUS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E41643072F5D2F6200708895 /* AXiS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AXiS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E4A769462C21A20A00BE3491 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -189,6 +216,17 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7A316D5FE0412EB6EACCB520 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2B6ED3A2BE1197DC6E6BDF3D /* Foundation.framework in Frameworks */,
+				8C35BA4C2F7CC7A4959DF5BF /* WidgetKit.framework in Frameworks */,
+				B57D260884AB107CD972E574 /* SwiftUI.framework in Frameworks */,
+				B5102ADCCB6C8B0F4305436D /* ActivityKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E41642F32F5D2F5200708895 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -233,6 +271,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		68FE9EF059CC694F0BA4816F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DF32C4CB130942BE84F9810D /* iOS */,
+				2745DAF4DF1C30D56B380624 /* WidgetKit.framework */,
+				88E5AFDB5874BB1E45D0379C /* SwiftUI.framework */,
+				46BB8E922640B5602C651A04 /* ActivityKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7FE5283FCFFC00325CFC9776 /* SharedBuysWidget */ = {
+			isa = PBXGroup;
+			children = (
+				02659166FE5A426385EF1DAD /* SharedBuysAttributes.swift */,
+				516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */,
+				171C3A7FD183AE1DE637FC0E /* SharedBuysWidgetBundle.swift */,
+				C6DA6538B4BE7801B0617C90 /* Info.plist */,
+				4A21F4CBB6C46E07523E557A /* SharedBuysWidget.entitlements */,
+			);
+			path = SharedBuysWidget;
+			sourceTree = "<group>";
+		};
+		DF32C4CB130942BE84F9810D /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				6F4DDFCCFE0D158B610EDEA8 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
 		E4A7693D2C21A20A00BE3491 = {
 			isa = PBXGroup;
 			children = (
@@ -245,6 +314,8 @@
 				0A11D0040000000000000004 /* Shared */,
 				0A11D0030000000000000003 /* OnHand */,
 				E4A769472C21A20A00BE3491 /* Products */,
+				68FE9EF059CC694F0BA4816F /* Frameworks */,
+				7FE5283FCFFC00325CFC9776 /* SharedBuysWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -256,6 +327,7 @@
 				E41642F62F5D2F5200708895 /* RADiUS.framework */,
 				E41643072F5D2F6200708895 /* AXiS.framework */,
 				0A11D0020000000000000002 /* CiRCLES.app */,
+				1298D61EBB64136051D35619 /* SharedBuysWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -297,11 +369,26 @@
 				0A11D0040000000000000004 /* Shared */,
 			);
 			name = OnHand;
-			packageProductDependencies = (
-			);
 			productName = OnHand;
 			productReference = 0A11D0020000000000000002 /* CiRCLES.app */;
 			productType = "com.apple.product-type.application";
+		};
+		6B3D76C36CF42BDCD8B1F9AC /* SharedBuysWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 41AC43A7201108561719CC76 /* Build configuration list for PBXNativeTarget "SharedBuysWidget" */;
+			buildPhases = (
+				54F56DE464193E79A8B62186 /* Sources */,
+				7A316D5FE0412EB6EACCB520 /* Frameworks */,
+				59E8AEF7DF968F6C4DBBE51B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SharedBuysWidget;
+			productName = SharedBuysWidget;
+			productReference = 1298D61EBB64136051D35619 /* SharedBuysWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		E41642F52F5D2F5200708895 /* RADiUS */ = {
 			isa = PBXNativeTarget;
@@ -320,8 +407,6 @@
 				E41642F72F5D2F5200708895 /* RADiUS */,
 			);
 			name = RADiUS;
-			packageProductDependencies = (
-			);
 			productName = RADiUS;
 			productReference = E41642F62F5D2F5200708895 /* RADiUS.framework */;
 			productType = "com.apple.product-type.framework";
@@ -371,6 +456,7 @@
 				E41642FB2F5D2F5300708895 /* PBXTargetDependency */,
 				E416430C2F5D2F6200708895 /* PBXTargetDependency */,
 				0A11D00D000000000000000D /* PBXTargetDependency */,
+				83C9E6485135D1B946FEC0F0 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				0A11D0040000000000000004 /* Shared */,
@@ -470,12 +556,20 @@
 				F1A0B0042F31700000000001 /* ShareWithCiRCLES */,
 				E41642F52F5D2F5200708895 /* RADiUS */,
 				E41643062F5D2F6200708895 /* AXiS */,
+				6B3D76C36CF42BDCD8B1F9AC /* SharedBuysWidget */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		0A11D0070000000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		59E8AEF7DF968F6C4DBBE51B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -541,6 +635,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		54F56DE464193E79A8B62186 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8CB377578DF8C7BC7A089FF8 /* SharedBuysAttributes.swift in Sources */,
+				75D7CED44B17D66CF9B0855E /* SharedBuysLiveActivity.swift in Sources */,
+				D187D843694B57F81185DD5B /* SharedBuysWidgetBundle.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E41642F22F5D2F5200708895 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -559,6 +663,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B532FEDB88215525BB6AD925 /* SharedBuysAttributes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -577,6 +682,12 @@
 			platformFilter = ios;
 			target = 0A11D0010000000000000001 /* OnHand */;
 			targetProxy = 0A11D00E000000000000000E /* PBXContainerItemProxy */;
+		};
+		83C9E6485135D1B946FEC0F0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = SharedBuysWidget;
+			target = 6B3D76C36CF42BDCD8B1F9AC /* SharedBuysWidget */;
+			targetProxy = C990AA01109B2B8A4864FD4A /* PBXContainerItemProxy */;
 		};
 		A1B2C3072F5D300000000005 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -666,6 +777,51 @@
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 4;
 				WATCHOS_DEPLOYMENT_TARGET = 26.0;
+			};
+			name = Release;
+		};
+		587EF380622F5BF2258EAD00 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = SharedBuysWidget/SharedBuysWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SharedBuysWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Shared Buys";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.SharedBuysWidget;
+				PRODUCT_NAME = SharedBuysWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5B734660DB1DC137E2A12D0B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = SharedBuysWidget/SharedBuysWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = SharedBuysWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Shared Buys";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.SharedBuysWidget;
+				PRODUCT_NAME = SharedBuysWidget;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -1138,6 +1294,15 @@
 			buildConfigurations = (
 				0A11D0090000000000000009 /* Debug */,
 				0A11D00A000000000000000A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		41AC43A7201108561719CC76 /* Build configuration list for PBXNativeTarget "SharedBuysWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5B734660DB1DC137E2A12D0B /* Release */,
+				587EF380622F5BF2258EAD00 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
