@@ -536,15 +536,16 @@ compacted to a snapshot when a session ends. Private `BuyEntries`/`BuyItems` are
 
 ## 13. Phasing
 
-1. Change log, fold, and the shared UI, behind a feature flag, with an in-process loopback
-   transport — i.e. what the prototype already is.
-2. **QR pairing and the relay client.** The server already exists, so this is the app's side only:
-   key derivation, the socket, and the frame handling in §6. It makes the feature work end to end on
-   both platforms before any radio work starts.
-3. **Bluetooth.** Same-platform first (iOS↔iOS, Android↔Android), then cross-platform. This is
-   what makes it survive a dead hall and what keeps the reconnect budget in check.
-4. Live Activity / Live Update, including the push path through the Worker.
-5. Lazy photo sync.
+1. **Done.** Change log, fold, and the model, behind the debug harness.
+2. **Done.** Key derivation, the relay client, and joining. Verified cross-platform against a local
+   relay.
+3. **Written, radio untested.** Bluetooth on both platforms; see §15.
+4. **Done on iOS, not started on Android.** Live Activity renders and updates; the push path
+   through the Worker is not built.
+5. **Not started.** Lazy photo sync.
+
+Still to do before this is a feature rather than a harness: the UI in §11, the config plumbing in
+§7, and SQLite storage per §12.
 
 Golden op-log vectors land in step 1 and gate every later step on both platforms.
 
@@ -626,3 +627,67 @@ which a popover cannot give.
 - Whether the Worker's outbound APNs/FCM calls count against the free request allowance. They are
   subrequests rather than inbound requests, which suggests not, but this needs confirming before
   step 4 — it changes the budget maths if it does.
+
+## 15. Where this stands
+
+Implemented on branch `claude/better-buys` in both app repos. The relay is on `main` in
+`../CirclesServer`.
+
+### Built and verified
+
+- Change log, fold and version vectors — `App/SharedBuys/` (iOS), `sharedbuys/` (Android).
+- Key derivation, AES-256-GCM sealing and HMAC tags. **Three independent implementations agree**:
+  Swift, Kotlin, and a Node peer written as a test oracle. All three derive the same room ID from a
+  key and open each other's records.
+- Relay client on both platforms, against a locally run `wrangler dev`.
+- **Cross-platform convergence** — iOS and Android joined to one room, each adding items, both
+  ending at the same list.
+- Reconnect with exponential backoff and jitter, suppressed while Bluetooth peers are present (§5c).
+- Bluetooth transport: rolling-tag advertisement carrying the state digest, GATT inbox/outbox,
+  chunked framing, and the digest short-circuit that avoids connecting to a peer already in sync.
+- Live Activity: lock screen and Dynamic Island, re-adopted after an app restart, updating on every
+  change.
+
+### Not verified
+
+- **Bluetooth convergence over a real radio.** Neither the simulator nor the emulator has one; this
+  needs two physical devices. The parts that must match across platforms are covered by a self-test
+  that produces identical output on both — digest `cb8909f9` for the same version vector, and a
+  500-byte payload chunking to 4 frames and reassembling out of order. Everything above the radio
+  is the same code the relay path uses, which is verified.
+- ActivityKit push updates (§10) — needs a device and the Worker's push path.
+
+### Deliberate shortcuts, to revisit
+
+- **Storage is a JSON file** in the app group (iOS) and SharedPreferences (Android), not the SQLite
+  tables in §12. Fine for hundreds of changes; replace before the log grows or compaction matters.
+- **Config is not wired up.** §7's CloudKit `RelayConfig` and Android's `RELAYS_JSON` + `relays.yml`
+  are unimplemented; the relay URL is a field in the debug harness instead.
+- **The shared list is not in `BuysView` yet.** It exists only behind the debug harness — none of
+  the UI work in §11 has been done.
+- `syncRate` batching is not implemented; changes send immediately.
+- Photos, member removal with key rotation, and the short pairing code are not implemented.
+
+### The debug harness
+
+Both apps expose the same URL scheme. Nothing here ships; it is how the feature is driven without
+the real UI.
+
+| URL | Effect |
+| --- | --- |
+| `circles-app://buys-debug` | Open the harness screen |
+| `circles-app://buys-join?v=1&e=0&k=<key>` | Join a session from a base64url key |
+| `circles-app://buys-add?name=…&cost=…` | Add an item |
+| `circles-app://buys-cycle?item=<id>` | Cycle an item's status |
+| `circles-app://buys-selftest` | Print the digest and framing check to the log |
+
+Run against a local relay only:
+
+```
+cd ../CirclesServer && npx wrangler dev --port 8787 --local
+```
+
+The iOS simulator uses `ws://127.0.0.1:8787`; the Android emulator uses `ws://10.0.2.2:8787`, with
+a debug-only network security config permitting cleartext to those hosts. Release builds are
+`wss://` only. **Do not point the harness at the deployed Workers** — the free-tier request budget
+is shared with everyone (§5b).
