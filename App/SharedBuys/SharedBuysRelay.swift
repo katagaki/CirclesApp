@@ -26,6 +26,7 @@ actor SharedBuysRelay {
     private var session: URLSession?
     private var handler: (@Sendable (RelayEvent) -> Void)?
     private var isRunning: Bool = false
+    private var generation: Int = 0
 
     struct Endpoint: Sendable {
         var baseURL: String
@@ -43,6 +44,8 @@ actor SharedBuysRelay {
         }
         handler = onEvent
         isRunning = true
+        generation += 1
+        let generation = generation
         let configuration = URLSessionConfiguration.default
         configuration.waitsForConnectivity = false
         let session = URLSession(configuration: configuration)
@@ -52,7 +55,7 @@ actor SharedBuysRelay {
         task.resume()
 
         Task { await self.sendHello(endpoint) }
-        Task { await self.receive() }
+        Task { await self.receive(generation: generation) }
     }
 
     func disconnect() {
@@ -108,10 +111,11 @@ actor SharedBuysRelay {
         }
     }
 
-    private func receive() async {
-        while isRunning, let task {
+    private func receive(generation: Int) async {
+        while isRunning, generation == self.generation, let task {
             do {
                 let message = try await task.receive()
+                guard generation == self.generation else { return }
                 guard case .string(let text) = message,
                       let data = text.data(using: .utf8),
                       let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
@@ -134,6 +138,7 @@ actor SharedBuysRelay {
                     continue
                 }
             } catch {
+                guard generation == self.generation else { return }
                 if isRunning {
                     let code = task.closeCode.rawValue
                     handler?(code == 0 ? .failed(error.localizedDescription) : .closed(code))
