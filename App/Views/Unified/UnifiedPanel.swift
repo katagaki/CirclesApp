@@ -34,6 +34,12 @@ struct UnifiedPanel: View {
                 .allowsHitTesting(unifier.isMinimized)
         }
         .animation(.easeInOut(duration: 0.2), value: unifier.isMinimized)
+        .sheet(isPresented: Binding(
+            get: { unifier.isSharedBuysDebugPresenting },
+            set: { unifier.isSharedBuysDebugPresenting = $0 }
+        )) {
+            SharedBuysDebugView()
+        }
         .presentationBackgroundInteraction(.enabled)
         .presentationDetents([unifier.compactDetent, .height(360), .large], selection: $unifier.selectedDetent)
         .presentationContentInteraction(.scrolls)

@@ -31,6 +31,7 @@ struct CirclesApp: App {
     @State var mapper = Mapper()
     @State var unifier = Unifier()
     @State var backupManager = BackupManager()
+    @State var sharedBuys = SharedBuysSession()
 
     @State var hasAppLaunchedForTheFirstTime: Bool = false
 
@@ -98,6 +99,7 @@ struct CirclesApp: App {
         .environment(mapper)
         .environment(unifier)
         .environment(backupManager)
+        .environment(sharedBuys)
         .onChange(of: scenePhase) { _, newValue in
             if !hasAppLaunchedForTheFirstTime {
                 hasAppLaunchedForTheFirstTime = true
