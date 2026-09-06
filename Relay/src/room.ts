@@ -25,6 +25,7 @@ export const CLOSE_PROTOCOL = 4002;
 export const CLOSE_ROOM_FULL = 4003;
 export const CLOSE_AUTH = 4004;
 export const CLOSE_STORAGE_FULL = 4005;
+export const CLOSE_UNKNOWN_ROOM = 4006;
 
 const DEVICE_ID = /^[0-9a-f]{8}$/;
 
@@ -53,6 +54,7 @@ const SLUG: { [code: number]: string } = {
   [CLOSE_ROOM_FULL]: "full",
   [CLOSE_AUTH]: "auth",
   [CLOSE_STORAGE_FULL]: "storage",
+  [CLOSE_UNKNOWN_ROOM]: "unknown",
 };
 
 function byteLength(text: string): number {
@@ -172,7 +174,9 @@ export class Room extends DurableObject {
     let keyBytes = existing;
     if (!keyBytes) {
       const registered = b64urlDecode(frame.k);
-      if (!registered || registered.length !== 32) throw new Fail(CLOSE_AUTH, "unknown room");
+      if (!registered || registered.length !== 32) {
+        throw new Fail(CLOSE_UNKNOWN_ROOM, "room not found, resend hello with the key");
+      }
       keyBytes = registered;
     }
     const key = await importAuthKey(keyBytes);
@@ -203,7 +207,7 @@ export class Room extends DurableObject {
     if (!Array.isArray(list) || list.length === 0) throw new Fail(CLOSE_PROTOCOL, "no records");
     if (list.length > MAX_RECORDS_PER_FRAME) throw new Fail(CLOSE_PROTOCOL, "too many records");
     const keyBytes = this.authKey();
-    if (!keyBytes) throw new Fail(CLOSE_AUTH, "unknown room");
+    if (!keyBytes) throw new Fail(CLOSE_UNKNOWN_ROOM, "room not found, resend hello with the key");
     const key = await importAuthKey(keyBytes);
 
     const records: { record: Record; blob: Uint8Array; tag: Uint8Array }[] = [];
@@ -221,8 +225,13 @@ export class Room extends DurableObject {
       records.push({ record: { d, n, b, a }, blob, tag: offered });
     }
 
-    const stored = this.count();
-    if (stored + records.length > MAX_STORED_RECORDS) throw new Fail(CLOSE_STORAGE_FULL, "room is full");
+    const pending = new Set<string>();
+    for (const { record } of records) {
+      const id = `${record.d}:${record.n}`;
+      if (pending.has(id) || this.holds(record.d, record.n)) continue;
+      pending.add(id);
+    }
+    if (this.count() + pending.size > MAX_STORED_RECORDS) throw new Fail(CLOSE_STORAGE_FULL, "room is full");
 
     const now = Math.floor(Date.now() / 1000);
     const fresh: Record[] = [];
@@ -251,6 +260,10 @@ export class Room extends DurableObject {
   private authKey(): Uint8Array | null {
     const row = this.sql.exec("SELECT auth_key FROM room WHERE id = 1").toArray()[0];
     return row ? toBytes(row.auth_key as ArrayBuffer) : null;
+  }
+
+  private holds(device: string, seq: number): boolean {
+    return this.sql.exec("SELECT 1 FROM ops WHERE device = ? AND seq = ? LIMIT 1", device, seq).toArray().length > 0;
   }
 
   private count(): number {

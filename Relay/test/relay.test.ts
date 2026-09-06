@@ -108,11 +108,28 @@ describe("authentication", () => {
     expect((await client.closure()).code).toBe(4004);
   });
 
-  it("rejects a hello for an unknown room that carries no key", async () => {
+  it("tells a hello for an unknown room to resend with the key", async () => {
     const room = roomId();
     const client = await Client.connect(room);
     client.send(await helloFrame(authKey(), "aaaaaaaa"));
-    expect((await client.closure()).code).toBe(4004);
+    expect((await client.closure()).code).toBe(4006);
+  });
+
+  it("lets a client back in with its key after the room expires", async () => {
+    const room = roomId();
+    const key = authKey();
+    const first = await join(room, key, "aaaaaaaa", {}, true);
+    await first.next();
+    await runInDurableObject(stub(room), async (instance: Room) => {
+      await instance.alarm();
+    });
+
+    const stale = await Client.connect(room);
+    stale.send(await helloFrame(key, "aaaaaaaa"));
+    expect((await stale.closure()).code).toBe(4006);
+
+    const retried = await join(room, key, "aaaaaaaa", {}, true);
+    expect(await retried.next()).toEqual({ t: "ops", o: [] });
   });
 
   it("keeps the first registered key when a later hello offers another", async () => {
@@ -168,6 +185,30 @@ describe("limits", () => {
     for (let i = 1; i < 8; i++) rest.push(await Client.connect(room));
     const overflow = await Client.connect(room);
     expect((await overflow.closure()).code).toBe(4003);
+  });
+
+  it("does not count records it already holds against the cap", async () => {
+    const room = roomId();
+    const key = authKey();
+    const a = await join(room, key, "aaaaaaaa", {}, true);
+    await a.next();
+    let seq = 1;
+    let first: { d: string; n: number; b: string; a: string } | null = null;
+    for (let frame = 0; frame < 16; frame++) {
+      const size = frame === 15 ? 20 : 32;
+      const ops = [];
+      for (let i = 0; i < size; i++) {
+        const entry = await record(key, "aaaaaaaa", seq++, `o${seq}`);
+        ops.push(entry);
+        first ??= entry;
+      }
+      a.send({ t: "ops", o: ops });
+    }
+    a.send({ t: "ops", o: [first!] });
+
+    const b = await join(room, key, "bbbbbbbb", { aaaaaaaa: 500 }, false);
+    expect(await b.next()).toEqual({ t: "ops", o: [] });
+    expect(a.closed).toBeNull();
   });
 
   it("closes 4005 once the room holds 500 records", async () => {

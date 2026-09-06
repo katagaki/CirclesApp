@@ -34,8 +34,8 @@ JSON text frames, binary values base64url without padding.
 `hello` is the required first frame; the reply is always an `ops` frame, empty when already current.
 Frames never exceed 4 KB, so catch-up is chunked.
 
-`(device, seq)` is a record's only identity. Re-sending one is a no-op, not an error, and is not
-fanned out again. Records are never reordered, rewritten, or deduplicated by content.
+`(device, seq)` is a record's only identity. Re-sending one is a no-op, not an error, is not fanned
+out again, and does not count against the room's 500-record cap. Records are never reordered, rewritten, or deduplicated by content.
 
 ### Auth tags
 
@@ -47,8 +47,12 @@ record tag = HMAC-SHA256(relayAuthKey, deviceId ‖ 0x00 ‖ uint64be(seq) ‖ s
 `deviceId` goes in as its 8 ASCII hex characters, not the 4 bytes they encode; `sealedBlob` is the
 decoded blob, not its base64url text. Compared in constant time.
 
-The first `hello` for a room carries `k`, the 32-byte `relayAuthKey`, stored only once its tag
-verifies. Later `k` values are ignored. Record tags are stored and replayed unchanged so receivers
+**Send `k`, the 32-byte `relayAuthKey`, on every `hello`.** It is stored only once its tag verifies,
+and later values are ignored, so repeating it costs 44 bytes and nothing else. A room is deleted 48
+hours after its last write, taking its key with it — a client that sent `k` only on its very first
+`hello` would be shut out of its own room after an idle weekend. Omitting `k` for a room that has no
+key closes `4006` (`unknown`), which is recoverable: reconnect and send `k`. That is distinct from
+`4004`, which means the tag itself was wrong and retrying will not help. Record tags are stored and replayed unchanged so receivers
 can verify them too.
 
 ## Limits
@@ -61,6 +65,7 @@ can verify them too.
 | Sockets per room | 8 | `4003` | `full` |
 | Stored records per room | 500 | `4005` | `storage` |
 | Bad, missing, or stale auth | — | `4004` | `auth` |
+| Room has no key yet and none offered | — | `4006` | `unknown` |
 | Room lifetime | 48 h sliding from last write | `1001` | — |
 
 Match on `c`, never on `m`.
