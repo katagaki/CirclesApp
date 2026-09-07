@@ -15,6 +15,7 @@ enum SharedBuysProfile {
     static let advertisementWindow: TimeInterval = 900.0
     static let maxPayloadPerChunk = 160
     static let frameMagic: UInt8 = 0x01
+    static let handshakeMagic: UInt8 = 0x02
 
     static func sessionTag(sessionKey: Data, at date: Date = .now) -> Data {
         SharedBuysCrypto.rollingTag(sessionKey: sessionKey, window: window(at: date))
@@ -22,6 +23,22 @@ enum SharedBuysProfile {
 
     static func window(at date: Date) -> Int {
         Int(date.timeIntervalSince1970 / advertisementWindow)
+    }
+
+    static func handshake(sessionKey: Data, at date: Date = .now) -> Data {
+        var frame = Data([handshakeMagic])
+        frame.append(sessionTag(sessionKey: sessionKey, at: date))
+        return frame
+    }
+
+    static func handshakeTag(in frame: Data) -> Data? {
+        guard frame.count == 3, frame[frame.startIndex] == handshakeMagic else { return nil }
+        return Data(frame.dropFirst())
+    }
+
+    static func accepts(handshake frame: Data, sessionKey: Data, at date: Date = .now) -> Bool {
+        guard let tag = handshakeTag(in: frame) else { return false }
+        return acceptedTags(sessionKey: sessionKey, at: date).contains(tag)
     }
 
     static func acceptedTags(sessionKey: Data, at date: Date = .now) -> [Data] {

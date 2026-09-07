@@ -162,27 +162,6 @@ public final class SharedBuysSession {
         }
     }
 
-    public func runSelfTest() {
-        let vector = ["aaaaaaaa": 3, "bbbbbbbb": 1, "cafebabe": 260]
-        let digest = SharedBuysDigest.data(of: vector).map { String(format: "%02x", $0) }.joined()
-        note("digest \(digest)")
-
-        let payload = Data((0..<500).map { UInt8($0 % 251) })
-        let frames = SharedBuysFraming.chunks(of: payload, messageID: 7)
-        var reassembler = SharedBuysFraming.Reassembler()
-        var rebuilt: Data?
-        for frame in frames.shuffled() {
-            if let result = reassembler.accept(frame) { rebuilt = result }
-        }
-        note("framing \(frames.count) chunks, round trip \(rebuilt == payload ? "ok" : "FAILED")")
-
-        if let sessionKey {
-            let tag = SharedBuysProfile.sessionTag(sessionKey: sessionKey)
-                .map { String(format: "%02x", $0) }.joined()
-            note("ble tag \(tag) window \(SharedBuysProfile.window(at: .now))")
-        }
-    }
-
     public func startBluetooth() {
         guard isBluetoothEnabled, let sessionKey else { return }
         bluetooth.start(sessionKey: sessionKey, digest: SharedBuysDigest.data(of: versionVector)) { event in
