@@ -69,23 +69,13 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
         case .circleDetail(let circle):
             CircleDetailView(circle: circle)
         case .namespacedCircleDetail(
-            let circle, let previousCircle, let nextCircle, let namespace
+            let circle, let previousCircle, let nextCircle, _
         ):
-            if UIDevice.current.userInterfaceIdiom == .phone,
-               UserDefaults.standard.object(forKey: "Customization.UseZoomTransition") as? Bool ?? true {
-                CircleDetailView(
-                    circle: circle,
-                    previousCircle: previousCircle,
-                    nextCircle: nextCircle
-                )
-                .navigationTransition(.zoom(sourceID: circle.id, in: namespace))
-            } else {
-                CircleDetailView(
-                    circle: circle,
-                    previousCircle: previousCircle,
-                    nextCircle: nextCircle
-                )
-            }
+            CircleDetailView(
+                circle: circle,
+                previousCircle: previousCircle,
+                nextCircle: nextCircle
+            )
         }
     }
 }

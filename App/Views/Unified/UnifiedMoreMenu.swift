@@ -43,7 +43,6 @@ struct UnifiedMoreMenu: View {
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
     @AppStorage(wrappedValue: true, "Customization.DoubleTapToVisit") var isDoubleTapToVisitEnabled: Bool
-    @AppStorage(wrappedValue: true, "Customization.UseZoomTransition") var useZoomTransition: Bool
 
     // Others
     @AppStorage(wrappedValue: false, "PrivacyMode.On") var isPrivacyModeOn: Bool
@@ -86,8 +85,6 @@ struct UnifiedMoreMenu: View {
                            isOn: $showDay)
                     Toggle("More.Customization.Circles.DoubleTapToVisit", systemImage: "hand.tap",
                            isOn: $isDoubleTapToVisitEnabled)
-                    Toggle("More.Customization.Circles.UseZoomTransition", systemImage: "arrow.up.backward.and.arrow.down.forward",
-                           isOn: $useZoomTransition)
                 }
                 .menuActionDismissBehavior(.disabled)
             }
