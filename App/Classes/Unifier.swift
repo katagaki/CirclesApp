@@ -41,7 +41,7 @@ class Unifier {
     var isMinimized: Bool {
         displayMode == .sheet && selectedDetent != .height(360) && selectedDetent != .large
     }
-    var compactBarHeight: CGFloat = 76.0
+    let compactBarHeight: CGFloat = 88.0
     var compactDetent: PresentationDetent {
         .height(compactBarHeight)
     }
@@ -108,17 +108,6 @@ class Unifier {
                     self.isPresenting = true
                 }
             }
-        }
-    }
-
-    @MainActor
-    func updateCompactBarHeight(_ newValue: CGFloat) {
-        let newHeight = max(60.0, newValue.rounded())
-        guard newHeight != compactBarHeight else { return }
-        let previousHeight = compactBarHeight
-        compactBarHeight = newHeight
-        if selectedDetent == .height(previousHeight) {
-            selectedDetent = .height(newHeight)
         }
     }
 

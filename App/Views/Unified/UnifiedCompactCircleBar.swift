@@ -21,7 +21,7 @@ struct UnifiedCompactCircleBar: View {
                     showSpaceName: .constant(false),
                     showDay: .constant(false)
                 )
-                .frame(height: 60.0)
+                .frame(height: 48.0)
 
                 VStack(alignment: .leading, spacing: 4.0) {
                     Text(circle.circleName)
@@ -39,18 +39,14 @@ struct UnifiedCompactCircleBar: View {
 
                 Spacer(minLength: 0.0)
             }
-            .frame(maxWidth: .infinity, minHeight: 60.0, alignment: .leading)
+            .frame(height: 48.0)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Shared.OpenPanel")
-        .padding(.horizontal, 28.0)
+        .padding(.horizontal, 20.0)
         .padding(.top, 20.0)
         .padding(.bottom, 20.0)
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.height
-        } action: { newValue in
-            unifier.updateCompactBarHeight(newValue)
-        }
     }
 }

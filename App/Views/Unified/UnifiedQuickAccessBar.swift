@@ -26,11 +26,6 @@ struct UnifiedQuickAccessBar: View {
         .padding(.horizontal, 20.0)
         .padding(.top, 20.0)
         .padding(.bottom, 20.0)
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.height
-        } action: { newValue in
-            unifier.updateCompactBarHeight(newValue)
-        }
     }
 }
 
