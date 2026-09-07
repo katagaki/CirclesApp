@@ -145,7 +145,7 @@
 		516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedBuysLiveActivity.swift; sourceTree = "<group>"; };
 		6F4DDFCCFE0D158B610EDEA8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		88E5AFDB5874BB1E45D0379C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
-		9D631878DB8C8016D0BFE1C2 /* ORBiT.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = ORBiT.framework; path = ORBiT.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		9D631878DB8C8016D0BFE1C2 /* ORBiT.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ORBiT.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6DA6538B4BE7801B0617C90 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E41642F62F5D2F5200708895 /* RADiUS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RADiUS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E41643072F5D2F6200708895 /* AXiS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AXiS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -189,8 +189,6 @@
 		};
 		0A11D0040000000000000004 /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = Shared;
 			sourceTree = "<group>";
 		};
@@ -204,29 +202,21 @@
 		};
 		E41642F72F5D2F5200708895 /* RADiUS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = RADiUS;
 			sourceTree = "<group>";
 		};
 		E41643082F5D2F6200708895 /* AXiS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = AXiS;
 			sourceTree = "<group>";
 		};
 		E489B5772F31607D00ED193F /* Swift Data */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = "Swift Data";
 			sourceTree = "<group>";
 		};
 		E9A543600FE4D4A1ADB7C1A6 /* ORBiT */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = ORBiT;
 			sourceTree = "<group>";
 		};
@@ -614,9 +604,9 @@
 			packageReferences = (
 				E405A48D2C21B157006FE791 /* XCRemoteSwiftPackageReference "Komponents" */,
 				E480AA752C441DD1009C1445 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
+				E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */,
 				E480AAA42C44BB77009C1445 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
-				E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability.swift" */,
+				E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability" */,
 				E40623002DEBE238002D3E28 /* XCRemoteSwiftPackageReference "Swift-WebP" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -1549,7 +1539,7 @@
 				minimumVersion = 4.2.2;
 			};
 		};
-		E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
+		E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
 			requirement = {
@@ -1565,7 +1555,7 @@
 				minimumVersion = 0.9.19;
 			};
 		};
-		E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability.swift" */ = {
+		E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
 			requirement = {
@@ -1578,7 +1568,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		A1B2C3022F5D300000000001 /* SQLite */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */;
 			productName = SQLite;
 		};
 		A1B2C3042F5D300000000002 /* ZIPFoundation */ = {
@@ -1603,7 +1593,7 @@
 		};
 		E480AA9C2C44A6F1009C1445 /* SQLite */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */;
 			productName = SQLite;
 		};
 		E480AAA52C44BB77009C1445 /* ZIPFoundation */ = {
@@ -1613,12 +1603,12 @@
 		};
 		E4D74B882C8CAEA70014CD16 /* Reachability */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability.swift" */;
+			package = E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability" */;
 			productName = Reachability;
 		};
 		F1A0B0022F31700000000001 /* SQLite */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
+			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */;
 			productName = SQLite;
 		};
 /* End XCSwiftPackageProductDependency section */
