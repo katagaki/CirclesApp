@@ -7,9 +7,9 @@ import ActivityKit
 import Foundation
 
 @MainActor
-extension SharedBuysSession {
+public extension SharedBuysSession {
 
-    var activityState: SharedBuysAttributes.ContentState {
+    public var activityState: SharedBuysAttributes.ContentState {
         let mine = items.filter { $0.assignee == actorPID }
         let pending = mine.filter { $0.status == .pending }
         let next = pending.first
@@ -22,19 +22,19 @@ extension SharedBuysSession {
         )
     }
 
-    var activityCount: Int {
+    public var activityCount: Int {
         Activity<SharedBuysAttributes>.activities.count
     }
 
-    var activitiesEnabled: Bool {
+    public var activitiesEnabled: Bool {
         ActivityAuthorizationInfo().areActivitiesEnabled
     }
 
-    var liveActivity: Activity<SharedBuysAttributes>? {
+    public var liveActivity: Activity<SharedBuysAttributes>? {
         activity as? Activity<SharedBuysAttributes>
     }
 
-    func adoptActivity() {
+    public func adoptActivity() {
         guard activity == nil, isActive else { return }
         guard let existing = Activity<SharedBuysAttributes>.activities
             .first(where: { $0.attributes.roomID == roomID }) else {
@@ -46,7 +46,7 @@ extension SharedBuysSession {
         updateActivity()
     }
 
-    func startActivity() {
+    public func startActivity() {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
             note("live activity not permitted")
             return
@@ -63,13 +63,13 @@ extension SharedBuysSession {
         }
     }
 
-    func updateActivity() {
+    public func updateActivity() {
         guard let identifier = liveActivity?.id else { return }
         let state = activityState
         Task { await Self.push(state, to: identifier) }
     }
 
-    func endActivity() {
+    public func endActivity() {
         guard let identifier = liveActivity?.id else { return }
         activity = nil
         Task { await Self.finish(identifier) }

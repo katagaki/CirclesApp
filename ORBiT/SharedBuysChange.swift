@@ -5,7 +5,7 @@
 
 import Foundation
 
-enum SharedBuyKind: Int, Codable, Sendable {
+public enum SharedBuyKind: Int, Codable, Sendable {
     case addItem = 0
     case setStatus = 1
     case setAssignee = 2
@@ -14,12 +14,12 @@ enum SharedBuyKind: Int, Codable, Sendable {
     case memberJoined = 5
 }
 
-enum SharedBuyStatus: Int, Codable, Sendable {
+public enum SharedBuyStatus: Int, Codable, Sendable {
     case pending = 0
     case bought = 1
     case cancelled = 2
 
-    var next: SharedBuyStatus {
+    public var next: SharedBuyStatus {
         switch self {
         case .pending: .bought
         case .bought: .cancelled
@@ -28,13 +28,13 @@ enum SharedBuyStatus: Int, Codable, Sendable {
     }
 }
 
-struct SharedBuyPayload: Codable, Sendable {
-    var actor: Int
-    var kind: SharedBuyKind
-    var itemID: String
-    var circleID: Int
-    var text: String?
-    var value: Int?
+public struct SharedBuyPayload: Codable, Sendable {
+    public var actor: Int
+    public var kind: SharedBuyKind
+    public var itemID: String
+    public var circleID: Int
+    public var text: String?
+    public var value: Int?
 
     enum CodingKeys: String, CodingKey {
         case actor = "a"
@@ -46,30 +46,30 @@ struct SharedBuyPayload: Codable, Sendable {
     }
 }
 
-struct SharedBuyChange: Codable, Sendable, Identifiable, Hashable {
-    var device: String
-    var seq: Int
-    var payload: SharedBuyPayload
+public struct SharedBuyChange: Codable, Sendable, Identifiable, Hashable {
+    public var device: String
+    public var seq: Int
+    public var payload: SharedBuyPayload
 
-    var id: String { "\(device)#\(seq)" }
+    public var id: String { "\(device)#\(seq)" }
 
-    static func == (lhs: SharedBuyChange, rhs: SharedBuyChange) -> Bool { lhs.id == rhs.id }
-    func hash(into hasher: inout Hasher) { hasher.combine(id) }
+    public static func == (lhs: SharedBuyChange, rhs: SharedBuyChange) -> Bool { lhs.id == rhs.id }
+    public func hash(into hasher: inout Hasher) { hasher.combine(id) }
 }
 
-struct SharedBuyItem: Identifiable, Sendable, Hashable {
-    let id: String
-    let circleID: Int
-    var name: String
-    var cost: Int
-    var status: SharedBuyStatus
-    var assignee: Int?
-    var isRemoved: Bool
-    var lastTouchedBy: Int
+public struct SharedBuyItem: Identifiable, Sendable, Hashable {
+    public let id: String
+    public let circleID: Int
+    public var name: String
+    public var cost: Int
+    public var status: SharedBuyStatus
+    public var assignee: Int?
+    public var isRemoved: Bool
+    public var lastTouchedBy: Int
 }
 
-enum SharedBuyFold {
-    static func items(from changes: [SharedBuyChange]) -> [SharedBuyItem] {
+public enum SharedBuyFold {
+    public static func items(from changes: [SharedBuyChange]) -> [SharedBuyItem] {
         var byID: [String: SharedBuyItem] = [:]
         var order: [String] = []
         for change in changes.sorted(by: ordered) {
@@ -105,7 +105,7 @@ enum SharedBuyFold {
         return order.compactMap { byID[$0] }.filter { !$0.isRemoved }
     }
 
-    static func members(from changes: [SharedBuyChange]) -> [Int: String] {
+    public static func members(from changes: [SharedBuyChange]) -> [Int: String] {
         var result: [Int: String] = [:]
         for change in changes.sorted(by: ordered) where change.payload.kind == .memberJoined {
             result[change.payload.actor] = change.payload.text ?? ""

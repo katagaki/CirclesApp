@@ -633,9 +633,14 @@ which a popover cannot give.
 Implemented on branch `claude/better-buys` in both app repos. The relay is on `main` in
 `../CirclesServer`.
 
+On iOS the sync layer lives in its own framework, **ORBiT**, joining `AXiS` (database) and
+`RADiUS` (API) — the model, crypto, relay client, Bluetooth transport and Live Activity
+attributes. Views stay in the app target, and the widget extension links ORBiT for the
+activity attributes.
+
 ### Built and verified
 
-- Change log, fold and version vectors — `App/SharedBuys/` (iOS), `sharedbuys/` (Android).
+- Change log, fold and version vectors — the **ORBiT** framework (iOS), `sharedbuys/` (Android).
 - Key derivation, AES-256-GCM sealing and HMAC tags. **Three independent implementations agree**:
   Swift, Kotlin, and a Node peer written as a test oracle. All three derive the same room ID from a
   key and open each other's records.

@@ -7,19 +7,20 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		07B24ED6FF9494174FC42930 /* ORBiT.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 9D631878DB8C8016D0BFE1C2 /* ORBiT.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0A11D00C000000000000000C /* CiRCLES.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0A11D0020000000000000002 /* CiRCLES.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2B6ED3A2BE1197DC6E6BDF3D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F4DDFCCFE0D158B610EDEA8 /* Foundation.framework */; };
 		75D7CED44B17D66CF9B0855E /* SharedBuysLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */; };
+		864CA3762F406E01D04EBD1C /* ORBiT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D631878DB8C8016D0BFE1C2 /* ORBiT.framework */; };
 		8C35BA4C2F7CC7A4959DF5BF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2745DAF4DF1C30D56B380624 /* WidgetKit.framework */; };
-		8CB377578DF8C7BC7A089FF8 /* SharedBuysAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02659166FE5A426385EF1DAD /* SharedBuysAttributes.swift */; };
 		94CF64F6B10F21FEE927DC8B /* SharedBuysWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1298D61EBB64136051D35619 /* SharedBuysWidget.appex */; };
 		A1B2C3012F5D300000000001 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3022F5D300000000001 /* SQLite */; };
 		A1B2C3032F5D300000000002 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3042F5D300000000002 /* ZIPFoundation */; };
 		A1B2C3052F5D300000000003 /* RADiUS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E41642F62F5D2F5200708895 /* RADiUS.framework */; };
 		A1B2C3062F5D300000000004 /* AXiS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E41643072F5D2F6200708895 /* AXiS.framework */; };
 		B5102ADCCB6C8B0F4305436D /* ActivityKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 46BB8E922640B5602C651A04 /* ActivityKit.framework */; };
-		B532FEDB88215525BB6AD925 /* SharedBuysAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02659166FE5A426385EF1DAD /* SharedBuysAttributes.swift */; };
 		B57D260884AB107CD972E574 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 88E5AFDB5874BB1E45D0379C /* SwiftUI.framework */; };
+		B59E0C245B0700B3F016814C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F4DDFCCFE0D158B610EDEA8 /* Foundation.framework */; };
 		D187D843694B57F81185DD5B /* SharedBuysWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171C3A7FD183AE1DE637FC0E /* SharedBuysWidgetBundle.swift */; };
 		E405A48F2C21B157006FE791 /* Komponents in Frameworks */ = {isa = PBXBuildFile; productRef = E405A48E2C21B157006FE791 /* Komponents */; };
 		E40623022DEBE238002D3E28 /* WebP in Frameworks */ = {isa = PBXBuildFile; productRef = E40623012DEBE238002D3E28 /* WebP */; };
@@ -31,11 +32,19 @@
 		E480AA9D2C44A6F1009C1445 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = E480AA9C2C44A6F1009C1445 /* SQLite */; };
 		E480AAA62C44BB77009C1445 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = E480AAA52C44BB77009C1445 /* ZIPFoundation */; };
 		E4D74B892C8CAEA70014CD16 /* Reachability in Frameworks */ = {isa = PBXBuildFile; productRef = E4D74B882C8CAEA70014CD16 /* Reachability */; };
+		ED0902791248727E7E2D4B6C /* ORBiT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D631878DB8C8016D0BFE1C2 /* ORBiT.framework */; };
 		F1A0B0012F31700000000001 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = F1A0B0022F31700000000001 /* SQLite */; };
 		F1A0B0062F31700000000001 /* ShareWithCiRCLES.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F1A0B0072F31700000000001 /* ShareWithCiRCLES.appex */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		0388C3D9E9864BB889173FB8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4A7693E2C21A20A00BE3491 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CB6E13782F57B967C91DCC94;
+			remoteInfo = ORBiT;
+		};
 		0A11D00E000000000000000E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E4A7693E2C21A20A00BE3491 /* Project object */;
@@ -78,6 +87,13 @@
 			remoteGlobalIDString = F1A0B0042F31700000000001;
 			remoteInfo = AttachProductList;
 		};
+		F20B65EE7DCEF4E9CD2F69D8 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E4A7693E2C21A20A00BE3491 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CB6E13782F57B967C91DCC94;
+			remoteInfo = ORBiT;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -100,6 +116,7 @@
 			files = (
 				E41642FD2F5D2F5300708895 /* RADiUS.framework in Embed Frameworks */,
 				E416430E2F5D2F6200708895 /* AXiS.framework in Embed Frameworks */,
+				07B24ED6FF9494174FC42930 /* ORBiT.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -119,7 +136,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		02659166FE5A426385EF1DAD /* SharedBuysAttributes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedBuysAttributes.swift; sourceTree = "<group>"; };
 		0A11D0020000000000000002 /* CiRCLES.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CiRCLES.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		1298D61EBB64136051D35619 /* SharedBuysWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SharedBuysWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		171C3A7FD183AE1DE637FC0E /* SharedBuysWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedBuysWidgetBundle.swift; sourceTree = "<group>"; };
@@ -129,6 +145,7 @@
 		516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedBuysLiveActivity.swift; sourceTree = "<group>"; };
 		6F4DDFCCFE0D158B610EDEA8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		88E5AFDB5874BB1E45D0379C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		9D631878DB8C8016D0BFE1C2 /* ORBiT.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; name = ORBiT.framework; path = ORBiT.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C6DA6538B4BE7801B0617C90 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E41642F62F5D2F5200708895 /* RADiUS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RADiUS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E41643072F5D2F6200708895 /* AXiS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = AXiS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -206,6 +223,13 @@
 			path = "Swift Data";
 			sourceTree = "<group>";
 		};
+		E9A543600FE4D4A1ADB7C1A6 /* ORBiT */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
+			path = ORBiT;
+			sourceTree = "<group>";
+		};
 		F1A0B00A2F31700000000001 /* Share Extension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -232,6 +256,7 @@
 				8C35BA4C2F7CC7A4959DF5BF /* WidgetKit.framework in Frameworks */,
 				B57D260884AB107CD972E574 /* SwiftUI.framework in Frameworks */,
 				B5102ADCCB6C8B0F4305436D /* ActivityKit.framework in Frameworks */,
+				ED0902791248727E7E2D4B6C /* ORBiT.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +289,15 @@
 				E41642FC2F5D2F5300708895 /* RADiUS.framework in Frameworks */,
 				E480AAA62C44BB77009C1445 /* ZIPFoundation in Frameworks */,
 				E416430D2F5D2F6200708895 /* AXiS.framework in Frameworks */,
+				864CA3762F406E01D04EBD1C /* ORBiT.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E54F4C59AFB3EBA19EF0241E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B59E0C245B0700B3F016814C /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,7 +327,6 @@
 		7FE5283FCFFC00325CFC9776 /* SharedBuysWidget */ = {
 			isa = PBXGroup;
 			children = (
-				02659166FE5A426385EF1DAD /* SharedBuysAttributes.swift */,
 				516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */,
 				171C3A7FD183AE1DE637FC0E /* SharedBuysWidgetBundle.swift */,
 				C6DA6538B4BE7801B0617C90 /* Info.plist */,
@@ -324,6 +357,7 @@
 				E4A769472C21A20A00BE3491 /* Products */,
 				68FE9EF059CC694F0BA4816F /* Frameworks */,
 				7FE5283FCFFC00325CFC9776 /* SharedBuysWidget */,
+				E9A543600FE4D4A1ADB7C1A6 /* ORBiT */,
 			);
 			sourceTree = "<group>";
 		};
@@ -336,6 +370,7 @@
 				E41643072F5D2F6200708895 /* AXiS.framework */,
 				0A11D0020000000000000002 /* CiRCLES.app */,
 				1298D61EBB64136051D35619 /* SharedBuysWidget.appex */,
+				9D631878DB8C8016D0BFE1C2 /* ORBiT.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -343,6 +378,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
+		C8B5F1F95DC46C69A9470787 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E41642F12F5D2F5200708895 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -392,11 +434,33 @@
 			buildRules = (
 			);
 			dependencies = (
+				EF5C8B5864C764D05FBDAB05 /* PBXTargetDependency */,
 			);
 			name = SharedBuysWidget;
 			productName = SharedBuysWidget;
 			productReference = 1298D61EBB64136051D35619 /* SharedBuysWidget.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		CB6E13782F57B967C91DCC94 /* ORBiT */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = EF72986683172EE59BCE2FF1 /* Build configuration list for PBXNativeTarget "ORBiT" */;
+			buildPhases = (
+				C8B5F1F95DC46C69A9470787 /* Headers */,
+				F168020BE19E3F6FF48D8BF2 /* Sources */,
+				E54F4C59AFB3EBA19EF0241E /* Frameworks */,
+				50C4A89A51899B0F05F176FF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E9A543600FE4D4A1ADB7C1A6 /* ORBiT */,
+			);
+			name = ORBiT;
+			productName = ORBiT;
+			productReference = 9D631878DB8C8016D0BFE1C2 /* ORBiT.framework */;
+			productType = "com.apple.product-type.framework";
 		};
 		E41642F52F5D2F5200708895 /* RADiUS */ = {
 			isa = PBXNativeTarget;
@@ -465,6 +529,7 @@
 				E416430C2F5D2F6200708895 /* PBXTargetDependency */,
 				0A11D00D000000000000000D /* PBXTargetDependency */,
 				83C9E6485135D1B946FEC0F0 /* PBXTargetDependency */,
+				C14D1AA2B8EF2469C7DA9A72 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				0A11D0040000000000000004 /* Shared */,
@@ -565,12 +630,20 @@
 				E41642F52F5D2F5200708895 /* RADiUS */,
 				E41643062F5D2F6200708895 /* AXiS */,
 				6B3D76C36CF42BDCD8B1F9AC /* SharedBuysWidget */,
+				CB6E13782F57B967C91DCC94 /* ORBiT */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		0A11D0070000000000000007 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		50C4A89A51899B0F05F176FF /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -647,7 +720,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8CB377578DF8C7BC7A089FF8 /* SharedBuysAttributes.swift in Sources */,
 				75D7CED44B17D66CF9B0855E /* SharedBuysLiveActivity.swift in Sources */,
 				D187D843694B57F81185DD5B /* SharedBuysWidgetBundle.swift in Sources */,
 			);
@@ -671,7 +743,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B532FEDB88215525BB6AD925 /* SharedBuysAttributes.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F168020BE19E3F6FF48D8BF2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -702,6 +780,12 @@
 			target = E41642F52F5D2F5200708895 /* RADiUS */;
 			targetProxy = A1B2C3082F5D300000000006 /* PBXContainerItemProxy */;
 		};
+		C14D1AA2B8EF2469C7DA9A72 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ORBiT;
+			target = CB6E13782F57B967C91DCC94 /* ORBiT */;
+			targetProxy = F20B65EE7DCEF4E9CD2F69D8 /* PBXContainerItemProxy */;
+		};
 		E41642FB2F5D2F5300708895 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = E41642F52F5D2F5200708895 /* RADiUS */;
@@ -711,6 +795,12 @@
 			isa = PBXTargetDependency;
 			target = E41643062F5D2F6200708895 /* AXiS */;
 			targetProxy = E416430B2F5D2F6200708895 /* PBXContainerItemProxy */;
+		};
+		EF5C8B5864C764D05FBDAB05 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = ORBiT;
+			target = CB6E13782F57B967C91DCC94 /* ORBiT */;
+			targetProxy = 0388C3D9E9864BB889173FB8 /* PBXContainerItemProxy */;
 		};
 		F1A0B00C2F31700000000001 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -788,6 +878,37 @@
 			};
 			name = Release;
 		};
+		4691EDD996269ABB853CDEA9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.ORBiT;
+				PRODUCT_NAME = ORBiT;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
 		587EF380622F5BF2258EAD00 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -830,6 +951,38 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		8500DB96FCB57343C2A67832 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GENERATE_INFOPLIST_FILE = YES;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.ORBiT;
+				PRODUCT_NAME = ORBiT;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
 			};
 			name = Release;
 		};
@@ -1347,6 +1500,15 @@
 			buildConfigurations = (
 				E4A769572C21A20B00BE3491 /* Debug */,
 				E4A769582C21A20B00BE3491 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		EF72986683172EE59BCE2FF1 /* Build configuration list for PBXNativeTarget "ORBiT" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8500DB96FCB57343C2A67832 /* Release */,
+				4691EDD996269ABB853CDEA9 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

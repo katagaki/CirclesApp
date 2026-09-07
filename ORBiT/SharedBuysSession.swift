@@ -7,7 +7,7 @@ import CryptoKit
 import Foundation
 import Observation
 
-enum SharedBuysStatus: Equatable {
+public enum SharedBuysStatus: Equatable {
     case idle
     case connecting
     case connected
@@ -16,44 +16,46 @@ enum SharedBuysStatus: Equatable {
 
 @Observable
 @MainActor
-final class SharedBuysSession {
+public final class SharedBuysSession {
 
-    static let joinHost = "buys-join"
+    public init() {}
 
-    var status: SharedBuysStatus = .idle
-    var log: [String] = []
-    var relayBaseURL: String = "ws://127.0.0.1:8787"
-    var actorPID: Int = 0
-    var nickname: String = ""
+    public static let joinHost = "buys-join"
 
-    private(set) var sessionKey: Data?
-    private(set) var deviceID: String = ""
-    private(set) var eventNumber: Int = 0
-    private(set) var changes: [SharedBuyChange] = []
+    public var status: SharedBuysStatus = .idle
+    public var log: [String] = []
+    public var relayBaseURL: String = "ws://127.0.0.1:8787"
+    public var actorPID: Int = 0
+    public var nickname: String = ""
+
+    public private(set) var sessionKey: Data?
+    public private(set) var deviceID: String = ""
+    public private(set) var eventNumber: Int = 0
+    public private(set) var changes: [SharedBuyChange] = []
     private var lastSeq: Int = 0
     private var reconnectAttempt: Int = 0
     private var reconnectTask: Task<Void, Never>?
-    var activity: Any?
+    public var activity: Any?
     private let relay = SharedBuysRelay()
     private let bluetooth = SharedBuysBluetooth()
 
-    var bluetoothPeers: Int = 0
-    var bluetoothNote: String = ""
-    var isBluetoothEnabled: Bool = true
+    public var bluetoothPeers: Int = 0
+    public var bluetoothNote: String = ""
+    public var isBluetoothEnabled: Bool = true
 
-    var isActive: Bool { sessionKey != nil }
+    public var isActive: Bool { sessionKey != nil }
 
-    var roomID: String? {
+    public var roomID: String? {
         guard let sessionKey else { return nil }
         return SharedBuysCrypto.roomID(sessionKey: sessionKey)
     }
 
-    var items: [SharedBuyItem] { SharedBuyFold.items(from: changes) }
+    public var items: [SharedBuyItem] { SharedBuyFold.items(from: changes) }
 
 
-    var members: [Int: String] { SharedBuyFold.members(from: changes) }
+    public var members: [Int: String] { SharedBuyFold.members(from: changes) }
 
-    var joinURL: URL? {
+    public var joinURL: URL? {
         guard let sessionKey else { return nil }
         var components = URLComponents()
         components.scheme = "circles-app"
@@ -66,13 +68,13 @@ final class SharedBuysSession {
         return components.url
     }
 
-    var versionVector: [String: Int] {
+    public var versionVector: [String: Int] {
         changes.reduce(into: [String: Int]()) { result, change in
             result[change.device] = max(result[change.device] ?? 0, change.seq)
         }
     }
 
-    func restore() {
+    public func restore() {
         adoptIdentity()
         guard let snapshot = SharedBuysStore.load() else { return }
         sessionKey = snapshot.sessionKey
@@ -86,7 +88,7 @@ final class SharedBuysSession {
         startBluetooth()
     }
 
-    func start(eventNumber: Int, nickname: String) {
+    public func start(eventNumber: Int, nickname: String) {
         sessionKey = SharedBuysCrypto.newSessionKey()
         deviceID = SharedBuysCrypto.newDeviceID()
         self.eventNumber = eventNumber
@@ -100,7 +102,7 @@ final class SharedBuysSession {
         startActivity()
     }
 
-    func join(url: URL, nickname: String) {
+    public func join(url: URL, nickname: String) {
         guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
               let raw = components.queryItems?.first(where: { $0.name == "k" })?.value,
               let key = Data(base64URL: raw), key.count == 32 else {
@@ -121,7 +123,7 @@ final class SharedBuysSession {
         startActivity()
     }
 
-    func leave() {
+    public func leave() {
         endActivity()
         reconnectTask?.cancel()
         reconnectTask = nil
@@ -137,7 +139,7 @@ final class SharedBuysSession {
         note("left session")
     }
 
-    func connect() {
+    public func connect() {
         guard let sessionKey, let roomID else { return }
         reconnectTask?.cancel()
         reconnectTask = nil
@@ -160,7 +162,7 @@ final class SharedBuysSession {
         }
     }
 
-    func runSelfTest() {
+    public func runSelfTest() {
         let vector = ["aaaaaaaa": 3, "bbbbbbbb": 1, "cafebabe": 260]
         let digest = SharedBuysDigest.data(of: vector).map { String(format: "%02x", $0) }.joined()
         note("digest \(digest)")
@@ -181,7 +183,7 @@ final class SharedBuysSession {
         }
     }
 
-    func startBluetooth() {
+    public func startBluetooth() {
         guard isBluetoothEnabled, let sessionKey else { return }
         bluetooth.start(sessionKey: sessionKey, digest: SharedBuysDigest.data(of: versionVector)) { event in
             switch event {
@@ -198,7 +200,7 @@ final class SharedBuysSession {
         }
     }
 
-    func stopBluetooth() {
+    public func stopBluetooth() {
         bluetooth.stop()
         bluetoothPeers = 0
     }
@@ -242,17 +244,17 @@ final class SharedBuysSession {
         bluetooth.send(data)
     }
 
-    func addItem(name: String, cost: Int, circleID: Int) {
+    public func addItem(name: String, cost: Int, circleID: Int) {
         let itemID = String(UUID().uuidString.prefix(8)).lowercased()
         append(.addItem, itemID: itemID, circleID: circleID, text: name, value: cost)
         append(.setAssignee, itemID: itemID, circleID: circleID, value: actorPID)
     }
 
-    func cycle(_ item: SharedBuyItem) {
+    public func cycle(_ item: SharedBuyItem) {
         append(.setStatus, itemID: item.id, circleID: item.circleID, value: item.status.next.rawValue)
     }
 
-    func assign(_ item: SharedBuyItem, to pid: Int?) {
+    public func assign(_ item: SharedBuyItem, to pid: Int?) {
         append(.setAssignee, itemID: item.id, circleID: item.circleID, value: pid)
     }
 
@@ -393,7 +395,7 @@ final class SharedBuysSession {
         )
     }
 
-    func note(_ message: String) {
+    public func note(_ message: String) {
         log.insert(message, at: 0)
         if log.count > 40 { log.removeLast() }
     }
