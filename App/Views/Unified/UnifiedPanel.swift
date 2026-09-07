@@ -22,9 +22,15 @@ struct UnifiedPanel: View {
             }
         }
         .overlay(alignment: .top) {
-            UnifiedQuickAccessBar()
-                .opacity(unifier.isMinimized ? 1.0 : 0.0)
-                .allowsHitTesting(unifier.isMinimized)
+            Group {
+                if let circle = unifier.minimizedCircle {
+                    UnifiedCompactCircleBar(circle: circle)
+                } else {
+                    UnifiedQuickAccessBar()
+                }
+            }
+            .opacity(unifier.isMinimized ? 1.0 : 0.0)
+            .allowsHitTesting(unifier.isMinimized)
         }
         .animation(.easeInOut(duration: 0.2), value: unifier.isMinimized)
         .sheet(isPresented: Binding(

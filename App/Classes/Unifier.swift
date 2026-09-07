@@ -1,5 +1,6 @@
 import Observation
 import SwiftUI
+import AXiS
 
 enum UnifiedDisplayMode {
     case sheet
@@ -118,6 +119,14 @@ class Unifier {
         compactBarHeight = newHeight
         if selectedDetent == .height(previousHeight) {
             selectedDetent = .height(newHeight)
+        }
+    }
+
+    var minimizedCircle: ComiketCircle? {
+        switch sheetPath.last ?? current {
+        case .circleDetail(let circle): circle
+        case .namespacedCircleDetail(let circle, _, _, _): circle
+        default: nil
         }
     }
 
