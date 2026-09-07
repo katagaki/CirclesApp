@@ -172,6 +172,8 @@
 		};
 		0A11D0040000000000000004 /* Shared */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = Shared;
 			sourceTree = "<group>";
 		};
@@ -185,16 +187,22 @@
 		};
 		E41642F72F5D2F5200708895 /* RADiUS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = RADiUS;
 			sourceTree = "<group>";
 		};
 		E41643082F5D2F6200708895 /* AXiS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = AXiS;
 			sourceTree = "<group>";
 		};
 		E489B5772F31607D00ED193F /* Swift Data */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = "Swift Data";
 			sourceTree = "<group>";
 		};
@@ -541,9 +549,9 @@
 			packageReferences = (
 				E405A48D2C21B157006FE791 /* XCRemoteSwiftPackageReference "Komponents" */,
 				E480AA752C441DD1009C1445 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
-				E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */,
+				E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite.swift" */,
 				E480AAA42C44BB77009C1445 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
-				E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability" */,
+				E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability.swift" */,
 				E40623002DEBE238002D3E28 /* XCRemoteSwiftPackageReference "Swift-WebP" */,
 			);
 			preferredProjectObjectVersion = 77;
@@ -731,7 +739,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.0.1;
+				MARKETING_VERSION = 109.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.OnHand;
 				PRODUCT_NAME = CiRCLES;
 				SDKROOT = watchos;
@@ -765,7 +773,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.0.1;
+				MARKETING_VERSION = 109.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.OnHand;
 				PRODUCT_NAME = CiRCLES;
 				SDKROOT = watchos;
@@ -792,7 +800,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Shared Buys";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 109.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.SharedBuysWidget;
 				PRODUCT_NAME = SharedBuysWidget;
 				SDKROOT = iphoneos;
@@ -814,7 +822,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Shared Buys";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 109.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.SharedBuysWidget;
 				PRODUCT_NAME = SharedBuysWidget;
 				SDKROOT = iphoneos;
@@ -1172,7 +1180,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.0.1;
+				MARKETING_VERSION = 109.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -1215,7 +1223,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.0.1;
+				MARKETING_VERSION = 109.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -1246,7 +1254,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 109.0.1;
+				MARKETING_VERSION = 109.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1274,7 +1282,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 109.0.1;
+				MARKETING_VERSION = 109.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1379,7 +1387,7 @@
 				minimumVersion = 4.2.2;
 			};
 		};
-		E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */ = {
+		E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/stephencelis/SQLite.swift";
 			requirement = {
@@ -1395,7 +1403,7 @@
 				minimumVersion = 0.9.19;
 			};
 		};
-		E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability" */ = {
+		E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability.swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/ashleymills/Reachability.swift";
 			requirement = {
@@ -1408,7 +1416,7 @@
 /* Begin XCSwiftPackageProductDependency section */
 		A1B2C3022F5D300000000001 /* SQLite */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */;
+			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
 			productName = SQLite;
 		};
 		A1B2C3042F5D300000000002 /* ZIPFoundation */ = {
@@ -1433,7 +1441,7 @@
 		};
 		E480AA9C2C44A6F1009C1445 /* SQLite */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */;
+			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
 			productName = SQLite;
 		};
 		E480AAA52C44BB77009C1445 /* ZIPFoundation */ = {
@@ -1443,12 +1451,12 @@
 		};
 		E4D74B882C8CAEA70014CD16 /* Reachability */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability" */;
+			package = E4D74B872C8CAEA70014CD16 /* XCRemoteSwiftPackageReference "Reachability.swift" */;
 			productName = Reachability;
 		};
 		F1A0B0022F31700000000001 /* SQLite */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite" */;
+			package = E480AA9B2C44A6F1009C1445 /* XCRemoteSwiftPackageReference "SQLite.swift" */;
 			productName = SQLite;
 		};
 /* End XCSwiftPackageProductDependency section */
