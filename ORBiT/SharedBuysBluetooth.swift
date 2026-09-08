@@ -8,6 +8,8 @@ import Foundation
 
 enum BluetoothEvent: Sendable {
     case peerCount(Int)
+    /// A peer finished the handshake, carrying the digest it advertised if we scanned it.
+    case peerVerified(Data?)
     case payload(Data)
     case unavailable(String)
 }
@@ -29,6 +31,9 @@ final class SharedBuysBluetooth: NSObject {
     private var rejectedUntil: [UUID: Date] = [:]
     private var pendingNotifies: [(frame: Data, centrals: [CBCentral])] = []
     private var messageCounter: UInt8 = 0
+    private var peerDigests: [UUID: Data] = [:]
+    private var advertisedWindow: Int?
+    private var refreshTask: Task<Void, Never>?
 
     private var sessionKey: Data?
     private var digest: Data = Data(repeating: 0, count: 4)
@@ -52,9 +57,13 @@ final class SharedBuysBluetooth: NSObject {
         }
         advertise()
         scan()
+        startRefreshing()
     }
 
     func stop() {
+        refreshTask?.cancel()
+        refreshTask = nil
+        advertisedWindow = nil
         peripheralManager?.stopAdvertising()
         centralManager?.stopScan()
         for peripheral in connected.values {
@@ -69,12 +78,15 @@ final class SharedBuysBluetooth: NSObject {
         verifiedCentrals.removeAll()
         rejectedUntil.removeAll()
         pendingNotifies.removeAll()
+        peerDigests.removeAll()
         sessionKey = nil
         onEvent = nil
     }
 
     func update(digest: Data) {
+        guard self.digest != digest else { return }
         self.digest = digest
+        advertise()
     }
 
     func send(_ payload: Data) {
@@ -90,11 +102,32 @@ final class SharedBuysBluetooth: NSObject {
     }
 
     private func advertise() {
-        guard let peripheralManager, peripheralManager.state == .poweredOn, sessionKey != nil else { return }
+        guard let peripheralManager, peripheralManager.state == .poweredOn, let sessionKey else { return }
+        // CoreBluetooth only lets a peripheral advertise service UUIDs and a local name,
+        // so the room tag and digest ride in the name; Android puts the same bytes in
+        // its scan response as service data, and both sides read either field.
+        advertisedWindow = SharedBuysProfile.window(at: .now)
         peripheralManager.stopAdvertising()
         peripheralManager.startAdvertising([
-            CBAdvertisementDataServiceUUIDsKey: [SharedBuysProfile.serviceUUID]
+            CBAdvertisementDataServiceUUIDsKey: [SharedBuysProfile.serviceUUID],
+            CBAdvertisementDataLocalNameKey: SharedBuysProfile.localName(
+                sessionKey: sessionKey,
+                digest: digest
+            )
         ])
+    }
+
+    /// The advertised tag is only valid for its window, so it has to be reissued before
+    /// the window turns over, or peers stop recognising us as part of the room.
+    private func startRefreshing() {
+        refreshTask?.cancel()
+        refreshTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(30))
+                guard let self, self.sessionKey != nil else { return }
+                if self.advertisedWindow != SharedBuysProfile.window(at: .now) { self.advertise() }
+            }
+        }
     }
 
     private func scan() {
@@ -226,6 +259,8 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralManagerDelegate {
                 verifiedCentrals.insert(identifier)
                 notify(SharedBuysProfile.handshake(sessionKey: sessionKey), to: [request.central])
                 announcePeers()
+                // We never scanned this one, so its digest is unknown.
+                onEvent?(.peerVerified(nil))
                 continue
             }
             guard verifiedCentrals.contains(identifier) else { continue }
@@ -251,6 +286,25 @@ extension SharedBuysBluetooth: @preconcurrency CBCentralManagerDelegate {
         rssi RSSI: NSNumber
     ) {
         guard shouldConnect(to: peripheral) else { return }
+        let serviceData = (advertisementData[CBAdvertisementDataServiceDataKey] as? [CBUUID: Data])?[
+            SharedBuysProfile.serviceUUID
+        ]
+        // A peer that carries no room bytes is not necessarily a stranger — an iOS app
+        // in the background cannot advertise a local name — so it still gets a chance at
+        // the handshake. One that carries the wrong room is a stranger, and connecting
+        // to it could only end in a failed handshake.
+        if let advertisement = SharedBuysProfile.advertisement(
+            serviceData: serviceData,
+            localName: advertisementData[CBAdvertisementDataLocalNameKey] as? String
+        ) {
+            guard let sessionKey,
+                  SharedBuysProfile.accepts(advertisement: advertisement, sessionKey: sessionKey)
+            else {
+                rejectedUntil[peripheral.identifier] = .now.addingTimeInterval(60.0)
+                return
+            }
+            peerDigests[peripheral.identifier] = SharedBuysProfile.digest(in: advertisement)
+        }
         connected[peripheral.identifier] = peripheral
         peripheral.delegate = self
         central.connect(peripheral)
@@ -267,6 +321,7 @@ extension SharedBuysBluetooth: @preconcurrency CBCentralManagerDelegate {
     ) {
         connected[peripheral.identifier] = nil
         inboxes[peripheral.identifier] = nil
+        peerDigests[peripheral.identifier] = nil
         reassemblers[peripheral.identifier] = nil
         centralReassemblers[peripheral.identifier] = nil
         verifiedPeripherals.remove(peripheral.identifier)
@@ -329,6 +384,7 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralDelegate {
             }
             verifiedPeripherals.insert(peripheral.identifier)
             announcePeers()
+            onEvent?(.peerVerified(peerDigests[peripheral.identifier]))
             return
         }
         guard verifiedPeripherals.contains(peripheral.identifier) else { return }

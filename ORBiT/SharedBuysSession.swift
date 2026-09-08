@@ -74,6 +74,20 @@ public final class SharedBuysSession {
         }
     }
 
+    /// The version vector covering only what Bluetooth carries.
+    ///
+    /// The full vector counts relay-only changes, so advertising it to a peer would
+    /// claim we hold status flips whose sequence numbers sit below a name or cost we
+    /// happened to receive over the relay. The peer would then filter those flips out
+    /// of its reply and they would never arrive. The peer-to-peer path has to reason
+    /// about its own subset of the log.
+    public var bluetoothVersionVector: [String: Int] {
+        changes.reduce(into: [String: Int]()) { result, change in
+            guard change.payload.kind.travelsOverBluetooth else { return }
+            result[change.device] = max(result[change.device] ?? 0, change.seq)
+        }
+    }
+
     public func restore() {
         adoptIdentity()
         guard let snapshot = SharedBuysStore.load() else { return }
@@ -164,12 +178,13 @@ public final class SharedBuysSession {
 
     public func startBluetooth() {
         guard isBluetoothEnabled, let sessionKey else { return }
-        bluetooth.start(sessionKey: sessionKey, digest: SharedBuysDigest.data(of: versionVector)) { event in
+        bluetooth.start(sessionKey: sessionKey, digest: SharedBuysDigest.data(of: bluetoothVersionVector)) { event in
             switch event {
             case .peerCount(let count):
                 self.bluetoothPeers = count
                 self.note("bluetooth peers \(count)")
-                if count > 0 { self.sendWant() }
+            case .peerVerified(let digest):
+                self.handshakeCompleted(peerDigest: digest)
             case .payload(let payload):
                 self.handleBluetooth(payload)
             case .unavailable(let reason):
@@ -184,43 +199,43 @@ public final class SharedBuysSession {
         bluetoothPeers = 0
     }
 
+    /// A peer that advertised our own digest holds the same Bluetooth-eligible log, so
+    /// there is nothing for a version vector exchange to turn up.
+    private func handshakeCompleted(peerDigest: Data?) {
+        guard peerDigest != SharedBuysDigest.data(of: bluetoothVersionVector) else {
+            note("peer is level, skipping want")
+            return
+        }
+        sendWant()
+    }
+
     private func sendWant() {
-        let frame: [String: Any] = ["t": "want", "v": versionVector]
-        guard let data = try? JSONSerialization.data(withJSONObject: frame) else { return }
-        bluetooth.send(data)
+        for frame in SharedBuysWire.wantFrames(bluetoothVersionVector) {
+            bluetooth.send(frame)
+        }
     }
 
     private func handleBluetooth(_ payload: Data) {
-        guard let object = try? JSONSerialization.jsonObject(with: payload) as? [String: Any] else { return }
-        switch object["t"] as? String {
-        case "want":
-            let theirs = object["v"] as? [String: Int] ?? [:]
-            let missing = changes.filter { $0.seq > (theirs[$0.device] ?? 0) }
-            sendOverBluetooth(missing)
-        case "ops":
-            let raw = object["o"] as? [[String: Any]] ?? []
-            let records: [RelayRecord] = raw.compactMap { entry in
-                guard let device = entry["d"] as? String,
-                      let seq = entry["n"] as? Int,
-                      let blob = entry["b"] as? String,
-                      let tag = entry["a"] as? String else { return nil }
-                return RelayRecord(device: device, seq: seq, blob: blob, tag: tag)
+        guard let frame = SharedBuysWire.decode(payload) else { return }
+        switch frame {
+        case .want(let theirs):
+            let missing = changes.filter {
+                $0.payload.kind.travelsOverBluetooth && $0.seq > (theirs[$0.device] ?? 0)
             }
+            sendOverBluetooth(missing)
+        case .changes(let records):
             ingest(records)
-        default:
-            break
         }
     }
 
     private func sendOverBluetooth(_ outgoing: [SharedBuyChange]) {
-        guard !outgoing.isEmpty, bluetoothPeers > 0, let sessionKey, let roomID else { return }
-        let records = outgoing.compactMap { seal($0, sessionKey: sessionKey, roomID: roomID) }
+        let eligible = outgoing.filter { $0.payload.kind.travelsOverBluetooth }
+        guard !eligible.isEmpty, bluetoothPeers > 0, let sessionKey, let roomID else { return }
+        let records = eligible.compactMap { seal($0, sessionKey: sessionKey, roomID: roomID) }
         guard !records.isEmpty else { return }
-        let frame: [String: Any] = ["t": "ops", "o": records.map {
-            ["d": $0.device, "n": $0.seq, "b": $0.blob, "a": $0.tag]
-        }]
-        guard let data = try? JSONSerialization.data(withJSONObject: frame) else { return }
-        bluetooth.send(data)
+        for frame in SharedBuysWire.changeFrames(records) {
+            bluetooth.send(frame)
+        }
     }
 
     @discardableResult
@@ -271,7 +286,7 @@ public final class SharedBuysSession {
         guard let record = seal(change, sessionKey: sessionKey, roomID: roomID) else { return }
         Task { await relay.send(records: [record]) }
         sendOverBluetooth([change])
-        bluetooth.update(digest: SharedBuysDigest.data(of: versionVector))
+        bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothVersionVector))
         updateActivity()
     }
 
@@ -369,7 +384,7 @@ public final class SharedBuysSession {
         }
         if added > 0 {
             persist()
-            bluetooth.update(digest: SharedBuysDigest.data(of: versionVector))
+            bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothVersionVector))
             updateActivity()
             note("received \(added)")
         }

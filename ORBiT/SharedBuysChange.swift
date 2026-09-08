@@ -13,6 +13,19 @@ public enum SharedBuyKind: Int, Codable, Sendable {
     case removeItem = 4
     case memberJoined = 5
     case renameItem = 6
+
+    /// Whether this kind is carried over the peer-to-peer Bluetooth path.
+    ///
+    /// Bluetooth frames are chunked at 160 bytes and reassembled by hand, so the
+    /// transport is only dependable for small, self-contained payloads. Item names,
+    /// costs and images travel over the relay exclusively; on-site we only exchange
+    /// status flips, which is what makes the list useful while walking a venue.
+    public var travelsOverBluetooth: Bool {
+        switch self {
+        case .setStatus: true
+        default: false
+        }
+    }
 }
 
 public enum SharedBuyStatus: Int, Codable, Sendable {
@@ -73,6 +86,8 @@ public enum SharedBuyFold {
     public static func items(from changes: [SharedBuyChange]) -> [SharedBuyItem] {
         var byID: [String: SharedBuyItem] = [:]
         var order: [String] = []
+        var deferred: [String: [SharedBuyChange]] = [:]
+
         for change in changes.sorted(by: ordered) {
             let payload = change.payload
             switch payload.kind {
@@ -88,25 +103,46 @@ public enum SharedBuyFold {
                     isRemoved: false,
                     lastTouchedBy: payload.actor
                 )
-            case .setStatus:
-                byID[payload.itemID]?.status = SharedBuyStatus(rawValue: payload.value ?? 0) ?? .pending
-                byID[payload.itemID]?.lastTouchedBy = payload.actor
-            case .setAssignee:
-                byID[payload.itemID]?.assignee = payload.value
-                byID[payload.itemID]?.lastTouchedBy = payload.actor
-            case .setCost:
-                byID[payload.itemID]?.cost = payload.value ?? 0
-                byID[payload.itemID]?.lastTouchedBy = payload.actor
-            case .renameItem:
-                byID[payload.itemID]?.name = payload.text ?? ""
-                byID[payload.itemID]?.lastTouchedBy = payload.actor
-            case .removeItem:
-                byID[payload.itemID]?.isRemoved = true
+                // A mutation can land before the addItem it targets: Bluetooth carries
+                // status flips but never the item itself, so a peer can learn that
+                // something was bought before the relay delivers what it is. Replay
+                // whatever was parked on this item, in the same order it was folded.
+                for pending in deferred.removeValue(forKey: payload.itemID) ?? [] {
+                    apply(pending, to: &byID)
+                }
             case .memberJoined:
                 continue
+            default:
+                if byID[payload.itemID] == nil {
+                    deferred[payload.itemID, default: []].append(change)
+                } else {
+                    apply(change, to: &byID)
+                }
             }
         }
         return order.compactMap { byID[$0] }.filter { !$0.isRemoved }
+    }
+
+    private static func apply(_ change: SharedBuyChange, to byID: inout [String: SharedBuyItem]) {
+        let payload = change.payload
+        switch payload.kind {
+        case .setStatus:
+            byID[payload.itemID]?.status = SharedBuyStatus(rawValue: payload.value ?? 0) ?? .pending
+            byID[payload.itemID]?.lastTouchedBy = payload.actor
+        case .setAssignee:
+            byID[payload.itemID]?.assignee = payload.value
+            byID[payload.itemID]?.lastTouchedBy = payload.actor
+        case .setCost:
+            byID[payload.itemID]?.cost = payload.value ?? 0
+            byID[payload.itemID]?.lastTouchedBy = payload.actor
+        case .renameItem:
+            byID[payload.itemID]?.name = payload.text ?? ""
+            byID[payload.itemID]?.lastTouchedBy = payload.actor
+        case .removeItem:
+            byID[payload.itemID]?.isRemoved = true
+        case .addItem, .memberJoined:
+            break
+        }
     }
 
     public static func members(from changes: [SharedBuyChange]) -> [Int: String] {
