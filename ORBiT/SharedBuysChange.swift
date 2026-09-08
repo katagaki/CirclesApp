@@ -12,6 +12,7 @@ public enum SharedBuyKind: Int, Codable, Sendable {
     case setCost = 3
     case removeItem = 4
     case memberJoined = 5
+    case renameItem = 6
 }
 
 public enum SharedBuyStatus: Int, Codable, Sendable {
@@ -95,6 +96,9 @@ public enum SharedBuyFold {
                 byID[payload.itemID]?.lastTouchedBy = payload.actor
             case .setCost:
                 byID[payload.itemID]?.cost = payload.value ?? 0
+                byID[payload.itemID]?.lastTouchedBy = payload.actor
+            case .renameItem:
+                byID[payload.itemID]?.name = payload.text ?? ""
                 byID[payload.itemID]?.lastTouchedBy = payload.actor
             case .removeItem:
                 byID[payload.itemID]?.isRemoved = true

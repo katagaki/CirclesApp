@@ -223,10 +223,24 @@ public final class SharedBuysSession {
         bluetooth.send(data)
     }
 
-    public func addItem(name: String, cost: Int, circleID: Int) {
+    @discardableResult
+    public func addItem(name: String, cost: Int, circleID: Int) -> String {
         let itemID = String(UUID().uuidString.prefix(8)).lowercased()
         append(.addItem, itemID: itemID, circleID: circleID, text: name, value: cost)
         append(.setAssignee, itemID: itemID, circleID: circleID, value: actorPID)
+        return itemID
+    }
+
+    public func rename(itemID: String, circleID: Int, to name: String) {
+        append(.renameItem, itemID: itemID, circleID: circleID, text: name)
+    }
+
+    public func setCost(itemID: String, circleID: Int, to cost: Int) {
+        append(.setCost, itemID: itemID, circleID: circleID, value: cost)
+    }
+
+    public func remove(itemID: String, circleID: Int) {
+        append(.removeItem, itemID: itemID, circleID: circleID)
     }
 
     public func cycle(_ item: SharedBuyItem) {

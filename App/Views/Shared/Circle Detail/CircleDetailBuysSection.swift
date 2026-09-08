@@ -18,7 +18,7 @@ struct CircleDetailBuysSection: View {
 
     @State private var buyEntry: BuyEntry?
     @State private var isEditing: Bool = false
-    @State private var isAddingToSharedList: Bool = false
+    @State private var sharedDrafts: [SharedBuyDraft] = []
 
     @Binding var buysAttachmentPickerCircle: ComiketCircle?
     @Binding var buysCropImage: UIImage?
@@ -46,6 +46,16 @@ struct CircleDetailBuysSection: View {
                 }
                 .moveDisabled(!isEditing)
             }
+            ForEach($sharedDrafts) { $draft in
+                SharedBuyDraftRow(circleID: circle.id, itemID: $draft.itemID)
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            discardDraft(draft)
+                        } label: {
+                            Label("Shared.Delete", systemImage: "trash")
+                        }
+                    }
+            }
             if isEditing || buyEntry == nil || buyEntry?.items.isEmpty == true {
                 Button {
                     if !isEditing {
@@ -57,7 +67,7 @@ struct CircleDetailBuysSection: View {
                 }
                 if sharedBuys.isActive {
                     Button {
-                        isAddingToSharedList = true
+                        sharedDrafts.append(SharedBuyDraft())
                     } label: {
                         Label("Buys.AddItem.Shared", systemImage: "person.2.badge.plus")
                     }
@@ -75,9 +85,6 @@ struct CircleDetailBuysSection: View {
                         .textCase(nil)
                 }
             }
-        }
-        .sheet(isPresented: $isAddingToSharedList) {
-            SharedBuyAddSheet(circleID: circle.id)
         }
         .onAppear {
             reloadEntry()
@@ -211,6 +218,13 @@ struct CircleDetailBuysSection: View {
         }
     }
 
+    func discardDraft(_ draft: SharedBuyDraft) {
+        if let itemID = draft.itemID {
+            sharedBuys.remove(itemID: itemID, circleID: circle.id)
+        }
+        sharedDrafts.removeAll { $0.id == draft.id }
+    }
+
     func addBlankItem() {
         let newItem = BuyItem(name: "", cost: 0)
         BuysDatabase.shared.addItem(newItem, circleID: circle.id, eventNumber: planner.activeEventNumber)
@@ -272,4 +286,9 @@ struct BuyImageViewer: View {
             }
         }
     }
+}
+
+struct SharedBuyDraft: Identifiable {
+    let id = UUID()
+    var itemID: String?
 }
