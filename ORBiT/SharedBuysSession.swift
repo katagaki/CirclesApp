@@ -22,6 +22,9 @@ public final class SharedBuysSession {
 
     public static let joinHost = "buys-join"
 
+    /// The relay refuses a frame carrying more than this (`MAX_RECORDS_PER_FRAME`).
+    public static let recordsPerFrame = 32
+
     public var status: SharedBuysStatus = .idle
     public var log: [String] = []
     public var relayBaseURL: String = "ws://127.0.0.1:8787"
@@ -68,13 +71,18 @@ public final class SharedBuysSession {
         return components.url
     }
 
+    /// What we hold with no gap in it, per device.
+    ///
+    /// A vector of `max(seq)` claims everything below the highest sequence number we
+    /// have seen, so a change learned out of order — over Bluetooth, or from a peer's
+    /// backlog — buries whatever is still missing underneath it, and the relay withholds
+    /// the gap forever. The contiguous prefix claims only what is actually complete;
+    /// anything above a hole is sent again and deduped on ingest.
     public var versionVector: [String: Int] {
-        changes.reduce(into: [String: Int]()) { result, change in
-            result[change.device] = max(result[change.device] ?? 0, change.seq)
-        }
+        Self.contiguousPrefix(of: changes)
     }
 
-    /// The version vector covering only what Bluetooth carries.
+    /// The same prefix, over the subset Bluetooth carries.
     ///
     /// The full vector counts relay-only changes, so advertising it to a peer would
     /// claim we hold status flips whose sequence numbers sit below a name or cost we
@@ -82,9 +90,31 @@ public final class SharedBuysSession {
     /// of its reply and they would never arrive. The peer-to-peer path has to reason
     /// about its own subset of the log.
     public var bluetoothVersionVector: [String: Int] {
+        Self.contiguousPrefix(of: changes.filter { $0.payload.kind.travelsOverBluetooth })
+    }
+
+    /// What the advertised digest summarises: everything held over Bluetooth, gaps and
+    /// all.
+    ///
+    /// The digest answers "is there anything to exchange at all", so it has to count a
+    /// change sitting above a hole. The vector we send answers "what may you skip", and
+    /// must not.
+    private var bluetoothDigestVector: [String: Int] {
         changes.reduce(into: [String: Int]()) { result, change in
             guard change.payload.kind.travelsOverBluetooth else { return }
             result[change.device] = max(result[change.device] ?? 0, change.seq)
+        }
+    }
+
+    /// The highest `n` for which every sequence number from 1 to `n` is present. A
+    /// device we hold nothing contiguous for is left out rather than claimed at 0.
+    private static func contiguousPrefix(of changes: [SharedBuyChange]) -> [String: Int] {
+        var held: [String: Set<Int>] = [:]
+        for change in changes { held[change.device, default: []].insert(change.seq) }
+        return held.compactMapValues { seqs in
+            var next = 1
+            while seqs.contains(next) { next += 1 }
+            return next > 1 ? next - 1 : nil
         }
     }
 
@@ -178,7 +208,7 @@ public final class SharedBuysSession {
 
     public func startBluetooth() {
         guard isBluetoothEnabled, let sessionKey else { return }
-        bluetooth.start(sessionKey: sessionKey, digest: SharedBuysDigest.data(of: bluetoothVersionVector)) { event in
+        bluetooth.start(sessionKey: sessionKey, digest: SharedBuysDigest.data(of: bluetoothDigestVector)) { event in
             switch event {
             case .peerCount(let count):
                 self.bluetoothPeers = count
@@ -202,7 +232,7 @@ public final class SharedBuysSession {
     /// A peer that advertised our own digest holds the same Bluetooth-eligible log, so
     /// there is nothing for a version vector exchange to turn up.
     private func handshakeCompleted(peerDigest: Data?) {
-        guard peerDigest != SharedBuysDigest.data(of: bluetoothVersionVector) else {
+        guard peerDigest != SharedBuysDigest.data(of: bluetoothDigestVector) else {
             note("peer is level, skipping want")
             return
         }
@@ -286,7 +316,7 @@ public final class SharedBuysSession {
         guard let record = seal(change, sessionKey: sessionKey, roomID: roomID) else { return }
         Task { await relay.send(records: [record]) }
         sendOverBluetooth([change])
-        bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothVersionVector))
+        bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothDigestVector))
         updateActivity()
     }
 
@@ -353,18 +383,33 @@ public final class SharedBuysSession {
         }
     }
 
+    /// Uploads every change this device authored, in frames the relay will accept.
+    ///
+    /// Taking the first 32 and discarding the rest left later changes with no path to
+    /// the server at all: `resend()` only runs on connect, and always re-took the same
+    /// 32. Each page is sealed as it is sent, so a long backlog no longer pays the whole
+    /// seal cost — encode, two derivations and AES-GCM per change — before transmitting
+    /// any of it.
     private func resend() {
         guard let sessionKey, let roomID else { return }
         let mine = changes.filter { $0.device == deviceID }
-        let records = mine.compactMap { seal($0, sessionKey: sessionKey, roomID: roomID) }
-        guard !records.isEmpty else { return }
-        Task { await relay.send(records: Array(records.prefix(32))) }
+        guard !mine.isEmpty else { return }
+        Task {
+            for start in stride(from: 0, to: mine.count, by: Self.recordsPerFrame) {
+                let page = mine[start..<min(start + Self.recordsPerFrame, mine.count)]
+                let records = page.compactMap {
+                    self.seal($0, sessionKey: sessionKey, roomID: roomID)
+                }
+                guard !records.isEmpty else { continue }
+                await self.relay.send(records: records)
+            }
+        }
     }
 
     private func ingest(_ records: [RelayRecord]) {
         guard let sessionKey, let roomID else { return }
         let contentKey = SharedBuysCrypto.derive(SharedBuysCrypto.opsInfo, from: sessionKey)
-        let known = Set(changes.map(\.id))
+        var known = Set(changes.map(\.id))
         var added = 0
         for record in records {
             let identifier = "\(record.device)#\(record.seq)"
@@ -380,11 +425,17 @@ public final class SharedBuysSession {
                 continue
             }
             changes.append(SharedBuyChange(device: record.device, seq: record.seq, payload: payload))
+            // A batch can carry the same record twice — a relay echo, or a `want` reply
+            // overlapping the live stream — so the set has to grow as we append.
+            known.insert(identifier)
+            // A Lamport clock. Without it a fresh device's seq 1 sorts under an
+            // established peer's seq 30, and the older edit wins on every screen.
+            lastSeq = max(lastSeq, record.seq)
             added += 1
         }
         if added > 0 {
             persist()
-            bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothVersionVector))
+            bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothDigestVector))
             updateActivity()
             note("received \(added)")
         }
