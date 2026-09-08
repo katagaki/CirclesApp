@@ -19,6 +19,7 @@ export const MAX_SOCKETS = 8;
 export const MAX_STORED_RECORDS = 500;
 export const HELLO_SKEW_SECONDS = 300;
 export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
+export const UNCLAIMED_TTL_MS = 5 * 60 * 1000;
 
 export const CLOSE_RATE = 4001;
 export const CLOSE_PROTOCOL = 4002;
@@ -85,6 +86,11 @@ export class Room extends DurableObject {
       created_at INTEGER NOT NULL
     )`);
     ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("ping", "pong"));
+    ctx.blockConcurrencyWhile(async () => {
+      if ((await ctx.storage.getAlarm()) === null) {
+        await ctx.storage.setAlarm(Date.now() + UNCLAIMED_TTL_MS);
+      }
+    });
   }
 
   override async fetch(request: Request): Promise<Response> {
@@ -215,6 +221,7 @@ export class Room extends DurableObject {
       if (!entry || typeof entry !== "object") throw new Fail(CLOSE_PROTOCOL, "bad record");
       const { d, n, b, a } = entry as Record;
       if (typeof d !== "string" || !DEVICE_ID.test(d)) throw new Fail(CLOSE_PROTOCOL, "bad device id");
+      if (d !== attachment.d) throw new Fail(CLOSE_AUTH, "device mismatch");
       if (!isSeq(n)) throw new Fail(CLOSE_PROTOCOL, "bad seq");
       const blob = b64urlDecode(b);
       const offered = b64urlDecode(a);
@@ -231,7 +238,9 @@ export class Room extends DurableObject {
       if (pending.has(id) || this.holds(record.d, record.n)) continue;
       pending.add(id);
     }
-    if (this.count() + pending.size > MAX_STORED_RECORDS) throw new Fail(CLOSE_STORAGE_FULL, "room is full");
+    if (pending.size > MAX_STORED_RECORDS) throw new Fail(CLOSE_STORAGE_FULL, "room is full");
+    const overflow = this.count() + pending.size - MAX_STORED_RECORDS;
+    if (overflow > 0) this.evict(overflow);
 
     const now = Math.floor(Date.now() / 1000);
     const fresh: Record[] = [];
@@ -264,6 +273,13 @@ export class Room extends DurableObject {
 
   private holds(device: string, seq: number): boolean {
     return this.sql.exec("SELECT 1 FROM ops WHERE device = ? AND seq = ? LIMIT 1", device, seq).toArray().length > 0;
+  }
+
+  private evict(rows: number): void {
+    this.sql.exec(
+      "DELETE FROM ops WHERE (device, seq) IN (SELECT device, seq FROM ops ORDER BY ts, device, seq LIMIT ?)",
+      rows,
+    );
   }
 
   private count(): number {

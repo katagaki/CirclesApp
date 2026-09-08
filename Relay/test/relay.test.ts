@@ -1,7 +1,7 @@
 import { env, runDurableObjectAlarm, runInDurableObject, SELF } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
 import { Client, authKey, helloFrame, record, roomId } from "./client";
-import type { Room } from "../src/room";
+import { UNCLAIMED_TTL_MS, type Room } from "../src/room";
 
 async function join(
   room: string,
@@ -211,7 +211,7 @@ describe("limits", () => {
     expect(a.closed).toBeNull();
   });
 
-  it("closes 4005 once the room holds 500 records", async () => {
+  it("evicts the oldest records once the room is full", async () => {
     const room = roomId();
     const key = authKey();
     const a = await join(room, key, "aaaaaaaa", {}, true);
@@ -224,11 +224,43 @@ describe("limits", () => {
       a.send({ t: "ops", o: ops });
     }
     a.send({ t: "ops", o: [await record(key, "aaaaaaaa", seq, "overflow")] });
-    expect((await a.closure()).code).toBe(4005);
+    await new Promise((resolve) => setTimeout(resolve, 50));
 
+    expect(a.closed).toBeNull();
     await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) => {
       expect(Number(state.storage.sql.exec("SELECT COUNT(*) AS c FROM ops").one().c)).toBe(500);
+      const held = state.storage.sql.exec("SELECT seq FROM ops ORDER BY seq").toArray();
+      expect(Number(held[held.length - 1].seq)).toBe(seq);
+      expect(held.some((row) => Number(row.seq) === 1)).toBe(false);
     });
+  });
+});
+
+describe("record authorship", () => {
+  it("closes 4004 on a record claiming another device", async () => {
+    const room = roomId();
+    const key = authKey();
+    const a = await join(room, key, "aaaaaaaa", {}, true);
+    await a.next();
+    a.send({ t: "ops", o: [await record(key, "bbbbbbbb", 5, "squat")] });
+    expect((await a.closure()).code).toBe(4004);
+  });
+
+  it("does not let a squatted seq erase the real record", async () => {
+    const room = roomId();
+    const key = authKey();
+    const a = await join(room, key, "aaaaaaaa", {}, true);
+    await a.next();
+    const b = await join(room, key, "bbbbbbbb");
+    await b.next();
+
+    b.send({ t: "ops", o: [await record(key, "aaaaaaaa", 5, "squat")] });
+    expect((await b.closure()).code).toBe(4004);
+
+    const real = await record(key, "aaaaaaaa", 5, "real");
+    a.send({ t: "ops", o: [real] });
+    const late = await join(room, key, "cccccccc");
+    expect(await late.next()).toEqual({ t: "ops", o: [real] });
   });
 });
 
@@ -267,6 +299,27 @@ describe("hibernation", () => {
 });
 
 describe("lifetime", () => {
+  it("arms a short alarm for a room nobody registered", async () => {
+    const room = roomId();
+    await Client.connect(room);
+    await runInDurableObject(stub(room), async (_instance: Room, state: DurableObjectState) => {
+      const alarm = await state.storage.getAlarm();
+      expect(alarm).not.toBeNull();
+      expect(alarm! - Date.now()).toBeLessThanOrEqual(UNCLAIMED_TTL_MS);
+    });
+  });
+
+  it("extends the alarm to the room lifetime once a key is registered", async () => {
+    const room = roomId();
+    const key = authKey();
+    const a = await join(room, key, "aaaaaaaa", {}, true);
+    await a.next();
+    await runInDurableObject(stub(room), async (_instance: Room, state: DurableObjectState) => {
+      const alarm = await state.storage.getAlarm();
+      expect(alarm! - Date.now()).toBeGreaterThan(UNCLAIMED_TTL_MS);
+    });
+  });
+
   it("clears the room when the alarm fires", async () => {
     const room = roomId();
     const key = authKey();
