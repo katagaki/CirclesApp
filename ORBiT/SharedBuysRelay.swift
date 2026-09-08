@@ -81,6 +81,21 @@ actor SharedBuysRelay {
         }
     }
 
+    /// Whether the room key may be handed to this relay.
+    ///
+    /// The hello frame registers a room by uploading `relayAuthKey`, the same key that
+    /// backs every `recordTag`. Over `ws://` anyone on the path recovers it and can
+    /// forge records for any device, so the key only travels over TLS — or to a
+    /// development server on this machine, which includes the Android emulator's alias
+    /// for its host. A relay that has not seen the key answers a hello with
+    /// `CLOSE_UNKNOWN_ROOM`, which is a diagnosable failure rather than a silent leak.
+    static func allowsKeyUpload(_ baseURL: String) -> Bool {
+        guard let url = URL(string: baseURL), let scheme = url.scheme?.lowercased() else { return false }
+        if scheme == "wss" || scheme == "https" { return true }
+        guard let host = url.host?.lowercased() else { return false }
+        return ["localhost", "127.0.0.1", "::1", "10.0.2.2"].contains(host)
+    }
+
     private func sendHello(_ endpoint: Endpoint) async {
         guard let task else { return }
         let relayAuthKey = SharedBuysCrypto.derive(
@@ -93,14 +108,16 @@ actor SharedBuysRelay {
             timestamp: timestamp,
             relayAuthKey: relayAuthKey
         )
-        let frame: [String: Any] = [
+        var frame: [String: Any] = [
             "t": "hello",
             "d": endpoint.deviceID,
             "v": endpoint.vector,
-            "k": relayAuthKey.withUnsafeBytes { Data($0) }.base64URL,
             "ts": timestamp,
             "a": tag.base64URL
         ]
+        if Self.allowsKeyUpload(endpoint.baseURL) {
+            frame["k"] = relayAuthKey.withUnsafeBytes { Data($0) }.base64URL
+        }
         guard let data = try? JSONSerialization.data(withJSONObject: frame),
               let text = String(data: data, encoding: .utf8) else { return }
         do {

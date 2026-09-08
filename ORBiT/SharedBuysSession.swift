@@ -25,6 +25,14 @@ public final class SharedBuysSession {
     /// The relay refuses a frame carrying more than this (`MAX_RECORDS_PER_FRAME`).
     public static let recordsPerFrame = 32
 
+    /// How long an outbound record waits for company before it is sent.
+    ///
+    /// The relay's bucket is 20 messages per 10 seconds and `addItem` alone emits two
+    /// changes, so a frame per change put ten quick adds over the limit and earned a
+    /// rate-limit close. A quarter second is under the threshold of feeling laggy and
+    /// collapses a burst of typing into one frame.
+    public static let coalesceWindow: Duration = .milliseconds(250)
+
     public var status: SharedBuysStatus = .idle
     public var log: [String] = []
     public var relayBaseURL: String = "ws://127.0.0.1:8787"
@@ -38,6 +46,8 @@ public final class SharedBuysSession {
     private var lastSeq: Int = 0
     private var reconnectAttempt: Int = 0
     private var reconnectTask: Task<Void, Never>?
+    private var outbox: [RelayRecord] = []
+    private var flushTask: Task<Void, Never>?
     public var activity: Any?
     private let relay = SharedBuysRelay()
     private let bluetooth = SharedBuysBluetooth()
@@ -172,6 +182,9 @@ public final class SharedBuysSession {
         reconnectTask?.cancel()
         reconnectTask = nil
         reconnectAttempt = 0
+        flushTask?.cancel()
+        flushTask = nil
+        outbox = []
         bluetooth.stop()
         bluetoothPeers = 0
         Task { await relay.disconnect() }
@@ -314,10 +327,35 @@ public final class SharedBuysSession {
         changes.append(change)
         persist()
         guard let record = seal(change, sessionKey: sessionKey, roomID: roomID) else { return }
-        Task { await relay.send(records: [record]) }
+        enqueue(record)
         sendOverBluetooth([change])
         bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothDigestVector))
         updateActivity()
+    }
+
+    /// Holds a record briefly so a burst of edits leaves as one frame.
+    private func enqueue(_ record: RelayRecord) {
+        outbox.append(record)
+        guard outbox.count < Self.recordsPerFrame else {
+            flushOutbox()
+            return
+        }
+        guard flushTask == nil else { return }
+        flushTask = Task {
+            try? await Task.sleep(for: Self.coalesceWindow)
+            guard !Task.isCancelled else { return }
+            self.flushTask = nil
+            self.flushOutbox()
+        }
+    }
+
+    private func flushOutbox() {
+        flushTask?.cancel()
+        flushTask = nil
+        guard !outbox.isEmpty else { return }
+        let records = outbox
+        outbox = []
+        Task { await relay.send(records: records) }
     }
 
     private func seal(_ change: SharedBuyChange, sessionKey: Data, roomID: String) -> RelayRecord? {
@@ -409,11 +447,24 @@ public final class SharedBuysSession {
     private func ingest(_ records: [RelayRecord]) {
         guard let sessionKey, let roomID else { return }
         let contentKey = SharedBuysCrypto.derive(SharedBuysCrypto.opsInfo, from: sessionKey)
+        let relayAuthKey = SharedBuysCrypto.derive(SharedBuysCrypto.relayAuthInfo, from: sessionKey)
         var known = Set(changes.map(\.id))
         var added = 0
         for record in records {
             let identifier = "\(record.device)#\(record.seq)"
             guard !known.contains(identifier), let blob = Data(base64URL: record.blob) else { continue }
+            // Whoever handed us this record — the relay, or a peer over Bluetooth — is
+            // not trusted to have authored it. Check the tag before it enters the log.
+            guard let offered = Data(base64URL: record.tag),
+                  offered == SharedBuysCrypto.recordTag(
+                      deviceID: record.device,
+                      seq: record.seq,
+                      blob: blob,
+                      relayAuthKey: relayAuthKey
+                  ) else {
+                note("bad tag on \(identifier)")
+                continue
+            }
             guard let plaintext = try? SharedBuysCrypto.open(
                 blob,
                 contentKey: contentKey,
