@@ -5,17 +5,20 @@
 //  Created by Claude on 2026/03/24.
 //
 
-import SwiftUI
 import AXiS
+import ORBiT
+import SwiftUI
 
 struct CircleDetailBuysSection: View {
 
     @Environment(Events.self) var planner
+    @Environment(SharedBuysSession.self) var sharedBuys
 
     let circle: ComiketCircle
 
     @State private var buyEntry: BuyEntry?
     @State private var isEditing: Bool = false
+    @State private var isAddingToSharedList: Bool = false
 
     @Binding var buysAttachmentPickerCircle: ComiketCircle?
     @Binding var buysCropImage: UIImage?
@@ -52,6 +55,13 @@ struct CircleDetailBuysSection: View {
                 } label: {
                     Label("Buys.AddItem", systemImage: "plus.circle.fill")
                 }
+                if sharedBuys.isActive {
+                    Button {
+                        isAddingToSharedList = true
+                    } label: {
+                        Label("Buys.AddItem.Shared", systemImage: "person.2.badge.plus")
+                    }
+                }
             }
         } header: {
             HStack {
@@ -65,6 +75,9 @@ struct CircleDetailBuysSection: View {
                         .textCase(nil)
                 }
             }
+        }
+        .sheet(isPresented: $isAddingToSharedList) {
+            SharedBuyAddSheet(circleID: circle.id)
         }
         .onAppear {
             reloadEntry()

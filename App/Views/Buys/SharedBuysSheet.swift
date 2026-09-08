@@ -155,3 +155,56 @@ struct SharedBuyAssignSheet: View {
         .presentationDetents([.medium])
     }
 }
+
+struct SharedBuyAddSheet: View {
+
+    @Environment(SharedBuysSession.self) var sharedBuys
+    @Environment(\.dismiss) var dismiss
+
+    let circleID: Int
+
+    @State private var name: String = ""
+    @State private var cost: String = ""
+    @FocusState private var isNameFocused: Bool
+
+    var trimmedName: String {
+        name.trimmingCharacters(in: .whitespaces)
+    }
+
+    var body: some View {
+        NavigationStack {
+            List {
+                Section {
+                    TextField("Buys.ItemName.Placeholder", text: $name)
+                        .focused($isNameFocused)
+                    TextField("Buys.ItemCost.Placeholder", text: $cost)
+                        .keyboardType(.numberPad)
+                }
+            }
+            .navigationTitle("Buys.AddItem.Shared")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .cancel) {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(role: .confirm) {
+                        sharedBuys.addItem(
+                            name: trimmedName,
+                            cost: Int(cost) ?? 0,
+                            circleID: circleID
+                        )
+                        dismiss()
+                    }
+                    .disabled(trimmedName.isEmpty)
+                }
+            }
+            .onAppear {
+                isNameFocused = true
+            }
+        }
+        .presentationDetents([.medium])
+    }
+}
