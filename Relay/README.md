@@ -1,10 +1,6 @@
-# circles-relay
+# CirclesRelay
 
-Store-and-forward relay for the CiRCLES / CirclesGo shared shopping list. One Cloudflare Worker,
-one Durable Object per room, WebSockets only.
-
-A dumb pipe: records arrive sealed, are stored as opaque bytes, and are replayed verbatim. Nothing
-here decrypts or inspects a record.
+Store-and-forward relay for the CiRCLES app. One Cloudflare Worker, one Durable Object per room, and WebSockets.
 
 ## Endpoints
 
@@ -31,11 +27,9 @@ JSON text frames, binary values base64url without padding.
 { "t": "err", "c": "auth", "m": "…" }  // always followed by a close
 ```
 
-`hello` is the required first frame; the reply is always an `ops` frame, empty when already current.
-Frames never exceed 4 KB, so catch-up is chunked.
+`hello` is the required first frame; the reply is always an `ops` frame, empty when already current. Frames never exceed 4 KB, so catch-up is chunked.
 
-`(device, seq)` is a record's only identity. Re-sending one is a no-op, not an error, is not fanned
-out again, and does not count against the room's 500-record cap. Records are never reordered, rewritten, or deduplicated by content.
+`(device, seq)` is a record's only identity. Records are never reordered, rewritten, or deduplicated by content.
 
 ### Auth tags
 
@@ -44,16 +38,9 @@ hello tag  = HMAC-SHA256(relayAuthKey, "hello" ‖ 0x00 ‖ deviceId ‖ 0x00 �
 record tag = HMAC-SHA256(relayAuthKey, deviceId ‖ 0x00 ‖ uint64be(seq) ‖ sealedBlob)[0..16]
 ```
 
-`deviceId` goes in as its 8 ASCII hex characters, not the 4 bytes they encode; `sealedBlob` is the
-decoded blob, not its base64url text. Compared in constant time.
+`deviceId` is its 8 ASCII hex characters, not the 4 bytes they encode; `sealedBlob` is the decoded blob, not its base64url text. Tags are compared in constant time and stored alongside each record so receivers can verify them too.
 
-**Send `k`, the 32-byte `relayAuthKey`, on every `hello`.** It is stored only once its tag verifies,
-and later values are ignored, so repeating it costs 44 bytes and nothing else. A room is deleted 48
-hours after its last write, taking its key with it — a client that sent `k` only on its very first
-`hello` would be shut out of its own room after an idle weekend. Omitting `k` for a room that has no
-key closes `4006` (`unknown`), which is recoverable: reconnect and send `k`. That is distinct from
-`4004`, which means the tag itself was wrong and retrying will not help. Record tags are stored and replayed unchanged so receivers
-can verify them too.
+**Send `k`, the 32-byte `relayAuthKey`, on every `hello`.** It's stored only once and ignored after, so repeating it just costs 44 bytes. A room is deleted 48 hours after its last write, taking its key with it, so a client that only sends `k` on its first-ever `hello` gets shut out after an idle weekend. Omitting `k` for a keyless room closes `4006` (`unknown`, recoverable: reconnect and send `k`); a wrong tag closes `4004` (`auth`, not recoverable by retrying).
 
 ## Limits
 
@@ -72,15 +59,11 @@ Match on `c`, never on `m`.
 
 ## Hibernation
 
-Idle rooms must bill no duration, so on the free plan two rules are load-bearing:
+Idle rooms must bill no duration, so on the free plan:
 
-- Nothing that outlives a message may sit in an instance field or module scope. Room state is in
-  SQLite, per-socket state in `serializeAttachment`.
-- Keepalive is `setWebSocketAutoResponse("ping" → "pong")`; the only scheduled work is `alarm()`.
-  No timers.
-
-Never add an HTTP polling endpoint. Outbound WebSocket messages are free, inbound requests are
-billed; polling turns the cheap path into the expensive one.
+- Nothing that outlives a message may sit in an instance field or module scope. Room state lives in SQLite, per-socket state in `serializeAttachment`.
+- Keepalive is `setWebSocketAutoResponse("ping" → "pong")`; the only scheduled work is `alarm()`, no timers.
+- No HTTP polling endpoint, ever. Outbound WebSocket messages are free, inbound requests are billed, so polling would turn the cheap path into the expensive one.
 
 ## Develop and deploy
 
@@ -90,18 +73,12 @@ npm run dev
 npx wrangler deploy --env staging
 ```
 
-CI deploys on tags — `staging-*` to staging, `v*` to production — using a `CLOUDFLARE_API_TOKEN`
-secret scoped to Edit Cloudflare Workers. There are no Worker secrets: room keys arrive from clients
-at runtime and live only in each object's storage.
+CI deploys on tags: `staging-*` to staging, `v*` to production, using a `CLOUDFLARE_API_TOKEN` secret scoped to Edit Cloudflare Workers. There are no Worker secrets: room keys arrive from clients at runtime and live only in each object's storage.
 
-After the first deploy, set a Workers Analytics alert at 50,000 requests/day, half the free-plan cap.
-Exhausting it fails silently for everyone at once.
+After the first deploy, set a Workers Analytics alert at 50,000 requests/day, half the free-plan cap, since exhausting it fails silently for everyone at once.
 
-Log counts and error codes only — never a blob, tag, key, room id, or full URL.
+Log counts and error codes only, never a blob, tag, key, room id, or full URL.
 
 ## Push notifications
 
-Not built. Outbound APNs/FCM calls will not count against the 100,000 requests/day allowance —
-subrequests are not billed, only the inbound request is. Instead the caps are 50 subrequests per
-invocation and six connections per invocation awaiting response headers, so a fan-out past 50
-devices must be batched.
+Not built. Outbound APNs/FCM calls wouldn't count against the 100,000 requests/day allowance (subrequests are unbilled, only the inbound request is), but each invocation is capped at 50 subrequests and six connections awaiting response headers, so a fan-out past 50 devices would need batching.
