@@ -49,9 +49,16 @@ struct GuestView: View {
         }
         .sheet(isPresented: $isShowingScanner) {
             SharedBuysScannerView { url in
-                sharedBuys.adoptIdentity()
-                sharedBuys.join(url: url, nickname: sharedBuys.nickname)
+                join(url)
             }
+        }
+        // `urlSchemeHandler` hangs off UnifiedView, which a guest never builds, so a join
+        // link tapped outside the app would land nowhere. Android's deep links are
+        // handled in the activity and work in either shell; this keeps the two matched.
+        .onOpenURL { url in
+            guard url.scheme == "circles-app", url.host() == SharedBuysSession.joinHost
+            else { return }
+            join(url)
         }
         .sheet(isPresented: $isShowingMy) {
             NavigationStack {
@@ -60,13 +67,18 @@ struct GuestView: View {
             .presentationDetents([.large])
         }
         .alert("Alerts.Guest.Leave.Title", isPresented: $isConfirmingLeave) {
-            Button("Buys.Shared.End", role: .destructive) {
+            Button("Buys.Guest.Leave", role: .destructive) {
                 sharedBuys.leave()
             }
             Button("Shared.Cancel", role: .cancel) { }
         } message: {
             Text("Alerts.Guest.Leave.Message")
         }
+    }
+
+    func join(_ url: URL) {
+        sharedBuys.adoptIdentity()
+        sharedBuys.join(url: url, nickname: sharedBuys.nickname)
     }
 
     @ViewBuilder
@@ -124,7 +136,7 @@ struct GuestView: View {
                 Text("Buys.Guest.ReadOnly")
             }
             Section {
-                Button("Buys.Shared.End", role: .destructive) {
+                Button("Buys.Guest.Leave", role: .destructive) {
                     isConfirmingLeave = true
                 }
             }
