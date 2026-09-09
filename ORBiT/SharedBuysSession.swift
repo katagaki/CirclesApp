@@ -42,8 +42,13 @@ public final class SharedBuysSession {
     public private(set) var sessionKey: Data?
     public private(set) var deviceID: String = ""
     public private(set) var eventNumber: Int = 0
-    public private(set) var changes: [SharedBuyChange] = []
-    private var lastSeq: Int = 0
+    public internal(set) var changes: [SharedBuyChange] = [] {
+        didSet { foldCache = nil }
+    }
+
+    /// The fold of `changes`, kept until the log changes underneath it.
+    @ObservationIgnored private var foldCache: (items: [SharedBuyItem], members: [Int: String])?
+    var lastSeq: Int = 0
     private var reconnectAttempt: Int = 0
     private var reconnectTask: Task<Void, Never>?
     var outbox: [RelayRecord] = []
@@ -63,9 +68,19 @@ public final class SharedBuysSession {
         return SharedBuysCrypto.roomID(sessionKey: sessionKey)
     }
 
-    public var items: [SharedBuyItem] { SharedBuyFold.items(from: changes) }
+    public var items: [SharedBuyItem] { fold().items }
 
-    public var members: [Int: String] { SharedBuyFold.members(from: changes) }
+    public var members: [Int: String] { fold().members }
+
+    private func fold() -> (items: [SharedBuyItem], members: [Int: String]) {
+        if let foldCache { return foldCache }
+        let folded = (
+            items: SharedBuyFold.items(from: changes),
+            members: SharedBuyFold.members(from: changes)
+        )
+        foldCache = folded
+        return folded
+    }
 
     public var joinURL: URL? {
         guard let sessionKey else { return nil }
@@ -139,6 +154,10 @@ public final class SharedBuysSession {
             return
         }
         let event = Int(components.queryItems?.first(where: { $0.name == "e" })?.value ?? "") ?? 0
+        // Joining a second room is leaving the first. Without this the previous room's
+        // Live Activity survived — `startActivity()` bails while one exists — and went on
+        // showing the new room's items under the old room's identity.
+        if isActive { leave() }
         sessionKey = key
         deviceID = SharedBuysCrypto.newDeviceID()
         eventNumber = event
@@ -320,65 +339,22 @@ public final class SharedBuysSession {
         }
     }
 
-    func ingest(_ records: [RelayRecord]) {
-        guard let sessionKey, let roomID else { return }
-        let contentKey = SharedBuysCrypto.derive(SharedBuysCrypto.opsInfo, from: sessionKey)
-        let relayAuthKey = SharedBuysCrypto.derive(SharedBuysCrypto.relayAuthInfo, from: sessionKey)
-        var known = Set(changes.map(\.id))
-        var added = 0
-        for record in records {
-            let identifier = "\(record.device)#\(record.seq)"
-            guard !known.contains(identifier), let blob = Data(base64URL: record.blob) else { continue }
-            // Whoever handed us this record — the relay, or a peer over Bluetooth — is
-            // not trusted to have authored it. Check the tag before it enters the log.
-            guard let offered = Data(base64URL: record.tag),
-                  offered == SharedBuysCrypto.recordTag(
-                      deviceID: record.device,
-                      seq: record.seq,
-                      blob: blob,
-                      relayAuthKey: relayAuthKey
-                  ) else {
-                note("bad tag on \(identifier)")
-                continue
-            }
-            guard let plaintext = try? SharedBuysCrypto.open(
-                blob,
-                contentKey: contentKey,
-                roomID: roomID,
-                deviceID: record.device,
-                seq: record.seq
-            ), let payload = try? JSONDecoder().decode(SharedBuyPayload.self, from: plaintext) else {
-                note("could not open \(identifier)")
-                continue
-            }
-            changes.append(SharedBuyChange(device: record.device, seq: record.seq, payload: payload))
-            // A batch can carry the same record twice — a relay echo, or a `want` reply
-            // overlapping the live stream — so the set has to grow as we append.
-            known.insert(identifier)
-            // A Lamport clock. Without it a fresh device's seq 1 sorts under an
-            // established peer's seq 30, and the older edit wins on every screen.
-            lastSeq = max(lastSeq, record.seq)
-            added += 1
-        }
-        if added > 0 {
-            persist()
-            bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothDigestVector))
-            updateActivity()
-            note("received \(added)")
-        }
-    }
-
-    private func persist() {
+    /// Snapshots the log and writes it away from the caller.
+    ///
+    /// Encoding every change and writing the file happened inline on whichever thread
+    /// tapped an item — O(N) per change and O(N²) across a session, on the main thread.
+    /// The snapshot is taken here, where the state is consistent; the encode and the
+    /// write happen on the store's own serial executor.
+    func persist() {
         guard let sessionKey else { return }
-        SharedBuysStore.save(
-            SharedBuysSnapshot(
-                sessionKey: sessionKey,
-                deviceID: deviceID,
-                eventNumber: eventNumber,
-                lastSeq: lastSeq,
-                changes: changes
-            )
+        let snapshot = SharedBuysSnapshot(
+            sessionKey: sessionKey,
+            deviceID: deviceID,
+            eventNumber: eventNumber,
+            lastSeq: lastSeq,
+            changes: changes
         )
+        Task.detached(priority: .utility) { await SharedBuysStore.writer.save(snapshot) }
     }
 
     public func note(_ message: String) {

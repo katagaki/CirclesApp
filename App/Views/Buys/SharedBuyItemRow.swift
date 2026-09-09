@@ -110,6 +110,6 @@ struct MemberInitial: View {
 
     var color: Color {
         let palette: [Color] = [.orange, .teal, .purple, .pink, .indigo, .green]
-        return palette[abs(nickname.hashValue) % palette.count]
+        return palette[SharedBuysPalette.index(for: nickname, count: palette.count)]
     }
 }

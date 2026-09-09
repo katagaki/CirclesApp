@@ -15,6 +15,9 @@ enum SharedBuysProfile {
     static let advertisementWindow: TimeInterval = 900.0
     static let maxPayloadPerChunk = 160
     static let frameHeaderLength = 4
+    static let frameMagic: UInt8 = 0x01
+    static let handshakeMagic: UInt8 = 0x02
+    static let advertisementLength = 6
 
     /// The body a chunk may carry over a link whose maximum write is `writeLength`.
     ///
@@ -23,9 +26,6 @@ enum SharedBuysProfile {
     static func payloadLimit(forWriteLength writeLength: Int) -> Int {
         max(1, min(maxPayloadPerChunk, writeLength - frameHeaderLength))
     }
-    static let frameMagic: UInt8 = 0x01
-    static let handshakeMagic: UInt8 = 0x02
-    static let advertisementLength = 6
 
     static func sessionTag(sessionKey: Data, at date: Date = .now) -> Data {
         SharedBuysCrypto.rollingTag(sessionKey: sessionKey, window: window(at: date))
@@ -118,6 +118,22 @@ enum SharedBuysDigest {
     static func data(of vector: [String: Int]) -> Data {
         var value = value(of: vector).bigEndian
         return Data(bytes: &value, count: 4)
+    }
+}
+
+/// Picks a member's avatar colour from their nickname.
+///
+/// `hashValue` is seeded per process, so the same member drew a different colour on every
+/// phone and after every relaunch, which is exactly what an identity cue must not do.
+/// This is Java's `String.hashCode` — 31·h + code unit over UTF-16, wrapping at 32 bits —
+/// so iOS and Android land on the same index for the same nickname.
+public enum SharedBuysPalette {
+
+    public static func index(for nickname: String, count: Int) -> Int {
+        guard count > 0 else { return 0 }
+        var hash: Int32 = 0
+        for unit in nickname.utf16 { hash = 31 &* hash &+ Int32(unit) }
+        return Int(hash.magnitude % UInt32(count))
     }
 }
 

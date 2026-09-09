@@ -33,6 +33,13 @@ enum SharedBuysStore {
         try? data.write(to: fileURL, options: .atomic)
     }
 
+    /// Serialises saves so two in flight cannot land out of order.
+    actor Writer {
+        func save(_ snapshot: SharedBuysSnapshot) { SharedBuysStore.save(snapshot) }
+    }
+
+    static let writer = Writer()
+
     static func clear() {
         guard let fileURL else { return }
         try? FileManager.default.removeItem(at: fileURL)

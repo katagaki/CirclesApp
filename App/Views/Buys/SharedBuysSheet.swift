@@ -56,6 +56,7 @@ struct SharedBuysSheet: View {
                 } else {
                     Section {
                         Button {
+                            sharedBuys.adoptIdentity()
                             sharedBuys.start(
                                 eventNumber: planner.activeEventNumber,
                                 nickname: sharedBuys.nickname
