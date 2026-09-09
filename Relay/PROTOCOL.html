@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shared Buys Wire Protocol</title>
+<style>
+  html { color-scheme: light dark; }
+  body { margin: 0; }
+  img { max-width: 100%; }
+
+  :root {
+    --ground: #f4f4f4;
+    --layer: #ffffff;
+    --layer-accent: #e8e8e8;
+    --text: #161616;
+    --text-secondary: #525252;
+    --text-helper: #6f6f6f;
+    --border-subtle: #e0e0e0;
+    --border-strong: #8d8d8d;
+    --accent: #0f62fe;
+    --accent-text: #0043ce;
+
+    --f-header: #0f62fe;
+    --f-identity: #007d79;
+    --f-length: #8a3ffc;
+    --f-opaque: #6f6f6f;
+    --f-mac: #d02670;
+    --f-time: #b28600;
+    --on-field: #ffffff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #161616;
+      --layer: #262626;
+      --layer-accent: #393939;
+      --text: #f4f4f4;
+      --text-secondary: #c6c6c6;
+      --text-helper: #a8a8a8;
+      --border-subtle: #393939;
+      --border-strong: #6f6f6f;
+      --accent: #4589ff;
+      --accent-text: #78a9ff;
+
+      --f-header: #4589ff;
+      --f-identity: #08bdba;
+      --f-length: #a56eff;
+      --f-opaque: #8d8d8d;
+      --f-mac: #ff7eb6;
+      --f-time: #f1c21b;
+      --on-field: #161616;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #161616;
+    --layer: #262626;
+    --layer-accent: #393939;
+    --text: #f4f4f4;
+    --text-secondary: #c6c6c6;
+    --text-helper: #a8a8a8;
+    --border-subtle: #393939;
+    --border-strong: #6f6f6f;
+    --accent: #4589ff;
+    --accent-text: #78a9ff;
+
+    --f-header: #4589ff;
+    --f-identity: #08bdba;
+    --f-length: #a56eff;
+    --f-opaque: #8d8d8d;
+    --f-mac: #ff7eb6;
+    --f-time: #f1c21b;
+    --on-field: #161616;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.43;
+    letter-spacing: 0.16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; letter-spacing: 0; }
+
+  .page { max-width: 1056px; margin: 0 auto; padding: 0 16px 96px; }
+
+  /* Masthead */
+
+  .masthead {
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 48px 0 32px;
+    display: flex; flex-direction: column; gap: 20px;
+  }
+
+  h1 { margin: 0; font-size: 42px; line-height: 1.19; font-weight: 300; letter-spacing: 0; text-wrap: balance; }
+
+  h2 {
+    margin: 0; font-size: 28px; line-height: 1.29; font-weight: 300; letter-spacing: 0;
+    padding-bottom: 12px; border-bottom: 1px solid var(--border-strong);
+  }
+
+  h3 { margin: 0; font-size: 20px; line-height: 1.4; font-weight: 600; letter-spacing: 0; }
+
+  h4 { margin: 0; font-size: 14px; font-weight: 600; letter-spacing: 0.16px; text-transform: uppercase; color: var(--text-secondary); }
+
+  section { padding: 40px 0 0; display: flex; flex-direction: column; gap: 24px; }
+
+  p { margin: 0; max-width: 68ch; }
+
+  .lede { color: var(--text-secondary); }
+
+  /* Transport matrix */
+
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border-subtle); vertical-align: top; }
+  th {
+    font-size: 12px; letter-spacing: 0.32px; text-transform: uppercase;
+    color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid var(--border-strong);
+  }
+  td.mono, th.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+  .scroll { overflow-x: auto; background: var(--layer); border: 1px solid var(--border-subtle); }
+  .scroll table { min-width: 560px; }
+  .scroll th, .scroll td { white-space: normal; }
+
+  .pill {
+    display: inline-block; font-size: 12px; letter-spacing: 0.32px;
+    padding: 2px 8px; border: 1px solid var(--border-strong); color: var(--text-secondary);
+    white-space: nowrap;
+  }
+  .pill.relay { border-color: var(--accent); color: var(--accent-text); }
+  .pill.ble { border-color: var(--f-identity); color: var(--f-identity); }
+
+  /* Byte diagrams */
+
+  .frame {
+    background: var(--layer);
+    border: 1px solid var(--border-subtle);
+    display: flex; flex-direction: column;
+  }
+
+  .frame-head {
+    padding: 16px; border-bottom: 1px solid var(--border-subtle);
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: baseline; justify-content: space-between;
+  }
+  .frame-head .size { font-size: 12px; letter-spacing: 0.32px; color: var(--text-helper); text-transform: uppercase; }
+
+  .strip-wrap { overflow-x: auto; padding: 20px 16px 8px; }
+  .strip { display: flex; min-width: 520px; align-items: stretch; }
+
+  .seg {
+    border-right: 1px solid var(--ground);
+    padding: 8px 6px;
+    min-width: 0;
+    display: flex; flex-direction: column; gap: 2px; justify-content: center;
+    color: var(--on-field);
+  }
+  .seg:last-child { border-right: none; }
+  .seg .name { font-size: 11px; font-weight: 600; letter-spacing: 0.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .seg .len { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 10px; opacity: 0.85; }
+
+  .f-header { background: var(--f-header); }
+  .f-identity { background: var(--f-identity); }
+  .f-length { background: var(--f-length); }
+  .f-opaque { background: var(--f-opaque); }
+  .f-mac { background: var(--f-mac); }
+  .f-time { background: var(--f-time); }
+  .f-var { background: repeating-linear-gradient(45deg, var(--f-opaque), var(--f-opaque) 6px, transparent 6px, transparent 12px), var(--f-opaque); }
+
+  .ruler {
+    display: flex; min-width: 520px; padding: 0 16px 16px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    font-size: 10px; color: var(--text-helper);
+  }
+  .ruler span { border-left: 1px solid var(--border-subtle); padding-left: 4px; min-width: 0; }
+  .ruler-wrap { overflow-x: auto; }
+
+  .fields { border-top: 1px solid var(--border-subtle); }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; color: var(--text-secondary); }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .swatch { width: 12px; height: 12px; display: inline-block; }
+
+  pre {
+    margin: 0; background: var(--layer); border: 1px solid var(--border-subtle);
+    padding: 16px; overflow-x: auto;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 12.5px; line-height: 1.6;
+  }
+  pre .k { color: var(--accent-text); }
+  pre .c { color: var(--text-helper); }
+
+  .note {
+    border-left: 4px solid var(--border-strong); padding: 4px 0 4px 16px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .note strong { font-weight: 600; }
+
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+
+  @media (max-width: 671px) {
+    h1 { font-size: 28px; }
+    h2 { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <h1>Shared Buys Wire Protocol</h1>
+    <div class="legend">
+      <span><i class="swatch f-header"></i> header / type</span>
+      <span><i class="swatch f-identity"></i> identity</span>
+      <span><i class="swatch f-length"></i> length</span>
+      <span><i class="swatch f-time"></i> time</span>
+      <span><i class="swatch f-opaque"></i> opaque payload</span>
+      <span><i class="swatch f-mac"></i> authentication tag</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Which message goes where</h2>
+    <p class="lede">
+      The split is deliberate. Bluetooth frames are chunked and reassembled by hand, so
+      only small self-contained payloads are trusted to it — at a venue you exchange what
+      was bought, not what the item is.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Message</th><th>Direction</th><th>Transport</th><th>Carries</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="mono">hello</td><td>client → relay</td><td><span class="pill relay">Relay</span></td><td>Device id, version vector, hello tag, and the room key on first registration only</td></tr>
+          <tr><td class="mono">ops</td><td>client → relay</td><td><span class="pill relay">Relay</span></td><td>1–32 sealed records of any kind</td></tr>
+          <tr><td class="mono">ops</td><td>relay → client</td><td><span class="pill relay">Relay</span></td><td>Records the client's vector lacked, then live fan-out</td></tr>
+          <tr><td class="mono">err</td><td>relay → client</td><td><span class="pill relay">Relay</span></td><td>A slug and message, immediately before a close</td></tr>
+          <tr><td class="mono">bye</td><td>client → relay</td><td><span class="pill relay">Relay</span></td><td>Nothing; a clean 1000 close</td></tr>
+          <tr><td class="mono">advertisement</td><td>peer ⇄ peer</td><td><span class="pill ble">Bluetooth</span></td><td>Rolling room tag and a digest of what the sender holds</td></tr>
+          <tr><td class="mono">handshake</td><td>peer ⇄ peer</td><td><span class="pill ble">Bluetooth</span></td><td>Proof of room membership for this 15-minute window</td></tr>
+          <tr><td class="mono">want</td><td>peer → peer</td><td><span class="pill ble">Bluetooth</span></td><td>The sender's contiguous version vector</td></tr>
+          <tr><td class="mono">changes</td><td>peer → peer</td><td><span class="pill ble">Bluetooth</span></td><td>Sealed <code>setStatus</code> records only</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <strong>Only kind 1 crosses Bluetooth.</strong>
+      <p>
+        <code>travelsOverBluetooth</code> is true for <code>setStatus</code> and nothing
+        else. Item names, costs, assignees and joins go over the relay exclusively, which
+        is why the peer-to-peer path keeps its own version vector over that subset — a
+        vector counting relay-only changes would claim status flips it does not hold.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Keys and identifiers</h2>
+    <p class="lede">
+      Everything derives from one 32-byte session key, which travels only in the join
+      link. The link is <code>circles-app://buys-join?v=1&amp;e=&lt;event&gt;&amp;k=&lt;base64url key&gt;</code>.
+    </p>
+
+    <pre><span class="c">// 32-byte session key, generated once by whoever starts the room</span>
+roomID        = HMAC-SHA256(sessionKey, "circles-buys/v1/topic")[0..16]   <span class="c">→ 32 hex chars</span>
+contentKey    = HKDF-SHA256(sessionKey, info: "circles-buys/v1/ops",        len 32)
+relayAuthKey  = HKDF-SHA256(sessionKey, info: "circles-buys/v1/relay-auth", len 32)
+
+deviceID      = 4 random bytes                                            <span class="c">→ 8 hex chars</span>
+nonce         = deviceID(4) ‖ u64be(seq)                                  <span class="c">→ 12 bytes, AES-GCM</span>
+aad           = roomID(16) ‖ deviceID(4) ‖ u64be(seq)                     <span class="c">→ 28 bytes</span>
+blob          = AES-256-GCM(contentKey, nonce, aad, payloadJSON) ‖ gcmTag(16)
+
+recordTag     = HMAC-SHA256(relayAuthKey, deviceID ‖ 0x00 ‖ u64be(seq) ‖ blob)[0..16]
+helloTag      = HMAC-SHA256(relayAuthKey, "hello" ‖ 0x00 ‖ deviceID ‖ 0x00 ‖ u64be(ts))[0..16]
+sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <span class="c">window = ⌊unix/900⌋</span></pre>
+
+    <div class="note">
+      <strong>The nonce is safe only because <code>seq</code> never repeats for a device.</strong>
+      <p>
+        <code>(deviceID, seq)</code> is the primary key everywhere — in the relay's table,
+        in client dedup, and in the GCM nonce. A device that reused a sequence number
+        would reuse a nonce under the same content key, which is why the local counter is
+        a Lamport clock advanced past every record ingested.
+      </p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Relay · WebSocket JSON</h2>
+    <p class="lede">
+      One text frame per message, at most 4096 bytes, to
+      <code>wss://&lt;host&gt;/r/&lt;32 hex roomID&gt;</code>. Binary frames are refused.
+      The relay moves records and never inspects them: it cannot decrypt a blob, and since
+      it holds <code>relayAuthKey</code> only to rate-bind a room, clients verify
+      <code>recordTag</code> themselves on ingest.
+    </p>
+
+    <div class="frame">
+      <div class="frame-head">
+        <h3 class="mono">hello</h3>
+        <span class="size">client → relay · first frame on every socket</span>
+      </div>
+      <pre>{
+  <span class="k">"t"</span>:  "hello",
+  <span class="k">"d"</span>:  "a1b2c3d4",              <span class="c">// deviceID, exactly 8 lowercase hex</span>
+  <span class="k">"v"</span>:  { "a1b2c3d4": 42, … },   <span class="c">// contiguous version vector, device → highest gapless seq</span>
+  <span class="k">"k"</span>:  "&lt;base64url 32 bytes&gt;",  <span class="c">// relayAuthKey — omitted unless TLS or a loopback dev server</span>
+  <span class="k">"ts"</span>: 1757400000,             <span class="c">// unix seconds, must be within ±300 s of relay time</span>
+  <span class="k">"a"</span>:  "&lt;base64url 16 bytes&gt;"   <span class="c">// helloTag</span>
+}</pre>
+      <div class="fields scroll">
+        <table>
+          <thead><tr><th>Field</th><th>Type</th><th>Rule</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">d</td><td>string</td><td>Must match <code>/^[0-9a-f]{8}$/</code>. Bound to the socket; every later record must claim this same device or the socket closes 4004.</td></tr>
+            <tr><td class="mono">v</td><td>object</td><td>Device → sequence number. The relay returns every stored record whose <code>seq</code> exceeds the value given, and everything for a device absent from the map. Values are the <em>contiguous</em> prefix, so a record above a gap is re-sent rather than skipped forever.</td></tr>
+            <tr><td class="mono">k</td><td>string?</td><td>Registers the room on first use. Ignored once a room has a key. Omitted by the client over plaintext non-loopback links; a relay that has never seen the key answers 4006.</td></tr>
+            <tr><td class="mono">ts</td><td>number</td><td>Safe integer ≥ 0. Beyond ±300 s of relay time closes 4004.</td></tr>
+            <tr><td class="mono">a</td><td>string</td><td>16-byte tag over <code>"hello" ‖ 0 ‖ d ‖ 0 ‖ u64be(ts)</code>, compared in constant time.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-head">
+        <h3 class="mono">ops</h3>
+        <span class="size">both directions · 1–32 records</span>
+      </div>
+      <pre>{
+  <span class="k">"t"</span>: "ops",
+  <span class="k">"o"</span>: [
+    {
+      <span class="k">"d"</span>: "a1b2c3d4",             <span class="c">// author device</span>
+      <span class="k">"n"</span>: 42,                     <span class="c">// seq, safe integer ≥ 0</span>
+      <span class="k">"b"</span>: "&lt;base64url blob&gt;",    <span class="c">// ciphertext ‖ 16-byte GCM tag</span>
+      <span class="k">"a"</span>: "&lt;base64url 16 bytes&gt;"  <span class="c">// recordTag</span>
+    }
+  ]
+}</pre>
+      <div class="fields scroll">
+        <table>
+          <thead><tr><th>Rule</th><th>Effect</th></tr></thead>
+          <tbody>
+            <tr><td>Empty or non-array <code>o</code></td><td>Close 4002</td></tr>
+            <tr><td>More than 32 entries</td><td>Close 4002</td></tr>
+            <tr><td><code>d</code> not the hello device</td><td>Close 4004 — stops one member squatting another's <code>(device, seq)</code></td></tr>
+            <tr><td><code>a</code> fails the tag check</td><td>Close 4004, nothing stored</td></tr>
+            <tr><td>Record already held</td><td>Silently ignored, not fanned out, not counted against the cap</td></tr>
+            <tr><td>Room at 500 records</td><td>Oldest rows evicted by <code>ts</code> to make room</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="frame">
+        <div class="frame-head"><h3 class="mono">err</h3><span class="size">relay → client</span></div>
+        <pre>{
+  <span class="k">"t"</span>: "err",
+  <span class="k">"c"</span>: "auth",        <span class="c">// slug</span>
+  <span class="k">"m"</span>: "bad tag"      <span class="c">// human text</span>
+}</pre>
+      </div>
+      <div class="frame">
+        <div class="frame-head"><h3 class="mono">bye</h3><span class="size">client → relay</span></div>
+        <pre>{ <span class="k">"t"</span>: "bye" }
+
+<span class="c">// relay replies with a
+// normal 1000 close</span></pre>
+      </div>
+    </div>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Close</th><th>Slug</th><th>Cause</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">1000</td><td>—</td><td>Client sent <code>bye</code></td></tr>
+          <tr><td class="mono">1001</td><td>—</td><td>Room alarm fired; the room's records are gone</td></tr>
+          <tr><td class="mono">4001</td><td class="mono">rate</td><td>More than 20 messages per 10 s on one socket</td></tr>
+          <tr><td class="mono">4002</td><td class="mono">proto</td><td>Binary frame, over 4096 bytes, malformed JSON, unknown <code>t</code>, bad record shape</td></tr>
+          <tr><td class="mono">4003</td><td class="mono">full</td><td>Ninth socket in the room</td></tr>
+          <tr><td class="mono">4004</td><td class="mono">auth</td><td>Bad hello tag, stale <code>ts</code>, bad record tag, or a record claiming another device</td></tr>
+          <tr><td class="mono">4005</td><td class="mono">storage</td><td>A single frame larger than the whole 500-record room</td></tr>
+          <tr><td class="mono">4006</td><td class="mono">unknown</td><td>Room has no key registered; resend hello with <code>k</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="lede">
+      Rooms expire 5 minutes after creation if nobody registers a key, and 48 hours after
+      the last write otherwise. The alarm clears the records and closes every socket with
+      1001.
+    </p>
+  </section>
+
+  <section>
+    <h2>Bluetooth · GATT</h2>
+    <p class="lede">
+      Every device runs both roles at once: a peripheral advertising the service, and a
+      central scanning for it. Which side writes depends on who discovered whom, so the
+      same peer pair may exchange a message down both paths — reassembly is kept separate
+      per role for exactly that reason.
+    </p>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>UUID</th><th>Role</th><th>Properties</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">A7C1F2E0-5B3D-4E8A-9F16-3C2D8E4B7A90</td><td>Service</td><td>Primary</td></tr>
+          <tr><td class="mono">A7C1F2E1-…</td><td>Inbox</td><td>Write without response — the peer writes chunks here</td></tr>
+          <tr><td class="mono">A7C1F2E2-…</td><td>Outbox</td><td>Notify — chunks arrive here; CCCD <code>0x2902</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Advertisement — 6 bytes</h3>
+    <p>
+      Android puts these bytes in the scan response as service data; iOS cannot advertise
+      service data, so it hex-encodes the same six bytes into the local name (12
+      characters). Both platforms read either field. A peer carrying the wrong room tag is
+      rejected before connecting and backed off for 60 seconds; a peer carrying no bytes
+      at all still gets a chance, because a backgrounded iOS app cannot advertise a name.
+    </p>
+    <div class="frame">
+      <div class="frame-head"><h4>Layout</h4><span class="size">6 bytes</span></div>
+      <div class="strip-wrap">
+        <div class="strip">
+          <div class="seg f-identity" style="flex:2"><span class="name">sessionTag</span><span class="len">2 B</span></div>
+          <div class="seg f-opaque" style="flex:4"><span class="name">version-vector digest</span><span class="len">4 B</span></div>
+        </div>
+      </div>
+      <div class="ruler-wrap"><div class="ruler">
+        <span style="flex:2">0</span><span style="flex:4">2</span>
+      </div></div>
+      <div class="fields scroll">
+        <table>
+          <thead><tr><th>Offset</th><th>Size</th><th>Field</th><th>Values</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">0</td><td class="mono">2</td><td>Rolling session tag</td><td>First 2 bytes of <code>HMAC(sessionKey, "ble" ‖ u64be(window))</code>. A peer accepts the tag for window − 1, window and window + 1, so a clock 15 minutes out still connects.</td></tr>
+            <tr><td class="mono">2</td><td class="mono">4</td><td>Digest</td><td>FNV-1a over the Bluetooth-eligible vector, big-endian. Equal digests mean equal holdings, and the <code>want</code> round trip is skipped. Computed over <em>max</em> seq per device, not the contiguous prefix, so a change sitting above a gap still registers.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h3>Handshake — 3 bytes</h3>
+    <p>
+      Written to the peer's inbox once notifications are enabled, and answered as a notify
+      from the other side. Until it succeeds, nothing else from that peer is accepted.
+    </p>
+    <div class="frame">
+      <div class="frame-head"><h4>Layout</h4><span class="size">3 bytes</span></div>
+      <div class="strip-wrap">
+        <div class="strip">
+          <div class="seg f-header" style="flex:1"><span class="name">0x02</span><span class="len">1 B</span></div>
+          <div class="seg f-identity" style="flex:2"><span class="name">sessionTag</span><span class="len">2 B</span></div>
+        </div>
+      </div>
+      <div class="ruler-wrap"><div class="ruler">
+        <span style="flex:1">0</span><span style="flex:2">1</span>
+      </div></div>
+      <div class="fields scroll">
+        <table>
+          <thead><tr><th>Offset</th><th>Size</th><th>Field</th><th>Values</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">0</td><td class="mono">1</td><td>Handshake magic</td><td><code>0x02</code>. Chunk frames use <code>0x01</code>, so the two are told apart by first byte and length.</td></tr>
+            <tr><td class="mono">1</td><td class="mono">2</td><td>Session tag</td><td>Same rolling tag as the advertisement, same ±1 window tolerance.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h3>Chunk header — 4 bytes + body</h3>
+    <p>
+      Wire frames are cut to whatever the link negotiated: body size is
+      <code>min(160, MTU − 3 − 4)</code>, so a connection stuck at the 23-byte default MTU
+      sends 16-byte bodies rather than silently truncating a 160-byte one. A message
+      needing more than 255 chunks cannot be described by this header and is not sent.
+    </p>
+    <div class="frame">
+      <div class="frame-head"><h4>Layout</h4><span class="size">4 + n bytes, n ≤ 160</span></div>
+      <div class="strip-wrap">
+        <div class="strip">
+          <div class="seg f-header" style="flex:1"><span class="name">0x01</span><span class="len">1 B</span></div>
+          <div class="seg f-identity" style="flex:1"><span class="name">msg id</span><span class="len">1 B</span></div>
+          <div class="seg f-length" style="flex:1"><span class="name">index</span><span class="len">1 B</span></div>
+          <div class="seg f-length" style="flex:1"><span class="name">count</span><span class="len">1 B</span></div>
+          <div class="seg f-var" style="flex:8"><span class="name">body</span><span class="len">n B</span></div>
+        </div>
+      </div>
+      <div class="ruler-wrap"><div class="ruler">
+        <span style="flex:1">0</span><span style="flex:1">1</span><span style="flex:1">2</span><span style="flex:1">3</span><span style="flex:8">4</span>
+      </div></div>
+      <div class="fields scroll">
+        <table>
+          <thead><tr><th>Offset</th><th>Size</th><th>Field</th><th>Values</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">0</td><td class="mono">1</td><td>Frame magic</td><td><code>0x01</code>. Anything else is dropped.</td></tr>
+            <tr><td class="mono">1</td><td class="mono">1</td><td>Message id</td><td><code>0x00</code>–<code>0xFF</code>, incremented per message and wrapping. A partial buffer expires after 10 s, and a known id arriving with a different chunk count resets the buffer, so a wrapped id cannot splice onto a stale partial.</td></tr>
+            <tr><td class="mono">2</td><td class="mono">1</td><td>Chunk index</td><td><code>0</code> … <code>count − 1</code>. An index ≥ count is dropped.</td></tr>
+            <tr><td class="mono">3</td><td class="mono">1</td><td>Chunk count</td><td><code>1</code>–<code>255</code>. Zero is dropped. At most 4 partial messages are held per peer, oldest evicted.</td></tr>
+            <tr><td class="mono">4</td><td class="mono">n</td><td>Body</td><td>A slice of the wire frame below. Reassembled in index order once every chunk has arrived.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h3>Wire frame — the reassembled payload</h3>
+    <p>
+      Three header bytes, then <code>count</code> bodies of the declared type. Records are
+      packed so that each frame fits inside a single chunk wherever possible; a record too
+      large for one chunk still gets its own frame and is split by the layer above rather
+      than dropped.
+    </p>
+
+    <div class="frame">
+      <div class="frame-head">
+        <h3 class="mono">changes — type 0x01</h3>
+        <span class="size">3 + count × (30 + blobLen) bytes</span>
+      </div>
+      <div class="strip-wrap">
+        <div class="strip">
+          <div class="seg f-header" style="flex:1"><span class="name">ver</span><span class="len">1 B</span></div>
+          <div class="seg f-header" style="flex:1"><span class="name">type</span><span class="len">1 B</span></div>
+          <div class="seg f-length" style="flex:1"><span class="name">count</span><span class="len">1 B</span></div>
+          <div class="seg f-identity" style="flex:4"><span class="name">device</span><span class="len">4 B</span></div>
+          <div class="seg f-identity" style="flex:8"><span class="name">seq (u64be)</span><span class="len">8 B</span></div>
+          <div class="seg f-length" style="flex:2"><span class="name">blobLen</span><span class="len">2 B</span></div>
+          <div class="seg f-var" style="flex:10"><span class="name">blob</span><span class="len">n B</span></div>
+          <div class="seg f-mac" style="flex:6"><span class="name">recordTag</span><span class="len">16 B</span></div>
+        </div>
+      </div>
+      <div class="ruler-wrap"><div class="ruler">
+        <span style="flex:1">0</span><span style="flex:1">1</span><span style="flex:1">2</span>
+        <span style="flex:4">3</span><span style="flex:8">7</span><span style="flex:2">15</span>
+        <span style="flex:10">17</span><span style="flex:6">17+n</span>
+      </div></div>
+      <div class="fields scroll">
+        <table>
+          <thead><tr><th>Offset</th><th>Size</th><th>Field</th><th>Values</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">0</td><td class="mono">1</td><td>Version</td><td><code>0x01</code>. A frame of another version is skipped whole — the layout behind the header is what changes, so guessing would fold garbage into the log.</td></tr>
+            <tr><td class="mono">1</td><td class="mono">1</td><td>Type</td><td><code>0x01</code> changes · <code>0x02</code> want. Anything else is dropped.</td></tr>
+            <tr><td class="mono">2</td><td class="mono">1</td><td>Record count</td><td><code>1</code>–<code>255</code>.</td></tr>
+            <tr><td class="mono">3</td><td class="mono">4</td><td>Device</td><td>The author's 4 identity bytes, rendered as 8 hex characters on the way in.</td></tr>
+            <tr><td class="mono">7</td><td class="mono">8</td><td>Sequence</td><td>Big-endian u64, must be &gt; 0 and ≤ <code>Int.max</code>. Fixed width, so no platform disagrees about its range.</td></tr>
+            <tr><td class="mono">15</td><td class="mono">2</td><td>Blob length</td><td>Big-endian u16. Checked against the bytes actually remaining before any slice is taken — it is a peer's claim about a buffer we hold.</td></tr>
+            <tr><td class="mono">17</td><td class="mono">n</td><td>Blob</td><td>AES-256-GCM ciphertext with its 16-byte tag appended. Must exceed 16 bytes.</td></tr>
+            <tr><td class="mono">17+n</td><td class="mono">16</td><td>Record tag</td><td>HMAC over <code>device ‖ 0 ‖ u64be(seq) ‖ blob</code>. Verified by the receiver before the record enters the log.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="frame">
+      <div class="frame-head">
+        <h3 class="mono">want — type 0x02</h3>
+        <span class="size">3 + count × 12 bytes</span>
+      </div>
+      <div class="strip-wrap">
+        <div class="strip">
+          <div class="seg f-header" style="flex:1"><span class="name">ver</span><span class="len">1 B</span></div>
+          <div class="seg f-header" style="flex:1"><span class="name">type</span><span class="len">1 B</span></div>
+          <div class="seg f-length" style="flex:1"><span class="name">count</span><span class="len">1 B</span></div>
+          <div class="seg f-identity" style="flex:4"><span class="name">device</span><span class="len">4 B</span></div>
+          <div class="seg f-identity" style="flex:8"><span class="name">seq (u64be)</span><span class="len">8 B</span></div>
+          <div class="seg f-opaque" style="flex:5"><span class="name">… further entries</span><span class="len">12 B each</span></div>
+        </div>
+      </div>
+      <div class="ruler-wrap"><div class="ruler">
+        <span style="flex:1">0</span><span style="flex:1">1</span><span style="flex:1">2</span>
+        <span style="flex:4">3</span><span style="flex:8">7</span><span style="flex:5">15</span>
+      </div></div>
+      <div class="fields scroll">
+        <table>
+          <thead><tr><th>Offset</th><th>Size</th><th>Field</th><th>Values</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">0–2</td><td class="mono">3</td><td>Header</td><td>Version <code>0x01</code>, type <code>0x02</code>, entry count.</td></tr>
+            <tr><td class="mono">3</td><td class="mono">4</td><td>Device</td><td>Identity bytes of a device the sender holds records for.</td></tr>
+            <tr><td class="mono">7</td><td class="mono">8</td><td>Sequence</td><td>Highest <em>gapless</em> seq held for that device. Entries at 0 are omitted entirely, which asks for everything.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="strip-wrap" style="padding-top:0">
+        <p style="max-width:none">
+          The receiver replies with every Bluetooth-eligible change whose
+          <code>seq</code> exceeds the value given for its device — and everything for a
+          device the frame never mentions.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The sealed payload</h2>
+    <p class="lede">
+      What sits inside every blob, on both transports. Compact keys because it is
+      encrypted per record and chunked at 160 bytes.
+    </p>
+
+    <pre>{
+  <span class="k">"a"</span>: 12345,        <span class="c">// actor — circle.ms PID, or a stored negative id when signed out</span>
+  <span class="k">"k"</span>: 1,            <span class="c">// kind, 0–6</span>
+  <span class="k">"i"</span>: "a1b2c3d4",   <span class="c">// item id, 8 chars of a UUID; "-" for memberJoined</span>
+  <span class="k">"c"</span>: 98765,        <span class="c">// circle id, 0 for memberJoined</span>
+  <span class="k">"t"</span>: "Poster",     <span class="c">// text, omitted when absent</span>
+  <span class="k">"v"</span>: 1             <span class="c">// value, omitted when absent</span>
+}</pre>
+
+    <div class="cols">
+      <div class="scroll">
+        <table>
+          <thead><tr><th>k</th><th>Kind</th><th>Uses</th><th>BLE</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">0</td><td>addItem</td><td><code>t</code> name, <code>v</code> cost</td><td>—</td></tr>
+            <tr><td class="mono">1</td><td>setStatus</td><td><code>v</code> status</td><td>✓</td></tr>
+            <tr><td class="mono">2</td><td>setAssignee</td><td><code>v</code> actor, or absent to unassign</td><td>—</td></tr>
+            <tr><td class="mono">3</td><td>setCost</td><td><code>v</code> cost</td><td>—</td></tr>
+            <tr><td class="mono">4</td><td>removeItem</td><td>—</td><td>—</td></tr>
+            <tr><td class="mono">5</td><td>memberJoined</td><td><code>t</code> nickname, <code>v</code> actor</td><td>—</td></tr>
+            <tr><td class="mono">6</td><td>renameItem</td><td><code>t</code> name</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>v</th><th>Status</th><th>Cycles to</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">0</td><td>pending</td><td>bought</td></tr>
+            <tr><td class="mono">1</td><td>bought</td><td>cancelled</td></tr>
+            <tr><td class="mono">2</td><td>cancelled</td><td>pending</td></tr>
+            <tr><td class="mono">other</td><td>unknown — kept raw, shown as pending</td><td>pending</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Unknown values are preserved, never rewritten.</strong>
+      <p>
+        A <code>k</code> outside 0–6 is stored, counted in the version vector, and folded
+        as a no-op on both platforms; a <code>v</code> outside 0–2 is kept as it arrived.
+        Either one being coerced or dropped on one platform and kept on the other is how
+        two devices holding the same log end up showing different totals.
+      </p>
+    </div>
+
+    <h3>A real frame, byte for byte</h3>
+    <p>
+      This is the cross-platform test vector both apps assert against at runtime — a single
+      <code>setStatus</code> over Bluetooth, from session key
+      <code>00 01 02 … 1f</code>, device <code>a1b2c3d4</code>, seq 42.
+    </p>
+    <pre>plaintext  {"a":12345,"k":1,"i":"a1b2c3d4","c":98765,"v":1}          <span class="c">48 bytes</span>
+
+01                                <span class="c">version 1</span>
+01                                <span class="c">type = changes</span>
+01                                <span class="c">1 record</span>
+a1 b2 c3 d4                       <span class="c">device</span>
+00 00 00 00 00 00 00 2a           <span class="c">seq 42</span>
+00 40                             <span class="c">blobLen 64 = 48 ciphertext + 16 GCM tag</span>
+2a b0 b4 c6 e6 9b 29 00 dc 62 74 a7 5e 78 3c b3
+36 89 90 16 f4 40 b2 4f cb 8d a6 df b6 40 f6 62
+4e 39 05 0b 00 d0 72 7f f8 af 49 ad 0b 51 2d 5b   <span class="c">blob</span>
+55 fd 21 a0 f1 ce 3c db c1 48 f0 14 37 11 1d 57
+f5 d6 3b 17 d6 93 ab f3 21 74 19 ad f1 b5 82 d2   <span class="c">recordTag</span>
+
+                                  <span class="c">97 bytes — one chunk on any link with MTU ≥ 104</span></pre>
+  </section>
+
+  <section>
+    <h2>How a change travels</h2>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Step</th><th>Relay path</th><th>Bluetooth path</th></tr></thead>
+        <tbody>
+          <tr><td>Author</td><td colspan="2">Local counter increments, change appended to the log, snapshot persisted off-thread</td></tr>
+          <tr><td>Seal</td><td colspan="2">JSON → AES-256-GCM under <code>contentKey</code> → HMAC under <code>relayAuthKey</code></td></tr>
+          <tr><td>Send</td><td>Queued for up to 250 ms, then one frame of up to 32 records</td><td>Sent immediately, but only if the kind is <code>setStatus</code></td></tr>
+          <tr><td>Fan out</td><td>Relay stores by <code>(device, seq)</code>, forwards to every other authenticated socket</td><td>Peer replies to a <code>want</code>, or receives the live frame</td></tr>
+          <tr><td>Receive</td><td colspan="2">Verify <code>recordTag</code> → open GCM → decode JSON, all off the delivering thread</td></tr>
+          <tr><td>Adopt</td><td colspan="2">Skip if <code>(device, seq)</code> is already held, append, advance the Lamport clock, re-fold, refresh the advertised digest</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+</body>
+</html>
