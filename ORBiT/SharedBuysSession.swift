@@ -188,8 +188,8 @@ public final class SharedBuysSession {
                     sessionKey: sessionKey,
                     vector: vector
                 )
-            ) { event in
-                Task { @MainActor in self.handle(event) }
+            ) { [weak self] event in
+                Task { @MainActor in self?.handle(event) }
             }
         }
     }
@@ -296,21 +296,27 @@ public final class SharedBuysSession {
         }
     }
 
-    private func scheduleReconnect() {
+    /// Arms the reconnect, deferring it while a peer is carrying the session.
+    ///
+    /// Returning early when peers were present left nothing to re-arm the task: the peer
+    /// count handler does not reconnect, so once the peer walked away the device stayed
+    /// offline until the app was relaunched. The task is armed either way now, and
+    /// re-checks the peer count when it fires.
+    func scheduleReconnect() {
         guard isActive, reconnectTask == nil else { return }
-        guard bluetoothPeers == 0 else {
-            note("holding off, bluetooth is carrying")
-            return
-        }
+        if bluetoothPeers > 0 { note("holding off, bluetooth is carrying") }
         reconnectAttempt = min(reconnectAttempt + 1, 6)
         let backoff = min(pow(2.0, Double(reconnectAttempt)), 30.0)
         let delay = backoff + Double.random(in: 0...1)
         note("reconnect in \(String(format: "%.1f", delay))s")
-        reconnectTask = Task { [delay] in
+        reconnectTask = Task { [weak self, delay] in
             try? await Task.sleep(for: .seconds(delay))
-            guard !Task.isCancelled else { return }
+            guard !Task.isCancelled, let self else { return }
             self.reconnectTask = nil
-            if self.isActive, self.bluetoothPeers == 0 { self.connect() }
+            guard self.isActive else { return }
+            // Still covered by a peer: come back and ask again rather than dropping the
+            // only thing that would have reconnected us.
+            if self.bluetoothPeers == 0 { self.connect() } else { self.scheduleReconnect() }
         }
     }
 

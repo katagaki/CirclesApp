@@ -90,11 +90,17 @@ public extension SharedBuysSession {
 
     func startBluetooth() {
         guard isBluetoothEnabled, let sessionKey else { return }
-        bluetooth.start(sessionKey: sessionKey, digest: SharedBuysDigest.data(of: bluetoothDigestVector)) { event in
+        bluetooth.start(
+            sessionKey: sessionKey,
+            digest: SharedBuysDigest.data(of: bluetoothDigestVector)
+        ) { [weak self] event in
+            guard let self else { return }
             switch event {
             case .peerCount(let count):
                 self.bluetoothPeers = count
                 self.note("bluetooth peers \(count)")
+                // A peer leaving is the moment the relay has to take over again.
+                if count == 0 { self.scheduleReconnect() }
             case .peerVerified(let digest):
                 self.handshakeCompleted(peerDigest: digest)
             case .payload(let payload):

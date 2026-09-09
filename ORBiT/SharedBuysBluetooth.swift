@@ -6,6 +6,11 @@
 import CoreBluetooth
 import Foundation
 
+// The class conforms to three CoreBluetooth delegates and owns both GATT roles, so it
+// runs past 400 lines. Splitting it would mean exposing most of its private state to a
+// second file for no benefit to the reader.
+// swiftlint:disable file_length
+
 enum BluetoothEvent: Sendable {
     case peerCount(Int)
     /// A peer finished the handshake, carrying the digest it advertised if we scanned it.
@@ -30,6 +35,7 @@ final class SharedBuysBluetooth: NSObject {
     private var verifiedCentrals: Set<UUID> = []
     private var rejectedUntil: [UUID: Date] = [:]
     private var pendingNotifies: [(frame: Data, centrals: [CBCentral])] = []
+    private var pendingWrites: [UUID: [Data]] = [:]
     private var messageCounter: UInt8 = 0
     private var peerDigests: [UUID: Data] = [:]
     private var advertisedWindow: Int?
@@ -78,6 +84,7 @@ final class SharedBuysBluetooth: NSObject {
         verifiedCentrals.removeAll()
         rejectedUntil.removeAll()
         pendingNotifies.removeAll()
+        pendingWrites.removeAll()
         peerDigests.removeAll()
         sessionKey = nil
         onEvent = nil
@@ -91,14 +98,42 @@ final class SharedBuysBluetooth: NSObject {
 
     func send(_ payload: Data) {
         messageCounter &+= 1
-        let frames = SharedBuysFraming.chunks(of: payload, messageID: messageCounter)
-        for frame in frames {
-            notify(frame, to: verifiedSubscribers)
-            for identifier in verifiedPeripherals {
-                guard let peripheral = connected[identifier], let inbox = inboxes[identifier] else { continue }
-                peripheral.writeValue(frame, for: inbox, type: .withoutResponse)
+        // Each link negotiates its own maximum write, so the payload is cut to fit the
+        // peer it is going to rather than to one hardcoded size.
+        let subscribers = verifiedSubscribers
+        if !subscribers.isEmpty {
+            let limit = subscribers
+                .map { SharedBuysProfile.payloadLimit(forWriteLength: $0.maximumUpdateValueLength) }
+                .min() ?? SharedBuysProfile.maxPayloadPerChunk
+            for frame in SharedBuysFraming.chunks(of: payload, messageID: messageCounter, limit: limit) {
+                notify(frame, to: subscribers)
             }
         }
+        for identifier in verifiedPeripherals {
+            guard let peripheral = connected[identifier], let inbox = inboxes[identifier] else { continue }
+            let limit = SharedBuysProfile.payloadLimit(
+                forWriteLength: peripheral.maximumWriteValueLength(for: .withoutResponse)
+            )
+            let frames = SharedBuysFraming.chunks(of: payload, messageID: messageCounter, limit: limit)
+            pendingWrites[identifier, default: []].append(contentsOf: frames)
+            pumpWrites(to: identifier)
+        }
+    }
+
+    /// Hands the peripheral one write at a time.
+    ///
+    /// Core Bluetooth drops writes without response once its queue is full and reports
+    /// nothing, so a burst of chunks lost whichever ones arrived after the buffer filled
+    /// and the message never reassembled. `peripheralIsReady` resumes the queue.
+    private func pumpWrites(to identifier: UUID) {
+        guard let peripheral = connected[identifier], let inbox = inboxes[identifier] else { return }
+        while peripheral.canSendWriteWithoutResponse,
+              var queue = pendingWrites[identifier], !queue.isEmpty {
+            let frame = queue.removeFirst()
+            pendingWrites[identifier] = queue
+            peripheral.writeValue(frame, for: inbox, type: .withoutResponse)
+        }
+        if pendingWrites[identifier]?.isEmpty == true { pendingWrites[identifier] = nil }
     }
 
     private func advertise() {
@@ -321,6 +356,7 @@ extension SharedBuysBluetooth: @preconcurrency CBCentralManagerDelegate {
     ) {
         connected[peripheral.identifier] = nil
         inboxes[peripheral.identifier] = nil
+        pendingWrites[peripheral.identifier] = nil
         peerDigests[peripheral.identifier] = nil
         reassemblers[peripheral.identifier] = nil
         centralReassemblers[peripheral.identifier] = nil
@@ -368,6 +404,10 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralDelegate {
             for: inbox,
             type: .withoutResponse
         )
+    }
+
+    func peripheralIsReady(toSendWriteWithoutResponse peripheral: CBPeripheral) {
+        pumpWrites(to: peripheral.identifier)
     }
 
     func peripheral(

@@ -14,6 +14,15 @@ enum SharedBuysProfile {
 
     static let advertisementWindow: TimeInterval = 900.0
     static let maxPayloadPerChunk = 160
+    static let frameHeaderLength = 4
+
+    /// The body a chunk may carry over a link whose maximum write is `writeLength`.
+    ///
+    /// Never larger than `maxPayloadPerChunk`, and never smaller than one byte, so a
+    /// miserly link produces many small chunks instead of silent truncation.
+    static func payloadLimit(forWriteLength writeLength: Int) -> Int {
+        max(1, min(maxPayloadPerChunk, writeLength - frameHeaderLength))
+    }
     static let frameMagic: UInt8 = 0x01
     static let handshakeMagic: UInt8 = 0x02
     static let advertisementLength = 6
@@ -114,9 +123,14 @@ enum SharedBuysDigest {
 
 enum SharedBuysFraming {
 
-    static func chunks(of payload: Data, messageID: UInt8) -> [Data] {
-        guard !payload.isEmpty else { return [] }
-        let limit = SharedBuysProfile.maxPayloadPerChunk
+    /// Splits a payload into chunks that fit `limit` bytes of body each.
+    ///
+    /// `limit` comes from what the link actually negotiated, not from a constant: on a
+    /// connection stuck at the 23 byte default MTU, a 160 byte chunk was truncated to 20
+    /// bytes on the wire, the 4 byte header still parsed, reassembly "succeeded", and
+    /// the result was corrupt ciphertext with nothing to point at.
+    static func chunks(of payload: Data, messageID: UInt8, limit: Int = SharedBuysProfile.maxPayloadPerChunk) -> [Data] {
+        guard !payload.isEmpty, limit > 0 else { return [] }
         var slices: [Data] = []
         var index = payload.startIndex
         while index < payload.endIndex {
@@ -124,7 +138,11 @@ enum SharedBuysFraming {
             slices.append(payload[index..<end])
             index = end
         }
-        let count = UInt8(min(slices.count, 255))
+        // The chunk index and count are single bytes, so a message that needs more than
+        // 255 chunks cannot be described by this header at all. Sending it anyway
+        // overflowed the index and trapped on the 256th chunk.
+        guard slices.count <= 255 else { return [] }
+        let count = UInt8(slices.count)
         return slices.enumerated().map { offset, slice in
             var frame = Data([SharedBuysProfile.frameMagic, messageID, UInt8(offset), count])
             frame.append(slice)
