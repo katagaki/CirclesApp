@@ -238,7 +238,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td class="mono">hello</td><td>client → relay</td><td><span class="pill relay">Relay</span></td><td>Device id, version vector, hello tag, and the room key on first registration only</td></tr>
+          <tr><td class="mono">hello</td><td>client → relay</td><td><span class="pill relay">Relay</span></td><td>Device id, version vector, hello tag, the room key on first registration only, and an optional push token</td></tr>
           <tr><td class="mono">ops</td><td>client → relay</td><td><span class="pill relay">Relay</span></td><td>1–32 sealed records of any kind</td></tr>
           <tr><td class="mono">ops</td><td>relay → client</td><td><span class="pill relay">Relay</span></td><td>Records the client's vector lacked, then live fan-out</td></tr>
           <tr><td class="mono">err</td><td>relay → client</td><td><span class="pill relay">Relay</span></td><td>A slug and message, immediately before a close</td></tr>
@@ -315,7 +315,8 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
   <span class="k">"v"</span>:  { "a1b2c3d4": 42, … },   <span class="c">// contiguous version vector, device → highest gapless seq</span>
   <span class="k">"k"</span>:  "&lt;base64url 32 bytes&gt;",  <span class="c">// relayAuthKey — omitted unless TLS or a loopback dev server</span>
   <span class="k">"ts"</span>: 1757400000,             <span class="c">// unix seconds, must be within ±300 s of relay time</span>
-  <span class="k">"a"</span>:  "&lt;base64url 16 bytes&gt;"   <span class="c">// helloTag</span>
+  <span class="k">"a"</span>:  "&lt;base64url 16 bytes&gt;",  <span class="c">// helloTag</span>
+  <span class="k">"p"</span>:  { "pl": "apns", "tk": "…", "e": "sandbox" }  <span class="c">// optional push registration</span>
 }</pre>
       <div class="fields scroll">
         <table>
@@ -326,10 +327,19 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
             <tr><td class="mono">k</td><td>string?</td><td>Registers the room on first use. Ignored once a room has a key. Omitted by the client over plaintext non-loopback links; a relay that has never seen the key answers 4006.</td></tr>
             <tr><td class="mono">ts</td><td>number</td><td>Safe integer ≥ 0. Beyond ±300 s of relay time closes 4004.</td></tr>
             <tr><td class="mono">a</td><td>string</td><td>16-byte tag over <code>"hello" ‖ 0 ‖ d ‖ 0 ‖ u64be(ts)</code>, compared in constant time.</td></tr>
+            <tr><td class="mono">p</td><td>object?</td><td>Push registration, stored only after the tag verifies: <code>pl</code> is <code>"apns"</code> or <code>"fcm"</code>, <code>tk</code> is the platform token (≤512 chars of <code>[A-Za-z0-9_:.-]</code>), <code>e</code> is <code>"sandbox"</code> or <code>"production"</code> and defaults to sandbox. One token per device, replaced on every hello. Anything malformed closes 4002.</td></tr>
           </tbody>
         </table>
       </div>
     </div>
+
+    <p>
+      A device that registered a token and is not currently connected gets a content-free wake-up when
+      another member writes: <code>{"aps":{"content-available":1}}</code> over APNs, or a data-only
+      high-priority message over FCM. The relay never composes user-visible content — it cannot, since it
+      holds no key. The woken client reconnects, catches up, and renders locally. Wake-ups are coalesced to
+      one per device per 10 seconds, and a token the platform reports as gone is dropped.
+    </p>
 
     <div class="frame">
       <div class="frame-head">

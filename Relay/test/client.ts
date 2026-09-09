@@ -20,12 +20,13 @@ export async function helloFrame(
   key: Uint8Array,
   device: string,
   vector: { [device: string]: number } = {},
-  options: { register?: Uint8Array; ts?: number } = {},
+  options: { register?: Uint8Array; ts?: number; push?: unknown } = {},
 ): Promise<string> {
   const ts = options.ts ?? Math.floor(Date.now() / 1000);
   const mac = await tag(await importAuthKey(key), helloInput(device, ts));
   const frame: { [k: string]: unknown } = { t: "hello", d: device, v: vector, ts, a: b64urlEncode(mac) };
   if (options.register) frame.k = b64urlEncode(options.register);
+  if (options.push !== undefined) frame.p = options.push;
   return JSON.stringify(frame);
 }
 

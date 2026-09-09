@@ -1,5 +1,5 @@
 declare namespace Cloudflare {
-  interface Env {
+  interface Env extends import("../src/push").PushEnv {
     ROOM: DurableObjectNamespace<import("../src/room").Room>;
   }
 }

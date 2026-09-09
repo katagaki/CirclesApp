@@ -8,10 +8,18 @@
   "durable_objects": {
     "bindings": [{ "name": "ROOM", "class_name": "Room" }]
   },
+  "vars": {
+    "APNS_TEAM_ID": "YYM4Z6MU8F",
+    "APNS_TOPIC": "com.tsubuzaki.CiRCLES"
+  },
   "env": {
     "staging": {
       "name": "circles-relay-beta",
       "observability": { "enabled": true },
+      "vars": {
+        "APNS_TEAM_ID": "YYM4Z6MU8F",
+        "APNS_TOPIC": "com.tsubuzaki.CiRCLES"
+      },
       "durable_objects": {
         "bindings": [{ "name": "ROOM", "class_name": "Room" }]
       }
@@ -19,6 +27,10 @@
     "production": {
       "name": "circles-relay",
       "observability": { "enabled": true },
+      "vars": {
+        "APNS_TEAM_ID": "YYM4Z6MU8F",
+        "APNS_TOPIC": "com.tsubuzaki.CiRCLES"
+      },
       "durable_objects": {
         "bindings": [{ "name": "ROOM", "class_name": "Room" }]
       }

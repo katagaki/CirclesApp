@@ -1,4 +1,5 @@
 import { DurableObject } from "cloudflare:workers";
+import { type Environment, type Platform, type PushEnv, type Target, push } from "./push";
 import {
   TAG_LEN,
   b64urlDecode,
@@ -20,6 +21,8 @@ export const MAX_STORED_RECORDS = 500;
 export const HELLO_SKEW_SECONDS = 300;
 export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
 export const UNCLAIMED_TTL_MS = 5 * 60 * 1000;
+export const PUSH_COALESCE_MS = 10_000;
+export const MAX_TOKEN_LENGTH = 512;
 
 export const CLOSE_RATE = 4001;
 export const CLOSE_PROTOCOL = 4002;
@@ -29,6 +32,7 @@ export const CLOSE_STORAGE_FULL = 4005;
 export const CLOSE_UNKNOWN_ROOM = 4006;
 
 const DEVICE_ID = /^[0-9a-f]{8}$/;
+const PUSH_TOKEN = /^[A-Za-z0-9_:.-]{1,512}$/;
 
 interface Attachment {
   d: string | null;
@@ -66,11 +70,11 @@ function isSeq(value: unknown): value is number {
   return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
 }
 
-export class Room extends DurableObject {
+export class Room extends DurableObject<PushEnv> {
   private sql: SqlStorage;
 
-  constructor(ctx: DurableObjectState, env: unknown) {
-    super(ctx, env as never);
+  constructor(ctx: DurableObjectState, env: PushEnv) {
+    super(ctx, env);
     this.sql = ctx.storage.sql;
     this.sql.exec(`CREATE TABLE IF NOT EXISTS ops (
       device TEXT    NOT NULL,
@@ -84,6 +88,13 @@ export class Room extends DurableObject {
       id         INTEGER PRIMARY KEY CHECK (id = 1),
       auth_key   BLOB    NOT NULL,
       created_at INTEGER NOT NULL
+    )`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS tokens (
+      device   TEXT    PRIMARY KEY,
+      platform TEXT    NOT NULL,
+      token    TEXT    NOT NULL,
+      env      TEXT    NOT NULL,
+      pushed   INTEGER NOT NULL
     )`);
     ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("ping", "pong"));
     ctx.blockConcurrencyWhile(async () => {
@@ -126,6 +137,7 @@ export class Room extends DurableObject {
   override async alarm(): Promise<void> {
     this.sql.exec("DELETE FROM ops");
     this.sql.exec("DELETE FROM room");
+    this.sql.exec("DELETE FROM tokens");
     for (const ws of this.ctx.getWebSockets()) ws.close(1001, "room expired");
   }
 
@@ -163,7 +175,7 @@ export class Room extends DurableObject {
 
   private async onHello(
     ws: WebSocket,
-    frame: { d?: unknown; v?: unknown; k?: unknown; ts?: unknown; a?: unknown },
+    frame: { d?: unknown; v?: unknown; k?: unknown; ts?: unknown; a?: unknown; p?: unknown },
     attachment: Attachment,
   ): Promise<void> {
     if (attachment.d) throw new Fail(CLOSE_PROTOCOL, "duplicate hello");
@@ -200,6 +212,7 @@ export class Room extends DurableObject {
 
     attachment.d = device;
     ws.serializeAttachment(attachment);
+    this.register(device, frame.p);
     this.send(ws, this.missing(frame.v));
   }
 
@@ -258,11 +271,61 @@ export class Room extends DurableObject {
     if (fresh.length === 0) return;
 
     await this.ctx.storage.setAlarm(Date.now() + ROOM_TTL_MS);
+    const connected = new Set<string>();
     for (const peer of this.ctx.getWebSockets()) {
-      if (peer === ws) continue;
       const peerAttachment = peer.deserializeAttachment() as Attachment | null;
       if (!peerAttachment?.d) continue;
+      connected.add(peerAttachment.d);
+      if (peer === ws) continue;
       this.send(peer, fresh);
+    }
+    this.wake(connected);
+  }
+
+  private register(device: string, value: unknown): void {
+    if (value === undefined || value === null) return;
+    if (typeof value !== "object") throw new Fail(CLOSE_PROTOCOL, "bad push registration");
+    const { pl, tk, e } = value as { pl?: unknown; tk?: unknown; e?: unknown };
+    if (pl !== "apns" && pl !== "fcm") throw new Fail(CLOSE_PROTOCOL, "bad push platform");
+    if (typeof tk !== "string" || !PUSH_TOKEN.test(tk)) throw new Fail(CLOSE_PROTOCOL, "bad push token");
+    if (e !== undefined && e !== "sandbox" && e !== "production") {
+      throw new Fail(CLOSE_PROTOCOL, "bad push environment");
+    }
+    this.sql.exec(
+      `INSERT INTO tokens (device, platform, token, env, pushed) VALUES (?, ?, ?, ?, 0)
+       ON CONFLICT (device) DO UPDATE SET platform = excluded.platform, token = excluded.token, env = excluded.env`,
+      device,
+      pl,
+      tk,
+      e ?? "sandbox",
+    );
+  }
+
+  private wake(connected: Set<string>): void {
+    const now = Date.now();
+    const targets: (Target & { device: string })[] = [];
+    for (const row of this.sql.exec("SELECT device, platform, token, env, pushed FROM tokens").toArray()) {
+      const device = row.device as string;
+      if (connected.has(device)) continue;
+      if (now - Number(row.pushed) < PUSH_COALESCE_MS) continue;
+      targets.push({
+        device,
+        platform: row.platform as Platform,
+        token: row.token as string,
+        environment: row.env as Environment,
+      });
+    }
+    if (targets.length === 0) return;
+    for (const target of targets) {
+      this.sql.exec("UPDATE tokens SET pushed = ? WHERE device = ?", now, target.device);
+    }
+    this.ctx.waitUntil(this.deliver(targets));
+  }
+
+  private async deliver(targets: (Target & { device: string })[]): Promise<void> {
+    for (const target of targets) {
+      const outcome = await push(this.env, target);
+      if (outcome === "gone") this.sql.exec("DELETE FROM tokens WHERE device = ?", target.device);
     }
   }
 

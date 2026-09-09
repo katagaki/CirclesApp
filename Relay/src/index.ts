@@ -1,11 +1,12 @@
 import { Room } from "./room";
+import type { PushEnv } from "./push";
 
 export { Room };
 
 const ROOM_PATH = /^\/r\/([0-9a-f]{32})$/;
 const HOMEPAGE = "https://github.com/katagaki/CirclesRelay";
 
-export interface Env {
+export interface Env extends PushEnv {
   ROOM: DurableObjectNamespace;
 }
 
