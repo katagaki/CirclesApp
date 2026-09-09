@@ -23,8 +23,6 @@ enum SharedBuysStore {
     /// registered for iOS — and without a fallback every save there silently did nothing.
     static var fileURL: URL? {
         let manager = FileManager.default
-        // The Mac harness is handed a group container path it has no entitlement for,
-        // so the directory is never created and every save vanished into `try?`.
         // Existence, not a non-nil URL, is what says the group is really there.
         if let container = manager
             .containerURL(forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.CiRCLES"),

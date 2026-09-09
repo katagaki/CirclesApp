@@ -61,8 +61,6 @@ struct MacHarnessApp: App {
         WindowGroup("Shared Buys Harness") {
             HarnessView(session: session)
                 .frame(minWidth: 940, minHeight: 620)
-                // Mirrored to stderr so the harness can be watched from a terminal
-                // while your hands are on the phone.
                 .task { await mirrorLog() }
                 .task {
                     session.adoptIdentity()
