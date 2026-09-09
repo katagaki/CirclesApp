@@ -73,7 +73,7 @@ npm run dev
 npx wrangler deploy --env staging
 ```
 
-CI deploys on tags: `staging-*` to staging, `v*` to production, using a `CLOUDFLARE_API_TOKEN` secret scoped to Edit Cloudflare Workers. There are no Worker secrets: room keys arrive from clients at runtime and live only in each object's storage.
+CI deploys on published GitHub Releases: a prerelease goes to staging, a full release to production, using a `CLOUDFLARE_API_TOKEN` secret scoped to Edit Cloudflare Workers. There are no Worker secrets: room keys arrive from clients at runtime and live only in each object's storage.
 
 After the first deploy, set a Workers Analytics alert at 50,000 requests/day, half the free-plan cap, since exhausting it fails silently for everyone at once.
 
