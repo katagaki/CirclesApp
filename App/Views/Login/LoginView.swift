@@ -1,9 +1,11 @@
+import ORBiT
 import SwiftUI
 
 struct LoginView: View {
 
     @Environment(\.openURL) var openURL
     @Environment(Authenticator.self) var authenticator
+    @Environment(SharedBuysSession.self) var sharedBuys
 
     @State var isOfflineModeConfirmationShowing: Bool = false
 
@@ -100,6 +102,20 @@ struct LoginView: View {
                 .clipShape(.capsule)
                 .tint(.accent)
                 .buttonStyle(.glassProminent)
+                // Someone who was handed a join code has no circle.ms account and no
+                // reason to make one; they are here to tick items off a friend's list.
+                Button {
+                    authenticator.isAuthenticating = false
+                    sharedBuys.enterGuestMode()
+                } label: {
+                    Text("Login.JoinAsGuest")
+                        .fontWeight(.bold)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 6.0)
+                }
+                .clipShape(.capsule)
+                .tint(.accent)
+                .buttonStyle(.glass)
                 if authenticator.canUseOfflineMode {
                     Button {
                         isOfflineModeConfirmationShowing = true

@@ -38,53 +38,23 @@ struct CirclesApp: App {
 
     var body: some Scene {
         WindowGroup {
-            UnifiedView()
-                .overlay {
-                    if authenticator.effectiveOnlineState == .offline {
-                        ZStack(alignment: .top) {
-                            Color.clear
-                            LinearGradient(
-                                colors: [.pink.opacity(0.3), .clear],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                            .frame(height: 24.0)
-                            .frame(maxWidth: .infinity)
-                            .ignoresSafeArea()
-                            .transition(.move(edge: .top).animation(.smooth.speed(2.0)))
-                        }
-                    }
+            // Guest Mode is a different app, not a mode of this one: no catalog, so no
+            // map, no browsing and no favourites. Chosen before UnifiedView is built so
+            // the login sheet it carries never gets a chance to appear over the top.
+            Group {
+                if sharedBuys.isGuest {
+                    GuestView()
+                } else {
+                    unifiedShell()
                 }
-                .progressAlert(
-                    isModal: .constant(true),
-                    isShowing: $oasis.isShowing,
-                    headerText: $oasis.headerText,
-                    bodyText: $oasis.bodyText,
-                    progress: $oasis.progress
-                )
-                .sheet(isPresented: Binding(
-                    get: { unifier.pendingAttachmentData != nil },
-                    set: { if !$0 { unifier.pendingAttachmentData = nil } }
-                )) {
-                    unifier.show()
-                } content: {
-                    if let data = unifier.pendingAttachmentData {
-                        AttachProductListView(imageData: data)
-                    }
-                }
-                .onChange(of: unifier.pendingAttachmentData) { _, newValue in
-                    if newValue != nil {
-                        unifier.hide()
-                    }
-                }
-                .onAppear {
-                    orientation.update()
-                    sharedBuys.restore()
-                }
-                .onRotate { newOrientation in
-                    orientation.update(to: newOrientation)
-                }
-                .onHandLifecycle()
+            }
+            .onAppear {
+                orientation.update()
+                sharedBuys.restore()
+            }
+            .onRotate { newOrientation in
+                orientation.update(to: newOrientation)
+            }
         }
         .modelContainer(sharedModelContainer)
         .environment(orientation)
@@ -153,5 +123,49 @@ struct CirclesApp: App {
         )
         #endif
         try? BGTaskScheduler.shared.submit(request)
+    }
+
+    @ViewBuilder
+    func unifiedShell() -> some View {
+        UnifiedView()
+            .overlay {
+                if authenticator.effectiveOnlineState == .offline {
+                    ZStack(alignment: .top) {
+                        Color.clear
+                        LinearGradient(
+                            colors: [.pink.opacity(0.3), .clear],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(height: 24.0)
+                        .frame(maxWidth: .infinity)
+                        .ignoresSafeArea()
+                        .transition(.move(edge: .top).animation(.smooth.speed(2.0)))
+                    }
+                }
+            }
+            .progressAlert(
+                isModal: .constant(true),
+                isShowing: $oasis.isShowing,
+                headerText: $oasis.headerText,
+                bodyText: $oasis.bodyText,
+                progress: $oasis.progress
+            )
+            .sheet(isPresented: Binding(
+                get: { unifier.pendingAttachmentData != nil },
+                set: { if !$0 { unifier.pendingAttachmentData = nil } }
+            )) {
+                unifier.show()
+            } content: {
+                if let data = unifier.pendingAttachmentData {
+                    AttachProductListView(imageData: data)
+                }
+            }
+            .onChange(of: unifier.pendingAttachmentData) { _, newValue in
+                if newValue != nil {
+                    unifier.hide()
+                }
+            }
+            .onHandLifecycle()
     }
 }

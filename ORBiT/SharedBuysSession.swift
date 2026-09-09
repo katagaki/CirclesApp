@@ -18,7 +18,11 @@ public enum SharedBuysStatus: Equatable {
 @MainActor
 public final class SharedBuysSession {
 
-    public init() {}
+    public init() {
+        // Read before the first view is built: the app root picks the guest shell from
+        // this, and restore() -- which would set it -- does not run until onAppear.
+        isGuest = UserDefaults.standard.bool(forKey: Self.guestModeKey)
+    }
 
     public static let joinHost = "buys-join"
 
