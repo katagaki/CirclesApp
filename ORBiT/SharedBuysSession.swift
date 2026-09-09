@@ -46,11 +46,11 @@ public final class SharedBuysSession {
     private var lastSeq: Int = 0
     private var reconnectAttempt: Int = 0
     private var reconnectTask: Task<Void, Never>?
-    private var outbox: [RelayRecord] = []
-    private var flushTask: Task<Void, Never>?
+    var outbox: [RelayRecord] = []
+    var flushTask: Task<Void, Never>?
     public var activity: Any?
-    private let relay = SharedBuysRelay()
-    private let bluetooth = SharedBuysBluetooth()
+    let relay = SharedBuysRelay()
+    let bluetooth = SharedBuysBluetooth()
 
     public var bluetoothPeers: Int = 0
     public var bluetoothNote: String = ""
@@ -92,33 +92,9 @@ public final class SharedBuysSession {
         Self.contiguousPrefix(of: changes)
     }
 
-    /// The same prefix, over the subset Bluetooth carries.
-    ///
-    /// The full vector counts relay-only changes, so advertising it to a peer would
-    /// claim we hold status flips whose sequence numbers sit below a name or cost we
-    /// happened to receive over the relay. The peer would then filter those flips out
-    /// of its reply and they would never arrive. The peer-to-peer path has to reason
-    /// about its own subset of the log.
-    public var bluetoothVersionVector: [String: Int] {
-        Self.contiguousPrefix(of: changes.filter { $0.payload.kind.travelsOverBluetooth })
-    }
-
-    /// What the advertised digest summarises: everything held over Bluetooth, gaps and
-    /// all.
-    ///
-    /// The digest answers "is there anything to exchange at all", so it has to count a
-    /// change sitting above a hole. The vector we send answers "what may you skip", and
-    /// must not.
-    private var bluetoothDigestVector: [String: Int] {
-        changes.reduce(into: [String: Int]()) { result, change in
-            guard change.payload.kind.travelsOverBluetooth else { return }
-            result[change.device] = max(result[change.device] ?? 0, change.seq)
-        }
-    }
-
     /// The highest `n` for which every sequence number from 1 to `n` is present. A
     /// device we hold nothing contiguous for is left out rather than claimed at 0.
-    private static func contiguousPrefix(of changes: [SharedBuyChange]) -> [String: Int] {
+    static func contiguousPrefix(of changes: [SharedBuyChange]) -> [String: Int] {
         var held: [String: Set<Int>] = [:]
         for change in changes { held[change.device, default: []].insert(change.seq) }
         return held.compactMapValues { seqs in
@@ -219,68 +195,6 @@ public final class SharedBuysSession {
         }
     }
 
-    public func startBluetooth() {
-        guard isBluetoothEnabled, let sessionKey else { return }
-        bluetooth.start(sessionKey: sessionKey, digest: SharedBuysDigest.data(of: bluetoothDigestVector)) { event in
-            switch event {
-            case .peerCount(let count):
-                self.bluetoothPeers = count
-                self.note("bluetooth peers \(count)")
-            case .peerVerified(let digest):
-                self.handshakeCompleted(peerDigest: digest)
-            case .payload(let payload):
-                self.handleBluetooth(payload)
-            case .unavailable(let reason):
-                self.bluetoothNote = reason
-                self.note("bluetooth: \(reason)")
-            }
-        }
-    }
-
-    public func stopBluetooth() {
-        bluetooth.stop()
-        bluetoothPeers = 0
-    }
-
-    /// A peer that advertised our own digest holds the same Bluetooth-eligible log, so
-    /// there is nothing for a version vector exchange to turn up.
-    private func handshakeCompleted(peerDigest: Data?) {
-        guard peerDigest != SharedBuysDigest.data(of: bluetoothDigestVector) else {
-            note("peer is level, skipping want")
-            return
-        }
-        sendWant()
-    }
-
-    private func sendWant() {
-        for frame in SharedBuysWire.wantFrames(bluetoothVersionVector) {
-            bluetooth.send(frame)
-        }
-    }
-
-    private func handleBluetooth(_ payload: Data) {
-        guard let frame = SharedBuysWire.decode(payload) else { return }
-        switch frame {
-        case .want(let theirs):
-            let missing = changes.filter {
-                $0.payload.kind.travelsOverBluetooth && $0.seq > (theirs[$0.device] ?? 0)
-            }
-            sendOverBluetooth(missing)
-        case .changes(let records):
-            ingest(records)
-        }
-    }
-
-    private func sendOverBluetooth(_ outgoing: [SharedBuyChange]) {
-        let eligible = outgoing.filter { $0.payload.kind.travelsOverBluetooth }
-        guard !eligible.isEmpty, bluetoothPeers > 0, let sessionKey, let roomID else { return }
-        let records = eligible.compactMap { seal($0, sessionKey: sessionKey, roomID: roomID) }
-        guard !records.isEmpty else { return }
-        for frame in SharedBuysWire.changeFrames(records) {
-            bluetooth.send(frame)
-        }
-    }
-
     @discardableResult
     public func addItem(name: String, cost: Int, circleID: Int) -> String {
         let itemID = String(UUID().uuidString.prefix(8)).lowercased()
@@ -302,7 +216,12 @@ public final class SharedBuysSession {
     }
 
     public func cycle(_ item: SharedBuyItem) {
-        append(.setStatus, itemID: item.id, circleID: item.circleID, value: item.status.next.rawValue)
+        append(
+            .setStatus,
+            itemID: item.id,
+            circleID: item.circleID,
+            value: SharedBuyStatus.next(after: item.rawStatus).rawValue
+        )
     }
 
     public func assign(_ item: SharedBuyItem, to pid: Int?) {
@@ -333,32 +252,7 @@ public final class SharedBuysSession {
         updateActivity()
     }
 
-    /// Holds a record briefly so a burst of edits leaves as one frame.
-    private func enqueue(_ record: RelayRecord) {
-        outbox.append(record)
-        guard outbox.count < Self.recordsPerFrame else {
-            flushOutbox()
-            return
-        }
-        guard flushTask == nil else { return }
-        flushTask = Task {
-            try? await Task.sleep(for: Self.coalesceWindow)
-            guard !Task.isCancelled else { return }
-            self.flushTask = nil
-            self.flushOutbox()
-        }
-    }
-
-    private func flushOutbox() {
-        flushTask?.cancel()
-        flushTask = nil
-        guard !outbox.isEmpty else { return }
-        let records = outbox
-        outbox = []
-        Task { await relay.send(records: records) }
-    }
-
-    private func seal(_ change: SharedBuyChange, sessionKey: Data, roomID: String) -> RelayRecord? {
+    func seal(_ change: SharedBuyChange, sessionKey: Data, roomID: String) -> RelayRecord? {
         guard let plaintext = try? JSONEncoder().encode(change.payload) else { return nil }
         let contentKey = SharedBuysCrypto.derive(SharedBuysCrypto.opsInfo, from: sessionKey)
         let relayAuthKey = SharedBuysCrypto.derive(SharedBuysCrypto.relayAuthInfo, from: sessionKey)
@@ -444,7 +338,7 @@ public final class SharedBuysSession {
         }
     }
 
-    private func ingest(_ records: [RelayRecord]) {
+    func ingest(_ records: [RelayRecord]) {
         guard let sessionKey, let roomID else { return }
         let contentKey = SharedBuysCrypto.derive(SharedBuysCrypto.opsInfo, from: sessionKey)
         let relayAuthKey = SharedBuysCrypto.derive(SharedBuysCrypto.relayAuthInfo, from: sessionKey)

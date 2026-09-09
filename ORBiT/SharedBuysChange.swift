@@ -40,19 +40,57 @@ public enum SharedBuyStatus: Int, Codable, Sendable {
         case .cancelled: .pending
         }
     }
+
+    /// The next status in the cycle, starting from a raw value this build may not know.
+    ///
+    /// Mirrors Android's `SharedBuyStatus.next`, where anything unrecognised cycles to
+    /// pending. Coercing the unknown value to pending first and then advancing would
+    /// land on bought instead, and the two platforms would disagree after one tap.
+    public static func next(after rawStatus: Int) -> SharedBuyStatus {
+        SharedBuyStatus(rawValue: rawStatus)?.next ?? .pending
+    }
 }
 
 public struct SharedBuyPayload: Codable, Sendable {
     public var actor: Int
-    public var kind: SharedBuyKind
+
+    /// The change kind exactly as it arrived on the wire.
+    ///
+    /// Decoding this as a closed enum made any kind this build does not know a hard
+    /// decode failure: the change was dropped, never reached the log or the version
+    /// vector, and was re-requested on every `want` forever — while Android, which
+    /// stores the raw int, kept it. The two devices then disagreed permanently. A kind
+    /// we cannot interpret is now folded as a no-op instead, so a future change kind
+    /// costs an old build a missing feature rather than a divergent list.
+    public var rawKind: Int
+
     public var itemID: String
     public var circleID: Int
     public var text: String?
     public var value: Int?
 
+    /// The kind, when it is one this build understands.
+    public var kind: SharedBuyKind? { SharedBuyKind(rawValue: rawKind) }
+
+    public init(
+        actor: Int,
+        kind: SharedBuyKind,
+        itemID: String,
+        circleID: Int,
+        text: String? = nil,
+        value: Int? = nil
+    ) {
+        self.actor = actor
+        self.rawKind = kind.rawValue
+        self.itemID = itemID
+        self.circleID = circleID
+        self.text = text
+        self.value = value
+    }
+
     enum CodingKeys: String, CodingKey {
         case actor = "a"
-        case kind = "k"
+        case rawKind = "k"
         case itemID = "i"
         case circleID = "c"
         case text = "t"
@@ -76,10 +114,17 @@ public struct SharedBuyItem: Identifiable, Sendable, Hashable {
     public let circleID: Int
     public var name: String
     public var cost: Int
-    public var status: SharedBuyStatus
+
+    /// The status exactly as the log recorded it, which may not be one of the three
+    /// this build knows. Kept raw so a status flip written by a newer build survives a
+    /// round trip through this one, and so cycling matches Android.
+    public var rawStatus: Int
+
     public var assignee: Int?
     public var isRemoved: Bool
     public var lastTouchedBy: Int
+
+    public var status: SharedBuyStatus { SharedBuyStatus(rawValue: rawStatus) ?? .pending }
 }
 
 public enum SharedBuyFold {
@@ -90,7 +135,11 @@ public enum SharedBuyFold {
 
         for change in changes.sorted(by: ordered) {
             let payload = change.payload
-            switch payload.kind {
+            // A kind this build does not understand cannot be folded into an item, but
+            // it stays in `changes` and in the version vector so the log still matches
+            // a build that does understand it.
+            guard let kind = payload.kind else { continue }
+            switch kind {
             case .addItem:
                 if byID[payload.itemID] == nil { order.append(payload.itemID) }
                 byID[payload.itemID] = SharedBuyItem(
@@ -98,7 +147,7 @@ public enum SharedBuyFold {
                     circleID: payload.circleID,
                     name: payload.text ?? "",
                     cost: payload.value ?? 0,
-                    status: .pending,
+                    rawStatus: SharedBuyStatus.pending.rawValue,
                     assignee: nil,
                     isRemoved: false,
                     lastTouchedBy: payload.actor
@@ -125,9 +174,12 @@ public enum SharedBuyFold {
 
     private static func apply(_ change: SharedBuyChange, to byID: inout [String: SharedBuyItem]) {
         let payload = change.payload
-        switch payload.kind {
+        guard let kind = payload.kind else { return }
+        switch kind {
         case .setStatus:
-            byID[payload.itemID]?.status = SharedBuyStatus(rawValue: payload.value ?? 0) ?? .pending
+            // Stored raw. Coercing an unrecognised status to pending here made this
+            // device disagree with Android, which keeps the value it was sent.
+            byID[payload.itemID]?.rawStatus = payload.value ?? 0
             byID[payload.itemID]?.lastTouchedBy = payload.actor
         case .setAssignee:
             byID[payload.itemID]?.assignee = payload.value
