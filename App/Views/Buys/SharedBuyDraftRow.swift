@@ -11,6 +11,12 @@ struct SharedBuyDraftRow: View {
     @Environment(SharedBuysSession.self) var sharedBuys
 
     let circleID: Int
+
+    /// The circle's name and space, relayed into the log alongside the first item from
+    /// this circle so a guest — who has no catalog database — can still read the header.
+    var circleName: String?
+    var circleSpace: String?
+
     @Binding var itemID: String?
 
     @State private var name: String = ""
@@ -58,7 +64,13 @@ struct SharedBuyDraftRow: View {
         guard !trimmedName.isEmpty else { return }
         let value = Int(cost) ?? 0
         guard let itemID else {
-            self.itemID = sharedBuys.addItem(name: trimmedName, cost: value, circleID: circleID)
+            self.itemID = sharedBuys.addItem(
+                name: trimmedName,
+                cost: value,
+                circleID: circleID,
+                circleName: circleName,
+                circleSpace: circleSpace
+            )
             syncedName = trimmedName
             syncedCost = value
             return

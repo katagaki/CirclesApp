@@ -22,6 +22,9 @@ public final class SharedBuysSession {
 
     public static let joinHost = "buys-join"
 
+    static let guestModeKey = "Guest.IsActive"
+    static let guestNicknameKey = "Guest.Nickname"
+
     /// The relay refuses a frame carrying more than this (`MAX_RECORDS_PER_FRAME`).
     public static let recordsPerFrame = 32
 
@@ -39,6 +42,15 @@ public final class SharedBuysSession {
     public var actorPID: Int = 0
     public var nickname: String = ""
 
+    /// Whether this device is running as a guest.
+    ///
+    /// A guest has no circle.ms account and no catalog database: they scanned a room
+    /// code to help tick things off, and that is all they can do. `append` honours this
+    /// by dropping every kind but a status flip. It is not enforceable — a guest holds
+    /// the room key, so a modified client could write anything the relay accepts — it
+    /// is this app keeping to the role it advertised.
+    public var isGuest: Bool = false
+
     public private(set) var sessionKey: Data?
     public private(set) var deviceID: String = ""
     public private(set) var eventNumber: Int = 0
@@ -47,7 +59,11 @@ public final class SharedBuysSession {
     }
 
     /// The fold of `changes`, kept until the log changes underneath it.
-    @ObservationIgnored private var foldCache: (items: [SharedBuyItem], members: [Int: String])?
+    @ObservationIgnored private var foldCache: (
+        items: [SharedBuyItem],
+        members: [Int: String],
+        circles: [Int: SharedBuyCircle]
+    )?
     var lastSeq: Int = 0
     private var reconnectAttempt: Int = 0
     private var reconnectTask: Task<Void, Never>?
@@ -72,11 +88,19 @@ public final class SharedBuysSession {
 
     public var members: [Int: String] { fold().members }
 
-    private func fold() -> (items: [SharedBuyItem], members: [Int: String]) {
+    /// Circle name and space as the log carries them, for a member with no catalog.
+    public var relayedCircles: [Int: SharedBuyCircle] { fold().circles }
+
+    private func fold() -> (
+        items: [SharedBuyItem],
+        members: [Int: String],
+        circles: [Int: SharedBuyCircle]
+    ) {
         if let foldCache { return foldCache }
         let folded = (
             items: SharedBuyFold.items(from: changes),
-            members: SharedBuyFold.members(from: changes)
+            members: SharedBuyFold.members(from: changes),
+            circles: SharedBuyFold.circles(from: changes)
         )
         foldCache = folded
         return folded
@@ -171,6 +195,25 @@ public final class SharedBuysSession {
         startActivity()
     }
 
+    /// Enters Guest Mode. Survives relaunch, so the app comes back into the guest shell
+    /// rather than the login screen.
+    public func enterGuestMode() {
+        UserDefaults.standard.set(true, forKey: Self.guestModeKey)
+        adoptIdentity()
+    }
+
+    /// Leaves Guest Mode and the room with it.
+    ///
+    /// The minted name is dropped too: coming back as a guest later is a new session
+    /// with a new member, not a resumption of the old one.
+    public func exitGuestMode() {
+        leave()
+        UserDefaults.standard.removeObject(forKey: Self.guestModeKey)
+        UserDefaults.standard.removeObject(forKey: Self.guestNicknameKey)
+        isGuest = false
+        nickname = ""
+    }
+
     public func leave() {
         endActivity()
         reconnectTask?.cancel()
@@ -213,9 +256,25 @@ public final class SharedBuysSession {
         }
     }
 
+    /// Adds an item, carrying the circle's identity into the log the first time that
+    /// circle appears in the room.
+    ///
+    /// `circleName` and `circleSpace` come from the caller's catalog database, which a
+    /// guest does not have. Relayed once per circle rather than per item: the check is
+    /// against the folded circle map, so it is idempotent across a restore and a
+    /// second contributor adding from a circle someone else already introduced.
     @discardableResult
-    public func addItem(name: String, cost: Int, circleID: Int) -> String {
+    public func addItem(
+        name: String,
+        cost: Int,
+        circleID: Int,
+        circleName: String? = nil,
+        circleSpace: String? = nil
+    ) -> String {
         let itemID = String(UUID().uuidString.prefix(8)).lowercased()
+        if let circleName, !circleName.isEmpty, SharedBuyFold.circles(from: changes)[circleID] == nil {
+            append(.circleInfo, itemID: "-", circleID: circleID, text: circleName, space: circleSpace)
+        }
         append(.addItem, itemID: itemID, circleID: circleID, text: name, value: cost)
         append(.setAssignee, itemID: itemID, circleID: circleID, value: actorPID)
         return itemID
@@ -246,8 +305,20 @@ public final class SharedBuysSession {
         append(.setAssignee, itemID: item.id, circleID: item.circleID, value: pid)
     }
 
-    private func append(_ kind: SharedBuyKind, itemID: String, circleID: Int, text: String? = nil, value: Int? = nil) {
+    private func append(
+        _ kind: SharedBuyKind,
+        itemID: String,
+        circleID: Int,
+        text: String? = nil,
+        value: Int? = nil,
+        space: String? = nil
+    ) {
         guard let sessionKey, let roomID else { return }
+        // A guest holds the room key and could append anything the relay would accept.
+        // The restriction is the app honouring its own role, not something the log can
+        // enforce -- see `isGuest`. `memberJoined` is how a guest appears in the members
+        // list at all, so it is allowed alongside the status flips they are here for.
+        guard !isGuest || kind == .setStatus || kind == .memberJoined else { return }
         lastSeq += 1
         let change = SharedBuyChange(
             device: deviceID,
@@ -258,7 +329,8 @@ public final class SharedBuysSession {
                 itemID: itemID,
                 circleID: circleID,
                 text: text,
-                value: value
+                value: value,
+                space: space
             )
         )
         changes.append(change)

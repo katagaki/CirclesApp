@@ -14,6 +14,16 @@ public enum SharedBuyKind: Int, Codable, Sendable {
     case memberJoined = 5
     case renameItem = 6
 
+    /// Circle name and space, relayed once per circle so a member without the
+    /// catalog database can still read the list.
+    ///
+    /// A guest joins by scanning a code and never downloads the catalog, so
+    /// `database.circles(_:)` returns nothing and every section header would read
+    /// "Unknown circle 12345". The contributor who first adds an item from a circle
+    /// carries that circle's name and space into the log alongside it, so the guest
+    /// reads the header off the log instead. Sent once per circle per room.
+    case circleInfo = 7
+
     /// Whether this kind is carried over the peer-to-peer Bluetooth path.
     ///
     /// Bluetooth frames are chunked at 160 bytes and reassembled by hand, so the
@@ -69,6 +79,14 @@ public struct SharedBuyPayload: Codable, Sendable {
     public var text: String?
     public var value: Int?
 
+    /// The circle's space, as `spaceName()` renders it. Only `circleInfo` sets it.
+    ///
+    /// A separate field rather than a delimiter inside `text`: a circle name is
+    /// user-supplied and may contain anything, so any separator would eventually be
+    /// part of a name. Optional, so it costs nothing on the other six kinds — both
+    /// platforms omit nil rather than encoding null.
+    public var space: String?
+
     /// The kind, when it is one this build understands.
     public var kind: SharedBuyKind? { SharedBuyKind(rawValue: rawKind) }
 
@@ -78,7 +96,8 @@ public struct SharedBuyPayload: Codable, Sendable {
         itemID: String,
         circleID: Int,
         text: String? = nil,
-        value: Int? = nil
+        value: Int? = nil,
+        space: String? = nil
     ) {
         self.actor = actor
         self.rawKind = kind.rawValue
@@ -86,6 +105,7 @@ public struct SharedBuyPayload: Codable, Sendable {
         self.circleID = circleID
         self.text = text
         self.value = value
+        self.space = space
     }
 
     enum CodingKeys: String, CodingKey {
@@ -95,6 +115,7 @@ public struct SharedBuyPayload: Codable, Sendable {
         case circleID = "c"
         case text = "t"
         case value = "v"
+        case space = "s"
     }
 }
 
@@ -107,6 +128,13 @@ public struct SharedBuyChange: Codable, Sendable, Identifiable, Hashable {
 
     public static func == (lhs: SharedBuyChange, rhs: SharedBuyChange) -> Bool { lhs.id == rhs.id }
     public func hash(into hasher: inout Hasher) { hasher.combine(id) }
+}
+
+/// A circle as the shared log describes it, for a member who cannot look it up.
+public struct SharedBuyCircle: Identifiable, Sendable, Hashable {
+    public let id: Int
+    public let name: String
+    public let space: String?
 }
 
 public struct SharedBuyItem: Identifiable, Sendable, Hashable {
@@ -159,7 +187,7 @@ public enum SharedBuyFold {
                 for pending in deferred.removeValue(forKey: payload.itemID) ?? [] {
                     apply(pending, to: &byID)
                 }
-            case .memberJoined:
+            case .memberJoined, .circleInfo:
                 continue
             default:
                 if byID[payload.itemID] == nil {
@@ -192,9 +220,25 @@ public enum SharedBuyFold {
             byID[payload.itemID]?.lastTouchedBy = payload.actor
         case .removeItem:
             byID[payload.itemID]?.isRemoved = true
-        case .addItem, .memberJoined:
+        case .addItem, .memberJoined, .circleInfo:
             break
         }
+    }
+
+    /// Circle name and space per circle ID, as the log carries them.
+    ///
+    /// Only ever a fallback for a member holding the catalog database, which is both
+    /// richer and current; for a guest it is the only source there is.
+    public static func circles(from changes: [SharedBuyChange]) -> [Int: SharedBuyCircle] {
+        var result: [Int: SharedBuyCircle] = [:]
+        for change in changes.sorted(by: ordered) where change.payload.kind == .circleInfo {
+            result[change.payload.circleID] = SharedBuyCircle(
+                id: change.payload.circleID,
+                name: change.payload.text ?? "",
+                space: change.payload.space
+            )
+        }
+        return result
     }
 
     public static func members(from changes: [SharedBuyChange]) -> [Int: String] {

@@ -47,7 +47,12 @@ struct CircleDetailBuysSection: View {
                 .moveDisabled(!isEditing)
             }
             ForEach($sharedDrafts) { $draft in
-                SharedBuyDraftRow(circleID: circle.id, itemID: $draft.itemID)
+                SharedBuyDraftRow(
+                    circleID: circle.id,
+                    circleName: circle.circleName,
+                    circleSpace: circle.spaceName(),
+                    itemID: $draft.itemID
+                )
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                         Button(role: .destructive) {
                             discardDraft(draft)

@@ -229,14 +229,16 @@ struct BuysView: View {
                             SharedBuyItemRow(item: item) { assignmentTarget = item }
                         }
                     } header: {
+                        // The catalog is authoritative and current; the log is what a
+                        // member without one has. Falling back to it is what keeps a
+                        // guest's headers readable instead of "Unknown circle 12345".
                         if let circle = circles.first(where: { $0.id == circleID }) {
-                            HStack(spacing: 6.0) {
-                                Text(circle.circleName)
-                                    .fontWeight(.semibold)
-                                if let spaceName = circle.spaceName() {
-                                    CircleBlockPill(LocalizedStringKey(spaceName))
-                                }
-                            }
+                            SharedBuyCircleHeader(
+                                name: circle.circleName,
+                                space: circle.spaceName()
+                            )
+                        } else if let relayed = sharedBuys.relayedCircles[circleID] {
+                            SharedBuyCircleHeader(name: relayed.name, space: relayed.space)
                         } else {
                             Text("Buys.UnknownCircle.\(circleID)")
                         }
@@ -333,4 +335,21 @@ struct SharedWithRow: View {
 struct ExpandedBuyImage: Identifiable {
     let id = UUID()
     let image: UIImage
+}
+
+/// A shared-list section header, from whichever source could describe the circle.
+struct SharedBuyCircleHeader: View {
+
+    let name: String
+    let space: String?
+
+    var body: some View {
+        HStack(spacing: 6.0) {
+            Text(name)
+                .fontWeight(.semibold)
+            if let space {
+                CircleBlockPill(LocalizedStringKey(space))
+            }
+        }
+    }
 }
