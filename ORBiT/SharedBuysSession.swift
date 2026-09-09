@@ -65,7 +65,6 @@ public final class SharedBuysSession {
 
     public var items: [SharedBuyItem] { SharedBuyFold.items(from: changes) }
 
-
     public var members: [Int: String] { SharedBuyFold.members(from: changes) }
 
     public var joinURL: URL? {
@@ -312,29 +311,6 @@ public final class SharedBuysSession {
             guard !Task.isCancelled else { return }
             self.reconnectTask = nil
             if self.isActive, self.bluetoothPeers == 0 { self.connect() }
-        }
-    }
-
-    /// Uploads every change this device authored, in frames the relay will accept.
-    ///
-    /// Taking the first 32 and discarding the rest left later changes with no path to
-    /// the server at all: `resend()` only runs on connect, and always re-took the same
-    /// 32. Each page is sealed as it is sent, so a long backlog no longer pays the whole
-    /// seal cost — encode, two derivations and AES-GCM per change — before transmitting
-    /// any of it.
-    private func resend() {
-        guard let sessionKey, let roomID else { return }
-        let mine = changes.filter { $0.device == deviceID }
-        guard !mine.isEmpty else { return }
-        Task {
-            for start in stride(from: 0, to: mine.count, by: Self.recordsPerFrame) {
-                let page = mine[start..<min(start + Self.recordsPerFrame, mine.count)]
-                let records = page.compactMap {
-                    self.seal($0, sessionKey: sessionKey, roomID: roomID)
-                }
-                guard !records.isEmpty else { continue }
-                await self.relay.send(records: records)
-            }
         }
     }
 
