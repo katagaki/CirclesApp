@@ -17,9 +17,22 @@ enum SharedBuysStore {
 
     static let filename = "shared-buys-session.json"
 
+    /// The app group on iOS, Application Support when there is no group to join.
+    ///
+    /// The Mac harness is not a member of `group.com.tsubuzaki.CiRCLES` — the group is
+    /// registered for iOS — and without a fallback every save there silently did nothing.
     static var fileURL: URL? {
-        FileManager.default
-            .containerURL(forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.CiRCLES")?
+        let manager = FileManager.default
+        // The Mac harness is handed a group container path it has no entitlement for,
+        // so the directory is never created and every save vanished into `try?`.
+        // Existence, not a non-nil URL, is what says the group is really there.
+        if let container = manager
+            .containerURL(forSecurityApplicationGroupIdentifier: "group.com.tsubuzaki.CiRCLES"),
+           manager.fileExists(atPath: container.path()) {
+            return container.appending(path: filename)
+        }
+        return try? manager
+            .url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
             .appending(path: filename)
     }
 

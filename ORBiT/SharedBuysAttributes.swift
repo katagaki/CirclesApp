@@ -3,6 +3,7 @@
 //  CiRCLES
 //
 
+#if os(iOS)
 import ActivityKit
 import Foundation
 
@@ -20,3 +21,4 @@ public struct SharedBuysAttributes: ActivityAttributes, Sendable {
 
     public var roomID: String
 }
+#endif

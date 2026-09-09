@@ -3,6 +3,7 @@
 //  CiRCLES
 //
 
+#if os(iOS)
 import ActivityKit
 import Foundation
 
@@ -91,3 +92,19 @@ public extension SharedBuysSession {
         await live.end(nil, dismissalPolicy: .immediate)
     }
 }
+#else
+import Foundation
+
+/// The Mac harness stands in for a second iOS device (§15) and has no ActivityKit.
+/// The session drives the activity from half a dozen places; stubs keep those call
+/// sites identical rather than scattering `#if os(iOS)` through the sync engine.
+@MainActor
+public extension SharedBuysSession {
+    var activityCount: Int { 0 }
+    var activitiesEnabled: Bool { false }
+    func adoptActivity() {}
+    func startActivity() {}
+    func updateActivity() {}
+    func endActivity() {}
+}
+#endif

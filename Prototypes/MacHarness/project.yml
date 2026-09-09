@@ -1,0 +1,27 @@
+name: MacHarness
+options:
+  bundleIdPrefix: com.tsubuzaki.prototype
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+targets:
+  MacHarness:
+    type: application
+    platform: macOS
+    sources:
+      - MacHarness
+      - path: ../../ORBiT
+        name: ORBiT
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tsubuzaki.prototype.MacHarness
+        PRODUCT_NAME: MacHarness
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription: Stands in for a second phone when testing the shared list over Bluetooth.
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        SWIFT_VERSION: "6.0"
+        MACOSX_DEPLOYMENT_TARGET: "26.0"
+        ENABLE_HARDENED_RUNTIME: NO
+        CODE_SIGN_IDENTITY: "-"
+        CODE_SIGN_STYLE: Manual
+        DEVELOPMENT_TEAM: ""
