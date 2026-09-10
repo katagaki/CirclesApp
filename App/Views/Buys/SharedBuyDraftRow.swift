@@ -1,8 +1,3 @@
-//
-//  SharedBuyDraftRow.swift
-//  CiRCLES
-//
-
 import ORBiT
 import SwiftUI
 
@@ -12,8 +7,6 @@ struct SharedBuyDraftRow: View {
 
     let circleID: Int
 
-    /// The circle's name and space, relayed into the log alongside the first item from
-    /// this circle so a guest — who has no catalog database — can still read the header.
     var circleName: String?
     var circleSpace: String?
 

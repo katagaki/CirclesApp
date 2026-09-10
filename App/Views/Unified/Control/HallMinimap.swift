@@ -1,10 +1,3 @@
-//
-//  HallMinimap.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/09/02.
-//
-
 import SwiftUI
 import AXiS
 
@@ -120,7 +113,6 @@ struct HallMinimap: View {
         }
     }
 
-    // Every hall the venue has, so halls the event does not use can still be shown as disabled.
     static let slots: [HallSlot] = [
         HallSlot(filenames: ["E78", "E7"], shape: east78Shape, placeholderName: "東78"),
         HallSlot(filenames: ["E123"], shape: rectangle(east123Frame), placeholderName: "東123"),

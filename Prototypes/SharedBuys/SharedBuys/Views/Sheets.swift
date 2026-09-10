@@ -1,8 +1,3 @@
-//
-//  Sheets.swift
-//  SharedBuys
-//
-
 import SwiftUI
 
 struct AddItemSheet: View {

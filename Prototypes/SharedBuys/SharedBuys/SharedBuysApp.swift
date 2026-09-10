@@ -1,8 +1,3 @@
-//
-//  SharedBuysApp.swift
-//  SharedBuys
-//
-
 import SwiftUI
 
 @main

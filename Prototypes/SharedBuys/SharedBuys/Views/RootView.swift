@@ -1,8 +1,3 @@
-//
-//  RootView.swift
-//  SharedBuys
-//
-
 import SwiftUI
 
 struct RootView: View {

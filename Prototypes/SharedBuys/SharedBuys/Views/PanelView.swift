@@ -1,8 +1,3 @@
-//
-//  PanelView.swift
-//  SharedBuys
-//
-
 import SwiftUI
 
 enum PanelSegment: String, CaseIterable, Identifiable {

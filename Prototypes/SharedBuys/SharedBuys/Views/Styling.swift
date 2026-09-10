@@ -1,8 +1,3 @@
-//
-//  Styling.swift
-//  SharedBuys
-//
-
 import SwiftUI
 
 extension Member {

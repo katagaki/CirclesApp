@@ -1,8 +1,3 @@
-//
-//  SessionView.swift
-//  SharedBuys
-//
-
 import SwiftUI
 
 struct SessionView: View {

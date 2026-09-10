@@ -1,10 +1,3 @@
-//
-//  MyEventNotifierSheet.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/15.
-//
-
 import SwiftUI
 import UserNotifications
 

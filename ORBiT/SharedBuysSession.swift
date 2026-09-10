@@ -1,8 +1,3 @@
-//
-//  SharedBuysSession.swift
-//  CiRCLES
-//
-
 import CryptoKit
 import Foundation
 import Observation
@@ -62,7 +57,6 @@ public final class SharedBuysSession {
         didSet { foldCache = nil }
     }
 
-    /// The fold of `changes`, kept until the log changes underneath it.
     @ObservationIgnored private var foldCache: (
         items: [SharedBuyItem],
         members: [Int: String],

@@ -1,8 +1,3 @@
-//
-//  Mesh.swift
-//  SharedBuys
-//
-
 import Foundation
 import Observation
 

@@ -1,8 +1,3 @@
-//
-//  SharedBuysListView.swift
-//  SharedBuys
-//
-
 import SwiftUI
 
 struct SharedBuysListView: View {

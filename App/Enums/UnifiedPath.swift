@@ -1,10 +1,3 @@
-//
-//  UnifiedPath.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/08/18.
-//
-
 import Foundation
 import SwiftUI
 import AXiS

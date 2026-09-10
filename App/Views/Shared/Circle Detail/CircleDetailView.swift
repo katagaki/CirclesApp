@@ -159,12 +159,10 @@ struct CircleDetailView: View {
         }
         .alert("Alerts.FirstCircle.Title", isPresented: $isFirstCircleAlertShowing) {
             Button("Shared.OK", role: .cancel) {
-                // Dismiss the alert; no additional action required.
             }
         }
         .alert("Alerts.LastCircle.Title", isPresented: $isLastCircleAlertShowing) {
             Button("Shared.OK", role: .cancel) {
-                // Dismiss the alert; no additional action required.
             }
         }
         .task {

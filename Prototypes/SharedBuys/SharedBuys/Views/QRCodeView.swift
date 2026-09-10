@@ -1,8 +1,3 @@
-//
-//  QRCodeView.swift
-//  SharedBuys
-//
-
 import CoreImage.CIFilterBuiltins
 import SwiftUI
 

@@ -1,8 +1,3 @@
-//
-//  SharedBuysSession+Activity.swift
-//  CiRCLES
-//
-
 #if os(iOS)
 import ActivityKit
 import Foundation

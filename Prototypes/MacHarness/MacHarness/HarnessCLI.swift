@@ -1,11 +1,5 @@
-//
-//  HarnessCLI.swift
-//  MacHarness
-//
-
 import Foundation
 
-/// The harness without the window: the stand-in device, driven from a terminal.
 enum HarnessCLI {
 
     static func run(arguments: [String]) {

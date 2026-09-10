@@ -1,24 +1,12 @@
-//
-//  SharedBuysScannerView.swift
-//  CiRCLES
-//
-
 import AVFoundation
 import ORBiT
 import SwiftUI
 import VisionKit
 
-/// Scans the code shown by `SharedBuysSheet` and hands back the join URL.
-///
-/// The code is a `circles-app://buys-join` link, so a member who already has the app can
-/// point the system camera at it and be taken straight in. A guest cannot: they arrive at
-/// a login screen with no way to feed it a URL. This is that way in.
 struct SharedBuysScannerView: View {
 
     @Environment(\.dismiss) var dismiss
 
-    /// Called with a URL that is shaped like a join link. Whether the key inside it is
-    /// usable is `join(url:nickname:)`'s call to make, not ours.
     let onScan: (URL) -> Void
 
     @State private var isCameraDenied: Bool = false

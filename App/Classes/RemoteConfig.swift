@@ -1,10 +1,3 @@
-//
-//  RemoteConfig.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/06/05.
-//
-
 import CloudKit
 import Foundation
 

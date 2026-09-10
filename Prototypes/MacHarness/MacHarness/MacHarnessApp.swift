@@ -1,8 +1,3 @@
-//
-//  MacHarnessApp.swift
-//  MacHarness
-//
-
 import Foundation
 import SwiftUI
 

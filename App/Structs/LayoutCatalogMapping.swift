@@ -1,12 +1,5 @@
 import AXiS
 
-//
-//  LayoutCatalogMapping.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/07.
-//
-
 struct LayoutCatalogMapping: Hashable, Equatable, Sendable {
     var blockID: Int
     var spaceNumber: Int

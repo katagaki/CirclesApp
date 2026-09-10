@@ -1,8 +1,3 @@
-//
-//  SharedBuysWidgetBundle.swift
-//  SharedBuysWidget
-//
-
 import SwiftUI
 import WidgetKit
 

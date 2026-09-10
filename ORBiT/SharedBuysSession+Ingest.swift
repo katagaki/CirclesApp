@@ -1,12 +1,6 @@
-//
-//  SharedBuysSession+Ingest.swift
-//  CiRCLES
-//
-
 import CryptoKit
 import Foundation
 
-/// Taking records in from either transport: verify, open, and append what is new.
 @MainActor
 public extension SharedBuysSession {
 

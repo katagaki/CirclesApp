@@ -1,8 +1,3 @@
-//
-//  SharedBuysLiveActivity.swift
-//  SharedBuysWidget
-//
-
 import ActivityKit
 import ORBiT
 import SwiftUI

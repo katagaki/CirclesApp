@@ -1,8 +1,3 @@
-//
-//  SharedBuysCrypto.swift
-//  CiRCLES
-//
-
 import CryptoKit
 import Foundation
 

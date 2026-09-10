@@ -1,8 +1,3 @@
-//
-//  SharedBuysSession+SelfTest.swift
-//  CiRCLES
-//
-
 import CryptoKit
 import Foundation
 

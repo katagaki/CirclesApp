@@ -1,8 +1,3 @@
-//
-//  GuestMyView.swift
-//  CiRCLES
-//
-
 import ORBiT
 import PhotosUI
 import SwiftUI

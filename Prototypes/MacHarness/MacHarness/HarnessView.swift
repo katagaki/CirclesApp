@@ -1,8 +1,3 @@
-//
-//  HarnessView.swift
-//  MacHarness
-//
-
 import SwiftUI
 
 struct HarnessView: View {

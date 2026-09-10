@@ -1,10 +1,3 @@
-//
-//  UnifiedMoreMenu.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/02.
-//
-
 import SwiftUI
 
 private let navigateMapsJPURL = "maps://?saddr=現在地&daddr=東京ビッグサイト"
@@ -31,20 +24,16 @@ struct UnifiedMoreMenu: View {
     @Environment(Unifier.self) var unifier
     @Environment(BackupManager.self) var backupManager
 
-    // Map Settings
-
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
     @AppStorage(wrappedValue: .none, "Map.ScrollType") var scrollType: MapAutoScrollType
 
-    // Circle Display Settings
     @AppStorage(wrappedValue: true, "Customization.ShowSpaceName") var showSpaceName: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
     @AppStorage(wrappedValue: true, "Customization.DoubleTapToVisit") var isDoubleTapToVisitEnabled: Bool
 
-    // Others
     @AppStorage(wrappedValue: false, "PrivacyMode.On") var isPrivacyModeOn: Bool
 
     var body: some View {

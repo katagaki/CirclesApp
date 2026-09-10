@@ -1,10 +1,3 @@
-//
-//  MyProfileSection.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/07.
-//
-
 import PhotosUI
 import SwiftUI
 import RADiUS

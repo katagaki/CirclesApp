@@ -1,10 +1,3 @@
-//
-//  OnHandPayloadBuilder.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/08/19.
-//
-
 import Foundation
 import AXiS
 import RADiUS

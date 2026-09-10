@@ -1,10 +1,3 @@
-//
-//  OpenIDToken.swift
-//  RADiUS
-//
-//  Created by シン・ジャスティン on 2024/07/14.
-//
-
 public struct OpenIDToken: Codable, Equatable, Sendable {
     public let accessToken: String
     public let tokenType: String

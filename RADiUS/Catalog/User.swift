@@ -1,10 +1,3 @@
-//
-//  User.swift
-//  RADiUS
-//
-//  Created by シン・ジャスティン on 2024/07/15.
-//
-
 import Foundation
 
 public class User {

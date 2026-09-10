@@ -1,10 +1,3 @@
-//
-//  MapView+Functions.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/08.
-//
-
 import SwiftUI
 import AXiS
 
@@ -86,7 +79,6 @@ extension MapView {
                 inMap: mapID,
                 useHighResolutionMaps: useHighResolutionMaps
             )
-            // Create Layout Mapping <> Web Catalog ID mapping data
             if layoutCatalogMappings.count > 0 {
                 layoutWebCatalogIDMappings = await actor.layoutCatalogMappingToWebCatalogIDs(
                     forMappings: layoutCatalogMappings, on: selectedDate
@@ -94,7 +86,6 @@ extension MapView {
             }
         }
 
-        // Send results back to the view
         await MainActor.run {
             withAnimation(.smooth.speed(2.0)) {
                 mapper.layouts = layoutWebCatalogIDMappings

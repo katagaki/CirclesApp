@@ -1,10 +1,3 @@
-//
-//  MapVisitedLayer.swift
-//  CiRCLES
-//
-//  Created by Antigravity on 2026/02/01.
-//
-
 import SwiftData
 import SwiftUI
 import AXiS
@@ -106,7 +99,6 @@ struct MapVisitedLayer: View {
         let rectHeight: CGFloat
         let castSpaceSize = CGFloat(spaceSize)
 
-        // Determine dimensions
         switch layout.layoutType {
         case .aOnLeft, .aOnRight, .unknown:
             rectWidth = castSpaceSize / CGFloat(total)
@@ -130,13 +122,11 @@ struct MapVisitedLayer: View {
     func checkmarkPath(in rect: CGRect) -> Path {
         var path = Path()
 
-        // Square to center checkmark        
         let sideLength = min(rect.width, rect.height)
         let xOffset = rect.minX + (rect.width - sideLength) / 2
         let yOffset = rect.minY + (rect.height - sideLength) / 2
         let square = CGRect(x: xOffset, y: yOffset, width: sideLength, height: sideLength)
 
-        // Checkmark
         let start = CGPoint(x: square.minX + square.width * 0.20, y: square.minY + square.height * 0.50)
         let mid = CGPoint(x: square.minX + square.width * 0.45, y: square.minY + square.height * 0.80)
         let end = CGPoint(x: square.minX + square.width * 0.80, y: square.minY + square.height * 0.20)

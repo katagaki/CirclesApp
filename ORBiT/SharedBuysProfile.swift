@@ -1,8 +1,3 @@
-//
-//  SharedBuysProfile.swift
-//  CiRCLES
-//
-
 import CoreBluetooth
 import Foundation
 

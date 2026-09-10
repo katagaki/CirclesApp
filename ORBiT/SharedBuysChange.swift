@@ -1,8 +1,3 @@
-//
-//  SharedBuysChange.swift
-//  CiRCLES
-//
-
 import Foundation
 
 public enum SharedBuyKind: Int, Codable, Sendable {

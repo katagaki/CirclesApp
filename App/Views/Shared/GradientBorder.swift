@@ -1,10 +1,3 @@
-//
-//  GradientBorder.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/11/18.
-//
-
 import SwiftUI
 
 // swiftlint:disable identifier_name line_length

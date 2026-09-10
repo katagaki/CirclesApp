@@ -1,8 +1,3 @@
-//
-//  SharedBuysRelay.swift
-//  CiRCLES
-//
-
 import CryptoKit
 import Foundation
 

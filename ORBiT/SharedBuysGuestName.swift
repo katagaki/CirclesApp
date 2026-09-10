@@ -1,8 +1,3 @@
-//
-//  SharedBuysGuestName.swift
-//  CiRCLES
-//
-
 import Foundation
 
 /// The display name a guest is given on the way into a room.

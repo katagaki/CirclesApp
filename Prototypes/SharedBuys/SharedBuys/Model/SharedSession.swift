@@ -1,8 +1,3 @@
-//
-//  SharedSession.swift
-//  SharedBuys
-//
-
 import Foundation
 
 struct Member: Identifiable, Hashable, Sendable {

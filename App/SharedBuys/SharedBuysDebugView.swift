@@ -1,8 +1,3 @@
-//
-//  SharedBuysDebugView.swift
-//  CiRCLES
-//
-
 import CoreImage.CIFilterBuiltins
 import ORBiT
 import SwiftUI

@@ -1,8 +1,3 @@
-//
-//  LiveActivityPreview.swift
-//  SharedBuys
-//
-
 import SwiftUI
 
 struct LiveActivityPreview: View {

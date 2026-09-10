@@ -1,8 +1,3 @@
-//
-//  SharedItemRow.swift
-//  SharedBuys
-//
-
 import SwiftUI
 
 struct SharedItemRow: View {

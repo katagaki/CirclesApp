@@ -35,7 +35,6 @@ class Unifier {
         self.displayMode = UIDevice.current.userInterfaceIdiom == .phone ? .sheet : .panel
     }
 
-    // Currently displayed sheet's data representation
     var current: UnifiedPath? = .circles
     var selectedDetent: PresentationDetent = .height(360)
     var isMinimized: Bool {
@@ -59,10 +58,8 @@ class Unifier {
         }
     }
 
-    // Bottom navigation stack's view path
     var stackPath: [UnifiedPath] = []
 
-    // Sheet's navigation stack's view path
     var sheetPath: [UnifiedPath] = []
 
     // Other sheets
@@ -73,19 +70,15 @@ class Unifier {
     var presentedControlMenu: UnifiedControlMenu?
     var controlFrame: CGRect = .zero
 
-    // Pending attachment from action extension
     var pendingAttachmentData: Data?
 
-    // Alerts
     var isGoingToSignOut: Bool = false
     var isGoingToEnterOfflineMode: Bool = false
     var isGoingToExitOfflineMode: Bool = false
     var isOfflineModeTipShowing: Bool = false
 
-    // Quick access bar search request
     var isSearchRequested: Bool = false
 
-    // Data update trigger
     var shouldUpdateData: Bool = false
 
     var animatesReload: Bool = true

@@ -1,8 +1,3 @@
-//
-//  SharedBuysWire.swift
-//  CiRCLES
-//
-
 import Foundation
 
 /// The binary frame both apps speak over Bluetooth.

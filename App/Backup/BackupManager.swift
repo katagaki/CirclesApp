@@ -1,10 +1,3 @@
-//
-//  BackupManager.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/08/20.
-//
-
 import Foundation
 import SwiftUI
 
@@ -57,11 +50,9 @@ final class BackupManager {
     var lastBackupDate: Date?
     var lastBackupFailed: Bool = false
 
-    /// PID a restorable backup was found for, which drives the restore prompt.
     var restorablePID: Int?
     var isRestorePromptShowing: Bool = false
 
-    /// Sizes shown on the backup screen, and what the backup in iCloud Drive says about itself.
     var contents: BackupContents?
     var remoteSnapshot: BackupSnapshot?
 
@@ -90,8 +81,6 @@ final class BackupManager {
         UserDefaults.standard.set(true, forKey: restoreCheckKey(for: pid))
     }
 
-    /// Called once the signed in user's PID is known. Offers a restore when this install has
-    /// never looked for one and a folder for the PID exists.
     func prepare(pid: Int) async {
         self.pid = pid
         let store = BackupStore.shared
@@ -114,7 +103,6 @@ final class BackupManager {
         isRestorePromptShowing = true
     }
 
-    /// Fills in the sizes and the iCloud state the backup screen shows.
     func loadDetails() async {
         let settings = settingsData()
         let profilePicture = UserDefaults.standard.data(forKey: Self.profilePictureKey)

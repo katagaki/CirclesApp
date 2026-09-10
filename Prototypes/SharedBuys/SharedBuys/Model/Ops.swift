@@ -1,8 +1,3 @@
-//
-//  Ops.swift
-//  SharedBuys
-//
-
 import Foundation
 
 enum SharedBuyStatus: Int, Codable, Sendable, CaseIterable {

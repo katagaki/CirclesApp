@@ -1,14 +1,5 @@
-//
-//  SharedBuysSession+Transport.swift
-//  CiRCLES
-//
-
 import Foundation
 
-/// The two ways a change leaves this device: the relay, and a peer over Bluetooth.
-///
-/// Both paths carry the same sealed records, so they are kept together and away from the
-/// session's own bookkeeping.
 @MainActor
 public extension SharedBuysSession {
 

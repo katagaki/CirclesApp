@@ -1,10 +1,3 @@
-//
-//  BuysView.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/03/24.
-//
-
 import AXiS
 import ORBiT
 import SwiftUI
@@ -229,9 +222,6 @@ struct BuysView: View {
                             SharedBuyItemRow(item: item) { assignmentTarget = item }
                         }
                     } header: {
-                        // The catalog is authoritative and current; the log is what a
-                        // member without one has. Falling back to it is what keeps a
-                        // guest's headers readable instead of "Unknown circle 12345".
                         if let circle = circles.first(where: { $0.id == circleID }) {
                             SharedBuyCircleHeader(
                                 name: circle.circleName,
@@ -337,7 +327,6 @@ struct ExpandedBuyImage: Identifiable {
     let image: UIImage
 }
 
-/// A shared-list section header, from whichever source could describe the circle.
 struct SharedBuyCircleHeader: View {
 
     let name: String

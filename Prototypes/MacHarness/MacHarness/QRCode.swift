@@ -1,14 +1,8 @@
-//
-//  QRCode.swift
-//  MacHarness
-//
-
 import CoreImage.CIFilterBuiltins
 import SwiftUI
 
 enum QRCode {
 
-    /// The join link as something a phone can read off the screen.
     static func image(for text: String, side: CGFloat) -> Image? {
         let filter = CIFilter.qrCodeGenerator()
         filter.message = Data(text.utf8)

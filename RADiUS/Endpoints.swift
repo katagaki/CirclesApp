@@ -1,10 +1,3 @@
-//
-//  Endpoints.swift
-//  RADiUS
-//
-//  Created by シン・ジャスティン on 2024/07/06.
-//
-
 import Foundation
 
 #if DEBUG

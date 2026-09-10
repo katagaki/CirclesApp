@@ -1,10 +1,3 @@
-//
-//  MyView.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/06.
-//
-
 import SwiftData
 import SwiftUI
 import RADiUS

@@ -1,10 +1,3 @@
-//
-//  App.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/06/18.
-//
-
 import AXiS
 import BackgroundTasks
 import Komponents

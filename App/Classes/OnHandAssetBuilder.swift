@@ -1,10 +1,3 @@
-//
-//  OnHandAssetBuilder.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/08/25.
-//
-
 import CoreGraphics
 import Foundation
 import UIKit

@@ -1,8 +1,3 @@
-//
-//  SharedBuysStore.swift
-//  CiRCLES
-//
-
 import Foundation
 
 struct SharedBuysSnapshot: Codable {

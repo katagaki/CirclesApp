@@ -1,8 +1,3 @@
-//
-//  SharedBuysSession+Totals.swift
-//  CiRCLES
-//
-
 import Foundation
 
 @MainActor

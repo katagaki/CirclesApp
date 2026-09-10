@@ -1,10 +1,3 @@
-//
-//  CircleDetailBuysSection.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/03/24.
-//
-
 import AXiS
 import ORBiT
 import SwiftUI
@@ -95,7 +88,6 @@ struct CircleDetailBuysSection: View {
             reloadEntry()
         }
         .onChange(of: buysCropImage) {
-            // When crop image is cleared after a crop completes, reload
             if buysCropImage == nil && buysCropItemID == nil {
                 reloadEntry()
             }
