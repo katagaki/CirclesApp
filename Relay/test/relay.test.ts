@@ -19,6 +19,17 @@ function stub(room: string): DurableObjectStub<Room> {
   return env.ROOM.get(env.ROOM.idFromName(room));
 }
 
+async function stored(room: string, device: string, seq: number): Promise<void> {
+  for (let attempt = 0; attempt < 150; attempt++) {
+    const arrived = await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) =>
+      state.storage.sql.exec("SELECT 1 FROM ops WHERE device = ? AND seq = ? LIMIT 1", device, seq).toArray().length > 0,
+    );
+    if (arrived) return;
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  throw new Error(`the relay never stored ${device}/${seq}`);
+}
+
 describe("routing", () => {
   it("serves health and rejects everything else", async () => {
     expect((await SELF.fetch("https://relay.test/health")).status).toBe(200);
@@ -224,7 +235,7 @@ describe("limits", () => {
       a.send({ t: "ops", o: ops });
     }
     a.send({ t: "ops", o: [await record(key, "aaaaaaaa", seq, "overflow")] });
-    await new Promise((resolve) => setTimeout(resolve, 50));
+    await stored(room, "aaaaaaaa", seq);
 
     expect(a.closed).toBeNull();
     await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) => {
