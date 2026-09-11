@@ -160,6 +160,10 @@ public final class SharedBuysSession {
     }
 
     public func start(eventNumber: Int, nickname: String) {
+        // Starting a second room is leaving the first, exactly as joining one is: the
+        // relay connection, the Bluetooth advertiser and the Live Activity all belong to
+        // the room being replaced, and only `leave()` can still reach them.
+        if isActive { leave() }
         sessionKey = SharedBuysCrypto.newSessionKey()
         deviceID = SharedBuysCrypto.newDeviceID()
         self.eventNumber = eventNumber
@@ -180,10 +184,11 @@ public final class SharedBuysSession {
             return
         }
         let event = Int(components.queryItems?.first(where: { $0.name == "e" })?.value ?? "") ?? 0
-        // Joining a second room is leaving the first. Without this the previous room's
-        // Live Activity survived — `startActivity()` bails while one exists — and went on
-        // showing the new room's items under the old room's identity. `adoptActivity()`
-        // catches what got away; this keeps it from getting away in the first place.
+        // Joining a second room is leaving the first, as in `start()`. Without this the
+        // previous room's Live Activity survived — `startActivity()` bails while one
+        // exists — and went on showing the new room's items under the old room's
+        // identity. `adoptActivity()` catches what got away on the next launch; this
+        // keeps it from getting away in the first place.
         if isActive { leave() }
         sessionKey = key
         deviceID = SharedBuysCrypto.newDeviceID()
