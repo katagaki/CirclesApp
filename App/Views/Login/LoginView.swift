@@ -9,6 +9,8 @@ struct LoginView: View {
 
     @State var isOfflineModeConfirmationShowing: Bool = false
 
+    let fadeHeight: CGFloat = 44.0
+
     var body: some View {
         @Bindable var authenticator = authenticator
         ScrollView {
@@ -123,27 +125,26 @@ struct LoginView: View {
             }
             .padding()
             .padding(.top, 8.0)
-            // The scroll area deliberately bleeds under this stack, so lay down a
-            // scrim that fades in from the top to keep the buttons legible. The hall
-            // sits on top of the scrim rather than under it, so it stays visible.
+            // The scroll area deliberately bleeds under this stack, so scrim it with
+            // the page's own ground. The fade is held in the overhang above the stack
+            // so text dissolves before it reaches the buttons, and the hall is drawn
+            // over the scrim rather than under it, so it survives.
             .background(alignment: .bottom) {
                 ZStack(alignment: .bottom) {
                     Rectangle()
-                        .fill(.regularMaterial)
+                        .fill(.background)
                         .mask {
-                            // A fixed fade, not a proportional one: the stack grows a
-                            // button taller when offline mode is offered, and a
-                            // percentage would drag the soft edge down over the text.
                             VStack(spacing: 0.0) {
                                 LinearGradient(
                                     colors: [.clear, .black],
                                     startPoint: .top,
                                     endPoint: .bottom
                                 )
-                                .frame(height: 20.0)
+                                .frame(height: fadeHeight)
                                 Rectangle()
                             }
                         }
+                        .padding(.top, -fadeHeight)
                         .ignoresSafeArea(edges: .bottom)
                     Image("TokyoBigSight")
                         .resizable()
