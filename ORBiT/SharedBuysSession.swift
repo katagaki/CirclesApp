@@ -67,6 +67,7 @@ public final class SharedBuysSession {
     private var reconnectTask: Task<Void, Never>?
     var outbox: [RelayRecord] = []
     var flushTask: Task<Void, Never>?
+    private var relayTask: Task<Void, Never>?
     public var activity: Any?
     let relay = SharedBuysRelay()
     let bluetooth = SharedBuysBluetooth()
@@ -231,13 +232,30 @@ public final class SharedBuysSession {
         outbox = []
         bluetooth.stop()
         bluetoothPeers = 0
-        Task { await relay.disconnect() }
+        serializeRelay { [relay] in await relay.disconnect() }
         sessionKey = nil
         changes = []
         lastSeq = 0
         status = .idle
         SharedBuysStore.clear()
         note("left session")
+    }
+
+    /// Runs relay lifecycle work in the order it was issued.
+    ///
+    /// `connect()` and `disconnect()` are called from synchronous main-actor code, so
+    /// each reached the actor as its own unstructured task and the two could land in
+    /// either order. Leaving a room and entering another in the same turn — `start()`,
+    /// `join()` — could therefore hand the new room's socket to the old room's
+    /// disconnect, leaving the session `.connecting` against a task that is already nil.
+    /// Chaining each call onto the previous one is the await the call sites cannot do
+    /// themselves without becoming async all the way up into the views.
+    private func serializeRelay(_ work: @escaping @Sendable () async -> Void) {
+        let previous = relayTask
+        relayTask = Task {
+            await previous?.value
+            await work()
+        }
     }
 
     public func connect() {
@@ -248,7 +266,7 @@ public final class SharedBuysSession {
         let base = relayBaseURL
         let device = deviceID
         let vector = versionVector
-        Task {
+        serializeRelay { [relay, weak self] in
             await relay.connect(
                 SharedBuysRelay.Endpoint(
                     baseURL: base,
@@ -257,7 +275,7 @@ public final class SharedBuysSession {
                     sessionKey: sessionKey,
                     vector: vector
                 )
-            ) { [weak self] event in
+            ) { event in
                 Task { @MainActor in self?.handle(event) }
             }
         }
