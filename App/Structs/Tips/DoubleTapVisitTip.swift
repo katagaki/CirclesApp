@@ -1,10 +1,3 @@
-//
-//  DoubleTapVisitTip.swift
-//  CiRCLES
-//
-//  Created by Antigravity on 2026/02/01.
-//
-
 import Foundation
 import TipKit
 

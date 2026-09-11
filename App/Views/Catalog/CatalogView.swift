@@ -1,10 +1,3 @@
-//
-//  CatalogView.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/07/21.
-//
-
 import SwiftData
 import SwiftUI
 import AXiS
@@ -19,11 +12,9 @@ struct CatalogView: View {
     @Environment(Unifier.self) var unifier
     @Environment(Events.self) var planner
 
-    // Search
     @State var isSearchActive: Bool = false
     @State var searchTerm: String = ""
 
-    // Display
     @AppStorage(wrappedValue: .grid, "Circles.DisplayMode") var displayMode: CircleDisplayMode
     @AppStorage(wrappedValue: .regular, "Circles.ListSize") var listDisplayMode: ListDisplayMode
     @AppStorage(wrappedValue: .medium, "Circles.GridSize") var gridDisplayMode: GridDisplayMode

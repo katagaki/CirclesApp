@@ -1,10 +1,3 @@
-//
-//  SceneDelegate.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/06/20.
-//
-
 import UIKit
 
 class SceneDelegate: NSObject, UIWindowSceneDelegate {

@@ -1,15 +1,9 @@
-//
-//  App.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/06/18.
-//
-
+import AXiS
 import BackgroundTasks
 import Komponents
-import SwiftUI
+import ORBiT
 import SwiftData
-import AXiS
+import SwiftUI
 
 @main
 struct CirclesApp: App {
@@ -31,57 +25,45 @@ struct CirclesApp: App {
     @State var mapper = Mapper()
     @State var unifier = Unifier()
     @State var backupManager = BackupManager()
+    @State var sharedBuys = SharedBuysSession()
 
     @State var hasAppLaunchedForTheFirstTime: Bool = false
 
     var body: some Scene {
         WindowGroup {
-            UnifiedView()
-                .overlay {
-                    if authenticator.effectiveOnlineState == .offline {
-                        ZStack(alignment: .top) {
-                            Color.clear
-                            LinearGradient(
-                                colors: [.pink.opacity(0.3), .clear],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                            .frame(height: 24.0)
-                            .frame(maxWidth: .infinity)
-                            .ignoresSafeArea()
-                            .transition(.move(edge: .top).animation(.smooth.speed(2.0)))
-                        }
-                    }
+            // Guest Mode is a different app, not a mode of this one: no catalog, so no
+            // map, no browsing and no favourites. Chosen before UnifiedView is built so
+            // the login sheet it carries never gets a chance to appear over the top.
+            Group {
+                // A guest shell with the feature switched off is an empty app: send them
+                // back to login rather than to a room they cannot reach. Guest Mode is
+                // left set, so flipping the switch on returns them to it.
+                if sharedBuys.isGuest && sharedBuys.isFeatureEnabled {
+                    GuestView()
+                } else {
+                    unifiedShell()
                 }
-                .progressAlert(
-                    isModal: .constant(true),
-                    isShowing: $oasis.isShowing,
-                    headerText: $oasis.headerText,
-                    bodyText: $oasis.bodyText,
-                    progress: $oasis.progress
+            }
+            .onAppear {
+                orientation.update()
+                sharedBuys.restore()
+            }
+            // The relay address is not compiled in, so `restore()` holds its connect until
+            // this lands. Outside the shell branch above so a guest — who has no
+            // `UnifiedView` and no login — is configured too.
+            .task {
+                let config = await RemoteConfigProvider().fetchRelayConfig()
+                sharedBuys.applyRelayConfig(
+                    baseURL: config?.baseURL,
+                    isFeatureEnabled: config?.isFeatureEnabled ?? true
                 )
-                .sheet(isPresented: Binding(
-                    get: { unifier.pendingAttachmentData != nil },
-                    set: { if !$0 { unifier.pendingAttachmentData = nil } }
-                )) {
-                    unifier.show()
-                } content: {
-                    if let data = unifier.pendingAttachmentData {
-                        AttachProductListView(imageData: data)
-                    }
+                if !sharedBuys.isFeatureEnabled && unifier.current == .buys {
+                    unifier.current = .circles
                 }
-                .onChange(of: unifier.pendingAttachmentData) { _, newValue in
-                    if newValue != nil {
-                        unifier.hide()
-                    }
-                }
-                .onAppear {
-                    orientation.update()
-                }
-                .onRotate { newOrientation in
-                    orientation.update(to: newOrientation)
-                }
-                .onHandLifecycle()
+            }
+            .onRotate { newOrientation in
+                orientation.update(to: newOrientation)
+            }
         }
         .modelContainer(sharedModelContainer)
         .environment(orientation)
@@ -98,6 +80,7 @@ struct CirclesApp: App {
         .environment(mapper)
         .environment(unifier)
         .environment(backupManager)
+        .environment(sharedBuys)
         .onChange(of: scenePhase) { _, newValue in
             if !hasAppLaunchedForTheFirstTime {
                 hasAppLaunchedForTheFirstTime = true
@@ -149,5 +132,49 @@ struct CirclesApp: App {
         )
         #endif
         try? BGTaskScheduler.shared.submit(request)
+    }
+
+    @ViewBuilder
+    func unifiedShell() -> some View {
+        UnifiedView()
+            .overlay {
+                if authenticator.effectiveOnlineState == .offline {
+                    ZStack(alignment: .top) {
+                        Color.clear
+                        LinearGradient(
+                            colors: [.pink.opacity(0.3), .clear],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        .frame(height: 24.0)
+                        .frame(maxWidth: .infinity)
+                        .ignoresSafeArea()
+                        .transition(.move(edge: .top).animation(.smooth.speed(2.0)))
+                    }
+                }
+            }
+            .progressAlert(
+                isModal: .constant(true),
+                isShowing: $oasis.isShowing,
+                headerText: $oasis.headerText,
+                bodyText: $oasis.bodyText,
+                progress: $oasis.progress
+            )
+            .sheet(isPresented: Binding(
+                get: { unifier.pendingAttachmentData != nil },
+                set: { if !$0 { unifier.pendingAttachmentData = nil } }
+            )) {
+                unifier.show()
+            } content: {
+                if let data = unifier.pendingAttachmentData {
+                    AttachProductListView(imageData: data)
+                }
+            }
+            .onChange(of: unifier.pendingAttachmentData) { _, newValue in
+                if newValue != nil {
+                    unifier.hide()
+                }
+            }
+            .onHandLifecycle()
     }
 }

@@ -1,10 +1,3 @@
-//
-//  Oasis.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/11/09.
-//
-
 import Foundation
 import SwiftUI
 

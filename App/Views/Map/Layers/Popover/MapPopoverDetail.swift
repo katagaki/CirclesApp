@@ -1,10 +1,3 @@
-//
-//  MapPopoverDetail.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/08/15.
-//
-
 import SwiftUI
 import TipKit
 import AXiS

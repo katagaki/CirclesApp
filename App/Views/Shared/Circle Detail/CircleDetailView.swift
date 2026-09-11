@@ -6,6 +6,7 @@ import Translation
 import UIKit
 import RADiUS
 import AXiS
+import ORBiT
 
 struct CircleDetailView: View {
 
@@ -15,6 +16,7 @@ struct CircleDetailView: View {
     @Environment(Events.self) var planner
     @Environment(Mapper.self) var mapper
     @Environment(Unifier.self) var unifier
+    @Environment(SharedBuysSession.self) var sharedBuys
 
     @State var circle: ComiketCircle
 
@@ -159,12 +161,10 @@ struct CircleDetailView: View {
         }
         .alert("Alerts.FirstCircle.Title", isPresented: $isFirstCircleAlertShowing) {
             Button("Shared.OK", role: .cancel) {
-                // Dismiss the alert; no additional action required.
             }
         }
         .alert("Alerts.LastCircle.Title", isPresented: $isLastCircleAlertShowing) {
             Button("Shared.OK", role: .cancel) {
-                // Dismiss the alert; no additional action required.
             }
         }
         .task {
@@ -232,13 +232,15 @@ struct CircleDetailView: View {
                 .popoverTip(AttachmentAndBuysTip())
             }
         case .buys:
-            CircleDetailBuysSection(
-                circle: circle,
-                buysAttachmentPickerCircle: $buysAttachmentPickerCircle,
-                buysCropImage: $buysCropImage,
-                buysCropItemID: $buysCropItemID,
-                buysViewerImage: $buysViewerImage
-            )
+            if sharedBuys.isFeatureEnabled {
+                CircleDetailBuysSection(
+                    circle: circle,
+                    buysAttachmentPickerCircle: $buysAttachmentPickerCircle,
+                    buysCropImage: $buysCropImage,
+                    buysCropItemID: $buysCropItemID,
+                    buysViewerImage: $buysViewerImage
+                )
+            }
         }
     }
 

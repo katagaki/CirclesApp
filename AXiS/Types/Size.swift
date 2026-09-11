@@ -1,10 +1,3 @@
-//
-//  Size.swift
-//  AXiS
-//
-//  Created by シン・ジャスティン on 2024/07/21.
-//
-
 import CoreGraphics
 
 public struct Size: Codable {

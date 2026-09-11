@@ -1,10 +1,3 @@
-//
-//  UserFavorites.swift
-//  RADiUS
-//
-//  Created by シン・ジャスティン on 2024/08/04.
-//
-
 // swiftlint:disable nesting
 public struct UserFavorites: Codable {
     public let status: String

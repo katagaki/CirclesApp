@@ -1,10 +1,3 @@
-//
-//  Authenticator+OfflineMode.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/07/22.
-//
-
 import Foundation
 import RADiUS
 

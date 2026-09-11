@@ -49,9 +49,17 @@
 			<string>Any</string>
 		</dict>
 	</dict>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>共有宝物リストを近くの端末と同期するために使用します。</string>
+	<key>NSCameraUsageDescription</key>
+	<string>共有宝物リストに参加するためのQRコードを読み取るために使用します。</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>bluetooth-central</string>
+		<string>bluetooth-peripheral</string>
 	</array>
 </dict>
 </plist>
