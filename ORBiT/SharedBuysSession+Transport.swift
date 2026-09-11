@@ -79,6 +79,34 @@ public extension SharedBuysSession {
         }
     }
 
+    /// Settles the relay address and the feature switch.
+    ///
+    /// A `nil` `baseURL` — the fetch failed, or the record carries no address — keeps
+    /// whatever `relayBaseURL` already holds rather than blocking the feature: offline
+    /// and local development both land here.
+    public func applyRelayConfig(baseURL: String?, isFeatureEnabled: Bool) {
+        self.isFeatureEnabled = isFeatureEnabled
+        if let baseURL, !baseURL.isEmpty {
+            relayBaseURL = baseURL
+        }
+        isRelayConfigured = true
+        if !isFeatureEnabled {
+            // The switch is off, so stop talking — but keep the log and the snapshot. A
+            // room that comes back when the switch flips on again is worth more than the
+            // few bytes reclaimed by clearing it.
+            note("shared buys disabled by remote configuration")
+            isConnectDeferred = false
+            stopBluetooth()
+            serializeRelay { [relay] in await relay.disconnect() }
+            status = .idle
+            return
+        }
+        if isConnectDeferred {
+            isConnectDeferred = false
+            connect()
+        }
+    }
+
     func startBluetooth() {
         guard isBluetoothEnabled, let sessionKey else { return }
         bluetooth.start(

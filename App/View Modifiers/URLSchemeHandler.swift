@@ -11,6 +11,13 @@ struct URLSchemeHandlerModifier: ViewModifier {
     func body(content: Content) -> some View {
         content
             .onOpenURL { url in
+                // Every buys-* link, the join link included, belongs to a feature that may
+                // be switched off; the rest of the schemes are unaffected.
+                if url.scheme == "circles-app", let host = url.host(),
+                   host.hasPrefix("buys-") || host == SharedBuysSession.joinHost,
+                   !sharedBuys.isFeatureEnabled {
+                    return
+                }
                 if url.scheme == "circles-app" && url.host() == "buys-selftest" {
                     sharedBuys.runSelfTest()
                     unifier.isSharedBuysDebugPresenting = true

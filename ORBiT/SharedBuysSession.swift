@@ -37,7 +37,25 @@ public final class SharedBuysSession {
 
     public var status: SharedBuysStatus = .idle
     public var log: [String] = []
-    public var relayBaseURL: String = "ws://127.0.0.1:8787"
+    /// The relay to dial.
+    ///
+    /// The compiled value is the local development relay; the address of the real one is
+    /// not in the binary. It is settled at launch by `applyRelayConfig(baseURL:isFeatureEnabled:)`,
+    /// and typing into the debug field counts as settling it too, so a hand-entered relay
+    /// works whether or not the fetch succeeded.
+    public var relayBaseURL: String = "ws://127.0.0.1:8787" {
+        didSet { if relayBaseURL != oldValue { isRelayConfigured = true } }
+    }
+
+    /// Whether Shared Buys is switched on for this build.
+    ///
+    /// Assumed on until the configuration says otherwise: a fetch that fails must leave a
+    /// room already in progress working, so only an explicit `featureEnabled` of 0 takes
+    /// the feature away.
+    public internal(set) var isFeatureEnabled: Bool = true
+
+    /// Whether the relay address has been settled, one way or another.
+    public internal(set) var isRelayConfigured: Bool = false
     public var actorPID: Int = 0
     public var nickname: String = ""
 
@@ -49,6 +67,8 @@ public final class SharedBuysSession {
     /// the room key, so a modified client could write anything the relay accepts — it
     /// is this app keeping to the role it advertised.
     public var isGuest: Bool = false
+
+    @ObservationIgnored internal var isConnectDeferred: Bool = false
 
     public private(set) var sessionKey: Data?
     public private(set) var deviceID: String = ""
@@ -250,7 +270,7 @@ public final class SharedBuysSession {
     /// disconnect, leaving the session `.connecting` against a task that is already nil.
     /// Chaining each call onto the previous one is the await the call sites cannot do
     /// themselves without becoming async all the way up into the views.
-    private func serializeRelay(_ work: @escaping @Sendable () async -> Void) {
+    internal func serializeRelay(_ work: @escaping @Sendable () async -> Void) {
         let previous = relayTask
         relayTask = Task {
             await previous?.value
@@ -259,7 +279,14 @@ public final class SharedBuysSession {
     }
 
     public func connect() {
+        guard isFeatureEnabled else { return }
         guard let sessionKey, let roomID else { return }
+        // A connect issued before the address is settled would dial the compiled
+        // development default. Hold it, and let `applyRelayConfig` issue it.
+        guard isRelayConfigured else {
+            isConnectDeferred = true
+            return
+        }
         reconnectTask?.cancel()
         reconnectTask = nil
         status = .connecting

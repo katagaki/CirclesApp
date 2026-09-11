@@ -97,18 +97,21 @@ struct LoginView: View {
                 .buttonStyle(.glassProminent)
                 // Someone who was handed a join code has no circle.ms account and no
                 // reason to make one; they are here to tick items off a friend's list.
-                Button {
-                    authenticator.isAuthenticating = false
-                    sharedBuys.enterGuestMode()
-                } label: {
-                    Text("Login.JoinAsGuest")
-                        .fontWeight(.bold)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 6.0)
+                // Guest Mode is Shared Buys and nothing else, so it goes with the feature.
+                if sharedBuys.isFeatureEnabled {
+                    Button {
+                        authenticator.isAuthenticating = false
+                        sharedBuys.enterGuestMode()
+                    } label: {
+                        Text("Login.JoinAsGuest")
+                            .fontWeight(.bold)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6.0)
+                    }
+                    .clipShape(.capsule)
+                    .tint(.accent)
+                    .buttonStyle(.glass)
                 }
-                .clipShape(.capsule)
-                .tint(.accent)
-                .buttonStyle(.glass)
                 if authenticator.canUseOfflineMode {
                     Button {
                         isOfflineModeConfirmationShowing = true

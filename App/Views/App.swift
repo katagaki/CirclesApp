@@ -35,7 +35,10 @@ struct CirclesApp: App {
             // map, no browsing and no favourites. Chosen before UnifiedView is built so
             // the login sheet it carries never gets a chance to appear over the top.
             Group {
-                if sharedBuys.isGuest {
+                // A guest shell with the feature switched off is an empty app: send them
+                // back to login rather than to a room they cannot reach. Guest Mode is
+                // left set, so flipping the switch on returns them to it.
+                if sharedBuys.isGuest && sharedBuys.isFeatureEnabled {
                     GuestView()
                 } else {
                     unifiedShell()
@@ -44,6 +47,19 @@ struct CirclesApp: App {
             .onAppear {
                 orientation.update()
                 sharedBuys.restore()
+            }
+            // The relay address is not compiled in, so `restore()` holds its connect until
+            // this lands. Outside the shell branch above so a guest — who has no
+            // `UnifiedView` and no login — is configured too.
+            .task {
+                let config = await RemoteConfigProvider().fetchRelayConfig()
+                sharedBuys.applyRelayConfig(
+                    baseURL: config?.baseURL,
+                    isFeatureEnabled: config?.isFeatureEnabled ?? true
+                )
+                if !sharedBuys.isFeatureEnabled && unifier.current == .buys {
+                    unifier.current = .circles
+                }
             }
             .onRotate { newOrientation in
                 orientation.update(to: newOrientation)
