@@ -87,7 +87,7 @@ public extension SharedBuysSession {
     public func applyRelayConfig(baseURL: String?, isFeatureEnabled: Bool) {
         self.isFeatureEnabled = isFeatureEnabled
         if let baseURL, !baseURL.isEmpty {
-            relayBaseURL = baseURL
+            relayBaseURL = Self.webSocketScheme(baseURL)
         }
         isRelayConfigured = true
         if !isFeatureEnabled {
@@ -105,6 +105,22 @@ public extension SharedBuysSession {
             isConnectDeferred = false
             connect()
         }
+    }
+
+    /// Rewrites an http(s) address to its WebSocket equivalent.
+    ///
+    /// The published address is written as a URL that can be pasted into a browser, and
+    /// `URLSessionWebSocketTask` wants ws/wss. Anything already ws/wss, and anything
+    /// unrecognised, is left exactly as it was given.
+    static func webSocketScheme(_ baseURL: String) -> String {
+        var rewritten = baseURL
+        if rewritten.hasPrefix("https://") {
+            rewritten = "wss://" + rewritten.dropFirst("https://".count)
+        } else if rewritten.hasPrefix("http://") {
+            rewritten = "ws://" + rewritten.dropFirst("http://".count)
+        }
+        while rewritten.hasSuffix("/") { rewritten.removeLast() }
+        return rewritten
     }
 
     func startBluetooth() {
