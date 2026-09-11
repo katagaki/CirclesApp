@@ -11,7 +11,7 @@ public extension SharedBuysSession {
         let next = pending.first
         return SharedBuysAttributes.ContentState(
             nextItemName: next?.name ?? "担当分はすべて完了しました",
-            nextItemDetail: next.map { "¥\($0.cost)" } ?? "",
+            nextItemDetail: next.map { "¥\($0.cost.formatted(.number))" } ?? "",
             boughtCount: mine.filter { $0.status == .bought }.count,
             assignedCount: mine.count,
             memberInitials: members.values.sorted().map { String($0.prefix(1)) }
