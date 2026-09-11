@@ -142,7 +142,12 @@ public final class SharedBuysSession {
 
     public func restore() {
         adoptIdentity()
-        guard let snapshot = SharedBuysStore.load() else { return }
+        guard let snapshot = SharedBuysStore.load() else {
+            // No room to come back to, so anything still on the Lock Screen belongs to a
+            // session that is gone. Nothing else can reach it.
+            adoptActivity()
+            return
+        }
         sessionKey = snapshot.sessionKey
         deviceID = snapshot.deviceID
         eventNumber = snapshot.eventNumber
@@ -165,7 +170,6 @@ public final class SharedBuysSession {
         note("started room \(roomID ?? "?") as \(deviceID)")
         connect()
         startBluetooth()
-        startActivity()
     }
 
     public func join(url: URL, nickname: String) {
@@ -178,7 +182,8 @@ public final class SharedBuysSession {
         let event = Int(components.queryItems?.first(where: { $0.name == "e" })?.value ?? "") ?? 0
         // Joining a second room is leaving the first. Without this the previous room's
         // Live Activity survived — `startActivity()` bails while one exists — and went on
-        // showing the new room's items under the old room's identity.
+        // showing the new room's items under the old room's identity. `adoptActivity()`
+        // catches what got away; this keeps it from getting away in the first place.
         if isActive { leave() }
         sessionKey = key
         deviceID = SharedBuysCrypto.newDeviceID()
@@ -190,7 +195,6 @@ public final class SharedBuysSession {
         note("joined room \(roomID ?? "?") as \(deviceID)")
         connect()
         startBluetooth()
-        startActivity()
     }
 
     /// Enters Guest Mode. Survives relaunch, so the app comes back into the guest shell

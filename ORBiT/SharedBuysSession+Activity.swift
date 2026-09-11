@@ -30,19 +30,40 @@ public extension SharedBuysSession {
         activity as? Activity<SharedBuysAttributes>
     }
 
+    /// Re-attaches to an activity that outlived the process, and ends any that no longer
+    /// belongs to this session.
+    ///
+    /// An activity is addressable only through the in-memory `activity` handle, so one
+    /// left over from a room joined on a previous launch — or from a session the app no
+    /// longer holds a snapshot of — can never be reached by `endActivity()`. This is the
+    /// only place the Lock Screen is reconciled against the session from scratch, so it
+    /// runs on every restore, including the one that finds no room to come back to.
     public func adoptActivity() {
-        guard activity == nil, isActive else { return }
-        guard let existing = Activity<SharedBuysAttributes>.activities
-            .first(where: { $0.attributes.roomID == roomID }) else {
-            startActivity()
-            return
+        let strays = Activity<SharedBuysAttributes>.activities
+            .filter { $0.attributes.roomID != roomID }
+            .map(\.id)
+        for stray in strays {
+            note("stray live activity ended")
+            Task { await Self.finish(stray) }
         }
-        activity = existing
-        note("live activity adopted")
+        if activity == nil, let roomID,
+           let existing = Activity<SharedBuysAttributes>.activities
+            .first(where: { $0.attributes.roomID == roomID }) {
+            activity = existing
+            note("live activity adopted")
+        }
         updateActivity()
     }
 
+    /// Starts an activity, but only for a session that has something to put in it.
+    ///
+    /// Entering a room is not the trigger: a room is created and joined empty, and the
+    /// list is shared per member, so a room full of someone else's items warrants
+    /// nothing here either. `updateActivity()` calls this once the first item lands on
+    /// this member.
     public func startActivity() {
+        let state = activityState
+        guard isActive, state.assignedCount > 0 else { return }
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
             note("live activity not permitted")
             return
@@ -51,7 +72,7 @@ public extension SharedBuysSession {
         do {
             activity = try Activity.request(
                 attributes: SharedBuysAttributes(roomID: roomID),
-                content: ActivityContent(state: activityState, staleDate: nil)
+                content: ActivityContent(state: state, staleDate: nil)
             )
             note("live activity started")
         } catch {
@@ -59,14 +80,28 @@ public extension SharedBuysSession {
         }
     }
 
+    /// Reconciles the activity with the session: one exists exactly while this member is
+    /// carrying something. Called after every change, local or ingested, so the activity
+    /// appears with the first item assigned here and goes away with the last one —
+    /// unassigned, removed, or the whole room left.
     public func updateActivity() {
-        guard let identifier = liveActivity?.id else { return }
         let state = activityState
+        guard isActive, state.assignedCount > 0 else {
+            endActivity()
+            return
+        }
+        guard let identifier = liveActivity?.id else {
+            startActivity()
+            return
+        }
         Task { await Self.push(state, to: identifier) }
     }
 
     public func endActivity() {
-        guard let identifier = liveActivity?.id else { return }
+        guard let identifier = liveActivity?.id else {
+            activity = nil
+            return
+        }
         activity = nil
         Task { await Self.finish(identifier) }
         note("live activity ended")
