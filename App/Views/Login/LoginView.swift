@@ -131,14 +131,18 @@ struct LoginView: View {
                     Rectangle()
                         .fill(.regularMaterial)
                         .mask {
-                            LinearGradient(
-                                stops: [
-                                    .init(color: .clear, location: 0.0),
-                                    .init(color: .black, location: 0.22)
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
+                            // A fixed fade, not a proportional one: the stack grows a
+                            // button taller when offline mode is offered, and a
+                            // percentage would drag the soft edge down over the text.
+                            VStack(spacing: 0.0) {
+                                LinearGradient(
+                                    colors: [.clear, .black],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                                .frame(height: 20.0)
+                                Rectangle()
+                            }
                         }
                         .ignoresSafeArea(edges: .bottom)
                     Image("TokyoBigSight")
