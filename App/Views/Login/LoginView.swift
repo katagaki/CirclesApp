@@ -42,21 +42,12 @@ struct LoginView: View {
             .padding(18.0)
         }
         .background {
-            ZStack(alignment: .bottom) {
-                LinearGradient(
-                    colors: [.accent.opacity(0.12), .clear],
-                    startPoint: .top,
-                    endPoint: .center
-                )
-                .ignoresSafeArea()
-                Image("TokyoBigSight")
-                    .resizable()
-                    .scaledToFit()
-                    .tint(.accent)
-                    .opacity(0.07)
-                    .ignoresSafeArea(edges: .bottom)
-                    .offset(y: 50.0)
-            }
+            LinearGradient(
+                colors: [.accent.opacity(0.12), .clear],
+                startPoint: .top,
+                endPoint: .center
+            )
+            .ignoresSafeArea()
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             VStack(spacing: 12.0) {
@@ -131,6 +122,35 @@ struct LoginView: View {
                 }
             }
             .padding()
+            .padding(.top, 8.0)
+            // The scroll area deliberately bleeds under this stack, so lay down a
+            // scrim that fades in from the top to keep the buttons legible. The hall
+            // sits on top of the scrim rather than under it, so it stays visible.
+            .background(alignment: .bottom) {
+                ZStack(alignment: .bottom) {
+                    Rectangle()
+                        .fill(.regularMaterial)
+                        .mask {
+                            LinearGradient(
+                                stops: [
+                                    .init(color: .clear, location: 0.0),
+                                    .init(color: .black, location: 0.22)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        }
+                        .ignoresSafeArea(edges: .bottom)
+                    Image("TokyoBigSight")
+                        .resizable()
+                        .scaledToFit()
+                        .tint(.accent)
+                        .opacity(0.07)
+                        .ignoresSafeArea(edges: .bottom)
+                        .offset(y: 50.0)
+                }
+                .allowsHitTesting(false)
+            }
         }
         .alert("Alerts.OfflineMode.Enter.Title", isPresented: $isOfflineModeConfirmationShowing) {
             Button("Login.UseOffline") {
