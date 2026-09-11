@@ -54,7 +54,7 @@ struct SharedBuysScannerView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Shared.Cancel") { dismiss() }
+                    Button(role: .cancel) { dismiss() }
                 }
             }
         }
