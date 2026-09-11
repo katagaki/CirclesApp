@@ -340,14 +340,14 @@
 				E4065DC02DECA30200AB7E20 /* App */,
 				E489B5772F31607D00ED193F /* Swift Data */,
 				F1A0B00A2F31700000000001 /* Share Extension */,
+				0A11D0030000000000000003 /* OnHand */,
 				E41642F72F5D2F5200708895 /* RADiUS */,
 				E41643082F5D2F6200708895 /* AXiS */,
+				E9A543600FE4D4A1ADB7C1A6 /* ORBiT */,
 				0A11D0040000000000000004 /* Shared */,
-				0A11D0030000000000000003 /* OnHand */,
 				E4A769472C21A20A00BE3491 /* Products */,
 				68FE9EF059CC694F0BA4816F /* Frameworks */,
 				7FE5283FCFFC00325CFC9776 /* SharedBuysWidget */,
-				E9A543600FE4D4A1ADB7C1A6 /* ORBiT */,
 			);
 			sourceTree = "<group>";
 		};
@@ -679,24 +679,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		E480AA932C449C04009C1445 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint lint \"$SRCROOT/ORBiT\"\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
-		};
 		E480AA922C449C04009C1445 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -714,6 +696,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which periphery > /dev/null; then\n  periphery scan --format xcode --skip-build\nelse\n  echo \"warning: Periphery not installed, download from https://github.com/peripheryapp/periphery\"\nfi\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
+		};
+		E480AA932C449C04009C1445 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint lint \"$SRCROOT/ORBiT\"\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
