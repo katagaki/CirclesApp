@@ -3,6 +3,7 @@ import Foundation
 struct SharedBuysSnapshot: Codable {
     var sessionKey: Data
     var deviceID: String
+    var deviceAuthKey: Data?
     var eventNumber: Int
     var lastSeq: Int
     var changes: [SharedBuyChange]

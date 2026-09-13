@@ -27,6 +27,7 @@ actor SharedBuysRelay {
         var baseURL: String
         var roomID: String
         var deviceID: String
+        var deviceAuthKey: Data
         var sessionKey: Data
         var vector: [String: Int]
     }
@@ -103,12 +104,19 @@ actor SharedBuysRelay {
             timestamp: timestamp,
             relayAuthKey: relayAuthKey
         )
+        let deviceTag = SharedBuysCrypto.helloTag(
+            deviceID: endpoint.deviceID,
+            timestamp: timestamp,
+            relayAuthKey: SymmetricKey(data: endpoint.deviceAuthKey)
+        )
         var frame: [String: Any] = [
             "t": "hello",
             "d": endpoint.deviceID,
             "v": endpoint.vector,
             "ts": timestamp,
-            "a": tag.base64URL
+            "a": tag.base64URL,
+            "x": endpoint.deviceAuthKey.base64URL,
+            "da": deviceTag.base64URL
         ]
         if Self.allowsKeyUpload(endpoint.baseURL) {
             frame["k"] = relayAuthKey.withUnsafeBytes { Data($0) }.base64URL

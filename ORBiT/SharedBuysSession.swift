@@ -72,6 +72,7 @@ public final class SharedBuysSession {
 
     public private(set) var sessionKey: Data?
     public private(set) var deviceID: String = ""
+    private var deviceAuthKey: Data = SharedBuysCrypto.newDeviceAuthKey()
     public private(set) var eventNumber: Int = 0
     public internal(set) var changes: [SharedBuyChange] = [] {
         didSet { foldCache = nil }
@@ -171,6 +172,7 @@ public final class SharedBuysSession {
         }
         sessionKey = snapshot.sessionKey
         deviceID = snapshot.deviceID
+        deviceAuthKey = snapshot.deviceAuthKey ?? SharedBuysCrypto.newDeviceAuthKey()
         eventNumber = snapshot.eventNumber
         lastSeq = snapshot.lastSeq
         changes = snapshot.changes
@@ -187,6 +189,7 @@ public final class SharedBuysSession {
         if isActive { leave() }
         sessionKey = SharedBuysCrypto.newSessionKey()
         deviceID = SharedBuysCrypto.newDeviceID()
+        deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
         self.eventNumber = eventNumber
         lastSeq = 0
         changes = []
@@ -213,6 +216,7 @@ public final class SharedBuysSession {
         if isActive { leave() }
         sessionKey = key
         deviceID = SharedBuysCrypto.newDeviceID()
+        deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
         eventNumber = event
         lastSeq = 0
         changes = []
@@ -254,6 +258,7 @@ public final class SharedBuysSession {
         bluetoothPeers = 0
         serializeRelay { [relay] in await relay.disconnect() }
         sessionKey = nil
+        deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
         changes = []
         lastSeq = 0
         status = .idle
@@ -292,6 +297,7 @@ public final class SharedBuysSession {
         status = .connecting
         let base = relayBaseURL
         let device = deviceID
+        let deviceAuthKey = deviceAuthKey
         let vector = versionVector
         serializeRelay { [relay, weak self] in
             await relay.connect(
@@ -299,6 +305,7 @@ public final class SharedBuysSession {
                     baseURL: base,
                     roomID: roomID,
                     deviceID: device,
+                    deviceAuthKey: deviceAuthKey,
                     sessionKey: sessionKey,
                     vector: vector
                 )
@@ -474,6 +481,7 @@ public final class SharedBuysSession {
         let snapshot = SharedBuysSnapshot(
             sessionKey: sessionKey,
             deviceID: deviceID,
+            deviceAuthKey: deviceAuthKey,
             eventNumber: eventNumber,
             lastSeq: lastSeq,
             changes: changes

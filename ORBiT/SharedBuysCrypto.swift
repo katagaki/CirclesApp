@@ -22,6 +22,8 @@ enum SharedBuysCrypto {
         return bytes.map { String(format: "%02x", $0) }.joined()
     }
 
+    static func newDeviceAuthKey() -> Data { randomBytes(count: 32) }
+
     static func roomID(sessionKey: Data) -> String {
         let mac = HMAC<SHA256>.authenticationCode(
             for: Data(topicInfo.utf8),
