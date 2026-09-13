@@ -7,6 +7,8 @@ enum SharedBuysCrypto {
     static let opsInfo = "circles-buys/v1/ops"
     static let relayAuthInfo = "circles-buys/v1/relay-auth"
     static let tagLength = 16
+    static let nonceLength = 12
+    static let randomNonceMarker = Data([0x53, 0x42, 0x32, 0x00])
 
     static func newSessionKey() -> Data {
         var bytes = [UInt8](repeating: 0, count: 32)
@@ -60,12 +62,6 @@ enum SharedBuysCrypto {
         return Data(mac).prefix(2)
     }
 
-    static func nonce(deviceID: String, seq: Int) -> Data {
-        var value = Data(hex: deviceID) ?? Data(repeating: 0, count: 4)
-        value.append(bigEndian(UInt64(seq)))
-        return value
-    }
-
     static func associatedData(roomID: String, deviceID: String, seq: Int) -> Data {
         var value = Data(hex: roomID) ?? Data()
         value.append(Data(hex: deviceID) ?? Data())
@@ -78,15 +74,18 @@ enum SharedBuysCrypto {
         contentKey: SymmetricKey,
         roomID: String,
         deviceID: String,
-        seq: Int
+        seq: Int,
+        nonce suppliedNonce: Data? = nil
     ) throws -> Data {
+        let nonce = suppliedNonce ?? randomBytes(count: nonceLength)
+        guard nonce.count == nonceLength else { throw SharedBuysError.malformed }
         let box = try AES.GCM.seal(
             plaintext,
             using: contentKey,
-            nonce: AES.GCM.Nonce(data: nonce(deviceID: deviceID, seq: seq)),
+            nonce: AES.GCM.Nonce(data: nonce),
             authenticating: associatedData(roomID: roomID, deviceID: deviceID, seq: seq)
         )
-        return box.ciphertext + box.tag
+        return randomNonceMarker + nonce + box.ciphertext + box.tag
     }
 
     static func open(
@@ -96,17 +95,43 @@ enum SharedBuysCrypto {
         deviceID: String,
         seq: Int
     ) throws -> Data {
-        guard blob.count > 16 else { throw SharedBuysError.malformed }
+        guard blob.count > tagLength else { throw SharedBuysError.malformed }
+        let nonce: Data
+        let sealed: Data
+        if blob.starts(with: randomNonceMarker) {
+            let nonceStart = randomNonceMarker.count
+            let ciphertextStart = nonceStart + nonceLength
+            guard blob.count > ciphertextStart + tagLength else { throw SharedBuysError.malformed }
+            nonce = Data(blob[nonceStart..<ciphertextStart])
+            sealed = Data(blob.dropFirst(ciphertextStart))
+        } else {
+            // Existing rooms used device + sequence as the nonce. Retain read support so
+            // an upgrade can ingest their history, but never author another legacy blob.
+            nonce = legacyNonce(deviceID: deviceID, seq: seq)
+            sealed = blob
+        }
         let box = try AES.GCM.SealedBox(
-            nonce: AES.GCM.Nonce(data: nonce(deviceID: deviceID, seq: seq)),
-            ciphertext: blob.dropLast(16),
-            tag: blob.suffix(16)
+            nonce: AES.GCM.Nonce(data: nonce),
+            ciphertext: sealed.dropLast(tagLength),
+            tag: sealed.suffix(tagLength)
         )
         return try AES.GCM.open(
             box,
             using: contentKey,
             authenticating: associatedData(roomID: roomID, deviceID: deviceID, seq: seq)
         )
+    }
+
+    private static func legacyNonce(deviceID: String, seq: Int) -> Data {
+        var value = Data(hex: deviceID) ?? Data(repeating: 0, count: 4)
+        value.append(bigEndian(UInt64(seq)))
+        return value
+    }
+
+    private static func randomBytes(count: Int) -> Data {
+        var bytes = [UInt8](repeating: 0, count: count)
+        _ = SecRandomCopyBytes(kSecRandomDefault, count, &bytes)
+        return Data(bytes)
     }
 
     private static func bigEndian(_ value: UInt64) -> Data {

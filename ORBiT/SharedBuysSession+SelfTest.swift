@@ -3,12 +3,6 @@ import Foundation
 
 public extension SharedBuysSession {
 
-    /// The frame from the wire format note, byte for byte.
-    private static let testVector = "010101a1b2c3d4000000000000002a0040" +
-        "2ab0b4c6e69b2900dc6274a75e783cb336899016f440b24fcb8da6dfb640f662" +
-        "4e39050b00d0727ff8af49ad0b512d5b55fd21a0f1ce3cdbc148f01437111d57" +
-        "f5d63b17d693abf3217419adf1b582d2"
-
     func runSelfTest() {
         let vector = ["aaaaaaaa": 3, "bbbbbbbb": 1, "cafebabe": 260]
         let digest = SharedBuysDigest.data(of: vector).map { String(format: "%02x", $0) }.joined()
@@ -60,7 +54,8 @@ public extension SharedBuysSession {
             contentKey: contentKey,
             roomID: room,
             deviceID: "a1b2c3d4",
-            seq: 42
+            seq: 42,
+            nonce: Data(repeating: 0x11, count: SharedBuysCrypto.nonceLength)
         ) else {
             note("wire vector FAILED to seal")
             return
@@ -81,8 +76,15 @@ public extension SharedBuysSession {
             note("wire vector FAILED to encode")
             return
         }
-        let hex = frame.map { String(format: "%02x", $0) }.joined()
-        note("wire \(frame.count)B vector \(hex == Self.testVector ? "ok" : "FAILED")")
+        let marked = blob.starts(with: SharedBuysCrypto.randomNonceMarker)
+        let opened = try? SharedBuysCrypto.open(
+            blob,
+            contentKey: contentKey,
+            roomID: room,
+            deviceID: "a1b2c3d4",
+            seq: 42
+        )
+        note("wire \(frame.count)B nonce \(marked ? "ok" : "FAILED") crypto \(opened == plaintext ? "ok" : "FAILED")")
 
         var rebuilt = "FAILED"
         if case .changes(let records) = SharedBuysWire.decode(frame), let first = records.first {
