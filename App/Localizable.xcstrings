@@ -1102,7 +1102,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "共有リストに追加"
+            "value": "共同購入リストに追加"
           }
         },
         "ko": {
@@ -1269,7 +1269,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "共有リストのQRコードを読み取ると、リストの中身を見て、買えたものにチェックを付けられます。"
+            "value": "共同購入リストのQRコードを読み取ると、リストの中身を見て、買えたものにチェックを付けられます。"
           }
         },
         "en": {
@@ -1374,7 +1374,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "共有リストのQRコードを枠内に収めてください"
+            "value": "共同購入リストのQRコードを枠内に収めてください"
           }
         },
         "en": {
@@ -2208,7 +2208,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "この端末で共有を終了"
+            "value": "共同購入リストから退出"
           }
         },
         "ko": {
@@ -2243,7 +2243,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "自分の宝物リストは非公開のままです。共有リストは、参加者全員が見て編集できる別のリストです。"
+            "value": "自分の宝物リストは非公開のままです。共同購入リストは、参加者全員が見て編集できる別のリストです。"
           }
         },
         "ko": {
@@ -2313,7 +2313,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "共有リストに参加"
+            "value": "共同購入リストに参加"
           }
         },
         "ko": {
@@ -2418,7 +2418,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "共有リストに頒布品がありません"
+            "value": "共同購入リストに頒布品がありません"
           }
         },
         "ko": {
@@ -2488,7 +2488,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "共有リストがありません"
+            "value": "共同購入リストがありません"
           }
         },
         "ko": {
@@ -2593,7 +2593,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "このQRコードを読み取ると、共有リストに参加できます"
+            "value": "このQRコードを読み取ると、共同購入リストに参加できます"
           }
         },
         "ko": {
@@ -2628,7 +2628,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "共有リストを作成"
+            "value": "共同購入リストを作成"
           }
         },
         "ko": {
@@ -2663,7 +2663,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "共有リスト"
+            "value": "共同購入リスト"
           }
         },
         "ko": {
@@ -8564,7 +8564,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "この名前は自動で付けられたものです。共有リストの参加者にはこの名前で表示されます。"
+            "value": "この名前は自動で付けられたものです。共同購入リストの参加者にはこの名前で表示されます。"
           }
         },
         "en": {
