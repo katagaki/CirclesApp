@@ -1965,7 +1965,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "自分の宝物"
+            "value": "自分"
           }
         },
         "ko": {
@@ -2000,7 +2000,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "共有リスト"
+            "value": "共同購入"
           }
         },
         "ko": {
