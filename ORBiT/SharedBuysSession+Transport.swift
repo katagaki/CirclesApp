@@ -3,6 +3,8 @@ import Foundation
 @MainActor
 public extension SharedBuysSession {
 
+    private static var resendPageDelay: Duration { .milliseconds(600) }
+
     var isActive: Bool { sessionKey != nil }
 
     var roomID: String? {
@@ -64,6 +66,9 @@ public extension SharedBuysSession {
                 }
                 guard !records.isEmpty else { continue }
                 await self.relay.send(records: records)
+                if start + Self.recordsPerFrame < mine.count {
+                    try? await Task.sleep(for: Self.resendPageDelay)
+                }
             }
         }
     }
