@@ -3,6 +3,21 @@ import Foundation
 @MainActor
 public extension SharedBuysSession {
 
+    var isActive: Bool { sessionKey != nil }
+
+    var roomID: String? {
+        guard let sessionKey else { return nil }
+        return SharedBuysCrypto.roomID(sessionKey: sessionKey)
+    }
+
+    func applyPushToken(_ token: Data, environment: String) {
+        let encoded = token.map { String(format: "%02x", $0) }.joined()
+        guard pushToken != encoded || pushEnvironment != environment else { return }
+        pushToken = encoded
+        pushEnvironment = environment
+        if isActive { connect() }
+    }
+
     // MARK: Relay
 
     /// Holds a record briefly so a burst of edits leaves as one frame.

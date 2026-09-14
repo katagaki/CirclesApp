@@ -73,6 +73,8 @@ public final class SharedBuysSession {
     public private(set) var sessionKey: Data?
     public private(set) var deviceID: String = ""
     private var deviceAuthKey: Data = SharedBuysCrypto.newDeviceAuthKey()
+    var pushToken: String?
+    var pushEnvironment: String = "sandbox"
     public private(set) var eventNumber: Int = 0
     public internal(set) var changes: [SharedBuyChange] = [] {
         didSet { foldCache = nil }
@@ -96,13 +98,6 @@ public final class SharedBuysSession {
     public var bluetoothPeers: Int = 0
     public var bluetoothNote: String = ""
     public var isBluetoothEnabled: Bool = true
-
-    public var isActive: Bool { sessionKey != nil }
-
-    public var roomID: String? {
-        guard let sessionKey else { return nil }
-        return SharedBuysCrypto.roomID(sessionKey: sessionKey)
-    }
 
     public var items: [SharedBuyItem] { fold().items }
 
@@ -299,6 +294,8 @@ public final class SharedBuysSession {
         let device = deviceID
         let deviceAuthKey = deviceAuthKey
         let vector = versionVector
+        let pushToken = pushToken
+        let pushEnvironment = pushEnvironment
         serializeRelay { [relay, weak self] in
             await relay.connect(
                 SharedBuysRelay.Endpoint(
@@ -307,7 +304,9 @@ public final class SharedBuysSession {
                     deviceID: device,
                     deviceAuthKey: deviceAuthKey,
                     sessionKey: sessionKey,
-                    vector: vector
+                    vector: vector,
+                    pushToken: pushToken,
+                    pushEnvironment: pushEnvironment
                 )
             ) { event in
                 Task { @MainActor in self?.handle(event) }

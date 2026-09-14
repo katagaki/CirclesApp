@@ -47,6 +47,17 @@ struct CirclesApp: App {
             .onAppear {
                 orientation.update()
                 sharedBuys.restore()
+                appDelegate.onSharedBuysEvent = { token in
+                    if let token {
+                        sharedBuys.applyPushToken(token, environment: Self.pushEnvironment)
+                    } else {
+                        sharedBuys.connect()
+                        sharedBuys.startBluetooth()
+                    }
+                }
+                if let token = appDelegate.sharedBuysPushToken {
+                    sharedBuys.applyPushToken(token, environment: Self.pushEnvironment)
+                }
             }
             // The relay address is not compiled in, so `restore()` holds its connect until
             // this lands. Outside the shell branch above so a guest — who has no
@@ -119,6 +130,14 @@ struct CirclesApp: App {
             await authenticator.refreshAuthenticationTokenInBackground()
             await registerBackgroundRefreshTask()
         }
+    }
+
+    private static var pushEnvironment: String {
+        #if DEBUG
+        "sandbox"
+        #else
+        "production"
+        #endif
     }
 
     func registerBackgroundRefreshTask() {

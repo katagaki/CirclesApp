@@ -30,6 +30,8 @@ actor SharedBuysRelay {
         var deviceAuthKey: Data
         var sessionKey: Data
         var vector: [String: Int]
+        var pushToken: String?
+        var pushEnvironment: String
     }
 
     func connect(_ endpoint: Endpoint, onEvent: @escaping @Sendable (RelayEvent) -> Void) {
@@ -120,6 +122,9 @@ actor SharedBuysRelay {
         ]
         if Self.allowsKeyUpload(endpoint.baseURL) {
             frame["k"] = relayAuthKey.withUnsafeBytes { Data($0) }.base64URL
+        }
+        if let pushToken = endpoint.pushToken {
+            frame["p"] = ["pl": "apns", "tk": pushToken, "e": endpoint.pushEnvironment]
         }
         guard let data = try? JSONSerialization.data(withJSONObject: frame),
               let text = String(data: data, encoding: .utf8) else { return }
