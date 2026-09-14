@@ -22,6 +22,8 @@ actor SharedBuysRelay {
     private var handler: (@Sendable (RelayEvent) -> Void)?
     private var isRunning: Bool = false
     private var generation: Int = 0
+    private var heartbeatTask: Task<Void, Never>?
+    private var lastPong: Date = .distantPast
 
     struct Endpoint: Sendable {
         var baseURL: String
@@ -54,10 +56,13 @@ actor SharedBuysRelay {
 
         Task { await self.sendHello(endpoint) }
         Task { await self.receive(generation: generation) }
+        heartbeatTask = Task { await self.heartbeat(generation: generation) }
     }
 
     func disconnect() {
         isRunning = false
+        heartbeatTask?.cancel()
+        heartbeatTask = nil
         task?.cancel(with: .goingAway, reason: nil)
         task = nil
         session?.invalidateAndCancel()
@@ -141,7 +146,12 @@ actor SharedBuysRelay {
             do {
                 let message = try await task.receive()
                 guard generation == self.generation else { return }
-                guard case .string(let text) = message,
+                guard case .string(let text) = message else { continue }
+                if text == "pong" {
+                    lastPong = .now
+                    continue
+                }
+                guard
                       let data = text.data(using: .utf8),
                       let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
                     continue
@@ -168,6 +178,28 @@ actor SharedBuysRelay {
                     let code = task.closeCode.rawValue
                     handler?(code == 0 ? .failed(error.localizedDescription) : .closed(code))
                 }
+                isRunning = false
+                return
+            }
+        }
+    }
+
+    private func heartbeat(generation: Int) async {
+        while isRunning, generation == self.generation {
+            try? await Task.sleep(for: .seconds(240))
+            guard !Task.isCancelled, isRunning, generation == self.generation, let task else { return }
+            let sent = Date.now
+            do {
+                try await task.send(.string("ping"))
+            } catch {
+                handler?(.failed(error.localizedDescription))
+                return
+            }
+            try? await Task.sleep(for: .seconds(30))
+            guard !Task.isCancelled, isRunning, generation == self.generation else { return }
+            if lastPong < sent {
+                task.cancel(with: .goingAway, reason: Data("heartbeat timeout".utf8))
+                handler?(.failed("heartbeat timeout"))
                 isRunning = false
                 return
             }
