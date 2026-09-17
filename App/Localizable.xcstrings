@@ -2733,7 +2733,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@と共有中"
+            "value": "%@が参加中"
           }
         },
         "ko": {
@@ -2768,7 +2768,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@・%2$@と共有中"
+            "value": "%1$@・%2$@が参加中"
           }
         },
         "ko": {
@@ -2803,7 +2803,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "他%lld人と共有中"
+            "value": "他%lld人が参加中"
           }
         },
         "ko": {
