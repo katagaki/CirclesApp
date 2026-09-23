@@ -57,6 +57,8 @@ final class SharedBuysBluetooth: NSObject {
     /// How long a peripheral has, from our connect, to finish the handshake.
     private static let handshakeDeadline: Duration = .seconds(10)
     private var handshakeAttempts: [UUID: UUID] = [:]
+    /// The room tags a peer may advertise, recomputed only when the window turns.
+    private var tagCache: (window: Int, tags: [Data])?
     private var digest: Data = Data(repeating: 0, count: 4)
     private var onEvent: ((BluetoothEvent) -> Void)?
 
@@ -105,6 +107,7 @@ final class SharedBuysBluetooth: NSObject {
         challenges.removeAll()
         responses.removeAll()
         handshakeAttempts.removeAll()
+        tagCache = nil
         sessionKey = nil
         handshakeKey = nil
         onEvent = nil
@@ -299,6 +302,14 @@ final class SharedBuysBluetooth: NSObject {
         if let payload { onEvent?(.payload(payload, from: .peripheral(identifier))) }
     }
 
+    private func acceptedTags(sessionKey: Data) -> [Data] {
+        let window = SharedBuysProfile.window(at: .now)
+        if let tagCache, tagCache.window == window { return tagCache.tags }
+        let tags = SharedBuysProfile.acceptedTags(sessionKey: sessionKey)
+        tagCache = (window, tags)
+        return tags
+    }
+
     private func announcePeers() {
         onEvent?(.peerCount(peerCount))
     }
@@ -423,7 +434,8 @@ extension SharedBuysBluetooth: @preconcurrency CBCentralManagerDelegate {
             localName: advertisementData[CBAdvertisementDataLocalNameKey] as? String
         ) {
             guard let sessionKey,
-                  SharedBuysProfile.accepts(advertisement: advertisement, sessionKey: sessionKey)
+                  advertisement.count == SharedBuysProfile.advertisementLength,
+                  acceptedTags(sessionKey: sessionKey).contains(Data(advertisement.prefix(2)))
             else {
                 rejectedUntil[peripheral.identifier] = .now.addingTimeInterval(60.0)
                 return

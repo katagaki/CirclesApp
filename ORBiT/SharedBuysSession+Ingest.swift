@@ -6,16 +6,17 @@ public extension SharedBuysSession {
 
     /// Opens incoming records away from the actor that received them.
     ///
-    /// Opening is pure work over the batch — two key derivations and a GCM open per
-    /// record — so it runs off the main actor and only the append comes back.
+    /// Opening is pure work over the batch — a tag check and a GCM open per record — so
+    /// it runs off the main actor and only the append comes back.
     internal func ingest(_ records: [RelayRecord]) {
         guard let sessionKey, let roomID else { return }
         let known = Set(changes.map(\.id))
         let fresh = records.filter { !known.contains("\($0.device)#\($0.seq)") }
         guard !fresh.isEmpty else { return }
+        let keys = keys(for: sessionKey)
         Task.detached(priority: .userInitiated) {
             let opened = fresh.compactMap {
-                Self.open($0, sessionKey: sessionKey, roomID: roomID)
+                Self.open($0, keys: keys, roomID: roomID)
             }
             let rejected = fresh.count - opened.count
             await MainActor.run { self.adopt(opened, rejected: rejected) }
@@ -24,18 +25,25 @@ public extension SharedBuysSession {
 
     internal func seal(_ change: SharedBuyChange, sessionKey: Data, roomID: String) -> RelayRecord? {
         if let record = sealed[change.id] { return record }
-        guard let record = Self.seal(change, sessionKey: sessionKey, roomID: roomID) else { return nil }
+        let keys = keys(for: sessionKey)
+        guard let record = Self.seal(change, keys: keys, roomID: roomID) else { return nil }
         sealed[change.id] = record
         return record
     }
 
-    private nonisolated static func seal(_ change: SharedBuyChange, sessionKey: Data, roomID: String) -> RelayRecord? {
+    /// The room's record keys, derived once per session key instead of twice per record.
+    internal func keys(for sessionKey: Data) -> SharedBuysKeys {
+        if let keyCache, keyCache.sessionKey == sessionKey { return keyCache.keys }
+        let keys = SharedBuysKeys(sessionKey: sessionKey)
+        keyCache = (sessionKey, keys)
+        return keys
+    }
+
+    private nonisolated static func seal(_ change: SharedBuyChange, keys: SharedBuysKeys, roomID: String) -> RelayRecord? {
         guard let plaintext = try? JSONEncoder().encode(change.payload) else { return nil }
-        let contentKey = SharedBuysCrypto.derive(SharedBuysCrypto.opsInfo, from: sessionKey)
-        let relayAuthKey = SharedBuysCrypto.derive(SharedBuysCrypto.relayAuthInfo, from: sessionKey)
         guard let blob = try? SharedBuysCrypto.seal(
             plaintext,
-            contentKey: contentKey,
+            contentKey: keys.content,
             roomID: roomID,
             deviceID: change.device,
             seq: change.seq
@@ -44,7 +52,7 @@ public extension SharedBuysSession {
             deviceID: change.device,
             seq: change.seq,
             blob: blob,
-            relayAuthKey: relayAuthKey
+            relayAuthKey: keys.relayAuth
         )
         return RelayRecord(
             device: change.device,
@@ -57,11 +65,10 @@ public extension SharedBuysSession {
     /// Verifies and decrypts one record. Pure, so it is safe anywhere.
     internal nonisolated static func open(
         _ record: RelayRecord,
-        sessionKey: Data,
+        keys: SharedBuysKeys,
         roomID: String
     ) -> SharedBuyChange? {
         guard let blob = Data(base64URL: record.blob) else { return nil }
-        let relayAuthKey = SharedBuysCrypto.derive(SharedBuysCrypto.relayAuthInfo, from: sessionKey)
         // Whoever handed us this record — the relay, or a peer over Bluetooth — is not
         // trusted to have authored it. Check the tag before it enters the log.
         guard let offered = Data(base64URL: record.tag),
@@ -69,12 +76,11 @@ public extension SharedBuysSession {
                   deviceID: record.device,
                   seq: record.seq,
                   blob: blob,
-                  relayAuthKey: relayAuthKey
+                  relayAuthKey: keys.relayAuth
               ) else { return nil }
-        let contentKey = SharedBuysCrypto.derive(SharedBuysCrypto.opsInfo, from: sessionKey)
         guard let plaintext = try? SharedBuysCrypto.open(
             blob,
-            contentKey: contentKey,
+            contentKey: keys.content,
             roomID: roomID,
             deviceID: record.device,
             seq: record.seq

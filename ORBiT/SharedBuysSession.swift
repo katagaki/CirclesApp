@@ -101,6 +101,7 @@ public final class SharedBuysSession {
     @ObservationIgnored var wantedPeers: Set<BluetoothPeer> = []
     /// Each change sealed once, rather than on every want reply and every reconnect.
     @ObservationIgnored var sealed: [String: RelayRecord] = [:]
+    @ObservationIgnored var keyCache: (sessionKey: Data, keys: SharedBuysKeys)?
     public var activity: Any?
     let relay = SharedBuysRelay()
     let bluetooth = SharedBuysBluetooth()

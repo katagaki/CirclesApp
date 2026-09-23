@@ -71,11 +71,6 @@ enum SharedBuysProfile {
     static func digest(in advertisement: Data) -> Data {
         Data(advertisement.dropFirst(2))
     }
-
-    static func accepts(advertisement: Data, sessionKey: Data, at date: Date = .now) -> Bool {
-        guard advertisement.count == advertisementLength else { return false }
-        return acceptedTags(sessionKey: sessionKey, at: date).contains(Data(advertisement.prefix(2)))
-    }
 }
 
 /// Proves both ends of a link hold the room key, over fresh nonces.

@@ -150,6 +150,17 @@ enum SharedBuysCrypto {
     }
 }
 
+/// The two keys every record needs, derived once per room rather than per record.
+struct SharedBuysKeys: Sendable {
+    let content: SymmetricKey
+    let relayAuth: SymmetricKey
+
+    init(sessionKey: Data) {
+        content = SharedBuysCrypto.derive(SharedBuysCrypto.opsInfo, from: sessionKey)
+        relayAuth = SharedBuysCrypto.derive(SharedBuysCrypto.relayAuthInfo, from: sessionKey)
+    }
+}
+
 enum SharedBuysError: Error {
     case malformed
     case badJoinURL
