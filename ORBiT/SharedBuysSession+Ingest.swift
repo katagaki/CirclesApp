@@ -61,9 +61,11 @@ public extension SharedBuysSession {
             // overlapping the live stream — so the set has to grow as we append.
             guard known.insert(change.id).inserted else { continue }
             changes.append(change)
-            // A Lamport clock. Without it a fresh device's seq 1 sorts under an
-            // established peer's seq 30, and the older edit wins on every screen.
-            lastSeq = max(lastSeq, change.seq)
+            // A Lamport clock. Without it a fresh device's first change sorts under an
+            // established peer's thirtieth, and the older edit wins on every screen.
+            clock = max(clock, change.order)
+            // Our own change coming back means a save was lost; never reuse its seq.
+            if change.device == deviceID { lastSeq = max(lastSeq, change.seq) }
             added += 1
         }
         if rejected > 0 { note("dropped \(rejected) unopenable") }

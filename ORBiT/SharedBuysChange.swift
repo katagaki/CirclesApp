@@ -82,6 +82,15 @@ public struct SharedBuyPayload: Codable, Sendable {
     /// platforms omit nil rather than encoding null.
     public var space: String?
 
+    /// The Lamport clock the change was written at, which is what orders the fold.
+    ///
+    /// Bumping `seq` to act as the clock left holes in each device's own numbering, so
+    /// the gapless prefix the relay and Bluetooth sync by stopped at the first jump and
+    /// every reconnect fetched almost the whole room again. `seq` now counts only this
+    /// device's changes. Absent on changes written before the split, which order by
+    /// `seq` as they always did.
+    public var clock: Int?
+
     /// The kind, when it is one this build understands.
     public var kind: SharedBuyKind? { SharedBuyKind(rawValue: rawKind) }
 
@@ -92,7 +101,8 @@ public struct SharedBuyPayload: Codable, Sendable {
         circleID: Int,
         text: String? = nil,
         value: Int? = nil,
-        space: String? = nil
+        space: String? = nil,
+        clock: Int? = nil
     ) {
         self.actor = actor
         self.rawKind = kind.rawValue
@@ -101,6 +111,7 @@ public struct SharedBuyPayload: Codable, Sendable {
         self.text = text
         self.value = value
         self.space = space
+        self.clock = clock
     }
 
     enum CodingKeys: String, CodingKey {
@@ -111,6 +122,7 @@ public struct SharedBuyPayload: Codable, Sendable {
         case text = "t"
         case value = "v"
         case space = "s"
+        case clock = "l"
     }
 }
 
@@ -120,6 +132,9 @@ public struct SharedBuyChange: Codable, Sendable, Identifiable, Hashable {
     public var payload: SharedBuyPayload
 
     public var id: String { "\(device)#\(seq)" }
+
+    /// Where the change sits in the fold.
+    public var order: Int { payload.clock ?? seq }
 
     public static func == (lhs: SharedBuyChange, rhs: SharedBuyChange) -> Bool { lhs.id == rhs.id }
     public func hash(into hasher: inout Hasher) { hasher.combine(id) }
@@ -245,6 +260,6 @@ public enum SharedBuyFold {
     }
 
     private static func ordered(_ lhs: SharedBuyChange, _ rhs: SharedBuyChange) -> Bool {
-        lhs.seq == rhs.seq ? lhs.device < rhs.device : lhs.seq < rhs.seq
+        lhs.order == rhs.order ? lhs.device < rhs.device : lhs.order < rhs.order
     }
 }

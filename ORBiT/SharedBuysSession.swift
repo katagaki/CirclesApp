@@ -86,6 +86,7 @@ public final class SharedBuysSession {
         circles: [Int: SharedBuyCircle]
     )?
     var lastSeq: Int = 0
+    var clock: Int = 0
     private var reconnectAttempt: Int = 0
     private var reconnectTask: Task<Void, Never>?
     var outbox: [RelayRecord] = []
@@ -173,6 +174,7 @@ public final class SharedBuysSession {
         eventNumber = snapshot.eventNumber
         lastSeq = snapshot.lastSeq
         changes = snapshot.changes
+        clock = snapshot.clock ?? changes.map(\.order).max() ?? 0
         note("restored room \(roomID ?? "?") as \(deviceID)")
         adoptActivity()
         connect()
@@ -189,6 +191,7 @@ public final class SharedBuysSession {
         deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
         self.eventNumber = eventNumber
         lastSeq = 0
+        clock = 0
         changes = []
         persist()
         append(.memberJoined, itemID: "-", circleID: 0, text: nickname, value: actorPID)
@@ -216,6 +219,7 @@ public final class SharedBuysSession {
         deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
         eventNumber = event
         lastSeq = 0
+        clock = 0
         changes = []
         persist()
         append(.memberJoined, itemID: "-", circleID: 0, text: nickname, value: actorPID)
@@ -258,6 +262,7 @@ public final class SharedBuysSession {
         deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
         changes = []
         lastSeq = 0
+        clock = 0
         status = .idle
         submit(.clear)
         note("left session")
@@ -380,6 +385,7 @@ public final class SharedBuysSession {
         // list at all, so it is allowed alongside the status flips they are here for.
         guard !isGuest || kind == .setStatus || kind == .memberJoined else { return }
         lastSeq += 1
+        clock += 1
         let change = SharedBuyChange(
             device: deviceID,
             seq: lastSeq,
@@ -390,7 +396,8 @@ public final class SharedBuysSession {
                 circleID: circleID,
                 text: text,
                 value: value,
-                space: space
+                space: space,
+                clock: clock
             )
         )
         changes.append(change)

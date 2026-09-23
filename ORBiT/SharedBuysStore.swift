@@ -7,6 +7,7 @@ struct SharedBuysSnapshot: Codable, Sendable {
     var eventNumber: Int
     var lastSeq: Int
     var changes: [SharedBuyChange]
+    var clock: Int?
 }
 
 enum SharedBuysStore {
@@ -109,7 +110,8 @@ extension SharedBuysSession {
                         deviceAuthKey: deviceAuthKey,
                         eventNumber: eventNumber,
                         lastSeq: lastSeq,
-                        changes: changes
+                        changes: changes,
+                        clock: clock
                     )
                 )
             }

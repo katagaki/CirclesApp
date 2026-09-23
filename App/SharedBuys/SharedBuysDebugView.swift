@@ -92,7 +92,7 @@ struct SharedBuysDebugView: View {
                     }
 
                     Section {
-                        ForEach(session.changes.sorted { $0.seq < $1.seq }, id: \.id) { change in
+                        ForEach(session.changes.sorted { $0.order < $1.order }, id: \.id) { change in
                             Text("\(change.id)  \(String(describing: change.payload.kind))")
                                 .font(.caption2)
                                 .monospaced()
