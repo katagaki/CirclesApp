@@ -45,6 +45,9 @@ final class SharedBuysBluetooth: NSObject {
     /// confirms.
     private var responses: [UUID: (challenge: Data, nonce: Data)] = [:]
     private static let maxPendingResponses = 16
+    /// How long a peripheral has, from our connect, to finish the handshake.
+    private static let handshakeDeadline: Duration = .seconds(10)
+    private var handshakeAttempts: [UUID: UUID] = [:]
     private var digest: Data = Data(repeating: 0, count: 4)
     private var onEvent: ((BluetoothEvent) -> Void)?
 
@@ -92,6 +95,7 @@ final class SharedBuysBluetooth: NSObject {
         peerDigests.removeAll()
         challenges.removeAll()
         responses.removeAll()
+        handshakeAttempts.removeAll()
         sessionKey = nil
         handshakeKey = nil
         onEvent = nil
@@ -207,9 +211,42 @@ final class SharedBuysBluetooth: NSObject {
         return true
     }
 
+    /// Drops a peripheral and backs it off for a minute.
+    ///
+    /// The state is forgotten here rather than in `didDisconnectPeripheral`, which never
+    /// fires for a connection that was still pending when it was cancelled.
     private func reject(_ peripheral: CBPeripheral) {
         rejectedUntil[peripheral.identifier] = .now.addingTimeInterval(60.0)
         centralManager?.cancelPeripheralConnection(peripheral)
+        forget(peripheral.identifier)
+    }
+
+    private func forget(_ identifier: UUID) {
+        connected[identifier] = nil
+        inboxes[identifier] = nil
+        pendingWrites[identifier] = nil
+        peerDigests[identifier] = nil
+        reassemblers[identifier] = nil
+        centralReassemblers[identifier] = nil
+        challenges[identifier] = nil
+        handshakeAttempts[identifier] = nil
+        if verifiedPeripherals.remove(identifier) != nil { announcePeers() }
+    }
+
+    /// Rejects the peripheral if it has not proved the room key in time.
+    ///
+    /// A peer that ignores the challenge — any nearby device of another room, or one
+    /// that never answers — otherwise held its connection for as long as it stayed in
+    /// range, and at a busy venue those filled every slot Core Bluetooth has.
+    private func armHandshakeDeadline(for peripheral: CBPeripheral) {
+        let attempt = UUID()
+        handshakeAttempts[peripheral.identifier] = attempt
+        Task { [weak self] in
+            try? await Task.sleep(for: Self.handshakeDeadline)
+            guard let self, self.handshakeAttempts[peripheral.identifier] == attempt,
+                  !self.verifiedPeripherals.contains(peripheral.identifier) else { return }
+            self.reject(peripheral)
+        }
     }
 
     private func notify(_ frame: Data, to centrals: [CBCentral]) {
@@ -382,6 +419,15 @@ extension SharedBuysBluetooth: @preconcurrency CBCentralManagerDelegate {
         connected[peripheral.identifier] = peripheral
         peripheral.delegate = self
         central.connect(peripheral)
+        armHandshakeDeadline(for: peripheral)
+    }
+
+    func centralManager(
+        _ central: CBCentralManager,
+        didFailToConnect peripheral: CBPeripheral,
+        error: (any Error)?
+    ) {
+        forget(peripheral.identifier)
     }
 
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
@@ -393,14 +439,7 @@ extension SharedBuysBluetooth: @preconcurrency CBCentralManagerDelegate {
         didDisconnectPeripheral peripheral: CBPeripheral,
         error: (any Error)?
     ) {
-        connected[peripheral.identifier] = nil
-        inboxes[peripheral.identifier] = nil
-        pendingWrites[peripheral.identifier] = nil
-        peerDigests[peripheral.identifier] = nil
-        challenges[peripheral.identifier] = nil
-        reassemblers[peripheral.identifier] = nil
-        centralReassemblers[peripheral.identifier] = nil
-        verifiedPeripherals.remove(peripheral.identifier)
+        forget(peripheral.identifier)
         announcePeers()
     }
 }
