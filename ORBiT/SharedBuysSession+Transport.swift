@@ -154,8 +154,6 @@ public extension SharedBuysSession {
             case .peerCount(let count):
                 self.bluetoothPeers = count
                 self.note("bluetooth peers \(count)")
-                // A peer leaving is the moment the relay has to take over again.
-                if count == 0 { self.scheduleReconnect() }
             case .peerVerified(let digest):
                 self.handshakeCompleted(peerDigest: digest)
             case .payload(let payload):
