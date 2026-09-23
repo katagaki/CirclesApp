@@ -433,13 +433,20 @@ public final class SharedBuysSession {
         case .failed(let reason):
             status = .offline(reason)
             note("failed: \(reason)")
-            scheduleReconnect()
+            if reason != Self.storageFullSlug { scheduleReconnect() }
         case .closed(let code):
             status = .offline("closed \(code)")
             note("closed \(code)")
-            scheduleReconnect()
+            if code != Self.storageFullCode { scheduleReconnect() }
         }
     }
+
+    /// The relay refuses writes once a room holds 500 records, and closes the socket that
+    /// tried. Reconnecting only re-sends the refused change and is closed again, every 30
+    /// seconds for the rest of the room's life, so a full room waits for the next launch
+    /// or foreground instead.
+    private static let storageFullSlug = "storage"
+    private static let storageFullCode = 4005
 
     /// Arms the reconnect.
     ///
