@@ -47,16 +47,15 @@ public extension SharedBuysSession {
         Task { await relay.send(records: records) }
     }
 
-    /// Uploads every change this device authored, in frames the relay will accept.
+    /// Uploads the changes this device authored that the relay does not hold yet.
     ///
-    /// Taking the first 32 and discarding the rest left later changes with no path to
-    /// the server at all: `resend()` only runs on connect, and always re-took the same
-    /// 32. Each page is sealed as it is sent, so a long backlog no longer pays the whole
-    /// seal cost — encode, two derivations and AES-GCM per change — before transmitting
-    /// any of it.
-    internal func resend() {
+    /// `seq` is the gapless prefix the relay reported after hello. Re-sending the whole
+    /// history on every reconnect re-sealed and re-uploaded changes the relay only threw
+    /// away as duplicates. Each page is sealed as it is sent, in frames the relay will
+    /// accept.
+    internal func resend(above seq: Int) {
         guard let sessionKey, let roomID else { return }
-        let mine = changes.filter { $0.device == deviceID }
+        let mine = changes.filter { $0.device == deviceID && $0.seq > seq }
         guard !mine.isEmpty else { return }
         Task {
             for start in stride(from: 0, to: mine.count, by: Self.recordsPerFrame) {

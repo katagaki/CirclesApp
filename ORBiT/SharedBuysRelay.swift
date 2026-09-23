@@ -11,6 +11,8 @@ struct RelayRecord: Sendable {
 enum RelayEvent: Sendable {
     case connected
     case records([RelayRecord])
+    /// How much of this device's own history the relay holds, as a gapless prefix.
+    case held(Int)
     case failed(String)
     case closed(Int)
 }
@@ -24,6 +26,7 @@ actor SharedBuysRelay {
     private var generation: Int = 0
     private var heartbeatTask: Task<Void, Never>?
     private var lastPong: Date = .distantPast
+    private var heldSeen: Bool = false
 
     struct Endpoint: Sendable {
         var baseURL: String
@@ -45,6 +48,7 @@ actor SharedBuysRelay {
         handler = onEvent
         isRunning = true
         generation += 1
+        heldSeen = false
         let generation = generation
         let configuration = URLSessionConfiguration.default
         configuration.waitsForConnectivity = false
@@ -157,7 +161,16 @@ actor SharedBuysRelay {
                     continue
                 }
                 switch object["t"] as? String {
+                case "held":
+                    heldSeen = true
+                    handler?(.held(object["n"] as? Int ?? 0))
                 case "ops":
+                    // A relay that predates `held` answers the hello with ops alone, so
+                    // it is treated as holding nothing and gets everything re-sent.
+                    if !heldSeen {
+                        heldSeen = true
+                        handler?(.held(0))
+                    }
                     let raw = object["o"] as? [[String: Any]] ?? []
                     let records: [RelayRecord] = raw.compactMap { entry in
                         guard let device = entry["d"] as? String,

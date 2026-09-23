@@ -440,7 +440,11 @@ public final class SharedBuysSession {
             status = .connected
             reconnectAttempt = 0
             note("connected")
-            resend()
+        case .held(let seq):
+            // Our own history coming back from the relay means a save was lost; never
+            // reuse a sequence number it already holds.
+            lastSeq = max(lastSeq, seq)
+            resend(above: seq)
         case .records(let records):
             ingest(records)
         case .failed(let reason):
