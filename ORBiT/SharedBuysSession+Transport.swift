@@ -142,10 +142,12 @@ public extension SharedBuysSession {
             case .peerCount(let count):
                 self.bluetoothPeers = count
                 self.note("bluetooth peers \(count)")
-            case .peerVerified(let digest):
-                self.handshakeCompleted(peerDigest: digest)
-            case .payload(let payload):
-                self.handleBluetooth(payload)
+            case .peerVerified(let peer, let digest):
+                self.handshakeCompleted(with: peer, digest: digest)
+            case .peerLost(let peer):
+                self.wantedPeers.remove(peer)
+            case .payload(let payload, let peer):
+                self.handleBluetooth(payload, from: peer)
             case .unavailable(let reason):
                 self.bluetoothNote = reason
                 self.note("bluetooth: \(reason)")
@@ -156,16 +158,22 @@ public extension SharedBuysSession {
     func stopBluetooth() {
         bluetooth.stop()
         bluetoothPeers = 0
+        wantedPeers.removeAll()
     }
 
-    /// A peer that advertised our own digest holds the same Bluetooth-eligible log, so
-    /// there is nothing for a version vector exchange to turn up.
-    internal func handshakeCompleted(peerDigest: Data?) {
-        guard peerDigest != SharedBuysDigest.data(of: bluetoothDigestVector) else {
+    /// Opens the exchange on a link we connected, unless the peer is already level.
+    ///
+    /// Only the connecting side asks first. Both sides asking on every link, and the
+    /// accepting side never knowing the peer's digest, meant four wants per pair of
+    /// phones, each answered to everyone in range. The accepting side asks back from
+    /// `handleBluetooth` instead, once, and only when the two logs differ.
+    internal func handshakeCompleted(with peer: BluetoothPeer, digest: Data?) {
+        guard case .peripheral = peer else { return }
+        guard digest != SharedBuysDigest.data(of: bluetoothDigestVector) else {
             note("peer is level, skipping want")
             return
         }
-        sendWant()
+        sendWant(to: peer)
     }
 
     /// Asks the peer for the status flips we lack.
@@ -176,32 +184,35 @@ public extension SharedBuysSession {
     /// sent. A prefix over the whole log is honest — holding every change up to `n`
     /// includes every status flip up to `n` — and anything above a hole comes again and
     /// is deduped on ingest.
-    internal func sendWant() {
+    internal func sendWant(to peer: BluetoothPeer) {
+        wantedPeers.insert(peer)
         for frame in SharedBuysWire.wantFrames(versionVector) {
-            bluetooth.send(frame)
+            bluetooth.send(frame, to: peer)
         }
     }
 
-    internal func handleBluetooth(_ payload: Data) {
+    internal func handleBluetooth(_ payload: Data, from peer: BluetoothPeer) {
         guard let frame = SharedBuysWire.decode(payload) else { return }
         switch frame {
         case .want(let theirs):
+            // The reply goes to whoever asked, not to every peer in range.
             let missing = changes.filter {
                 $0.payload.kind?.travelsOverBluetooth == true && $0.seq > (theirs[$0.device] ?? 0)
             }
-            sendOverBluetooth(missing)
+            sendOverBluetooth(missing, to: peer)
+            if !wantedPeers.contains(peer), theirs != versionVector { sendWant(to: peer) }
         case .changes(let records):
             ingest(records)
         }
     }
 
-    internal func sendOverBluetooth(_ outgoing: [SharedBuyChange]) {
+    internal func sendOverBluetooth(_ outgoing: [SharedBuyChange], to peer: BluetoothPeer? = nil) {
         let eligible = outgoing.filter { $0.payload.kind?.travelsOverBluetooth == true }
         guard !eligible.isEmpty, bluetoothPeers > 0, let sessionKey, let roomID else { return }
         let records = eligible.compactMap { seal($0, sessionKey: sessionKey, roomID: roomID) }
         guard !records.isEmpty else { return }
         for frame in SharedBuysWire.changeFrames(records) {
-            bluetooth.send(frame)
+            bluetooth.send(frame, to: peer)
         }
     }
 }

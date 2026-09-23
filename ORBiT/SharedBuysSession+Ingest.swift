@@ -22,6 +22,38 @@ public extension SharedBuysSession {
         }
     }
 
+    internal func seal(_ change: SharedBuyChange, sessionKey: Data, roomID: String) -> RelayRecord? {
+        if let record = sealed[change.id] { return record }
+        guard let record = Self.seal(change, sessionKey: sessionKey, roomID: roomID) else { return nil }
+        sealed[change.id] = record
+        return record
+    }
+
+    private nonisolated static func seal(_ change: SharedBuyChange, sessionKey: Data, roomID: String) -> RelayRecord? {
+        guard let plaintext = try? JSONEncoder().encode(change.payload) else { return nil }
+        let contentKey = SharedBuysCrypto.derive(SharedBuysCrypto.opsInfo, from: sessionKey)
+        let relayAuthKey = SharedBuysCrypto.derive(SharedBuysCrypto.relayAuthInfo, from: sessionKey)
+        guard let blob = try? SharedBuysCrypto.seal(
+            plaintext,
+            contentKey: contentKey,
+            roomID: roomID,
+            deviceID: change.device,
+            seq: change.seq
+        ) else { return nil }
+        let tag = SharedBuysCrypto.recordTag(
+            deviceID: change.device,
+            seq: change.seq,
+            blob: blob,
+            relayAuthKey: relayAuthKey
+        )
+        return RelayRecord(
+            device: change.device,
+            seq: change.seq,
+            blob: blob.base64URL,
+            tag: tag.base64URL
+        )
+    }
+
     /// Verifies and decrypts one record. Pure, so it is safe anywhere.
     internal nonisolated static func open(
         _ record: RelayRecord,

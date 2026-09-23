@@ -77,7 +77,10 @@ public final class SharedBuysSession {
     var pushEnvironment: String = "sandbox"
     public private(set) var eventNumber: Int = 0
     public internal(set) var changes: [SharedBuyChange] = [] {
-        didSet { foldCache = nil }
+        didSet {
+            foldCache = nil
+            if changes.isEmpty { sealed = [:] }
+        }
     }
 
     @ObservationIgnored private var foldCache: (
@@ -94,6 +97,10 @@ public final class SharedBuysSession {
     private var relayTask: Task<Void, Never>?
     @ObservationIgnored var pendingWrite: SharedBuysStore.Pending?
     @ObservationIgnored var writeTask: Task<Void, Never>?
+    /// Links we have already sent a want down, so each asks at most once.
+    @ObservationIgnored var wantedPeers: Set<BluetoothPeer> = []
+    /// Each change sealed once, rather than on every want reply and every reconnect.
+    @ObservationIgnored var sealed: [String: RelayRecord] = [:]
     public var activity: Any?
     let relay = SharedBuysRelay()
     let bluetooth = SharedBuysBluetooth()
@@ -407,31 +414,6 @@ public final class SharedBuysSession {
         sendOverBluetooth([change])
         bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothDigestVector))
         updateActivity()
-    }
-
-    func seal(_ change: SharedBuyChange, sessionKey: Data, roomID: String) -> RelayRecord? {
-        guard let plaintext = try? JSONEncoder().encode(change.payload) else { return nil }
-        let contentKey = SharedBuysCrypto.derive(SharedBuysCrypto.opsInfo, from: sessionKey)
-        let relayAuthKey = SharedBuysCrypto.derive(SharedBuysCrypto.relayAuthInfo, from: sessionKey)
-        guard let blob = try? SharedBuysCrypto.seal(
-            plaintext,
-            contentKey: contentKey,
-            roomID: roomID,
-            deviceID: change.device,
-            seq: change.seq
-        ) else { return nil }
-        let tag = SharedBuysCrypto.recordTag(
-            deviceID: change.device,
-            seq: change.seq,
-            blob: blob,
-            relayAuthKey: relayAuthKey
-        )
-        return RelayRecord(
-            device: change.device,
-            seq: change.seq,
-            blob: blob.base64URL,
-            tag: tag.base64URL
-        )
     }
 
     private func handle(_ event: RelayEvent) {

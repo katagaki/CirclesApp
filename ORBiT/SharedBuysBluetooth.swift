@@ -7,11 +7,20 @@ import Foundation
 // second file for no benefit to the reader.
 // swiftlint:disable file_length
 
+/// One end of one link. The same phone connected both ways is two peers.
+enum BluetoothPeer: Hashable, Sendable {
+    /// A central connected to our peripheral.
+    case central(UUID)
+    /// A peripheral we connected to as a central.
+    case peripheral(UUID)
+}
+
 enum BluetoothEvent: Sendable {
     case peerCount(Int)
     /// A peer finished the handshake, carrying the digest it advertised if we scanned it.
-    case peerVerified(Data?)
-    case payload(Data)
+    case peerVerified(BluetoothPeer, Data?)
+    case peerLost(BluetoothPeer)
+    case payload(Data, from: BluetoothPeer)
     case unavailable(String)
 }
 
@@ -107,11 +116,12 @@ final class SharedBuysBluetooth: NSObject {
         advertise()
     }
 
-    func send(_ payload: Data) {
+    /// Sends to one peer, or to every verified peer when `peer` is nil.
+    func send(_ payload: Data, to peer: BluetoothPeer? = nil) {
         messageCounter &+= 1
         // Each link negotiates its own maximum write, so the payload is cut to fit the
         // peer it is going to rather than to one hardcoded size.
-        let subscribers = verifiedSubscribers
+        let subscribers = verifiedSubscribers.filter { peer == nil || peer == .central($0.identifier) }
         if !subscribers.isEmpty {
             let limit = subscribers
                 .map { SharedBuysProfile.payloadLimit(forWriteLength: $0.maximumUpdateValueLength) }
@@ -120,7 +130,7 @@ final class SharedBuysBluetooth: NSObject {
                 notify(frame, to: subscribers)
             }
         }
-        for identifier in verifiedPeripherals {
+        for identifier in verifiedPeripherals where peer == nil || peer == .peripheral(identifier) {
             guard let peripheral = connected[identifier], let inbox = inboxes[identifier] else { continue }
             let limit = SharedBuysProfile.payloadLimit(
                 forWriteLength: peripheral.maximumWriteValueLength(for: .withoutResponse)
@@ -230,7 +240,10 @@ final class SharedBuysBluetooth: NSObject {
         centralReassemblers[identifier] = nil
         challenges[identifier] = nil
         handshakeAttempts[identifier] = nil
-        if verifiedPeripherals.remove(identifier) != nil { announcePeers() }
+        if verifiedPeripherals.remove(identifier) != nil {
+            announcePeers()
+            onEvent?(.peerLost(.peripheral(identifier)))
+        }
     }
 
     /// Rejects the peripheral if it has not proved the room key in time.
@@ -276,14 +289,14 @@ final class SharedBuysBluetooth: NSObject {
         var reassembler = reassemblers[identifier] ?? SharedBuysFraming.Reassembler()
         let payload = reassembler.accept(frame)
         reassemblers[identifier] = reassembler
-        if let payload { onEvent?(.payload(payload)) }
+        if let payload { onEvent?(.payload(payload, from: .central(identifier))) }
     }
 
     private func deliverFromPeripheral(_ frame: Data, from identifier: UUID) {
         var reassembler = centralReassemblers[identifier] ?? SharedBuysFraming.Reassembler()
         let payload = reassembler.accept(frame)
         centralReassemblers[identifier] = reassembler
-        if let payload { onEvent?(.payload(payload)) }
+        if let payload { onEvent?(.payload(payload, from: .peripheral(identifier))) }
     }
 
     private func announcePeers() {
@@ -323,10 +336,11 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralManagerDelegate {
         didUnsubscribeFrom characteristic: CBCharacteristic
     ) {
         subscribers.removeAll { $0.identifier == central.identifier }
-        verifiedCentrals.remove(central.identifier)
+        let wasVerified = verifiedCentrals.remove(central.identifier) != nil
         reassemblers[central.identifier] = nil
         responses[central.identifier] = nil
         announcePeers()
+        if wasVerified { onEvent?(.peerLost(.central(central.identifier))) }
     }
 
     func peripheralManager(_ peripheral: CBPeripheralManager, didReceiveWrite requests: [CBATTRequest]) {
@@ -373,7 +387,7 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralManagerDelegate {
             verifiedCentrals.insert(identifier)
             announcePeers()
             // We never scanned this one, so its digest is unknown.
-            onEvent?(.peerVerified(nil))
+            onEvent?(.peerVerified(.central(identifier), nil))
         case .response:
             return
         }
@@ -511,7 +525,7 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralDelegate {
             pumpWrites(to: peripheral.identifier)
             verifiedPeripherals.insert(peripheral.identifier)
             announcePeers()
-            onEvent?(.peerVerified(peerDigests[peripheral.identifier]))
+            onEvent?(.peerVerified(.peripheral(peripheral.identifier), peerDigests[peripheral.identifier]))
             return
         }
         guard verifiedPeripherals.contains(peripheral.identifier) else { return }
