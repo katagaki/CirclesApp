@@ -35,9 +35,18 @@ enum SharedBuysStore {
         return try? JSONDecoder().decode(SharedBuysSnapshot.self, from: data)
     }
 
+    /// Writes the snapshot, keeping it out of device backups.
+    ///
+    /// It holds the room key, this device's relay key and its change counter. Restored
+    /// onto another phone it would speak as this device from a stale counter, and the
+    /// relay silently drops every change that reuses a sequence number. The atomic
+    /// write replaces the file, so the exclusion is set again after every save.
     static func save(_ snapshot: SharedBuysSnapshot) {
-        guard let fileURL, let data = try? JSONEncoder().encode(snapshot) else { return }
+        guard var fileURL, let data = try? JSONEncoder().encode(snapshot) else { return }
         try? data.write(to: fileURL, options: .atomic)
+        var values = URLResourceValues()
+        values.isExcludedFromBackup = true
+        try? fileURL.setResourceValues(values)
     }
 
     enum Pending {
