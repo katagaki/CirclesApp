@@ -74,17 +74,6 @@ public extension SharedBuysSession {
 
     // MARK: Bluetooth
 
-    /// The version vector covering only what Bluetooth carries.
-    ///
-    /// The full vector counts relay-only changes, so advertising it to a peer would
-    /// claim we hold status flips whose sequence numbers sit below a name or cost we
-    /// happened to receive over the relay. The peer would then filter those flips out
-    /// of its reply and they would never arrive. The peer-to-peer path has to reason
-    /// about its own subset of the log.
-    var bluetoothVersionVector: [String: Int] {
-        Self.contiguousPrefix(of: changes.filter { $0.payload.kind?.travelsOverBluetooth == true })
-    }
-
     /// What the advertised digest summarises: everything held over Bluetooth, gaps and
     /// all.
     ///
@@ -179,8 +168,16 @@ public extension SharedBuysSession {
         sendWant()
     }
 
+    /// Asks the peer for the status flips we lack.
+    ///
+    /// The vector is the gapless prefix of the whole log, not of the Bluetooth subset: a
+    /// device's first change is always `memberJoined`, which never travels over
+    /// Bluetooth, so the subset's prefix was empty for everyone and no want was ever
+    /// sent. A prefix over the whole log is honest — holding every change up to `n`
+    /// includes every status flip up to `n` — and anything above a hole comes again and
+    /// is deduped on ingest.
     internal func sendWant() {
-        for frame in SharedBuysWire.wantFrames(bluetoothVersionVector) {
+        for frame in SharedBuysWire.wantFrames(versionVector) {
             bluetooth.send(frame)
         }
     }

@@ -27,6 +27,9 @@ enum SharedBuysWire {
     }
 
     /// Frames holding the version vector, packed so each one still fits a single chunk.
+    ///
+    /// An empty vector is still one frame, `count` 0, meaning "send me everything":
+    /// packing nothing produced no frame at all, and a peer holding nothing never asked.
     static func wantFrames(_ vector: [String: Int]) -> [Data] {
         let bodies = vector.sorted { $0.key < $1.key }.compactMap { entry -> Data? in
             guard let device = Data(hex: entry.key), device.count == deviceLength, entry.value > 0
@@ -35,6 +38,7 @@ enum SharedBuysWire {
             body.append(bigEndian(UInt64(entry.value)))
             return body
         }
+        guard !bodies.isEmpty else { return [Data([version, wantType, 0])] }
         return pack(bodies, type: wantType)
     }
 
