@@ -1,6 +1,6 @@
 import Foundation
 
-struct SharedBuysSnapshot: Codable {
+struct SharedBuysSnapshot: Codable, Sendable {
     var sessionKey: Data
     var deviceID: String
     var deviceAuthKey: Data?
@@ -40,15 +40,72 @@ enum SharedBuysStore {
         try? data.write(to: fileURL, options: .atomic)
     }
 
-    /// Serialises saves so two in flight cannot land out of order.
-    actor Writer {
-        func save(_ snapshot: SharedBuysSnapshot) { SharedBuysStore.save(snapshot) }
+    enum Pending {
+        case save
+        case clear
     }
 
-    static let writer = Writer()
+    enum Write: Sendable {
+        case save(SharedBuysSnapshot)
+        case clear
+    }
+
+    static func perform(_ write: Write) {
+        switch write {
+        case .save(let snapshot): save(snapshot)
+        case .clear: clear()
+        }
+    }
 
     static func clear() {
         guard let fileURL else { return }
         try? FileManager.default.removeItem(at: fileURL)
+    }
+}
+
+@MainActor
+extension SharedBuysSession {
+
+    /// Marks the session as needing a save.
+    ///
+    /// One writer drains the latest request, so saves can neither land out of order —
+    /// an older snapshot overwriting a newer one rolled `lastSeq` back, and the next
+    /// change reused a sequence number the relay already held — nor outlive a `leave()`
+    /// and bring the room back on the next launch. A burst of changes collapses into
+    /// one write, and the snapshot is taken when the write starts, not per change.
+    func persist() {
+        guard sessionKey != nil else { return }
+        submit(.save)
+    }
+
+    func submit(_ write: SharedBuysStore.Pending) {
+        pendingWrite = write
+        guard writeTask == nil else { return }
+        writeTask = Task { await drainWrites() }
+    }
+
+    private func drainWrites() async {
+        while let write = pendingWrite {
+            pendingWrite = nil
+            let operation: SharedBuysStore.Write
+            switch write {
+            case .clear:
+                operation = .clear
+            case .save:
+                guard let sessionKey else { continue }
+                operation = .save(
+                    SharedBuysSnapshot(
+                        sessionKey: sessionKey,
+                        deviceID: deviceID,
+                        deviceAuthKey: deviceAuthKey,
+                        eventNumber: eventNumber,
+                        lastSeq: lastSeq,
+                        changes: changes
+                    )
+                )
+            }
+            await Task.detached(priority: .utility) { SharedBuysStore.perform(operation) }.value
+        }
+        writeTask = nil
     }
 }

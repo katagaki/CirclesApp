@@ -72,7 +72,7 @@ public final class SharedBuysSession {
 
     public private(set) var sessionKey: Data?
     public private(set) var deviceID: String = ""
-    private var deviceAuthKey: Data = SharedBuysCrypto.newDeviceAuthKey()
+    private(set) var deviceAuthKey: Data = SharedBuysCrypto.newDeviceAuthKey()
     var pushToken: String?
     var pushEnvironment: String = "sandbox"
     public private(set) var eventNumber: Int = 0
@@ -91,6 +91,8 @@ public final class SharedBuysSession {
     var outbox: [RelayRecord] = []
     var flushTask: Task<Void, Never>?
     private var relayTask: Task<Void, Never>?
+    @ObservationIgnored var pendingWrite: SharedBuysStore.Pending?
+    @ObservationIgnored var writeTask: Task<Void, Never>?
     public var activity: Any?
     let relay = SharedBuysRelay()
     let bluetooth = SharedBuysBluetooth()
@@ -257,7 +259,7 @@ public final class SharedBuysSession {
         changes = []
         lastSeq = 0
         status = .idle
-        SharedBuysStore.clear()
+        submit(.clear)
         note("left session")
     }
 
@@ -463,25 +465,6 @@ public final class SharedBuysSession {
             guard self.isActive else { return }
             self.connect()
         }
-    }
-
-    /// Snapshots the log and writes it away from the caller.
-    ///
-    /// Encoding every change and writing the file happened inline on whichever thread
-    /// tapped an item — O(N) per change and O(N²) across a session, on the main thread.
-    /// The snapshot is taken here, where the state is consistent; the encode and the
-    /// write happen on the store's own serial executor.
-    func persist() {
-        guard let sessionKey else { return }
-        let snapshot = SharedBuysSnapshot(
-            sessionKey: sessionKey,
-            deviceID: deviceID,
-            deviceAuthKey: deviceAuthKey,
-            eventNumber: eventNumber,
-            lastSeq: lastSeq,
-            changes: changes
-        )
-        Task.detached(priority: .utility) { await SharedBuysStore.writer.save(snapshot) }
     }
 
     public func note(_ message: String) {
