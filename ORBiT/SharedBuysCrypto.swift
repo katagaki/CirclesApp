@@ -6,6 +6,7 @@ enum SharedBuysCrypto {
     static let topicInfo = "circles-buys/v1/topic"
     static let opsInfo = "circles-buys/v1/ops"
     static let relayAuthInfo = "circles-buys/v1/relay-auth"
+    static let handshakeInfo = "circles-buys/v1/ble-handshake"
     static let tagLength = 16
     static let nonceLength = 12
     static let randomNonceMarker = Data([0x53, 0x42, 0x32, 0x00])
@@ -23,6 +24,13 @@ enum SharedBuysCrypto {
     }
 
     static func newDeviceAuthKey() -> Data { randomBytes(count: 32) }
+
+    static func randomNonce(count: Int) -> Data { randomBytes(count: count) }
+
+    static func constantTimeEqual(_ lhs: Data, _ rhs: Data) -> Bool {
+        guard lhs.count == rhs.count else { return false }
+        return zip(lhs, rhs).reduce(UInt8(0)) { $0 | ($1.0 ^ $1.1) } == 0
+    }
 
     static func roomID(sessionKey: Data) -> String {
         let mac = HMAC<SHA256>.authenticationCode(

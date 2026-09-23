@@ -1,4 +1,5 @@
 import CoreBluetooth
+import CryptoKit
 import Foundation
 
 enum SharedBuysProfile {
@@ -11,7 +12,6 @@ enum SharedBuysProfile {
     static let maxPayloadPerChunk = 160
     static let frameHeaderLength = 4
     static let frameMagic: UInt8 = 0x01
-    static let handshakeMagic: UInt8 = 0x02
     static let advertisementLength = 6
 
     /// The body a chunk may carry over a link whose maximum write is `writeLength`.
@@ -28,22 +28,6 @@ enum SharedBuysProfile {
 
     static func window(at date: Date) -> Int {
         Int(date.timeIntervalSince1970 / advertisementWindow)
-    }
-
-    static func handshake(sessionKey: Data, at date: Date = .now) -> Data {
-        var frame = Data([handshakeMagic])
-        frame.append(sessionTag(sessionKey: sessionKey, at: date))
-        return frame
-    }
-
-    static func handshakeTag(in frame: Data) -> Data? {
-        guard frame.count == 3, frame[frame.startIndex] == handshakeMagic else { return nil }
-        return Data(frame.dropFirst())
-    }
-
-    static func accepts(handshake frame: Data, sessionKey: Data, at date: Date = .now) -> Bool {
-        guard let tag = handshakeTag(in: frame) else { return false }
-        return acceptedTags(sessionKey: sessionKey, at: date).contains(tag)
     }
 
     static func acceptedTags(sessionKey: Data, at date: Date = .now) -> [Data] {
@@ -91,6 +75,82 @@ enum SharedBuysProfile {
     static func accepts(advertisement: Data, sessionKey: Data, at date: Date = .now) -> Bool {
         guard advertisement.count == advertisementLength else { return false }
         return acceptedTags(sessionKey: sessionKey, at: date).contains(Data(advertisement.prefix(2)))
+    }
+}
+
+/// Proves both ends of a link hold the room key, over fresh nonces.
+///
+/// The old handshake was the advertisement's two tag bytes, which every scanner in range
+/// can read, so anyone could replay them and be taken for a member. Now the central
+/// sends a random challenge, the peripheral answers with its own nonce and a MAC over
+/// both, and the central confirms with a MAC under a different label, so neither answer
+/// can be reflected back as the other. Every frame fits the 20 bytes a link at the
+/// default MTU carries.
+enum SharedBuysHandshake {
+
+    static let challengeMagic: UInt8 = 0x03
+    static let responseMagic: UInt8 = 0x04
+    static let confirmMagic: UInt8 = 0x05
+    static let nonceLength = 8
+    static let macLength = 8
+
+    enum Frame: Equatable {
+        case challenge(nonce: Data)
+        case response(nonce: Data, mac: Data)
+        case confirm(mac: Data)
+    }
+
+    static func key(sessionKey: Data) -> SymmetricKey {
+        SharedBuysCrypto.derive(SharedBuysCrypto.handshakeInfo, from: sessionKey)
+    }
+
+    static func nonce() -> Data { SharedBuysCrypto.randomNonce(count: nonceLength) }
+
+    static func challenge(nonce: Data) -> Data { Data([challengeMagic]) + nonce }
+
+    static func response(challenge: Data, nonce: Data, key: SymmetricKey) -> Data {
+        Data([responseMagic]) + nonce + mac("resp", challenge: challenge, response: nonce, key: key)
+    }
+
+    static func confirm(challenge: Data, response: Data, key: SymmetricKey) -> Data {
+        Data([confirmMagic]) + mac("conf", challenge: challenge, response: response, key: key)
+    }
+
+    static func verifiesResponse(_ mac: Data, challenge: Data, response: Data, key: SymmetricKey) -> Bool {
+        SharedBuysCrypto.constantTimeEqual(
+            mac,
+            Self.mac("resp", challenge: challenge, response: response, key: key)
+        )
+    }
+
+    static func verifiesConfirm(_ mac: Data, challenge: Data, response: Data, key: SymmetricKey) -> Bool {
+        SharedBuysCrypto.constantTimeEqual(
+            mac,
+            Self.mac("conf", challenge: challenge, response: response, key: key)
+        )
+    }
+
+    /// Reads a handshake frame, told apart from chunk frames (`0x01`) by first byte and
+    /// exact length.
+    static func parse(_ frame: Data) -> Frame? {
+        let bytes = [UInt8](frame)
+        guard let magic = bytes.first else { return nil }
+        let body = bytes.dropFirst()
+        switch (magic, bytes.count) {
+        case (challengeMagic, 1 + nonceLength):
+            return .challenge(nonce: Data(body))
+        case (responseMagic, 1 + nonceLength + macLength):
+            return .response(nonce: Data(body.prefix(nonceLength)), mac: Data(body.suffix(macLength)))
+        case (confirmMagic, 1 + macLength):
+            return .confirm(mac: Data(body))
+        default:
+            return nil
+        }
+    }
+
+    private static func mac(_ label: String, challenge: Data, response: Data, key: SymmetricKey) -> Data {
+        let input = Data(label.utf8) + challenge + response
+        return Data(HMAC<SHA256>.authenticationCode(for: input, using: key)).prefix(macLength)
     }
 }
 

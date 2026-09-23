@@ -1,4 +1,5 @@
 import CoreBluetooth
+import CryptoKit
 import Foundation
 
 // The class conforms to three CoreBluetooth delegates and owns both GATT roles, so it
@@ -37,6 +38,13 @@ final class SharedBuysBluetooth: NSObject {
     private var refreshTask: Task<Void, Never>?
 
     private var sessionKey: Data?
+    private var handshakeKey: SymmetricKey?
+    /// The challenge we sent each peripheral, until it answers.
+    private var challenges: [UUID: Data] = [:]
+    /// The challenge each central sent us and the nonce we answered with, until it
+    /// confirms.
+    private var responses: [UUID: (challenge: Data, nonce: Data)] = [:]
+    private static let maxPendingResponses = 16
     private var digest: Data = Data(repeating: 0, count: 4)
     private var onEvent: ((BluetoothEvent) -> Void)?
 
@@ -48,6 +56,7 @@ final class SharedBuysBluetooth: NSObject {
 
     func start(sessionKey: Data, digest: Data, onEvent: @escaping (BluetoothEvent) -> Void) {
         self.sessionKey = sessionKey
+        self.handshakeKey = SharedBuysHandshake.key(sessionKey: sessionKey)
         self.digest = digest
         self.onEvent = onEvent
         if peripheralManager == nil {
@@ -81,7 +90,10 @@ final class SharedBuysBluetooth: NSObject {
         pendingNotifies.removeAll()
         pendingWrites.removeAll()
         peerDigests.removeAll()
+        challenges.removeAll()
+        responses.removeAll()
         sessionKey = nil
+        handshakeKey = nil
         onEvent = nil
     }
 
@@ -276,6 +288,7 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralManagerDelegate {
         subscribers.removeAll { $0.identifier == central.identifier }
         verifiedCentrals.remove(central.identifier)
         reassemblers[central.identifier] = nil
+        responses[central.identifier] = nil
         announcePeers()
     }
 
@@ -283,18 +296,49 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralManagerDelegate {
         for request in requests {
             guard let value = request.value else { continue }
             let identifier = request.central.identifier
-            if SharedBuysProfile.handshakeTag(in: value) != nil {
-                guard let sessionKey,
-                      SharedBuysProfile.accepts(handshake: value, sessionKey: sessionKey) else { continue }
-                verifiedCentrals.insert(identifier)
-                notify(SharedBuysProfile.handshake(sessionKey: sessionKey), to: [request.central])
-                announcePeers()
-                // We never scanned this one, so its digest is unknown.
-                onEvent?(.peerVerified(nil))
+            if let frame = SharedBuysHandshake.parse(value) {
+                answer(frame, from: request.central)
                 continue
             }
             guard verifiedCentrals.contains(identifier) else { continue }
             deliver(value, from: identifier)
+        }
+    }
+
+    /// The peripheral half of the handshake: answer a challenge, then check the confirm.
+    ///
+    /// Any challenge gets an answer, since a stranger learns nothing from a MAC over a
+    /// nonce it chose and one we chose; only a central that proves the key in its
+    /// confirm is let in.
+    private func answer(_ frame: SharedBuysHandshake.Frame, from central: CBCentral) {
+        guard let handshakeKey else { return }
+        let identifier = central.identifier
+        switch frame {
+        case .challenge(let challenge):
+            let nonce = SharedBuysHandshake.nonce()
+            if responses[identifier] == nil, responses.count >= Self.maxPendingResponses,
+               let evicted = responses.keys.first {
+                responses[evicted] = nil
+            }
+            responses[identifier] = (challenge, nonce)
+            notify(
+                SharedBuysHandshake.response(challenge: challenge, nonce: nonce, key: handshakeKey),
+                to: [central]
+            )
+        case .confirm(let mac):
+            guard let pending = responses.removeValue(forKey: identifier),
+                  SharedBuysHandshake.verifiesConfirm(
+                      mac,
+                      challenge: pending.challenge,
+                      response: pending.nonce,
+                      key: handshakeKey
+                  ) else { return }
+            verifiedCentrals.insert(identifier)
+            announcePeers()
+            // We never scanned this one, so its digest is unknown.
+            onEvent?(.peerVerified(nil))
+        case .response:
+            return
         }
     }
 
@@ -353,6 +397,7 @@ extension SharedBuysBluetooth: @preconcurrency CBCentralManagerDelegate {
         inboxes[peripheral.identifier] = nil
         pendingWrites[peripheral.identifier] = nil
         peerDigests[peripheral.identifier] = nil
+        challenges[peripheral.identifier] = nil
         reassemblers[peripheral.identifier] = nil
         centralReassemblers[peripheral.identifier] = nil
         verifiedPeripherals.remove(peripheral.identifier)
@@ -393,12 +438,11 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralDelegate {
         error: (any Error)?
     ) {
         guard characteristic.uuid == SharedBuysProfile.outboxUUID, characteristic.isNotifying else { return }
-        guard let sessionKey, let inbox = inboxes[peripheral.identifier] else { return }
-        peripheral.writeValue(
-            SharedBuysProfile.handshake(sessionKey: sessionKey),
-            for: inbox,
-            type: .withoutResponse
-        )
+        guard handshakeKey != nil, inboxes[peripheral.identifier] != nil else { return }
+        let challenge = SharedBuysHandshake.nonce()
+        challenges[peripheral.identifier] = challenge
+        pendingWrites[peripheral.identifier, default: []].append(SharedBuysHandshake.challenge(nonce: challenge))
+        pumpWrites(to: peripheral.identifier)
     }
 
     func peripheralIsReady(toSendWriteWithoutResponse peripheral: CBPeripheral) {
@@ -411,12 +455,21 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralDelegate {
         error: (any Error)?
     ) {
         guard let value = characteristic.value else { return }
-        if SharedBuysProfile.handshakeTag(in: value) != nil {
-            guard let sessionKey,
-                  SharedBuysProfile.accepts(handshake: value, sessionKey: sessionKey) else {
+        if let frame = SharedBuysHandshake.parse(value) {
+            // The central half of the handshake: the peripheral must answer our own
+            // challenge, and only then do we prove the key back to it.
+            guard case .response(let nonce, let mac) = frame,
+                  let handshakeKey,
+                  let challenge = challenges.removeValue(forKey: peripheral.identifier),
+                  SharedBuysHandshake.verifiesResponse(mac, challenge: challenge, response: nonce, key: handshakeKey)
+            else {
                 reject(peripheral)
                 return
             }
+            pendingWrites[peripheral.identifier, default: []].append(
+                SharedBuysHandshake.confirm(challenge: challenge, response: nonce, key: handshakeKey)
+            )
+            pumpWrites(to: peripheral.identifier)
             verifiedPeripherals.insert(peripheral.identifier)
             announcePeers()
             onEvent?(.peerVerified(peerDigests[peripheral.identifier]))

@@ -23,19 +23,35 @@ public extension SharedBuysSession {
             let tag = SharedBuysProfile.sessionTag(sessionKey: sessionKey)
                 .map { String(format: "%02x", $0) }.joined()
             note("ble tag \(tag) window \(SharedBuysProfile.window(at: .now))")
-
-            let handshake = SharedBuysProfile.handshake(sessionKey: sessionKey)
-            let accepted = SharedBuysProfile.accepts(handshake: handshake, sessionKey: sessionKey)
-            let stranger = Data(repeating: 0x5a, count: sessionKey.count)
-            let rejected = !SharedBuysProfile.accepts(handshake: handshake, sessionKey: stranger)
-            let notConfused = frames.first.map { SharedBuysProfile.handshakeTag(in: $0) == nil } ?? false
-            note(
-                "handshake \(handshake.count)B " +
-                "accept \(accepted ? "ok" : "FAILED") " +
-                "reject \(rejected ? "ok" : "FAILED") " +
-                "framing \(notConfused ? "ok" : "FAILED")"
-            )
         }
+
+        let notConfused = frames.first.map { SharedBuysHandshake.parse($0) == nil } ?? false
+        checkHandshake(notConfused: notConfused)
+    }
+
+    /// Runs the handshake test vector both platforms share, and a stranger against it.
+    private func checkHandshake(notConfused: Bool) {
+        let key = SharedBuysHandshake.key(sessionKey: Data((0..<32).map { UInt8($0) }))
+        let challenge = Data((1...8).map { UInt8($0) })
+        let nonce = Data((0x11...0x18).map { UInt8($0) })
+        let response = SharedBuysHandshake.response(challenge: challenge, nonce: nonce, key: key)
+        let confirm = SharedBuysHandshake.confirm(challenge: challenge, response: nonce, key: key)
+        let hex = { (data: Data) in data.map { String(format: "%02x", $0) }.joined() }
+        let vector = hex(response) == "04111213141516171812f9003d9145f14c"
+            && hex(confirm) == "05cff3acad54e390af"
+        let stranger = SharedBuysHandshake.key(sessionKey: Data(repeating: 0x5a, count: 32))
+        var verified = false
+        if case .response(let parsedNonce, let mac) = SharedBuysHandshake.parse(response) {
+            verified = SharedBuysHandshake.verifiesResponse(mac, challenge: challenge, response: parsedNonce, key: key)
+                && !SharedBuysHandshake.verifiesResponse(
+                    mac, challenge: challenge, response: parsedNonce, key: stranger
+                )
+        }
+        note(
+            "handshake vector \(vector ? "ok" : "FAILED") " +
+            "verify \(verified ? "ok" : "FAILED") " +
+            "framing \(notConfused ? "ok" : "FAILED")"
+        )
     }
 
     /// Encodes the note's test vector from scratch and parses it back.
