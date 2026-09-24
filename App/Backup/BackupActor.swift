@@ -1,10 +1,3 @@
-//
-//  BackupActor.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/08/20.
-//
-
 import Foundation
 import SwiftData
 
@@ -25,14 +18,12 @@ actor BackupActor {
         return (try? JSONEncoder().encode(encodable)) ?? Data("[]".utf8)
     }
 
-    /// Size the visits take up in a backup, and zero when there are none to back up.
     func visitsSize() -> Int64 {
         let count = (try? modelContext.fetchCount(FetchDescriptor<CirclesVisitEntry>())) ?? 0
         guard count > 0 else { return 0 }
         return Int64(visitsData().count)
     }
 
-    /// Merges the backed up visits in, keeping any visit that already exists locally.
     func restoreVisits(from data: Data) {
         guard let visits = try? JSONDecoder().decode([BackupVisit].self, from: data) else { return }
         let existing = (try? modelContext.fetch(FetchDescriptor<CirclesVisitEntry>())) ?? []

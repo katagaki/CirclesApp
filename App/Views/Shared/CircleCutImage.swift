@@ -1,10 +1,3 @@
-//
-//  CircleCutImage.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/11/09.
-//
-
 import SwiftData
 import SwiftUI
 import RADiUS
@@ -77,7 +70,6 @@ struct CircleCutImage: View {
         .overlay {
             if database.hasCircleImage(circle.id) {
                 Canvas { context, size in
-                    // Favorite color
                     if let favorites = favorites.wcIDMappedItems,
                        let extendedInformation = circle.extendedInformation,
                        let favorite = favorites[extendedInformation.webCatalogID] {
@@ -94,7 +86,6 @@ struct CircleCutImage: View {
                         context.fill(checkmarkSquarePath, with: .color(favorite.favorite.color.backgroundColor()))
                     }
 
-                    // Checkmark for visit status
                     if showVisitStatus,
                         !visits.filter({$0.eventNumber == planner.activeEventNumber}).isEmpty {
                         let checkmarkSize = 0.20 * size.width
@@ -189,7 +180,6 @@ struct CircleCutImage: View {
 
     func prepareCutImage() {
         let isOnline = authenticator.effectiveOnlineState == .online
-        // Use the cached web cut when available, otherwise fall back to the catalog cut
         if cutType == .web, !(isOnline && forceReload), let cachedWebCut = cachedWebCut() {
             cutImage = cachedWebCut
             displayedCutType = .web
@@ -197,7 +187,6 @@ struct CircleCutImage: View {
         } else if cutImage == nil {
             loadCatalogCut()
         }
-        // Only fetch web cut when cutType is .web and we're online
         if cutType == .web && isOnline,
            let extendedInformation = circle.extendedInformation {
             let circleID = circle.id

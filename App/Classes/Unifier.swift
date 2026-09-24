@@ -1,5 +1,6 @@
 import Observation
 import SwiftUI
+import AXiS
 
 enum UnifiedDisplayMode {
     case sheet
@@ -34,13 +35,12 @@ class Unifier {
         self.displayMode = UIDevice.current.userInterfaceIdiom == .phone ? .sheet : .panel
     }
 
-    // Currently displayed sheet's data representation
     var current: UnifiedPath? = .circles
     var selectedDetent: PresentationDetent = .height(360)
     var isMinimized: Bool {
         displayMode == .sheet && selectedDetent != .height(360) && selectedDetent != .large
     }
-    var compactBarHeight: CGFloat = 76.0
+    let compactBarHeight: CGFloat = 88.0
     var compactDetent: PresentationDetent {
         .height(compactBarHeight)
     }
@@ -58,32 +58,27 @@ class Unifier {
         }
     }
 
-    // Bottom navigation stack's view path
     var stackPath: [UnifiedPath] = []
 
-    // Sheet's navigation stack's view path
     var sheetPath: [UnifiedPath] = []
 
     // Other sheets
     var isMyComiketPresenting: Bool = false
+    var isSharedBuysDebugPresenting: Bool = false
 
     // Date and hall menus, drawn as overlays so the panel stays open
     var presentedControlMenu: UnifiedControlMenu?
     var controlFrame: CGRect = .zero
 
-    // Pending attachment from action extension
     var pendingAttachmentData: Data?
 
-    // Alerts
     var isGoingToSignOut: Bool = false
     var isGoingToEnterOfflineMode: Bool = false
     var isGoingToExitOfflineMode: Bool = false
     var isOfflineModeTipShowing: Bool = false
 
-    // Quick access bar search request
     var isSearchRequested: Bool = false
 
-    // Data update trigger
     var shouldUpdateData: Bool = false
 
     var animatesReload: Bool = true
@@ -109,14 +104,11 @@ class Unifier {
         }
     }
 
-    @MainActor
-    func updateCompactBarHeight(_ newValue: CGFloat) {
-        let newHeight = max(60.0, newValue.rounded())
-        guard newHeight != compactBarHeight else { return }
-        let previousHeight = compactBarHeight
-        compactBarHeight = newHeight
-        if selectedDetent == .height(previousHeight) {
-            selectedDetent = .height(newHeight)
+    var minimizedCircle: ComiketCircle? {
+        switch sheetPath.last ?? current {
+        case .circleDetail(let circle): circle
+        case .namespacedCircleDetail(let circle, _, _, _): circle
+        default: nil
         }
     }
 

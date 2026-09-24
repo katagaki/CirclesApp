@@ -1,10 +1,3 @@
-//
-//  OnHandApp.swift
-//  OnHand
-//
-//  Created by シン・ジャスティン on 2026/08/19.
-//
-
 import SwiftUI
 
 @main

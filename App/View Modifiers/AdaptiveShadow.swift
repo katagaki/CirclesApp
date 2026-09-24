@@ -1,10 +1,3 @@
-//
-//  AdaptiveShadow.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/08/19.
-//
-
 import SwiftUI
 
 struct AdaptiveShadow: ViewModifier {

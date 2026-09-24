@@ -1,10 +1,3 @@
-//
-//  Database.swift
-//  AXiS
-//
-//  Created by シン・ジャスティン on 2024/07/15.
-//
-
 import Foundation
 import RADiUS
 import SQLite
@@ -37,7 +30,6 @@ public class Database {
     )
 
     public init() {
-        // No initialization required; properties are set lazily or by callers.
     }
 
     static let indexedFlagKeyPrefix = "Database.Indexed."
@@ -122,12 +114,10 @@ public class Database {
             let groupTextDatabaseURL = Database.groupContainerURL?
                 .appending(path: "webcatalog\(event.number).db")
 
-            // Migrate from Documents to group container if needed
             if FileManager.default.fileExists(atPath: textDatabaseURL.path(percentEncoded: false)) {
                 migrateTextDatabaseToGroupContainer(textDatabaseURL, eventNumber: event.number)
             }
 
-            // Use group container database if available, fall back to Documents
             if let groupTextDatabaseURL,
                FileManager.default.fileExists(atPath: groupTextDatabaseURL.path(percentEncoded: false)) {
                 #if DEBUG

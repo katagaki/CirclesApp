@@ -1,10 +1,3 @@
-//
-//  HighlightData.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/14.
-//
-
 import Foundation
 
 struct HighlightData: Equatable {

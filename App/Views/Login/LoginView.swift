@@ -1,11 +1,15 @@
+import ORBiT
 import SwiftUI
 
 struct LoginView: View {
 
     @Environment(\.openURL) var openURL
     @Environment(Authenticator.self) var authenticator
+    @Environment(SharedBuysSession.self) var sharedBuys
 
     @State var isOfflineModeConfirmationShowing: Bool = false
+
+    let fadeHeight: CGFloat = 44.0
 
     var body: some View {
         @Bindable var authenticator = authenticator
@@ -40,21 +44,12 @@ struct LoginView: View {
             .padding(18.0)
         }
         .background {
-            ZStack(alignment: .bottom) {
-                LinearGradient(
-                    colors: [.accent.opacity(0.12), .clear],
-                    startPoint: .top,
-                    endPoint: .center
-                )
-                .ignoresSafeArea()
-                Image("TokyoBigSight")
-                    .resizable()
-                    .scaledToFit()
-                    .tint(.accent)
-                    .opacity(0.07)
-                    .ignoresSafeArea(edges: .bottom)
-                    .offset(y: 50.0)
-            }
+            LinearGradient(
+                colors: [.accent.opacity(0.12), .clear],
+                startPoint: .top,
+                endPoint: .center
+            )
+            .ignoresSafeArea()
         }
         .safeAreaInset(edge: .bottom, spacing: 0.0) {
             VStack(spacing: 12.0) {
@@ -100,6 +95,23 @@ struct LoginView: View {
                 .clipShape(.capsule)
                 .tint(.accent)
                 .buttonStyle(.glassProminent)
+                // Someone who was handed a join code has no circle.ms account and no
+                // reason to make one; they are here to tick items off a friend's list.
+                // Guest Mode is Shared Buys and nothing else, so it goes with the feature.
+                if sharedBuys.isFeatureEnabled {
+                    Button {
+                        authenticator.isAuthenticating = false
+                        sharedBuys.enterGuestMode()
+                    } label: {
+                        Text("Login.JoinAsGuest")
+                            .fontWeight(.bold)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6.0)
+                    }
+                    .clipShape(.capsule)
+                    .tint(.accent)
+                    .buttonStyle(.glass)
+                }
                 if authenticator.canUseOfflineMode {
                     Button {
                         isOfflineModeConfirmationShowing = true
@@ -115,6 +127,38 @@ struct LoginView: View {
                 }
             }
             .padding()
+            .padding(.top, 8.0)
+            // The scroll area deliberately bleeds under this stack, so scrim it with
+            // the page's own ground. The fade is held in the overhang above the stack
+            // so text dissolves before it reaches the buttons, and the hall is drawn
+            // over the scrim rather than under it, so it survives.
+            .background(alignment: .bottom) {
+                ZStack(alignment: .bottom) {
+                    Rectangle()
+                        .fill(.background)
+                        .mask {
+                            VStack(spacing: 0.0) {
+                                LinearGradient(
+                                    colors: [.clear, .black],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                                .frame(height: fadeHeight)
+                                Rectangle()
+                            }
+                        }
+                        .padding(.top, -fadeHeight)
+                        .ignoresSafeArea(edges: .bottom)
+                    Image("TokyoBigSight")
+                        .resizable()
+                        .scaledToFit()
+                        .tint(.accent)
+                        .opacity(0.07)
+                        .ignoresSafeArea(edges: .bottom)
+                        .offset(y: 50.0)
+                }
+                .allowsHitTesting(false)
+            }
         }
         .alert("Alerts.OfflineMode.Enter.Title", isPresented: $isOfflineModeConfirmationShowing) {
             Button("Login.UseOffline") {

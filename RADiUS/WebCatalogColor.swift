@@ -1,10 +1,3 @@
-//
-//  WebCatalogColor.swift
-//  RADiUS
-//
-//  Created by シン・ジャスティン on 2024/08/04.
-//
-
 import SwiftUI
 
 public enum WebCatalogColor: Int, CaseIterable, Codable, Sendable {

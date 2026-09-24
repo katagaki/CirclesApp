@@ -1,0 +1,117 @@
+import CryptoKit
+import Foundation
+
+@MainActor
+public extension SharedBuysSession {
+
+    /// Opens incoming records away from the actor that received them.
+    ///
+    /// Opening is pure work over the batch — a tag check and a GCM open per record — so
+    /// it runs off the main actor and only the append comes back.
+    internal func ingest(_ records: [RelayRecord]) {
+        guard let sessionKey, let roomID else { return }
+        let known = Set(changes.map(\.id))
+        let fresh = records.filter { !known.contains("\($0.device)#\($0.seq)") }
+        guard !fresh.isEmpty else { return }
+        let keys = keys(for: sessionKey)
+        Task.detached(priority: .userInitiated) {
+            let opened = fresh.compactMap {
+                Self.open($0, keys: keys, roomID: roomID)
+            }
+            let rejected = fresh.count - opened.count
+            await MainActor.run { self.adopt(opened, rejected: rejected) }
+        }
+    }
+
+    internal func seal(_ change: SharedBuyChange, sessionKey: Data, roomID: String) -> RelayRecord? {
+        if let record = sealed[change.id] { return record }
+        let keys = keys(for: sessionKey)
+        guard let record = Self.seal(change, keys: keys, roomID: roomID) else { return nil }
+        sealed[change.id] = record
+        return record
+    }
+
+    /// The room's record keys, derived once per session key instead of twice per record.
+    internal func keys(for sessionKey: Data) -> SharedBuysKeys {
+        if let keyCache, keyCache.sessionKey == sessionKey { return keyCache.keys }
+        let keys = SharedBuysKeys(sessionKey: sessionKey)
+        keyCache = (sessionKey, keys)
+        return keys
+    }
+
+    private nonisolated static func seal(_ change: SharedBuyChange, keys: SharedBuysKeys, roomID: String) -> RelayRecord? {
+        guard let plaintext = try? JSONEncoder().encode(change.payload) else { return nil }
+        guard let blob = try? SharedBuysCrypto.seal(
+            plaintext,
+            contentKey: keys.content,
+            roomID: roomID,
+            deviceID: change.device,
+            seq: change.seq
+        ) else { return nil }
+        let tag = SharedBuysCrypto.recordTag(
+            deviceID: change.device,
+            seq: change.seq,
+            blob: blob,
+            relayAuthKey: keys.relayAuth
+        )
+        return RelayRecord(
+            device: change.device,
+            seq: change.seq,
+            blob: blob.base64URL,
+            tag: tag.base64URL
+        )
+    }
+
+    /// Verifies and decrypts one record. Pure, so it is safe anywhere.
+    internal nonisolated static func open(
+        _ record: RelayRecord,
+        keys: SharedBuysKeys,
+        roomID: String
+    ) -> SharedBuyChange? {
+        guard let blob = Data(base64URL: record.blob) else { return nil }
+        // Whoever handed us this record — the relay, or a peer over Bluetooth — is not
+        // trusted to have authored it. Check the tag before it enters the log.
+        guard let offered = Data(base64URL: record.tag),
+              offered == SharedBuysCrypto.recordTag(
+                  deviceID: record.device,
+                  seq: record.seq,
+                  blob: blob,
+                  relayAuthKey: keys.relayAuth
+              ) else { return nil }
+        guard let plaintext = try? SharedBuysCrypto.open(
+            blob,
+            contentKey: keys.content,
+            roomID: roomID,
+            deviceID: record.device,
+            seq: record.seq
+        ), let payload = try? JSONDecoder().decode(SharedBuyPayload.self, from: plaintext) else {
+            return nil
+        }
+        return SharedBuyChange(device: record.device, seq: record.seq, payload: payload)
+    }
+
+    /// Appends what was opened, re-checking against a log that may have moved meanwhile.
+    internal func adopt(_ opened: [SharedBuyChange], rejected: Int) {
+        var known = Set(changes.map(\.id))
+        var added = 0
+        for change in opened {
+            // A batch can carry the same record twice — a relay echo, or a `want` reply
+            // overlapping the live stream — so the set has to grow as we append.
+            guard known.insert(change.id).inserted else { continue }
+            changes.append(change)
+            // A Lamport clock. Without it a fresh device's first change sorts under an
+            // established peer's thirtieth, and the older edit wins on every screen.
+            clock = max(clock, change.order)
+            // Our own change coming back means a save was lost; never reuse its seq.
+            if change.device == deviceID { lastSeq = max(lastSeq, change.seq) }
+            added += 1
+        }
+        if rejected > 0 { note("dropped \(rejected) unopenable") }
+        if added > 0 {
+            persist()
+            bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothDigestVector))
+            updateActivity()
+            note("received \(added)")
+        }
+    }
+}

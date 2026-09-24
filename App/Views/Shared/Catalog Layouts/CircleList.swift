@@ -1,10 +1,3 @@
-//
-//  CircleList.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/04.
-//
-
 import SwiftUI
 import TipKit
 import AXiS

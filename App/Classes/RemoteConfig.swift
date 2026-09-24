@@ -1,10 +1,3 @@
-//
-//  RemoteConfig.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/06/05.
-//
-
 import CloudKit
 import Foundation
 
@@ -13,6 +6,17 @@ struct RemoteConfig: Sendable {
     var clientSecret: String?
     var redirectURL: String?
     var broadcastMessage: String?
+}
+
+/// One feature's relay settings, as published in the `RelayConfig` record type.
+///
+/// The address of the relay is deliberately not in the binary: it lives here, one record
+/// per feature, and CloudKit's development and production environments give the
+/// beta-versus-production split for free.
+struct RelayConfig: Sendable {
+    var baseURL: String?
+    var isFeatureEnabled: Bool
+    var syncRate: Int
 }
 
 enum BroadcastFetchOutcome: Sendable {
@@ -26,6 +30,7 @@ actor RemoteConfigProvider {
     static let containerIdentifier: String = "iCloud.com.tsubuzaki.KamiSeries"
     static let recordType: String = "RemoteConfig"
     static let recordName: String = "production"
+    static let relayRecordName: String = "sharedBuys"
 
     private let container: CKContainer
     private let database: CKDatabase
@@ -87,6 +92,43 @@ actor RemoteConfigProvider {
                 } else {
                     continuation.resume(returning: .failed)
                 }
+            }
+            database.add(operation)
+        }
+    }
+
+    /// Fetches one feature's relay settings by record name, which is its feature ID.
+    ///
+    /// Returns `nil` when the record cannot be read, which the caller must treat as "leave
+    /// the feature alone" rather than "switch it off": a timeout on a flaky connection is
+    /// far more likely than a deliberate shutdown, and `featureEnabled` hides the feature
+    /// outright.
+    func fetchRelayConfig(
+        featureID: String = relayRecordName,
+        timeout: TimeInterval = 5.0
+    ) async -> RelayConfig? {
+        let recordID = CKRecord.ID(recordName: featureID)
+        let operation = CKFetchRecordsOperation(recordIDs: [recordID])
+        operation.desiredKeys = ["baseUrl", "featureEnabled", "syncRate"]
+        let configuration = CKOperation.Configuration()
+        configuration.timeoutIntervalForRequest = timeout
+        configuration.timeoutIntervalForResource = timeout
+        operation.configuration = configuration
+
+        return await withCheckedContinuation { continuation in
+            var config: RelayConfig?
+            operation.perRecordResultBlock = { _, result in
+                guard case .success(let record) = result else { return }
+                config = RelayConfig(
+                    baseURL: record["baseUrl"] as? String,
+                    // CloudKit hands a checkbox back as Int64, as `authEnabled` already
+                    // assumes. A record with the field left empty reads as enabled.
+                    isFeatureEnabled: (record["featureEnabled"] as? Int64 ?? 1) != 0,
+                    syncRate: Int(record["syncRate"] as? Int64 ?? 0)
+                )
+            }
+            operation.fetchRecordsResultBlock = { _ in
+                continuation.resume(returning: config)
             }
             database.add(operation)
         }

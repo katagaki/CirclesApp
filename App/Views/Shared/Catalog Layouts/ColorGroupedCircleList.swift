@@ -1,10 +1,3 @@
-//
-//  ColorGroupedCircleList.swift
-//  CiRCLES
-//
-//  Created by Antigravity on 2026/02/01.
-//
-
 import SwiftUI
 import TipKit
 import RADiUS

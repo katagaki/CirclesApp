@@ -1,10 +1,3 @@
-//
-//  CircleDetailHero.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/10.
-//
-
 import SwiftUI
 import AXiS
 
@@ -26,7 +19,6 @@ struct CircleDetailHero: View {
 
     var body: some View {
         HStack(alignment: .top, spacing: 12.0) {
-            // Cut image
             VStack(alignment: .leading, spacing: 2.0) {
                 CircleCutImage(
                     circle,
@@ -58,7 +50,6 @@ struct CircleDetailHero: View {
                 .foregroundStyle(.secondary)
             }
 
-            // Info stack
             VStack(alignment: .leading, spacing: 8.0) {
                 HStack(spacing: 5.0) {
                     CircleBlockPill("Shared.\(circle.day)th.Day", size: .large)

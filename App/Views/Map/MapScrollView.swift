@@ -1,10 +1,3 @@
-//
-//  MapScrollView.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/13.
-//
-
 import SwiftUI
 import UIKit
 
@@ -63,14 +56,12 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
         if let position = mapper.scrollToPosition {
             let zoomScale = scrollView.zoomScale
 
-            // Calculate scaled position based on current zoom
             let scaledX = position.x * zoomScale
             let scaledY = position.y * zoomScale
 
             let halfWidth = scrollView.bounds.width / 2
             let halfHeight = scrollView.bounds.height / 2
 
-            // Calculate target offset, clamping to valid scroll range
             let centeredX = max(0, min(scaledX - halfWidth,
                                        scrollView.contentSize.width - scrollView.bounds.width))
 

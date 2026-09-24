@@ -1,10 +1,3 @@
-//
-//  MyEventNotifierSheet.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/15.
-//
-
 import SwiftUI
 import UserNotifications
 
@@ -180,14 +173,14 @@ struct MyEventNotifierSheet: View {
             .navigationTitle(date.formatted(date: .long, time: .omitted))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Shared.Cancel", role: .cancel) {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(role: .cancel) {
                         notificationsToUpdate.removeAll()
                         dismiss()
                     }
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Shared.Save") {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(role: .confirm) {
                         Task {
                             await saveNotifications()
                         }

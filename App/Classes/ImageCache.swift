@@ -1,10 +1,3 @@
-//
-//  ImageCache.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/11/09.
-//
-
 import Foundation
 import RADiUS
 import SwiftUI
@@ -78,12 +71,10 @@ class ImageCache {
             var finalImage: UIImage?
             var finalData: Data?
             if let image = UIImage(data: data) {
-                // PNG, JPEG
                 ImageCache.saveImage(data, named: String(id))
                 finalImage = image
                 finalData = data
             } else if let image = try? WebPDecoder().decodeUIImage(from: data, options: WebPDecoderOptions()) {
-                // WebP
                 var nonWebpData: Data?
                 if let convertedData = image.pngData() {
                     nonWebpData = convertedData
@@ -99,7 +90,6 @@ class ImageCache {
             if let finalImage {
                 return (finalImage, finalData)
             } else {
-                // Others (unsupported formats)
                 let placeholderData = Data()
                 ImageCache.saveImage(placeholderData, named: String(id))
                 return (nil, data)

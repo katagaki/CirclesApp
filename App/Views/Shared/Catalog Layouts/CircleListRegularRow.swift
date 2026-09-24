@@ -1,10 +1,3 @@
-//
-//  CircleListRegularRow.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/08.
-//
-
 import SwiftUI
 import AXiS
 

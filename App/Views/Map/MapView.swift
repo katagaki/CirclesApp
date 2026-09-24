@@ -1,10 +1,3 @@
-//
-//  MapView.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/08/07.
-//
-
 import SwiftUI
 import TipKit
 import AXiS

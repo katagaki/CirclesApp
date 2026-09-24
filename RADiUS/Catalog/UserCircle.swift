@@ -1,10 +1,3 @@
-//
-//  UserCircle.swift
-//  RADiUS
-//
-//  Created by シン・ジャスティン on 2024/07/15.
-//
-
 // swiftlint:disable nesting
 public struct UserCircle: Codable, Sendable {
     public let status: String

@@ -1,0 +1,49 @@
+DEFINE SCHEMA
+
+    CREATE ROLE CirclesAppUser;
+
+    RECORD TYPE RelayConfig (
+        "___createTime" TIMESTAMP,
+        "___createdBy"  REFERENCE,
+        "___etag"       STRING,
+        "___modTime"    TIMESTAMP,
+        "___modifiedBy" REFERENCE,
+        "___recordID"   REFERENCE QUERYABLE,
+        baseUrl         STRING,
+        featureEnabled  INT64,
+        featureId       STRING,
+        syncRate        INT64,
+        GRANT WRITE TO "_creator",
+        GRANT READ TO "_world"
+    );
+
+    RECORD TYPE RemoteConfig (
+        "___createTime"   TIMESTAMP,
+        "___createdBy"    REFERENCE,
+        "___etag"         STRING,
+        "___modTime"      TIMESTAMP,
+        "___modifiedBy"   REFERENCE,
+        "___recordID"     REFERENCE QUERYABLE,
+        authEnabled       INT64,
+        authMessage       STRING,
+        authMessageActive INT64,
+        authMessageJa     STRING,
+        clientID          STRING,
+        clientSecret      STRING,
+        redirectURL       STRING,
+        GRANT READ TO CirclesAppUser,
+        GRANT WRITE TO "_creator",
+        GRANT READ TO "_icloud"
+    );
+
+    RECORD TYPE Users (
+        "___createTime" TIMESTAMP,
+        "___createdBy"  REFERENCE,
+        "___etag"       STRING,
+        "___modTime"    TIMESTAMP,
+        "___modifiedBy" REFERENCE,
+        "___recordID"   REFERENCE,
+        roles           LIST<INT64>,
+        GRANT WRITE TO "_creator",
+        GRANT READ TO "_world"
+    );

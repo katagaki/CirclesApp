@@ -1,10 +1,3 @@
-//
-//  WebCatalogFavorite.swift
-//  RADiUS
-//
-//  Created by シン・ジャスティン on 2024/08/04.
-//
-
 // swiftlint:disable nesting
 public struct WebCatalogFavorite: Codable, Hashable, Sendable {
     public let webCatalogID: Int

@@ -1,10 +1,3 @@
-//
-//  DisplayModeSwitcher.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/02.
-//
-
 import SwiftUI
 
 struct DisplayModeSwitcher: View {

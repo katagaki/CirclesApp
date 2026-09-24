@@ -1,10 +1,3 @@
-//
-//  Planner.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/11/17.
-//
-
 import Foundation
 import SwiftUI
 import RADiUS
@@ -105,7 +98,6 @@ class Events {
     @MainActor
     func prepare(authToken: OpenIDToken) async {
         if eventData == nil {
-            // Use cached event data if available, and refresh it in the background
             if let cachedEventData = WebCatalog.cachedEvents() {
                 setEventData(cachedEventData)
                 Task {
@@ -114,7 +106,6 @@ class Events {
                     }
                 }
             } else {
-                // Fetch event data from API
                 if let freshEventData = await WebCatalog.events(authToken: authToken) {
                     setEventData(freshEventData)
                 }
@@ -123,7 +114,6 @@ class Events {
 
         guard let eventData, let latestEvent else { return }
 
-        // Set active event to latest event if active event number is not specified
         if activeEventNumber == -1 {
             activeEventNumber = latestEvent.number
             activeEventNumberUserDefault = activeEventNumber
@@ -131,7 +121,6 @@ class Events {
         }
         isActiveEventLatest = activeEventNumber == eventData.latestEventNumber
 
-        // Set specified active event using active event number
         if let eventInList = eventData.list.first(where: {$0.number == activeEventNumber}) {
             activeEvent = WebCatalogEvent.Response.Event(
                 id: eventInList.id,

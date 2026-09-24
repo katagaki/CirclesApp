@@ -1,10 +1,3 @@
-//
-//  BackupStore.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/08/20.
-//
-
 import Foundation
 import Synchronization
 
@@ -17,13 +10,11 @@ struct BackupPayload: Sendable {
     let visits: Data
 }
 
-/// What a backup found in iCloud Drive says about itself, without reading it back in full.
 struct BackupSnapshot: Sendable {
     let date: Date
     let deviceName: String?
 }
 
-/// Sizes of the data this device would put into its next backup.
 struct BackupContents: Sendable {
     let visitBytes: Int64
     let buysBytes: Int64
@@ -82,7 +73,6 @@ final class BackupStore: Sendable {
 
     // MARK: - Discovery
 
-    /// Whether a backup folder for this PID exists in iCloud Drive.
     func backupExists(for pid: Int) -> Bool {
         guard let folderURL = folderURL(for: pid) else { return false }
         var isDirectory: ObjCBool = false
@@ -109,7 +99,6 @@ final class BackupStore: Sendable {
         return BackupSnapshot(date: date, deviceName: (deviceName?.isEmpty ?? true) ? nil : deviceName)
     }
 
-    /// Sizes of the app group databases, split the way the backup screen lists them.
     func databaseSizes() -> (buys: Int64, attachments: Int64) {
         var buys: Int64 = 0
         var attachments: Int64 = 0
@@ -184,7 +173,6 @@ final class BackupStore: Sendable {
         try? fileManager.copyItem(at: sourceURL, to: destinationURL)
     }
 
-    /// Skips recopying databases that have not been touched since the previous backup.
     private func hasChanged(_ sourceURL: URL, comparedTo destinationURL: URL) -> Bool {
         let keys: Set<URLResourceKey> = [.contentModificationDateKey, .fileSizeKey]
         guard let source = try? sourceURL.resourceValues(forKeys: keys),
@@ -195,7 +183,6 @@ final class BackupStore: Sendable {
             || source.fileSize != destination.fileSize
     }
 
-    /// SQLite files in the app group that hold user data the Web Catalog API does not store.
     private func backupableDatabaseURLs() -> [URL] {
         guard let groupContainerURL else { return [] }
         let contents = (try? FileManager.default.contentsOfDirectory(
@@ -238,7 +225,6 @@ final class BackupStore: Sendable {
         )
     }
 
-    /// Puts the backed up SQLite files back into the app group container.
     func restoreDatabases(for pid: Int) {
         guard let folderURL = folderURL(for: pid), let groupContainerURL else { return }
         let databasesURL = folderURL.appending(path: Self.databasesFolderName)

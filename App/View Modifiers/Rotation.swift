@@ -1,10 +1,3 @@
-//
-//  Rotation.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/08/17.
-//
-
 import SwiftUI
 
 // Adapted from https://www.hackingwithswift.com/quick-start/swiftui/how-to-detect-device-rotation

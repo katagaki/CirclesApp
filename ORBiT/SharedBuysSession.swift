@@ -1,0 +1,475 @@
+import CryptoKit
+import Foundation
+import Observation
+
+public enum SharedBuysStatus: Equatable {
+    case idle
+    case connecting
+    case connected
+    case offline(String)
+}
+
+@Observable
+@MainActor
+public final class SharedBuysSession {
+
+    public init() {
+        // Read before the first view is built: the app root picks the guest shell from
+        // this, and restore() -- which would set it -- does not run until onAppear.
+        isGuest = UserDefaults.standard.bool(forKey: Self.guestModeKey)
+    }
+
+    public static let joinHost = "buys-join"
+
+    static let guestModeKey = "Guest.IsActive"
+    static let guestNicknameKey = "Guest.Nickname"
+
+    /// The relay refuses a frame carrying more than this (`MAX_RECORDS_PER_FRAME`).
+    public static let recordsPerFrame = 32
+
+    /// How long an outbound record waits for company before it is sent.
+    ///
+    /// The relay's bucket is 20 messages per 10 seconds and `addItem` alone emits two
+    /// changes, so a frame per change put ten quick adds over the limit and earned a
+    /// rate-limit close. A quarter second is under the threshold of feeling laggy and
+    /// collapses a burst of typing into one frame.
+    public static let coalesceWindow: Duration = .milliseconds(250)
+
+    public var status: SharedBuysStatus = .idle
+    public var log: [String] = []
+    /// The relay to dial.
+    ///
+    /// The compiled value is the local development relay; the address of the real one is
+    /// not in the binary. It is settled at launch by `applyRelayConfig(baseURL:isFeatureEnabled:)`,
+    /// and typing into the debug field counts as settling it too, so a hand-entered relay
+    /// works whether or not the fetch succeeded.
+    public var relayBaseURL: String = "ws://127.0.0.1:8787" {
+        didSet { if relayBaseURL != oldValue { isRelayConfigured = true } }
+    }
+
+    /// Whether Shared Buys is switched on for this build.
+    ///
+    /// Assumed on until the configuration says otherwise: a fetch that fails must leave a
+    /// room already in progress working, so only an explicit `featureEnabled` of 0 takes
+    /// the feature away.
+    public internal(set) var isFeatureEnabled: Bool = true
+
+    /// Whether the relay address has been settled, one way or another.
+    public internal(set) var isRelayConfigured: Bool = false
+    public var actorPID: Int = 0
+    public var nickname: String = ""
+
+    /// Whether this device is running as a guest.
+    ///
+    /// A guest has no circle.ms account and no catalog database: they scanned a room
+    /// code to help tick things off, and that is all they can do. `append` honours this
+    /// by dropping every kind but a status flip. It is not enforceable — a guest holds
+    /// the room key, so a modified client could write anything the relay accepts — it
+    /// is this app keeping to the role it advertised.
+    public var isGuest: Bool = false
+
+    @ObservationIgnored internal var isConnectDeferred: Bool = false
+
+    public private(set) var sessionKey: Data?
+    public private(set) var deviceID: String = ""
+    private(set) var deviceAuthKey: Data = SharedBuysCrypto.newDeviceAuthKey()
+    var pushToken: String?
+    var pushEnvironment: String = "sandbox"
+    public private(set) var eventNumber: Int = 0
+    public internal(set) var changes: [SharedBuyChange] = [] {
+        didSet {
+            foldCache = nil
+            if changes.isEmpty { sealed = [:] }
+        }
+    }
+
+    @ObservationIgnored private var foldCache: (
+        items: [SharedBuyItem],
+        members: [Int: String],
+        circles: [Int: SharedBuyCircle]
+    )?
+    var lastSeq: Int = 0
+    var clock: Int = 0
+    private var reconnectAttempt: Int = 0
+    private var reconnectTask: Task<Void, Never>?
+    var outbox: [RelayRecord] = []
+    var flushTask: Task<Void, Never>?
+    private var relayTask: Task<Void, Never>?
+    @ObservationIgnored var pendingWrite: SharedBuysStore.Pending?
+    @ObservationIgnored var writeTask: Task<Void, Never>?
+    /// Links we have already sent a want down, so each asks at most once.
+    @ObservationIgnored var wantedPeers: Set<BluetoothPeer> = []
+    /// Each change sealed once, rather than on every want reply and every reconnect.
+    @ObservationIgnored var sealed: [String: RelayRecord] = [:]
+    @ObservationIgnored var keyCache: (sessionKey: Data, keys: SharedBuysKeys)?
+    public var activity: Any?
+    let relay = SharedBuysRelay()
+    let bluetooth = SharedBuysBluetooth()
+
+    public var bluetoothPeers: Int = 0
+    public var bluetoothNote: String = ""
+    public var isBluetoothEnabled: Bool = true
+
+    public var items: [SharedBuyItem] { fold().items }
+
+    public var members: [Int: String] { fold().members }
+
+    /// Circle name and space as the log carries them, for a member with no catalog.
+    public var relayedCircles: [Int: SharedBuyCircle] { fold().circles }
+
+    private func fold() -> (
+        items: [SharedBuyItem],
+        members: [Int: String],
+        circles: [Int: SharedBuyCircle]
+    ) {
+        if let foldCache { return foldCache }
+        let folded = (
+            items: SharedBuyFold.items(from: changes),
+            members: SharedBuyFold.members(from: changes),
+            circles: SharedBuyFold.circles(from: changes)
+        )
+        foldCache = folded
+        return folded
+    }
+
+    public var joinURL: URL? {
+        guard let sessionKey else { return nil }
+        var components = URLComponents()
+        components.scheme = "circles-app"
+        components.host = Self.joinHost
+        components.queryItems = [
+            URLQueryItem(name: "v", value: "1"),
+            URLQueryItem(name: "e", value: String(eventNumber)),
+            URLQueryItem(name: "k", value: sessionKey.base64URL)
+        ]
+        return components.url
+    }
+
+    /// What we hold with no gap in it, per device.
+    ///
+    /// A vector of `max(seq)` claims everything below the highest sequence number we
+    /// have seen, so a change learned out of order — over Bluetooth, or from a peer's
+    /// backlog — buries whatever is still missing underneath it, and the relay withholds
+    /// the gap forever. The contiguous prefix claims only what is actually complete;
+    /// anything above a hole is sent again and deduped on ingest.
+    public var versionVector: [String: Int] {
+        Self.contiguousPrefix(of: changes)
+    }
+
+    /// The highest `n` for which every sequence number from 1 to `n` is present. A
+    /// device we hold nothing contiguous for is left out rather than claimed at 0.
+    static func contiguousPrefix(of changes: [SharedBuyChange]) -> [String: Int] {
+        var held: [String: Set<Int>] = [:]
+        for change in changes { held[change.device, default: []].insert(change.seq) }
+        return held.compactMapValues { seqs in
+            var next = 1
+            while seqs.contains(next) { next += 1 }
+            return next > 1 ? next - 1 : nil
+        }
+    }
+
+    public func restore() {
+        adoptIdentity()
+        guard let snapshot = SharedBuysStore.load() else {
+            // No room to come back to, so anything still on the Lock Screen belongs to a
+            // session that is gone. Nothing else can reach it.
+            adoptActivity()
+            return
+        }
+        sessionKey = snapshot.sessionKey
+        deviceID = snapshot.deviceID
+        deviceAuthKey = snapshot.deviceAuthKey ?? SharedBuysCrypto.newDeviceAuthKey()
+        eventNumber = snapshot.eventNumber
+        lastSeq = snapshot.lastSeq
+        changes = snapshot.changes
+        clock = snapshot.clock ?? changes.map(\.order).max() ?? 0
+        note("restored room \(roomID ?? "?") as \(deviceID)")
+        adoptActivity()
+        connect()
+        startBluetooth()
+    }
+
+    public func start(eventNumber: Int, nickname: String) {
+        // Starting a second room is leaving the first, exactly as joining one is: the
+        // relay connection, the Bluetooth advertiser and the Live Activity all belong to
+        // the room being replaced, and only `leave()` can still reach them.
+        if isActive { leave() }
+        sessionKey = SharedBuysCrypto.newSessionKey()
+        deviceID = SharedBuysCrypto.newDeviceID()
+        deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
+        self.eventNumber = eventNumber
+        lastSeq = 0
+        clock = 0
+        changes = []
+        persist()
+        append(.memberJoined, itemID: "-", circleID: 0, text: nickname, value: actorPID)
+        note("started room \(roomID ?? "?") as \(deviceID)")
+        connect()
+        startBluetooth()
+    }
+
+    public func join(url: URL, nickname: String) {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let raw = components.queryItems?.first(where: { $0.name == "k" })?.value,
+              let key = Data(base64URL: raw), key.count == 32 else {
+            note("bad join link")
+            return
+        }
+        let event = Int(components.queryItems?.first(where: { $0.name == "e" })?.value ?? "") ?? 0
+        // Joining a second room is leaving the first, as in `start()`. Without this the
+        // previous room's Live Activity survived — `startActivity()` bails while one
+        // exists — and went on showing the new room's items under the old room's
+        // identity. `adoptActivity()` catches what got away on the next launch; this
+        // keeps it from getting away in the first place.
+        if isActive { leave() }
+        sessionKey = key
+        deviceID = SharedBuysCrypto.newDeviceID()
+        deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
+        eventNumber = event
+        lastSeq = 0
+        clock = 0
+        changes = []
+        persist()
+        append(.memberJoined, itemID: "-", circleID: 0, text: nickname, value: actorPID)
+        note("joined room \(roomID ?? "?") as \(deviceID)")
+        connect()
+        startBluetooth()
+    }
+
+    /// Enters Guest Mode. Survives relaunch, so the app comes back into the guest shell
+    /// rather than the login screen.
+    public func enterGuestMode() {
+        UserDefaults.standard.set(true, forKey: Self.guestModeKey)
+        adoptIdentity()
+    }
+
+    /// Leaves Guest Mode and the room with it.
+    ///
+    /// The minted name is dropped too: coming back as a guest later is a new session
+    /// with a new member, not a resumption of the old one.
+    public func exitGuestMode() {
+        leave()
+        UserDefaults.standard.removeObject(forKey: Self.guestModeKey)
+        UserDefaults.standard.removeObject(forKey: Self.guestNicknameKey)
+        isGuest = false
+        nickname = ""
+    }
+
+    public func leave() {
+        endActivity()
+        reconnectTask?.cancel()
+        reconnectTask = nil
+        reconnectAttempt = 0
+        flushTask?.cancel()
+        flushTask = nil
+        outbox = []
+        bluetooth.stop()
+        bluetoothPeers = 0
+        serializeRelay { [relay] in await relay.disconnect() }
+        sessionKey = nil
+        deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
+        changes = []
+        lastSeq = 0
+        clock = 0
+        status = .idle
+        submit(.clear)
+        note("left session")
+    }
+
+    /// Runs relay lifecycle work in the order it was issued.
+    ///
+    /// `connect()` and `disconnect()` are called from synchronous main-actor code, so
+    /// each reached the actor as its own unstructured task and the two could land in
+    /// either order. Leaving a room and entering another in the same turn — `start()`,
+    /// `join()` — could therefore hand the new room's socket to the old room's
+    /// disconnect, leaving the session `.connecting` against a task that is already nil.
+    /// Chaining each call onto the previous one is the await the call sites cannot do
+    /// themselves without becoming async all the way up into the views.
+    internal func serializeRelay(_ work: @escaping @Sendable () async -> Void) {
+        let previous = relayTask
+        relayTask = Task {
+            await previous?.value
+            await work()
+        }
+    }
+
+    public func connect() {
+        guard isFeatureEnabled else { return }
+        guard let sessionKey, let roomID else { return }
+        // A connect issued before the address is settled would dial the compiled
+        // development default. Hold it, and let `applyRelayConfig` issue it.
+        guard isRelayConfigured else {
+            isConnectDeferred = true
+            return
+        }
+        reconnectTask?.cancel()
+        reconnectTask = nil
+        status = .connecting
+        let base = relayBaseURL
+        let device = deviceID
+        let deviceAuthKey = deviceAuthKey
+        let vector = versionVector
+        let pushToken = pushToken
+        let pushEnvironment = pushEnvironment
+        serializeRelay { [relay, weak self] in
+            await relay.connect(
+                SharedBuysRelay.Endpoint(
+                    baseURL: base,
+                    roomID: roomID,
+                    deviceID: device,
+                    deviceAuthKey: deviceAuthKey,
+                    sessionKey: sessionKey,
+                    vector: vector,
+                    pushToken: pushToken,
+                    pushEnvironment: pushEnvironment
+                )
+            ) { event in
+                Task { @MainActor in self?.handle(event) }
+            }
+        }
+    }
+
+    /// Adds an item, carrying the circle's identity into the log the first time that
+    /// circle appears in the room.
+    ///
+    /// `circleName` and `circleSpace` come from the caller's catalog database, which a
+    /// guest does not have. Relayed once per circle rather than per item: the check is
+    /// against the folded circle map, so it is idempotent across a restore and a
+    /// second contributor adding from a circle someone else already introduced.
+    @discardableResult
+    public func addItem(
+        name: String,
+        cost: Int,
+        circleID: Int,
+        circleName: String? = nil,
+        circleSpace: String? = nil
+    ) -> String {
+        let itemID = String(UUID().uuidString.prefix(8)).lowercased()
+        if let circleName, !circleName.isEmpty, SharedBuyFold.circles(from: changes)[circleID] == nil {
+            append(.circleInfo, itemID: "-", circleID: circleID, text: circleName, space: circleSpace)
+        }
+        append(.addItem, itemID: itemID, circleID: circleID, text: name, value: cost)
+        append(.setAssignee, itemID: itemID, circleID: circleID, value: actorPID)
+        return itemID
+    }
+
+    public func rename(itemID: String, circleID: Int, to name: String) {
+        append(.renameItem, itemID: itemID, circleID: circleID, text: name)
+    }
+
+    public func setCost(itemID: String, circleID: Int, to cost: Int) {
+        append(.setCost, itemID: itemID, circleID: circleID, value: cost)
+    }
+
+    public func remove(itemID: String, circleID: Int) {
+        append(.removeItem, itemID: itemID, circleID: circleID)
+    }
+
+    public func cycle(_ item: SharedBuyItem) {
+        append(
+            .setStatus,
+            itemID: item.id,
+            circleID: item.circleID,
+            value: SharedBuyStatus.next(after: item.rawStatus).rawValue
+        )
+    }
+
+    public func assign(_ item: SharedBuyItem, to pid: Int?) {
+        append(.setAssignee, itemID: item.id, circleID: item.circleID, value: pid)
+    }
+
+    private func append(
+        _ kind: SharedBuyKind,
+        itemID: String,
+        circleID: Int,
+        text: String? = nil,
+        value: Int? = nil,
+        space: String? = nil
+    ) {
+        guard let sessionKey, let roomID else { return }
+        // A guest holds the room key and could append anything the relay would accept.
+        // The restriction is the app honouring its own role, not something the log can
+        // enforce -- see `isGuest`. `memberJoined` is how a guest appears in the members
+        // list at all, so it is allowed alongside the status flips they are here for.
+        guard !isGuest || kind == .setStatus || kind == .memberJoined else { return }
+        lastSeq += 1
+        clock += 1
+        let change = SharedBuyChange(
+            device: deviceID,
+            seq: lastSeq,
+            payload: SharedBuyPayload(
+                actor: actorPID,
+                kind: kind,
+                itemID: itemID,
+                circleID: circleID,
+                text: text,
+                value: value,
+                space: space,
+                clock: clock
+            )
+        )
+        changes.append(change)
+        persist()
+        guard let record = seal(change, sessionKey: sessionKey, roomID: roomID) else { return }
+        enqueue(record)
+        sendOverBluetooth([change])
+        bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothDigestVector))
+        updateActivity()
+    }
+
+    private func handle(_ event: RelayEvent) {
+        switch event {
+        case .connected:
+            status = .connected
+            reconnectAttempt = 0
+            note("connected")
+        case .held(let seq):
+            // Our own history coming back from the relay means a save was lost; never
+            // reuse a sequence number it already holds.
+            lastSeq = max(lastSeq, seq)
+            resend(above: seq)
+        case .records(let records):
+            ingest(records)
+        case .failed(let reason):
+            status = .offline(reason)
+            note("failed: \(reason)")
+            if reason != Self.storageFullSlug { scheduleReconnect() }
+        case .closed(let code):
+            status = .offline("closed \(code)")
+            note("closed \(code)")
+            if code != Self.storageFullCode { scheduleReconnect() }
+        }
+    }
+
+    /// The relay refuses writes once a room holds 500 records, and closes the socket that
+    /// tried. Reconnecting only re-sends the refused change and is closed again, every 30
+    /// seconds for the rest of the room's life, so a full room waits for the next launch
+    /// or foreground instead.
+    private static let storageFullSlug = "storage"
+    private static let storageFullCode = 4005
+
+    /// Arms the reconnect.
+    ///
+    /// Nearby peers never defer it. Bluetooth only carries status flips, so holding the
+    /// relay off while a peer was in range stranded every added item, rename, cost and
+    /// assignment on this phone for as long as the two stayed together.
+    func scheduleReconnect() {
+        guard isActive, reconnectTask == nil else { return }
+        reconnectAttempt = min(reconnectAttempt + 1, 6)
+        let backoff = min(pow(2.0, Double(reconnectAttempt)), 30.0)
+        let delay = backoff + Double.random(in: 0...1)
+        note("reconnect in \(String(format: "%.1f", delay))s")
+        reconnectTask = Task { [weak self, delay] in
+            try? await Task.sleep(for: .seconds(delay))
+            guard !Task.isCancelled, let self else { return }
+            self.reconnectTask = nil
+            guard self.isActive else { return }
+            self.connect()
+        }
+    }
+
+    public func note(_ message: String) {
+        log.insert(message, at: 0)
+        if log.count > 40 { log.removeLast() }
+    }
+}

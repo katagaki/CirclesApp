@@ -1,10 +1,3 @@
-//
-//  MapHighlightLayer.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/14.
-//
-
 import SwiftUI
 
 struct MapHighlightLayer: View {

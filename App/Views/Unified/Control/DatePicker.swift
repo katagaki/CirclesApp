@@ -1,10 +1,3 @@
-//
-//  DatePicker.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/09/21.
-//
-
 import SwiftData
 import SwiftUI
 import AXiS
