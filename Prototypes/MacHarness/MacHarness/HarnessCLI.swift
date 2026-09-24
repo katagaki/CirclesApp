@@ -65,9 +65,11 @@ enum HarnessCLI {
             SharedBuysSnapshot(
                 sessionKey: sessionKey,
                 deviceID: session.deviceID,
+                deviceAuthKey: session.deviceAuthKey,
                 eventNumber: session.eventNumber,
                 lastSeq: session.lastSeq,
-                changes: session.changes
+                changes: session.changes,
+                clock: session.clock
             )
         )
     }
