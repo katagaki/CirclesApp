@@ -244,8 +244,8 @@
           <tr><td class="mono">err</td><td>relay → client</td><td><span class="pill relay">Relay</span></td><td>A slug and message, immediately before a close</td></tr>
           <tr><td class="mono">bye</td><td>client → relay</td><td><span class="pill relay">Relay</span></td><td>Nothing; a clean 1000 close</td></tr>
           <tr><td class="mono">advertisement</td><td>peer ⇄ peer</td><td><span class="pill ble">Bluetooth</span></td><td>Rolling room tag and a digest of what the sender holds</td></tr>
-          <tr><td class="mono">handshake</td><td>peer ⇄ peer</td><td><span class="pill ble">Bluetooth</span></td><td>Proof of room membership for this 15-minute window</td></tr>
-          <tr><td class="mono">want</td><td>peer → peer</td><td><span class="pill ble">Bluetooth</span></td><td>The sender's contiguous version vector</td></tr>
+          <tr><td class="mono">handshake</td><td>peer ⇄ peer</td><td><span class="pill ble">Bluetooth</span></td><td>Challenge, response and confirm: each side proves the room key over fresh nonces</td></tr>
+          <tr><td class="mono">want</td><td>peer → peer</td><td><span class="pill ble">Bluetooth</span></td><td>The sender's contiguous version vector over the whole log, answered to the sender alone</td></tr>
           <tr><td class="mono">changes</td><td>peer → peer</td><td><span class="pill ble">Bluetooth</span></td><td>Sealed <code>setStatus</code> records only</td></tr>
         </tbody>
       </table>
@@ -255,9 +255,11 @@
       <strong>Only kind 1 crosses Bluetooth.</strong>
       <p>
         <code>travelsOverBluetooth</code> is true for <code>setStatus</code> and nothing
-        else. Item names, costs, assignees and joins go over the relay exclusively, which
-        is why the peer-to-peer path keeps its own version vector over that subset — a
-        vector counting relay-only changes would claim status flips it does not hold.
+        else. Item names, costs, assignees and joins go over the relay exclusively. The
+        <code>want</code> still carries the gapless prefix of the <em>whole</em> log: holding
+        every change up to <code>n</code> includes every status flip up to <code>n</code>,
+        while a prefix over the subset was always empty, since a device's first change is
+        its <code>memberJoined</code>.
       </p>
     </div>
   </section>
@@ -273,23 +275,29 @@
 roomID        = HMAC-SHA256(sessionKey, "circles-buys/v1/topic")[0..16]   <span class="c">→ 32 hex chars</span>
 contentKey    = HKDF-SHA256(sessionKey, info: "circles-buys/v1/ops",        len 32)
 relayAuthKey  = HKDF-SHA256(sessionKey, info: "circles-buys/v1/relay-auth", len 32)
+handshakeKey  = HKDF-SHA256(sessionKey, info: "circles-buys/v1/ble-handshake", len 32)
 
 deviceID      = 4 random bytes                                            <span class="c">→ 8 hex chars</span>
-nonce         = deviceID(4) ‖ u64be(seq)                                  <span class="c">→ 12 bytes, AES-GCM</span>
+nonce         = 12 random bytes                                           <span class="c">→ AES-GCM</span>
 aad           = roomID(16) ‖ deviceID(4) ‖ u64be(seq)                     <span class="c">→ 28 bytes</span>
-blob          = AES-256-GCM(contentKey, nonce, aad, payloadJSON) ‖ gcmTag(16)
+blob          = 53 42 32 00 ‖ nonce ‖ AES-256-GCM(contentKey, nonce, aad, payloadJSON) ‖ gcmTag(16)
 
 recordTag     = HMAC-SHA256(relayAuthKey, deviceID ‖ 0x00 ‖ u64be(seq) ‖ blob)[0..16]
 helloTag      = HMAC-SHA256(relayAuthKey, "hello" ‖ 0x00 ‖ deviceID ‖ 0x00 ‖ u64be(ts))[0..16]
 sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <span class="c">window = ⌊unix/900⌋</span></pre>
 
     <div class="note">
-      <strong>The nonce is safe only because <code>seq</code> never repeats for a device.</strong>
+      <strong><code>seq</code> counts one device's own changes, with no gaps.</strong>
       <p>
-        <code>(deviceID, seq)</code> is the primary key everywhere — in the relay's table,
-        in client dedup, and in the GCM nonce. A device that reused a sequence number
-        would reuse a nonce under the same content key, which is why the local counter is
-        a Lamport clock advanced past every record ingested.
+        <code>(deviceID, seq)</code> is the primary key everywhere — in the relay's table
+        and in client dedup — and both sync paths ask by gapless prefix, so a device's
+        numbering must run 1, 2, 3… A reused number is silently dropped by the relay as a
+        duplicate, which is why a client raises its counter past any of its own records the
+        relay hands back. Ordering across devices is a separate Lamport clock carried in the
+        payload as <code>l</code>, advanced past every record ingested; a payload without it
+        orders by <code>seq</code>. Blobs from before random nonces used
+        <code>deviceID ‖ u64be(seq)</code> as the nonce and carry no marker; clients still
+        open them but never write one.
       </p>
     </div>
   </section>
@@ -340,6 +348,23 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
       holds no key. The woken client reconnects, catches up, and renders locally. Wake-ups are coalesced to
       one per device per 10 seconds, and a token the platform reports as gone is dropped.
     </p>
+
+    <div class="frame">
+      <div class="frame-head">
+        <h3 class="mono">held</h3>
+        <span class="size">relay → client · once, right after a verified hello</span>
+      </div>
+      <pre>{
+  <span class="k">"t"</span>: "held",
+  <span class="k">"n"</span>: 41                       <span class="c">// highest gapless seq the relay holds for the hello device</span>
+}</pre>
+      <p>
+        Sent before the <code>ops</code> reply to the hello, so a client uploads only its own records
+        above <code>n</code> instead of its whole history on every reconnect. A client that sees the
+        hello's <code>ops</code> reply without a <code>held</code> ahead of it is talking to an older
+        relay and falls back to uploading everything it authored.
+      </p>
+    </div>
 
     <div class="frame">
       <div class="frame-head">
@@ -397,11 +422,12 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
           <tr><td class="mono">1000</td><td>—</td><td>Client sent <code>bye</code></td></tr>
           <tr><td class="mono">1001</td><td>—</td><td>Room alarm fired; the room's records are gone</td></tr>
           <tr><td class="mono">4001</td><td class="mono">rate</td><td>More than 20 messages per 10 s on one socket</td></tr>
-          <tr><td class="mono">4002</td><td class="mono">proto</td><td>Binary frame, over 4096 bytes, malformed JSON, unknown <code>t</code>, bad record shape</td></tr>
-          <tr><td class="mono">4003</td><td class="mono">full</td><td>Ninth socket in the room</td></tr>
+          <tr><td class="mono">4002</td><td class="mono">proto</td><td>Binary frame, over 4096 bytes, malformed JSON, unknown <code>t</code>, bad record shape, or no hello within 10 s</td></tr>
+          <tr><td class="mono">4003</td><td class="mono">full</td><td>Ninth device in the room, or a fifth socket still waiting to say hello</td></tr>
           <tr><td class="mono">4004</td><td class="mono">auth</td><td>Bad hello tag, stale <code>ts</code>, bad record tag, or a record claiming another device</td></tr>
           <tr><td class="mono">4005</td><td class="mono">storage</td><td>A single frame larger than the whole 500-record room</td></tr>
           <tr><td class="mono">4006</td><td class="mono">unknown</td><td>Room has no key registered; resend hello with <code>k</code></td></tr>
+          <tr><td class="mono">4007</td><td class="mono">replaced</td><td>The same device said hello on a newer socket</td></tr>
         </tbody>
       </table>
     </div>
@@ -463,32 +489,27 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
       </div>
     </div>
 
-    <h3>Handshake — 3 bytes</h3>
+    <h3>Handshake — challenge, response, confirm</h3>
     <p>
-      Written to the peer's inbox once notifications are enabled, and answered as a notify
-      from the other side. Until it succeeds, nothing else from that peer is accepted.
+      The central writes a challenge to the peer's inbox once notifications are enabled.
+      The peripheral answers any challenge with its own nonce and a MAC over both; the
+      central checks it and writes a confirm under a different label, so neither MAC can be
+      reflected back as the other. Only then is either side verified, and until it is,
+      nothing else from that peer is accepted. The advertisement's tag is not proof of
+      anything — every scanner in range can read it — and only filters discovery. A central
+      that has not verified a peer within 10 seconds drops it and backs it off for 60; an
+      Android peripheral drops a central that never confirms on the same deadline.
     </p>
-    <div class="frame">
-      <div class="frame-head"><h4>Layout</h4><span class="size">3 bytes</span></div>
-      <div class="strip-wrap">
-        <div class="strip">
-          <div class="seg f-header" style="flex:1"><span class="name">0x02</span><span class="len">1 B</span></div>
-          <div class="seg f-identity" style="flex:2"><span class="name">sessionTag</span><span class="len">2 B</span></div>
-        </div>
-      </div>
-      <div class="ruler-wrap"><div class="ruler">
-        <span style="flex:1">0</span><span style="flex:2">1</span>
-      </div></div>
-      <div class="fields scroll">
-        <table>
-          <thead><tr><th>Offset</th><th>Size</th><th>Field</th><th>Values</th></tr></thead>
-          <tbody>
-            <tr><td class="mono">0</td><td class="mono">1</td><td>Handshake magic</td><td><code>0x02</code>. Chunk frames use <code>0x01</code>, so the two are told apart by first byte and length.</td></tr>
-            <tr><td class="mono">1</td><td class="mono">2</td><td>Session tag</td><td>Same rolling tag as the advertisement, same ±1 window tolerance.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <pre>challenge  = 0x03 ‖ nonceC(8)                                              <span class="c">central → peripheral, 9 B</span>
+response   = 0x04 ‖ nonceP(8) ‖ HMAC(handshakeKey, "resp" ‖ nonceC ‖ nonceP)[0..8]   <span class="c">peripheral → central, 17 B</span>
+confirm    = 0x05 ‖ HMAC(handshakeKey, "conf" ‖ nonceC ‖ nonceP)[0..8]              <span class="c">central → peripheral, 9 B</span></pre>
+    <p>
+      Every frame fits the 20 bytes a link at the default MTU carries, and is told apart
+      from a chunk frame (<code>0x01</code>) by first byte and exact length. Test vector:
+      session key <code>00 01 … 1f</code>, nonceC <code>01 … 08</code>, nonceP
+      <code>11 … 18</code> give response <code>04111213141516171812f9003d9145f14c</code> and
+      confirm <code>05cff3acad54e390af</code>.
+    </p>
 
     <h3>Chunk header — 4 bytes + body</h3>
     <p>
@@ -597,15 +618,18 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
           <tbody>
             <tr><td class="mono">0–2</td><td class="mono">3</td><td>Header</td><td>Version <code>0x01</code>, type <code>0x02</code>, entry count.</td></tr>
             <tr><td class="mono">3</td><td class="mono">4</td><td>Device</td><td>Identity bytes of a device the sender holds records for.</td></tr>
-            <tr><td class="mono">7</td><td class="mono">8</td><td>Sequence</td><td>Highest <em>gapless</em> seq held for that device. Entries at 0 are omitted entirely, which asks for everything.</td></tr>
+            <tr><td class="mono">7</td><td class="mono">8</td><td>Sequence</td><td>Highest <em>gapless</em> seq held for that device, over the whole log. Entries at 0 are omitted entirely, which asks for everything; a vector with no entries is still sent, as a bare 3-byte header.</td></tr>
           </tbody>
         </table>
       </div>
       <div class="strip-wrap" style="padding-top:0">
         <p style="max-width:none">
-          The receiver replies with every Bluetooth-eligible change whose
-          <code>seq</code> exceeds the value given for its device — and everything for a
-          device the frame never mentions.
+          The receiver replies, to the sender alone, with every Bluetooth-eligible change
+          whose <code>seq</code> exceeds the value given for its device — and everything for
+          a device the frame never mentions. Only the side that connected sends the first
+          <code>want</code> on a link, and skips it when the advertised digest matches its
+          own; the other side sends one back, once per link, only if the two vectors
+          differ.
         </p>
       </div>
     </div>

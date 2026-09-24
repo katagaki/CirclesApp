@@ -111,8 +111,29 @@ async function apns(env: PushEnv, target: Target): Promise<Outcome> {
     body: JSON.stringify({ aps: { "content-available": 1 } }),
   });
   if (response.ok) return "sent";
-  if (response.status === 410 || response.status === 400) return "gone";
+  if (response.status === 410) return "gone";
+  if (response.status === 400 && APNS_DEAD_TOKEN.has(await reason(response))) return "gone";
   return "failed";
+}
+
+const APNS_DEAD_TOKEN = new Set(["BadDeviceToken", "DeviceTokenNotForTopic", "Unregistered"]);
+
+async function reason(response: Response): Promise<string> {
+  try {
+    const body = (await response.json()) as { reason?: unknown };
+    return typeof body.reason === "string" ? body.reason : "";
+  } catch {
+    return "";
+  }
+}
+
+async function fcmErrorCodes(response: Response): Promise<string[]> {
+  try {
+    const body = (await response.json()) as { error?: { details?: { errorCode?: unknown }[] } };
+    return (body.error?.details ?? []).map((detail) => String(detail.errorCode ?? ""));
+  } catch {
+    return [];
+  }
 }
 
 interface ServiceAccount {
@@ -187,7 +208,8 @@ async function fcm(env: PushEnv, target: Target): Promise<Outcome> {
     }),
   });
   if (response.ok) return "sent";
-  if (response.status === 404 || response.status === 400) return "gone";
+  if (response.status === 404) return "gone";
+  if ((await fcmErrorCodes(response)).includes("UNREGISTERED")) return "gone";
   return "failed";
 }
 

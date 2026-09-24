@@ -6,6 +6,8 @@ export interface CloseInfo {
   reason: string;
 }
 
+const deviceKeys = new Map<string, Uint8Array>();
+
 export function roomId(): string {
   return [...crypto.getRandomValues(new Uint8Array(16))]
     .map((b) => b.toString(16).padStart(2, "0"))
@@ -20,11 +22,17 @@ export async function helloFrame(
   key: Uint8Array,
   device: string,
   vector: { [device: string]: number } = {},
-  options: { register?: Uint8Array; ts?: number; push?: unknown } = {},
+  options: { register?: Uint8Array; ts?: number; push?: unknown; deviceKey?: Uint8Array } = {},
 ): Promise<string> {
   const ts = options.ts ?? Math.floor(Date.now() / 1000);
   const mac = await tag(await importAuthKey(key), helloInput(device, ts));
-  const frame: { [k: string]: unknown } = { t: "hello", d: device, v: vector, ts, a: b64urlEncode(mac) };
+  const deviceKey = options.deviceKey ?? deviceKeys.get(device) ?? crypto.getRandomValues(new Uint8Array(32));
+  deviceKeys.set(device, deviceKey);
+  const deviceMac = await tag(await importAuthKey(deviceKey), helloInput(device, ts));
+  const frame: { [k: string]: unknown } = {
+    t: "hello", d: device, v: vector, ts, a: b64urlEncode(mac),
+    x: b64urlEncode(deviceKey), da: b64urlEncode(deviceMac),
+  };
   if (options.register) frame.k = b64urlEncode(options.register);
   if (options.push !== undefined) frame.p = options.push;
   return JSON.stringify(frame);
@@ -74,12 +82,18 @@ export class Client {
     this.ws.send(typeof frame === "string" ? frame : JSON.stringify(frame));
   }
 
+  held: number | null = null;
+
   async next(): Promise<any> {
-    while (this.messages.length === 0) {
-      if (this.closed) throw new Error(`closed with ${this.closed.code}`);
-      await this.settle();
+    for (;;) {
+      while (this.messages.length === 0) {
+        if (this.closed) throw new Error(`closed with ${this.closed.code}`);
+        await this.settle();
+      }
+      const frame = JSON.parse(this.messages.shift()!);
+      if (frame.t !== "held") return frame;
+      this.held = frame.n;
     }
-    return JSON.parse(this.messages.shift()!);
   }
 
   async nextRaw(): Promise<string> {

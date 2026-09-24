@@ -17,6 +17,8 @@ export const MAX_RECORDS_PER_FRAME = 32;
 export const RATE_TOKENS = 20;
 export const RATE_WINDOW_MS = 10_000;
 export const MAX_SOCKETS = 8;
+export const MAX_PENDING_SOCKETS = 4;
+export const HELLO_DEADLINE_MS = 10_000;
 export const MAX_STORED_RECORDS = 500;
 export const HELLO_SKEW_SECONDS = 300;
 export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
@@ -30,6 +32,7 @@ export const CLOSE_ROOM_FULL = 4003;
 export const CLOSE_AUTH = 4004;
 export const CLOSE_STORAGE_FULL = 4005;
 export const CLOSE_UNKNOWN_ROOM = 4006;
+export const CLOSE_REPLACED = 4007;
 
 const DEVICE_ID = /^[0-9a-f]{8}$/;
 const PUSH_TOKEN = /^[A-Za-z0-9_:.-]{1,512}$/;
@@ -38,6 +41,7 @@ interface Attachment {
   d: string | null;
   tk: number;
   at: number;
+  o?: number;
 }
 
 interface Record {
@@ -60,6 +64,7 @@ const SLUG: { [code: number]: string } = {
   [CLOSE_AUTH]: "auth",
   [CLOSE_STORAGE_FULL]: "storage",
   [CLOSE_UNKNOWN_ROOM]: "unknown",
+  [CLOSE_REPLACED]: "replaced",
 };
 
 function byteLength(text: string): number {
@@ -68,6 +73,10 @@ function byteLength(text: string): number {
 
 function isSeq(value: unknown): value is number {
   return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
+}
+
+function isPositiveSeq(value: unknown): value is number {
+  return isSeq(value) && value > 0;
 }
 
 export class Room extends DurableObject<PushEnv> {
@@ -96,6 +105,10 @@ export class Room extends DurableObject<PushEnv> {
       env      TEXT    NOT NULL,
       pushed   INTEGER NOT NULL
     )`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS devices (
+      device   TEXT PRIMARY KEY,
+      auth_key BLOB NOT NULL
+    )`);
     ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("ping", "pong"));
     ctx.blockConcurrencyWhile(async () => {
       if ((await ctx.storage.getAlarm()) === null) {
@@ -111,13 +124,14 @@ export class Room extends DurableObject<PushEnv> {
     const pair = new WebSocketPair();
     const client = pair[0];
     const server = pair[1];
-    if (this.ctx.getWebSockets().length >= MAX_SOCKETS) {
+    if (this.pendingSockets() >= MAX_PENDING_SOCKETS) {
       server.accept();
       this.reject(server, CLOSE_ROOM_FULL, "room is full");
       return new Response(null, { status: 101, webSocket: client });
     }
     this.ctx.acceptWebSocket(server);
-    server.serializeAttachment({ d: null, tk: RATE_TOKENS, at: Date.now() } satisfies Attachment);
+    const now = Date.now();
+    server.serializeAttachment({ d: null, tk: RATE_TOKENS, at: now, o: now } satisfies Attachment);
     return new Response(null, { status: 101, webSocket: client });
   }
 
@@ -138,6 +152,7 @@ export class Room extends DurableObject<PushEnv> {
     this.sql.exec("DELETE FROM ops");
     this.sql.exec("DELETE FROM room");
     this.sql.exec("DELETE FROM tokens");
+    this.sql.exec("DELETE FROM devices");
     for (const ws of this.ctx.getWebSockets()) ws.close(1001, "room expired");
   }
 
@@ -175,7 +190,7 @@ export class Room extends DurableObject<PushEnv> {
 
   private async onHello(
     ws: WebSocket,
-    frame: { d?: unknown; v?: unknown; k?: unknown; ts?: unknown; a?: unknown; p?: unknown },
+    frame: { d?: unknown; v?: unknown; k?: unknown; ts?: unknown; a?: unknown; x?: unknown; da?: unknown; p?: unknown },
     attachment: Attachment,
   ): Promise<void> {
     if (attachment.d) throw new Fail(CLOSE_PROTOCOL, "duplicate hello");
@@ -201,6 +216,17 @@ export class Room extends DurableObject<PushEnv> {
     const expected = await tag(key, helloInput(device, frame.ts));
     if (!timingSafeEqual(expected, offered)) throw new Fail(CLOSE_AUTH, "bad tag");
 
+    const registeredDeviceKey = this.deviceKey(device);
+    const suppliedDeviceKey = b64urlDecode(frame.x);
+    const deviceKeyBytes = registeredDeviceKey ?? suppliedDeviceKey;
+    if (!deviceKeyBytes || deviceKeyBytes.length !== 32) throw new Fail(CLOSE_AUTH, "device key required");
+    const deviceOffered = b64urlDecode(frame.da);
+    if (!deviceOffered || deviceOffered.length !== TAG_LEN) throw new Fail(CLOSE_AUTH, "bad device tag");
+    const deviceExpected = await tag(await importAuthKey(deviceKeyBytes), helloInput(device, frame.ts));
+    if (!timingSafeEqual(deviceExpected, deviceOffered)) throw new Fail(CLOSE_AUTH, "bad device tag");
+
+    this.admit(ws, device);
+
     if (!existing) {
       this.sql.exec(
         "INSERT INTO room (id, auth_key, created_at) VALUES (1, ?, ?)",
@@ -209,10 +235,14 @@ export class Room extends DurableObject<PushEnv> {
       );
       await this.ctx.storage.setAlarm(Date.now() + ROOM_TTL_MS);
     }
+    if (!registeredDeviceKey) {
+      this.sql.exec("INSERT INTO devices (device, auth_key) VALUES (?, ?)", device, deviceKeyBytes);
+    }
 
     attachment.d = device;
     ws.serializeAttachment(attachment);
     this.register(device, frame.p);
+    ws.send(JSON.stringify({ t: "held", n: this.heldPrefix(device) }));
     this.send(ws, this.missing(frame.v));
   }
 
@@ -235,7 +265,7 @@ export class Room extends DurableObject<PushEnv> {
       const { d, n, b, a } = entry as Record;
       if (typeof d !== "string" || !DEVICE_ID.test(d)) throw new Fail(CLOSE_PROTOCOL, "bad device id");
       if (d !== attachment.d) throw new Fail(CLOSE_AUTH, "device mismatch");
-      if (!isSeq(n)) throw new Fail(CLOSE_PROTOCOL, "bad seq");
+      if (!isPositiveSeq(n)) throw new Fail(CLOSE_PROTOCOL, "bad seq");
       const blob = b64urlDecode(b);
       const offered = b64urlDecode(a);
       if (!blob || blob.length === 0) throw new Fail(CLOSE_PROTOCOL, "bad blob");
@@ -251,9 +281,9 @@ export class Room extends DurableObject<PushEnv> {
       if (pending.has(id) || this.holds(record.d, record.n)) continue;
       pending.add(id);
     }
-    if (pending.size > MAX_STORED_RECORDS) throw new Fail(CLOSE_STORAGE_FULL, "room is full");
-    const overflow = this.count() + pending.size - MAX_STORED_RECORDS;
-    if (overflow > 0) this.evict(overflow);
+    if (this.count() + pending.size > MAX_STORED_RECORDS) {
+      throw new Fail(CLOSE_STORAGE_FULL, "room is full");
+    }
 
     const now = Math.floor(Date.now() / 1000);
     const fresh: Record[] = [];
@@ -280,6 +310,37 @@ export class Room extends DurableObject<PushEnv> {
       this.send(peer, fresh);
     }
     this.wake(connected);
+  }
+
+  private pendingSockets(): number {
+    const now = Date.now();
+    let pending = 0;
+    for (const socket of this.ctx.getWebSockets()) {
+      if (socket.readyState !== WebSocket.OPEN) continue;
+      const attachment = socket.deserializeAttachment() as Attachment | null;
+      if (attachment?.d) continue;
+      if (now - (attachment?.o ?? attachment?.at ?? 0) > HELLO_DEADLINE_MS) {
+        this.reject(socket, CLOSE_PROTOCOL, "hello timed out");
+        continue;
+      }
+      pending++;
+    }
+    return pending;
+  }
+
+  private admit(ws: WebSocket, device: string): void {
+    let members = 0;
+    for (const peer of this.ctx.getWebSockets()) {
+      if (peer === ws || peer.readyState !== WebSocket.OPEN) continue;
+      const attachment = peer.deserializeAttachment() as Attachment | null;
+      if (!attachment?.d) continue;
+      if (attachment.d === device) {
+        this.reject(peer, CLOSE_REPLACED, "replaced by a newer connection");
+        continue;
+      }
+      members++;
+    }
+    if (members >= MAX_SOCKETS) throw new Fail(CLOSE_ROOM_FULL, "room is full");
   }
 
   private register(device: string, value: unknown): void {
@@ -334,15 +395,23 @@ export class Room extends DurableObject<PushEnv> {
     return row ? toBytes(row.auth_key as ArrayBuffer) : null;
   }
 
+  private deviceKey(device: string): Uint8Array | null {
+    const row = this.sql.exec("SELECT auth_key FROM devices WHERE device = ?", device).toArray()[0];
+    return row ? toBytes(row.auth_key as ArrayBuffer) : null;
+  }
+
   private holds(device: string, seq: number): boolean {
     return this.sql.exec("SELECT 1 FROM ops WHERE device = ? AND seq = ? LIMIT 1", device, seq).toArray().length > 0;
   }
 
-  private evict(rows: number): void {
-    this.sql.exec(
-      "DELETE FROM ops WHERE (device, seq) IN (SELECT device, seq FROM ops ORDER BY ts, device, seq LIMIT ?)",
-      rows,
-    );
+  private heldPrefix(device: string): number {
+    let next = 1;
+    for (const row of this.sql.exec("SELECT seq FROM ops WHERE device = ? ORDER BY seq", device)) {
+      const seq = Number(row.seq);
+      if (seq > next) break;
+      if (seq === next) next++;
+    }
+    return next - 1;
   }
 
   private count(): number {

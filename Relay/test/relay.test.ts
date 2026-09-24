@@ -1,7 +1,7 @@
 import { env, runDurableObjectAlarm, runInDurableObject, SELF } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
 import { Client, authKey, helloFrame, record, roomId } from "./client";
-import { UNCLAIMED_TTL_MS, type Room } from "../src/room";
+import { HELLO_DEADLINE_MS, UNCLAIMED_TTL_MS, type Room } from "../src/room";
 
 async function join(
   room: string,
@@ -75,6 +75,27 @@ describe("fan-out", () => {
     const late = await join(room, key, "cccccccc", { aaaaaaaa: 2 });
     expect(await late.next()).toEqual({ t: "ops", o: [ops[2]] });
     await late.quiet();
+  });
+
+  it("tells a device how much of its own history it already holds", async () => {
+    const room = roomId();
+    const key = authKey();
+    const first = await join(room, key, "aaaaaaaa", {}, true);
+    const firstReply = JSON.parse(await first.nextRaw());
+    expect(firstReply).toEqual({ t: "held", n: 0 });
+    first.send({
+      t: "ops",
+      o: [
+        await record(key, "aaaaaaaa", 1, "one"),
+        await record(key, "aaaaaaaa", 2, "two"),
+        await record(key, "aaaaaaaa", 4, "four"),
+      ],
+    });
+    await stored(room, "aaaaaaaa", 4);
+
+    const again = await join(room, key, "aaaaaaaa", { aaaaaaaa: 4 });
+    expect(JSON.parse(await again.nextRaw())).toEqual({ t: "held", n: 2 });
+    expect(await again.next()).toEqual({ t: "ops", o: [] });
   });
 
   it("ignores a re-sent record and does not fan it out", async () => {
@@ -187,15 +208,49 @@ describe("limits", () => {
     expect((await a.closure()).code).toBe(4001);
   });
 
-  it("closes 4003 on the ninth socket in a room", async () => {
+  it("closes 4003 on the ninth device in a room", async () => {
     const room = roomId();
     const key = authKey();
     const first = await join(room, key, "aaaaaaaa", {}, true);
     await first.next();
-    const rest = [];
-    for (let i = 1; i < 8; i++) rest.push(await Client.connect(room));
+    for (let i = 1; i < 8; i++) {
+      const member = await join(room, key, `0000000${i}`);
+      await member.next();
+    }
+    const overflow = await join(room, key, "99999999");
+    expect((await overflow.closure()).code).toBe(4003);
+  });
+
+  it("closes 4003 once four sockets are waiting to say hello", async () => {
+    const room = roomId();
+    const waiting = [];
+    for (let i = 0; i < 4; i++) waiting.push(await Client.connect(room));
     const overflow = await Client.connect(room);
     expect((await overflow.closure()).code).toBe(4003);
+  });
+
+  it("closes a socket that never says hello once a newcomer arrives", async () => {
+    const room = roomId();
+    const silent = await Client.connect(room);
+    await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) => {
+      for (const socket of state.getWebSockets()) {
+        const attachment = socket.deserializeAttachment() as { o: number };
+        socket.serializeAttachment({ ...attachment, o: attachment.o - HELLO_DEADLINE_MS - 1 });
+      }
+    });
+    await Client.connect(room);
+    expect((await silent.closure()).code).toBe(4002);
+  });
+
+  it("replaces a device's older socket when it says hello again", async () => {
+    const room = roomId();
+    const key = authKey();
+    const stale = await join(room, key, "aaaaaaaa", {}, true);
+    await stale.next();
+    const fresh = await join(room, key, "aaaaaaaa");
+    expect(await fresh.next()).toEqual({ t: "ops", o: [] });
+    expect((await stale.closure()).code).toBe(4007);
+    expect(fresh.closed).toBe(null);
   });
 
   it("does not count records it already holds against the cap", async () => {
@@ -224,20 +279,19 @@ describe("limits", () => {
     const probe = await record(key, "aaaaaaaa", seq, "probe");
     a.send({ t: "ops", o: [probe] });
 
-    // A record the room already holds is not fresh, so it must not reach b. Were it
-    // counted as new it would evict the oldest row, be re-inserted, and arrive here
-    // ahead of the probe.
-    expect(await b.next()).toEqual({ t: "ops", o: [probe] });
-    expect(a.closed).toBeNull();
+    // A record the room already holds is not fresh, so it does not consume capacity.
+    // The genuinely new probe is rejected without deleting any reconstructive history.
+    expect((await a.closure()).code).toBe(4005);
+    await b.quiet();
     await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) => {
       expect(Number(state.storage.sql.exec("SELECT COUNT(*) AS c FROM ops").one().c)).toBe(500);
       const held = state.storage.sql.exec("SELECT seq FROM ops ORDER BY seq").toArray().map((row) => Number(row.seq));
-      expect(held[0]).toBe(2);
-      expect(held[held.length - 1]).toBe(seq);
+      expect(held[0]).toBe(1);
+      expect(held[held.length - 1]).toBe(seq - 1);
     });
   });
 
-  it("evicts the oldest records once the room is full", async () => {
+  it("rejects new records rather than evicting history once the room is full", async () => {
     const room = roomId();
     const key = authKey();
     const a = await join(room, key, "aaaaaaaa", {}, true);
@@ -250,19 +304,26 @@ describe("limits", () => {
       a.send({ t: "ops", o: ops });
     }
     a.send({ t: "ops", o: [await record(key, "aaaaaaaa", seq, "overflow")] });
-    await stored(room, "aaaaaaaa", seq);
-
-    expect(a.closed).toBeNull();
+    expect((await a.closure()).code).toBe(4005);
     await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) => {
       expect(Number(state.storage.sql.exec("SELECT COUNT(*) AS c FROM ops").one().c)).toBe(500);
       const held = state.storage.sql.exec("SELECT seq FROM ops ORDER BY seq").toArray();
-      expect(Number(held[held.length - 1].seq)).toBe(seq);
-      expect(held.some((row) => Number(row.seq) === 1)).toBe(false);
+      expect(Number(held[held.length - 1].seq)).toBe(seq - 1);
+      expect(held.some((row) => Number(row.seq) === 1)).toBe(true);
     });
   });
 });
 
 describe("record authorship", () => {
+  it("rejects sequence zero to match both client protocols", async () => {
+    const room = roomId();
+    const key = authKey();
+    const client = await join(room, key, "aaaaaaaa", {}, true);
+    await client.next();
+    client.send({ t: "ops", o: [await record(key, "aaaaaaaa", 0, "zero")] });
+    expect((await client.closure()).code).toBe(4002);
+  });
+
   it("closes 4004 on a record claiming another device", async () => {
     const room = roomId();
     const key = authKey();
@@ -287,6 +348,17 @@ describe("record authorship", () => {
     a.send({ t: "ops", o: [real] });
     const late = await join(room, key, "cccccccc");
     expect(await late.next()).toEqual({ t: "ops", o: [real] });
+  });
+
+  it("rejects a room member claiming a registered device without its device key", async () => {
+    const room = roomId();
+    const key = authKey();
+    const owner = await join(room, key, "aaaaaaaa", {}, true);
+    await owner.next();
+
+    const impostor = await Client.connect(room);
+    impostor.send(await helloFrame(key, "aaaaaaaa", {}, { deviceKey: authKey() }));
+    expect((await impostor.closure()).code).toBe(4004);
   });
 });
 

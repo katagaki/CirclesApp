@@ -11,6 +11,9 @@ interface Seen {
 }
 
 let apnsStatus = 200;
+let apnsBody = "";
+let fcmStatus = 200;
+let fcmBody: object = {};
 let seen: Seen[] = [];
 const real = globalThis.fetch;
 
@@ -24,9 +27,10 @@ function stub(url: string, init: RequestInit | undefined): Response {
     return Response.json({ access_token: "test-access-token", expires_in: 3599 });
   }
   if (url.includes("fcm.googleapis.com")) {
+    if (fcmStatus !== 200) return Response.json(fcmBody, { status: fcmStatus });
     return Response.json({ name: "projects/circles-test/messages/1" });
   }
-  return new Response("", { status: apnsStatus });
+  return new Response(apnsBody, { status: apnsStatus });
 }
 
 async function settled(count: number): Promise<Seen[]> {
@@ -62,8 +66,30 @@ afterAll(() => {
 beforeEach(() => {
   seen = [];
   apnsStatus = 200;
+  apnsBody = "";
+  fcmStatus = 200;
+  fcmBody = {};
   resetBearers();
 });
+
+async function tokensAfterWake(platform: string, token: string): Promise<number> {
+  const room = roomId();
+  const key = authKey();
+  const away = await Client.connect(room);
+  away.send(await helloFrame(key, "bbbbbbbb", {}, { register: key, push: { pl: platform, tk: token } }));
+  await away.next();
+  away.send({ t: "bye" });
+  await away.closure();
+
+  const writer = await Client.connect(room);
+  writer.send(await helloFrame(key, "aaaaaaaa"));
+  await writer.next();
+  writer.send({ t: "ops", o: [await record(key, "aaaaaaaa", 1, "sealed")] });
+
+  await settled(1);
+  await new Promise((resolve) => setTimeout(resolve, 200));
+  return tokenCount(room);
+}
 
 describe("push", () => {
   it("wakes a registered device that is not connected", async () => {
@@ -178,6 +204,30 @@ describe("push", () => {
     await settled(1);
     await new Promise((resolve) => setTimeout(resolve, 200));
     expect(await tokenCount(room)).toBe(0);
+  });
+
+  it("keeps an APNs token through a 400 that is not about the token", async () => {
+    apnsStatus = 400;
+    apnsBody = JSON.stringify({ reason: "BadTopic" });
+    expect(await tokensAfterWake("apns", "8899aabbccddeeff")).toBe(1);
+  });
+
+  it("forgets an APNs token rejected as a bad device token", async () => {
+    apnsStatus = 400;
+    apnsBody = JSON.stringify({ reason: "BadDeviceToken" });
+    expect(await tokensAfterWake("apns", "8899aabbccddeeff")).toBe(0);
+  });
+
+  it("keeps an FCM token through a 400 that is not about the token", async () => {
+    fcmStatus = 400;
+    fcmBody = { error: { status: "INVALID_ARGUMENT", details: [{ errorCode: "INVALID_ARGUMENT" }] } };
+    expect(await tokensAfterWake("fcm", "fcm:token-1_x")).toBe(1);
+  });
+
+  it("forgets an FCM token reported as unregistered", async () => {
+    fcmStatus = 404;
+    fcmBody = { error: { status: "NOT_FOUND", details: [{ errorCode: "UNREGISTERED" }] } };
+    expect(await tokensAfterWake("fcm", "fcm:token-1_x")).toBe(0);
   });
 
   it("rejects a malformed registration", async () => {
