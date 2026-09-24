@@ -50,14 +50,6 @@ struct BuysView: View {
 
     var body: some View {
         VStack(spacing: 0.0) {
-            Picker("", selection: $scope) {
-                Text("Buys.Scope.Mine").tag(BuysScope.mine)
-                Text("Buys.Scope.Shared").tag(BuysScope.shared)
-            }
-            .pickerStyle(.segmented)
-            .labelsHidden()
-            .padding(.horizontal, 16.0)
-            .padding(.bottom, 8.0)
             if scope == .mine {
                 privateBuys()
             } else {
@@ -84,11 +76,18 @@ struct BuysView: View {
                     infoButton()
                 }
             } else {
-                ToolbarSpacer(.flexible, placement: .bottomBar)
                 ToolbarItem(placement: .bottomBar) {
                     infoButton()
                 }
                 SidebarPositionToolbarItem()
+            }
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                Picker("ViewTitle.Buys", selection: $scope) {
+                    Text("Buys.Scope.Mine").tag(BuysScope.mine)
+                    Text("Buys.Scope.Shared").tag(BuysScope.shared)
+                }
+                .pickerStyle(.menu)
             }
         }
         .alert("Buys.Info.Title", isPresented: $isShowingInfoAlert) {
