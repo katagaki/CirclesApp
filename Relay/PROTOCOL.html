@@ -238,7 +238,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr><td class="mono">hello</td><td>client → relay</td><td><span class="pill relay">Relay</span></td><td>Device id, version vector, hello tag, the room key on first registration only, and an optional push token</td></tr>
+          <tr><td class="mono">hello</td><td>client → relay</td><td><span class="pill relay">Relay</span></td><td>Device id, version vector, hello tag, the room key on first registration only, an optional push token, and optional device attestation</td></tr>
           <tr><td class="mono">ops</td><td>client → relay</td><td><span class="pill relay">Relay</span></td><td>1–32 sealed records of any kind</td></tr>
           <tr><td class="mono">ops</td><td>relay → client</td><td><span class="pill relay">Relay</span></td><td>Records the client's vector lacked, then live fan-out</td></tr>
           <tr><td class="mono">err</td><td>relay → client</td><td><span class="pill relay">Relay</span></td><td>A slug and message, immediately before a close</td></tr>
@@ -284,6 +284,9 @@ blob          = 53 42 32 00 ‖ nonce ‖ AES-256-GCM(contentKey, nonce, aad, pa
 
 recordTag     = HMAC-SHA256(relayAuthKey, deviceID ‖ 0x00 ‖ u64be(seq) ‖ blob)[0..16]
 helloTag      = HMAC-SHA256(relayAuthKey, "hello" ‖ 0x00 ‖ deviceID ‖ 0x00 ‖ u64be(ts))[0..16]
+helloInput     = "hello"  ‖ 0x00 ‖ deviceID ‖ 0x00 ‖ u64be(ts)
+attestInput    = "attest" ‖ 0x00 ‖ roomID   ‖ 0x00 ‖ helloInput                <span class="c">→ 63 bytes</span>
+clientDataHash = SHA-256(attestInput)                                          <span class="c">→ App Attest clientDataHash, Play requestHash</span>
 sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <span class="c">window = ⌊unix/900⌋</span></pre>
 
     <div class="note">
@@ -324,7 +327,8 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
   <span class="k">"k"</span>:  "&lt;base64url 32 bytes&gt;",  <span class="c">// relayAuthKey — omitted unless TLS or a loopback dev server</span>
   <span class="k">"ts"</span>: 1757400000,             <span class="c">// unix seconds, must be within ±300 s of relay time</span>
   <span class="k">"a"</span>:  "&lt;base64url 16 bytes&gt;",  <span class="c">// helloTag</span>
-  <span class="k">"p"</span>:  { "pl": "apns", "tk": "…", "e": "sandbox" }  <span class="c">// optional push registration</span>
+  <span class="k">"p"</span>:  { "pl": "apns", "tk": "…", "e": "sandbox" },  <span class="c">// optional push registration</span>
+  <span class="k">"at"</span>: { "t": "appattest", "k": "…", "s": "…" }   <span class="c">// optional device attestation</span>
 }</pre>
       <div class="fields scroll">
         <table>
@@ -335,6 +339,7 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
             <tr><td class="mono">k</td><td>string?</td><td>Registers the room on first use. Ignored once a room has a key. Omitted by the client over plaintext non-loopback links; a relay that has never seen the key answers 4006.</td></tr>
             <tr><td class="mono">ts</td><td>number</td><td>Safe integer ≥ 0. Beyond ±300 s of relay time closes 4004.</td></tr>
             <tr><td class="mono">a</td><td>string</td><td>16-byte tag over <code>"hello" ‖ 0 ‖ d ‖ 0 ‖ u64be(ts)</code>, compared in constant time.</td></tr>
+            <tr><td class="mono">at</td><td>object?</td><td>Device attestation, checked only after both tags verify. A tagged union: <code>t</code> is <code>"appattest"</code> or <code>"playintegrity"</code>, and nothing else — there is no default branch and no unattested fallback. Whether it is required, merely checked when offered, or ignored altogether is the relay's <code>ATTEST_MODE</code>. Anything that fails to verify closes 4004.</td></tr>
             <tr><td class="mono">p</td><td>object?</td><td>Push registration, stored only after the tag verifies: <code>pl</code> is <code>"apns"</code> or <code>"fcm"</code>, <code>tk</code> is the platform token (≤512 chars of <code>[A-Za-z0-9_:.-]</code>), <code>e</code> is <code>"sandbox"</code> or <code>"production"</code> and defaults to sandbox. One token per device, replaced on every hello. Anything malformed closes 4002.</td></tr>
           </tbody>
         </table>
@@ -348,6 +353,42 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
       holds no key. The woken client reconnects, catches up, and renders locally. Wake-ups are coalesced to
       one per device per 10 seconds, and a token the platform reports as gone is dropped.
     </p>
+
+    <div class="note">
+      <strong>Attestation says the peer is a real build on real hardware — nothing more.</strong>
+      <p>
+        The room key already proves physical presence: whoever holds it finished the Bluetooth
+        handshake. <code>at</code> proves something orthogonal, that the socket belongs to an
+        unmodified CiRCLES on a device its vendor still vouches for. Neither says a record is
+        <em>true</em>, so records stay the clients' to validate and the relay stays a pipe.
+      </p>
+      <p>
+        Both mechanisms bind to the same <code>clientDataHash</code>, so one challenge
+        construction covers two carriers. It is checked once per hello, never per record —
+        a signature check and a counter write on every record would make the relay a
+        bottleneck and buy nothing the hello has not already established.
+      </p>
+      <pre>Apple   "at": { "t": "appattest", "k": keyId, "o": attestationObject }   <span class="c">// first hello of an install</span>
+        "at": { "t": "appattest", "k": keyId, "s": assertion }          <span class="c">// every hello after</span>
+Google  "at": { "t": "playintegrity", "tk": token }                     <span class="c">// standard request, every hello</span></pre>
+      <p>
+        Apple's path enrolls once — chain to Apple's App Attest root, nonce, key id, app id,
+        zero counter, environment — and then verifies a cheap assertion against the stored
+        key, refusing any counter that fails to advance. Re-enrolling a key whose counter has
+        already moved is refused too, so a replayed enrollment cannot reset it. Google's path
+        has no durable key: every hello carries a fresh token that the relay hands to
+        <code>playintegrity.googleapis.com</code> to decode, then checks the package, the
+        request hash, the token age, <code>PLAY_RECOGNIZED</code>, and the device verdict
+        against <code>PLAY_MIN_VERDICT</code>.
+      </p>
+      <p>
+        Absent evidence is normal, not an error: App Attest reports unsupported in the
+        Simulator, on Mac — Catalyst included — and in app extensions, and Play Integrity
+        returns nothing useful without Google Play services. With
+        <code>ATTEST_MODE=optional</code> such a device still syncs; with
+        <code>required</code> it cannot.
+      </p>
+    </div>
 
     <div class="frame">
       <div class="frame-head">
@@ -422,9 +463,9 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
           <tr><td class="mono">1000</td><td>—</td><td>Client sent <code>bye</code></td></tr>
           <tr><td class="mono">1001</td><td>—</td><td>Room alarm fired; the room's records are gone</td></tr>
           <tr><td class="mono">4001</td><td class="mono">rate</td><td>More than 20 messages per 10 s on one socket</td></tr>
-          <tr><td class="mono">4002</td><td class="mono">proto</td><td>Binary frame, over 4096 bytes, malformed JSON, unknown <code>t</code>, bad record shape, or no hello within 10 s</td></tr>
+          <tr><td class="mono">4002</td><td class="mono">proto</td><td>Binary frame, over 4096 bytes — 16384 for a <code>hello</code>, which may carry an integrity token — malformed JSON, unknown <code>t</code>, bad record shape, or no hello within 30 s</td></tr>
           <tr><td class="mono">4003</td><td class="mono">full</td><td>Ninth device in the room, or a fifth socket still waiting to say hello</td></tr>
-          <tr><td class="mono">4004</td><td class="mono">auth</td><td>Bad hello tag, stale <code>ts</code>, bad record tag, or a record claiming another device</td></tr>
+          <tr><td class="mono">4004</td><td class="mono">auth</td><td>Bad hello tag, stale <code>ts</code>, bad record tag, a record claiming another device, or attestation that is required and absent, malformed, or unverifiable</td></tr>
           <tr><td class="mono">4005</td><td class="mono">storage</td><td>A single frame larger than the whole 500-record room</td></tr>
           <tr><td class="mono">4006</td><td class="mono">unknown</td><td>Room has no key registered; resend hello with <code>k</code></td></tr>
           <tr><td class="mono">4007</td><td class="mono">replaced</td><td>The same device said hello on a newer socket</td></tr>
