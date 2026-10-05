@@ -68,7 +68,7 @@ function fail(reason: string): Verified {
 
 export function attestMode(env: AttestEnv): AttestMode {
   const mode = env.ATTEST_MODE;
-  return mode === "required" || mode === "optional" ? mode : "off";
+  return mode === "off" || mode === "optional" ? mode : "required";
 }
 
 export async function verifyAttestation(

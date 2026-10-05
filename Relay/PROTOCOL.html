@@ -339,7 +339,7 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
             <tr><td class="mono">k</td><td>string?</td><td>Registers the room on first use. Ignored once a room has a key. Omitted by the client over plaintext non-loopback links; a relay that has never seen the key answers 4006.</td></tr>
             <tr><td class="mono">ts</td><td>number</td><td>Safe integer ≥ 0. Beyond ±300 s of relay time closes 4004.</td></tr>
             <tr><td class="mono">a</td><td>string</td><td>16-byte tag over <code>"hello" ‖ 0 ‖ d ‖ 0 ‖ u64be(ts)</code>, compared in constant time.</td></tr>
-            <tr><td class="mono">at</td><td>object?</td><td>Device attestation, checked only after both tags verify. A tagged union: <code>t</code> is <code>"appattest"</code> or <code>"playintegrity"</code>, and nothing else — there is no default branch and no unattested fallback. Whether it is required, merely checked when offered, or ignored altogether is the relay's <code>ATTEST_MODE</code>. Anything that fails to verify closes 4004.</td></tr>
+            <tr><td class="mono">at</td><td>object?</td><td>Device attestation, checked only after both tags verify. A tagged union: <code>t</code> is <code>"appattest"</code> or <code>"playintegrity"</code>, and nothing else — there is no default branch and no unattested fallback. Whether it is required, merely checked when offered, or ignored altogether is the relay's <code>ATTEST_MODE</code>, which defaults to <code>required</code> and fails closed on a value it does not recognise. Anything that fails to verify closes 4004.</td></tr>
             <tr><td class="mono">p</td><td>object?</td><td>Push registration, stored only after the tag verifies: <code>pl</code> is <code>"apns"</code> or <code>"fcm"</code>, <code>tk</code> is the platform token (≤512 chars of <code>[A-Za-z0-9_:.-]</code>), <code>e</code> is <code>"sandbox"</code> or <code>"production"</code> and defaults to sandbox. One token per device, replaced on every hello. Anything malformed closes 4002.</td></tr>
           </tbody>
         </table>
@@ -386,7 +386,9 @@ Google  "at": { "t": "playintegrity", "tk": token }                     <span cl
         Simulator, on Mac — Catalyst included — and in app extensions, and Play Integrity
         returns nothing useful without Google Play services. With
         <code>ATTEST_MODE=optional</code> such a device still syncs; with
-        <code>required</code> it cannot.
+        <code>required</code>, the default, it cannot — and because that refusal can never
+        succeed, a client that sent no evidence and was closed 4004 stops reconnecting
+        instead of retrying for the life of the room.
       </p>
     </div>
 

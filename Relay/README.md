@@ -37,11 +37,15 @@ A `hello` may carry an `at` object proving the socket belongs to a genuine build
 
 | Mode | Behaviour |
 | --- | --- |
-| `off` | Evidence is ignored entirely. The default, and what to ship before the clients that send it. |
+| `required` | A hello without verifiable evidence closes 4004. **The default**, including when the var is unset or misspelt — it fails closed. |
 | `optional` | Evidence is verified when offered and a failure closes 4004, but a hello without any still joins. |
-| `required` | A hello without verifiable evidence closes 4004. |
+| `off` | Evidence is ignored entirely. |
 
-Roll it out in that order — `off` until attesting clients are live, `optional` to watch real traffic, `required` once the logs are clean. Going straight to `required` locks out every already-installed client, and permanently locks out the Simulator, Mac and Catalyst builds, app extensions, and Android devices with no Play services.
+Requiring it is deliberate, and it has teeth. It locks out any client that cannot attest, permanently: the Simulator, Mac and Catalyst builds, app extensions — `SharedBuysWidget` included — and Android devices with no Play services. It also locks out every already-installed client until the attesting build ships, so a deploy ahead of those releases takes Shared Buys down for everyone.
+
+When that matters, step through `off` → `optional` → `required` instead, and read the 4004 rate in between. `optional` is the useful middle: evidence that fails to verify is still refused, so a broken attestation cannot hide, but a device that cannot produce any still syncs.
+
+Clients know the difference between a refusal they can retry and one they cannot. A hello that carried no evidence and came back 4004 is permanent, so both apps surface it and stop reconnecting rather than retrying every 30 seconds for the life of the room; a refusal after evidence *was* sent clears the stored enrollment and retries.
 
 The plain vars are `APP_ATTEST_TEAM_ID`, `APP_ATTEST_BUNDLE_ID`, `APP_ATTEST_ENVIRONMENT` (`production`, or `development` to also accept development-signed attestations), `PLAY_PACKAGE_NAME` and `PLAY_MIN_VERDICT` (`basic`, `device` or `strong`).
 

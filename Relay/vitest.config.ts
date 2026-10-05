@@ -16,6 +16,7 @@ export default defineConfig({
       wrangler: { configPath: "./wrangler.jsonc" },
       miniflare: {
         bindings: {
+          ATTEST_MODE: "off",
           APNS_TEAM_ID: "TEAMTEAM99",
           APNS_TOPIC: "com.tsubuzaki.CiRCLES",
           APNS_SANDBOX_KEY_ID: "SANDBOXKEY",

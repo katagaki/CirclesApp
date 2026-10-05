@@ -1,13 +1,16 @@
+import { env as workerEnv, runInDurableObject } from "cloudflare:test";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { decodeCbor } from "../src/cbor";
 import {
   type AttestEnv,
+  type AttestMode,
   type Enrolled,
   attestMode,
   verifyAttestation,
 } from "../src/attest";
 import { attestInput, sha256 } from "../src/proto";
 import { resetBearers } from "../src/push";
+import type { Room } from "../src/room";
 import { Client, authKey, helloFrame, roomId } from "./client";
 import {
   type AssertionKeys,
@@ -101,11 +104,16 @@ describe("cbor", () => {
 });
 
 describe("mode", () => {
-  it("is off unless the environment opts in", () => {
-    expect(attestMode({})).toBe("off");
-    expect(attestMode({ ATTEST_MODE: "nonsense" })).toBe("off");
-    expect(attestMode({ ATTEST_MODE: "optional" })).toBe("optional");
+  it("requires attestation unless the environment opts out", () => {
     expect(attestMode({ ATTEST_MODE: "required" })).toBe("required");
+    expect(attestMode({ ATTEST_MODE: "optional" })).toBe("optional");
+    expect(attestMode({ ATTEST_MODE: "off" })).toBe("off");
+  });
+
+  it("fails closed on a missing or unrecognised mode", () => {
+    for (const mode of [undefined, "", "nonsense", "OFF", "Optional", "0", "false"]) {
+      expect(attestMode({ ATTEST_MODE: mode })).toBe("required");
+    }
   });
 });
 
@@ -392,10 +400,67 @@ describe("client data", () => {
   });
 });
 
+/**
+ * Points one room's object at a mode, since the pool binds ATTEST_MODE off for the suite.
+ *
+ * The env object is shared by every object in the pool, so this swaps the instance's own
+ * reference for a copy; mutating the original leaked the mode into later tests.
+ */
+async function mode(room: string, value: AttestMode): Promise<void> {
+  const target = (workerEnv as unknown as { ROOM: DurableObjectNamespace<Room> }).ROOM;
+  await runInDurableObject(target.get(target.idFromName(room)), (instance: Room) => {
+    const held = instance as unknown as { env: AttestEnv };
+    held.env = { ...held.env, ATTEST_MODE: value };
+  });
+}
+
 describe("the hello gate", () => {
+  it("refuses a hello carrying no evidence when attestation is required", async () => {
+    const room = roomId();
+    const key = authKey();
+    await mode(room, "required");
+    const client = await Client.connect(room);
+    client.send(await helloFrame(key, "aaaaaaaa", {}, { register: key }));
+    const closed = await client.closure();
+    expect(closed.code).toBe(4004);
+    expect(closed.reason).toBe("auth");
+  });
+
+  it("refuses a hello naming an attestation kind it does not know", async () => {
+    const room = roomId();
+    const key = authKey();
+    await mode(room, "required");
+    const client = await Client.connect(room);
+    const frame = JSON.parse(await helloFrame(key, "aaaaaaaa", {}, { register: key }));
+    frame.at = { t: "pinkyswear", tk: "trust me" };
+    client.send(JSON.stringify(frame));
+    expect((await client.closure()).code).toBe(4004);
+  });
+
+  it("lets a hello carrying no evidence through when attestation is optional", async () => {
+    const room = roomId();
+    const key = authKey();
+    await mode(room, "optional");
+    const client = await Client.connect(room);
+    client.send(await helloFrame(key, "aaaaaaaa", {}, { register: key }));
+    expect(await client.next()).toEqual({ t: "ops", o: [] });
+  });
+
+  it("still refuses evidence that fails to verify when attestation is optional", async () => {
+    const room = roomId();
+    const key = authKey();
+    await mode(room, "optional");
+    const client = await Client.connect(room);
+    const frame = JSON.parse(await helloFrame(key, "aaaaaaaa", {}, { register: key }));
+    frame.at = { t: "appattest", k: base64url(new Uint8Array(31)) };
+    client.send(JSON.stringify(frame));
+    expect((await client.closure()).code).toBe(4004);
+  });
+
   it("lets a hello through untouched while attestation is off", async () => {
     const room = roomId();
     const key = authKey();
+    await mode(room, "off");
     const client = await Client.connect(room);
     client.send(await helloFrame(key, "aaaaaaaa", {}, { register: key }));
     expect(await client.next()).toEqual({ t: "ops", o: [] });
@@ -404,6 +469,7 @@ describe("the hello gate", () => {
   it("accepts a hello carrying evidence it is not yet configured to check", async () => {
     const room = roomId();
     const key = authKey();
+    await mode(room, "off");
     const client = await Client.connect(room);
     const frame = JSON.parse(await helloFrame(key, "aaaaaaaa", {}, { register: key }));
     frame.at = { t: "playintegrity", tk: "x".repeat(2000) };
