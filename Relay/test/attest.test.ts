@@ -6,11 +6,13 @@ import {
   type AttestMode,
   type Enrolled,
   attestMode,
+  isLoopback,
   verifyAttestation,
 } from "../src/attest";
 import { attestInput, sha256 } from "../src/proto";
 import { resetBearers } from "../src/push";
 import type { Room } from "../src/room";
+import { SELF } from "cloudflare:test";
 import { Client, authKey, helloFrame, roomId } from "./client";
 import {
   type AssertionKeys,
@@ -104,15 +106,47 @@ describe("cbor", () => {
 });
 
 describe("mode", () => {
-  it("requires attestation unless the environment opts out", () => {
-    expect(attestMode({ ATTEST_MODE: "required" })).toBe("required");
-    expect(attestMode({ ATTEST_MODE: "optional" })).toBe("optional");
-    expect(attestMode({ ATTEST_MODE: "off" })).toBe("off");
+  const dev = { ATTEST_DEV_OVERRIDE: "1" };
+
+  it("requires attestation with no environment variable set at all", () => {
+    expect(attestMode({}, false)).toBe("required");
+    expect(attestMode({}, true)).toBe("required");
   });
 
-  it("fails closed on a missing or unrecognised mode", () => {
+  it("cannot be turned down anywhere but a local run", () => {
+    for (const mode of ["off", "optional"]) {
+      expect(attestMode({ ...dev, ATTEST_MODE: mode }, true)).toBe(mode);
+      // Deployed: the same vars, and it is still required.
+      expect(attestMode({ ...dev, ATTEST_MODE: mode }, false)).toBe("required");
+      // Local, but without the dev-vars-only override.
+      expect(attestMode({ ATTEST_MODE: mode }, true)).toBe("required");
+    }
+  });
+
+  it("fails closed on an unrecognised mode even locally", () => {
     for (const mode of [undefined, "", "nonsense", "OFF", "Optional", "0", "false"]) {
-      expect(attestMode({ ATTEST_MODE: mode })).toBe("required");
+      expect(attestMode({ ...dev, ATTEST_MODE: mode }, true)).toBe("required");
+    }
+  });
+});
+
+describe("loopback", () => {
+  it("recognises the hosts a dev server answers on", () => {
+    for (const host of ["localhost", "LOCALHOST", "127.0.0.1", "::1", "[::1]", "10.0.2.2"]) {
+      expect(isLoopback(host)).toBe(true);
+    }
+  });
+
+  it("recognises nothing else", () => {
+    for (const host of [
+      "relay.test",
+      "circles-relay.workers.dev",
+      "localhost.evil.com",
+      "127.0.0.2",
+      "10.0.2.3",
+      "",
+    ]) {
+      expect(isLoopback(host)).toBe(false);
     }
   });
 });
@@ -435,6 +469,23 @@ describe("the hello gate", () => {
     frame.at = { t: "pinkyswear", tk: "trust me" };
     client.send(JSON.stringify(frame));
     expect((await client.closure()).code).toBe(4004);
+  });
+
+  it("requires attestation on a deployed host however the mode is set", async () => {
+    const room = roomId();
+    const key = authKey();
+    await mode(room, "off");
+    // Not loopback, so the relaxed mode must not apply.
+    const response = await SELF.fetch(`https://relay.test/r/${room}`, {
+      headers: { Upgrade: "websocket" },
+    });
+    const socket = response.webSocket!;
+    socket.accept();
+    const closed = new Promise<number>((resolve) => {
+      socket.addEventListener("close", (event) => resolve(event.code));
+    });
+    socket.send(await helloFrame(key, "aaaaaaaa", {}, { register: key }));
+    expect(await closed).toBe(4004);
   });
 
   it("lets a hello carrying no evidence through when attestation is optional", async () => {

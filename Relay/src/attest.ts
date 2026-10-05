@@ -40,6 +40,7 @@ export type AttestMode = "off" | "optional" | "required";
 
 export interface AttestEnv {
   ATTEST_MODE?: string;
+  ATTEST_DEV_OVERRIDE?: string;
   APP_ATTEST_TEAM_ID?: string;
   APP_ATTEST_BUNDLE_ID?: string;
   APP_ATTEST_ENVIRONMENT?: string;
@@ -66,7 +67,14 @@ function fail(reason: string): Verified {
   return { ok: false, reason };
 }
 
-export function attestMode(env: AttestEnv): AttestMode {
+const LOOPBACK = new Set(["localhost", "127.0.0.1", "::1", "[::1]", "10.0.2.2"]);
+
+export function isLoopback(hostname: string): boolean {
+  return LOOPBACK.has(hostname.toLowerCase());
+}
+
+export function attestMode(env: AttestEnv, local: boolean): AttestMode {
+  if (!local || !env.ATTEST_DEV_OVERRIDE) return "required";
   const mode = env.ATTEST_MODE;
   return mode === "off" || mode === "optional" ? mode : "required";
 }

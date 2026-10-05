@@ -33,17 +33,30 @@ Secrets, set per environment with `npx wrangler secret put NAME --env staging` (
 
 A `hello` may carry an `at` object proving the socket belongs to a genuine build on genuine hardware — App Attest from Apple platforms, Play Integrity from Android. It is a tagged union with no default branch: an unrecognised kind is refused rather than waved through. See `PROTOCOL.html` for the wire format and what each path checks.
 
-`ATTEST_MODE` in `wrangler.jsonc` decides how much it matters:
+**Attestation is always on, and there is no way to turn it off on a deployed relay.** It needs no
+variable to enable it: with nothing configured at all, every hello must carry evidence that
+verifies, and a hello that does not is closed 4004. There is deliberately no production switch —
+`ATTEST_MODE` is not in `wrangler.jsonc` and setting it as a secret does nothing.
 
-| Mode | Behaviour |
-| --- | --- |
-| `required` | A hello without verifiable evidence closes 4004. **The default**, including when the var is unset or misspelt — it fails closed. |
-| `optional` | Evidence is verified when offered and a failure closes 4004, but a hello without any still joins. |
-| `off` | Evidence is ignored entirely. |
+It can only be turned down on a local run, which needs **both** of:
 
-Requiring it is deliberate, and it has teeth: it locks out any client that cannot attest, permanently. That is the Simulator, Mac and Catalyst builds, app extensions — `SharedBuysWidget` included — and Android devices with no Play services.
+| Variable | Set in | Effect |
+| --- | --- | --- |
+| `ATTEST_DEV_OVERRIDE` | `.dev.vars` only — never a secret | Permits `ATTEST_MODE` to be honoured at all |
+| `ATTEST_MODE` | `.dev.vars` | `optional` to let unattested devices join, `off` to skip checking entirely |
 
-`optional` exists for when you need a relay that still talks to those: evidence that fails to verify is refused either way, so a broken attestation cannot hide behind it, but a device that cannot produce any still syncs. `off` is for bisecting the relay itself.
+Both are required, and the request must have arrived on a loopback host — `localhost`,
+`127.0.0.1`, `::1`, or `10.0.2.2` for the Android emulator. A deployed relay fails both the
+host test and, unless someone deliberately puts `ATTEST_DEV_OVERRIDE` in its secrets, the
+variable test. Anything other than `optional` or `off` falls back to required, so a typo cannot
+open it either.
+
+The host is read from the request at the WebSocket upgrade, not from anything a client sends in
+a frame, so a peer cannot claim to be local.
+
+Requiring it has teeth: it locks out any client that cannot attest, permanently. That is the
+Simulator, Mac and Catalyst builds, app extensions — `SharedBuysWidget` included — and Android
+devices with no Play services.
 
 Clients know the difference between a refusal they can retry and one they cannot. A hello that carried no evidence and came back 4004 is permanent, so both apps surface it and stop reconnecting rather than retrying every 30 seconds for the life of the room; a refusal after evidence *was* sent clears the stored enrollment and retries.
 

@@ -6,6 +6,7 @@ import {
   type Enrolled,
   MAX_ATTEST_FRAME_BYTES,
   attestMode,
+  isLoopback,
   verifyAttestation,
 } from "./attest";
 import {
@@ -52,6 +53,7 @@ interface Attachment {
   tk: number;
   at: number;
   o?: number;
+  lo?: 1;
 }
 
 interface Record {
@@ -149,7 +151,9 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     }
     this.ctx.acceptWebSocket(server);
     const now = Date.now();
-    server.serializeAttachment({ d: null, tk: RATE_TOKENS, at: now, o: now } satisfies Attachment);
+    const attachment: Attachment = { d: null, tk: RATE_TOKENS, at: now, o: now };
+    if (isLoopback(new URL(request.url).hostname)) attachment.lo = 1;
+    server.serializeAttachment(attachment);
     return new Response(null, { status: 101, webSocket: client });
   }
 
@@ -256,7 +260,7 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     const deviceExpected = await tag(await importAuthKey(deviceKeyBytes), helloInput(device, frame.ts));
     if (!timingSafeEqual(deviceExpected, deviceOffered)) throw new Fail(CLOSE_AUTH, "bad device tag");
 
-    await this.attest(device, frame.ts, frame.at);
+    await this.attest(device, frame.ts, frame.at, attachment.lo === 1);
 
     this.admit(ws, device);
 
@@ -428,8 +432,8 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     return row ? toBytes(row.auth_key as ArrayBuffer) : null;
   }
 
-  private async attest(device: string, ts: number, evidence: unknown): Promise<void> {
-    const mode = attestMode(this.env);
+  private async attest(device: string, ts: number, evidence: unknown, local: boolean): Promise<void> {
+    const mode = attestMode(this.env, local);
     if (mode === "off") return;
     if (evidence === undefined || evidence === null) {
       if (mode === "required") throw new Fail(CLOSE_AUTH, "attestation required");

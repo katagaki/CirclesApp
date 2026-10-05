@@ -57,7 +57,7 @@ export class Client {
   private constructor(readonly ws: WebSocket) {}
 
   static async connect(room: string): Promise<Client> {
-    const response = await SELF.fetch(`https://relay.test/r/${room}`, {
+    const response = await SELF.fetch(`http://localhost/r/${room}`, {
       headers: { Upgrade: "websocket" },
     });
     if (!response.webSocket) throw new Error(`no websocket: ${response.status}`);

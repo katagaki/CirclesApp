@@ -17,6 +17,7 @@ export default defineConfig({
       miniflare: {
         bindings: {
           ATTEST_MODE: "off",
+          ATTEST_DEV_OVERRIDE: "1",
           APNS_TEAM_ID: "TEAMTEAM99",
           APNS_TOPIC: "com.tsubuzaki.CiRCLES",
           APNS_SANDBOX_KEY_ID: "SANDBOXKEY",

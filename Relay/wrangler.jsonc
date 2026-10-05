@@ -11,7 +11,6 @@
   "vars": {
     "APNS_TEAM_ID": "YYM4Z6MU8F",
     "APNS_TOPIC": "com.tsubuzaki.CiRCLES",
-    "ATTEST_MODE": "required",
     "APP_ATTEST_TEAM_ID": "YYM4Z6MU8F",
     "APP_ATTEST_BUNDLE_ID": "com.tsubuzaki.CiRCLES",
     "APP_ATTEST_ENVIRONMENT": "production",
@@ -25,7 +24,6 @@
       "vars": {
         "APNS_TEAM_ID": "YYM4Z6MU8F",
         "APNS_TOPIC": "com.tsubuzaki.CiRCLES",
-        "ATTEST_MODE": "required",
         "APP_ATTEST_TEAM_ID": "YYM4Z6MU8F",
         "APP_ATTEST_BUNDLE_ID": "com.tsubuzaki.CiRCLES",
         "APP_ATTEST_ENVIRONMENT": "development",
@@ -42,7 +40,6 @@
       "vars": {
         "APNS_TEAM_ID": "YYM4Z6MU8F",
         "APNS_TOPIC": "com.tsubuzaki.CiRCLES",
-        "ATTEST_MODE": "required",
         "APP_ATTEST_TEAM_ID": "YYM4Z6MU8F",
         "APP_ATTEST_BUNDLE_ID": "com.tsubuzaki.CiRCLES",
         "APP_ATTEST_ENVIRONMENT": "production",
