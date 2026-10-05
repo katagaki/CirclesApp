@@ -41,9 +41,9 @@ A `hello` may carry an `at` object proving the socket belongs to a genuine build
 | `optional` | Evidence is verified when offered and a failure closes 4004, but a hello without any still joins. |
 | `off` | Evidence is ignored entirely. |
 
-Requiring it is deliberate, and it has teeth. It locks out any client that cannot attest, permanently: the Simulator, Mac and Catalyst builds, app extensions — `SharedBuysWidget` included — and Android devices with no Play services. It also locks out every already-installed client until the attesting build ships, so a deploy ahead of those releases takes Shared Buys down for everyone.
+Requiring it is deliberate, and it has teeth: it locks out any client that cannot attest, permanently. That is the Simulator, Mac and Catalyst builds, app extensions — `SharedBuysWidget` included — and Android devices with no Play services.
 
-When that matters, step through `off` → `optional` → `required` instead, and read the 4004 rate in between. `optional` is the useful middle: evidence that fails to verify is still refused, so a broken attestation cannot hide, but a device that cannot produce any still syncs.
+`optional` exists for when you need a relay that still talks to those: evidence that fails to verify is refused either way, so a broken attestation cannot hide behind it, but a device that cannot produce any still syncs. `off` is for bisecting the relay itself.
 
 Clients know the difference between a refusal they can retry and one they cannot. A hello that carried no evidence and came back 4004 is permanent, so both apps surface it and stop reconnecting rather than retrying every 30 seconds for the life of the room; a refusal after evidence *was* sent clears the stored enrollment and retries.
 
