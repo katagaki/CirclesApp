@@ -21,5 +21,9 @@
     "esbuild@0.28.1": true,
     "workerd@1.20260815.1": true,
     "workerd@1.20260903.1": true
+  },
+  "dependencies": {
+    "@peculiar/x509": "^2.1.0",
+    "reflect-metadata": "^0.2.2"
   }
 }

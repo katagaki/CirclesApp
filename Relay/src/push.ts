@@ -3,6 +3,7 @@ import { ascii } from "./proto";
 export const APNS_SANDBOX = "https://api.sandbox.push.apple.com";
 export const APNS_PRODUCTION = "https://api.push.apple.com";
 export const FCM_SEND = "https://fcm.googleapis.com/v1/projects";
+export const FCM_SCOPE = "https://www.googleapis.com/auth/firebase.messaging";
 export const TOKEN_TTL_MS = 50 * 60 * 1000;
 
 export type Platform = "apns" | "fcm";
@@ -136,17 +137,17 @@ async function fcmErrorCodes(response: Response): Promise<string[]> {
   }
 }
 
-interface ServiceAccount {
+export interface ServiceAccount {
   project_id?: string;
   client_email?: string;
   private_key?: string;
   token_uri?: string;
 }
 
-function serviceAccount(env: PushEnv): ServiceAccount | null {
-  if (!env.FCM_SERVICE_ACCOUNT) return null;
+export function serviceAccount(raw: string | undefined): ServiceAccount | null {
+  if (!raw) return null;
   try {
-    const parsed = JSON.parse(env.FCM_SERVICE_ACCOUNT) as ServiceAccount;
+    const parsed = JSON.parse(raw) as ServiceAccount;
     if (!parsed.project_id || !parsed.client_email || !parsed.private_key) return null;
     return parsed;
   } catch {
@@ -154,9 +155,9 @@ function serviceAccount(env: PushEnv): ServiceAccount | null {
   }
 }
 
-async function fcmBearer(account: ServiceAccount): Promise<string | null> {
+export async function googleBearer(account: ServiceAccount, scope: string): Promise<string | null> {
   const endpoint = account.token_uri ?? "https://oauth2.googleapis.com/token";
-  return cache(`fcm:${account.client_email}`, async () => {
+  return cache(`google:${account.client_email}:${scope}`, async () => {
     const key = await crypto.subtle.importKey(
       "pkcs8",
       pkcs8(account.private_key!) as BufferSource,
@@ -171,7 +172,7 @@ async function fcmBearer(account: ServiceAccount): Promise<string | null> {
       { alg: "RS256", typ: "JWT" },
       {
         iss: account.client_email,
-        scope: "https://www.googleapis.com/auth/firebase.messaging",
+        scope,
         aud: endpoint,
         iat: now,
         exp: now + 3600,
@@ -192,9 +193,9 @@ async function fcmBearer(account: ServiceAccount): Promise<string | null> {
 }
 
 async function fcm(env: PushEnv, target: Target): Promise<Outcome> {
-  const account = serviceAccount(env);
+  const account = serviceAccount(env.FCM_SERVICE_ACCOUNT);
   if (!account) return "unconfigured";
-  const bearer = await fcmBearer(account);
+  const bearer = await googleBearer(account, FCM_SCOPE);
   if (!bearer) return "failed";
   const response = await fetch(`${FCM_SEND}/${account.project_id}/messages:send`, {
     method: "POST",

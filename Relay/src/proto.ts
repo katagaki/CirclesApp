@@ -74,3 +74,11 @@ export function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
   for (let i = 0; i < a.length; i++) diff |= a[i] ^ b[i];
   return diff === 0;
 }
+
+export function attestInput(deviceId: string, ts: number, roomId: string): Uint8Array {
+  return concat(ascii("attest"), ZERO, ascii(roomId), ZERO, helloInput(deviceId, ts));
+}
+
+export async function sha256(input: Uint8Array): Promise<Uint8Array> {
+  return new Uint8Array(await crypto.subtle.digest("SHA-256", input as BufferSource));
+}
