@@ -374,6 +374,11 @@ describe("play integrity", () => {
 });
 
 describe("client data", () => {
+  it("matches the vector the iOS and Android clients produce", async () => {
+    const hash = await sha256(attestInput("a1b2c3d4", 1767225600, "0123456789abcdef0123456789abcdef"));
+    expect(base64url(hash)).toBe("5kcFEKKULlhnD5i6NT_B_W8giQnfboQHBo2pAQGhxws");
+  });
+
   it("binds the room, the device and the hello timestamp", async () => {
     const one = await sha256(attestInput("aaaaaaaa", 100, "r1"));
     expect(one).toEqual(await sha256(attestInput("aaaaaaaa", 100, "r1")));
