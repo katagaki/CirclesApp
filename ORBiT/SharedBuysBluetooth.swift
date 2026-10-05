@@ -315,6 +315,41 @@ final class SharedBuysBluetooth: NSObject {
     }
 }
 
+// The teardown lives in an extension so it does not count against the class body,
+// which is already at the limit SwiftLint allows.
+private extension SharedBuysBluetooth {
+
+    /// Drops every live link without ending the session.
+    ///
+    /// Core Bluetooth invalidates connections when the radio goes down, and promises no
+    /// disconnect callback for them, so these maps outlived the links they described:
+    /// `peerCount` stayed inflated, and `shouldConnect` refused every peer still sitting
+    /// in `connected`, so nothing reconnected once the radio came back. The session key
+    /// and the event sink are kept — the room is still joined, only the radio went away.
+    func invalidateLinks() {
+        let lost = verifiedPeripherals.map { BluetoothPeer.peripheral($0) }
+            + verifiedCentrals.map { BluetoothPeer.central($0) }
+        connected.removeAll()
+        inboxes.removeAll()
+        subscribers.removeAll()
+        reassemblers.removeAll()
+        centralReassemblers.removeAll()
+        verifiedPeripherals.removeAll()
+        verifiedCentrals.removeAll()
+        pendingNotifies.removeAll()
+        pendingWrites.removeAll()
+        peerDigests.removeAll()
+        challenges.removeAll()
+        responses.removeAll()
+        // Forgetting the attempts disarms the deadlines still in flight, which would
+        // otherwise reject peripherals that are already gone.
+        handshakeAttempts.removeAll()
+        advertisedWindow = nil
+        announcePeers()
+        for peer in lost { onEvent?(.peerLost(peer)) }
+    }
+}
+
 extension SharedBuysBluetooth: @preconcurrency CBPeripheralManagerDelegate {
 
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
@@ -325,7 +360,10 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralManagerDelegate {
         case .unauthorized:
             onEvent?(.unavailable("bluetooth not permitted"))
         case .poweredOff:
+            invalidateLinks()
             onEvent?(.unavailable("bluetooth off"))
+        case .resetting:
+            invalidateLinks()
         default:
             break
         }
@@ -412,7 +450,14 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralManagerDelegate {
 extension SharedBuysBluetooth: @preconcurrency CBCentralManagerDelegate {
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        if central.state == .poweredOn { scan() }
+        switch central.state {
+        case .poweredOn:
+            scan()
+        case .poweredOff, .resetting:
+            invalidateLinks()
+        default:
+            break
+        }
     }
 
     func centralManager(
