@@ -27,6 +27,7 @@ actor SharedBuysRelay {
     private var heartbeatTask: Task<Void, Never>?
     private var lastPong: Date = .distantPast
     private var heldSeen: Bool = false
+    private var sentEvidence: Bool = false
 
     struct Endpoint: Sendable {
         var baseURL: String
@@ -135,11 +136,13 @@ actor SharedBuysRelay {
         if let pushToken = endpoint.pushToken {
             frame["p"] = ["pl": "apns", "tk": pushToken, "e": endpoint.pushEnvironment]
         }
-        if let evidence = await SharedBuysAttestation.shared.evidence(
+        let evidence = await SharedBuysAttestation.shared.evidence(
             roomID: endpoint.roomID,
             deviceID: endpoint.deviceID,
             timestamp: timestamp
-        ) {
+        )
+        sentEvidence = evidence != nil
+        if let evidence {
             frame["at"] = evidence.frame
         }
         guard let data = try? JSONSerialization.data(withJSONObject: frame),
@@ -204,12 +207,31 @@ actor SharedBuysRelay {
         }
     }
 
+    /// The relay refused a hello this device cannot ever satisfy.
+    ///
+    /// Reported instead of `auth` when we sent no attestation and the relay demanded
+    /// one, which is the permanent case: App Attest is unsupported here — the Simulator,
+    /// Mac and Catalyst, most app extensions — or Play has nothing to say about this
+    /// device. Reconnecting would be refused identically every 30 seconds for the rest
+    /// of the room's life, so the session stops instead and waits for a relaunch.
+    static let unattestedSlug = "unattested"
+
     /// Reports a relay error, forgetting the enrollment when it rejected our hello.
     ///
     /// A stale enrollment can only keep failing: the key the relay has on file is not
     /// the one this install is signing with, so the next hello has to attest afresh.
     private func fail(_ code: String) async {
-        if code == "auth" { await SharedBuysAttestation.shared.invalidate() }
+        guard code == "auth" else {
+            handler?(.failed(code))
+            return
+        }
+        await SharedBuysAttestation.shared.invalidate()
+        guard sentEvidence else {
+            // Swallow the close that follows, so the session sees one terminal event.
+            isRunning = false
+            handler?(.failed(Self.unattestedSlug))
+            return
+        }
         handler?(.failed(code))
     }
 

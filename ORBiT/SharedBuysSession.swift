@@ -433,7 +433,9 @@ public final class SharedBuysSession {
         case .failed(let reason):
             status = .offline(reason)
             note("failed: \(reason)")
-            if reason != Self.storageFullSlug { scheduleReconnect() }
+            if reason != Self.storageFullSlug, reason != SharedBuysRelay.unattestedSlug {
+                scheduleReconnect()
+            }
         case .closed(let code):
             status = .offline("closed \(code)")
             note("closed \(code)")
