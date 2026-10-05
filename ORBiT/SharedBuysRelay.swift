@@ -135,6 +135,13 @@ actor SharedBuysRelay {
         if let pushToken = endpoint.pushToken {
             frame["p"] = ["pl": "apns", "tk": pushToken, "e": endpoint.pushEnvironment]
         }
+        if let evidence = await SharedBuysAttestation.shared.evidence(
+            roomID: endpoint.roomID,
+            deviceID: endpoint.deviceID,
+            timestamp: timestamp
+        ) {
+            frame["at"] = evidence.frame
+        }
         guard let data = try? JSONSerialization.data(withJSONObject: frame),
               let text = String(data: data, encoding: .utf8) else { return }
         do {
@@ -181,7 +188,7 @@ actor SharedBuysRelay {
                     }
                     handler?(.records(records))
                 case "err":
-                    handler?(.failed(object["c"] as? String ?? "error"))
+                    await fail(object["c"] as? String ?? "error")
                 default:
                     continue
                 }
@@ -195,6 +202,15 @@ actor SharedBuysRelay {
                 return
             }
         }
+    }
+
+    /// Reports a relay error, forgetting the enrollment when it rejected our hello.
+    ///
+    /// A stale enrollment can only keep failing: the key the relay has on file is not
+    /// the one this install is signing with, so the next hello has to attest afresh.
+    private func fail(_ code: String) async {
+        if code == "auth" { await SharedBuysAttestation.shared.invalidate() }
+        handler?(.failed(code))
     }
 
     private func heartbeat(generation: Int) async {

@@ -48,13 +48,32 @@ enum SharedBuysCrypto {
         )
     }
 
-    static func helloTag(deviceID: String, timestamp: Int, relayAuthKey: SymmetricKey) -> Data {
+    static func helloInput(deviceID: String, timestamp: Int) -> Data {
         var input = Data("hello".utf8)
         input.append(0)
         input.append(Data(deviceID.utf8))
         input.append(0)
         input.append(bigEndian(UInt64(timestamp)))
+        return input
+    }
+
+    static func helloTag(deviceID: String, timestamp: Int, relayAuthKey: SymmetricKey) -> Data {
+        let input = helloInput(deviceID: deviceID, timestamp: timestamp)
         return Data(HMAC<SHA256>.authenticationCode(for: input, using: relayAuthKey)).prefix(tagLength)
+    }
+
+    /// The client data an attestation is bound to, matching the relay byte for byte.
+    static func attestInput(deviceID: String, timestamp: Int, roomID: String) -> Data {
+        var input = Data("attest".utf8)
+        input.append(0)
+        input.append(Data(roomID.utf8))
+        input.append(0)
+        input.append(helloInput(deviceID: deviceID, timestamp: timestamp))
+        return input
+    }
+
+    static func clientDataHash(deviceID: String, timestamp: Int, roomID: String) -> Data {
+        Data(SHA256.hash(data: attestInput(deviceID: deviceID, timestamp: timestamp, roomID: roomID)))
     }
 
     static func recordTag(deviceID: String, seq: Int, blob: Data, relayAuthKey: SymmetricKey) -> Data {
