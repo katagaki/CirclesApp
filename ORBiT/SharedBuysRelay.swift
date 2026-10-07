@@ -51,15 +51,21 @@ actor SharedBuysRelay {
         generation += 1
         heldSeen = false
         let generation = generation
+        Task { await self.open(endpoint, url: url, generation: generation) }
+    }
+
+    private func open(_ endpoint: Endpoint, url: URL, generation: Int) async {
+        guard let data = await helloData(endpoint),
+              isRunning, generation == self.generation else { return }
+        var request = URLRequest(url: url)
+        request.setValue(data.base64URL, forHTTPHeaderField: "X-Circles-Hello")
         let configuration = URLSessionConfiguration.default
         configuration.waitsForConnectivity = false
         let session = URLSession(configuration: configuration)
         self.session = session
-        let task = session.webSocketTask(with: url)
+        let task = session.webSocketTask(with: request)
         self.task = task
         task.resume()
-
-        Task { await self.sendHello(endpoint) }
         Task { await self.receive(generation: generation) }
         heartbeatTask = Task { await self.heartbeat(generation: generation) }
     }
@@ -104,8 +110,7 @@ actor SharedBuysRelay {
         return ["localhost", "127.0.0.1", "::1", "10.0.2.2"].contains(host)
     }
 
-    private func sendHello(_ endpoint: Endpoint) async {
-        guard let task else { return }
+    private func helloData(_ endpoint: Endpoint) async -> Data? {
         let relayAuthKey = SharedBuysCrypto.derive(
             SharedBuysCrypto.relayAuthInfo,
             from: endpoint.sessionKey
@@ -145,14 +150,7 @@ actor SharedBuysRelay {
         if let evidence {
             frame["at"] = evidence.frame
         }
-        guard let data = try? JSONSerialization.data(withJSONObject: frame),
-              let text = String(data: data, encoding: .utf8) else { return }
-        do {
-            try await task.send(.string(text))
-            handler?(.connected)
-        } catch {
-            handler?(.failed(error.localizedDescription))
-        }
+        return try? JSONSerialization.data(withJSONObject: frame)
     }
 
     private func receive(generation: Int) async {
@@ -173,6 +171,7 @@ actor SharedBuysRelay {
                 switch object["t"] as? String {
                 case "held":
                     heldSeen = true
+                    handler?(.connected)
                     handler?(.held(object["n"] as? Int ?? 0))
                 case "ops":
                     // A relay that predates `held` answers the hello with ops alone, so
@@ -198,8 +197,12 @@ actor SharedBuysRelay {
             } catch {
                 guard generation == self.generation else { return }
                 if isRunning {
-                    let code = task.closeCode.rawValue
-                    handler?(code == 0 ? .failed(error.localizedDescription) : .closed(code))
+                    if let response = task.response as? HTTPURLResponse, response.statusCode == 401 {
+                        await fail("auth")
+                    } else {
+                        let code = task.closeCode.rawValue
+                        handler?(code == 0 ? .failed(error.localizedDescription) : .closed(code))
+                    }
                 }
                 isRunning = false
                 return

@@ -2,21 +2,21 @@ import CryptoKit
 import DeviceCheck
 import Foundation
 
-/// One device's App Attest evidence, ready for the hello frame.
+/// One device's App Attest evidence for the authenticated upgrade.
 struct SharedBuysEvidence: Sendable {
     let keyID: String
     var attestation: String?
     var assertion: String?
 
     var frame: [String: Any] {
-        var value: [String: Any] = ["t": "appattest", "k": keyID]
+        var value: [String: Any] = ["t": "appattest", "k": Data(base64Encoded: keyID)?.base64URL ?? keyID]
         if let attestation { value["o"] = attestation }
         if let assertion { value["s"] = assertion }
         return value
     }
 }
 
-/// App Attest evidence for the relay's hello frame.
+/// App Attest evidence for the relay's upgrade request.
 ///
 /// The first hello from an install carries an attestation object, which asks Apple to
 /// certify a fresh Secure Enclave key; every later hello carries a cheap assertion
@@ -71,12 +71,12 @@ actor SharedBuysAttestation {
         return SharedBuysEvidence(keyID: key, attestation: object.base64URL)
     }
 
-    /// Forgets the enrollment so the next hello attests again.
+    /// Drops the old key so the next connection can enroll with a fresh attestation.
     ///
     /// Called when the relay answers a hello with an auth failure: the stored key may
     /// be one it never accepted, and assertions against it can only keep failing.
     func invalidate() {
-        isEnrolled = false
+        reset()
     }
 
     /// Drops the key as well, for when the key itself is what the relay rejected.
