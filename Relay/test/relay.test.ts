@@ -1,7 +1,7 @@
 import { env, runDurableObjectAlarm, runInDurableObject, SELF } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
 import { Client, authKey, helloFrame, record, roomId } from "./client";
-import { HELLO_DEADLINE_MS, UNCLAIMED_TTL_MS, type Room } from "../src/room";
+import { type Room } from "../src/room";
 
 async function join(
   room: string,
@@ -39,7 +39,7 @@ describe("routing", () => {
     expect((await SELF.fetch("https://relay.test/?x=1")).status).toBe(400);
     expect((await SELF.fetch("https://relay.test/r/nothex")).status).toBe(400);
     const upgrade = { headers: { Upgrade: "websocket" } };
-    expect((await SELF.fetch(`https://relay.test/r/${roomId()}`, upgrade)).status).toBe(101);
+    expect((await SELF.fetch(`https://relay.test/r/${roomId()}`, upgrade)).status).toBe(401);
     expect((await SELF.fetch(`https://relay.test/r/${roomId()}`)).status).toBe(400);
   });
 });
@@ -182,7 +182,10 @@ describe("authentication", () => {
 
 describe("limits", () => {
   it("closes 4002 on an oversized frame", async () => {
-    const client = await Client.connect(roomId());
+    const room = roomId();
+    const key = authKey();
+    const client = await join(room, key, "aaaaaaaa", {}, true);
+    await client.next();
     client.send(JSON.stringify({ t: "hello", pad: "x".repeat(4200) }));
     expect((await client.closure()).code).toBe(4002);
   });
@@ -221,25 +224,20 @@ describe("limits", () => {
     expect((await overflow.closure()).code).toBe(4003);
   });
 
-  it("closes 4003 once four sockets are waiting to say hello", async () => {
+  it("rejects unauthenticated upgrades without occupying room sockets", async () => {
     const room = roomId();
-    const waiting = [];
-    for (let i = 0; i < 4; i++) waiting.push(await Client.connect(room));
-    const overflow = await Client.connect(room);
-    expect((await overflow.closure()).code).toBe(4003);
-  });
-
-  it("closes a socket that never says hello once a newcomer arrives", async () => {
-    const room = roomId();
-    const silent = await Client.connect(room);
+    for (let i = 0; i < 8; i++) {
+      const response = await SELF.fetch(`https://relay.test/r/${room}`, { headers: { Upgrade: "websocket" } });
+      expect(response.status).toBe(401);
+      expect(response.webSocket).toBeNull();
+    }
+    const key = authKey();
+    const member = await join(room, key, "aaaaaaaa", {}, true);
+    expect(await member.next()).toEqual({ t: "ops", o: [] });
     await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) => {
-      for (const socket of state.getWebSockets()) {
-        const attachment = socket.deserializeAttachment() as { o: number };
-        socket.serializeAttachment({ ...attachment, o: attachment.o - HELLO_DEADLINE_MS - 1 });
-      }
+      expect(state.getWebSockets().length).toBe(1);
+      expect(state.getWebSockets()[0].deserializeAttachment().d).toBe("aaaaaaaa");
     });
-    await Client.connect(room);
-    expect((await silent.closure()).code).toBe(4002);
   });
 
   it("replaces a device's older socket when it says hello again", async () => {
@@ -346,6 +344,7 @@ describe("record authorship", () => {
 
     const real = await record(key, "aaaaaaaa", 5, "real");
     a.send({ t: "ops", o: [real] });
+    await stored(room, "aaaaaaaa", 5);
     const late = await join(room, key, "cccccccc");
     expect(await late.next()).toEqual({ t: "ops", o: [real] });
   });
@@ -397,16 +396,6 @@ describe("hibernation", () => {
 });
 
 describe("lifetime", () => {
-  it("arms a short alarm for a room nobody registered", async () => {
-    const room = roomId();
-    await Client.connect(room);
-    await runInDurableObject(stub(room), async (_instance: Room, state: DurableObjectState) => {
-      const alarm = await state.storage.getAlarm();
-      expect(alarm).not.toBeNull();
-      expect(alarm! - Date.now()).toBeLessThanOrEqual(UNCLAIMED_TTL_MS);
-    });
-  });
-
   it("extends the alarm to the room lifetime once a key is registered", async () => {
     const room = roomId();
     const key = authKey();
@@ -414,7 +403,7 @@ describe("lifetime", () => {
     await a.next();
     await runInDurableObject(stub(room), async (_instance: Room, state: DurableObjectState) => {
       const alarm = await state.storage.getAlarm();
-      expect(alarm! - Date.now()).toBeGreaterThan(UNCLAIMED_TTL_MS);
+      expect(alarm! - Date.now()).toBeGreaterThan(47 * 60 * 60 * 1000);
     });
   });
 

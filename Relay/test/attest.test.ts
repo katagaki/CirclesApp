@@ -9,7 +9,8 @@ import {
   isLoopback,
   verifyAttestation,
 } from "../src/attest";
-import { attestInput, sha256 } from "../src/proto";
+import worker, { HELLO_HEADER, type Env } from "../src/index";
+import { attestInput, b64urlEncode, sha256 } from "../src/proto";
 import { resetBearers } from "../src/push";
 import type { Room } from "../src/room";
 import { SELF } from "cloudflare:test";
@@ -434,18 +435,8 @@ describe("client data", () => {
   });
 });
 
-/**
- * Points one room's object at a mode, since the pool binds ATTEST_MODE off for the suite.
- *
- * The env object is shared by every object in the pool, so this swaps the instance's own
- * reference for a copy; mutating the original leaked the mode into later tests.
- */
 async function mode(room: string, value: AttestMode): Promise<void> {
-  const target = (workerEnv as unknown as { ROOM: DurableObjectNamespace<Room> }).ROOM;
-  await runInDurableObject(target.get(target.idFromName(room)), (instance: Room) => {
-    const held = instance as unknown as { env: AttestEnv };
-    held.env = { ...held.env, ATTEST_MODE: value };
-  });
+  Client.modes.set(room, value);
 }
 
 describe("the hello gate", () => {
@@ -479,13 +470,8 @@ describe("the hello gate", () => {
     const response = await SELF.fetch(`https://relay.test/r/${room}`, {
       headers: { Upgrade: "websocket" },
     });
-    const socket = response.webSocket!;
-    socket.accept();
-    const closed = new Promise<number>((resolve) => {
-      socket.addEventListener("close", (event) => resolve(event.code));
-    });
-    socket.send(await helloFrame(key, "aaaaaaaa", {}, { register: key }));
-    expect(await closed).toBe(4004);
+    expect(response.status).toBe(401);
+    expect(response.webSocket).toBeNull();
   });
 
   it("lets a hello carrying no evidence through when attestation is optional", async () => {
@@ -527,4 +513,19 @@ describe("the hello gate", () => {
     client.send(JSON.stringify(frame));
     expect(await client.next()).toEqual({ t: "ops", o: [] });
   });
+
+  it("admits Play Integrity before opening the production socket", async () => {
+    const room = roomId();
+    const key = authKey();
+    const frame = JSON.parse(await helloFrame(key, "aaaaaaaa", {}, {register:key}));
+    frame.at = {t:"playintegrity",tk:"test-integrity-token"};
+    payload = playPayload({}, b64urlEncode(await sha256(attestInput(frame.d,frame.ts,room))));
+    const response = await worker.fetch(new Request(`https://relay.test/r/${room}`, {
+      headers:{Upgrade:"websocket",[HELLO_HEADER]:b64urlEncode(new TextEncoder().encode(JSON.stringify(frame)))},
+    }), {...workerEnv, PLAY_SERVICE_ACCOUNT:account} as Env);
+    expect(response.status).toBe(101);
+    response.webSocket!.accept();
+    response.webSocket!.close();
+  });
+
 });

@@ -1,23 +1,14 @@
 import { DurableObject } from "cloudflare:workers";
 import { type Environment, type Platform, type PushEnv, type Target, push } from "./push";
-import {
-  type AttestEnv,
-  type AttestKind,
-  type Enrolled,
-  MAX_ATTEST_FRAME_BYTES,
-  attestMode,
-  isLoopback,
-  verifyAttestation,
-} from "./attest";
+import type { AttestEnv } from "./attest";
+import { AUTHENTICATED_HEADER, readHello, rejection } from "./admission";
 import {
   TAG_LEN,
-  attestInput,
   b64urlDecode,
   b64urlEncode,
   helloInput,
   importAuthKey,
   recordInput,
-  sha256,
   tag,
   timingSafeEqual,
   toBytes,
@@ -28,12 +19,9 @@ export const MAX_RECORDS_PER_FRAME = 32;
 export const RATE_TOKENS = 20;
 export const RATE_WINDOW_MS = 10_000;
 export const MAX_SOCKETS = 8;
-export const MAX_PENDING_SOCKETS = 4;
-export const HELLO_DEADLINE_MS = 30_000;
 export const MAX_STORED_RECORDS = 500;
 export const HELLO_SKEW_SECONDS = 300;
 export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
-export const UNCLAIMED_TTL_MS = 5 * 60 * 1000;
 export const PUSH_COALESCE_MS = 10_000;
 export const MAX_TOKEN_LENGTH = 512;
 
@@ -52,8 +40,6 @@ interface Attachment {
   d: string | null;
   tk: number;
   at: number;
-  o?: number;
-  lo?: 1;
 }
 
 interface Record {
@@ -121,40 +107,37 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
       device   TEXT PRIMARY KEY,
       auth_key BLOB NOT NULL
     )`);
-    this.sql.exec(`CREATE TABLE IF NOT EXISTS attest (
-      device  TEXT    PRIMARY KEY,
-      kind    TEXT    NOT NULL,
-      key_id  BLOB,
-      pubkey  BLOB,
-      counter INTEGER NOT NULL,
-      at      INTEGER NOT NULL
-    )`);
+    for (const socket of ctx.getWebSockets()) {
+      if (!(socket.deserializeAttachment() as Attachment | null)?.d) this.reject(socket, CLOSE_AUTH, "authentication required");
+    }
     ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair("ping", "pong"));
-    ctx.blockConcurrencyWhile(async () => {
-      if ((await ctx.storage.getAlarm()) === null) {
-        await ctx.storage.setAlarm(Date.now() + UNCLAIMED_TTL_MS);
-      }
-    });
   }
 
   override async fetch(request: Request): Promise<Response> {
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
       return new Response("expected websocket", { status: 400 });
     }
-    const pair = new WebSocketPair();
-    const client = pair[0];
-    const server = pair[1];
-    if (this.pendingSockets() >= MAX_PENDING_SOCKETS) {
-      server.accept();
-      this.reject(server, CLOSE_ROOM_FULL, "room is full");
-      return new Response(null, { status: 101, webSocket: client });
-    }
-    this.ctx.acceptWebSocket(server);
-    const now = Date.now();
-    const attachment: Attachment = { d: null, tk: RATE_TOKENS, at: now, o: now };
-    if (isLoopback(new URL(request.url).hostname)) attachment.lo = 1;
-    server.serializeAttachment(attachment);
-    return new Response(null, { status: 101, webSocket: client });
+    if (request.headers.get(AUTHENTICATED_HEADER) !== "1") return rejection(401, "auth", "attestation required");
+    const frame = readHello(request);
+    if (!frame) return rejection(401, "auth", "authenticated hello required");
+    return this.ctx.blockConcurrencyWhile(async () => {
+      try {
+        const device = await this.authorize(frame);
+        const pair = new WebSocketPair();
+        const client = pair[0];
+        const server = pair[1];
+        this.admit(server, device);
+        this.ctx.acceptWebSocket(server);
+        server.serializeAttachment({ d: device, tk: RATE_TOKENS, at: Date.now() } satisfies Attachment);
+        server.send(JSON.stringify({ t: "held", n: this.heldPrefix(device) }));
+        this.send(server, this.missing(frame.v));
+        return new Response(null, { status: 101, webSocket: client });
+      } catch (error) {
+        if (!(error instanceof Fail)) throw error;
+        const status = error.code === CLOSE_AUTH ? 401 : error.code === CLOSE_UNKNOWN_ROOM ? 404 : error.code === CLOSE_ROOM_FULL ? 429 : 400;
+        return rejection(status, SLUG[error.code], error.message);
+      }
+    });
   }
 
   override async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
@@ -175,14 +158,13 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     this.sql.exec("DELETE FROM room");
     this.sql.exec("DELETE FROM tokens");
     this.sql.exec("DELETE FROM devices");
-    this.sql.exec("DELETE FROM attest");
     for (const ws of this.ctx.getWebSockets()) ws.close(1001, "room expired");
   }
 
   private async dispatch(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
     if (typeof message !== "string") throw new Fail(CLOSE_PROTOCOL, "text frames only");
     const size = byteLength(message);
-    if (size > MAX_ATTEST_FRAME_BYTES) throw new Fail(CLOSE_PROTOCOL, "frame too large");
+    if (size > MAX_FRAME_BYTES) throw new Fail(CLOSE_PROTOCOL, "frame too large");
 
     const attachment = this.spend(ws);
     let frame: Record | { t?: unknown } | null;
@@ -194,9 +176,7 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     if (!frame || typeof frame !== "object") throw new Fail(CLOSE_PROTOCOL, "malformed frame");
 
     const type = (frame as { t?: unknown }).t;
-    if (type !== "hello" && size > MAX_FRAME_BYTES) throw new Fail(CLOSE_PROTOCOL, "frame too large");
-    if (type === "hello") await this.onHello(ws, frame as never, attachment);
-    else if (type === "ops") await this.onOps(ws, frame as never, attachment);
+    if (type === "ops") await this.onOps(ws, frame as never, attachment);
     else if (type === "bye") ws.close(1000, "bye");
     else throw new Fail(CLOSE_PROTOCOL, "unknown frame type");
   }
@@ -213,22 +193,7 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     return attachment;
   }
 
-  private async onHello(
-    ws: WebSocket,
-    frame: {
-      d?: unknown;
-      v?: unknown;
-      k?: unknown;
-      ts?: unknown;
-      a?: unknown;
-      x?: unknown;
-      da?: unknown;
-      p?: unknown;
-      at?: unknown;
-    },
-    attachment: Attachment,
-  ): Promise<void> {
-    if (attachment.d) throw new Fail(CLOSE_PROTOCOL, "duplicate hello");
+  private async authorize(frame: { [key: string]: unknown }): Promise<string> {
     const device = frame.d;
     if (typeof device !== "string" || !DEVICE_ID.test(device)) throw new Fail(CLOSE_PROTOCOL, "bad device id");
     if (!isSeq(frame.ts)) throw new Fail(CLOSE_PROTOCOL, "bad timestamp");
@@ -260,10 +225,6 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     const deviceExpected = await tag(await importAuthKey(deviceKeyBytes), helloInput(device, frame.ts));
     if (!timingSafeEqual(deviceExpected, deviceOffered)) throw new Fail(CLOSE_AUTH, "bad device tag");
 
-    await this.attest(device, frame.ts, frame.at, attachment.lo === 1);
-
-    this.admit(ws, device);
-
     if (!existing) {
       this.sql.exec(
         "INSERT INTO room (id, auth_key, created_at) VALUES (1, ?, ?)",
@@ -276,11 +237,8 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
       this.sql.exec("INSERT INTO devices (device, auth_key) VALUES (?, ?)", device, deviceKeyBytes);
     }
 
-    attachment.d = device;
-    ws.serializeAttachment(attachment);
     this.register(device, frame.p);
-    ws.send(JSON.stringify({ t: "held", n: this.heldPrefix(device) }));
-    this.send(ws, this.missing(frame.v));
+    return device;
   }
 
   private async onOps(
@@ -349,22 +307,6 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     this.wake(connected);
   }
 
-  private pendingSockets(): number {
-    const now = Date.now();
-    let pending = 0;
-    for (const socket of this.ctx.getWebSockets()) {
-      if (socket.readyState !== WebSocket.OPEN) continue;
-      const attachment = socket.deserializeAttachment() as Attachment | null;
-      if (attachment?.d) continue;
-      if (now - (attachment?.o ?? attachment?.at ?? 0) > HELLO_DEADLINE_MS) {
-        this.reject(socket, CLOSE_PROTOCOL, "hello timed out");
-        continue;
-      }
-      pending++;
-    }
-    return pending;
-  }
-
   private admit(ws: WebSocket, device: string): void {
     let members = 0;
     for (const peer of this.ctx.getWebSockets()) {
@@ -430,40 +372,6 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
   private authKey(): Uint8Array | null {
     const row = this.sql.exec("SELECT auth_key FROM room WHERE id = 1").toArray()[0];
     return row ? toBytes(row.auth_key as ArrayBuffer) : null;
-  }
-
-  private async attest(device: string, ts: number, evidence: unknown, local: boolean): Promise<void> {
-    const mode = attestMode(this.env, local);
-    if (mode === "off") return;
-    if (evidence === undefined || evidence === null) {
-      if (mode === "required") throw new Fail(CLOSE_AUTH, "attestation required");
-      return;
-    }
-    const clientDataHash = await sha256(attestInput(device, ts, this.ctx.id.name ?? ""));
-    const result = await verifyAttestation(this.env, evidence, clientDataHash, this.enrolled(device));
-    if (!result.ok) throw new Fail(CLOSE_AUTH, result.reason);
-    this.sql.exec(
-      `INSERT INTO attest (device, kind, key_id, pubkey, counter, at) VALUES (?, ?, ?, ?, ?, ?)
-       ON CONFLICT (device) DO UPDATE SET kind = excluded.kind, key_id = excluded.key_id,
-         pubkey = excluded.pubkey, counter = excluded.counter, at = excluded.at`,
-      device,
-      result.kind,
-      result.keyId,
-      result.pubkey,
-      result.counter,
-      Math.floor(Date.now() / 1000),
-    );
-  }
-
-  private enrolled(device: string): Enrolled | null {
-    const row = this.sql.exec("SELECT kind, key_id, pubkey, counter FROM attest WHERE device = ?", device).toArray()[0];
-    if (!row) return null;
-    return {
-      kind: row.kind as AttestKind,
-      keyId: row.key_id ? toBytes(row.key_id as ArrayBuffer) : null,
-      pubkey: row.pubkey ? toBytes(row.pubkey as ArrayBuffer) : null,
-      counter: Number(row.counter),
-    };
   }
 
   private deviceKey(device: string): Uint8Array | null {

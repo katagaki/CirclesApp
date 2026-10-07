@@ -1,4 +1,5 @@
-import { SELF } from "cloudflare:test";
+import { env } from "cloudflare:test";
+import worker, { HELLO_HEADER, type Env } from "../src/index";
 import { b64urlEncode, helloInput, importAuthKey, recordInput, tag } from "../src/proto";
 
 export interface CloseInfo {
@@ -54,24 +55,38 @@ export class Client {
   private waiters: (() => void)[] = [];
   closed: CloseInfo | null = null;
 
-  private constructor(readonly ws: WebSocket) {}
+  ws!: WebSocket;
+  private opening = false;
+  static modes = new Map<string, string>();
+
+  private constructor(private readonly room: string) {}
 
   static async connect(room: string): Promise<Client> {
-    const response = await SELF.fetch(`http://localhost/r/${room}`, {
-      headers: { Upgrade: "websocket" },
+    return new Client(room);
+  }
+
+  private async open(hello: string): Promise<void> {
+    const response = await worker.fetch(new Request(`http://localhost/r/${this.room}`, {
+      headers: { Upgrade: "websocket", [HELLO_HEADER]: b64urlEncode(new TextEncoder().encode(hello)) },
+    }), { ...env, ATTEST_MODE: Client.modes.get(this.room) ?? "off" } as Env);
+    if (!response.webSocket) {
+      const error = await response.json() as { c: string };
+      this.messages.push(JSON.stringify(error));
+      const codes: { [key: string]: number } = { auth: 4004, proto: 4002, full: 4003, unknown: 4006 };
+      this.closed = { code: codes[error.c] ?? 4002, reason: error.c };
+      this.wake();
+      return;
+    }
+    this.ws = response.webSocket;
+    this.ws.addEventListener("message", (event) => {
+      this.messages.push(event.data as string);
+      this.wake();
     });
-    if (!response.webSocket) throw new Error(`no websocket: ${response.status}`);
-    const client = new Client(response.webSocket);
-    response.webSocket.accept();
-    response.webSocket.addEventListener("message", (event) => {
-      client.messages.push(event.data as string);
-      client.wake();
+    this.ws.addEventListener("close", (event) => {
+      this.closed = { code: event.code, reason: event.reason };
+      this.wake();
     });
-    response.webSocket.addEventListener("close", (event) => {
-      client.closed = { code: event.code, reason: event.reason };
-      client.wake();
-    });
-    return client;
+    this.ws.accept();
   }
 
   private wake(): void {
@@ -79,7 +94,15 @@ export class Client {
   }
 
   send(frame: string | object): void {
-    this.ws.send(typeof frame === "string" ? frame : JSON.stringify(frame));
+    const text = typeof frame === "string" ? frame : JSON.stringify(frame);
+    if (this.ws) this.ws.send(text);
+    else if (!this.opening) {
+      this.opening = true;
+      void this.open(text).catch(() => {
+        this.closed = { code: 4002, reason: "internal error" };
+        this.wake();
+      });
+    } else throw new Error("upgrade still pending");
   }
 
   held: number | null = null;
