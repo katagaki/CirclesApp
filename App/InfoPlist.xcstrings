@@ -187,6 +187,18 @@
           }
         }
       }
+    },
+    "NSCameraUsageDescription" : {
+      "comment" : "Privacy - Camera Usage Description",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "共同購入リストに参加するためのQRコードを読み取るために使用します。"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
