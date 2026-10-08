@@ -14,7 +14,7 @@ struct SharedBuysLiveActivity: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    Label("共有宝物リスト", systemImage: "bag.fill")
+                    Label("共同購入リスト", systemImage: "bag.fill")
                         .font(.caption2)
                         .fontWeight(.semibold)
                         .foregroundStyle(.secondary)
@@ -53,7 +53,7 @@ struct SharedBuysLiveActivity: Widget {
             HStack(spacing: 6.0) {
                 Image(systemName: "bag.fill")
                     .font(.caption2)
-                Text("共有宝物リスト")
+                Text("共同購入リスト")
                     .font(.caption2)
                     .fontWeight(.semibold)
                 Spacer(minLength: 8.0)
