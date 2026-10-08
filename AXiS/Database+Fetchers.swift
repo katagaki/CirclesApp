@@ -1,10 +1,3 @@
-//
-//  Database+Fetchers.swift
-//  AXiS
-//
-//  Created by シン・ジャスティン on 2026/02/01.
-//
-
 import SQLite
 import UIKit
 

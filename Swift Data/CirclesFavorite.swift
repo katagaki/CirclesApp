@@ -1,10 +1,3 @@
-//
-//  CirclesFavorite.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/11/22.
-//
-
 import Foundation
 import SwiftData
 import RADiUS

@@ -1,10 +1,3 @@
-//
-//  BuyItemImageViewer.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/03/28.
-//
-
 import SwiftUI
 
 struct BuyItemImageViewer: View {

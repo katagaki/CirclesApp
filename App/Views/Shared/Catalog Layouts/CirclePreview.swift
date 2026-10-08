@@ -1,10 +1,3 @@
-//
-//  CirclePreview.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/02.
-//
-
 import SwiftUI
 import AXiS
 

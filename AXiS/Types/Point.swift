@@ -1,10 +1,3 @@
-//
-//  Point.swift
-//  AXiS
-//
-//  Created by シン・ジャスティン on 2024/07/21.
-//
-
 import CoreGraphics
 
 // swiftlint:disable identifier_name

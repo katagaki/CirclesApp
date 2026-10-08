@@ -1,10 +1,3 @@
-//
-//  EventDataRows.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/05/12.
-//
-
 import SwiftUI
 import RADiUS
 

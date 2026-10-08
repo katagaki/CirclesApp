@@ -1,10 +1,3 @@
-//
-//  AssetImage.swift
-//  OnHand
-//
-//  Created by シン・ジャスティン on 2026/08/25.
-//
-
 import SwiftUI
 
 struct AssetImage<Placeholder: View>: View {

@@ -22,7 +22,6 @@ struct CircleDetailToolbar: ToolbarContent {
     @AppStorage(wrappedValue: true, "Events.Active.IsLatest") var isActiveEventLatest: Bool
 
     var body: some ToolbarContent {
-        // Favorites button
         if isActiveEventLatest && authenticator.effectiveOnlineState == .online {
             ToolbarItem(placement: .bottomBar) {
                 if isCallingFavoritesAPI {
@@ -54,10 +53,8 @@ struct CircleDetailToolbar: ToolbarContent {
             }
         }
 
-        // Spacer
         ToolbarSpacer(.flexible, placement: .bottomBar)
 
-        // Links menu (only show if there are links)
         if let webCatalogInformation, !webCatalogInformation.onlineStores.isEmpty {
             ToolbarSpacer(.fixed, placement: .bottomBar)
 
@@ -76,7 +73,6 @@ struct CircleDetailToolbar: ToolbarContent {
             }
         }
 
-        // SNS buttons
         if extendedInformation.twitterURL != nil ||
            extendedInformation.pixivURL != nil ||
            extendedInformation.circleMsPortalURL != nil {

@@ -1,10 +1,3 @@
-//
-//  CircleStrikethrough.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/11/17.
-//
-
 import SwiftData
 import SwiftUI
 import AXiS

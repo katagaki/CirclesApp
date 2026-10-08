@@ -66,7 +66,6 @@ struct CircleDetailSectionEditor: View {
             return CircleDetailSection.defaultOrder
         }
         var sections = rawValues.compactMap { CircleDetailSection(rawValue: $0) }
-        // Append any missing sections (e.g. newly added ones)
         for section in CircleDetailSection.allCases where !sections.contains(section) {
             sections.append(section)
         }

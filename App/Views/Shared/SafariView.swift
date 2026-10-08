@@ -1,10 +1,3 @@
-//
-//  SafariView.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/07/09.
-//
-
 import SafariServices
 import SwiftUI
 import UIKit
@@ -27,7 +20,6 @@ struct SafariView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ safariViewController: SFSafariViewController, context _: Context) {
-        // No updates needed; SFSafariViewController manages its own state.
     }
 }
 #endif

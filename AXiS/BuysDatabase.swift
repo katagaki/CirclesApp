@@ -1,10 +1,3 @@
-//
-//  BuysDatabase.swift
-//  AXiS
-//
-//  Created by Claude on 2026/03/26.
-//
-
 import Foundation
 import SQLite
 

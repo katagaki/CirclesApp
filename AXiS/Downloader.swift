@@ -1,10 +1,3 @@
-//
-//  Downloader.swift
-//  AXiS
-//
-//  Created by シン・ジャスティン on 2024/08/31.
-//
-
 import Foundation
 
 public class Downloader: NSObject, @unchecked Sendable, URLSessionDownloadDelegate {

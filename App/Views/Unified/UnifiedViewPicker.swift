@@ -1,9 +1,11 @@
+import ORBiT
 import SwiftUI
 
 struct UnifiedViewPicker: View {
 
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
+    @Environment(SharedBuysSession.self) var sharedBuys
 
     var body: some View {
         @Bindable var unifier = unifier
@@ -14,8 +16,10 @@ struct UnifiedViewPicker: View {
                 Text("ViewTitle.Favorites")
                     .tag(UnifiedPath.favorites)
             }
-            Text("ViewTitle.Buys")
-                .tag(UnifiedPath.buys)
+            if sharedBuys.isFeatureEnabled {
+                Text("ViewTitle.Buys")
+                    .tag(UnifiedPath.buys)
+            }
         } label: {
             // Label intentionally left empty; the picker uses segmented style.
         }

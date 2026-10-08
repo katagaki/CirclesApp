@@ -1,10 +1,3 @@
-//
-//  ImagePickerFlowView.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/03/27.
-//
-
 import PhotosUI
 import SwiftUI
 

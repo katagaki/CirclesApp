@@ -1,10 +1,3 @@
-//
-//  BuyItemRow.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/03/24.
-//
-
 import SwiftUI
 import AXiS
 

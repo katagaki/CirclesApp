@@ -1,10 +1,3 @@
-//
-//  ComiketHall.swift
-//  AXiS
-//
-//  Created by シン・ジャスティン on 2024/07/21.
-//
-
 public enum ComiketHall: String {
     case east123 = "E123"
     case east456 = "E456"

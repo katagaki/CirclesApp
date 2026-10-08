@@ -1,10 +1,3 @@
-//
-//  CircleBlockPill.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/01.
-//
-
 import SwiftUI
 
 struct CircleBlockPill: View {

@@ -1,10 +1,3 @@
-//
-//  AttachmentViewer.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/02/28.
-//
-
 import SwiftUI
 import AXiS
 

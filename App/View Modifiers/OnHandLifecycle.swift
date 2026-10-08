@@ -1,10 +1,3 @@
-//
-//  OnHandLifecycle.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/08/19.
-//
-
 import SwiftData
 import SwiftUI
 import AXiS

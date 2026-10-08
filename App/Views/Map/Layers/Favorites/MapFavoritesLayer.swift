@@ -1,10 +1,3 @@
-//
-//  MapFavoritesLayer.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/06/07.
-//
-
 import SwiftUI
 import RADiUS
 import AXiS
@@ -59,16 +52,13 @@ struct MapFavoritesLayer: View {
 
         let spaceNumberSuffixes = await actor.spaceNumberSuffixes(forWebCatalogIDs: webCatalogIDs)
 
-        // Group by color locally first
         var colorRects: [WebCatalogColor: Path] = [:]
 
-        // Helper to get rect
         func getGenericRect(layout: LayoutCatalogMapping, index: Int, total: Int) -> CGRect {
             let rectWidth: CGFloat
             let rectHeight: CGFloat
             let castSpaceSize = CGFloat(spaceSize)
 
-            // Determine dimensions
             switch layout.layoutType {
             case .aOnLeft, .aOnRight, .unknown:
                 rectWidth = castSpaceSize / CGFloat(total)
@@ -90,14 +80,12 @@ struct MapFavoritesLayer: View {
         }
 
         for (layout, mapping) in layoutFavoriteWebCatalogIDMappings {
-            // Sort IDs
             let sortedIDs = mapping.keys.sorted {
                 let lhsSuffix = spaceNumberSuffixes[$0] ?? 0
                 let rhsSuffix = spaceNumberSuffixes[$1] ?? 0
                 return lhsSuffix < rhsSuffix
             }
 
-            // Layout order
             let orderedIDs: [Int]
             switch layout.layoutType {
             case .aOnBottom, .aOnRight:
