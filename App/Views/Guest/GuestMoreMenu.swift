@@ -22,6 +22,7 @@ private let sourceCodeURL = "https://github.com/katagaki/CirclesApp"
 struct GuestMoreMenu: View {
 
     @Environment(\.openURL) var openURL
+    @Environment(Authenticator.self) var authenticator
     @Environment(SharedBuysSession.self) var sharedBuys
 
     @Binding var stackPath: [UnifiedPath]
@@ -103,6 +104,12 @@ struct GuestMoreMenu: View {
         .alert("Alerts.Guest.Exit.Title", isPresented: $isConfirmingExit) {
             Button("More.Guest.Exit", role: .destructive) {
                 sharedBuys.exitGuestMode()
+                // Joining as a guest dismissed the login sheet, so leaving has to bring it
+                // back. An authenticator that never bootstrapped (the app launched straight
+                // into Guest Mode) decides for itself once UnifiedView sets it up.
+                if authenticator.isReady && !authenticator.isOfflineModeActive {
+                    authenticator.isAuthenticating = true
+                }
             }
             Button("Shared.Cancel", role: .cancel) { }
         } message: {
