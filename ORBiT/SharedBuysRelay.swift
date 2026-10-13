@@ -55,10 +55,13 @@ actor SharedBuysRelay {
     }
 
     private func open(_ endpoint: Endpoint, url: URL, generation: Int) async {
-        guard let data = await helloData(endpoint),
+        guard let (hello, evidence) = await helloData(endpoint),
               isRunning, generation == self.generation else { return }
         var request = URLRequest(url: url)
-        request.setValue(data.base64URL, forHTTPHeaderField: "X-Circles-Hello")
+        request.setValue(hello.base64URL, forHTTPHeaderField: "X-Circles-Hello")
+        if let evidence {
+            request.setValue(evidence.base64URL, forHTTPHeaderField: "X-Circles-Attest")
+        }
         let configuration = URLSessionConfiguration.default
         configuration.waitsForConnectivity = false
         let session = URLSession(configuration: configuration)
@@ -110,7 +113,8 @@ actor SharedBuysRelay {
         return ["localhost", "127.0.0.1", "::1", "10.0.2.2"].contains(host)
     }
 
-    private func helloData(_ endpoint: Endpoint) async -> Data? {
+    /// The hello JSON and, when this device can attest, evidence bound to those exact bytes.
+    private func helloData(_ endpoint: Endpoint) async -> (Data, Data?)? {
         let relayAuthKey = SharedBuysCrypto.derive(
             SharedBuysCrypto.relayAuthInfo,
             from: endpoint.sessionKey
@@ -141,16 +145,11 @@ actor SharedBuysRelay {
         if let pushToken = endpoint.pushToken {
             frame["p"] = ["pl": "apns", "tk": pushToken, "e": endpoint.pushEnvironment]
         }
-        let evidence = await SharedBuysAttestation.shared.evidence(
-            roomID: endpoint.roomID,
-            deviceID: endpoint.deviceID,
-            timestamp: timestamp
-        )
+        guard let hello = try? JSONSerialization.data(withJSONObject: frame) else { return nil }
+        let evidence = await SharedBuysAttestation.shared.evidence(roomID: endpoint.roomID, hello: hello)
         sentEvidence = evidence != nil
-        if let evidence {
-            frame["at"] = evidence.frame
-        }
-        return try? JSONSerialization.data(withJSONObject: frame)
+        guard let evidence else { return (hello, nil) }
+        return (hello, try? JSONSerialization.data(withJSONObject: evidence.frame))
     }
 
     private func receive(generation: Int) async {
@@ -197,8 +196,9 @@ actor SharedBuysRelay {
             } catch {
                 guard generation == self.generation else { return }
                 if isRunning {
-                    if let response = task.response as? HTTPURLResponse, response.statusCode == 401 {
-                        await fail("auth")
+                    if let response = task.response as? HTTPURLResponse,
+                       let slug = Self.refusalSlugs[response.statusCode] {
+                        await fail(slug)
                     } else {
                         let code = task.closeCode.rawValue
                         handler?(code == 0 ? .failed(error.localizedDescription) : .closed(code))
@@ -219,12 +219,16 @@ actor SharedBuysRelay {
     /// of the room's life, so the session stops instead and waits for a relaunch.
     static let unattestedSlug = "unattested"
 
-    /// Reports a relay error, forgetting the enrollment when it rejected our hello.
+    /// The upgrade refusals the relay distinguishes by status, since a failed WebSocket
+    /// upgrade exposes no response body: 403 is the attestation, 401 the hello itself.
+    static let refusalSlugs = [401: "auth", 403: "attest", 429: "rate"]
+
+    /// Reports a relay error, forgetting the enrollment when it rejected our attestation.
     ///
     /// A stale enrollment can only keep failing: the key the relay has on file is not
     /// the one this install is signing with, so the next hello has to attest afresh.
     private func fail(_ code: String) async {
-        guard code == "auth" else {
+        guard code == "attest" else {
             handler?(.failed(code))
             return
         }

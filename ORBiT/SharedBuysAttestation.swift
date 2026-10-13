@@ -49,14 +49,10 @@ actor SharedBuysAttestation {
         set { defaults.set(newValue, forKey: enrolledDefault) }
     }
 
-    /// Builds the `at` object for a hello, or nil when this device cannot attest.
-    func evidence(roomID: String, deviceID: String, timestamp: Int) async -> SharedBuysEvidence? {
+    /// Builds the `X-Circles-Attest` object for a hello, or nil when this device cannot attest.
+    func evidence(roomID: String, hello: Data) async -> SharedBuysEvidence? {
         guard service.isSupported else { return nil }
-        let hash = SharedBuysCrypto.clientDataHash(
-            deviceID: deviceID,
-            timestamp: timestamp,
-            roomID: roomID
-        )
+        let hash = SharedBuysCrypto.clientDataHash(roomID: roomID, hello: hello)
         guard let key = await key() else { return nil }
         if isEnrolled {
             guard let assertion = try? await service.generateAssertion(key, clientDataHash: hash) else {
@@ -73,8 +69,10 @@ actor SharedBuysAttestation {
 
     /// Drops the old key so the next connection can enroll with a fresh attestation.
     ///
-    /// Called when the relay answers a hello with an auth failure: the stored key may
-    /// be one it never accepted, and assertions against it can only keep failing.
+    /// Called only when the relay refuses the attestation itself (HTTP 403): the stored
+    /// key may be one it never accepted, and assertions against it can only keep failing.
+    /// A bad or stale hello (HTTP 401) says nothing about the key, and dropping it there
+    /// would burn a fresh attestation — which Apple rate-limits — on every retry.
     func invalidate() {
         reset()
     }

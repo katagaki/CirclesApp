@@ -63,17 +63,20 @@ enum SharedBuysCrypto {
     }
 
     /// The client data an attestation is bound to, matching the relay byte for byte.
-    static func attestInput(deviceID: String, timestamp: Int, roomID: String) -> Data {
+    ///
+    /// `hello` is the exact UTF-8 JSON sent in `X-Circles-Hello`, so the attestation
+    /// covers every field of it — push token and device key included.
+    static func attestInput(roomID: String, hello: Data) -> Data {
         var input = Data("attest".utf8)
         input.append(0)
         input.append(Data(roomID.utf8))
         input.append(0)
-        input.append(helloInput(deviceID: deviceID, timestamp: timestamp))
+        input.append(hello)
         return input
     }
 
-    static func clientDataHash(deviceID: String, timestamp: Int, roomID: String) -> Data {
-        Data(SHA256.hash(data: attestInput(deviceID: deviceID, timestamp: timestamp, roomID: roomID)))
+    static func clientDataHash(roomID: String, hello: Data) -> Data {
+        Data(SHA256.hash(data: attestInput(roomID: roomID, hello: hello)))
     }
 
     static func recordTag(deviceID: String, seq: Int, blob: Data, relayAuthKey: SymmetricKey) -> Data {
