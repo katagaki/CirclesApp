@@ -9,12 +9,12 @@ import {
   isLoopback,
   verifyAttestation,
 } from "../src/attest";
-import worker, { HELLO_HEADER, type Env } from "../src/index";
+import worker, { ATTEST_HEADER, HELLO_HEADER, type Env } from "../src/index";
 import { attestInput, b64urlEncode, sha256 } from "../src/proto";
 import { resetBearers } from "../src/push";
 import type { Room } from "../src/room";
 import { SELF } from "cloudflare:test";
-import { Client, authKey, helloFrame, roomId } from "./client";
+import { Client, authKey, encodeJson, helloFrame, roomId } from "./client";
 import {
   type AssertionKeys,
   appIdHash,
@@ -35,6 +35,7 @@ const PACKAGE = "com.tsubuzaki.circlesgo";
 let account = "";
 let payload: object | null = null;
 let decodeStatus = 200;
+let decodeCalls = 0;
 const real = globalThis.fetch;
 
 function env(overrides: Partial<AttestEnv> = {}): AttestEnv {
@@ -71,6 +72,7 @@ beforeAll(async () => {
       return Promise.resolve(Response.json({ access_token: "test-access-token", expires_in: 3599 }));
     }
     if (url.includes("playintegrity.googleapis.com")) {
+      decodeCalls++;
       return Promise.resolve(Response.json(payload ?? {}, { status: decodeStatus }));
     }
     return real(input as never, init as never);
@@ -84,6 +86,7 @@ afterAll(() => {
 beforeEach(() => {
   payload = null;
   decodeStatus = 200;
+  decodeCalls = 0;
   resetBearers();
 });
 
@@ -329,6 +332,14 @@ describe("play integrity", () => {
     }
   });
 
+  it("refuses a token that cannot be a JWT without asking Google", async () => {
+    for (const tk of ["not a token", "a+b/c=", "tok\u00e9n", "a\nb"]) {
+      const result = await verifyAttestation(env(), { t: "playintegrity", tk }, hash, null);
+      expect(result).toEqual({ ok: false, reason: "bad integrity token" });
+    }
+    expect(decodeCalls).toBe(0);
+  });
+
   it("accepts a verdict that names our package and binds our request hash", async () => {
     payload = playPayload({}, base64url(hash));
     const result = await verifyAttestation(env(), { t: "playintegrity", tk: "token" }, hash, null);
@@ -418,17 +429,20 @@ describe("play integrity", () => {
 
 describe("client data", () => {
   it("matches the vector the iOS and Android clients produce", async () => {
-    const hash = await sha256(attestInput("a1b2c3d4", 1767225600, "0123456789abcdef0123456789abcdef"));
-    expect(base64url(hash)).toBe("5kcFEKKULlhnD5i6NT_B_W8giQnfboQHBo2pAQGhxws");
+    const hello = new TextEncoder().encode('{"t":"hello","d":"a1b2c3d4","ts":1767225600}');
+    const hash = await sha256(attestInput("0123456789abcdef0123456789abcdef", hello));
+    expect(base64url(hash)).toBe("DvY3BJUP_NDPEvVJ3OuFZin305Hd52V2YGfmkfTt1RE");
   });
 
-  it("binds the room, the device and the hello timestamp", async () => {
-    const one = await sha256(attestInput("aaaaaaaa", 100, "r1"));
-    expect(one).toEqual(await sha256(attestInput("aaaaaaaa", 100, "r1")));
+  it("binds the room and every byte of the hello", async () => {
+    const encode = (text: string) => new TextEncoder().encode(text);
+    const one = await sha256(attestInput("r1", encode('{"t":"hello","d":"aaaaaaaa"}')));
+    expect(one).toEqual(await sha256(attestInput("r1", encode('{"t":"hello","d":"aaaaaaaa"}'))));
     for (const other of [
-      attestInput("bbbbbbbb", 100, "r1"),
-      attestInput("aaaaaaaa", 101, "r1"),
-      attestInput("aaaaaaaa", 100, "r2"),
+      attestInput("r2", encode('{"t":"hello","d":"aaaaaaaa"}')),
+      attestInput("r1", encode('{"t":"hello","d":"aaaaaaab"}')),
+      attestInput("r1", encode('{"t":"hello","d":"aaaaaaaa","p":{}}')),
+      attestInput("r1", encode('{"t":"hello", "d":"aaaaaaaa"}')),
     ]) {
       expect(await sha256(other)).not.toEqual(one);
     }
@@ -448,7 +462,7 @@ describe("the hello gate", () => {
     client.send(await helloFrame(key, "aaaaaaaa", {}, { register: key }));
     const closed = await client.closure();
     expect(closed.code).toBe(4004);
-    expect(closed.reason).toBe("auth");
+    expect(closed.reason).toBe("attest");
   });
 
   it("refuses a hello naming an attestation kind it does not know", async () => {
@@ -517,15 +531,27 @@ describe("the hello gate", () => {
   it("admits Play Integrity before opening the production socket", async () => {
     const room = roomId();
     const key = authKey();
-    const frame = JSON.parse(await helloFrame(key, "aaaaaaaa", {}, {register:key}));
-    frame.at = {t:"playintegrity",tk:"test-integrity-token"};
-    payload = playPayload({}, b64urlEncode(await sha256(attestInput(frame.d,frame.ts,room))));
+    const hello = await helloFrame(key, "aaaaaaaa", {}, {register:key});
+    payload = playPayload({}, b64urlEncode(await sha256(attestInput(room, new TextEncoder().encode(hello)))));
     const response = await worker.fetch(new Request(`https://relay.test/r/${room}`, {
-      headers:{Upgrade:"websocket",[HELLO_HEADER]:b64urlEncode(new TextEncoder().encode(JSON.stringify(frame)))},
+      headers:{Upgrade:"websocket",[HELLO_HEADER]:b64urlEncode(new TextEncoder().encode(hello)),[ATTEST_HEADER]:encodeJson({t:"playintegrity",tk:"test-integrity-token"})},
     }), {...workerEnv, PLAY_SERVICE_ACCOUNT:account} as Env);
     expect(response.status).toBe(101);
     response.webSocket!.accept();
     response.webSocket!.close();
+  });
+
+  it("refuses evidence bound to a hello other than the one sent", async () => {
+    const room = roomId();
+    const key = authKey();
+    const hello = await helloFrame(key, "aaaaaaaa", {}, {register:key});
+    payload = playPayload({}, b64urlEncode(await sha256(attestInput(room, new TextEncoder().encode(hello)))));
+    const swapped = JSON.stringify({...JSON.parse(hello), p:{pl:"fcm",tk:"attacker-token"}});
+    const response = await worker.fetch(new Request(`https://relay.test/r/${room}`, {
+      headers:{Upgrade:"websocket",[HELLO_HEADER]:b64urlEncode(new TextEncoder().encode(swapped)),[ATTEST_HEADER]:encodeJson({t:"playintegrity",tk:"test-integrity-token"})},
+    }), {...workerEnv, PLAY_SERVICE_ACCOUNT:account} as Env);
+    expect(response.status).toBe(403);
+    expect(await response.json()).toMatchObject({c:"attest",m:"integrity request hash mismatch"});
   });
 
 });

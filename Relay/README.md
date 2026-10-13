@@ -31,7 +31,7 @@ Secrets, set per environment with `npx wrangler secret put NAME --env staging` (
 
 ## Device attestation
 
-The WebSocket upgrade must carry `X-Circles-Hello`, the base64url-encoded UTF-8 JSON hello, including an `at` object proving the socket belongs to a genuine build on genuine hardware — App Attest from Apple platforms, Play Integrity from Android. It is a tagged union with no default branch: an unrecognised kind is refused rather than waved through. See `PROTOCOL.html` for the wire format and what each path checks.
+The WebSocket upgrade must carry `X-Circles-Hello`, the base64url-encoded UTF-8 JSON hello, and `X-Circles-Attest`, the base64url-encoded UTF-8 JSON evidence bound to those exact hello bytes, proving the socket belongs to a genuine build on genuine hardware — App Attest from Apple platforms, Play Integrity from Android. It is a tagged union with no default branch: an unrecognised kind is refused rather than waved through. See `PROTOCOL.html` for the wire format and what each path checks.
 
 **Attestation is always on, and there is no way to turn it off on a deployed relay.** It needs no
 variable to enable it: with nothing configured at all, every hello must carry evidence that
@@ -68,7 +68,7 @@ The plain vars are `APP_ATTEST_TEAM_ID`, `APP_ATTEST_BUNDLE_ID`, `APP_ATTEST_ENV
 
 ## Admission rollout
 
-Both clients send the hello in `X-Circles-Hello` instead of sending it as the first WebSocket message. The header decodes to at most 16 KiB. Missing or invalid attestation returns HTTP 401 before the room namespace is accessed. Invalid room/device credentials return an HTTP error before any socket is accepted. Accepted sockets receive `held` followed by `ops` immediately.
+Both clients send the hello in `X-Circles-Hello` instead of sending it as the first WebSocket message. Each header decodes to at most 16 KiB. Missing or invalid attestation returns HTTP 403, and more than 30 attestation checks a minute from one IP (`ATTEST_LIMITER`) returns HTTP 429, both before the room namespace is accessed. A bad or stale hello and invalid room/device credentials return HTTP 401 or another error before any socket is accepted; clients only discard attestation state on 403. Accepted sockets receive `held` followed by `ops` immediately.
 
 The `v2` migration adds the `IDENTITY` binding and SQLite-backed `Identity` class in both environments. Identity objects store App Attest enrollment and monotonically increasing assertion counters independently of rooms; only a verified enrollment is persisted, and enrollment of the same key is refused. Play Integrity tokens are decoded once before room routing.
 

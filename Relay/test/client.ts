@@ -1,5 +1,5 @@
 import { env } from "cloudflare:test";
-import worker, { HELLO_HEADER, type Env } from "../src/index";
+import worker, { ATTEST_HEADER, HELLO_HEADER, type Env } from "../src/index";
 import { b64urlEncode, helloInput, importAuthKey, recordInput, tag } from "../src/proto";
 
 export interface CloseInfo {
@@ -39,6 +39,10 @@ export async function helloFrame(
   return JSON.stringify(frame);
 }
 
+export function encodeJson(value: unknown): string {
+  return b64urlEncode(new TextEncoder().encode(JSON.stringify(value)));
+}
+
 export async function record(
   key: Uint8Array,
   device: string,
@@ -65,14 +69,16 @@ export class Client {
     return new Client(room);
   }
 
-  private async open(hello: string): Promise<void> {
-    const response = await worker.fetch(new Request(`http://localhost/r/${this.room}`, {
-      headers: { Upgrade: "websocket", [HELLO_HEADER]: b64urlEncode(new TextEncoder().encode(hello)) },
-    }), { ...env, ATTEST_MODE: Client.modes.get(this.room) ?? "off" } as Env);
+  private async open(text: string): Promise<void> {
+    const { at, ...hello } = JSON.parse(text);
+    const headers = new Headers({ Upgrade: "websocket", [HELLO_HEADER]: encodeJson(hello) });
+    if (at !== undefined) headers.set(ATTEST_HEADER, encodeJson(at));
+    const response = await worker.fetch(new Request(`http://localhost/r/${this.room}`, { headers }),
+      { ...env, ATTEST_MODE: Client.modes.get(this.room) ?? "off" } as Env);
     if (!response.webSocket) {
       const error = await response.json() as { c: string };
       this.messages.push(JSON.stringify(error));
-      const codes: { [key: string]: number } = { auth: 4004, proto: 4002, full: 4003, unknown: 4006 };
+      const codes: { [key: string]: number } = { auth: 4004, attest: 4004, proto: 4002, full: 4003, unknown: 4006 };
       this.closed = { code: codes[error.c] ?? 4002, reason: error.c };
       this.wake();
       return;

@@ -34,6 +34,7 @@ const MIN_VERDICT: { [name: string]: number } = { basic: 1, device: 2, strong: 3
 export const ATTEST_SKEW_MS = 300_000;
 export const MAX_ATTEST_FRAME_BYTES = 16_384;
 export const MAX_INTEGRITY_TOKEN = 8_192;
+const INTEGRITY_TOKEN = /^[A-Za-z0-9_.-]+$/;
 
 export type AttestKind = "appattest" | "playintegrity";
 export type AttestMode = "off" | "optional" | "required";
@@ -341,7 +342,7 @@ async function playIntegrity(env: AttestEnv, evidence: PlayEvidence, clientDataH
   const account = serviceAccount(env.PLAY_SERVICE_ACCOUNT ?? env.FCM_SERVICE_ACCOUNT);
   if (!name || !account) return fail("play integrity unconfigured");
   const token = evidence.tk;
-  if (typeof token !== "string" || token.length === 0 || token.length > MAX_INTEGRITY_TOKEN) {
+  if (typeof token !== "string" || token.length > MAX_INTEGRITY_TOKEN || !INTEGRITY_TOKEN.test(token)) {
     return fail("bad integrity token");
   }
   const bearer = await googleBearer(account, PLAY_SCOPE);

@@ -118,7 +118,7 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
       return new Response("expected websocket", { status: 400 });
     }
     if (request.headers.get(AUTHENTICATED_HEADER) !== "1") return rejection(401, "auth", "attestation required");
-    const frame = readHello(request);
+    const frame = readHello(request)?.frame;
     if (!frame) return rejection(401, "auth", "authenticated hello required");
     return this.ctx.blockConcurrencyWhile(async () => {
       try {

@@ -75,8 +75,8 @@ export function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
   return diff === 0;
 }
 
-export function attestInput(deviceId: string, ts: number, roomId: string): Uint8Array {
-  return concat(ascii("attest"), ZERO, ascii(roomId), ZERO, helloInput(deviceId, ts));
+export function attestInput(roomId: string, hello: Uint8Array): Uint8Array {
+  return concat(ascii("attest"), ZERO, ascii(roomId), ZERO, hello);
 }
 
 export async function sha256(input: Uint8Array): Promise<Uint8Array> {
