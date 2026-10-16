@@ -154,6 +154,50 @@ describe("authentication", () => {
     expect((await client.closure()).code).toBe(4004);
   });
 
+  it("refuses a replayed hello without displacing the socket that sent it", async () => {
+    const room = roomId();
+    const key = authKey();
+    const hello = await helloFrame(key, "aaaaaaaa", {}, { register: key });
+    const original = await Client.connect(room);
+    original.send(hello);
+    expect(await original.next()).toEqual({ t: "ops", o: [] });
+
+    const replay = await Client.connect(room);
+    replay.send(hello);
+    expect(await replay.closure()).toEqual({ code: 4004, reason: "auth" });
+    expect(await replay.nextRaw()).toContain("replayed hello");
+    await original.quiet();
+    expect(original.closed).toBe(null);
+  });
+
+  it("accepts a different hello from the same device in the same second", async () => {
+    const room = roomId();
+    const key = authKey();
+    const ts = Math.floor(Date.now() / 1000);
+    const first = await Client.connect(room);
+    first.send(await helloFrame(key, "aaaaaaaa", {}, { register: key, ts }));
+    await first.next();
+    const second = await Client.connect(room);
+    second.send(await helloFrame(key, "aaaaaaaa", {}, { ts, push: { pl: "fcm", tk: "token" } }));
+    expect(await second.next()).toEqual({ t: "ops", o: [] });
+  });
+
+  it("forgets accepted hellos once they are too old to pass the skew check", async () => {
+    const room = roomId();
+    const key = authKey();
+    const first = await join(room, key, "aaaaaaaa", {}, true);
+    await first.next();
+    await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) => {
+      state.storage.sql.exec("UPDATE hellos SET ts = ts - 301");
+    });
+    const second = await join(room, key, "bbbbbbbb");
+    await second.next();
+    const remaining = await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) =>
+      Number(state.storage.sql.exec("SELECT COUNT(*) AS c FROM hellos").one().c),
+    );
+    expect(remaining).toBe(1);
+  });
+
   it("tells a hello for an unknown room to resend with the key", async () => {
     const room = roomId();
     const client = await Client.connect(room);

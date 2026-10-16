@@ -9,6 +9,7 @@ import {
   helloInput,
   importAuthKey,
   recordInput,
+  sha256,
   tag,
   timingSafeEqual,
   toBytes,
@@ -96,11 +97,12 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
       return new Response("expected websocket", { status: 400 });
     }
     if (request.headers.get(AUTHENTICATED_HEADER) !== "1") return rejection(401, "auth", "attestation required");
-    const frame = readHello(request)?.frame;
-    if (!frame) return rejection(401, "auth", "authenticated hello required");
+    const hello = readHello(request);
+    if (!hello) return rejection(401, "auth", "authenticated hello required");
+    const frame = hello.frame;
     return this.ctx.blockConcurrencyWhile(async () => {
       try {
-        const device = await this.authorize(frame);
+        const device = await this.authorize(frame, hello.bytes);
         const pair = new WebSocketPair();
         const client = pair[0];
         const server = pair[1];
@@ -168,7 +170,7 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     return attachment;
   }
 
-  private async authorize(frame: { [key: string]: unknown }): Promise<string> {
+  private async authorize(frame: { [key: string]: unknown }, bytes: Uint8Array): Promise<string> {
     const device = frame.d;
     if (typeof device !== "string" || !DEVICE_ID.test(device)) throw new Fail(CLOSE_PROTOCOL, "bad device id");
     if (!isSeq(frame.ts)) throw new Fail(CLOSE_PROTOCOL, "bad timestamp");
@@ -200,12 +202,18 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     const deviceExpected = await tag(await importAuthKey(deviceKeyBytes), helloInput(device, frame.ts));
     if (!timingSafeEqual(deviceExpected, deviceOffered)) throw new Fail(CLOSE_AUTH, "bad device tag");
 
+    this.createTables();
     if (!registeredDeviceKey && this.deviceCount() >= MAX_DEVICES) {
       throw new Fail(CLOSE_ROOM_FULL, "room has too many devices");
     }
 
+    this.sql.exec("DELETE FROM hellos WHERE ts < ?", Math.floor(Date.now() / 1000) - HELLO_SKEW_SECONDS);
+    const digest = await sha256(bytes);
+    if (this.sql.exec("INSERT OR IGNORE INTO hellos (digest, ts) VALUES (?, ?)", digest, frame.ts).rowsWritten === 0) {
+      throw new Fail(CLOSE_AUTH, "replayed hello");
+    }
+
     if (!existing) {
-      this.createTables();
       this.sql.exec(
         "INSERT INTO room (id, auth_key, created_at) VALUES (1, ?, ?)",
         keyBytes,
@@ -373,6 +381,10 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     this.sql.exec(`CREATE TABLE IF NOT EXISTS devices (
       device   TEXT PRIMARY KEY,
       auth_key BLOB NOT NULL
+    )`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS hellos (
+      digest BLOB    PRIMARY KEY,
+      ts     INTEGER NOT NULL
     )`);
   }
 
