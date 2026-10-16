@@ -51,21 +51,18 @@ public extension SharedBuysSession {
     ///
     /// `seq` is the gapless prefix the relay reported after hello. Re-sending the whole
     /// history on every reconnect re-sealed and re-uploaded changes the relay only threw
-    /// away as duplicates. Each page is sealed as it is sent, in frames the relay will
-    /// accept.
+    /// away as duplicates. Pages are frames the relay will accept, spaced out so a long
+    /// history stays under its rate limit.
     internal func resend(above seq: Int) {
         guard let sessionKey, let roomID else { return }
         let mine = changes.filter { $0.device == deviceID && $0.seq > seq }
         guard !mine.isEmpty else { return }
         Task {
-            for start in stride(from: 0, to: mine.count, by: Self.recordsPerFrame) {
-                let page = mine[start..<min(start + Self.recordsPerFrame, mine.count)]
-                let records = page.compactMap {
-                    self.seal($0, sessionKey: sessionKey, roomID: roomID)
-                }
-                guard !records.isEmpty else { continue }
-                await self.relay.send(records: records)
-                if start + Self.recordsPerFrame < mine.count {
+            let records = mine.compactMap { self.seal($0, sessionKey: sessionKey, roomID: roomID) }
+            let pages = SharedBuysRelay.pages(records)
+            for (index, page) in pages.enumerated() {
+                await self.relay.send(records: page)
+                if index < pages.count - 1 {
                     try? await Task.sleep(for: Self.resendPageDelay)
                 }
             }
@@ -202,7 +199,7 @@ public extension SharedBuysSession {
             sendOverBluetooth(missing, to: peer)
             if !wantedPeers.contains(peer), theirs != versionVector { sendWant(to: peer) }
         case .changes(let records):
-            ingest(records)
+            ingest(records, viaBluetooth: true)
         }
     }
 

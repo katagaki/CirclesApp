@@ -4,6 +4,7 @@ struct SharedBuysSnapshot: Codable, Sendable {
     var sessionKey: Data
     var deviceID: String
     var deviceAuthKey: Data?
+    var signingKey: Data?
     var eventNumber: Int
     var lastSeq: Int
     var changes: [SharedBuyChange]
@@ -108,6 +109,7 @@ extension SharedBuysSession {
                         sessionKey: sessionKey,
                         deviceID: deviceID,
                         deviceAuthKey: deviceAuthKey,
+                        signingKey: signingKey,
                         eventNumber: eventNumber,
                         lastSeq: lastSeq,
                         changes: changes,

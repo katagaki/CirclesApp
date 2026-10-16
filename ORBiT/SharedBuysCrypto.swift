@@ -7,6 +7,7 @@ enum SharedBuysCrypto {
     static let opsInfo = "circles-buys/v1/ops"
     static let relayAuthInfo = "circles-buys/v1/relay-auth"
     static let handshakeInfo = "circles-buys/v1/ble-handshake"
+    static let signInfo = "circles-buys/v1/sign"
     static let tagLength = 16
     static let nonceLength = 12
     static let randomNonceMarker = Data([0x53, 0x42, 0x32, 0x00])
@@ -85,6 +86,57 @@ enum SharedBuysCrypto {
         input.append(bigEndian(UInt64(seq)))
         input.append(blob)
         return Data(HMAC<SHA256>.authenticationCode(for: input, using: relayAuthKey)).prefix(tagLength)
+    }
+
+    static func newSigningKey() -> Data { Curve25519.Signing.PrivateKey().rawRepresentation }
+
+    static func publicKey(signingKey: Data) -> Data? {
+        try? Curve25519.Signing.PrivateKey(rawRepresentation: signingKey).publicKey.rawRepresentation
+    }
+
+    /// What a record's signature covers: the room, the author's `(device, seq)` and every
+    /// payload field but the signature, in a fixed binary layout.
+    ///
+    /// Not the JSON or the blob. A peer answering a `want` re-seals other devices' changes
+    /// under a fresh nonce and re-encodes the payload, so neither survives forwarding, but
+    /// these fields do.
+    static func signInput(roomID: String, deviceID: String, seq: Int, payload: SharedBuyPayload) -> Data {
+        var input = Data(signInfo.utf8)
+        input.append(0)
+        input.append(Data(hex: roomID) ?? Data())
+        input.append(Data(hex: deviceID) ?? Data())
+        input.append(bigEndian(UInt64(seq)))
+        func integer(_ value: Int) { input.append(bigEndian(UInt64(bitPattern: Int64(value)))) }
+        func text(_ value: String) {
+            let bytes = Data(value.utf8)
+            var length = UInt32(bytes.count).bigEndian
+            input.append(Data(bytes: &length, count: 4))
+            input.append(bytes)
+        }
+        func optional<T>(_ value: T?, _ write: (T) -> Void) {
+            guard let value else { return input.append(0) }
+            input.append(1)
+            write(value)
+        }
+        integer(payload.actor)
+        integer(payload.rawKind)
+        text(payload.itemID)
+        integer(payload.circleID)
+        optional(payload.text, text)
+        optional(payload.value, integer)
+        optional(payload.space, text)
+        optional(payload.clock, integer)
+        optional(payload.publicKey, text)
+        return input
+    }
+
+    static func sign(_ input: Data, signingKey: Data) -> Data? {
+        try? Curve25519.Signing.PrivateKey(rawRepresentation: signingKey).signature(for: input)
+    }
+
+    static func verifies(_ signature: Data, input: Data, publicKey: Data) -> Bool {
+        guard let key = try? Curve25519.Signing.PublicKey(rawRepresentation: publicKey) else { return false }
+        return key.isValidSignature(signature, for: input)
     }
 
     static func rollingTag(sessionKey: Data, window: Int) -> Data {
@@ -180,6 +232,68 @@ struct SharedBuysKeys: Sendable {
     init(sessionKey: Data) {
         content = SharedBuysCrypto.derive(SharedBuysCrypto.opsInfo, from: sessionKey)
         relayAuth = SharedBuysCrypto.derive(SharedBuysCrypto.relayAuthInfo, from: sessionKey)
+    }
+}
+
+/// Which key, if any, each device in the room signs with.
+///
+/// A device's first `memberJoined` decides it: one carrying a public key pins that key,
+/// one without marks a device running a build from before signatures, whose records are
+/// taken on the room key alone as they always were. A device whose `memberJoined` has not
+/// arrived is unknown, and nothing it wrote is adopted yet — whichever copy reached us
+/// first would otherwise win, forged or not. Its records come again, since the version
+/// vector never claimed them.
+struct SharedBuySigners: Sendable {
+
+    private enum Signer: Sendable {
+        case key(Data)
+        case unsigned
+    }
+
+    private var byDevice: [String: Signer] = [:]
+
+    init(changes: [SharedBuyChange]) {
+        for change in changes.sorted(by: { $0.seq < $1.seq })
+        where change.payload.kind == .memberJoined && byDevice[change.device] == nil {
+            byDevice[change.device] = Self.signer(announcedBy: change.payload)
+        }
+    }
+
+    /// Whether the change may enter the log, learning its device's key if it introduces one.
+    mutating func admit(_ change: SharedBuyChange, roomID: String) -> Bool {
+        switch byDevice[change.device] {
+        case .key(let key):
+            return Self.verifies(change, roomID: roomID, publicKey: key)
+        case .unsigned:
+            return true
+        case nil:
+            guard change.payload.kind == .memberJoined,
+                  let signer = Self.signer(announcedBy: change.payload) else { return false }
+            if case .key(let key) = signer, !Self.verifies(change, roomID: roomID, publicKey: key) {
+                return false
+            }
+            byDevice[change.device] = signer
+            return true
+        }
+    }
+
+    private static func signer(announcedBy payload: SharedBuyPayload) -> Signer? {
+        guard let encoded = payload.publicKey else { return .unsigned }
+        guard let key = Data(base64URL: encoded), key.count == 32 else { return nil }
+        return .key(key)
+    }
+
+    private static func verifies(_ change: SharedBuyChange, roomID: String, publicKey: Data) -> Bool {
+        guard let encoded = change.payload.signature, let signature = Data(base64URL: encoded) else {
+            return false
+        }
+        let input = SharedBuysCrypto.signInput(
+            roomID: roomID,
+            deviceID: change.device,
+            seq: change.seq,
+            payload: change.payload
+        )
+        return SharedBuysCrypto.verifies(signature, input: input, publicKey: publicKey)
     }
 }
 

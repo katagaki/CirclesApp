@@ -66,6 +66,7 @@ enum HarnessCLI {
                 sessionKey: sessionKey,
                 deviceID: session.deviceID,
                 deviceAuthKey: session.deviceAuthKey,
+                signingKey: session.signingKey,
                 eventNumber: session.eventNumber,
                 lastSeq: session.lastSeq,
                 changes: session.changes,

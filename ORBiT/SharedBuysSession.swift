@@ -25,7 +25,7 @@ public final class SharedBuysSession {
     static let guestNicknameKey = "Guest.Nickname"
 
     /// The relay refuses a frame carrying more than this (`MAX_RECORDS_PER_FRAME`).
-    public static let recordsPerFrame = 32
+    public static let recordsPerFrame = SharedBuysRelay.maxRecordsPerFrame
 
     /// How long an outbound record waits for company before it is sent.
     ///
@@ -73,6 +73,7 @@ public final class SharedBuysSession {
     public private(set) var sessionKey: Data?
     public private(set) var deviceID: String = ""
     private(set) var deviceAuthKey: Data = SharedBuysCrypto.newDeviceAuthKey()
+    private(set) var signingKey: Data = SharedBuysCrypto.newSigningKey()
     var pushToken: String?
     var pushEnvironment: String = "sandbox"
     public private(set) var eventNumber: Int = 0
@@ -102,6 +103,9 @@ public final class SharedBuysSession {
     /// Each change sealed once, rather than on every want reply and every reconnect.
     @ObservationIgnored var sealed: [String: RelayRecord] = [:]
     @ObservationIgnored var keyCache: (sessionKey: Data, keys: SharedBuysKeys)?
+    /// The batch being opened. Each waits for the one before, so a device's
+    /// `memberJoined` is adopted before the records it signs are checked.
+    @ObservationIgnored var ingestTask: Task<Void, Never>?
     public var activity: Any?
     let relay = SharedBuysRelay()
     let bluetooth = SharedBuysBluetooth()
@@ -179,6 +183,7 @@ public final class SharedBuysSession {
         sessionKey = snapshot.sessionKey
         deviceID = snapshot.deviceID
         deviceAuthKey = snapshot.deviceAuthKey ?? SharedBuysCrypto.newDeviceAuthKey()
+        signingKey = snapshot.signingKey ?? SharedBuysCrypto.newSigningKey()
         eventNumber = snapshot.eventNumber
         lastSeq = snapshot.lastSeq
         changes = snapshot.changes
@@ -197,6 +202,7 @@ public final class SharedBuysSession {
         sessionKey = SharedBuysCrypto.newSessionKey()
         deviceID = SharedBuysCrypto.newDeviceID()
         deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
+        signingKey = SharedBuysCrypto.newSigningKey()
         self.eventNumber = eventNumber
         lastSeq = 0
         clock = 0
@@ -225,6 +231,7 @@ public final class SharedBuysSession {
         sessionKey = key
         deviceID = SharedBuysCrypto.newDeviceID()
         deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
+        signingKey = SharedBuysCrypto.newSigningKey()
         eventNumber = event
         lastSeq = 0
         clock = 0
@@ -268,6 +275,7 @@ public final class SharedBuysSession {
         serializeRelay { [relay] in await relay.disconnect() }
         sessionKey = nil
         deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
+        signingKey = SharedBuysCrypto.newSigningKey()
         changes = []
         lastSeq = 0
         clock = 0
@@ -394,20 +402,24 @@ public final class SharedBuysSession {
         guard !isGuest || kind == .setStatus || kind == .memberJoined else { return }
         lastSeq += 1
         clock += 1
-        let change = SharedBuyChange(
-            device: deviceID,
-            seq: lastSeq,
-            payload: SharedBuyPayload(
-                actor: actorPID,
-                kind: kind,
-                itemID: itemID,
-                circleID: circleID,
-                text: text,
-                value: value,
-                space: space,
-                clock: clock
-            )
+        var payload = SharedBuyPayload(
+            actor: actorPID,
+            kind: kind,
+            itemID: itemID,
+            circleID: circleID,
+            text: text,
+            value: value,
+            space: space,
+            clock: clock,
+            publicKey: kind == .memberJoined
+                ? SharedBuysCrypto.publicKey(signingKey: signingKey)?.base64URL
+                : nil
         )
+        payload.signature = SharedBuysCrypto.sign(
+            SharedBuysCrypto.signInput(roomID: roomID, deviceID: deviceID, seq: lastSeq, payload: payload),
+            signingKey: signingKey
+        )?.base64URL
+        let change = SharedBuyChange(device: deviceID, seq: lastSeq, payload: payload)
         changes.append(change)
         persist()
         guard let record = seal(change, sessionKey: sessionKey, roomID: roomID) else { return }
