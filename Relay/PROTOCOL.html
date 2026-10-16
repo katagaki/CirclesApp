@@ -255,7 +255,10 @@
       <strong>Only kind 1 crosses Bluetooth.</strong>
       <p>
         <code>travelsOverBluetooth</code> is true for <code>setStatus</code> and nothing
-        else. Item names, costs, assignees and joins go over the relay exclusively. The
+        else. Item names, costs, assignees and joins go over the relay exclusively, and a
+        receiver drops any other kind that arrives over Bluetooth — that is how a member in
+        range would otherwise announce a signing key of their own for a device whose
+        <code>memberJoined</code> has not reached us yet. The
         <code>want</code> still carries the gapless prefix of the <em>whole</em> log: holding
         every change up to <code>n</code> includes every status flip up to <code>n</code>,
         while a prefix over the subset was always empty, since a device's first change is
@@ -287,7 +290,11 @@ helloTag      = HMAC-SHA256(relayAuthKey, "hello" ‖ 0x00 ‖ deviceID ‖ 0x00
 helloInput     = "hello"  ‖ 0x00 ‖ deviceID ‖ 0x00 ‖ u64be(ts)
 attestInput    = "attest" ‖ 0x00 ‖ roomID   ‖ 0x00 ‖ helloBytes                <span class="c">helloBytes = decoded X-Circles-Hello</span>
 clientDataHash = SHA-256(attestInput)                                          <span class="c">→ App Attest clientDataHash, Play requestHash</span>
-sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <span class="c">window = ⌊unix/900⌋</span></pre>
+sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <span class="c">window = ⌊unix/900⌋</span>
+
+signingKey    = Ed25519 seed, 32 random bytes per device per room             <span class="c">never leaves the device</span>
+signInput     = "circles-buys/v1/sign" ‖ 0x00 ‖ roomID(16) ‖ deviceID(4) ‖ u64be(seq) ‖ fields
+signature     = Ed25519(signingKey, signInput)                              <span class="c">→ payload "g", see below</span></pre>
 
     <div class="note">
       <strong><code>seq</code> counts one device's own changes, with no gaps.</strong>
@@ -315,7 +322,8 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
       it holds <code>relayAuthKey</code> to bind a room, clients verify
       <code>recordTag</code> themselves on ingest. That key is shared by every member and the relay,
       so a valid <code>recordTag</code> proves a record came from someone in the room, not which device
-      wrote it, and gives clients no protection against the relay.
+      wrote it. Which device wrote it is the per-device signature inside the blob, checked by clients
+      alone — see <a href="#signatures">Per-device signatures</a>.
     </p>
 
     <div class="frame">
@@ -446,6 +454,11 @@ Google  { "t": "playintegrity", "tk": token }                     <span class="c
           </tbody>
         </table>
       </div>
+      <p>
+        Clients pack outgoing records by encoded size as well as by count, so no frame they send
+        exceeds the 4096-byte limit. A signed status flip encodes to roughly 300 bytes, so a full
+        frame holds about a dozen.
+      </p>
     </div>
 
     <div class="cols">
@@ -637,7 +650,7 @@ confirm    = 0x05 ‖ HMAC(handshakeKey, "conf" ‖ nonceC ‖ nonceP)[0..8]    
             <tr><td class="mono">7</td><td class="mono">8</td><td>Sequence</td><td>Big-endian u64, must be &gt; 0 and ≤ <code>Int.max</code>. Fixed width, so no platform disagrees about its range.</td></tr>
             <tr><td class="mono">15</td><td class="mono">2</td><td>Blob length</td><td>Big-endian u16. Checked against the bytes actually remaining before any slice is taken — it is a peer's claim about a buffer we hold.</td></tr>
             <tr><td class="mono">17</td><td class="mono">n</td><td>Blob</td><td>AES-256-GCM ciphertext with its 16-byte tag appended. Must exceed 16 bytes.</td></tr>
-            <tr><td class="mono">17+n</td><td class="mono">16</td><td>Record tag</td><td>HMAC over <code>device ‖ 0 ‖ u64be(seq) ‖ blob</code>. Verified by the receiver before the record enters the log.</td></tr>
+            <tr><td class="mono">17+n</td><td class="mono">16</td><td>Record tag</td><td>HMAC over <code>device ‖ 0 ‖ u64be(seq) ‖ blob</code>. Verified by the receiver before the record enters the log, followed by the author's signature inside the blob.</td></tr>
           </tbody>
         </table>
       </div>
@@ -698,7 +711,11 @@ confirm    = 0x05 ‖ HMAC(handshakeKey, "conf" ‖ nonceC ‖ nonceP)[0..8]    
   <span class="k">"i"</span>: "a1b2c3d4",   <span class="c">// item id, 8 chars of a UUID; "-" for memberJoined</span>
   <span class="k">"c"</span>: 98765,        <span class="c">// circle id, 0 for memberJoined</span>
   <span class="k">"t"</span>: "Poster",     <span class="c">// text, omitted when absent</span>
-  <span class="k">"v"</span>: 1             <span class="c">// value, omitted when absent</span>
+  <span class="k">"v"</span>: 1,            <span class="c">// value, omitted when absent</span>
+  <span class="k">"s"</span>: "東A-01a",    <span class="c">// circle space, circleInfo only</span>
+  <span class="k">"l"</span>: 17,           <span class="c">// Lamport clock, omitted by builds before the split</span>
+  <span class="k">"p"</span>: "&lt;base64url 32 bytes&gt;",  <span class="c">// Ed25519 public key, memberJoined only</span>
+  <span class="k">"g"</span>: "&lt;base64url 64 bytes&gt;"   <span class="c">// Ed25519 signature over signInput, omitted by older builds</span>
 }</pre>
 
     <div class="cols">
@@ -760,6 +777,112 @@ a1 b2 c3 d4                       <span class="c">device</span>
 f5 d6 3b 17 d6 93 ab f3 21 74 19 ad f1 b5 82 d2   <span class="c">recordTag</span>
 
                                   <span class="c">97 bytes — one chunk on any link with MTU ≥ 104</span></pre>
+    <p>
+      The vector predates signatures and random nonces, and stays the fixed point both apps
+      check their AES-GCM and framing against. A signed flip carries <code>"l"</code> and
+      <code>"g"</code> too, so its blob is about 180 bytes and the frame about 215, which takes
+      two chunks.
+    </p>
+  </section>
+
+  <section id="signatures">
+    <h2>Per-device signatures</h2>
+    <p class="lede">
+      The room key proves a record came from a member, not which member. Each device therefore
+      signs every record it writes with its own Ed25519 key, and announces that key once, in its
+      <code>memberJoined</code>. A member holding the room key can still read and write as
+      themselves, but no longer as anyone else — over Bluetooth or through the relay, and the
+      relay cannot do it either.
+    </p>
+
+    <pre>fields = i64be(a) ‖ i64be(k) ‖ str(i) ‖ i64be(c)
+       ‖ opt(t, str) ‖ opt(v, i64be) ‖ opt(s, str) ‖ opt(l, i64be) ‖ opt(p, str)
+
+str(x)        = u32be(len(utf8(x))) ‖ utf8(x)
+opt(x, enc)   = 0x00                      <span class="c">absent</span>
+              | 0x01 ‖ enc(x)             <span class="c">present</span></pre>
+    <p>
+      The signature covers the payload's fields in this fixed layout, not the JSON and not the
+      blob. A peer answering a <code>want</code> re-seals other devices' changes under a fresh
+      nonce and re-encodes their JSON, so neither the ciphertext nor the plaintext bytes survive
+      forwarding; the fields, and with them the signature, do. Every field but <code>g</code>
+      is covered, including <code>p</code>, so <code>memberJoined</code> is self-signed. A field
+      added later must extend this layout under a new <code>signInput</code> label. The
+      signature travels inside the sealed payload, so neither transport's framing changes and
+      the relay never sees it.
+    </p>
+
+    <h3>Verification</h3>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Author's state</th><th>Record</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td>Key pinned</td><td><code>g</code> verifies under the pinned key</td><td>Adopted</td></tr>
+          <tr><td>Key pinned</td><td><code>g</code> missing or wrong</td><td>Dropped, never enters the log or the vector</td></tr>
+          <tr><td>Unsigned</td><td>Anything</td><td>Adopted on <code>recordTag</code> and GCM alone, as before</td></tr>
+          <tr><td>Unknown</td><td><code>memberJoined</code> with a valid <code>p</code> and a <code>g</code> it verifies</td><td>Adopted; pins <code>p</code></td></tr>
+          <tr><td>Unknown</td><td><code>memberJoined</code> without <code>p</code></td><td>Adopted; marks the device unsigned</td></tr>
+          <tr><td>Unknown</td><td>Anything else</td><td>Dropped for now</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      A device's state is decided by its first <code>memberJoined</code>, by <code>seq</code>,
+      which is always its seq 1. Clients open each incoming batch in <code>(device, seq)</code>
+      order and one batch at a time, so a device's join is in the log before anything it signed
+      is checked. A record from a device whose join has not arrived is dropped rather than kept:
+      keeping it would let whichever copy of a <code>(device, seq)</code> arrived first win,
+      forged or not. Since the version vector never claimed it, it is offered again on the next
+      <code>want</code> or relay hello. Dropped records are verified again from scratch each time
+      they arrive; nothing is cached as rejected.
+    </p>
+
+    <div class="note">
+      <strong>Rollout: a mixed room keeps working, and gets stricter as it upgrades.</strong>
+      <p>
+        Nothing on the wire changes shape: <code>p</code> and <code>g</code> are new optional
+        JSON keys inside the blob, and both apps' decoders ignore keys they do not know. Older
+        builds read signed records as they always read records, and the relay needs no change.
+      </p>
+      <p>
+        A device that joined from an older build has a <code>memberJoined</code> without
+        <code>p</code>, and stays unsigned in that room for its lifetime, even after the app
+        updates — its records are trusted exactly as much as before. A device that joined from
+        a signing build is protected from its first record on, in every signing client. An
+        older build forwarding a signed flip over Bluetooth re-encodes it without
+        <code>g</code>; signing clients drop that copy and take the author's own, from the relay
+        or from a peer that kept the signature.
+      </p>
+    </div>
+
+    <div class="note">
+      <strong>What signatures do not cover.</strong>
+      <p>
+        Older builds verify nothing, so they can still be shown forged records for any device.
+        Records of an unsigned device can still be forged by any member. The key is pinned on
+        first sight: a device's <code>memberJoined</code> reaches clients only through the relay,
+        which accepts records for a device only from the socket holding that device's
+        <code>x</code>, so pinning a false key takes a member colluding with the relay before the
+        real device's join lands. The actor <code>a</code> and the nickname remain what the
+        device says they are; the signature binds them to a device, not to a circle.ms account.
+      </p>
+    </div>
+
+    <h3>Test vector</h3>
+    <p>
+      The <code>setStatus</code> payload above, unsigned, as device <code>a1b2c3d4</code> seq 42
+      in the room of session key <code>00 01 … 1f</code>, with signing seed
+      <code>20 21 … 3f</code>. Ed25519 is deterministic, so any conforming signer produces this
+      signature; CryptoKit randomises its signatures, so iOS checks it by verification instead.
+    </p>
+    <pre>signInput  636972636c65732d627579732f76312f7369676e00                 <span class="c">"circles-buys/v1/sign" ‖ 0</span>
+           d82272e2a9501834ab4a2139c8dd043c a1b2c3d4 000000000000002a   <span class="c">room ‖ device ‖ seq</span>
+           0000000000003039 0000000000000001                            <span class="c">a, k</span>
+           00000008 6131623263336434 00000000000181cd                   <span class="c">i, c</span>
+           00 01 0000000000000001 00 00 00                              <span class="c">t, v, s, l, p</span>
+publicKey  29acbae141bccaf0b22e1a94d34d0bc7361e526d0bfe12c89794bc9322966dd7
+signature  f2d23784ace1922d4c1de1309b8c92dec096802082acc71a40b77c66281fbe63
+           3ea7a7f6304f98ba06295e7ecd0b66eac2c4230538613b66c85d4c31c26f200c</pre>
   </section>
 
   <section>
@@ -769,10 +892,10 @@ f5 d6 3b 17 d6 93 ab f3 21 74 19 ad f1 b5 82 d2   <span class="c">recordTag</spa
         <thead><tr><th>Step</th><th>Relay path</th><th>Bluetooth path</th></tr></thead>
         <tbody>
           <tr><td>Author</td><td colspan="2">Local counter increments, change appended to the log, snapshot persisted off-thread</td></tr>
-          <tr><td>Seal</td><td colspan="2">JSON → AES-256-GCM under <code>contentKey</code> → HMAC under <code>relayAuthKey</code></td></tr>
-          <tr><td>Send</td><td>Queued for up to 250 ms, then one frame of up to 32 records</td><td>Sent immediately, but only if the kind is <code>setStatus</code></td></tr>
+          <tr><td>Seal</td><td colspan="2">Ed25519 over <code>signInput</code> under the device's <code>signingKey</code> → JSON → AES-256-GCM under <code>contentKey</code> → HMAC under <code>relayAuthKey</code></td></tr>
+          <tr><td>Send</td><td>Queued for up to 250 ms, then frames of up to 32 records and 4096 bytes</td><td>Sent immediately, but only if the kind is <code>setStatus</code></td></tr>
           <tr><td>Fan out</td><td>Relay stores by <code>(device, seq)</code>, forwards to every other authenticated socket</td><td>Peer replies to a <code>want</code>, or receives the live frame</td></tr>
-          <tr><td>Receive</td><td colspan="2">Verify <code>recordTag</code> → open GCM → decode JSON, all off the delivering thread</td></tr>
+          <tr><td>Receive</td><td colspan="2">Verify <code>recordTag</code> → open GCM → decode JSON → check the signature against the author's pinned key, all off the delivering thread, one batch at a time in <code>(device, seq)</code> order</td></tr>
           <tr><td>Adopt</td><td colspan="2">Skip if <code>(device, seq)</code> is already held, append, advance the Lamport clock, re-fold, refresh the advertised digest</td></tr>
         </tbody>
       </table>
