@@ -83,30 +83,6 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
   constructor(ctx: DurableObjectState, env: PushEnv & AttestEnv) {
     super(ctx, env);
     this.sql = ctx.storage.sql;
-    this.sql.exec(`CREATE TABLE IF NOT EXISTS ops (
-      device TEXT    NOT NULL,
-      seq    INTEGER NOT NULL,
-      blob   BLOB    NOT NULL,
-      tag    BLOB    NOT NULL,
-      ts     INTEGER NOT NULL,
-      PRIMARY KEY (device, seq)
-    )`);
-    this.sql.exec(`CREATE TABLE IF NOT EXISTS room (
-      id         INTEGER PRIMARY KEY CHECK (id = 1),
-      auth_key   BLOB    NOT NULL,
-      created_at INTEGER NOT NULL
-    )`);
-    this.sql.exec(`CREATE TABLE IF NOT EXISTS tokens (
-      device   TEXT    PRIMARY KEY,
-      platform TEXT    NOT NULL,
-      token    TEXT    NOT NULL,
-      env      TEXT    NOT NULL,
-      pushed   INTEGER NOT NULL
-    )`);
-    this.sql.exec(`CREATE TABLE IF NOT EXISTS devices (
-      device   TEXT PRIMARY KEY,
-      auth_key BLOB NOT NULL
-    )`);
     for (const socket of ctx.getWebSockets()) {
       if (!(socket.deserializeAttachment() as Attachment | null)?.d) this.reject(socket, CLOSE_AUTH, "authentication required");
     }
@@ -154,10 +130,7 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
   }
 
   override async alarm(): Promise<void> {
-    this.sql.exec("DELETE FROM ops");
-    this.sql.exec("DELETE FROM room");
-    this.sql.exec("DELETE FROM tokens");
-    this.sql.exec("DELETE FROM devices");
+    await this.ctx.storage.deleteAll();
     for (const ws of this.ctx.getWebSockets()) ws.close(1001, "room expired");
   }
 
@@ -226,6 +199,7 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     if (!timingSafeEqual(deviceExpected, deviceOffered)) throw new Fail(CLOSE_AUTH, "bad device tag");
 
     if (!existing) {
+      this.createTables();
       this.sql.exec(
         "INSERT INTO room (id, auth_key, created_at) VALUES (1, ?, ?)",
         keyBytes,
@@ -369,12 +343,45 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     }
   }
 
+  private createTables(): void {
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS ops (
+      device TEXT    NOT NULL,
+      seq    INTEGER NOT NULL,
+      blob   BLOB    NOT NULL,
+      tag    BLOB    NOT NULL,
+      ts     INTEGER NOT NULL,
+      PRIMARY KEY (device, seq)
+    )`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS room (
+      id         INTEGER PRIMARY KEY CHECK (id = 1),
+      auth_key   BLOB    NOT NULL,
+      created_at INTEGER NOT NULL
+    )`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS tokens (
+      device   TEXT    PRIMARY KEY,
+      platform TEXT    NOT NULL,
+      token    TEXT    NOT NULL,
+      env      TEXT    NOT NULL,
+      pushed   INTEGER NOT NULL
+    )`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS devices (
+      device   TEXT PRIMARY KEY,
+      auth_key BLOB NOT NULL
+    )`);
+  }
+
+  private hasTables(): boolean {
+    return this.sql.exec("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'room'").toArray().length > 0;
+  }
+
   private authKey(): Uint8Array | null {
+    if (!this.hasTables()) return null;
     const row = this.sql.exec("SELECT auth_key FROM room WHERE id = 1").toArray()[0];
     return row ? toBytes(row.auth_key as ArrayBuffer) : null;
   }
 
   private deviceKey(device: string): Uint8Array | null {
+    if (!this.hasTables()) return null;
     const row = this.sql.exec("SELECT auth_key FROM devices WHERE device = ?", device).toArray()[0];
     return row ? toBytes(row.auth_key as ArrayBuffer) : null;
   }

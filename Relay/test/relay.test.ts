@@ -19,6 +19,20 @@ function stub(room: string): DurableObjectStub<Room> {
   return env.ROOM.get(env.ROOM.idFromName(room));
 }
 
+function tables(state: DurableObjectState): unknown[] {
+  return state.storage.sql
+    .exec("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE '\\_%' ESCAPE '\\'")
+    .toArray()
+    .map((row) => row.name);
+}
+
+function state(room: string): Promise<{ tables: unknown[]; alarm: number | null }> {
+  return runInDurableObject(stub(room), async (_instance: Room, state: DurableObjectState) => ({
+    tables: tables(state),
+    alarm: await state.storage.getAlarm(),
+  }));
+}
+
 async function stored(room: string, device: string, seq: number): Promise<void> {
   for (let attempt = 0; attempt < 150; attempt++) {
     const arrived = await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) =>
@@ -417,9 +431,23 @@ describe("lifetime", () => {
 
     expect(await runDurableObjectAlarm(stub(room))).toBe(true);
     await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) => {
-      expect(Number(state.storage.sql.exec("SELECT COUNT(*) AS c FROM ops").one().c)).toBe(0);
-      expect(Number(state.storage.sql.exec("SELECT COUNT(*) AS c FROM room").one().c)).toBe(0);
+      expect(tables(state)).toEqual([]);
     });
+    expect((await state(room)).alarm).toBe(null);
     expect((await a.closure()).code).toBe(1001);
+  });
+
+  it("leaves no storage behind for hellos that never register a room", async () => {
+    const room = roomId();
+    const unknown = await Client.connect(room);
+    unknown.send(await helloFrame(authKey(), "aaaaaaaa"));
+    expect((await unknown.closure()).code).toBe(4006);
+
+    const forged = await Client.connect(room);
+    const frame = await helloFrame(authKey(), "aaaaaaaa", {}, { register: authKey() });
+    forged.send(frame);
+    expect((await forged.closure()).code).toBe(4004);
+
+    expect(await state(room)).toEqual({ tables: [], alarm: null });
   });
 });

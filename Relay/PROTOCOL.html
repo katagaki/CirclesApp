@@ -484,8 +484,8 @@ Google  { "t": "playintegrity", "tk": token }                     <span class="c
     </div>
 
     <p class="lede">
-      Rooms expire 48 hours after registration or the last write, whichever is later. The alarm clears the records and closes every socket with
-      1001.
+      Rooms expire 48 hours after registration or the last write, whichever is later. The alarm deletes all of the room's storage and closes
+      every socket with 1001. The relay stores nothing for a room until a hello registers its key, so a refused hello leaves no trace.
     </p>
   </section>
 
