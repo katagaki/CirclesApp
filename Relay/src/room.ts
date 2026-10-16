@@ -19,7 +19,9 @@ export const MAX_RECORDS_PER_FRAME = 32;
 export const RATE_TOKENS = 20;
 export const RATE_WINDOW_MS = 10_000;
 export const MAX_SOCKETS = 8;
-export const MAX_STORED_RECORDS = 500;
+export const MAX_DEVICES = 16;
+export const MAX_RECORDS_PER_DEVICE = 500;
+export const MAX_STORED_RECORDS = MAX_DEVICES * MAX_RECORDS_PER_DEVICE;
 export const HELLO_SKEW_SECONDS = 300;
 export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
 export const PUSH_COALESCE_MS = 10_000;
@@ -198,6 +200,10 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     const deviceExpected = await tag(await importAuthKey(deviceKeyBytes), helloInput(device, frame.ts));
     if (!timingSafeEqual(deviceExpected, deviceOffered)) throw new Fail(CLOSE_AUTH, "bad device tag");
 
+    if (!registeredDeviceKey && this.deviceCount() >= MAX_DEVICES) {
+      throw new Fail(CLOSE_ROOM_FULL, "room has too many devices");
+    }
+
     if (!existing) {
       this.createTables();
       this.sql.exec(
@@ -250,8 +256,8 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
       if (pending.has(id) || this.holds(record.d, record.n)) continue;
       pending.add(id);
     }
-    if (this.count() + pending.size > MAX_STORED_RECORDS) {
-      throw new Fail(CLOSE_STORAGE_FULL, "room is full");
+    if (this.count(attachment.d) + pending.size > MAX_RECORDS_PER_DEVICE) {
+      throw new Fail(CLOSE_STORAGE_FULL, "device record quota reached");
     }
 
     const now = Math.floor(Date.now() / 1000);
@@ -400,8 +406,12 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     return next - 1;
   }
 
-  private count(): number {
-    return Number(this.sql.exec("SELECT COUNT(*) AS c FROM ops").one().c);
+  private count(device: string): number {
+    return Number(this.sql.exec("SELECT COUNT(*) AS c FROM ops WHERE device = ?", device).one().c);
+  }
+
+  private deviceCount(): number {
+    return Number(this.sql.exec("SELECT COUNT(*) AS c FROM devices").one().c);
   }
 
   private missing(vector: unknown): Record[] {
