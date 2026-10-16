@@ -195,8 +195,8 @@ public final class SharedBuysSession {
         // the room being replaced, and only `leave()` can still reach them.
         if isActive { leave() }
         sessionKey = SharedBuysCrypto.newSessionKey()
-        deviceID = SharedBuysCrypto.newDeviceID()
         deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
+        deviceID = SharedBuysCrypto.deviceID(deviceAuthKey: deviceAuthKey)
         self.eventNumber = eventNumber
         lastSeq = 0
         clock = 0
@@ -223,8 +223,8 @@ public final class SharedBuysSession {
         // keeps it from getting away in the first place.
         if isActive { leave() }
         sessionKey = key
-        deviceID = SharedBuysCrypto.newDeviceID()
         deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
+        deviceID = SharedBuysCrypto.deviceID(deviceAuthKey: deviceAuthKey)
         eventNumber = event
         lastSeq = 0
         clock = 0
