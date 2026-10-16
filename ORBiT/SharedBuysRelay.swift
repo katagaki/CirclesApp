@@ -85,17 +85,51 @@ actor SharedBuysRelay {
     }
 
     func send(records: [RelayRecord]) async {
-        guard let task, !records.isEmpty else { return }
-        let frame: [String: Any] = ["t": "ops", "o": records.map {
-            ["d": $0.device, "n": $0.seq, "b": $0.blob, "a": $0.tag]
-        }]
-        guard let data = try? JSONSerialization.data(withJSONObject: frame),
-              let text = String(data: data, encoding: .utf8) else { return }
-        do {
-            try await task.send(.string(text))
-        } catch {
-            handler?(.failed(error.localizedDescription))
+        guard let task else { return }
+        for page in Self.pages(records) {
+            let frame: [String: Any] = ["t": "ops", "o": page.map {
+                ["d": $0.device, "n": $0.seq, "b": $0.blob, "a": $0.tag]
+            }]
+            guard let data = try? JSONSerialization.data(withJSONObject: frame),
+                  let text = String(data: data, encoding: .utf8) else { return }
+            do {
+                try await task.send(.string(text))
+            } catch {
+                handler?(.failed(error.localizedDescription))
+                return
+            }
         }
+    }
+
+    /// The relay closes a socket whose text frame is larger than this (`MAX_FRAME_BYTES`).
+    static let maxFrameBytes = 4096
+
+    /// The relay refuses a frame carrying more than this (`MAX_RECORDS_PER_FRAME`).
+    static let maxRecordsPerFrame = 32
+
+    /// Records grouped into frames the relay accepts, by count and by encoded size.
+    ///
+    /// A signed status flip is around 300 bytes once encoded, so 32 of them are more than
+    /// twice what one frame may carry, and the relay would close the socket for it.
+    static func pages(_ records: [RelayRecord]) -> [[RelayRecord]] {
+        let frameOverhead = #"{"t":"ops","o":[]}"#.utf8.count
+        let recordOverhead = #"{"d":"","n":,"b":"","a":""},"#.utf8.count
+        var pages: [[RelayRecord]] = []
+        var page: [RelayRecord] = []
+        var size = frameOverhead
+        for record in records {
+            let cost = recordOverhead + record.device.utf8.count + String(record.seq).utf8.count
+                + record.blob.utf8.count + record.tag.utf8.count
+            if !page.isEmpty, size + cost > maxFrameBytes || page.count == maxRecordsPerFrame {
+                pages.append(page)
+                page = []
+                size = frameOverhead
+            }
+            page.append(record)
+            size += cost
+        }
+        if !page.isEmpty { pages.append(page) }
+        return pages
     }
 
     /// Whether the room key may be handed to this relay.

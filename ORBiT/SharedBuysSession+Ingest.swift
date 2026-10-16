@@ -6,21 +6,50 @@ public extension SharedBuysSession {
 
     /// Opens incoming records away from the actor that received them.
     ///
-    /// Opening is pure work over the batch — a tag check and a GCM open per record — so
-    /// it runs off the main actor and only the append comes back.
-    internal func ingest(_ records: [RelayRecord]) {
+    /// Opening is pure work over the batch — a tag check, a GCM open and a signature check
+    /// per record — so it runs off the main actor and only the append comes back. Batches
+    /// are opened one at a time, against the signers the log held when the batch began.
+    internal func ingest(_ records: [RelayRecord], viaBluetooth: Bool = false) {
         guard let sessionKey, let roomID else { return }
-        let known = Set(changes.map(\.id))
-        let fresh = records.filter { !known.contains("\($0.device)#\($0.seq)") }
-        guard !fresh.isEmpty else { return }
         let keys = keys(for: sessionKey)
-        Task.detached(priority: .userInitiated) {
-            let opened = fresh.compactMap {
-                Self.open($0, keys: keys, roomID: roomID)
-            }
-            let rejected = fresh.count - opened.count
-            await MainActor.run { self.adopt(opened, rejected: rejected) }
+        let previous = ingestTask
+        ingestTask = Task {
+            await previous?.value
+            guard self.sessionKey == sessionKey else { return }
+            let known = Set(self.changes.map(\.id))
+            let fresh = records.filter { !known.contains("\($0.device)#\($0.seq)") }
+            guard !fresh.isEmpty else { return }
+            let signers = SharedBuySigners(changes: self.changes)
+            let opened = await Task.detached(priority: .userInitiated) {
+                Self.open(fresh, keys: keys, roomID: roomID, signers: signers, viaBluetooth: viaBluetooth)
+            }.value
+            guard self.sessionKey == sessionKey else { return }
+            self.adopt(opened, rejected: fresh.count - opened.count)
         }
+    }
+
+    /// Opens a batch in `(device, seq)` order, so a `memberJoined` pins its key before the
+    /// records it signs are checked.
+    ///
+    /// Bluetooth only ever carries status flips, so anything else arriving that way is
+    /// refused: it is how a member nearby would otherwise announce a key of their own for
+    /// a device we have not heard join yet.
+    internal nonisolated static func open(
+        _ records: [RelayRecord],
+        keys: SharedBuysKeys,
+        roomID: String,
+        signers: SharedBuySigners,
+        viaBluetooth: Bool
+    ) -> [SharedBuyChange] {
+        var signers = signers
+        return records
+            .sorted { ($0.device, $0.seq) < ($1.device, $1.seq) }
+            .compactMap { record in
+                guard let change = open(record, keys: keys, roomID: roomID),
+                      !viaBluetooth || change.payload.kind?.travelsOverBluetooth == true,
+                      signers.admit(change, roomID: roomID) else { return nil }
+                return change
+            }
     }
 
     internal func seal(_ change: SharedBuyChange, sessionKey: Data, roomID: String) -> RelayRecord? {
@@ -106,7 +135,7 @@ public extension SharedBuysSession {
             if change.device == deviceID { lastSeq = max(lastSeq, change.seq) }
             added += 1
         }
-        if rejected > 0 { note("dropped \(rejected) unopenable") }
+        if rejected > 0 { note("dropped \(rejected) unopenable or unsigned") }
         if added > 0 {
             persist()
             bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothDigestVector))
