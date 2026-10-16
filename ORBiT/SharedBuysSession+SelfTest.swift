@@ -153,13 +153,15 @@ public extension SharedBuysSession {
             rebuilt = first.device == record.device && first.seq == record.seq
                 && first.blob == record.blob && first.tag == record.tag ? "ok" : "FAILED"
         }
-        let vector = ["a1b2c3d4": 42, "cafebabe": 260]
-        var want = "FAILED"
-        if let wantFrame = SharedBuysWire.wantFrames(vector).first,
-           case .want(let theirs) = SharedBuysWire.decode(wantFrame) {
-            want = theirs == vector ? "ok" : "FAILED"
+        let bound = SharedBuysCrypto.deviceID(deviceAuthKey: key)
+        let vector = ["a1b2c3d4": 42, "cafebabe": 260, bound: 7]
+        var wanted: [String: Int] = [:]
+        for wantFrame in SharedBuysWire.wantFrames(vector) {
+            if case .want(let theirs, _) = SharedBuysWire.decode(wantFrame) { wanted.merge(theirs) { $1 } }
         }
-        note("wire round trip changes \(rebuilt) want \(want)")
+        let want = wanted == vector ? "ok" : "FAILED"
+        let derived = bound == "3374c70b1060e4267c8f92863dd8db7d" ? "ok" : "FAILED"
+        note("wire round trip changes \(rebuilt) want \(want) device id \(derived)")
 
         // A blobLen larger than what is left must be refused, not sliced.
         let truncated = frame.prefix(frame.count - 1)

@@ -7,6 +7,8 @@ enum SharedBuysCrypto {
     static let opsInfo = "circles-buys/v1/ops"
     static let relayAuthInfo = "circles-buys/v1/relay-auth"
     static let handshakeInfo = "circles-buys/v1/ble-handshake"
+    static let deviceInfo = "circles-buys/v1/device"
+    static let deviceIDLength = 16
     static let signInfo = "circles-buys/v1/sign"
     static let tagLength = 16
     static let nonceLength = 12
@@ -18,10 +20,14 @@ enum SharedBuysCrypto {
         return Data(bytes)
     }
 
-    static func newDeviceID() -> String {
-        var bytes = [UInt8](repeating: 0, count: 4)
-        _ = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
-        return bytes.map { String(format: "%02x", $0) }.joined()
+    /// The device's ID is a hash of its device key, so the relay registers the ID only
+    /// under that key and a member who has seen the ID cannot claim it first.
+    static func deviceID(deviceAuthKey: Data) -> String {
+        var input = Data(deviceInfo.utf8)
+        input.append(0)
+        input.append(deviceAuthKey)
+        return Data(SHA256.hash(data: input)).prefix(deviceIDLength)
+            .map { String(format: "%02x", $0) }.joined()
     }
 
     static func newDeviceAuthKey() -> Data { randomBytes(count: 32) }

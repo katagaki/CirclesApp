@@ -191,13 +191,17 @@ public extension SharedBuysSession {
     internal func handleBluetooth(_ payload: Data, from peer: BluetoothPeer) {
         guard let frame = SharedBuysWire.decode(payload) else { return }
         switch frame {
-        case .want(let theirs):
+        case .want(let theirs, let deviceLength):
             // The reply goes to whoever asked, not to every peer in range.
+            let scoped = { (device: String) in SharedBuysWire.deviceLength(of: device) == deviceLength }
             let missing = changes.filter {
-                $0.payload.kind?.travelsOverBluetooth == true && $0.seq > (theirs[$0.device] ?? 0)
+                $0.payload.kind?.travelsOverBluetooth == true && scoped($0.device)
+                    && $0.seq > (theirs[$0.device] ?? 0)
             }
             sendOverBluetooth(missing, to: peer)
-            if !wantedPeers.contains(peer), theirs != versionVector { sendWant(to: peer) }
+            if !wantedPeers.contains(peer), theirs != versionVector.filter({ scoped($0.key) }) {
+                sendWant(to: peer)
+            }
         case .changes(let records):
             ingest(records, viaBluetooth: true)
         }

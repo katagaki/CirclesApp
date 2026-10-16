@@ -7,42 +7,56 @@ import Foundation
 /// bytes for a single status flip — two chunks — where this costs 97.
 enum SharedBuysWire {
 
-    static let version: UInt8 = 0x01
     static let changesType: UInt8 = 0x01
     static let wantType: UInt8 = 0x02
     static let headerLength = 3
-    static let deviceLength = 4
-    static let wantEntryLength = 12
+
+    /// Version 1 carries the 4-byte IDs older clients drew at random, version 2 the
+    /// 16-byte IDs derived from a device key. The layout is otherwise the same, and each
+    /// length keeps to its own version so a client that only knows version 1 still
+    /// trades legacy records with us.
+    static let deviceLengths: [UInt8: Int] = [0x01: 4, 0x02: SharedBuysCrypto.deviceIDLength]
+    static let versions: [UInt8] = deviceLengths.keys.sorted()
 
     enum Frame {
         case changes([RelayRecord])
-        case want([String: Int])
+        case want([String: Int], deviceLength: Int)
     }
+
+    static func deviceLength(of device: String) -> Int { device.utf8.count / 2 }
 
     // MARK: Encoding
 
     /// Frames holding the records, packed so each one still fits a single chunk.
     static func changeFrames(_ records: [RelayRecord]) -> [Data] {
-        pack(records.compactMap(body(of:)), type: changesType)
+        versions.flatMap { version in
+            let length = deviceLengths[version]!
+            return pack(records.compactMap { body(of: $0, deviceLength: length) }, version: version, type: changesType)
+        }
     }
 
     /// Frames holding the version vector, packed so each one still fits a single chunk.
     ///
-    /// An empty vector is still one frame, `count` 0, meaning "send me everything":
-    /// packing nothing produced no frame at all, and a peer holding nothing never asked.
+    /// A want only speaks for devices whose ID length matches its version, so every
+    /// version sends at least one frame. An empty one, `count` 0, means "send me
+    /// everything": packing nothing produced no frame at all, and a peer holding
+    /// nothing never asked.
     static func wantFrames(_ vector: [String: Int]) -> [Data] {
-        let bodies = vector.sorted { $0.key < $1.key }.compactMap { entry -> Data? in
-            guard let device = Data(hex: entry.key), device.count == deviceLength, entry.value > 0
-            else { return nil }
-            var body = device
-            body.append(bigEndian(UInt64(entry.value)))
-            return body
+        versions.flatMap { version -> [Data] in
+            let length = deviceLengths[version]!
+            let bodies = vector.sorted { $0.key < $1.key }.compactMap { entry -> Data? in
+                guard let device = Data(hex: entry.key), device.count == length, entry.value > 0
+                else { return nil }
+                var body = device
+                body.append(bigEndian(UInt64(entry.value)))
+                return body
+            }
+            guard !bodies.isEmpty else { return [Data([version, wantType, 0])] }
+            return pack(bodies, version: version, type: wantType)
         }
-        guard !bodies.isEmpty else { return [Data([version, wantType, 0])] }
-        return pack(bodies, type: wantType)
     }
 
-    private static func body(of record: RelayRecord) -> Data? {
+    private static func body(of record: RelayRecord, deviceLength: Int) -> Data? {
         guard let device = Data(hex: record.device), device.count == deviceLength,
               record.seq > 0,
               let blob = Data(base64URL: record.blob),
@@ -60,7 +74,7 @@ enum SharedBuysWire {
 
     /// A record spanning more than one chunk still gets its own frame: the chunk layer
     /// splits it, rather than the body being silently dropped.
-    private static func pack(_ bodies: [Data], type: UInt8) -> [Data] {
+    private static func pack(_ bodies: [Data], version: UInt8, type: UInt8) -> [Data] {
         let limit = SharedBuysProfile.maxPayloadPerChunk - headerLength
         var frames: [Data] = []
         var group: [Data] = []
@@ -90,16 +104,16 @@ enum SharedBuysWire {
         let bytes = [UInt8](payload)
         // A frame of another version is skipped, not parsed: the layout behind the
         // header is what changes, so guessing at it would fold garbage into the log.
-        guard bytes.count >= headerLength, bytes[0] == version else { return nil }
+        guard bytes.count >= headerLength, let deviceLength = deviceLengths[bytes[0]] else { return nil }
         let count = Int(bytes[2])
         switch bytes[1] {
-        case changesType: return changes(in: bytes, count: count)
-        case wantType: return want(in: bytes, count: count)
+        case changesType: return changes(in: bytes, count: count, deviceLength: deviceLength)
+        case wantType: return want(in: bytes, count: count, deviceLength: deviceLength)
         default: return nil
         }
     }
 
-    private static func changes(in bytes: [UInt8], count: Int) -> Frame? {
+    private static func changes(in bytes: [UInt8], count: Int, deviceLength: Int) -> Frame? {
         var records: [RelayRecord] = []
         var offset = headerLength
         for _ in 0..<count {
@@ -126,17 +140,17 @@ enum SharedBuysWire {
         return .changes(records)
     }
 
-    private static func want(in bytes: [UInt8], count: Int) -> Frame? {
+    private static func want(in bytes: [UInt8], count: Int, deviceLength: Int) -> Frame? {
         var vector: [String: Int] = [:]
         var offset = headerLength
         for _ in 0..<count {
-            guard offset + wantEntryLength <= bytes.count else { return nil }
+            guard offset + deviceLength + 8 <= bytes.count else { return nil }
             let device = hex(bytes[offset..<offset + deviceLength])
             guard let seq = sequence(in: bytes, at: offset + deviceLength) else { return nil }
             vector[device] = max(vector[device] ?? 0, seq)
-            offset += wantEntryLength
+            offset += deviceLength + 8
         }
-        return .want(vector)
+        return .want(vector, deviceLength: deviceLength)
     }
 
     private static func sequence(in bytes: [UInt8], at offset: Int) -> Int? {
