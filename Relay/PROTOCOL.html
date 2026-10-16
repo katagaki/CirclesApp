@@ -246,7 +246,7 @@
           <tr><td class="mono">advertisement</td><td>peer ⇄ peer</td><td><span class="pill ble">Bluetooth</span></td><td>Rolling room tag and a digest of what the sender holds</td></tr>
           <tr><td class="mono">handshake</td><td>peer ⇄ peer</td><td><span class="pill ble">Bluetooth</span></td><td>Challenge, response and confirm: each side proves the room key over fresh nonces</td></tr>
           <tr><td class="mono">want</td><td>peer → peer</td><td><span class="pill ble">Bluetooth</span></td><td>The sender's contiguous version vector over the whole log, answered to the sender alone</td></tr>
-          <tr><td class="mono">changes</td><td>peer → peer</td><td><span class="pill ble">Bluetooth</span></td><td>Sealed <code>setStatus</code> records only</td></tr>
+          <tr><td class="mono">changes</td><td>peer → peer</td><td><span class="pill ble">Bluetooth</span></td><td>Sealed <code>setStatus</code> records only; a receiver drops any other kind it opens from Bluetooth</td></tr>
         </tbody>
       </table>
     </div>
@@ -270,8 +270,11 @@
   <section>
     <h2>Keys and identifiers</h2>
     <p class="lede">
-      Everything derives from one 32-byte session key, which travels only in the join
-      link. The link is <code>circles-app://buys-join?v=1&amp;e=&lt;event&gt;&amp;k=&lt;base64url key&gt;</code>.
+      Everything derives from one 32-byte session key, which travels only in the join link or sealed in a
+      <code>rekey</code>. The link is <code>circles-app://buys-join?v=1&amp;e=&lt;event&gt;&amp;k=&lt;base64url key&gt;&amp;o=&lt;owner device&gt;</code>.
+      <code>o</code> is the 8 hex deviceID of the member who started the room; links without it still join,
+      but such a member never follows a re-key. A room's key never changes: replacing it means moving to a new
+      room, as described under <a href="#rekey">Re-keying a room</a>.
     </p>
 
     <pre><span class="c">// 32-byte session key, generated once by whoever starts the room</span>
@@ -279,6 +282,7 @@ roomID        = HMAC-SHA256(sessionKey, "circles-buys/v1/topic")[0..16]   <span 
 contentKey    = HKDF-SHA256(sessionKey, info: "circles-buys/v1/ops",        len 32)
 relayAuthKey  = HKDF-SHA256(sessionKey, info: "circles-buys/v1/relay-auth", len 32)
 handshakeKey  = HKDF-SHA256(sessionKey, info: "circles-buys/v1/ble-handshake", len 32)
+agreementKey  = P-256 key pair, fresh per device per room                 <span class="c">→ public half announced as memberKey</span>
 
 deviceID      = 4 random bytes                                            <span class="c">→ 8 hex chars</span>
 nonce         = 12 random bytes                                           <span class="c">→ AES-GCM</span>
@@ -707,7 +711,7 @@ confirm    = 0x05 ‖ HMAC(handshakeKey, "conf" ‖ nonceC ‖ nonceP)[0..8]    
 
     <pre>{
   <span class="k">"a"</span>: 12345,        <span class="c">// actor — circle.ms PID, or a stored negative id when signed out</span>
-  <span class="k">"k"</span>: 1,            <span class="c">// kind, 0–6</span>
+  <span class="k">"k"</span>: 1,            <span class="c">// kind, 0–9</span>
   <span class="k">"i"</span>: "a1b2c3d4",   <span class="c">// item id, 8 chars of a UUID; "-" for memberJoined</span>
   <span class="k">"c"</span>: 98765,        <span class="c">// circle id, 0 for memberJoined</span>
   <span class="k">"t"</span>: "Poster",     <span class="c">// text, omitted when absent</span>
@@ -730,6 +734,9 @@ confirm    = 0x05 ‖ HMAC(handshakeKey, "conf" ‖ nonceC ‖ nonceP)[0..8]    
             <tr><td class="mono">4</td><td>removeItem</td><td>—</td><td>—</td></tr>
             <tr><td class="mono">5</td><td>memberJoined</td><td><code>t</code> nickname, <code>v</code> actor</td><td>—</td></tr>
             <tr><td class="mono">6</td><td>renameItem</td><td><code>t</code> name</td><td>—</td></tr>
+            <tr><td class="mono">7</td><td>circleInfo</td><td><code>t</code> circle name, <code>s</code> space</td><td>—</td></tr>
+            <tr><td class="mono">8</td><td>memberKey</td><td><code>t</code> agreement public key</td><td>—</td></tr>
+            <tr><td class="mono">9</td><td>rekey</td><td><code>i</code> recipient device, <code>t</code> sealed new key</td><td>—</td></tr>
           </tbody>
         </table>
       </div>
@@ -749,7 +756,7 @@ confirm    = 0x05 ‖ HMAC(handshakeKey, "conf" ‖ nonceC ‖ nonceP)[0..8]    
     <div class="note">
       <strong>Unknown values are preserved, never rewritten.</strong>
       <p>
-        A <code>k</code> outside 0–6 is stored, counted in the version vector, and folded
+        A <code>k</code> outside 0–9 is stored, counted in the version vector, and folded
         as a no-op on both platforms; a <code>v</code> outside 0–2 is kept as it arrived.
         Either one being coerced or dropped on one platform and kept on the other is how
         two devices holding the same log end up showing different totals.
@@ -883,6 +890,72 @@ opt(x, enc)   = 0x00                      <span class="c">absent</span>
 publicKey  29acbae141bccaf0b22e1a94d34d0bc7361e526d0bfe12c89794bc9322966dd7
 signature  f2d23784ace1922d4c1de1309b8c92dec096802082acc71a40b77c66281fbe63
            3ea7a7f6304f98ba06295e7ecd0b66eac2c4230538613b66c85d4c31c26f200c</pre>
+  </section>
+
+  <section id="rekey">
+    <h2>Re-keying a room</h2>
+    <p class="lede">
+      Anyone who ever held a join link can read and write the room for as long as it exists. The owner
+      ends that by moving everyone they still trust to a new room under a new key, sent inside the old
+      room in a form only those members can open.
+    </p>
+
+    <pre><span class="c">// memberKey, k 8 — written by every device right after its memberJoined</span>
+t             = base64url(P-256 public key, X9.63 uncompressed)             <span class="c">→ 65 bytes, 04 ‖ x ‖ y</span>
+
+<span class="c">// rekey, k 9 — one per remaining device, written by the owner in the old room</span>
+i             = recipient deviceID
+shared        = ECDH(ephemeral, recipient memberKey)                       <span class="c">→ 32-byte x coordinate</span>
+wrapKey       = HKDF-SHA256(shared, info: "circles-buys/v1/rekey", len 32)
+aad           = oldRoomID(16) ‖ recipient deviceID(4)
+t             = base64url(ephemeralPublic(65) ‖ nonce(12) ‖ AES-256-GCM(wrapKey, nonce, aad, newSessionKey(32) ‖ newOwnerDevice(4)) ‖ gcmTag(16))
+                                                                           <span class="c">→ 129 bytes</span></pre>
+
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Step</th><th>Owner</th><th>Remaining member</th></tr></thead>
+        <tbody>
+          <tr><td>Announce</td><td colspan="2">Each device generates an agreement key per room and writes its public half as <code>memberKey</code>; a device restored without one generates a key and announces it then. The latest <code>memberKey</code> per device wins.</td></tr>
+          <tr><td>Seal</td><td>While connected, picks a new session key and a new deviceID, and writes one <code>rekey</code> per device holding a <code>memberKey</code>, except its own and those whose first <code>memberJoined</code> names the removed actor</td><td>—</td></tr>
+          <tr><td>Send</td><td>Sends the <code>rekey</code> records in one frame on the old socket, then closes it</td><td>—</td></tr>
+          <tr><td>Accept</td><td>—</td><td>Follows a <code>rekey</code> only if its <code>i</code> is its own deviceID, it was written by the link's <code>o</code> device and arrived over the relay, and it opens under its agreement key</td></tr>
+          <tr><td>Move</td><td colspan="2">Leaves the old room and enters the new one with a fresh deviceID, device key and agreement key, writing <code>memberJoined</code> and <code>memberKey</code> as on any join. The new owner device becomes <code>o</code>.</td></tr>
+          <tr><td>Carry</td><td>Rewrites the current list into the new room — <code>memberJoined</code> for each remaining member, <code>circleInfo</code>, and <code>addItem</code>, <code>setStatus</code>, <code>setAssignee</code> per live item, each with the actor that last touched it — since nobody else can upload under the owner's device</td><td>Starts from an empty log and catches up from the relay</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <strong>Why the sender check holds.</strong>
+      <p>
+        Every member holds the old key, so a removed member can seal a <code>rekey</code> to anyone. The relay
+        binds each socket to one registered device and refuses records claiming another, so a <code>rekey</code>
+        written as the owner's device can only come from the owner — or from the relay itself, which holds no
+        content key and so cannot produce a record that opens. Bluetooth has no such binding, which is why a
+        receiver drops every kind but <code>setStatus</code> it opens from a peer.
+      </p>
+    </div>
+
+    <div class="note">
+      <strong>What re-keying does not do.</strong>
+      <p>
+        The old room stays readable to anyone with the old key until it expires, history included; a removed
+        member keeps whatever they already saw. A member whose build never wrote a <code>memberKey</code>, or who
+        joined from a link without <code>o</code>, is left behind and has to be given the new link. Changes written
+        to the old room after the owner left are not carried. Old clients ignore kinds 8 and 9 as unknown, so
+        nothing about this changes the wire for them or for the relay.
+      </p>
+    </div>
+
+    <div class="note">
+      <strong>Roles are advisory.</strong>
+      <p>
+        A guest is a member whose app writes only <code>setStatus</code>, <code>memberJoined</code> and
+        <code>memberKey</code>. Nothing enforces that: a guest holds the session key, so a modified client can write
+        any kind the relay accepts, and the relay cannot tell kinds apart. The only role the log honours is the
+        owner's, and only for following a <code>rekey</code>; removing someone is re-keying without them.
+      </p>
+    </div>
   </section>
 
   <section>
