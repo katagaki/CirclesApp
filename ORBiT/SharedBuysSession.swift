@@ -437,9 +437,12 @@ public final class SharedBuysSession {
             note("connected")
         case .held(let seq):
             // Our own history coming back from the relay means a save was lost; never
-            // reuse a sequence number it already holds.
-            lastSeq = max(lastSeq, seq)
-            resend(above: seq)
+            // reuse a sequence number it already holds. `held` carries no tag, so it is
+            // capped at what a room can hold: a relay that lies cannot push `lastSeq` out
+            // of reach and strand every later write on this device.
+            let held = min(max(seq, 0), Self.maxStoredRecords)
+            lastSeq = max(lastSeq, held)
+            resend(above: held)
         case .records(let records):
             ingest(records)
         case .failed(let reason):
@@ -461,6 +464,7 @@ public final class SharedBuysSession {
     /// or foreground instead.
     private static let storageFullSlug = "storage"
     private static let storageFullCode = 4005
+    private static let maxStoredRecords = 500
 
     /// Arms the reconnect.
     ///
