@@ -312,8 +312,10 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
       One text frame per message, at most 4096 bytes, to
       <code>wss://&lt;host&gt;/r/&lt;32 hex roomID&gt;</code>. Binary frames are refused.
       The relay moves records and never inspects them: it cannot decrypt a blob, and since
-      it holds <code>relayAuthKey</code> only to rate-bind a room, clients verify
-      <code>recordTag</code> themselves on ingest.
+      it holds <code>relayAuthKey</code> to bind a room, clients verify
+      <code>recordTag</code> themselves on ingest. That key is shared by every member and the relay,
+      so a valid <code>recordTag</code> proves a record came from someone in the room, not which device
+      wrote it, and gives clients no protection against the relay.
     </p>
 
     <div class="frame">
@@ -328,6 +330,8 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
   <span class="k">"k"</span>:  "&lt;base64url 32 bytes&gt;",  <span class="c">// relayAuthKey — omitted unless TLS or a loopback dev server</span>
   <span class="k">"ts"</span>: 1757400000,             <span class="c">// unix seconds, must be within ±300 s of relay time</span>
   <span class="k">"a"</span>:  "&lt;base64url 16 bytes&gt;",  <span class="c">// helloTag</span>
+  <span class="k">"x"</span>:  "&lt;base64url 32 bytes&gt;",  <span class="c">// device key — registers the device on first use</span>
+  <span class="k">"da"</span>: "&lt;base64url 16 bytes&gt;",  <span class="c">// device tag</span>
   <span class="k">"p"</span>:  { "pl": "apns", "tk": "…", "e": "sandbox" }   <span class="c">// optional push registration</span>
 }
 
@@ -341,6 +345,8 @@ sessionTag    = HMAC-SHA256(sessionKey,   "ble" ‖ u64be(window))[0..2]    <spa
             <tr><td class="mono">k</td><td>string?</td><td>Registers the room on first use. Ignored once a room has a key. Omitted by the client over plaintext non-loopback links; a relay that has never seen the key answers 4006.</td></tr>
             <tr><td class="mono">ts</td><td>number</td><td>Safe integer ≥ 0. Beyond ±300 s of relay time refuses the upgrade with HTTP 401.</td></tr>
             <tr><td class="mono">a</td><td>string</td><td>16-byte tag over <code>"hello" ‖ 0 ‖ d ‖ 0 ‖ u64be(ts)</code>, compared in constant time.</td></tr>
+            <tr><td class="mono">x</td><td>string?</td><td>32-byte per-device key. Registers the device on its first hello in the room and is ignored once the device has a key; a device with no registered key and no <code>x</code> is refused with HTTP 401. The binding is first-come: whoever presents a deviceID first owns it until the room expires.</td></tr>
+            <tr><td class="mono">da</td><td>string</td><td>16-byte tag over the same input as <code>a</code>, keyed by the device key, compared in constant time. A mismatch refuses the upgrade with HTTP 401.</td></tr>
             <tr><td class="mono">X-Circles-Attest</td><td>object</td><td>Device attestation, a separate header bound to the hello bytes, checked before accessing the room or validating its tags. A tagged union: <code>t</code> is <code>"appattest"</code> or <code>"playintegrity"</code>, and nothing else — there is no default branch and no unattested fallback. Always required on a deployed relay, with no variable to enable it and none that can turn it off; a local run reached over loopback can relax it to optional or off through <code>.dev.vars</code>. Anything that fails to verify, or is missing when required, refuses the upgrade with HTTP 403 and <code>c: "attest"</code>. An <code>at</code> field inside the hello is ignored.</td></tr>
             <tr><td class="mono">p</td><td>object?</td><td>Push registration, stored only after the tag verifies: <code>pl</code> is <code>"apns"</code> or <code>"fcm"</code>, <code>tk</code> is the platform token (≤512 chars of <code>[A-Za-z0-9_:.-]</code>), <code>e</code> is <code>"sandbox"</code> or <code>"production"</code> and defaults to sandbox. One token per device, replaced on every hello. Anything malformed refuses the upgrade with HTTP 400.</td></tr>
           </tbody>
@@ -436,7 +442,7 @@ Google  { "t": "playintegrity", "tk": token }                     <span class="c
             <tr><td><code>d</code> not the hello device</td><td>Close 4004 — stops one member squatting another's <code>(device, seq)</code></td></tr>
             <tr><td><code>a</code> fails the tag check</td><td>Close 4004, nothing stored</td></tr>
             <tr><td>Record already held</td><td>Silently ignored, not fanned out, not counted against the cap</td></tr>
-            <tr><td>Room at 500 records</td><td>Oldest rows evicted by <code>ts</code> to make room</td></tr>
+            <tr><td>Frame would take the room past 500 records</td><td>Close 4005, nothing stored; held records are never evicted</td></tr>
           </tbody>
         </table>
       </div>
@@ -470,7 +476,7 @@ Google  { "t": "playintegrity", "tk": token }                     <span class="c
           <tr><td class="mono">4002</td><td class="mono">proto</td><td>Binary frame, over 4096 bytes, malformed JSON, unknown <code>t</code>, or bad record shape</td></tr>
           <tr><td class="mono">4003</td><td class="mono">full</td><td>Admission of a ninth device is refused with HTTP 429 and slug <code>full</code></td></tr>
           <tr><td class="mono">4004</td><td class="mono">auth</td><td>Bad record tag or a record claiming another device; invalid attestation refuses the upgrade with HTTP 403, invalid hello credentials with HTTP 401</td></tr>
-          <tr><td class="mono">4005</td><td class="mono">storage</td><td>A single frame larger than the whole 500-record room</td></tr>
+          <tr><td class="mono">4005</td><td class="mono">storage</td><td>A frame whose new records would take the room past 500 stored records</td></tr>
           <tr><td class="mono">4006</td><td class="mono">unknown</td><td>Admission without a registered room key is refused with HTTP 404 and slug <code>unknown</code>; retry the upgrade with <code>k</code></td></tr>
           <tr><td class="mono">4007</td><td class="mono">replaced</td><td>The same device said hello on a newer socket</td></tr>
         </tbody>
@@ -478,8 +484,7 @@ Google  { "t": "playintegrity", "tk": token }                     <span class="c
     </div>
 
     <p class="lede">
-      Rooms expire 5 minutes after creation if nobody registers a key, and 48 hours after
-      the last write otherwise. The alarm clears the records and closes every socket with
+      Rooms expire 48 hours after registration or the last write, whichever is later. The alarm clears the records and closes every socket with
       1001.
     </p>
   </section>
