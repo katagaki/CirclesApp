@@ -91,6 +91,17 @@ public struct SharedBuyPayload: Codable, Sendable {
     /// `seq` as they always did.
     public var clock: Int?
 
+    /// The author's Ed25519 public key, base64url. Only `memberJoined` carries it.
+    ///
+    /// A device's first `memberJoined` pins its key for the rest of the room: every later
+    /// record from that device must carry a `signature` the key verifies, so a member
+    /// holding the room key can no longer write as somebody else's device.
+    public var publicKey: String?
+
+    /// Ed25519 over `SharedBuysCrypto.signInput`, base64url. Absent from older builds,
+    /// whose devices stay unsigned for the life of the room.
+    public var signature: String?
+
     /// The kind, when it is one this build understands.
     public var kind: SharedBuyKind? { SharedBuyKind(rawValue: rawKind) }
 
@@ -102,7 +113,8 @@ public struct SharedBuyPayload: Codable, Sendable {
         text: String? = nil,
         value: Int? = nil,
         space: String? = nil,
-        clock: Int? = nil
+        clock: Int? = nil,
+        publicKey: String? = nil
     ) {
         self.actor = actor
         self.rawKind = kind.rawValue
@@ -112,6 +124,7 @@ public struct SharedBuyPayload: Codable, Sendable {
         self.value = value
         self.space = space
         self.clock = clock
+        self.publicKey = publicKey
     }
 
     enum CodingKeys: String, CodingKey {
@@ -123,6 +136,8 @@ public struct SharedBuyPayload: Codable, Sendable {
         case value = "v"
         case space = "s"
         case clock = "l"
+        case publicKey = "p"
+        case signature = "g"
     }
 }
 

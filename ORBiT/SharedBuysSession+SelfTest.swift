@@ -18,6 +18,7 @@ public extension SharedBuysSession {
         note("framing \(frames.count) chunks, round trip \(rebuilt == payload ? "ok" : "FAILED")")
 
         checkWire()
+        checkSignatures()
 
         if let sessionKey {
             let tag = SharedBuysProfile.sessionTag(sessionKey: sessionKey)
@@ -27,6 +28,51 @@ public extension SharedBuysSession {
 
         let notConfused = frames.first.map { SharedBuysHandshake.parse($0) == nil } ?? false
         checkHandshake(notConfused: notConfused)
+    }
+
+    /// Checks the signature test vector both platforms share, and that a member signing
+    /// as another device, or a device that never joined, is refused.
+    private func checkSignatures() {
+        let hex = { (data: Data) in data.map { String(format: "%02x", $0) }.joined() }
+        let room = SharedBuysCrypto.roomID(sessionKey: Data((0..<32).map { UInt8($0) }))
+        let payload = SharedBuyPayload(actor: 12345, kind: .setStatus, itemID: "a1b2c3d4", circleID: 98765, value: 1)
+        let input = SharedBuysCrypto.signInput(roomID: room, deviceID: "a1b2c3d4", seq: 42, payload: payload)
+        let seed = Data((0x20..<0x40).map { UInt8($0) })
+        let publicKey = SharedBuysCrypto.publicKey(signingKey: seed) ?? Data()
+        let signature = Data(hex: "f2d23784ace1922d4c1de1309b8c92dec096802082acc71a40b77c66281fbe63"
+            + "3ea7a7f6304f98ba06295e7ecd0b66eac2c4230538613b66c85d4c31c26f200c") ?? Data()
+        let vector = hex(input) == "636972636c65732d627579732f76312f7369676e00d82272e2a9501834ab4a2139c8dd043c"
+            + "a1b2c3d4000000000000002a00000000000030390000000000000001000000086131623263336434"
+            + "00000000000181cd00010000000000000001000000"
+            && hex(publicKey) == "29acbae141bccaf0b22e1a94d34d0bc7361e526d0bfe12c89794bc9322966dd7"
+            && SharedBuysCrypto.verifies(signature, input: input, publicKey: publicKey)
+
+        func signed(_ payload: SharedBuyPayload, device: String, seq: Int, key: Data) -> SharedBuyChange {
+            var payload = payload
+            payload.signature = SharedBuysCrypto.sign(
+                SharedBuysCrypto.signInput(roomID: room, deviceID: device, seq: seq, payload: payload),
+                signingKey: key
+            )?.base64URL
+            return SharedBuyChange(device: device, seq: seq, payload: payload)
+        }
+        let member = SharedBuysCrypto.newSigningKey()
+        let forger = SharedBuysCrypto.newSigningKey()
+        let joined = SharedBuyPayload(
+            actor: 1, kind: .memberJoined, itemID: "-", circleID: 0, text: "a",
+            publicKey: SharedBuysCrypto.publicKey(signingKey: member)?.base64URL
+        )
+        var signers = SharedBuySigners(changes: [])
+        let unknown = !signers.admit(signed(payload, device: "a1b2c3d4", seq: 2, key: member), roomID: room)
+        let pinned = signers.admit(signed(joined, device: "a1b2c3d4", seq: 1, key: member), roomID: room)
+        let genuine = signers.admit(signed(payload, device: "a1b2c3d4", seq: 2, key: member), roomID: room)
+        let forged = !signers.admit(signed(payload, device: "a1b2c3d4", seq: 3, key: forger), roomID: room)
+        let stripped = !signers.admit(SharedBuyChange(device: "a1b2c3d4", seq: 4, payload: payload), roomID: room)
+        var legacy = joined
+        legacy.publicKey = nil
+        let unsigned = signers.admit(SharedBuyChange(device: "cafebabe", seq: 1, payload: legacy), roomID: room)
+            && signers.admit(SharedBuyChange(device: "cafebabe", seq: 2, payload: payload), roomID: room)
+        let policy = unknown && pinned && genuine && forged && stripped && unsigned
+        note("signature vector \(vector ? "ok" : "FAILED") policy \(policy ? "ok" : "FAILED")")
     }
 
     /// Runs the handshake test vector both platforms share, and a stranger against it.
