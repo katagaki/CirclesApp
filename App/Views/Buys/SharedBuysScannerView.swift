@@ -27,19 +27,8 @@ struct SharedBuysScannerView: View {
                         }
                         .buttonStyle(.borderedProminent)
                     }
-                } else if DataScannerViewController.isSupported && DataScannerViewController.isAvailable {
-                    CodeScanner { url in
-                        onScan(url)
-                        dismiss()
-                    }
-                    .ignoresSafeArea(edges: .bottom)
-                    .overlay(alignment: .bottom) {
-                        Text("Buys.Guest.Scan.Hint")
-                            .font(.subheadline)
-                            .padding()
-                            .background(.regularMaterial, in: Capsule())
-                            .padding(.bottom, 32.0)
-                    }
+                } else if isScannerAvailable {
+                    scanner
                 } else {
                     // Simulators and devices without a Neural Engine cannot run the
                     // scanner at all. Saying so beats a permanently black viewfinder.
@@ -63,7 +52,36 @@ struct SharedBuysScannerView: View {
             isCameraDenied = !(await AVCaptureDevice.requestAccess(for: .video))
         }
     }
+
+    // DataScannerViewController is unavailable on Mac Catalyst.
+    private var isScannerAvailable: Bool {
+        #if targetEnvironment(macCatalyst)
+        false
+        #else
+        DataScannerViewController.isSupported && DataScannerViewController.isAvailable
+        #endif
+    }
+
+    @ViewBuilder
+    private var scanner: some View {
+        #if !targetEnvironment(macCatalyst)
+        CodeScanner { url in
+            onScan(url)
+            dismiss()
+        }
+        .ignoresSafeArea(edges: .bottom)
+        .overlay(alignment: .bottom) {
+            Text("Buys.Guest.Scan.Hint")
+                .font(.subheadline)
+                .padding()
+                .background(.regularMaterial, in: Capsule())
+                .padding(.bottom, 32.0)
+        }
+        #endif
+    }
 }
+
+#if !targetEnvironment(macCatalyst)
 
 private struct CodeScanner: UIViewControllerRepresentable {
 
@@ -133,3 +151,4 @@ private struct CodeScanner: UIViewControllerRepresentable {
         }
     }
 }
+#endif

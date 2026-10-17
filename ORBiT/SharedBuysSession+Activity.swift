@@ -1,4 +1,4 @@
-#if os(iOS)
+#if os(iOS) && !targetEnvironment(macCatalyst)
 import ActivityKit
 import Foundation
 
@@ -125,7 +125,8 @@ public extension SharedBuysSession {
 #else
 import Foundation
 
-/// The Mac harness stands in for a second iOS device (§15) and has no ActivityKit.
+/// The Mac harness and Mac Catalyst have no usable ActivityKit (the harness stands in
+/// for a second iOS device, §15).
 /// The session drives the activity from half a dozen places; stubs keep those call
 /// sites identical rather than scattering `#if os(iOS)` through the sync engine.
 @MainActor

@@ -13,7 +13,7 @@
 		75D7CED44B17D66CF9B0855E /* SharedBuysLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */; };
 		864CA3762F406E01D04EBD1C /* ORBiT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D631878DB8C8016D0BFE1C2 /* ORBiT.framework */; };
 		8C35BA4C2F7CC7A4959DF5BF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2745DAF4DF1C30D56B380624 /* WidgetKit.framework */; };
-		94CF64F6B10F21FEE927DC8B /* SharedBuysWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1298D61EBB64136051D35619 /* SharedBuysWidget.appex */; };
+		94CF64F6B10F21FEE927DC8B /* SharedBuysWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1298D61EBB64136051D35619 /* SharedBuysWidget.appex */; platformFilter = ios; };
 		A1B2C3012F5D300000000001 /* SQLite in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3022F5D300000000001 /* SQLite */; };
 		A1B2C3032F5D300000000002 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = A1B2C3042F5D300000000002 /* ZIPFoundation */; };
 		A1B2C3052F5D300000000003 /* RADiUS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E41642F62F5D2F5200708895 /* RADiUS.framework */; };
@@ -781,6 +781,7 @@
 		83C9E6485135D1B946FEC0F0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = SharedBuysWidget;
+			platformFilter = ios;
 			target = 6B3D76C36CF42BDCD8B1F9AC /* SharedBuysWidget */;
 			targetProxy = C990AA01109B2B8A4864FD4A /* PBXContainerItemProxy */;
 		};
