@@ -1,10 +1,3 @@
-//
-//  PopoverData.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/06/07.
-//
-
 import Foundation
 
 struct PopoverData: Identifiable, Equatable {

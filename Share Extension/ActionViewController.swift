@@ -1,10 +1,3 @@
-//
-//  ActionViewController.swift
-//  AttachProductList
-//
-//  Created by シン・ジャスティン on 2026/02/28.
-//
-
 import UIKit
 import UniformTypeIdentifiers
 

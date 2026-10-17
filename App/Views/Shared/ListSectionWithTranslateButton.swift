@@ -1,10 +1,3 @@
-//
-//  ListSectionWithTranslateButton.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/11/30.
-//
-
 import Foundation
 import SwiftUI
 

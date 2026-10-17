@@ -1,0 +1,1058 @@
+<title>Shared Buys</title>
+<style>
+:root {
+  --ground: #f4f4f4;
+  --layer: #ffffff;
+  --layer-alt: #e8e8e8;
+  --border: #e0e0e0;
+  --border-strong: #8d8d8d;
+  --text: #161616;
+  --text-2: #525252;
+  --text-3: #6f6f6f;
+  --accent: #0f62fe;
+  --accent-soft: #d0e2ff;
+  --teal: #007d79;
+  --magenta: #d02670;
+  --green: #198038;
+  --red: #da1e28;
+  --purple: #6929c4;
+  --ink: #161616;
+  --ink-text: #f4f4f4;
+  --ok-bg: #defbe6;
+  --ok-fg: #0e6027;
+  --warn-bg: #fcf4d6;
+  --warn-fg: #684e00;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground: #161616;
+    --layer: #262626;
+    --layer-alt: #393939;
+    --border: #393939;
+    --border-strong: #6f6f6f;
+    --text: #f4f4f4;
+    --text-2: #c6c6c6;
+    --text-3: #a8a8a8;
+    --accent: #4589ff;
+    --accent-soft: #002d9c;
+    --teal: #08bdba;
+    --magenta: #ff7eb6;
+    --green: #42be65;
+    --red: #ff8389;
+    --purple: #be95ff;
+    --ink: #000000;
+    --ink-text: #f4f4f4;
+    --ok-bg: #044317;
+    --ok-fg: #6fdc8c;
+    --warn-bg: #483700;
+    --warn-fg: #fddc69;
+  }
+}
+:root[data-theme="dark"] {
+  --ground: #161616;
+  --layer: #262626;
+  --layer-alt: #393939;
+  --border: #393939;
+  --border-strong: #6f6f6f;
+  --text: #f4f4f4;
+  --text-2: #c6c6c6;
+  --text-3: #a8a8a8;
+  --accent: #4589ff;
+  --accent-soft: #002d9c;
+  --teal: #08bdba;
+  --magenta: #ff7eb6;
+  --green: #42be65;
+  --red: #ff8389;
+  --purple: #be95ff;
+  --ink: #000000;
+  --ink-text: #f4f4f4;
+  --ok-bg: #044317;
+  --ok-fg: #6fdc8c;
+  --warn-bg: #483700;
+  --warn-fg: #fddc69;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.16px;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1104px; margin: 0 auto; padding: 0 16px; }
+
+/* ---------- type ---------- */
+h1, h2, h3, h4 { margin: 0; text-wrap: balance; font-weight: 400; }
+h1 { font-size: 42px; line-height: 50px; letter-spacing: 0; }
+h2 { font-size: 28px; line-height: 36px; letter-spacing: 0; }
+h3 { font-size: 20px; line-height: 28px; letter-spacing: 0; }
+h4 { font-size: 14px; line-height: 20px; font-weight: 600; letter-spacing: 0.16px; }
+p { margin: 0; }
+.label {
+  font-size: 12px; line-height: 16px; font-weight: 600;
+  letter-spacing: 0.32px; text-transform: uppercase; color: var(--text-3);
+}
+.lead { font-size: 16px; line-height: 24px; color: var(--text-2); max-width: 62ch; }
+.dim { color: var(--text-2); }
+.mono { font-variant-numeric: tabular-nums; }
+
+/* ---------- masthead ---------- */
+.masthead { background: var(--ink); color: var(--ink-text); padding: 56px 0 48px; }
+.masthead .label { color: #78a9ff; }
+.masthead h1 { color: var(--ink-text); margin: 12px 0 16px; max-width: 20ch; }
+.masthead .lead { color: #c6c6c6; }
+.facts { display: flex; flex-wrap: wrap; gap: 1px; margin-top: 32px; background: #393939; border: 1px solid #393939; }
+.fact { background: var(--ink); padding: 16px 20px; flex: 1 1 200px; }
+.fact .k { font-size: 12px; line-height: 16px; letter-spacing: 0.32px; text-transform: uppercase; color: #8d8d8d; }
+.fact .v { font-size: 16px; line-height: 22px; color: var(--ink-text); margin-top: 4px; }
+
+/* ---------- sections ---------- */
+section { border-top: 1px solid var(--border); padding: 48px 0; }
+section:first-of-type { border-top: 0; }
+.sec-head { margin-bottom: 32px; }
+.sec-head h2 { margin: 8px 0 12px; }
+
+/* ---------- grids ---------- */
+.grid { display: grid; gap: 1px; background: var(--border); border: 1px solid var(--border); }
+.g2 { grid-template-columns: repeat(2, 1fr); }
+.g3 { grid-template-columns: repeat(3, 1fr); }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+.cell { background: var(--layer); padding: 20px; }
+.cell h4 { margin-bottom: 8px; }
+.cell ul { margin: 0; padding-left: 18px; color: var(--text-2); }
+.cell li + li { margin-top: 6px; }
+.step-n {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.32px;
+  color: var(--accent); display: block; margin-bottom: 10px;
+}
+
+/* ---------- flow strip ---------- */
+.flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+.flow .cell { display: flex; flex-direction: column; gap: 12px; }
+.flow svg { display: block; }
+
+/* ---------- phones ---------- */
+.phones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; align-items: start; }
+.phone {
+  background: var(--ink); border: 1px solid var(--border);
+  padding: 8px; width: 100%;
+}
+.screen { background: #f4f4f4; color: #161616; font-size: 10px; line-height: 14px; }
+.scr-pad { padding: 10px; }
+.seg { display: flex; background: #e0e0e0; padding: 2px; }
+.seg span { flex: 1; text-align: center; padding: 4px 0; color: #525252; font-size: 9px; }
+.seg span.on { background: #ffffff; color: #161616; font-weight: 600; }
+.row { display: flex; align-items: center; gap: 6px; background: #ffffff; padding: 8px; border-bottom: 1px solid #e0e0e0; }
+.row:last-child { border-bottom: 0; }
+.row .grow { flex: 1; min-width: 0; }
+.grp { font-size: 9px; color: #6f6f6f; padding: 10px 2px 4px; display: flex; gap: 6px; align-items: center; }
+.pill { background: #ffd6e8; color: #9f1853; font-size: 8px; padding: 1px 4px; }
+.av { width: 16px; height: 16px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 8px; font-weight: 700; flex: none; }
+.av.j { background: #ff832b; } .av.a { background: #009d9a; } .av.m { background: #8a3ffc; }
+.avs { display: flex; }
+.avs .av + .av { margin-left: -5px; box-shadow: 0 0 0 1.5px #fff; }
+.circ { width: 11px; height: 11px; border: 1.5px solid #8d8d8d; border-radius: 50%; flex: none; }
+.circ.done { border-color: #0f62fe; background: #0f62fe; }
+.qr {
+  width: 96px; height: 96px; margin: 8px auto; background: #fff; position: relative;
+  background-image:
+    repeating-conic-gradient(#161616 0% 25%, #ffffff 0% 50%);
+  background-size: 12px 12px;
+}
+.qr i { position: absolute; width: 26px; height: 26px; border: 5px solid #161616; background: #fff; }
+.qr i.tl { top: 4px; left: 4px; } .qr i.tr { top: 4px; right: 4px; } .qr i.bl { bottom: 4px; left: 4px; }
+.la { background: #161616; color: #f4f4f4; padding: 10px; }
+.la .bar { height: 3px; background: #525252; margin-top: 8px; }
+.la .bar i { display: block; height: 3px; width: 40%; background: #0f62fe; }
+.caption { margin-top: 14px; }
+.caption ul { margin: 8px 0 0; padding-left: 18px; color: var(--text-2); }
+.caption li + li { margin-top: 4px; }
+
+.diagram { overflow-x: auto; margin-top: 4px; }
+.diagram svg { display: block; width: 100%; min-width: 640px; height: auto; }
+.dcap { color: var(--text-3); font-size: 12px; line-height: 18px; margin-top: 10px; max-width: 76ch; }
+
+/* ---------- callout ---------- */
+.callout { background: var(--layer); border-left: 3px solid var(--accent); padding: 20px 24px; }
+.split { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 20px; }
+.split > div { background: var(--layer); padding: 20px; }
+.tick { display: flex; gap: 8px; align-items: baseline; }
+.tick + .tick { margin-top: 8px; }
+.tick b { font-weight: 400; color: var(--text-2); }
+.mark { font-weight: 700; flex: none; width: 14px; }
+.yes .mark { color: var(--green); } .no .mark { color: var(--red); }
+
+/* ---------- table ---------- */
+.tbl-wrap { overflow-x: auto; border: 1px solid var(--border); }
+table { border-collapse: collapse; width: 100%; min-width: 560px; background: var(--layer); }
+th {
+  text-align: left; font-size: 12px; line-height: 16px; font-weight: 600;
+  letter-spacing: 0.32px; text-transform: uppercase; color: var(--text-2);
+  background: var(--layer-alt); padding: 12px 16px; border-bottom: 1px solid var(--border);
+}
+td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text-2); }
+tr:last-child td { border-bottom: 0; }
+td.name { color: var(--text); font-weight: 600; }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.2px; padding: 2px 8px; }
+.tag.pick { background: var(--accent-soft); color: var(--accent); }
+.tag.no { background: var(--layer-alt); color: var(--text-3); }
+
+/* ---------- build order ---------- */
+.order { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+.order .cell { position: relative; padding-top: 28px; }
+.order .cell::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--accent);
+}
+.order .cell:nth-child(2)::before { background: var(--teal); }
+.order .cell:nth-child(3)::before { background: var(--purple); }
+.order .cell:nth-child(4)::before { background: var(--magenta); }
+.order .cell:nth-child(5)::before { background: var(--border-strong); }
+
+.fix { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.fix .label { color: var(--green); }
+.fix p { margin-top: 6px; color: var(--text-2); }
+.state { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.2px;
+  padding: 2px 8px; margin-bottom: 10px; }
+.state.done { background: var(--ok-bg); color: var(--ok-fg); }
+.state.part { background: var(--warn-bg); color: var(--warn-fg); }
+.state.open { background: var(--layer-alt); color: var(--text-2); }
+footer { border-top: 1px solid var(--border); padding: 32px 0 56px; color: var(--text-3); font-size: 12px; }
+
+@media (max-width: 900px) {
+  .g4, .flow, .order { grid-template-columns: repeat(2, 1fr); }
+  .phones { grid-template-columns: 1fr; gap: 24px; }
+  .g3 { grid-template-columns: 1fr; }
+}
+@media (max-width: 620px) {
+  h1 { font-size: 28px; line-height: 36px; }
+  h2 { font-size: 20px; line-height: 28px; }
+  .g2, .g4, .flow, .order, .split { grid-template-columns: 1fr; }
+}
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <span class="label">CiRCLES · CirclesGo — feature plan</span>
+    <h1>Shared Buys</h1>
+    <p class="lead">One shopping list a group shares at the venue. Scan a QR to join, split up,
+      tick things off, and everyone's list stays in step — with or without a signal.</p>
+    <div class="facts">
+      <div class="fact"><div class="k">Cost to run</div><div class="v">¥0 — no paid services</div></div>
+      <div class="fact"><div class="k">Platforms</div><div class="v">iOS and Android</div></div>
+      <div class="fact"><div class="k">When Wi-Fi dies</div><div class="v">Keeps working</div></div>
+      <div class="fact"><div class="k">Runs</div><div class="v">Only while you say so</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<section>
+  <div class="sec-head">
+    <span class="label">What people do</span>
+    <h2>Four moments, start to finish</h2>
+  </div>
+  <div class="flow">
+    <div class="cell">
+      <svg width="100%" height="64" viewBox="0 0 160 64" aria-label="One phone shows a QR code, another scans it">
+        <rect x="18" y="8" width="38" height="48" fill="none" stroke="var(--text-3)" stroke-width="1.5"/>
+        <rect x="26" y="18" width="22" height="22" fill="var(--accent)"/>
+        <rect x="104" y="8" width="38" height="48" fill="none" stroke="var(--text-3)" stroke-width="1.5"/>
+        <path d="M112 20h8v-4M134 20h-8v-4M112 40h8v4M134 40h-8v4" fill="none" stroke="var(--accent)" stroke-width="1.5"/>
+        <path d="M64 32h32" stroke="var(--text-3)" stroke-width="1.5"/>
+        <path d="M92 28l6 4-6 4" fill="var(--text-3)"/>
+      </svg>
+      <div>
+        <span class="step-n">MOMENT 1</span>
+        <h4>Start it, or scan in</h4>
+        <p class="dim">One person taps 共有リストを作成. Everyone else scans the QR. No accounts, no codes to type.</p>
+      </div>
+    </div>
+    <div class="cell">
+      <svg width="100%" height="64" viewBox="0 0 160 64" aria-label="Three people spread apart across a hall">
+        <rect x="6" y="10" width="148" height="44" fill="none" stroke="var(--border)" stroke-width="1.5"/>
+        <circle cx="34" cy="24" r="7" fill="#ff832b"/>
+        <circle cx="86" cy="42" r="7" fill="var(--teal)"/>
+        <circle cx="128" cy="20" r="7" fill="var(--purple)"/>
+        <path d="M20 34h20M60 30h30M104 34h18" stroke="var(--border)" stroke-width="1.5" stroke-dasharray="3 3"/>
+      </svg>
+      <div>
+        <span class="step-n">MOMENT 2</span>
+        <h4>Split up</h4>
+        <p class="dim">Each person picks up the items with their face on them. Anyone can grab an unclaimed one.</p>
+      </div>
+    </div>
+    <div class="cell">
+      <svg width="100%" height="64" viewBox="0 0 160 64" aria-label="A list with two items ticked off">
+        <rect x="20" y="10" width="120" height="12" fill="var(--layer-alt)"/>
+        <rect x="20" y="26" width="120" height="12" fill="var(--layer-alt)"/>
+        <rect x="20" y="42" width="120" height="12" fill="var(--layer-alt)"/>
+        <circle cx="27" cy="16" r="4.5" fill="var(--accent)"/>
+        <circle cx="27" cy="32" r="4.5" fill="var(--accent)"/>
+        <circle cx="27" cy="48" r="4.5" fill="none" stroke="var(--text-3)" stroke-width="1.5"/>
+        <path d="M25 16l1.5 1.5L29 14.5" stroke="#fff" stroke-width="1.5" fill="none"/>
+        <path d="M25 32l1.5 1.5L29 30.5" stroke="#fff" stroke-width="1.5" fill="none"/>
+      </svg>
+      <div>
+        <span class="step-n">MOMENT 3</span>
+        <h4>Tick things off</h4>
+        <p class="dim">Same tap as today: 未購入 → 購入済 → 見送り. Everyone's list updates, and the running total with it.</p>
+      </div>
+    </div>
+    <div class="cell">
+      <svg width="100%" height="64" viewBox="0 0 160 64" aria-label="A session ending">
+        <rect x="46" y="8" width="38" height="48" fill="none" stroke="var(--text-3)" stroke-width="1.5"/>
+        <path d="M96 32h28" stroke="var(--border-strong)" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <path d="M100 22l24 20M124 22l-24 20" stroke="var(--red)" stroke-width="1.5"/>
+        <rect x="54" y="20" width="22" height="4" fill="var(--border-strong)"/>
+        <rect x="54" y="30" width="22" height="4" fill="var(--border-strong)"/>
+      </svg>
+      <div>
+        <span class="step-n">MOMENT 4</span>
+        <h4>End it</h4>
+        <p class="dim">The Live Activity disappears and the radios go quiet. Nothing runs in the background afterwards.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">The screens</span>
+    <h2>Three surfaces, built from what's already there</h2>
+    <p class="lead">The shared list lives inside the existing 宝物 tab of the panel. No new tab, no new
+      navigation — the app is map-first and stays that way.</p>
+  </div>
+  <div class="phones">
+
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="scr-pad">
+          <div class="seg"><span>サークル</span><span>お気に入り</span><span class="on">宝物</span></div>
+        </div>
+        <div class="row">
+          <div class="avs"><i class="av j">J</i><i class="av a">A</i></div>
+          <div class="grow">Justinと共有中</div>
+          <span style="color:#8d8d8d">›</span>
+        </div>
+        <div class="scr-pad" style="padding-bottom:0">
+          <div class="grp">こんぺいとう工房 <span class="pill">東 A-12a</span></div>
+        </div>
+        <div class="row"><i class="circ done"></i><span class="grow">新刊 B5 アンソロジー</span><span>¥1,200</span><i class="av a">A</i></div>
+        <div class="row"><i class="circ"></i><span class="grow">アクリルスタンド</span><span>¥2,500</span><i class="av j">J</i></div>
+        <div class="scr-pad" style="padding-bottom:0">
+          <div class="grp">藍色ノート <span class="pill">西 は-03a</span></div>
+        </div>
+        <div class="row"><i class="circ"></i><span class="grow">缶バッジセット</span><span>¥800</span><i class="av m">M</i></div>
+        <div class="row"><span class="grow" style="color:#0f62fe">＋ 共有する頒布品を追加</span></div>
+        <div class="row"><span class="grow">あなたの分</span><span class="mono">¥2,500</span></div>
+        <div class="row"><span class="grow"><b>全員の合計</b></span><span class="mono"><b>¥4,500</b></span></div>
+      </div></div>
+      <div class="caption">
+        <h4>The list</h4>
+        <ul>
+          <li>One new row at the top: who you're sharing with</li>
+          <li>A face on each item shows who's getting it — tap to claim or hand over</li>
+          <li>Your rows are tinted; あなたの分 sits above the existing totals</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="row" style="justify-content:center"><b>共有リスト</b></div>
+        <div class="scr-pad" style="background:#fff;text-align:center">
+          <div class="qr"><i class="tl"></i><i class="tr"></i><i class="bl"></i></div>
+          <div style="color:#525252;font-size:9px">このQRコードを読み取ると、<br>共有リストに参加できます</div>
+          <div style="font-weight:700;letter-spacing:1px;margin-top:6px">CIRCLES-4K7Q</div>
+        </div>
+        <div class="scr-pad" style="padding-bottom:0"><div class="grp">参加者</div></div>
+        <div class="row"><i class="av j">J</i><span class="grow">Justin</span></div>
+        <div class="row"><i class="av a">A</i><span class="grow">Aoi</span></div>
+        <div class="row"><i class="av m">M</i><span class="grow">Mika</span></div>
+        <div class="row"><span class="grow" style="color:#da1e28">この端末で共有を終了</span></div>
+      </div></div>
+      <div class="caption">
+        <h4>The sheet</h4>
+        <ul>
+          <li>Opened by tapping the sharing row — four things only</li>
+          <li>The QR carries everything needed to join, so it works with no signal at all</li>
+          <li>The short code is there for when a camera won't focus</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div class="phone"><div class="screen">
+        <div class="la">
+          <div style="font-size:8px;letter-spacing:0.5px;color:#8d8d8d">共有宝物リスト</div>
+          <div style="font-size:12px;font-weight:600;margin-top:6px">アクリルスタンド</div>
+          <div style="font-size:9px;color:#a8a8a8">こんぺいとう工房 · 東 A-12a</div>
+          <div class="bar"><i></i></div>
+          <div style="font-size:8px;color:#a8a8a8;margin-top:4px">2/5</div>
+        </div>
+        <div class="scr-pad" style="color:#6f6f6f;font-size:9px">
+          Lock screen · Dynamic Island shows 2/5
+        </div>
+        <div class="row"><i class="circ done"></i><span class="grow">設定資料集</span><span style="color:#6f6f6f">Aoiが購入</span></div>
+        <div class="row"><i class="circ"></i><span class="grow">タペストリー</span><span style="color:#6f6f6f">未定</span></div>
+      </div></div>
+      <div class="caption">
+        <h4>The Live Activity</h4>
+        <ul>
+          <li>Your next unbought item, its circle and space, and group progress</li>
+          <li>Starts when the session starts, ends when it ends — that's the on/off switch</li>
+          <li>Android gets the same thing as an ongoing notification</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">The rule</span>
+    <h2>The app never explains how it syncs</h2>
+  </div>
+  <div class="callout">
+    <p class="lead" style="color:var(--text)">Which radio carried a change isn't something anyone can act
+      on. Showing it just asks people to worry about plumbing. So none of it appears on screen.</p>
+    <div class="split">
+      <div>
+        <span class="label" style="color:var(--green)">Shown</span>
+        <div style="margin-top:14px">
+          <div class="tick yes"><span class="mark">✓</span><b>Who you're sharing with</b></div>
+          <div class="tick yes"><span class="mark">✓</span><b>Who's getting each item</b></div>
+          <div class="tick yes"><span class="mark">✓</span><b>「Aoiが購入しました」when someone moves something</b></div>
+          <div class="tick yes"><span class="mark">✓</span><b>「まだ全員に届いていない変更があります」— only when true</b></div>
+        </div>
+      </div>
+      <div>
+        <span class="label" style="color:var(--red)">Never shown</span>
+        <div style="margin-top:14px">
+          <div class="tick no"><span class="mark">✕</span><b>The word Bluetooth</b></div>
+          <div class="tick no"><span class="mark">✕</span><b>Connection or signal status</b></div>
+          <div class="tick no"><span class="mark">✕</span><b>Counts of unsent changes</b></div>
+          <div class="tick no"><span class="mark">✕</span><b>Anything with an ID in it</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">How it works</span>
+    <h2>Three situations, handled the same way</h2>
+    <p class="lead">Changes normally go out over the internet, because that reaches everyone wherever they
+      are standing. Phone-to-phone takes over when the network is dead — or merely bad. Neither is
+      visible to the user.</p>
+  </div>
+  <div class="grid g3">
+    <div class="cell">
+      <svg width="100%" height="86" viewBox="0 0 220 86" aria-label="Two phones connected through a relay that pushes to both">
+        <rect x="10" y="34" width="40" height="42" fill="var(--layer-alt)" stroke="var(--border-strong)"/>
+        <rect x="170" y="34" width="40" height="42" fill="var(--layer-alt)" stroke="var(--border-strong)"/>
+        <rect x="92" y="6" width="36" height="24" fill="var(--accent)"/>
+        <path d="M52 48L92 24M128 24l40 24" stroke="var(--accent)" stroke-width="2" fill="none"/>
+        <path d="M86 30l-30 16" stroke="var(--accent)" stroke-width="2"/>
+        <path d="M60 40l-6 7 9 1" fill="var(--accent)"/>
+        <path d="M166 44l-6-7 9-1" fill="var(--accent)"/>
+      </svg>
+      <h4 style="margin-top:14px">Normal</h4>
+      <p class="dim">One connection each, held open. Changes are pushed out the instant they happen —
+        never fetched on a timer — and reach everyone at once.</p>
+    </div>
+    <div class="cell">
+      <svg width="100%" height="86" viewBox="0 0 220 86" aria-label="Two nearby phones talking directly while the network is unreliable">
+        <rect x="34" y="14" width="42" height="58" fill="var(--layer-alt)" stroke="var(--border-strong)"/>
+        <rect x="144" y="14" width="42" height="58" fill="var(--layer-alt)" stroke="var(--border-strong)"/>
+        <path d="M84 43h52" stroke="var(--teal)" stroke-width="2"/>
+        <circle cx="94" cy="43" r="3" fill="var(--teal)"/>
+        <circle cx="110" cy="43" r="3" fill="var(--teal)"/>
+        <circle cx="126" cy="43" r="3" fill="var(--teal)"/>
+      </svg>
+      <h4 style="margin-top:14px">Bad signal</h4>
+      <p class="dim">Rather than hammering away at reconnecting, phones near each other pass changes
+        directly over Bluetooth until the network settles. This is what keeps the bill at zero.</p>
+    </div>
+    <div class="cell">
+      <svg width="100%" height="86" viewBox="0 0 220 86" aria-label="A phone holding changes while offline">
+        <rect x="88" y="14" width="44" height="58" fill="var(--layer-alt)" stroke="var(--border-strong)"/>
+        <rect x="96" y="26" width="28" height="5" fill="var(--magenta)"/>
+        <rect x="96" y="36" width="28" height="5" fill="var(--magenta)"/>
+        <rect x="96" y="46" width="18" height="5" fill="var(--magenta)"/>
+        <path d="M30 43h30M160 43h30" stroke="var(--border)" stroke-width="2" stroke-dasharray="4 4"/>
+      </svg>
+      <h4 style="margin-top:14px">Nothing at all</h4>
+      <p class="dim">Changes are kept on the phone and sent the moment either path returns. Nothing is ever
+        lost, and nothing needs retrying by hand.</p>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:32px">
+    <div class="cell">
+      <span class="label">The thing that actually costs money</span>
+      <h3 style="margin:10px 0 12px">Connecting, not talking</h3>
+      <p class="dim">On the free plan, sending a change out to the group costs nothing at all, and the
+        keepalive is free too. What gets counted is <b style="color:var(--text)">opening a connection</b> —
+        so a flaky hall network that drops the socket every few minutes is the one thing that could run the
+        budget dry.</p>
+      <ul style="margin:14px 0 0;padding-left:18px;color:var(--text-2)">
+        <li>One connection per person, held open for the whole session</li>
+        <li>Reconnects backed off and staggered, never retried in a tight loop</li>
+        <li>No reconnecting at all while phones nearby are already passing changes along</li>
+        <li>Rapid taps grouped into one send instead of eight</li>
+        <li>Photos never go over Bluetooth — only over Wi-Fi, and only when opened</li>
+      </ul>
+      </div>
+    <div class="cell">
+      <span class="label">Measured in the prototype</span>
+      <h3 style="margin:10px 0 12px">Only what's missing crosses a radio</h3>
+      <svg width="100%" height="120" viewBox="0 0 320 120" aria-label="A phone holding nine changes sends only two to a phone that has seven">
+        <text x="0" y="14" font-size="11" fill="var(--text-2)" font-family="sans-serif">Justin has 9 changes</text>
+        <g fill="var(--border-strong)">
+          <rect x="0" y="24" width="26" height="16"/><rect x="30" y="24" width="26" height="16"/>
+          <rect x="60" y="24" width="26" height="16"/><rect x="90" y="24" width="26" height="16"/>
+          <rect x="120" y="24" width="26" height="16"/><rect x="150" y="24" width="26" height="16"/>
+          <rect x="180" y="24" width="26" height="16"/>
+        </g>
+        <rect x="210" y="24" width="26" height="16" fill="var(--accent)"/>
+        <rect x="240" y="24" width="26" height="16" fill="var(--accent)"/>
+        <text x="0" y="74" font-size="11" fill="var(--text-2)" font-family="sans-serif">Aoi already had 7 — she gets 2</text>
+        <rect x="0" y="84" width="56" height="16" fill="var(--accent)"/>
+        <text x="66" y="96" font-size="11" fill="var(--text)" font-family="sans-serif" font-weight="600">≈100 bytes</text>
+      </svg>
+      <p class="dim" style="margin-top:10px">A cold catch-up of a whole 9-item list measured
+        <b style="color:var(--text)">1,035 bytes</b>. Once everyone agrees, it drops to zero.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Where it runs</span>
+    <h2>Nothing here costs money</h2>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Option</th><th>Cost</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="name">Cloudflare Workers, free plan</td>
+          <td>Free — 100k requests a day, shared across everyone using the app</td>
+          <td><span class="tag pick">Default path</span> Pushes changes out instantly. Sending is free;
+            only connecting is counted.</td>
+        </tr>
+        <tr>
+          <td class="name">Phone to phone, Bluetooth</td>
+          <td>Free, no account, no ceiling, no infrastructure</td>
+          <td><span class="tag pick">Safety net</span> Works with the venue network completely dead, and
+            soaks up reconnects when it is merely bad — which is what keeps the request count down.</td>
+        </tr>
+        <tr>
+          <td class="name">Firebase</td>
+          <td>Free tier, capped at 100 people connected at once</td>
+          <td><span class="tag no">Rejected</span> Heavy SDK, needs a Google account, and that cap is real.</td>
+        </tr>
+        <tr>
+          <td class="name">CloudKit</td>
+          <td>Free, and already set up for this app</td>
+          <td><span class="tag no">Rejected</span> iOS only. Would mean writing the feature twice.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+<section>
+  <div class="sec-head">
+    <span class="label">The relay</span>
+    <h2>One small Worker, already built</h2>
+    <p class="lead">The relay exists and is deployed — it lives in its own repository, separate from both
+      apps. No servers to run, no database to manage, no monthly bill. What remains is the app's side of
+      the conversation.</p>
+  </div>
+
+  <div class="grid g4">
+    <div class="cell">
+      <h4>What it's built on</h4>
+      <ul>
+        <li>Cloudflare Workers, free plan</li>
+        <li>Durable Objects — one per list</li>
+        <li>Hibernation, which is required, not optional</li>
+        <li>No storage service, no queue, nothing else</li>
+      </ul>
+    </div>
+    <div class="cell">
+      <h4>What it does</h4>
+      <ul>
+        <li>Keeps a room's changes for 48 hours, then deletes them</li>
+        <li>Sends each new change straight to everyone else</li>
+        <li>Catches up anyone who reconnects</li>
+        <li>Sends the lock-screen updates too</li>
+      </ul>
+    </div>
+    <div class="cell">
+      <h4>Where it already is</h4>
+      <ul>
+        <li>Beta and live, deployed by tagging</li>
+        <li>Debug builds talk to beta, releases to live</li>
+        <li>Built-in analytics, alerting well under the daily cap</li>
+        <li>Its own repository and its own credentials</li>
+      </ul>
+    </div>
+    <div class="cell">
+      <h4>What breaks if it's down</h4>
+      <ul>
+        <li>Phones fall back to talking directly</li>
+        <li>Changes queue up and go later</li>
+        <li>No error message — there is nothing for anyone to do</li>
+        <li>Nothing is lost</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:32px">
+    <div class="cell">
+      <span class="label">Security</span>
+      <h3 style="margin:10px 0 14px">The relay can't read the list</h3>
+      <div class="tick yes"><span class="mark">✓</span><b>Everything is locked with a key that only exists
+        in the QR code and on members' phones. The relay stores sealed bytes it cannot open.</b></div>
+      <div class="tick yes"><span class="mark">✓</span><b>Nothing secret ships inside the app, so there is
+        no key to leak or rotate.</b></div>
+      <div class="tick yes"><span class="mark">✓</span><b>Each message is signed with a second key, so
+        strangers can't write into a room even if they somehow found it. That signature is a spam gate —
+        proof of membership is that the contents unlock at all, which the relay can never do.</b></div>
+      <div class="tick yes"><span class="mark">✓</span><b>Room names are 128-bit and unguessable.</b></div>
+      <div class="tick yes"><span class="mark">✓</span><b>No names, no account numbers, no item text, and
+        no message logging — nothing stored identifies a person.</b></div>
+      <div class="tick yes"><span class="mark">✓</span><b>Hard caps per room: message size, message rate,
+        number of people, number of changes, and a 48-hour life.</b></div>
+    </div>
+    <div class="cell">
+      <span class="label">The budget, in numbers</span>
+      <h3 style="margin:10px 0 14px">5,000 people, 20 changes each</h3>
+      <div class="tbl-wrap" style="border:0">
+        <table style="min-width:0">
+          <thead><tr><th>If the connection…</th><th>Uses</th><th></th></tr></thead>
+          <tbody>
+            <tr><td class="name">holds</td><td class="mono">10,000</td><td><span class="tag pick">Fine</span></td></tr>
+            <tr><td class="name">drops every 30 min</td><td class="mono">90,000</td><td><span class="tag no">Tight</span></td></tr>
+            <tr><td class="name">drops every 5 min</td><td class="mono">490,000</td><td><span class="tag no">5× over</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="dim" style="margin-top:14px">Out of 100,000 a day, shared by everyone using the app — and
+        almost all of it lands in three days a year. Holding the connection open is the whole game.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Joining a list</span>
+    <h2>The QR is the whole handshake</h2>
+    <p class="lead">Scanning is not a request to a server that then lets you in. The code itself contains
+      everything needed, so two phones that have never been online can still end up on the same list.</p>
+  </div>
+  <div class="diagram">
+    <svg viewBox="0 0 680 316" role="img" aria-label="The host makes one key, shows it as a QR code, the joining phone scans it, and both then work out the same four keys, which is how they find the same relay room and recognise each other over Bluetooth">
+      <rect x="8" y="26" width="196" height="58" fill="var(--layer-alt)" stroke="var(--border-strong)"/>
+      <text x="22" y="46" font-size="10" font-family="sans-serif" font-weight="600" letter-spacing="0.5" fill="var(--text-3)">HOST PHONE</text>
+      <text x="22" y="68" font-size="13" font-family="sans-serif" font-weight="600" fill="var(--text)">Makes one key</text>
+
+      <path d="M212 55h44" stroke="var(--border-strong)" stroke-width="1.5" fill="none"/>
+      <path d="M256 50l10 5-10 5z" fill="var(--border-strong)"/>
+
+      <rect x="278" y="20" width="70" height="70" fill="#ffffff" stroke="var(--border-strong)"/>
+      <g fill="#161616">
+        <rect x="286" y="28" width="16" height="16"/><rect x="290" y="32" width="8" height="8" fill="#ffffff"/>
+        <rect x="324" y="28" width="16" height="16"/><rect x="328" y="32" width="8" height="8" fill="#ffffff"/>
+        <rect x="286" y="66" width="16" height="16"/><rect x="290" y="70" width="8" height="8" fill="#ffffff"/>
+        <rect x="308" y="30" width="5" height="5"/><rect x="308" y="40" width="5" height="5"/>
+        <rect x="316" y="48" width="5" height="5"/><rect x="308" y="56" width="5" height="5"/>
+        <rect x="324" y="52" width="5" height="5"/><rect x="332" y="60" width="5" height="5"/>
+        <rect x="316" y="68" width="5" height="5"/><rect x="330" y="72" width="5" height="5"/>
+        <rect x="296" y="52" width="5" height="5"/><rect x="288" y="56" width="5" height="5"/>
+      </g>
+      <text x="313" y="106" font-size="10" font-family="sans-serif" font-weight="600" letter-spacing="0.5" fill="var(--text-3)" text-anchor="middle">THE KEY TRAVELS ONLY HERE</text>
+
+      <path d="M362 55h44" stroke="var(--border-strong)" stroke-width="1.5" fill="none"/>
+      <path d="M406 50l10 5-10 5z" fill="var(--border-strong)"/>
+
+      <rect x="428" y="26" width="196" height="58" fill="var(--layer-alt)" stroke="var(--border-strong)"/>
+      <text x="442" y="46" font-size="10" font-family="sans-serif" font-weight="600" letter-spacing="0.5" fill="var(--text-3)">JOINING PHONE</text>
+      <text x="442" y="68" font-size="13" font-family="sans-serif" font-weight="600" fill="var(--text)">Now has the same key</text>
+
+      <path d="M106 84v34M526 84v34" stroke="var(--border-strong)" stroke-width="1.5" fill="none"/>
+      <path d="M101 118l5 10 5-10zM521 118l5 10 5-10z" fill="var(--border-strong)"/>
+
+      <rect x="8" y="130" width="616" height="70" fill="var(--layer)" stroke="var(--border)"/>
+      <text x="22" y="150" font-size="10" font-family="sans-serif" font-weight="600" letter-spacing="0.5" fill="var(--text-3)">BOTH WORK OUT THE SAME FOUR KEYS, SEPARATELY</text>
+      <rect x="22" y="160" width="142" height="26" fill="var(--accent)"/>
+      <text x="93" y="177" font-size="11" font-family="sans-serif" font-weight="600" fill="#ffffff" text-anchor="middle">Locks the list</text>
+      <rect x="174" y="160" width="142" height="26" fill="var(--layer-alt)" stroke="var(--border)"/>
+      <text x="245" y="177" font-size="11" font-family="sans-serif" fill="var(--text-2)" text-anchor="middle">Names the room</text>
+      <rect x="326" y="160" width="142" height="26" fill="var(--layer-alt)" stroke="var(--border)"/>
+      <text x="397" y="177" font-size="11" font-family="sans-serif" fill="var(--text-2)" text-anchor="middle">Tags the signal</text>
+      <rect x="478" y="160" width="142" height="26" fill="var(--layer-alt)" stroke="var(--border)"/>
+      <text x="549" y="177" font-size="11" font-family="sans-serif" fill="var(--text-2)" text-anchor="middle">Blocks strangers</text>
+
+      <path d="M170 200v20M470 200v20" stroke="var(--border-strong)" stroke-width="1.5" fill="none"/>
+      <path d="M165 220l5 10 5-10zM465 220l5 10 5-10z" fill="var(--border-strong)"/>
+
+      <rect x="8" y="232" width="304" height="58" fill="var(--layer)" stroke="var(--accent)"/>
+      <text x="22" y="252" font-size="12" font-family="sans-serif" font-weight="600" fill="var(--text)">They land in the same relay room</text>
+      <text x="22" y="272" font-size="11" font-family="sans-serif" fill="var(--text-2)">without the relay ever learning the key</text>
+
+      <rect x="320" y="232" width="304" height="58" fill="var(--layer)" stroke="var(--teal)"/>
+      <text x="334" y="252" font-size="12" font-family="sans-serif" font-weight="600" fill="var(--text)">They recognise each other nearby</text>
+      <text x="334" y="272" font-size="11" font-family="sans-serif" fill="var(--text-2)">using a tag that rolls over every 15 minutes</text>
+    </svg>
+  </div>
+  <p class="dcap">Nothing above touches a server. Two phones with no signal at all can pair and start
+    sharing, and the relay only ever learns a room name it cannot work backwards from.</p>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Security</span>
+    <h2>Locked before it leaves the phone</h2>
+    <p class="lead">Nothing trusts the connection it travels over. Every change is sealed on the device
+      that made it, and the identical sealed bytes go out over Bluetooth and over the internet alike.</p>
+  </div>
+
+  <div class="grid g2">
+    <div class="cell">
+      <span class="label">One key, four jobs</span>
+      <svg width="100%" height="210" viewBox="0 0 340 210" aria-label="The QR code holds one key, from which four separate keys are derived">
+        <rect x="8" y="8" width="88" height="34" fill="var(--accent)"/>
+        <text x="52" y="30" font-size="12" fill="#ffffff" text-anchor="middle" font-family="sans-serif" font-weight="600">QR code</text>
+        <path d="M52 42v18h96" stroke="var(--border-strong)" stroke-width="1.5" fill="none"/>
+        <rect x="148" y="44" width="184" height="32" fill="var(--layer-alt)" stroke="var(--border-strong)"/>
+        <text x="158" y="64" font-size="12" fill="var(--text)" font-family="sans-serif" font-weight="600">One key, 32 random bytes</text>
+        <path d="M160 76v18M160 94h-4" stroke="var(--border-strong)" stroke-width="1.5" fill="none"/>
+        <path d="M160 76v90" stroke="var(--border-strong)" stroke-width="1.5" fill="none"/>
+        <g font-size="11" font-family="sans-serif">
+          <path d="M160 100h18" stroke="var(--border-strong)" stroke-width="1.5"/>
+          <rect x="178" y="90" width="154" height="20" fill="var(--layer)" stroke="var(--border)"/>
+          <text x="186" y="104" fill="var(--text)">Locks the list itself</text>
+          <path d="M160 124h18" stroke="var(--border-strong)" stroke-width="1.5"/>
+          <rect x="178" y="114" width="154" height="20" fill="var(--layer)" stroke="var(--border)"/>
+          <text x="186" y="128" fill="var(--text-2)">Names the relay room</text>
+          <path d="M160 148h18" stroke="var(--border-strong)" stroke-width="1.5"/>
+          <rect x="178" y="138" width="154" height="20" fill="var(--layer)" stroke="var(--border)"/>
+          <text x="186" y="152" fill="var(--text-2)">Tags the Bluetooth signal</text>
+          <path d="M160 172h18" stroke="var(--border-strong)" stroke-width="1.5"/>
+          <rect x="178" y="162" width="154" height="20" fill="var(--layer)" stroke="var(--border)"/>
+          <text x="186" y="176" fill="var(--text-2)">Keeps strangers from writing</text>
+        </g>
+        <text x="8" y="196" font-size="11" fill="var(--text-3)" font-family="sans-serif">Each is one-way — the public ones give nothing back</text>
+      </svg>
+      <p class="dim" style="margin-top:8px">Only the first of the four ever unlocks anything, and it never
+        leaves the members' phones.</p>
+    </div>
+
+    <div class="cell">
+      <span class="label">Choices worth knowing</span>
+      <h3 style="margin:10px 0 12px">Three that aren't obvious</h3>
+      <div style="margin-top:14px">
+        <h4>Bluetooth's own encryption is switched off on purpose</h4>
+        <p class="dim" style="margin-bottom:14px">Turning it on means a system pairing prompt — the exact
+          friction the QR removes — and it varies by handset, and it wouldn't stop a phone that joined
+          legitimately. The list is already locked, so the link doesn't need to be.</p>
+        <h4>The lock is picked by its number, not by chance</h4>
+        <p class="dim" style="margin-bottom:14px">Everyone shares one key, so two phones must never
+          accidentally lock two changes the same way — that breaks this kind of encryption wide open. Each
+          change is locked using its own identity, which is unique by construction, so a collision can't
+          happen at all.</p>
+        <h4>The signal tag changes every 15 minutes</h4>
+        <p class="dim">Otherwise a fixed Bluetooth tag would be a beacon anyone could follow around the
+          hall. It rolls on a clock all members share.</p>
+      </div>
+    </div>
+  </div>
+
+
+  <div style="margin-top:32px">
+    <span class="label">Sealing one change</span>
+    <h3 style="margin:8px 0 16px">Locked once, then never touched again</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 680 356" role="img" aria-label="A change is locked with the key from the QR and a number unique to that change, producing sealed bytes that travel identically over Bluetooth or the internet, and are opened by the other phone">
+        <text x="340" y="18" font-size="10" font-family="sans-serif" font-weight="600" letter-spacing="0.5" fill="var(--text-3)" text-anchor="middle">WHAT HAPPENED</text>
+        <rect x="180" y="26" width="320" height="44" fill="var(--layer-alt)" stroke="var(--border-strong)"/>
+        <text x="340" y="54" font-size="13" font-family="sans-serif" fill="var(--text)" text-anchor="middle">アクリルスタンド → 購入済</text>
+
+        <path d="M340 70v22" stroke="var(--border-strong)" stroke-width="1.5" fill="none"/>
+        <path d="M335 92l5 10 5-10z" fill="var(--border-strong)"/>
+
+        <rect x="180" y="104" width="320" height="62" fill="var(--accent)"/>
+        <text x="340" y="130" font-size="13" font-family="sans-serif" font-weight="600" fill="#ffffff" text-anchor="middle">Locked — AES-256-GCM</text>
+        <text x="340" y="150" font-size="11" font-family="sans-serif" fill="#d0e2ff" text-anchor="middle">on the phone that made the change</text>
+
+        <path d="M172 122h-52M172 148h-52" stroke="var(--border-strong)" stroke-width="1.5" fill="none"/>
+        <path d="M180 117l-10 5 10 5zM180 143l-10 5 10 5z" fill="var(--border-strong)"/>
+        <text x="8" y="118" font-size="11" font-family="sans-serif" font-weight="600" fill="var(--text)">The key</text>
+        <text x="8" y="132" font-size="10" font-family="sans-serif" fill="var(--text-2)">members only</text>
+        <text x="8" y="152" font-size="11" font-family="sans-serif" font-weight="600" fill="var(--text)">Its own number</text>
+        <text x="8" y="166" font-size="10" font-family="sans-serif" fill="var(--text-2)">never reused — see below</text>
+
+        <path d="M510 135h46" stroke="var(--border-strong)" stroke-width="1.5" fill="none"/>
+        <path d="M500 135l10-5v10z" fill="var(--border-strong)"/>
+        <text x="562" y="126" font-size="11" font-family="sans-serif" font-weight="600" fill="var(--text)">Tied to this list</text>
+        <text x="562" y="142" font-size="10" font-family="sans-serif" fill="var(--text-2)">can't be moved or</text>
+        <text x="562" y="155" font-size="10" font-family="sans-serif" fill="var(--text-2)">re-attributed</text>
+
+        <path d="M340 166v22" stroke="var(--border-strong)" stroke-width="1.5" fill="none"/>
+        <path d="M335 188l5 10 5-10z" fill="var(--border-strong)"/>
+
+        <rect x="180" y="200" width="320" height="44" fill="var(--layer)" stroke="var(--border-strong)"/>
+        <text x="340" y="222" font-size="12" font-family="monospace" fill="var(--text-2)" text-anchor="middle">8f 2a c1 04 9e … 4d</text>
+        <text x="340" y="237" font-size="10" font-family="sans-serif" font-weight="600" letter-spacing="0.5" fill="var(--text-3)" text-anchor="middle">SEALED BYTES</text>
+
+        <path d="M280 244v20h-90v22M400 244v20h90v22" stroke="var(--border-strong)" stroke-width="1.5" fill="none"/>
+        <path d="M185 286l5 10 5-10zM485 286l5 10 5-10z" fill="var(--border-strong)"/>
+
+        <rect x="60" y="298" width="260" height="46" fill="var(--layer)" stroke="var(--teal)"/>
+        <text x="190" y="320" font-size="12" font-family="sans-serif" font-weight="600" fill="var(--text)" text-anchor="middle">Straight to a nearby phone</text>
+        <text x="190" y="336" font-size="10" font-family="sans-serif" fill="var(--text-2)" text-anchor="middle">Bluetooth link left unencrypted, deliberately</text>
+
+        <rect x="360" y="298" width="260" height="46" fill="var(--layer)" stroke="var(--accent)"/>
+        <text x="490" y="320" font-size="12" font-family="sans-serif" font-weight="600" fill="var(--text)" text-anchor="middle">Or out through the relay</text>
+        <text x="490" y="336" font-size="10" font-family="sans-serif" fill="var(--text-2)" text-anchor="middle">which stores it without being able to open it</text>
+      </svg>
+    </div>
+    <p class="dcap">The same bytes go either way, so neither path has to be trusted — and if a change
+      opens on the far end, whoever sent it had the key. That is the only proof of membership anyone needs.</p>
+  </div>
+
+  <div style="margin-top:32px">
+    <span class="label">Why two phones can't clash</span>
+    <h3 style="margin:8px 0 16px">Each lock is numbered by the phone that made it</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 680 176" role="img" aria-label="Justin's phone numbers its changes J1 J2 J3 and Aoi's numbers hers A1 A2 A3, so no two numbers are ever the same">
+        <text x="8" y="30" font-size="12" font-family="sans-serif" font-weight="600" fill="var(--text)">Justin's phone</text>
+        <g>
+          <rect x="150" y="14" width="84" height="28" fill="#ff832b"/>
+          <text x="192" y="33" font-size="12" font-family="monospace" fill="#161616" text-anchor="middle">J · 1</text>
+          <rect x="244" y="14" width="84" height="28" fill="#ff832b"/>
+          <text x="286" y="33" font-size="12" font-family="monospace" fill="#161616" text-anchor="middle">J · 2</text>
+          <rect x="338" y="14" width="84" height="28" fill="#ff832b"/>
+          <text x="380" y="33" font-size="12" font-family="monospace" fill="#161616" text-anchor="middle">J · 3</text>
+        </g>
+        <text x="8" y="80" font-size="12" font-family="sans-serif" font-weight="600" fill="var(--text)">Aoi's phone</text>
+        <g>
+          <rect x="150" y="64" width="84" height="28" fill="var(--teal)"/>
+          <text x="192" y="83" font-size="12" font-family="monospace" fill="#ffffff" text-anchor="middle">A · 1</text>
+          <rect x="244" y="64" width="84" height="28" fill="var(--teal)"/>
+          <text x="286" y="83" font-size="12" font-family="monospace" fill="#ffffff" text-anchor="middle">A · 2</text>
+          <rect x="338" y="64" width="84" height="28" fill="var(--teal)"/>
+          <text x="380" y="83" font-size="12" font-family="monospace" fill="#ffffff" text-anchor="middle">A · 3</text>
+        </g>
+        <path d="M444 28h60M444 78h60" stroke="var(--border)" stroke-width="1.5" fill="none"/>
+        <rect x="504" y="14" width="168" height="78" fill="var(--layer)" stroke="var(--border-strong)"/>
+        <text x="588" y="42" font-size="12" font-family="sans-serif" font-weight="600" fill="var(--text)" text-anchor="middle">Always different</text>
+        <text x="588" y="62" font-size="11" font-family="sans-serif" fill="var(--text-2)" text-anchor="middle">because the phone comes</text>
+        <text x="588" y="76" font-size="11" font-family="sans-serif" fill="var(--text-2)" text-anchor="middle">first, then its own count</text>
+        <rect x="8" y="112" width="664" height="50" fill="var(--layer-alt)"/>
+        <text x="22" y="134" font-size="11" font-family="sans-serif" fill="var(--text-2)">Everyone shares one key, and with this kind of encryption two changes locked with the same number would break it open.</text>
+        <text x="22" y="150" font-size="11" font-family="sans-serif" fill="var(--text-2)">Numbering by phone makes a clash impossible rather than unlikely — which is why a change is sealed once and never re-sealed.</text>
+      </svg>
+    </div>
+  </div>
+
+  <div style="margin-top:32px">
+    <span class="label">Who can see what</span>
+    <div class="tbl-wrap" style="margin-top:12px">
+      <table>
+        <thead><tr><th>Can see</th><th>The items and prices</th><th>Who's buying what</th><th>That a list exists</th></tr></thead>
+        <tbody>
+          <tr><td class="name">Cloudflare</td><td><b style="color:var(--green)">No</b></td><td><b style="color:var(--green)">No</b></td><td>Yes — and roughly how many people</td></tr>
+          <tr><td class="name">Someone listening to Bluetooth nearby</td><td><b style="color:var(--green)">No</b></td><td><b style="color:var(--green)">No</b></td><td>Yes — that a CiRCLES list is nearby, not whose</td></tr>
+          <tr><td class="name">Someone on the same Wi-Fi</td><td><b style="color:var(--green)">No</b></td><td><b style="color:var(--green)">No</b></td><td>Only that the app is talking to Cloudflare</td></tr>
+          <tr><td class="name">Anyone who photographs the QR</td><td>Yes</td><td>Yes</td><td>Yes — they are a member</td></tr>
+          <tr><td class="name">A member</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="dim" style="margin-top:12px;max-width:70ch">The last two rows are the design, not a leak: the
+      QR <em>is</em> the invitation. Photographing someone's screen gets you into their shopping list, the
+      same way seeing their paper list would. Everything above those rows is sealed.</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Implementation</span>
+    <h2>What gets built</h2>
+  </div>
+  <div class="grid g4">
+    <div class="cell">
+      <h4>Who you are</h4>
+      <p class="dim">The circle.ms account already in the app. No new sign-up, no new user list — the same
+        identity works on both platforms.</p>
+    </div>
+    <div class="cell">
+      <h4>What a change is</h4>
+      <p class="dim">A small note — added, claimed, bought, cancelled — with an order number. Phones swap
+        notes and replay them in the same order, so they always land on the same list.</p>
+    </div>
+    <div class="cell">
+      <h4>Where it's kept</h4>
+      <p class="dim">Three new tables in the Buys database that's already there. Private Buys are untouched;
+        an item can be promoted into the shared list.</p>
+    </div>
+    <div class="cell">
+      <h4>Keeping both apps honest</h4>
+      <p class="dim">One shared set of test cases — a list of changes and the exact list they must produce —
+        checked into both repos. iOS and Android must agree byte for byte.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Build order</span>
+    <h2>Five steps, each shippable</h2>
+    <p class="lead">Steps 1 and 2 are built and working across both platforms against a local relay.
+      Step 3 is written but needs real hardware. The list still lives behind a debug harness, not in
+      the app's own UI.</p>
+  </div>
+  <div class="order">
+    <div class="cell">
+      <span class="state done">DONE</span>
+      <span class="step-n">STEP 1</span>
+      <h4>The list itself</h4>
+      <p class="dim">Changes, replay, and the UI, behind a flag. No radios yet. This is what the prototype
+        already is.</p>
+    </div>
+    <div class="cell">
+      <span class="state done">DONE</span>
+      <span class="step-n">STEP 2</span>
+      <h4>Joining, and the app's side of the relay</h4>
+      <p class="dim">The server is done, so this is key handling and the connection. It makes the feature
+        work end to end on both platforms before any radio work starts.</p>
+    </div>
+    <div class="cell">
+      <span class="state part">WRITTEN</span>
+      <span class="step-n">STEP 3</span>
+      <h4>Phone to phone</h4>
+      <p class="dim">Bluetooth, same platform first, then across. Written on both platforms, but a
+        simulator has no radio — this one needs two real handsets to confirm.</p>
+    </div>
+    <div class="cell">
+      <span class="state part">HALF</span>
+      <span class="step-n">STEP 4</span>
+      <h4>Live Activity</h4>
+      <p class="dim">Running on iOS — lock screen and Dynamic Island, updating as the list changes.
+        Android's notification and the push path are still to do.</p>
+    </div>
+    <div class="cell">
+      <span class="state open">TO DO</span>
+      <span class="step-n">STEP 5</span>
+      <h4>Photos</h4>
+      <p class="dim">Item pictures, fetched only when someone opens them.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <span class="label">Known problems</span>
+    <h2>Six, and what we're doing about each</h2>
+  </div>
+  <div class="grid g3">
+    <div class="cell">
+      <span class="state done">CLOSED</span>
+      <h4>A sleeping iPhone can't be seen by Android</h4>
+      <p class="dim">When the app isn't open, iOS hides its Bluetooth signature somewhere only other
+        iPhones can read.</p>
+      <div class="fix">
+        <span class="label">Decision</span>
+        <p>Android always does the broadcasting — it's already running a foreground service for its
+          notification. A sleeping iPhone listens and reaches out. Every combination is covered; the only
+          cost is that a Bluetooth-only catch-up can take tens of seconds.</p>
+      </div>
+    </div>
+    <div class="cell">
+      <span class="state part">MITIGATED</span>
+      <h4>Tens of thousands of phones in one hall</h4>
+      <p class="dim">Spotting a friend's phone is cheap. Actually connecting, in that much radio noise,
+        can take seconds or fail.</p>
+      <div class="fix">
+        <span class="label">Decision</span>
+        <p>Mostly don't connect. A phone broadcasting the same fingerprint as ours is left alone entirely.
+          Beyond that: two connection attempts at a time, one retry per phone per minute, and never make
+          the screen wait for one.</p>
+      </div>
+    </div>
+    <div class="cell">
+      <span class="state part">NARROWED</span>
+      <h4>Anyone who photographs the QR is in</h4>
+      <p class="dim">Instant joining is the whole point, so an approval prompt isn't the answer.</p>
+      <div class="fix">
+        <span class="label">Decision</span>
+        <p>Make joins visible — everyone sees 「Aoiが参加しました」— and make removal real: taking someone
+          out issues a brand-new key to everyone else. The removed phone is left holding something that no
+          longer opens anything. Marking them as removed wouldn't have done that.</p>
+      </div>
+    </div>
+    <div class="cell">
+      <span class="state part">GUARDED</span>
+      <h4>If the free allowance runs out, it runs out for everyone</h4>
+      <p class="dim">There's one relay and no second one. The failure would land on the three days a year
+        that matter.</p>
+      <div class="fix">
+        <span class="label">Decision</span>
+        <p>Guard the input, not the output: reconnect discipline is the mitigation, since that's the only
+          thing that can realistically drain it. Alert at half the daily cap. If it ever happens, phones
+          fall back to talking directly — line-of-sight only, but still working, and still silent.</p>
+      </div>
+    </div>
+    <div class="cell">
+      <span class="state part">BOUNDED</span>
+      <h4>Clocks drift, and the Bluetooth tag depends on one</h4>
+      <p class="dim">The tag rolls every 15 minutes so it can't be used to follow someone. Two phones with
+        very different clocks would compute different tags.</p>
+      <div class="fix">
+        <span class="label">Decision</span>
+        <p>Each phone accepts the tag either side of the current one, so a clock up to about 15 minutes
+          out still matches. Both platforms set their clocks from the network anyway. This affects finding
+          each other only — the order of changes never depends on the time.</p>
+      </div>
+    </div>
+    <div class="cell">
+      <span class="state done">DESIGNED</span>
+      <h4>iPad's docked panel is narrow</h4>
+      <p class="dim">On iPad the panel sits in a 360pt sidebar, which is where the new rows are tightest.</p>
+      <div class="fix">
+        <span class="label">Decision</span>
+        <p>The sharing row drops to faces and a count. Item names truncate; price and face stay put. The
+          QR opens as a full sheet rather than a popover — an iPad is held further away from the phone
+          scanning it, so the code has to be physically bigger.</p>
+      </div>
+    </div>
+  </div>
+  <div class="callout" style="margin-top:32px">
+    <span class="state open">STILL OPEN</span>
+    <h4>Does the Worker's own outgoing push count against the allowance?</h4>
+    <p class="dim" style="margin-top:6px">Sending lock-screen updates means the Worker calling Apple and
+      Google. Those are outgoing calls rather than incoming ones, which suggests they're not counted — but
+      it needs confirming before that step, because it changes the budget if they are.</p>
+  </div>
+</section>
+
+<footer>
+  Prototype: <b>Prototypes/SharedBuys</b> — a standalone SwiftUI harness with three simulated phones,
+  switchable radios, and a byte-level log of everything sent.
+</footer>
+
+</div>

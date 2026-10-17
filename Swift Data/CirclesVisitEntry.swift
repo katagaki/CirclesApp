@@ -1,10 +1,3 @@
-//
-//  CirclesVisitEntry.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/11/16.
-//
-
 import Foundation
 import SwiftData
 

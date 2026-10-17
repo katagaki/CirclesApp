@@ -1,10 +1,3 @@
-//
-//  ReachabilitySetup.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/08/18.
-//
-
 import SwiftUI
 
 struct ReachabilitySetupModifier: ViewModifier {

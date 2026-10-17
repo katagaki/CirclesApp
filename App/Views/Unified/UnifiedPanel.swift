@@ -14,13 +14,6 @@ struct UnifiedPanel: View {
                 ToolbarItem(placement: .principal) {
                     UnifiedViewPicker()
                 }
-                if unifier.displayMode == .sheet {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Shared.CollapsePanel", systemImage: "chevron.down") {
-                            self.unifier.collapse()
-                        }
-                    }
-                }
             }
             .toolbarVisibility(unifier.isMinimized ? .hidden : .visible, for: .navigationBar, .bottomBar)
             .navigationDestination(for: UnifiedPath.self) { path in
@@ -29,11 +22,17 @@ struct UnifiedPanel: View {
             }
         }
         .overlay(alignment: .top) {
-            UnifiedQuickAccessBar()
+            UnifiedCollapsedBar()
                 .opacity(unifier.isMinimized ? 1.0 : 0.0)
                 .allowsHitTesting(unifier.isMinimized)
         }
         .animation(.easeInOut(duration: 0.2), value: unifier.isMinimized)
+        .sheet(isPresented: Binding(
+            get: { unifier.isSharedBuysDebugPresenting },
+            set: { unifier.isSharedBuysDebugPresenting = $0 }
+        )) {
+            SharedBuysDebugView()
+        }
         .presentationBackgroundInteraction(.enabled)
         .presentationDetents([unifier.compactDetent, .height(360), .large], selection: $unifier.selectedDetent)
         .presentationContentInteraction(.scrolls)

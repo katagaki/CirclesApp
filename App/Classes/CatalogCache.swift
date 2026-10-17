@@ -1,10 +1,3 @@
-//
-//  CatalogCache.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/11/11.
-//
-
 import SwiftData
 import SwiftUI
 import AXiS

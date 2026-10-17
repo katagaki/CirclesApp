@@ -1,10 +1,3 @@
-//
-//  WebCatalogCircle.swift
-//  RADiUS
-//
-//  Created by シン・ジャスティン on 2024/08/04.
-//
-
 public struct WebCatalogCircle: Codable, Hashable, Sendable {
     public let webCatalogID: Int
     public let name: String

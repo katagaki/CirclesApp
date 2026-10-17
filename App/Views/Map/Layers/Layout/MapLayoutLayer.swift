@@ -1,10 +1,3 @@
-//
-//  MapLayoutLayer.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/06/07.
-//
-
 import SwiftUI
 import AXiS
 
@@ -21,7 +14,6 @@ struct MapLayoutLayer: View {
     var body: some View {
         let color: Color = !useDarkModeMaps ? .black.opacity(0.3) : .primary.opacity(0.3)
         ZStack(alignment: .topLeading) {
-            // Draw selection highlight if popover is active
             if let popoverData = mapper.popoverData {
                 Rectangle()
                     .fill(color)
@@ -29,7 +21,6 @@ struct MapLayoutLayer: View {
                     .position(x: popoverData.sourceRect.midX, y: popoverData.sourceRect.midY)
             }
 
-            // Interaction layer
             Color.clear
                 .contentShape(Rectangle())
                 .onTapGesture { location in
@@ -38,7 +29,6 @@ struct MapLayoutLayer: View {
         }
         .frame(width: mapper.canvasSize.width, height: mapper.canvasSize.height)
         .overlay {
-            // Selection source rectangle for matched transition
             if let popoverData = mapper.popoverData {
                 ZStack {
                     // Empty stack used as a transparent hit-test target for matched transitions.

@@ -1,10 +1,3 @@
-//
-//  CircleDetailSection.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/03/01.
-//
-
 import SwiftUI
 
 enum CircleDetailSection: Int, CaseIterable, Codable, Identifiable {

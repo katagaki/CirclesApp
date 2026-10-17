@@ -1,10 +1,3 @@
-//
-//  ControlMenu.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/09/04.
-//
-
 import SwiftUI
 
 enum ControlMenuMetrics {

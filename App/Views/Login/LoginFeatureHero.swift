@@ -1,10 +1,3 @@
-//
-//  LoginFeatureHero.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/08/16.
-//
-
 import SwiftUI
 
 struct LoginFeatureHero: View {

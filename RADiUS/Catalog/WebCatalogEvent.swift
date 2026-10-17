@@ -1,10 +1,3 @@
-//
-//  WebCatalogEvent.swift
-//  RADiUS
-//
-//  Created by シン・ジャスティン on 2024/07/15.
-//
-
 // swiftlint:disable nesting
 public struct WebCatalogEvent: Codable {
     public let status: String

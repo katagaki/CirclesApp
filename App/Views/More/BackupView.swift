@@ -1,10 +1,3 @@
-//
-//  BackupView.swift
-//  CiRCLES
-//
-//  Created by Claude on 2026/08/20.
-//
-
 import SwiftUI
 
 struct BackupView: View {

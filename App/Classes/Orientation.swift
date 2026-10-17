@@ -1,10 +1,3 @@
-//
-//  Orientation.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2025/06/01.
-//
-
 import Foundation
 import SwiftUI
 

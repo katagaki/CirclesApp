@@ -1,10 +1,3 @@
-//
-//  OnHandMapGeometry.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2026/08/26.
-//
-
 import CoreGraphics
 import Foundation
 import AXiS

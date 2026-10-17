@@ -1,10 +1,3 @@
-//
-//  Authenticator.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/07/09.
-//
-
 import CloudKit
 import Foundation
 import KeychainAccess
@@ -95,7 +88,6 @@ class Authenticator {
         let provider = RemoteConfigProvider()
 
         guard await provider.accountStatus() == .available else {
-            // Login only requires iCloud when the client configuration has not been cached yet
             if client == nil {
                 let isJapanese = Locale.current.language.languageCode?.identifier == "ja"
                 self.authBroadcastMessage = isJapanese
@@ -242,7 +234,6 @@ class Authenticator {
     }
 
     func restoreAuthenticationFromKeychainAndDefaults() -> Bool {
-        // Returns Bool: Whether authentication is still fresh enough
         if let tokenExpiryDate = UserDefaults.standard.object(forKey: tokenExpiryDateKey) as? Date,
            tokenExpiryDate > .now,
            let tokenInKeychain = try? keychain.get(keychainAuthTokenKey),

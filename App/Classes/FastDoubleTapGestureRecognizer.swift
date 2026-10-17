@@ -1,10 +1,3 @@
-//
-//  FastDoubleTapGestureRecognizer.swift
-//  CiRCLES
-//
-//  Created by Antigravity on 2026/02/01.
-//
-
 import UIKit
 
 class FastDoubleTapGestureRecognizer: UIGestureRecognizer {
@@ -68,7 +61,6 @@ class FastDoubleTapGestureRecognizer: UIGestureRecognizer {
         if delay > 0 {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
                 guard let self = self else { return }
-                // Only fire single tap if no second tap has started or been recognized in the meantime
                 if self.state == .possible && self.firstTapTimestamp == currentTimestamp {
                     self.singleTapHandler?()
                     self.firstTapTimestamp = 0

@@ -1,10 +1,3 @@
-//
-//  ColorFilterView.swift
-//  OnHand
-//
-//  Created by シン・ジャスティン on 2026/08/25.
-//
-
 import SwiftUI
 
 struct ColorFilterView: View {

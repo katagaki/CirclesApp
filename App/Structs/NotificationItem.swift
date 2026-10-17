@@ -1,10 +1,3 @@
-//
-//  Notification.swift
-//  CiRCLES
-//
-//  Created by シン・ジャスティン on 2024/09/15.
-//
-
 import Foundation
 import SwiftUI
 import UserNotifications
@@ -110,7 +103,6 @@ struct NotificationItem: Identifiable {
 
     // swiftlint:disable cyclomatic_complexity function_body_length
     func requestObject() -> UNNotificationRequest? {
-        // Configure notification contents
         let contents = UNMutableNotificationContent()
         contents.userInfo = [
             "id": id,
@@ -147,7 +139,6 @@ struct NotificationItem: Identifiable {
         }
         contents.sound = UNNotificationSound.default
 
-        // Configure notification time
         var trigger: UNCalendarNotificationTrigger?
         let calendar = Calendar.current
         var dateComponents: DateComponents = calendar.dateComponents(
@@ -198,7 +189,6 @@ struct NotificationItem: Identifiable {
             dateComponents.minute = 0
         }
         if let identifier = identifier(from: dateComponents) {
-            // Configure notification trigger
             trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
             return UNNotificationRequest(
                 identifier: identifier,
