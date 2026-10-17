@@ -85,7 +85,6 @@ fun MapVisitedLayer(
     ) {
         val path = Path()
         for (rect in visitedRects) {
-            // Center a square within the rect for the checkmark
             val left = rect.left.dp.toPx()
             val top = rect.top.dp.toPx()
             val width = rect.width().dp.toPx()

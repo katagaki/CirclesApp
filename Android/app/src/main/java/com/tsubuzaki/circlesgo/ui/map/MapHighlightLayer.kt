@@ -19,10 +19,6 @@ import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.state.Mapper
 import kotlinx.coroutines.delay
 
-/**
- * Blinks a rectangle over the highlighted circle's space ("Show on Map"),
- * mirroring the iOS MapHighlightLayer.
- */
 @Composable
 fun MapHighlightLayer(
     mapper: Mapper,
@@ -35,7 +31,6 @@ fun MapHighlightLayer(
     LaunchedEffect(highlightData) {
         val data = highlightData
         if (data != null && data.shouldBlink) {
-            // Blink 7 times at 160 ms
             isVisible = true
             repeat(7) {
                 isVisible = !isVisible

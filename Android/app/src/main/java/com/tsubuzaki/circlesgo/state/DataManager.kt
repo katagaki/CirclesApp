@@ -57,21 +57,16 @@ class DataManager(
                 isDatabaseInitialized = false
             }
             unifier.hide()
-            // Drop anything that references the previous event's data
             unifier.clearSheetContent()
 
-            // Step 1: Fetch events list from API
             val authToken = authenticator.token.value ?: OpenIDToken()
             events.prepare(authToken)
 
-            // Step 2: Update active event based on online state
             events.updateActiveEvent(authenticator.onlineState.value)
             val activeEvent = events.activeEvent.value
 
-            // Step 3: Download databases and load data
             if (activeEvent != null) {
                 if (!database.isDownloaded(activeEvent)) {
-                    // Database needs downloading - show progress dialog
                     oasis.open()
                     try {
                         loadDataFromDatabase(activeEvent, authToken)
@@ -79,7 +74,6 @@ class DataManager(
                         finishReload(shouldResetSelections = true)
                     }
                 } else {
-                    // Database exists, just load it
                     loadDataFromDatabase(activeEvent, authToken)
                     finishReload(shouldResetSelections = shouldResetSelections)
                 }
@@ -120,7 +114,6 @@ class DataManager(
                 database.loadCircleImages()
             }
 
-            // Favorites are unavailable in demo mode; present an empty state.
             favorites.setItems(emptyList())
             favorites.setWcIDMappedItems(emptyMap())
 
@@ -139,10 +132,8 @@ class DataManager(
             selections.resetSelections()
         }
 
-        // Force the catalog to refetch circles from the (possibly new) database
         catalogCache.invalidate()
 
-        // Set default selections from database
         if (shouldResetSelections || selections.date.value == null) {
             val defaultDate = selections.fetchDefaultDateSelection(database)
             if (defaultDate != null) {
@@ -156,7 +147,6 @@ class DataManager(
             }
         }
 
-        // Show the UI
         if (!authenticator.isAuthenticating.value) {
             unifier.show()
         }
@@ -170,14 +160,12 @@ class DataManager(
         val downloader = CatalogDatabaseDownloader(database)
 
         if (!database.isDownloaded(activeEvent)) {
-            // Download text database
             oasis.setHeaderText(context.getString(R.string.downloading))
             oasis.setBodyText(context.getString(R.string.downloading_text_database))
             downloader.downloadTextDatabase(activeEvent, authToken) { progress ->
                 oasis.setProgress(progress)
             }
 
-            // Download image database
             oasis.setBodyText(context.getString(R.string.downloading_image_database))
             downloader.downloadImageDatabase(activeEvent, authToken) { progress ->
                 oasis.setProgress(progress)
@@ -190,14 +178,12 @@ class DataManager(
             oasis.setBodyText(context.getString(R.string.loading_database))
         }
 
-        // Reload selections from database
         selections.reloadData(database)
 
         if (oasis.isShowing.value) {
             oasis.setHeaderText(context.getString(R.string.loading))
         }
 
-        // Load images
         if (!isDatabaseInitialized) {
             isDatabaseInitialized = true
         }
@@ -207,7 +193,6 @@ class DataManager(
             database.loadCircleImages()
         }
 
-        // Load favorites in background
         loadFavorites(authToken)
     }
 

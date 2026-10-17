@@ -66,17 +66,13 @@ fun CatalogView(
     val gridSize by selections.gridSize.collectAsState()
     val listSize by selections.listSize.collectAsState()
 
-    // Search state
     var searchTerm by remember { mutableStateOf("") }
     var searchExpanded by remember { mutableStateOf(false) }
 
-    // Notify parent about search active state for bottom sheet expansion
     LaunchedEffect(searchExpanded) {
         unifier.setIsSearchActive(searchExpanded)
     }
 
-    // Reload circles when selection changes or the cache is invalidated
-    // (e.g. after switching the active event)
     val catalogGeneration by catalogCache.generation.collectAsState()
     LaunchedEffect(selectedMap, selectedDate, selectedGenres, selectedBlocks, catalogGeneration) {
         val catalogSelectionID = selections.catalogSelectionID
@@ -85,7 +81,6 @@ fun CatalogView(
         }
     }
 
-    // Search when term changes
     LaunchedEffect(searchTerm) {
         if (searchTerm.isNotEmpty()) {
             scope.launch(Dispatchers.IO) {
@@ -123,7 +118,6 @@ fun CatalogView(
         }
     }
 
-    // Display overlay settings
     val isPrivacyMode by selections.isPrivacyMode.collectAsState()
     val showSpaceName by selections.showSpaceName.collectAsState()
     val showDay by selections.showDay.collectAsState()
@@ -175,7 +169,6 @@ fun CatalogView(
         onExpandedChange = { searchExpanded = it },
         windowInsets = WindowInsets(0, 0, 0, 0),
     ) {
-        // Search results view (shown when expanded)
         val currentSearched = searchedCircles
         if (currentSearched != null && displayMode == CircleDisplayMode.GRID) {
             CircleGrid(
@@ -225,7 +218,6 @@ fun CatalogView(
         }
     }
 
-    // Main content (shown when search is not expanded)
     if (!searchExpanded) {
         CatalogToolbar(
             database = database,

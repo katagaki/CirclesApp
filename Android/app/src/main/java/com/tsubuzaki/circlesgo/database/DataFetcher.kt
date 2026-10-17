@@ -181,7 +181,6 @@ class DataFetcher(private val database: SQLiteDatabase?) {
             val args = mutableListOf<String>()
             var hasFilter = false
 
-            // Filter by map: get block IDs from mapping table
             if (mapID != null) {
                 val mapCursor = db.rawQuery(
                     SELECT_BLOCK_IDS_FOR_MAP,

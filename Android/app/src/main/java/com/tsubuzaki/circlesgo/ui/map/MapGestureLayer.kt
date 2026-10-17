@@ -136,7 +136,6 @@ fun MapGestureLayer(
                             return@detectTapGestures
                         }
                     }
-                    // Tapped outside any layout block
                     mapper.setPopoverData(null)
                 }
             }

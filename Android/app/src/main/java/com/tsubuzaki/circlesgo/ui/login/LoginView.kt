@@ -40,7 +40,7 @@ import com.tsubuzaki.circlesgo.R
 fun LoginView(
     authURL: String,
     onLoginTapped: () -> Unit = {},
-    onDemoTapped: () -> Unit = {}
+    onGuestTapped: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
@@ -121,14 +121,14 @@ fun LoginView(
         Spacer(modifier = Modifier.height(8.dp))
 
         OutlinedButton(
-            onClick = onDemoTapped,
+            onClick = onGuestTapped,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
             shape = RoundedCornerShape(26.dp)
         ) {
             Text(
-                text = stringResource(R.string.login_demo_mode),
+                text = stringResource(R.string.login_guest_mode),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )

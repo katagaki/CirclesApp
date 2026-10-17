@@ -58,7 +58,6 @@ enum class WebCatalogColor(val value: Int) {
     }
 
     companion object {
-        /** Colors a user can assign to a favorite; excludes [UNCOLORED]. */
         val assignable: List<WebCatalogColor> = entries.filter { it != UNCOLORED }
 
         // Out-of-palette Web Catalog colors decode as UNCOLORED

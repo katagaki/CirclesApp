@@ -65,10 +65,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-/**
- * Image attachments for a circle (product lists, notices), mirroring the iOS
- * attachments section. Images are picked from the photo library.
- */
 @Composable
 fun CircleDetailAttachmentsSection(
     circleID: Int,
@@ -154,7 +150,6 @@ fun CircleDetailAttachmentsSection(
             }
         }
 
-        // Add attachment button
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -184,7 +179,6 @@ fun CircleDetailAttachmentsSection(
         }
     }
 
-    // Fullscreen viewer
     viewerFile?.let { file ->
         val bitmap = thumbnails[file.path]
         Dialog(
@@ -198,7 +192,6 @@ fun CircleDetailAttachmentsSection(
                 contentAlignment = Alignment.Center
             ) {
                 if (bitmap != null) {
-                    // Pinch to zoom with pan; springs back to fit on release
                     val scope = rememberCoroutineScope()
                     val zoomScale = remember { Animatable(1f) }
                     val panOffset = remember { Animatable(Offset.Zero, Offset.VectorConverter) }

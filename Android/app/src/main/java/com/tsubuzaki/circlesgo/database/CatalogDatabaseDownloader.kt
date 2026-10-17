@@ -66,10 +66,6 @@ class CatalogDatabaseDownloader(
         return textFile != null && imageFile != null
     }
 
-    /**
-     * Returns the expected download size in bytes for the given event's
-     * databases, or null if it could not be determined.
-     */
     suspend fun estimateDownloadSize(
         databaseInformation: WebCatalogDatabase
     ): Long? = withContext(Dispatchers.IO) {
@@ -126,7 +122,6 @@ class CatalogDatabaseDownloader(
         }
 
         val databaseInfo = databaseInformationOverride ?: run {
-            // Fetch database information if not already present
             if (catalogDatabase.databaseInformation == null) {
                 val info = fetchDatabaseInformation(event, authToken)
                 if (info != null) {
@@ -141,7 +136,6 @@ class CatalogDatabaseDownloader(
             DatabaseType.IMAGES -> databaseInfo.response.databaseFor211By300Images()
         } ?: return@withContext null
 
-        // Download the ZIP file
         val downloader = Downloader()
         val zippedFile = try {
             downloader.download(downloadURL, dataStoreDir) { progress ->
@@ -154,7 +148,6 @@ class CatalogDatabaseDownloader(
 
         updateProgress(null)
 
-        // Unzip the file
         unzip(zippedFile, dataStoreDir, updateProgress)
     }
 
@@ -230,7 +223,6 @@ class CatalogDatabaseDownloader(
                     }
                 }
             }
-            // Clean up the zip file
             if (!zipFile.delete() && zipFile.exists()) {
                 Log.w(TAG, "Failed to delete zip file: ${zipFile.name}")
             }

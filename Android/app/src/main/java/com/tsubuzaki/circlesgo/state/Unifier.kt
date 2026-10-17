@@ -29,8 +29,6 @@ class Unifier {
     private val _isSearchActive = MutableStateFlow(false)
     val isSearchActive: StateFlow<Boolean> = _isSearchActive
 
-    // Event data management is presented full screen, on top of the map and
-    // the bottom sheet, instead of being pushed inside the sheet
     private val _isEventDataPresenting = MutableStateFlow(false)
     val isEventDataPresenting: StateFlow<Boolean> = _isEventDataPresenting
 

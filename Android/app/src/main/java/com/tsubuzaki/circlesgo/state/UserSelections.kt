@@ -268,10 +268,6 @@ class UserSelections(context: Context) {
         _blocks.value = emptySet()
     }
 
-    /**
-     * Clears every persisted preference and resets in-memory state to
-     * defaults, mirroring the iOS sign-out which wipes all UserDefaults.
-     */
     fun wipeAll() {
         prefs.edit { clear() }
         _date.value = null

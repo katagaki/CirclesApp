@@ -100,7 +100,6 @@ class Authenticator(
             .build()
         connectivityManager.registerNetworkCallback(request, callback)
 
-        // Check current state
         val activeNetwork = connectivityManager.activeNetwork
         val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
         if (capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true) {

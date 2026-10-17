@@ -31,7 +31,6 @@ class FavoritesAPI(private val cache: FavoritesCache) {
                 val items = favorites.response.list.sortedBy { it.favorite.color }
                 val wcIDMappedItems = items.associateBy { it.circle.webCatalogID }
 
-                // Cache locally
                 cache.save(items)
 
                 Pair(items, wcIDMappedItems)

@@ -9,11 +9,6 @@ import kotlinx.coroutines.flow.StateFlow
 import java.io.File
 import java.util.UUID
 
-/**
- * Stores image attachments per event and circle, mirroring the iOS
- * AttachmentsDatabase. Images live as JPEG files under the app's
- * internal storage.
- */
 class AttachmentsCache(context: Context) {
 
     companion object {
@@ -22,7 +17,6 @@ class AttachmentsCache(context: Context) {
 
     private val baseDir = File(context.filesDir, "attachments")
 
-    // Bumped after every mutation so views can observe changes
     private val _version = MutableStateFlow(0)
     val version: StateFlow<Int> = _version
 
@@ -35,7 +29,6 @@ class AttachmentsCache(context: Context) {
         return files.filter { it.isFile }.sortedBy { it.name }
     }
 
-    /** Removes every event's attachments (sign-out wipe). */
     fun clearAll() {
         baseDir.deleteRecursively()
         _version.value += 1

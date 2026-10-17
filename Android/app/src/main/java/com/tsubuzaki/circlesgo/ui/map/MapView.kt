@@ -69,7 +69,6 @@ fun MapView(
 
     val spaceSize = if (useHighResolutionMaps) 40 else 20
 
-    // Reload map image when selection changes, resolution setting changes, or when common images finish loading
     LaunchedEffect(selectedDate, selectedMap, commonImagesLoadCount, useHighResolutionMaps) {
         val date = selectedDate
         val map = selectedMap
@@ -88,20 +87,17 @@ fun MapView(
         }
     }
 
-    // Dismiss the popover when switching to a different map or date
     LaunchedEffect(selectedDate, selectedMap) {
         mapper.setPopoverData(null)
         mapper.setPopoverPosition(null)
     }
 
-    // Update canvas size when map image changes
     LaunchedEffect(mapImage) {
         mapImage?.let {
             mapper.setCanvasSize(it.width.dp, it.height.dp)
         }
     }
 
-    // Reload layouts when map/date changes
     LaunchedEffect(selectedDate, selectedMap, mapImage) {
         val map = selectedMap
         val date = selectedDate
@@ -122,14 +118,11 @@ fun MapView(
         }
     }
 
-    // Handle highlight target
     LaunchedEffect(highlightTarget) {
         val target = highlightTarget
         if (target != null) {
             val success = mapper.highlightCircle(spaceSize)
             if (!success) {
-                // Try to switch to the correct map/date; keep the target alive
-                // so the highlight retries once the new layouts are loaded
                 val isSwitchingMap = withContext(Dispatchers.IO) {
                     val fetcher = DataFetcher(database.getTextDatabase())
                     val mapID = fetcher.mapID(target.blockID)
@@ -155,14 +148,12 @@ fun MapView(
         }
     }
 
-    // Retry highlight after layouts reload
     LaunchedEffect(layouts) {
         if (highlightTarget != null) {
             mapper.highlightCircle(spaceSize)
         }
     }
 
-    // Auto-scroll to popover
     LaunchedEffect(popoverPosition) {
         if (scrollType == MapAutoScrollType.POPOVER) {
             popoverPosition?.let { mapper.setScrollToPosition(it) }
@@ -194,10 +185,6 @@ fun MapView(
                 popoverContent = { offset, currentZoom, viewportSize ->
                     val density = androidx.compose.ui.platform.LocalDensity.current
                     popoverData?.let { data ->
-                        // Project source rect from map coordinates to screen coordinates
-                        // sourceRect is in Dp (from MapGestureLayer).
-                        // offset is in Pixels.
-                        // We need the result in Dp for MapPopoverLayer.
                         val dx = with(density) { offset.x.toDp().value }
                         val dy = with(density) { offset.y.toDp().value }
 
@@ -211,7 +198,7 @@ fun MapView(
 
                         MapPopoverLayer(
                             popoverData = data.copy(sourceRect = projectedRect),
-                            zoomScale = 1.0f, // Use 1.0 scale to prevent scaling
+                            zoomScale = 1.0f,
                             canvasWidth = viewportSize.width,
                             canvasHeight = viewportSize.height,
                             mapper = mapper,
@@ -224,7 +211,6 @@ fun MapView(
                 }
             ) {
                 Box {
-                    // Layer 1: Base map image
                     MapImageLayer(
                         bitmap = currentMapImage,
                         canvasWidth = canvasWidth,
@@ -232,7 +218,6 @@ fun MapView(
                         darkenInDarkMode = darkenMapInDarkMode
                     )
 
-                    // Layer 2: Favorites overlay
                     MapFavoritesLayer(
                         layouts = layouts,
                         favoriteItems = favoriteItems ?: emptyMap(),
@@ -242,7 +227,6 @@ fun MapView(
                         database = database
                     )
 
-                    // Layer 3: Genre overlay
                     if (showGenreOverlay) {
                         genreImage?.let { genre ->
                             MapImageLayer(
@@ -254,7 +238,6 @@ fun MapView(
                         }
                     }
 
-                    // Layer 4: Filter dim overlay
                     MapFilterLayer(
                         layouts = layouts,
                         selections = selections,
@@ -265,7 +248,6 @@ fun MapView(
                         database = database
                     )
 
-                    // Layer 5: Visited checkmarks
                     if (visitsState != null && events != null) {
                         val visits by visitsState.visits.collectAsState()
                         MapVisitedLayer(
@@ -279,14 +261,12 @@ fun MapView(
                         )
                     }
 
-                    // Layer 6: Highlight blink overlay (Show on Map)
                     MapHighlightLayer(
                         mapper = mapper,
                         canvasWidth = canvasWidth,
                         canvasHeight = canvasHeight
                     )
 
-                    // Layer 7: Layout interaction layer
                     MapLayoutLayer(
                         canvasWidth = canvasWidth,
                         canvasHeight = canvasHeight,

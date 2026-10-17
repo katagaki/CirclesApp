@@ -47,7 +47,6 @@ fun ColorGroupedCircleGrid(
     showSpaceName: Boolean = false,
     showDay: Boolean = false,
     showsOverlayWhenEmpty: Boolean = true,
-    /** Shows the Web Catalog color notice above the uncolored group. */
     showUncoloredNotice: Boolean = false,
     onSelect: (ComiketCircle) -> Unit,
     isPrivacyMode: Boolean = false,
@@ -77,7 +76,6 @@ fun ColorGroupedCircleGrid(
                         WebCatalogFavoriteNotice()
                     }
                 }
-                // Color section items
                 items(
                     items = circles,
                     key = { circle -> circle.id },
@@ -120,11 +118,6 @@ fun ColorGroupedCircleGrid(
     }
 }
 
-/**
- * Notice shown above uncolored favorites: colors picked from the Web
- * Catalog's own palette are not represented in the app and should be
- * re-selected here.
- */
 @Composable
 fun WebCatalogFavoriteNotice() {
     Column(

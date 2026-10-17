@@ -8,10 +8,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.util.UUID
 
-/**
- * Stores planned purchases ("buys") per event, mirroring the iOS BuysDatabase.
- * Entries are keyed by circle ID; each entry holds an ordered list of items.
- */
 class BuysCache(context: Context) {
 
     companion object {
@@ -48,7 +44,6 @@ class BuysCache(context: Context) {
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
-    // Bumped after every mutation so views can observe changes
     private val _version = MutableStateFlow(0)
     val version: StateFlow<Int> = _version
 
@@ -102,7 +97,6 @@ class BuysCache(context: Context) {
         saveAll(eventNumber, all)
     }
 
-    /** Removes every event's shopping list (sign-out wipe). */
     fun clearAll() {
         prefs.edit { clear() }
         _version.value += 1

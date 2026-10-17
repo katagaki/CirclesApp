@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -47,15 +49,16 @@ import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
 import com.tsubuzaki.circlesgo.state.Events
+import androidx.compose.material3.PrimaryTabRow
+import androidx.compose.material3.Tab
+import com.tsubuzaki.circlesgo.ui.shared.LocalSharedBuys
+import com.tsubuzaki.circlesgo.ui.sharedbuys.SharedBuysList
+import com.tsubuzaki.circlesgo.ui.sharedbuys.SharedBuysSheet
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/**
- * Purchase planning tab, mirroring the iOS Buys tab: planned items grouped by
- * circle, filtered by the selected day, with a running total and grand total.
- */
 @Composable
 fun BuysView(
     database: CatalogDatabase,
@@ -64,6 +67,11 @@ fun BuysView(
     selections: UserSelections,
     unifier: Unifier
 ) {
+    val sharedBuys = LocalSharedBuys.current
+    var scope by remember { mutableStateOf(0) }
+    var hasChosenScope by remember { mutableStateOf(false) }
+    var isShowingSharedSheet by remember { mutableStateOf(false) }
+
     val buysVersion by buysCache.version.collectAsState()
     val selectedDate by selections.date.collectAsState()
     val eventNumber = events.activeEventNumber
@@ -97,25 +105,71 @@ fun BuysView(
     val totalCost = cost(visibleEntries)
     val grandTotalCost = cost(entries)
 
+    LaunchedEffect(sharedBuys?.isActive) {
+        if (sharedBuys?.isActive == true && !hasChosenScope) scope = 1
+    }
+
+    if (isShowingSharedSheet && sharedBuys != null) {
+        SharedBuysSheet(sharedBuys) { isShowingSharedSheet = false }
+    }
+
     Column(modifier = Modifier.fillMaxSize()) {
-        // Info button row
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { isShowingInfo = true }) {
-                Icon(
-                    imageVector = Icons.Outlined.Info,
-                    contentDescription = stringResource(R.string.buys_info_title),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+        Surface(color = MaterialTheme.colorScheme.surface) {
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = { isShowingInfo = true },
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = stringResource(R.string.buys_info_title),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    if (sharedBuys != null) {
+                        PrimaryTabRow(
+                            selectedTabIndex = scope,
+                            modifier = Modifier.weight(1f),
+                            containerColor = Color.Transparent,
+                            divider = {}
+                        ) {
+                            Tab(
+                                selected = scope == 0,
+                                onClick = { scope = 0; hasChosenScope = true },
+                                text = { Text(stringResource(R.string.buys_scope_mine)) }
+                            )
+                            Tab(
+                                selected = scope == 1,
+                                onClick = { scope = 1; hasChosenScope = true },
+                                text = { Text(stringResource(R.string.buys_scope_shared)) }
+                            )
+                        }
+                        // Balances the info button so the tabs stay centered
+                        Spacer(modifier = Modifier.width(56.dp))
+                    } else {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+                HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
             }
-            Spacer(modifier = Modifier.weight(1f))
         }
 
-        if (visibleEntries.isEmpty()) {
+        if (sharedBuys != null && scope == 1) {
+            SharedBuysList(
+                session = sharedBuys,
+                circlesByID = circlesByID,
+                onOpenSession = { isShowingSharedSheet = true },
+                onStart = {
+                    sharedBuys.adoptIdentity()
+                    sharedBuys.start(eventNumber, sharedBuys.nickname)
+                    isShowingSharedSheet = true
+                }
+            )
+        } else if (visibleEntries.isEmpty()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -257,7 +311,6 @@ private fun BuysEntryCard(
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            // Circle header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -282,7 +335,6 @@ private fun BuysEntryCard(
                 }
             }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-            // Items
             for (item in entry.items.filter { it.name.isNotBlank() }.sortedBy { it.sortOrder }) {
                 Row(
                     modifier = Modifier

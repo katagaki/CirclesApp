@@ -137,6 +137,7 @@
     <string name="tab_buys">Buys</string>
     <string name="buys_section_title">Buys</string>
     <string name="buys_add_item">Add Item</string>
+    <string name="buys_add_item_shared">Add to shared list</string>
     <string name="buys_item_name_placeholder">Item name</string>
     <string name="buys_item_cost_placeholder">Cost</string>
     <string name="buys_total">Total</string>
@@ -189,4 +190,47 @@
     <string name="grid_size_small">Small</string>
     <string name="list_style_regular">Regular</string>
     <string name="list_style_compact">Compact</string>
+    <string name="buys_scope_mine">My Buys</string>
+    <string name="buys_scope_shared">Shared</string>
+    <string name="buys_shared_only_you">Only you so far</string>
+    <string name="buys_shared_with">Shared with %1$s</string>
+    <string name="buys_shared_with_two">Shared with %1$s and %2$s</string>
+    <string name="buys_shared_with_others">Shared with %1$d others</string>
+    <string name="buys_shared_start">Start a shared list</string>
+    <string name="buys_shared_explain">Your own Buys stay private. A shared list is a separate list that everyone in the session can see and edit.</string>
+    <string name="buys_shared_not_started">No shared list</string>
+    <string name="buys_shared_no_items">Nothing in the shared list</string>
+    <string name="buys_shared_no_items_description">Anything a member adds shows up here.</string>
+    <string name="buys_shared_pending">Some changes haven\'t reached everyone yet.</string>
+    <string name="buys_shared_your_share">Your share</string>
+    <string name="buys_shared_group_total">Group total</string>
+    <string name="buys_shared_bought">%1$s bought this</string>
+    <string name="buys_shared_cancelled">%1$s cancelled this</string>
+    <string name="buys_shared_title">Shared list</string>
+    <string name="buys_shared_scan_to_join">Scan this code to join the shared list</string>
+    <string name="buys_shared_members">Members</string>
+    <string name="buys_shared_end">End sharing on this device</string>
+    <string name="buys_shared_remove">Remove</string>
+    <string name="buys_shared_rotate_key">Change join code</string>
+    <string name="buys_shared_rotate_key_explain">Moves everyone still here to a new code. Anyone who only has the old code, or who was removed, can no longer see the list.</string>
+    <string name="buys_shared_you">You</string>
+    <string name="buys_unknown_circle">Unknown circle (ID: %1$d)</string>
+    <!-- Guest Mode -->
+    <string name="guest_leave">Leave This List</string>
+    <string name="login_guest_mode">Join as a Guest</string>
+    <string name="guest_not_joined">Not in a List</string>
+    <string name="guest_not_joined_description">Scan a shared list\'s QR code to see what\'s on it and tick off the things you\'ve bought.</string>
+    <string name="guest_scan">Scan QR Code</string>
+    <string name="guest_scan_unavailable">This device can\'t scan QR codes. Ask whoever shared the list to send you the join link instead.</string>
+    <string name="guest_read_only">As a guest you can tick items off, but not add or edit them.</string>
+    <string name="guest_exit">Exit Guest Mode</string>
+    <string name="guest_exit_title">Exit Guest Mode?</string>
+    <string name="guest_exit_message">You\'ll leave the list you\'re in, and the guest name you were given will be discarded.</string>
+    <string name="guest_leave_title">Leave This List?</string>
+    <string name="guest_leave_message">You\'ll need to scan the QR code again to rejoin.</string>
+    <string name="shared_buys_channel_id" translatable="false">shared_buys</string>
+    <string name="shared_buys_channel_name">Shared Buys</string>
+    <string name="shared_buys_live_done">You\'ve bought everything on your list</string>
+    <string name="shared_buys_live_next">¥%1$d · %2$d of %3$d bought</string>
+    <string name="shared_buys_live_progress">%1$d of %2$d bought</string>
 </resources>

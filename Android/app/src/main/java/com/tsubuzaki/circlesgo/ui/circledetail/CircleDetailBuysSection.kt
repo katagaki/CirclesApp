@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Delete
@@ -23,6 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,21 +40,21 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.data.local.BuysCache
+import com.tsubuzaki.circlesgo.ui.shared.LocalSharedBuys
 
-/**
- * Buys editor inside the circle detail view: add items, rename them, set
- * their cost, cycle their status, and delete them.
- */
 @Composable
 fun CircleDetailBuysSection(
     circleID: Int,
     eventNumber: Int,
     buysCache: BuysCache,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    circleName: String? = null,
+    circleSpace: String? = null
 ) {
     val buysVersion by buysCache.version.collectAsState()
     var items by remember { mutableStateOf<List<BuysCache.BuyItem>>(emptyList()) }
     var isEditing by remember { mutableStateOf(false) }
+    val sharedDrafts = remember { mutableStateListOf<SharedBuyDraft>() }
 
     LaunchedEffect(buysVersion, circleID, eventNumber) {
         items = buysCache.entry(circleID, eventNumber)?.items?.sortedBy { it.sortOrder }
@@ -105,7 +108,24 @@ fun CircleDetailBuysSection(
             }
         }
 
-        // Add item button
+        val activeSession = LocalSharedBuys.current
+        if (activeSession != null && activeSession.isActive) {
+            sharedDrafts.forEach { draft ->
+                key(draft.id) {
+                    SharedBuyDraftRow(
+                        circleID = circleID,
+                        circleName = circleName,
+                        circleSpace = circleSpace,
+                        draft = draft,
+                        onDelete = {
+                            draft.itemId?.let { activeSession.remove(it, circleID) }
+                            sharedDrafts.remove(draft)
+                        }
+                    )
+                }
+            }
+        }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -129,6 +149,31 @@ fun CircleDetailBuysSection(
                 color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Medium
             )
+        }
+
+        val sharedBuys = LocalSharedBuys.current
+        if (sharedBuys != null && sharedBuys.isActive) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { sharedDrafts.add(SharedBuyDraft()) }
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.PersonAdd,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.buys_add_item_shared),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
 }

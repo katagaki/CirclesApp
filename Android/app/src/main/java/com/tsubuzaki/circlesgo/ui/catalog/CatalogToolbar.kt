@@ -64,7 +64,6 @@ fun CatalogToolbar(
     // event changes, even if the selection IDs stay the same
     val commonImagesLoadCount by database.commonImagesLoadCount.collectAsState()
 
-    // Reload selectable genres when map or date changes
     LaunchedEffect(selectedMap, selectedDate, commonImagesLoadCount) {
         val mapID = selectedMap?.id
         val dayID = selectedDate?.id
@@ -82,7 +81,6 @@ fun CatalogToolbar(
         }
     }
 
-    // Reload selectable blocks when map, date, or genres change
     LaunchedEffect(selectedMap, selectedDate, selectedGenres, commonImagesLoadCount) {
         val mapID = selectedMap?.id
         val dayID = selectedDate?.id
@@ -140,10 +138,6 @@ fun CatalogToolbar(
     }
 }
 
-/**
- * Grid/list switch plus the per-layout size options, mirroring the iOS
- * display customization (grid big/medium/small, list regular/compact).
- */
 @Composable
 fun DisplayOptionsMenu(selections: UserSelections) {
     val displayMode by selections.displayMode.collectAsState()

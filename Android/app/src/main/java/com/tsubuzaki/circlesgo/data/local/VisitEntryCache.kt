@@ -42,7 +42,6 @@ class VisitEntryCache(context: Context) {
         saveAll(all)
     }
 
-    /** Removes every visit entry (sign-out wipe). */
     fun clear() {
         prefs.edit { clear() }
     }

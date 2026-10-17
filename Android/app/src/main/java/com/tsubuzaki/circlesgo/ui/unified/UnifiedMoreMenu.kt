@@ -64,7 +64,6 @@ fun UnifiedMoreMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
-            // Event data management
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.manage_event_data)) },
                 onClick = {
@@ -81,7 +80,6 @@ fun UnifiedMoreMenu(
 
             HorizontalDivider()
 
-            // Genre overlay toggle
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.show_genre_overlay)) },
                 onClick = { selections.setShowGenreOverlay(!showGenreOverlay) },
@@ -99,7 +97,6 @@ fun UnifiedMoreMenu(
                 }
             )
 
-            // Darken map in dark mode toggle
             val darkenMapInDarkMode by selections.darkenMapInDarkMode.collectAsState()
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.darken_map_in_dark_mode)) },
@@ -118,7 +115,6 @@ fun UnifiedMoreMenu(
                 }
             )
 
-            // High resolution maps toggle
             val useHighResolutionMaps by selections.useHighResolutionMaps.collectAsState()
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.use_high_resolution_maps)) },
@@ -139,7 +135,6 @@ fun UnifiedMoreMenu(
 
             HorizontalDivider()
 
-            // Show Web Cuts toggle
             val showWebCuts by selections.showWebCuts.collectAsState()
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.show_web_cuts)) },
@@ -157,7 +152,6 @@ fun UnifiedMoreMenu(
                     )
                 }
             )
-            // Show Space Name toggle
             val showSpaceName by selections.showSpaceName.collectAsState()
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.show_space_name)) },
@@ -175,7 +169,6 @@ fun UnifiedMoreMenu(
                     )
                 }
             )
-            // Show Day toggle
             val showDay by selections.showDay.collectAsState()
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.show_day)) },
@@ -295,7 +288,6 @@ fun UnifiedMoreMenu(
 
             HorizontalDivider()
 
-            // Privacy Mode toggle
             val isPrivacyMode by selections.isPrivacyMode.collectAsState()
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.privacy_mode)) },
@@ -314,7 +306,6 @@ fun UnifiedMoreMenu(
                 }
             )
 
-            // Sign out / exit demo mode button
             val isDemoMode = LocalDemoMode.current
             DropdownMenuItem(
                 text = {

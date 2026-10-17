@@ -27,10 +27,6 @@ import com.tsubuzaki.circlesgo.state.UserSelections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/**
- * Dims circle spaces that do not match the active genre/block filters,
- * mirroring the iOS MapFilterLayer.
- */
 @Composable
 fun MapFilterLayer(
     layouts: Map<LayoutCatalogMapping, List<Int>>,

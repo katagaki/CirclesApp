@@ -20,3 +20,6 @@ local.properties
 
 # OpenID credentials - must not be committed
 app/src/main/assets/OpenID.json
+
+# Relay addresses, written by CI from the RELAYS_JSON secret
+/app/src/main/assets/Relays.json

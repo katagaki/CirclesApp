@@ -77,7 +77,6 @@ fun CircleCutImage(
         }
     }
 
-    // Load web cut image from API cache / network
     var webCutImageBitmap by remember(circle.id) {
         mutableStateOf(webCutImageCache.getCached(circle.id)?.asImageBitmap())
     }
@@ -85,7 +84,6 @@ fun CircleCutImage(
         if (!showWebCuts) return@LaunchedEffect
         if (webCutImageBitmap != null) return@LaunchedEffect
 
-        // Try disk cache first
         val cached = withContext(Dispatchers.IO) {
             webCutImageCache.getCached(circle.id)?.asImageBitmap()
         }
@@ -94,10 +92,8 @@ fun CircleCutImage(
             return@LaunchedEffect
         }
 
-        // Already fetched but no image available
         if (webCutImageCache.isFetched(circle.id)) return@LaunchedEffect
 
-        // Fetch from API if online
         if (onlineState != OnlineState.ONLINE) return@LaunchedEffect
         val token = authToken ?: return@LaunchedEffect
         val webCatalogID = circle.extendedInformation?.webCatalogID ?: return@LaunchedEffect
@@ -133,7 +129,6 @@ fun CircleCutImage(
                     )
             )
         } else {
-            // No image available placeholder
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -144,7 +139,6 @@ fun CircleCutImage(
             }
         }
 
-        // Favorite color indicator and visited checkmark overlay
         if (currentBitmap != null) {
             val favoriteItem: UserFavorites.Response.FavoriteItem? = remember(
                 circle.extendedInformation?.webCatalogID, wcIDMappedItems
@@ -216,7 +210,6 @@ fun CircleCutImage(
             }
         }
 
-        // Space name and day pills overlay
         if (showSpaceName || showDay) {
             Box(
                 modifier = Modifier

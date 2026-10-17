@@ -31,7 +31,6 @@ fun MapLayoutLayer(
             .width(canvasWidth)
             .height(canvasHeight)
     ) {
-        // Draw selection highlight
         Canvas(
             modifier = Modifier
                 .width(canvasWidth)

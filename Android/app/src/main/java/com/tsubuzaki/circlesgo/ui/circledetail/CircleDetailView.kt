@@ -123,11 +123,9 @@ fun CircleDetailView(
     var showDemoUnavailable by remember { mutableStateOf(false) }
     var genre by remember { mutableStateOf<String?>(null) }
 
-    // Currently shown circle; changes with previous/next navigation
     var circle by remember(initialCircle) { mutableStateOf(initialCircle) }
     var boundaryAlertMessage by remember { mutableStateOf<Int?>(null) }
 
-    // Favorite state
     val wcIDMappedItems by favorites.wcIDMappedItems.collectAsState()
     val authToken by authenticator.token.collectAsState()
     val webCatalogID = circle.extendedInformation?.webCatalogID
@@ -146,7 +144,6 @@ fun CircleDetailView(
     var memo by remember { mutableStateOf(existingFavorite?.favorite?.memo ?: "") }
     var isSaving by remember { mutableStateOf(false) }
 
-    // Update editing state when favorite data changes
     LaunchedEffect(existingFavorite) {
         selectedColor = existingFavorite?.favorite?.webCatalogColor()
             ?.takeIf { it != WebCatalogColor.UNCOLORED }
@@ -154,7 +151,6 @@ fun CircleDetailView(
         memo = existingFavorite?.favorite?.memo ?: ""
     }
 
-    // Fetch genre name
     LaunchedEffect(circle.genreID) {
         scope.launch(Dispatchers.IO) {
             val fetcher = DataFetcher(database.getTextDatabase())
@@ -162,7 +158,6 @@ fun CircleDetailView(
         }
     }
 
-    // Fetch web catalog tags and online store links
     var tags by remember { mutableStateOf<String?>(null) }
     var onlineStores by remember {
         mutableStateOf<List<WebCatalogCircle.OnlineStore>>(emptyList())
@@ -192,7 +187,6 @@ fun CircleDetailView(
             Modifier.fillMaxSize()
         }
     ) {
-        // Top bar with back button and circle name
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -263,7 +257,6 @@ fun CircleDetailView(
                     contentDescription = stringResource(R.string.next_circle)
                 )
             }
-            // Show on map
             if (mapper != null) {
                 IconButton(onClick = {
                     mapper.setHighlightTarget(circle)
@@ -278,14 +271,12 @@ fun CircleDetailView(
             }
         }
 
-        // Scrollable detail content
         Column(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
         ) {
 
-        // Hero section: cut image + info
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -360,12 +351,10 @@ fun CircleDetailView(
 
             Spacer(modifier = Modifier.width(12.dp))
 
-            // Info stack
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // Day and space pills
                 Row(horizontalArrangement = Arrangement.spacedBy(5.dp)) {
                     CircleBlockPill(
                         text = stringResource(R.string.day_format, circle.day),
@@ -379,7 +368,6 @@ fun CircleDetailView(
                     }
                 }
 
-                // Favorite memo
                 existingFavorite?.favorite?.memo?.takeIf { it.isNotBlank() }?.let { favoriteMemo ->
                     Text(
                         text = favoriteMemo,
@@ -388,7 +376,6 @@ fun CircleDetailView(
                     )
                 }
 
-                // Description
                 if (circle.supplementaryDescription.trim().isNotEmpty()) {
                     InfoSection(
                         title = stringResource(R.string.description_label),
@@ -405,7 +392,6 @@ fun CircleDetailView(
 
         HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
 
-        // Book name section
         if (circle.bookName.trim().isNotEmpty()) {
             InfoSection(
                 title = stringResource(R.string.book_name),
@@ -415,7 +401,6 @@ fun CircleDetailView(
             HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
         }
 
-        // Genre section
         genre?.let {
             InfoSection(
                 title = stringResource(R.string.genre_label),
@@ -425,7 +410,6 @@ fun CircleDetailView(
             HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
         }
 
-        // Tags section (from web catalog)
         tags?.let {
             InfoSection(
                 title = stringResource(R.string.tags_label),
@@ -435,7 +419,6 @@ fun CircleDetailView(
             HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
         }
 
-        // Memo section
         if (circle.memo.trim().isNotEmpty()) {
             InfoSection(
                 title = stringResource(R.string.circle_memo),
@@ -445,10 +428,11 @@ fun CircleDetailView(
             HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
         }
 
-        // Buys section
         if (buysCache != null && events != null) {
             CircleDetailBuysSection(
                 circleID = circle.id,
+                circleName = circle.circleName,
+                circleSpace = circle.spaceName(),
                 eventNumber = events.activeEventNumber,
                 buysCache = buysCache,
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
@@ -456,7 +440,6 @@ fun CircleDetailView(
             HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
         }
 
-        // Attachments section
         if (attachmentsCache != null && events != null) {
             CircleDetailAttachmentsSection(
                 circleID = circle.id,
@@ -469,7 +452,6 @@ fun CircleDetailView(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // URL link
         circle.url?.let { url ->
             if (url.isNotEmpty()) {
                 Row(
@@ -564,7 +546,6 @@ fun CircleDetailView(
                     .launchUrl(context, url.toUri())
             }
 
-            // Online store links from the Web Catalog
             if (onlineStores.isNotEmpty()) {
                 var linksExpanded by remember { mutableStateOf(false) }
                 Box {
@@ -592,7 +573,6 @@ fun CircleDetailView(
                 }
             }
 
-            // SNS buttons
             if (extInfo != null && extInfo.hasAccessibleURLs()) {
                 extInfo.circleMsPortalURL?.let { url ->
                     SNSIconButton(
@@ -763,7 +743,6 @@ private fun FavoriteEditorDialog(
         },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                // 4-wide color grid over the assignable palette
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp),

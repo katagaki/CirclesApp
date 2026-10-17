@@ -209,10 +209,6 @@ class CatalogDatabase(private val context: Context) {
         return "webcatalog${event.number}${suffix}.db"
     }
 
-    /**
-     * Returns the on-disk size of each downloaded event's databases,
-     * keyed by event number.
-     */
     fun downloadedEventSizes(): Map<Int, Long> {
         val perEvent = mutableMapOf<Int, Long>()
         dataStoreDir.listFiles()?.forEach { file ->
@@ -286,7 +282,6 @@ class CatalogDatabase(private val context: Context) {
                 }
             }
 
-            // Fetch blocks for the circles
             val blockIDs = circles.map { it.blockID }.toSet()
             if (blockIDs.isNotEmpty()) {
                 val blockPlaceholders = blockIDs.joinToString(",") { "?" }

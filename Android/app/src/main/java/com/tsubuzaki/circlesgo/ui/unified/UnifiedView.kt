@@ -142,7 +142,6 @@ fun UnifiedView(
         scope.launch { bottomSheetState.partialExpand() }
     }
 
-    // Expand/collapse bottom sheet based on search state
     LaunchedEffect(isSearchActive) {
         if (isSearchActive) {
             isSheetMinimized = false
@@ -187,7 +186,6 @@ fun UnifiedView(
         }
     }
 
-    // Collapse the sheet when requested (e.g. Show on Map)
     val sheetCollapseRequest by unifier.sheetCollapseRequest.collectAsState()
     LaunchedEffect(sheetCollapseRequest) {
         if (sheetCollapseRequest > 0) {
@@ -204,22 +202,18 @@ fun UnifiedView(
                 || !isSheetMinimized
     ) {
         when {
-            // 1. If circle detail (or other pushed content) is showing, pop it
             unifier.hasSheetContent() -> {
                 if (sheetPath.lastOrNull() == UnifiedPath.CIRCLE_DETAIL) {
                     unifier.clearCircleDetail()
                 }
                 unifier.popSheetPath()
             }
-            // 2. If search is active, close it
             isSearchActive -> {
                 unifier.setIsSearchActive(false)
             }
-            // 3. If bottom sheet is expanded, collapse it to its standard height
             sheetValue == SheetValue.Expanded -> {
                 scope.launch { bottomSheetState.partialExpand() }
             }
-            // 4. Otherwise minimize the sheet, clearing the map
             else -> {
                 isSheetMinimized = true
             }
@@ -228,7 +222,6 @@ fun UnifiedView(
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // Sign out / exit demo mode dialog
         if (isGoingToSignOut) {
             val isDemoMode = LocalDemoMode.current
             val actionLabel = stringResource(
@@ -371,10 +364,8 @@ fun UnifiedView(
             )
         }
 
-        // Progress overlay (shown during database download/loading)
         ProgressOverlay(oasis = oasis)
 
-        // Event data management, presented full screen on top of everything else
         AnimatedVisibility(
             visible = isEventDataPresenting,
             enter = slideInHorizontally { it },

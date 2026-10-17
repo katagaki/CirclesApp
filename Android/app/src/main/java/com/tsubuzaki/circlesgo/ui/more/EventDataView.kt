@@ -182,7 +182,6 @@ fun EventDataView(
             .fillMaxSize()
             .statusBarsPadding()
     ) {
-        // Top bar with back button and title
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -201,7 +200,6 @@ fun EventDataView(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1f)
             )
-            // Refresh button: re-fetches the event list and local storage stats
             if (isRefreshing) {
                 CircularProgressIndicator(
                     modifier = Modifier
@@ -233,7 +231,6 @@ fun EventDataView(
             modifier = Modifier.fillMaxSize(),
             contentPadding = WindowInsets.navigationBars.asPaddingValues()
         ) {
-            // Storage breakdown
             item {
                 SectionHeader(stringResource(R.string.storage_header))
                 StorageBreakdown(
@@ -244,7 +241,6 @@ fun EventDataView(
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))
             }
 
-            // Selected event
             val activeRow = eventRows.firstOrNull { it.number == activeEventNumber }
             if (activeRow != null) {
                 item {
@@ -260,7 +256,6 @@ fun EventDataView(
                 }
             }
 
-            // Other events
             val otherRows = eventRows.filter { it.number != activeEventNumber }
             if (otherRows.isNotEmpty()) {
                 item {
@@ -298,7 +293,6 @@ fun EventDataView(
         }
     }
 
-    // Switch event confirmation
     pendingSwitchEvent?.let { eventNumber ->
         AlertDialog(
             onDismissRequest = { pendingSwitchEvent = null },
@@ -320,7 +314,6 @@ fun EventDataView(
         )
     }
 
-    // Download confirmation with expected data size
     pendingDownload?.let { pending ->
         AlertDialog(
             onDismissRequest = { pendingDownload = null },
@@ -534,7 +527,6 @@ private fun StorageBreakdown(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Proportional usage bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -554,7 +546,6 @@ private fun StorageBreakdown(
             }
         }
 
-        // Legend
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             segments.forEach { segment ->
                 Row(

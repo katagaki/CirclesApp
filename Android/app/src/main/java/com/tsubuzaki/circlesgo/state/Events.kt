@@ -36,7 +36,6 @@ class Events(private val context: Context) {
         prefs.getBoolean(ACTIVE_EVENT_IS_LATEST_KEY, false)
     )
 
-    /** Reactive view of [isActiveEventLatest] for Compose consumers. */
     val isActiveEventLatestFlow: StateFlow<Boolean> = _isActiveEventLatestFlow
 
     var isActiveEventLatest: Boolean
@@ -46,7 +45,6 @@ class Events(private val context: Context) {
             _isActiveEventLatestFlow.value = value
         }
 
-    /** Clears the event list, active event, and their persisted values. */
     fun reset() {
         eventData = null
         latestEvent = null
@@ -64,7 +62,6 @@ class Events(private val context: Context) {
             activeEventNumber = number
             prefs.edit { putInt(ACTIVE_EVENT_NUMBER_KEY, activeEventNumber) }
 
-            // update _activeEvent immediately if data is available
             val eventInList = eventData?.list?.firstOrNull { it.number == activeEventNumber }
             if (eventInList != null) {
                 _activeEvent.value = WebCatalogEvent.Response.Event(
@@ -98,9 +95,6 @@ class Events(private val context: Context) {
         }
     }
 
-    /**
-     * Seeds a fixed event list for demo mode without touching the network.
-     */
     fun loadDemoData(activeEventNumber: Int, response: WebCatalogEvent.Response) {
         eventData = response
         latestEvent = response.list.firstOrNull { it.number == response.latestEventNumber }
@@ -115,10 +109,6 @@ class Events(private val context: Context) {
         )
     }
 
-    /**
-     * Re-fetches the event list from the API (falling back to the cached
-     * response when offline) and updates the latest event accordingly.
-     */
     suspend fun refreshEventList(authToken: OpenIDToken) {
         val fetched = WebCatalogAPI.events(authToken, context) ?: return
         eventData = fetched

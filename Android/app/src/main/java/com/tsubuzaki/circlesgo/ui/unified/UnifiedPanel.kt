@@ -2,6 +2,8 @@ package com.tsubuzaki.circlesgo.ui.unified
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Tab
@@ -72,7 +74,6 @@ fun UnifiedPanel(
         }
     }
 
-    // Check if circle detail is showing (in sheet path stack)
     val isShowingCircleDetail =
         sheetPath.lastOrNull() == UnifiedPath.CIRCLE_DETAIL && selectedCircle != null
 
@@ -81,7 +82,6 @@ fun UnifiedPanel(
             .fillMaxSize()
     ) {
         if (isShowingCircleDetail) {
-            // Circle detail view (pushed on top)
             CircleDetailView(
                 initialCircle = selectedCircle!!,
                 database = database,
@@ -99,7 +99,6 @@ fun UnifiedPanel(
                 visibleHeight = visibleHeight
             )
         } else {
-            // Tab row: Circles / Favorites (latest event only) / Buys
             val tabs = if (isActiveEventLatest) {
                 listOf(UnifiedPath.CIRCLES, UnifiedPath.FAVORITES, UnifiedPath.BUYS)
             } else {
@@ -107,61 +106,72 @@ fun UnifiedPanel(
             }
             val selectedIndex = tabs.indexOf(currentPath).coerceAtLeast(0)
 
-            SecondaryTabRow(
-                selectedTabIndex = selectedIndex,
-                containerColor = Color.Transparent
+            // While the sheet sits below its expanded height the content is
+            // measured against the full sheet height, which would push
+            // vertically centred pages below the visible fold
+            Column(
+                modifier = if (visibleHeight != null) {
+                    Modifier
+                        .fillMaxWidth()
+                        .height(visibleHeight)
+                } else {
+                    Modifier.fillMaxSize()
+                }
             ) {
-                for (tab in tabs) {
-                    Tab(
-                        selected = currentPath == tab,
-                        onClick = {
-                            unifier.setCurrentPath(tab)
-                            if (isMinimized) {
-                                onRequestExpand()
-                            }
-                        },
-                        text = {
-                            Text(
-                                stringResource(
-                                    when (tab) {
-                                        UnifiedPath.FAVORITES -> R.string.tab_favorites
-                                        UnifiedPath.BUYS -> R.string.tab_buys
-                                        else -> R.string.tab_circles
-                                    }
+                SecondaryTabRow(
+                    selectedTabIndex = selectedIndex,
+                    containerColor = Color.Transparent
+                ) {
+                    for (tab in tabs) {
+                        Tab(
+                            selected = currentPath == tab,
+                            onClick = {
+                                unifier.setCurrentPath(tab)
+                                if (isMinimized) {
+                                    onRequestExpand()
+                                }
+                            },
+                            text = {
+                                Text(
+                                    stringResource(
+                                        when (tab) {
+                                            UnifiedPath.FAVORITES -> R.string.tab_favorites
+                                            UnifiedPath.BUYS -> R.string.tab_buys
+                                            else -> R.string.tab_circles
+                                        }
+                                    )
                                 )
-                            )
-                        },
+                            },
+                        )
+                    }
+                }
+
+                when (currentPath) {
+                    UnifiedPath.FAVORITES -> FavoritesView(
+                        database = database,
+                        favorites = favorites,
+                        selections = selections,
+                        unifier = unifier,
+                        favoritesAPI = favoritesAPI,
+                        authenticator = authenticator
+                    )
+
+                    UnifiedPath.BUYS -> BuysView(
+                        database = database,
+                        buysCache = buysCache,
+                        events = events,
+                        selections = selections,
+                        unifier = unifier
+                    )
+
+                    else -> CatalogView(
+                        database = database,
+                        selections = selections,
+                        favorites = favorites,
+                        unifier = unifier,
+                        catalogCache = catalogCache
                     )
                 }
-            }
-
-            // Content based on current path
-            when (currentPath) {
-                UnifiedPath.FAVORITES -> FavoritesView(
-                    database = database,
-                    favorites = favorites,
-                    selections = selections,
-                    unifier = unifier,
-                    favoritesAPI = favoritesAPI,
-                    authenticator = authenticator
-                )
-
-                UnifiedPath.BUYS -> BuysView(
-                    database = database,
-                    buysCache = buysCache,
-                    events = events,
-                    selections = selections,
-                    unifier = unifier
-                )
-
-                // CIRCLES and any unhandled path
-                else -> CatalogView(
-                    database = database,
-                    selections = selections,
-                    favorites = favorites,
-                    unifier = unifier,
-                    catalogCache = catalogCache
-                )
             }
         }
     }

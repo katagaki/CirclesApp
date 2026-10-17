@@ -53,7 +53,6 @@ class FavoritesState {
             favoriteItems: List<UserFavorites.Response.FavoriteItem>,
             database: CatalogDatabase
         ): Map<Int, List<Int>> = withContext(Dispatchers.IO) {
-            // Group favorite items by color, normalizing unknown colors
             val groupedByColor = favoriteItems.groupBy {
                 WebCatalogColor.fromValue(it.favorite.color).value
             }

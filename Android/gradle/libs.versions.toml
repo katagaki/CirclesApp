@@ -1,16 +1,20 @@
 [versions]
 activity-compose = "1.13.0"
 activity-ktx = "1.13.0"
-agp = "9.2.1"
+agp = "9.3.2"
 browser = "1.10.0"
-compose-bom = "2026.05.00"
-core-ktx = "1.18.0"
+compose-bom = "2026.09.00"
+core-ktx = "1.19.0"
 coroutines = "1.11.0"
-kotlin = "2.3.21"
-ktor = "3.4.3"
-lifecycle = "2.10.0"
-material3 = "1.5.0-alpha19"
+firebase-bom = "34.19.0"
+google-services = "4.5.0"
+kotlin = "2.4.20"
+ktor = "3.5.2"
+lifecycle = "2.11.0"
+material3 = "1.5.0-alpha28"
+play-integrity = "1.6.0"
 serialization = "1.11.0"
+tink = "1.18.0"
 
 [libraries]
 # Kotlin & Coroutines
@@ -20,8 +24,23 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 # Ktor (HTTP client)
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
+zxing-core = { module = "com.google.zxing:core", version = "3.5.4" }
+
+# Google Play Services (QR code scanner for Guest Mode)
+play-services-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version = "16.1.0" }
+
+# Play Integrity (device attestation for the relay)
+play-integrity = { module = "com.google.android.play:integrity", version.ref = "play-integrity" }
+
+# Tink (Ed25519 record signatures; the platform only has Ed25519 from API 33)
+tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
+# Firebase
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebase-bom" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 
 # AndroidX Browser (Custom Tabs for OAuth)
 browser = { module = "androidx.browser:browser", version.ref = "browser" }
@@ -47,3 +66,4 @@ material3 = { group = "androidx.compose.material3", name = "material3", version.
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

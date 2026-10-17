@@ -70,7 +70,6 @@ fun MapPopoverLayer(
             val circleIDs = fetcher.circlesWithWebCatalogIDs(popoverData.ids)
             circles = database.circles(circleIDs, reversed = popoverData.reversed)
         }
-        // Set popover position for auto-scroll
         mapper.setPopoverPosition(
             PointF(popoverData.sourceRect.centerX(), popoverData.sourceRect.centerY())
         )
@@ -156,7 +155,6 @@ fun MapPopoverLayer(
                                     style = MaterialTheme.typography.bodyMedium,
                                     maxLines = 2
                                 )
-                                // Favorite memo
                                 val wcIDMappedItems by favorites.wcIDMappedItems.collectAsState()
                                 val favoriteMemo = circle.extendedInformation?.webCatalogID
                                     ?.let { wcIDMappedItems?.get(it) }

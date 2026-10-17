@@ -4,10 +4,6 @@ import com.tsubuzaki.circlesgo.data.local.VisitEntryCache
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-/**
- * Observable wrapper around [VisitEntryCache] so views (circle detail,
- * map visited layer) can react to visit changes.
- */
 class VisitsState(private val cache: VisitEntryCache) {
 
     private val _visits = MutableStateFlow<List<VisitEntryCache.VisitEntry>>(emptyList())
@@ -40,7 +36,6 @@ class VisitsState(private val cache: VisitEntryCache) {
         reload()
     }
 
-    /** Removes every visit entry (sign-out wipe). */
     fun clearAll() {
         cache.clear()
         reload()

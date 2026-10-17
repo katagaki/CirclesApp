@@ -70,7 +70,6 @@ fun FavoritesView(
 
     var isRefreshing by remember { mutableStateOf(false) }
 
-    // Prepare circles when favorite items or selected date changes
     LaunchedEffect(favoriteItems, selectedDate) {
         val items = favoriteItems ?: return@LaunchedEffect
         scope.launch(Dispatchers.IO) {
@@ -79,7 +78,6 @@ fun FavoritesView(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Toolbar row: group by color toggle + display mode toggle
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -122,7 +120,6 @@ fun FavoritesView(
             }
         }
 
-        // Content area; pull to refresh re-syncs favorites from the API
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh = {
@@ -143,7 +140,6 @@ fun FavoritesView(
         ) {
             val circles = favoriteCircles
             if (circles == null) {
-                // Loading or no favorites loaded yet
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -179,8 +175,6 @@ fun FavoritesView(
                 val gridSize by selections.gridSize.collectAsState()
                 val listSize by selections.listSize.collectAsState()
 
-                // Previous/next in the detail view walks the tapped
-                // circle's color group
                 val onSelect: (ComiketCircle) -> Unit = { circle ->
                     val groupIDs = circles.entries
                         .firstOrNull { entry -> entry.value.any { it.id == circle.id } }

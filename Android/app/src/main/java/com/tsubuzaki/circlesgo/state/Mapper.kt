@@ -13,18 +13,15 @@ import kotlinx.coroutines.flow.StateFlow
 class Mapper {
     typealias Layouts = Map<LayoutCatalogMapping, List<Int>>
 
-    // Canvas info
     private val _canvasWidth = MutableStateFlow(0.dp)
     val canvasWidth: StateFlow<Dp> = _canvasWidth
 
     private val _canvasHeight = MutableStateFlow(0.dp)
     val canvasHeight: StateFlow<Dp> = _canvasHeight
 
-    // Layout (interactive) layer
     private val _layouts = MutableStateFlow<Layouts>(emptyMap())
     val layouts: StateFlow<Layouts> = _layouts
 
-    // Popover layer
     val popoverWidth: Float = 240f
     val popoverHeight: Float = (16f * 2) + (65f * 2) + 8f
     val popoverDistance: Float = 8f
@@ -39,7 +36,6 @@ class Mapper {
     private val _scrollToPosition = MutableStateFlow<PointF?>(null)
     val scrollToPosition: StateFlow<PointF?> = _scrollToPosition
 
-    // Highlight layer
     private val _highlightData = MutableStateFlow<HighlightData?>(null)
     val highlightData: StateFlow<HighlightData?> = _highlightData
 

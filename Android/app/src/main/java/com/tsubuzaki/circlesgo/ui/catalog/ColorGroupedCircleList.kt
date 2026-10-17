@@ -30,7 +30,6 @@ fun ColorGroupedCircleList(
     showSpaceName: Boolean = false,
     showDay: Boolean = false,
     showsOverlayWhenEmpty: Boolean = true,
-    /** Shows the Web Catalog color notice above the uncolored group. */
     showUncoloredNotice: Boolean = false,
     onSelect: (ComiketCircle) -> Unit,
     isPrivacyMode: Boolean = false

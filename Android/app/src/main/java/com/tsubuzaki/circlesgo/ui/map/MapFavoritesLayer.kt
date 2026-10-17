@@ -44,7 +44,6 @@ fun MapFavoritesLayer(
         withContext(Dispatchers.IO) {
             val fetcher = DataFetcher(database.getTextDatabase())
 
-            // Build webCatalogID -> layout mapping
             val wcIDToLayout = mutableMapOf<Int, LayoutCatalogMapping>()
             for ((layout, ids) in layouts) {
                 for (id in ids) {
@@ -52,7 +51,6 @@ fun MapFavoritesLayer(
                 }
             }
 
-            // Build layout -> (wcID -> color) mapping
             val layoutFavorites =
                 mutableMapOf<LayoutCatalogMapping, MutableMap<Int, WebCatalogColor?>>()
             for ((layout, ids) in layouts) {
@@ -64,7 +62,6 @@ fun MapFavoritesLayer(
                 layoutFavorites[layout]?.put(wcID, WebCatalogColor.fromValue(item.favorite.color))
             }
 
-            // Get space number suffixes for sorting
             val allWCIDs = layouts.values.flatten().toSet().toList()
             val suffixes = fetcher.spaceNumberSuffixes(allWCIDs)
 
