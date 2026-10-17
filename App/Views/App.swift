@@ -194,6 +194,7 @@ struct CirclesApp: App {
                     unifier.hide()
                 }
             }
+            .circleFinderHandler()
             .onHandLifecycle()
     }
 }

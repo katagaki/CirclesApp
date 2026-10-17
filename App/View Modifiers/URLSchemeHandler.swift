@@ -6,6 +6,7 @@ struct URLSchemeHandlerModifier: ViewModifier {
 
     @Environment(Authenticator.self) var authenticator
     @Environment(Unifier.self) var unifier
+    @Environment(Events.self) var planner
     @Environment(SharedBuysSession.self) var sharedBuys
 
     func body(content: Content) -> some View {
@@ -38,6 +39,8 @@ struct URLSchemeHandlerModifier: ViewModifier {
                     sharedBuys.join(url: url, nickname: sharedBuys.nickname)
                     unifier.current = .buys
                     unifier.expand()
+                } else if handleCircleFinderURL(url) {
+                    return
                 } else if url.scheme == "circles-app" && url.host() == "sixseven" {
                     authenticator.isAuthenticating = true
                 } else if url.scheme == "circles-app" && url.host() == "attach-product-list",
@@ -51,6 +54,31 @@ struct URLSchemeHandlerModifier: ViewModifier {
                     authenticator.getAuthenticationCode(from: url)
                 }
             }
+    }
+}
+
+extension URLSchemeHandlerModifier {
+
+    /// `circles-app://find-circles?text=…` and `circles-app://circle?id=…[&event=…]`.
+    func handleCircleFinderURL(_ url: URL) -> Bool {
+        guard url.scheme == "circles-app",
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return false }
+        let value: (String) -> String? = { name in
+            components.queryItems?.first(where: { $0.name == name })?.value
+        }
+        switch url.host() {
+        case "find-circles":
+            guard let text = value("text"), !text.isEmpty else { return false }
+            CircleFinderRouter.shared.pendingText = text
+        case "circle":
+            guard let circleID = Int(value("id") ?? "") else { return false }
+            CircleFinderRouter.shared.pendingCircle = CircleEntity.identifier(
+                eventNumber: Int(value("event") ?? "") ?? planner.activeEventNumber, circleID: circleID
+            )
+        default:
+            return false
+        }
+        return true
     }
 }
 
