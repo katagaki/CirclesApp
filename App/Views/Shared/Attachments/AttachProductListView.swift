@@ -16,39 +16,46 @@ struct AttachProductListView: View {
     @State var isSaving: Bool = false
     @State var searchTask: Task<Void, Never>?
     @State var isSearching: Bool = false
+    @State var isShowingSuggestions: Bool = false
 
     @Namespace var namespace
 
     var body: some View {
         NavigationStack {
             List {
-                ForEach(searchResults) { circle in
-                    Button {
-                        selectedCircle = circle
-                    } label: {
-                        HStack(spacing: 10.0) {
-                            CircleCutImage(
-                                circle, in: namespace, cutType: .catalog,
-                                showSpaceName: .constant(false), showDay: .constant(false)
-                            )
-                            .frame(width: 70.0, height: 100.0, alignment: .center)
-                            VStack(alignment: .leading, spacing: 5.0) {
-                                Text(circle.circleName)
-                                    .strikethrough(circle: circle)
-                                    .foregroundStyle(selectedCircle?.id == circle.id
-                                                     ? Color.accentColor : .primary)
-                                if circle.penName
-                                    .trimmingCharacters(in: .whitespacesAndNewlines) != "" {
-                                    Text(circle.penName)
-                                        .foregroundStyle(.secondary)
+                Section {
+                    ForEach(searchResults) { circle in
+                        Button {
+                            selectedCircle = circle
+                        } label: {
+                            HStack(spacing: 10.0) {
+                                CircleCutImage(
+                                    circle, in: namespace, cutType: .catalog,
+                                    showSpaceName: .constant(false), showDay: .constant(false)
+                                )
+                                .frame(width: 70.0, height: 100.0, alignment: .center)
+                                VStack(alignment: .leading, spacing: 5.0) {
+                                    Text(circle.circleName)
+                                        .strikethrough(circle: circle)
+                                        .foregroundStyle(selectedCircle?.id == circle.id
+                                                         ? Color.accentColor : .primary)
+                                    if circle.penName
+                                        .trimmingCharacters(in: .whitespacesAndNewlines) != "" {
+                                        Text(circle.penName)
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                Spacer(minLength: 0)
+                                if selectedCircle?.id == circle.id {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(Color.accentColor)
                                 }
                             }
-                            Spacer(minLength: 0)
-                            if selectedCircle?.id == circle.id {
-                                Image(systemName: "checkmark")
-                                    .foregroundStyle(Color.accentColor)
-                            }
                         }
+                    }
+                } header: {
+                    if isShowingSuggestions {
+                        Text("Circles.Attachments.Suggested")
                     }
                 }
                 if hasMoreResults {
@@ -62,7 +69,7 @@ struct AttachProductListView: View {
             }
             .listStyle(.plain)
             .overlay {
-                if searchTerm.trimmingCharacters(in: .whitespaces).count < 2 {
+                if searchResults.isEmpty && searchTerm.trimmingCharacters(in: .whitespaces).count < 2 {
                     ContentUnavailableView(
                         "Circles.Attachments.Search",
                         systemImage: "magnifyingglass",
@@ -90,6 +97,16 @@ struct AttachProductListView: View {
                         dismiss()
                     }
                 }
+                if let selectedCircle {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Circles.Attachments.Open", systemImage: "arrow.up.forward.app") {
+                            CircleFinderRouter.shared.pendingCircle = CircleEntity.identifier(
+                                eventNumber: planner.activeEventNumber, circleID: selectedCircle.id
+                            )
+                            dismiss()
+                        }
+                    }
+                }
             }
             .safeAreaInset(edge: .bottom) {
                 if selectedCircle != nil {
@@ -111,6 +128,9 @@ struct AttachProductListView: View {
         .onAppear {
             isSearching = true
         }
+        .task {
+            await suggestCircles()
+        }
     }
 
     var saveButton: some View {
@@ -131,6 +151,8 @@ struct AttachProductListView: View {
     func performSearch() async {
         let identifiers = await CatalogCache.searchCircles(searchTerm, database: database)
         guard let identifiers else {
+            // Keep what was read from the image until a search replaces it.
+            guard !isShowingSuggestions else { return }
             searchResults = []
             hasMoreResults = false
             return
@@ -141,6 +163,27 @@ struct AttachProductListView: View {
         let circles = database.circles(limited)
         searchResults = circles
         hasMoreResults = hasMore
+        isShowingSuggestions = false
+    }
+
+    /// Product lists usually carry the circle's space, so the circle can often be found
+    /// before anything is typed.
+    func suggestCircles() async {
+        guard let text = await CircleFinder.text(in: imageData) else { return }
+        let fetcher = DataFetcher(database: database.newReadOnlyTextConnection())
+        let identifiers = await fetcher.circles(mentionedIn: text)
+        guard !identifiers.isEmpty, searchTerm.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        let circlesByID = Dictionary(
+            database.circles(Array(identifiers.prefix(10))).map { ($0.id, $0) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        searchResults = identifiers.prefix(10).compactMap { circlesByID[$0] }
+        hasMoreResults = identifiers.count > 10
+        isShowingSuggestions = true
+        if searchResults.count == 1 {
+            selectedCircle = searchResults.first
+        }
+        isSearching = false
     }
 
     func save() {
