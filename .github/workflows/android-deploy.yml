@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'Android/**'
-      - '!Android/Assets/**'
       - '!Android/README.md'
       - '.github/workflows/android-deploy.yml'
   workflow_dispatch:
