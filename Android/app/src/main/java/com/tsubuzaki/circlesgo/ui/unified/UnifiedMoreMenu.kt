@@ -254,7 +254,7 @@ fun UnifiedMoreMenu(
                     val customTabsIntent = CustomTabsIntent.Builder()
                         .setDefaultColorSchemeParams(colorSchemeParams)
                         .build()
-                    customTabsIntent.launchUrl(context, "https://github.com/katagaki/CirclesGo".toUri())
+                    customTabsIntent.launchUrl(context, "https://github.com/katagaki/CirclesApp".toUri())
                 },
                 leadingIcon = {
                     Icon(

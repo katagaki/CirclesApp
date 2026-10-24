@@ -110,7 +110,7 @@ fun GuestMoreMenu(session: SharedBuysSession, onScan: () -> Unit) {
                 text = { Text(stringResource(R.string.link_source_code)) },
                 onClick = {
                     expanded = false
-                    open("https://github.com/katagaki/CirclesGo")
+                    open("https://github.com/katagaki/CirclesApp")
                 }
             )
 
