@@ -1,6 +1,6 @@
 # CirclesGo
 
-CiRCLES for Android, a Jetpack Compose port of [CiRCLES for iOS](https://github.com/katagaki/CirclesApp) (usually checked out at `../CirclesApp`).
+CiRCLES for Android, a Jetpack Compose port of [CiRCLES for iOS](../Apple).
 
 ## Feature parity with iOS
 
@@ -17,4 +17,4 @@ When porting features from the iOS app, the iOS codebase is the reference for be
 - Commit messages are single-line, imperative ("Add X", "Fix Y").
 - User-facing strings are localized in both `values/strings.xml` and `values-ja/strings.xml`.
 - State classes live in `state/`, persisted caches in `data/local/` (SharedPreferences-JSON or files), API clients in `api/`.
-- The favorites color palette (`WebCatalogColor`) mirrors the iOS 18-color palette in `../CirclesApp/RADiUS/WebCatalogColor.swift`.
+- The favorites color palette (`WebCatalogColor`) mirrors the iOS 18-color palette in `../Apple/RADiUS/WebCatalogColor.swift`.
