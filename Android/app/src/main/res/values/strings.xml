@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CiRCLES</string>
+
+    <!-- Login -->
+    <string name="login_title">Welcome to CiRCLES</string>
+    <string name="login_hero_map_title">Navigate Halls</string>
+    <string name="login_hero_map_description">Plan and execute your visit to the Comic Market</string>
+    <string name="login_hero_catalog_title">Browse Circles</string>
+    <string name="login_hero_catalog_description">Browse participating circles without an Internet connection</string>
+    <string name="login_hero_favorites_title">Manage Favorites</string>
+    <string name="login_hero_favorites_description">Assign colors to your favorite circles and easily find them on the day of the Comic Market</string>
+    <string name="login_sign_in_prompt">To use CiRCLES, you will need a Comiket Web Catalog Gold Member subscription.</string>
+    <string name="login_sign_in">Sign In</string>
+    <string name="login_demo_mode">Try Demo Mode</string>
+
+    <!-- Demo Mode -->
+    <string name="demo_unavailable_title">Not Available in Demo</string>
+    <string name="demo_unavailable_message">This feature isn\'t available in demo mode. Sign in with Circle.ms to use it.</string>
+    <string name="demo_unavailable_dismiss">OK</string>
+
+    <!-- Catalog / Search -->
+    <string name="search_circles_placeholder">Search circles…</string>
+    <string name="close_search">Close search</string>
+    <string name="clear">Clear</string>
+    <string name="search_min_characters">Type at least 2 characters to search.</string>
+    <string name="no_filter_selected">Select a hall and filters\nto browse circles.</string>
+    <string name="no_circles_found">No circles found.</string>
+    <string name="no_circles_found_filters">No circles found.\nTry adjusting filters.</string>
+
+    <!-- Circle Detail -->
+    <string name="back">Back</string>
+    <string name="day_format">Day %1$d</string>
+    <string name="description_label">Description</string>
+    <string name="no_description">No description available.</string>
+    <string name="book_name">Book Name</string>
+    <string name="genre_label">Genre</string>
+    <string name="circle_memo">Circle Memo</string>
+    <string name="links">Links</string>
+    <string name="sns_twitter">X/Twitter</string>
+    <string name="sns_pixiv">Pixiv</string>
+    <string name="sns_circlems">Circle.ms</string>
+
+    <!-- Favorites -->
+    <string name="group_by_color">Group by Color</string>
+    <string name="no_favorites_loaded">No favorites loaded.\nSign in and sync to view favorites.</string>
+    <string name="no_favorites_yet">No favorites yet.\nAdd favorites from the web catalog.</string>
+    <string name="add_to_favorites">Add to Favorites</string>
+    <string name="edit_favorite">Edit Favorite</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
+    <string name="save_favorite">Save Favorite</string>
+    <string name="favorite_color">Color</string>
+    <string name="favorite_memo">Memo</string>
+    <string name="favorite_memo_placeholder">Add a memo…</string>
+    <string name="save">Save</string>
+    <string name="remove">Remove</string>
+
+    <!-- Navigation / Tabs -->
+    <string name="tab_circles">Circles</string>
+    <string name="tab_favorites">Favorites</string>
+
+    <!-- Sign Out -->
+    <string name="sign_out">Sign Out</string>
+    <string name="sign_out_confirm_message">Are you sure you want to sign out? All downloaded data will be deleted.</string>
+    <string name="exit_demo_mode">Exit Demo Mode</string>
+    <string name="exit_demo_mode_confirm_message">Are you sure you want to exit demo mode? All demo data will be deleted.</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- More Menu -->
+    <string name="comic_market_format">Comic Market %1$d</string>
+    <string name="more">More</string>
+    <string name="manage_event_data">Manage Event Data</string>
+    <string name="show_genre_overlay">Show Genre Overlay</string>
+    <string name="darken_map_in_dark_mode">Darken Map in Dark Mode</string>
+    <string name="use_high_resolution_maps">Use High Definition Map</string>
+    <string name="show_space_name">Show Space Number</string>
+    <string name="show_day">Show Day</string>
+    <string name="show_web_cuts">Show Web Cuts</string>
+    <string name="privacy_mode">Privacy Mode</string>
+    <string name="link_web_catalog">Comiket Web Catalog</string>
+    <string name="link_official_site">Official Comic Market Site</string>
+    <string name="link_floor_map">Tokyo Big Sight Floor Map</string>
+    <string name="link_source_code">Source Code</string>
+    <string name="link_ios_app">Preview iOS Version</string>
+
+    <!-- Event Data Management -->
+    <string name="event_data_title">Event Data</string>
+    <string name="storage_header">Storage</string>
+    <string name="storage_disclaimer">Comic Market, Circle.ms, and Tokyo Big Sight bear no responsibility for any issues that may arise with this app.</string>
+    <string name="storage_provided_by">Data provided by Comiket Web Catalog</string>
+    <string name="storage_image_cache">Image Cache</string>
+    <string name="storage_other_apps">Other Apps</string>
+    <string name="storage_free">Free</string>
+    <string name="selected_event_header">Selected Event</string>
+    <string name="other_events_header">Other Events</string>
+    <string name="downloaded_indicator">Downloaded</string>
+    <string name="download_event_data">Download event data</string>
+    <string name="delete_event_data">Delete event data</string>
+    <string name="switch_event_title">Change Event?</string>
+    <string name="switch_event_message">The selected event will be changed to Comic Market %1$d.</string>
+    <string name="switch_event_action">Change</string>
+    <string name="download_event_title">Download Event Data?</string>
+    <string name="download_event_message">Approximately %2$s of data will be downloaded for Comic Market %1$d.</string>
+    <string name="download_event_message_unknown_size">Event data for Comic Market %1$d will be downloaded. The download size could not be determined.</string>
+    <string name="download_event_estimating">Checking download size…</string>
+    <string name="download_event_info_failed">Could not retrieve the event data information. Check your connection and try again.</string>
+    <string name="download_action">Download</string>
+    <string name="refresh">Refresh</string>
+
+    <!-- Toolbar Filters -->
+    <string name="genre_filter">Genre</string>
+    <string name="genres_count_format">Genres (%1$d)</string>
+    <string name="block_filter">Block</string>
+    <string name="blocks_count_format">Blocks (%1$d)</string>
+    <string name="all_filter">All</string>
+
+    <!-- Day / Hall Picker -->
+    <string name="no_day">No day</string>
+    <string name="no_hall">No hall</string>
+
+    <!-- Data Loading -->
+    <string name="downloading">Updating Data</string>
+    <string name="downloading_text_database">Downloading text database…</string>
+    <string name="downloading_image_database">Downloading images…</string>
+    <string name="loading_database">Loading data…</string>
+
+    <!-- Toolbar -->
+    <string name="show_catalog">Show catalog</string>
+
+    <!-- Map -->
+    <string name="loading">Loading…</string>
+    <string name="no_map_selected">No map selected</string>
+    <string name="switch_to_list">Switch to List</string>
+    <string name="switch_to_grid">Switch to Grid</string>
+
+    <!-- Buys -->
+    <string name="tab_buys">Buys</string>
+    <string name="buys_section_title">Buys</string>
+    <string name="buys_add_item">Add Item</string>
+    <string name="buys_add_item_shared">Add to shared list</string>
+    <string name="buys_item_name_placeholder">Item name</string>
+    <string name="buys_item_cost_placeholder">Cost</string>
+    <string name="buys_total">Total</string>
+    <string name="buys_grand_total">Grand Total (All Days)</string>
+    <string name="buys_cost_value">%1$d yen</string>
+    <string name="buys_no_buys">No Buys</string>
+    <string name="buys_no_buys_description">Add items you plan to buy from a circle\'s detail page.</string>
+    <string name="buys_no_buys_on_day">No Buys On This Day</string>
+    <string name="buys_no_buys_on_day_description">You have no planned buys for the selected day.</string>
+    <string name="buys_info_title">About Buys</string>
+    <string name="buys_info_description">Track items you plan to buy from each circle. Tap an item to cycle its status: to buy, bought, or cancelled.</string>
+    <string name="buys_edit">Edit</string>
+    <string name="buys_done">Done</string>
+    <string name="buys_delete">Delete</string>
+
+    <!-- Visits -->
+    <string name="mark_visited">Mark Visited</string>
+    <string name="mark_not_visited">Mark Not Visited</string>
+
+    <!-- Circle Detail -->
+    <string name="show_on_map">Show on Map</string>
+    <string name="previous_circle">Previous circle</string>
+    <string name="next_circle">Next circle</string>
+    <string name="first_circle_message">This is the first circle.</string>
+    <string name="last_circle_message">This is the last circle.</string>
+    <string name="ok">OK</string>
+
+    <!-- Attachments -->
+    <string name="attachments_title">Attachments</string>
+    <string name="attachments_add">Add Attachment</string>
+    <string name="attachments_delete">Delete attachment</string>
+
+    <!-- Tags -->
+    <string name="tags_label">Tags</string>
+
+    <!-- Circle Cut Types -->
+    <string name="cut_catalog">Catalog Cut</string>
+    <string name="cut_web">Web Cut</string>
+
+    <!-- Web Catalog Favorites Notice -->
+    <string name="favorites_web_catalog_notice_title">About favorites added from the Web Catalog</string>
+    <string name="favorites_web_catalog_notice_description">Colors chosen from the Web Catalog\'s 18-color palette are not shown correctly in the app. Sorry for the inconvenience, but please select the color again in the app.</string>
+
+    <!-- Display Options -->
+    <string name="display_options">Display options</string>
+    <string name="display_grid">Grid</string>
+    <string name="display_list">List</string>
+    <string name="grid_size_big">Large</string>
+    <string name="grid_size_medium">Medium</string>
+    <string name="grid_size_small">Small</string>
+    <string name="list_style_regular">Regular</string>
+    <string name="list_style_compact">Compact</string>
+    <string name="buys_scope_mine">My Buys</string>
+    <string name="buys_scope_shared">Shared</string>
+    <string name="buys_shared_only_you">Only you so far</string>
+    <string name="buys_shared_with">Shared with %1$s</string>
+    <string name="buys_shared_with_two">Shared with %1$s and %2$s</string>
+    <string name="buys_shared_with_others">Shared with %1$d others</string>
+    <string name="buys_shared_start">Start a shared list</string>
+    <string name="buys_shared_explain">Your own Buys stay private. A shared list is a separate list that everyone in the session can see and edit.</string>
+    <string name="buys_shared_not_started">No shared list</string>
+    <string name="buys_shared_no_items">Nothing in the shared list</string>
+    <string name="buys_shared_no_items_description">Anything a member adds shows up here.</string>
+    <string name="buys_shared_pending">Some changes haven\'t reached everyone yet.</string>
+    <string name="buys_shared_your_share">Your share</string>
+    <string name="buys_shared_group_total">Group total</string>
+    <string name="buys_shared_bought">%1$s bought this</string>
+    <string name="buys_shared_cancelled">%1$s cancelled this</string>
+    <string name="buys_shared_title">Shared list</string>
+    <string name="buys_shared_scan_to_join">Scan this code to join the shared list</string>
+    <string name="buys_shared_members">Members</string>
+    <string name="buys_shared_end">End sharing on this device</string>
+    <string name="buys_shared_remove">Remove</string>
+    <string name="buys_shared_rotate_key">Change join code</string>
+    <string name="buys_shared_rotate_key_explain">Moves everyone still here to a new code. Anyone who only has the old code, or who was removed, can no longer see the list.</string>
+    <string name="buys_shared_you">You</string>
+    <string name="buys_unknown_circle">Unknown circle (ID: %1$d)</string>
+    <!-- Guest Mode -->
+    <string name="guest_leave">Leave This List</string>
+    <string name="login_guest_mode">Join as a Guest</string>
+    <string name="guest_not_joined">Not in a List</string>
+    <string name="guest_not_joined_description">Scan a shared list\'s QR code to see what\'s on it and tick off the things you\'ve bought.</string>
+    <string name="guest_scan">Scan QR Code</string>
+    <string name="guest_scan_unavailable">This device can\'t scan QR codes. Ask whoever shared the list to send you the join link instead.</string>
+    <string name="guest_read_only">As a guest you can tick items off, but not add or edit them.</string>
+    <string name="guest_exit">Exit Guest Mode</string>
+    <string name="guest_exit_title">Exit Guest Mode?</string>
+    <string name="guest_exit_message">You\'ll leave the list you\'re in, and the guest name you were given will be discarded.</string>
+    <string name="guest_leave_title">Leave This List?</string>
+    <string name="guest_leave_message">You\'ll need to scan the QR code again to rejoin.</string>
+    <string name="shared_buys_channel_id" translatable="false">shared_buys</string>
+    <string name="shared_buys_channel_name">Shared Buys</string>
+    <string name="shared_buys_live_done">You\'ve bought everything on your list</string>
+    <string name="shared_buys_live_next">¥%1$d · %2$d of %3$d bought</string>
+    <string name="shared_buys_live_progress">%1$d of %2$d bought</string>
+</resources>

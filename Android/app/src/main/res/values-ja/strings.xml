@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">サークルズ</string>
+
+    <!-- Login -->
+    <string name="login_title">「サークルズ」へようこそ</string>
+    <string name="login_hero_map_title">会場マップ</string>
+    <string name="login_hero_map_description">コミケの前でも、当日でも簡単にマップを見て計画する</string>
+    <string name="login_hero_catalog_title">サークルデータ</string>
+    <string name="login_hero_catalog_description">インターネットに接続できなくても、サークルの情報にアクセスできる</string>
+    <string name="login_hero_favorites_title">お気に入りを管理</string>
+    <string name="login_hero_favorites_description">好きなサークルに色付けて、コミケ当日に簡単に見分ける</string>
+    <string name="login_sign_in_prompt">Circle.msでログインするには、コミケWebカタログ・有料プラン（Gold会員）を契約する必要があります。</string>
+    <string name="login_sign_in">Circle.msでログイン</string>
+    <string name="login_demo_mode">デモモードを試す</string>
+
+    <!-- Demo Mode -->
+    <string name="demo_unavailable_title">デモモードでは利用できません</string>
+    <string name="demo_unavailable_message">この機能はデモモードでは利用できません。ご利用にはCircle.msでログインしてください。</string>
+    <string name="demo_unavailable_dismiss">OK</string>
+
+    <!-- Catalog / Search -->
+    <string name="search_circles_placeholder">サークル名、執筆者名、配布誌名</string>
+    <string name="close_search">検索を閉じる</string>
+    <string name="clear">クリア</string>
+    <string name="search_min_characters">2文字以上入力して検索してください。</string>
+    <string name="no_filter_selected">サークルを閲覧するには、ジャンルまたは棟を選択してください。</string>
+    <string name="no_circles_found">サークルが見つかりませんでした。</string>
+    <string name="no_circles_found_filters">サークルが見つかりませんでした。\nフィルターを調整してみてください。</string>
+
+    <!-- Circle Detail -->
+    <string name="back">戻る</string>
+    <string name="day_format">%1$d日目</string>
+    <string name="description_label">補足説明/サークルアピール</string>
+    <string name="no_description">内容が書かれていません。</string>
+    <string name="book_name">頒布予定の誌名</string>
+    <string name="genre_label">ジャンル</string>
+    <string name="circle_memo">メモ（サークル）</string>
+    <string name="links">リンク</string>
+    <string name="sns_twitter">X（旧Twitter）</string>
+    <string name="sns_pixiv">pixiv</string>
+    <string name="sns_circlems">Circle.msポータル</string>
+
+    <!-- Favorites -->
+    <string name="group_by_color">色でグループ</string>
+    <string name="no_favorites_loaded">お気に入りがありません。\nログインして同期すると表示されます。</string>
+    <string name="no_favorites_yet">お気に入りがありません。\nサークルをお気に入りに追加すると、この画面に表示されます。</string>
+    <string name="add_to_favorites">お気に入りに追加</string>
+    <string name="edit_favorite">お気に入りを編集</string>
+    <string name="remove_from_favorites">お気に入りから削除</string>
+    <string name="save_favorite">お気に入りを保存</string>
+    <string name="favorite_color">色</string>
+    <string name="favorite_memo">メモ</string>
+    <string name="favorite_memo_placeholder">メモを入力…</string>
+    <string name="save">保存</string>
+    <string name="remove">削除</string>
+
+    <!-- Navigation / Tabs -->
+    <string name="tab_circles">サークル</string>
+    <string name="tab_favorites">お気に入り</string>
+
+    <!-- Sign Out -->
+    <string name="sign_out">ログアウト</string>
+    <string name="sign_out_confirm_message">ログアウトしますか？再度ログインすると、マップとサークルデータのダウンロードが再度行われます。</string>
+    <string name="exit_demo_mode">デモモードを終了</string>
+    <string name="exit_demo_mode_confirm_message">デモモードを終了しますか？デモデータはすべて削除されます。</string>
+    <string name="cancel">キャンセル</string>
+
+    <!-- More Menu -->
+    <string name="comic_market_format">コミックマーケット%1$d</string>
+    <string name="more">その他</string>
+    <string name="manage_event_data">イベントデータを管理</string>
+    <string name="show_genre_overlay">ジャンルを表示</string>
+    <string name="darken_map_in_dark_mode">ダークモードに従う</string>
+    <string name="use_high_resolution_maps">高解像度マップを使用</string>
+    <string name="show_space_name">スペース番号を表示</string>
+    <string name="show_day">開催日を表示</string>
+    <string name="show_web_cuts">ウェブ版画像を表示</string>
+    <string name="link_web_catalog">コミケWebカタログ</string>
+    <string name="link_official_site">コミックマーケット公式サイト</string>
+    <string name="link_floor_map">東京ビッグサイト フロアマップ</string>
+    <string name="link_source_code">ソースコード</string>
+    <string name="link_ios_app">iOS版をプレビュー</string>
+
+    <!-- Event Data Management -->
+    <string name="event_data_title">イベントデータ</string>
+    <string name="storage_header">ストレージ</string>
+    <string name="storage_disclaimer">本アプリの不具合について、コミケット、Circle.ms、東京ビッグサイトは責任を一切負いません。</string>
+    <string name="storage_provided_by">データ提供元：コミケWebカタログ</string>
+    <string name="storage_image_cache">画像キャッシュ</string>
+    <string name="storage_other_apps">その他のアプリ</string>
+    <string name="storage_free">空き容量</string>
+    <string name="selected_event_header">選択されたイベント</string>
+    <string name="other_events_header">その他のイベント</string>
+    <string name="downloaded_indicator">ダウンロード済み</string>
+    <string name="download_event_data">イベントデータをダウンロード</string>
+    <string name="delete_event_data">イベントデータを削除</string>
+    <string name="switch_event_title">イベントを切り替えますか？</string>
+    <string name="switch_event_message">選択中のイベントを「コミックマーケット%1$d」に切り替えます。</string>
+    <string name="switch_event_action">切り替え</string>
+    <string name="download_event_title">イベントデータをダウンロードしますか？</string>
+    <string name="download_event_message">「コミックマーケット%1$d」のデータ（約%2$s）をダウンロードします。</string>
+    <string name="download_event_message_unknown_size">「コミックマーケット%1$d」のデータをダウンロードします。データサイズを取得できませんでした。</string>
+    <string name="download_event_estimating">ダウンロードサイズを確認中…</string>
+    <string name="download_event_info_failed">イベントデータの情報を取得できませんでした。通信環境を確認して、もう一度お試しください。</string>
+    <string name="download_action">ダウンロード</string>
+    <string name="refresh">更新</string>
+
+    <!-- Toolbar Filters -->
+    <string name="privacy_mode">プライバシーモード</string>
+    <string name="genre_filter">ジャンル</string>
+    <string name="genres_count_format">ジャンル（%1$d）</string>
+    <string name="block_filter">ブロック</string>
+    <string name="blocks_count_format">ブロック（%1$d）</string>
+    <string name="all_filter">リセット</string>
+
+    <!-- Day / Hall Picker -->
+    <string name="no_day">開催日なし</string>
+    <string name="no_hall">棟なし</string>
+
+    <!-- Toolbar -->
+    <string name="loading_database">データを読み込み中…</string>
+    <string name="show_catalog">カタログを表示</string>
+
+    <!-- Map -->
+    <string name="loading">読み込み中…</string>
+    <string name="no_map_selected">表示できるマップがありません</string>
+    <string name="downloading">データ更新中</string>
+    <string name="downloading_text_database">イベントデータをダウンロード中…</string>
+    <string name="downloading_image_database">画像データをダウンロード中…</string>
+    <string name="switch_to_list">リスト表示に切り替える</string>
+    <string name="switch_to_grid">グリッド表示に切り替える</string>
+
+    <!-- Buys -->
+    <string name="tab_buys">買い物</string>
+    <string name="buys_section_title">買い物リスト</string>
+    <string name="buys_add_item">アイテムを追加</string>
+    <string name="buys_add_item_shared">共同購入リストに追加</string>
+    <string name="buys_item_name_placeholder">アイテム名</string>
+    <string name="buys_item_cost_placeholder">金額</string>
+    <string name="buys_total">合計</string>
+    <string name="buys_grand_total">総合計(全日程)</string>
+    <string name="buys_cost_value">%1$d円</string>
+    <string name="buys_no_buys">買い物リストがありません</string>
+    <string name="buys_no_buys_description">サークルの詳細ページから購入予定のアイテムを追加できます。</string>
+    <string name="buys_no_buys_on_day">この日の買い物はありません</string>
+    <string name="buys_no_buys_on_day_description">選択中の日に購入予定のアイテムはありません。</string>
+    <string name="buys_info_title">買い物リストについて</string>
+    <string name="buys_info_description">各サークルで購入予定のアイテムを管理できます。アイテムをタップすると「購入予定」「購入済み」「キャンセル」の順に切り替わります。</string>
+    <string name="buys_edit">編集</string>
+    <string name="buys_done">完了</string>
+    <string name="buys_delete">削除</string>
+
+    <!-- Visits -->
+    <string name="mark_visited">訪問済みにする</string>
+    <string name="mark_not_visited">未訪問にする</string>
+
+    <!-- Circle Detail -->
+    <string name="show_on_map">マップで表示</string>
+    <string name="previous_circle">前のサークル</string>
+    <string name="next_circle">次のサークル</string>
+    <string name="first_circle_message">最初のサークルです。</string>
+    <string name="last_circle_message">最後のサークルです。</string>
+    <string name="ok">OK</string>
+
+    <!-- Attachments -->
+    <string name="attachments_title">添付ファイル</string>
+    <string name="attachments_add">添付ファイルを追加</string>
+    <string name="attachments_delete">添付ファイルを削除</string>
+
+    <!-- Tags -->
+    <string name="tags_label">タグ</string>
+
+    <!-- Circle Cut Types -->
+    <string name="cut_catalog">カタログカット</string>
+    <string name="cut_web">Webカット</string>
+
+    <!-- Web Catalog Favorites Notice -->
+    <string name="favorites_web_catalog_notice_title">Webカタログからの登録について</string>
+    <string name="favorites_web_catalog_notice_description">Webカタログの18色を選択した場合、アプリ内では正しく表示されません。お手数ですが、再度アプリで色を選択してください。</string>
+
+    <!-- Display Options -->
+    <string name="display_options">表示オプション</string>
+    <string name="display_grid">グリッド</string>
+    <string name="display_list">リスト</string>
+    <string name="grid_size_big">大</string>
+    <string name="grid_size_medium">中</string>
+    <string name="grid_size_small">小</string>
+    <string name="list_style_regular">標準</string>
+    <string name="list_style_compact">コンパクト</string>
+    <string name="buys_scope_mine">自分</string>
+    <string name="buys_scope_shared">共同購入</string>
+    <string name="buys_shared_only_you">まだあなただけです</string>
+    <string name="buys_shared_with">%1$sが参加中</string>
+    <string name="buys_shared_with_two">%1$s・%2$sが参加中</string>
+    <string name="buys_shared_with_others">他%1$d人が参加中</string>
+    <string name="buys_shared_start">共同購入リストを作成</string>
+    <string name="buys_shared_explain">自分の宝物リストは非公開のままです。共同購入リストは、参加者全員が見て編集できる別のリストです。</string>
+    <string name="buys_shared_not_started">共同購入リストがありません</string>
+    <string name="buys_shared_no_items">共同購入リストに頒布品がありません</string>
+    <string name="buys_shared_no_items_description">参加者の誰かが追加すると、ここに表示されます。</string>
+    <string name="buys_shared_pending">まだ全員に届いていない変更があります。</string>
+    <string name="buys_shared_your_share">あなたの分</string>
+    <string name="buys_shared_group_total">全員の合計</string>
+    <string name="buys_shared_bought">%1$sが購入しました</string>
+    <string name="buys_shared_cancelled">%1$sがキャンセルしました</string>
+    <string name="buys_shared_title">共同購入リスト</string>
+    <string name="buys_shared_scan_to_join">このQRコードを読み取ると、共同購入リストに参加できます</string>
+    <string name="buys_shared_members">参加者</string>
+    <string name="buys_shared_end">共同購入リストから退出</string>
+    <string name="buys_shared_remove">外す</string>
+    <string name="buys_shared_rotate_key">参加コードを変更</string>
+    <string name="buys_shared_rotate_key_explain">残っているメンバー全員を新しいコードに移します。古いコードしか持っていない人や外された人は、リストを見られなくなります。</string>
+    <string name="buys_shared_you">あなた</string>
+    <string name="buys_unknown_circle">不明なサークル（ID：%1$d）</string>
+    <!-- Guest Mode -->
+    <string name="guest_leave">このリストから退出</string>
+    <string name="login_guest_mode">ゲストとして参加</string>
+    <string name="guest_not_joined">リストに参加していません</string>
+    <string name="guest_not_joined_description">共同購入リストのQRコードを読み取ると、リストの中身を見て、買えたものにチェックを付けられます。</string>
+    <string name="guest_scan">QRコードを読み取る</string>
+    <string name="guest_scan_unavailable">この端末はQRコードの読み取りに対応していません。リストを共有した人に参加用リンクを送ってもらってください。</string>
+    <string name="guest_read_only">ゲストは品物にチェックを付けられますが、追加や編集はできません。</string>
+    <string name="guest_exit">ゲストモードを終了</string>
+    <string name="guest_exit_title">ゲストモードを終了しますか？</string>
+    <string name="guest_exit_message">参加中のリストから退出し、ゲスト用の名前も破棄されます。</string>
+    <string name="guest_leave_title">リストから退出しますか？</string>
+    <string name="guest_leave_message">もう一度参加するには、QRコードを読み取り直す必要があります。</string>
+    <string name="shared_buys_channel_name">宝物の共同購入リスト</string>
+    <string name="shared_buys_live_done">担当分はすべて完了しました</string>
+    <string name="shared_buys_live_next">¥%1$d・%2$d/%3$d 購入済み</string>
+    <string name="shared_buys_live_progress">%1$d/%2$d 購入済み</string>
+</resources>

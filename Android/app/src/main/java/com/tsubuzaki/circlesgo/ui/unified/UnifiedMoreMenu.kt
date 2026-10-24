@@ -1,0 +1,325 @@
+package com.tsubuzaki.circlesgo.ui.unified
+
+import androidx.browser.customtabs.CustomTabColorSchemeParams
+import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.outlined.CalendarMonth
+import androidx.compose.material.icons.outlined.Code
+import androidx.compose.material.icons.outlined.DarkMode
+import androidx.compose.material.icons.outlined.Hd
+import androidx.compose.material.icons.outlined.PhoneIphone
+import androidx.compose.material.icons.outlined.Storage
+import androidx.compose.material.icons.outlined.TableRestaurant
+import androidx.compose.material.icons.outlined.TheaterComedy
+import androidx.compose.material.icons.outlined.Web
+import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.core.net.toUri
+import com.tsubuzaki.circlesgo.R
+import com.tsubuzaki.circlesgo.state.Unifier
+import com.tsubuzaki.circlesgo.state.UserSelections
+import com.tsubuzaki.circlesgo.ui.shared.LocalDemoMode
+import java.util.Locale
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun UnifiedMoreMenu(
+    unifier: Unifier,
+    selections: UserSelections
+) {
+    val context = LocalContext.current
+    val primaryColor = MaterialTheme.colorScheme.primary.toArgb()
+    var expanded by remember { mutableStateOf(false) }
+    val showGenreOverlay by selections.showGenreOverlay.collectAsState()
+
+    Box {
+        IconButton(
+            onClick = { expanded = true },
+        ) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.more)
+            )
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.manage_event_data)) },
+                onClick = {
+                    expanded = false
+                    unifier.setIsEventDataPresenting(true)
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Storage,
+                        contentDescription = null
+                    )
+                }
+            )
+
+            HorizontalDivider()
+
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_genre_overlay)) },
+                onClick = { selections.setShowGenreOverlay(!showGenreOverlay) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.TheaterComedy,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = showGenreOverlay,
+                        onCheckedChange = { selections.setShowGenreOverlay(it) }
+                    )
+                }
+            )
+
+            val darkenMapInDarkMode by selections.darkenMapInDarkMode.collectAsState()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.darken_map_in_dark_mode)) },
+                onClick = { selections.setDarkenMapInDarkMode(!darkenMapInDarkMode) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.DarkMode,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = darkenMapInDarkMode,
+                        onCheckedChange = { selections.setDarkenMapInDarkMode(it) }
+                    )
+                }
+            )
+
+            val useHighResolutionMaps by selections.useHighResolutionMaps.collectAsState()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.use_high_resolution_maps)) },
+                onClick = { selections.setUseHighResolutionMaps(!useHighResolutionMaps) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Hd,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = useHighResolutionMaps,
+                        onCheckedChange = { selections.setUseHighResolutionMaps(it) }
+                    )
+                }
+            )
+
+            HorizontalDivider()
+
+            val showWebCuts by selections.showWebCuts.collectAsState()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_web_cuts)) },
+                onClick = { selections.setShowWebCuts(!showWebCuts) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Web,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = showWebCuts,
+                        onCheckedChange = { selections.setShowWebCuts(it) }
+                    )
+                }
+            )
+            val showSpaceName by selections.showSpaceName.collectAsState()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_space_name)) },
+                onClick = { selections.setShowSpaceName(!showSpaceName) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.TableRestaurant,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = showSpaceName,
+                        onCheckedChange = { selections.setShowSpaceName(it) }
+                    )
+                }
+            )
+            val showDay by selections.showDay.collectAsState()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.show_day)) },
+                onClick = { selections.setShowDay(!showDay) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.CalendarMonth,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = showDay,
+                        onCheckedChange = { selections.setShowDay(it) }
+                    )
+                }
+            )
+
+            HorizontalDivider()
+
+            // Links; Japanese users get the JP web catalog and floor map,
+            // everyone else the English variants
+            val isJapanese = Locale.getDefault().language == Locale.JAPANESE.language
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.link_web_catalog)) },
+                onClick = {
+                    expanded = false
+                    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(primaryColor)
+                        .build()
+                    val customTabsIntent = CustomTabsIntent.Builder()
+                        .setDefaultColorSchemeParams(colorSchemeParams)
+                        .build()
+                    val url = if (isJapanese) {
+                        "https://webcatalog.circle.ms"
+                    } else {
+                        "https://int.webcatalog.circle.ms/en/catalog"
+                    }
+                    customTabsIntent.launchUrl(context, url.toUri())
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.link_official_site)) },
+                onClick = {
+                    expanded = false
+                    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(primaryColor)
+                        .build()
+                    val customTabsIntent = CustomTabsIntent.Builder()
+                        .setDefaultColorSchemeParams(colorSchemeParams)
+                        .build()
+                    customTabsIntent.launchUrl(context, "https://comiket.co.jp".toUri())
+                }
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.link_floor_map)) },
+                onClick = {
+                    expanded = false
+                    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(primaryColor)
+                        .build()
+                    val customTabsIntent = CustomTabsIntent.Builder()
+                        .setDefaultColorSchemeParams(colorSchemeParams)
+                        .build()
+                    val url = if (isJapanese) {
+                        "https://www.bigsight.jp/visitor/floormap/"
+                    } else {
+                        "https://www.bigsight.jp/english/visitor/floormap/"
+                    }
+                    customTabsIntent.launchUrl(context, url.toUri())
+                }
+            )
+
+            HorizontalDivider()
+
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.link_source_code)) },
+                onClick = {
+                    expanded = false
+                    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(primaryColor)
+                        .build()
+                    val customTabsIntent = CustomTabsIntent.Builder()
+                        .setDefaultColorSchemeParams(colorSchemeParams)
+                        .build()
+                    customTabsIntent.launchUrl(context, "https://github.com/katagaki/CirclesGo".toUri())
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Code,
+                        contentDescription = null
+                    )
+                },
+            )
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.link_ios_app)) },
+                onClick = {
+                    expanded = false
+                    val colorSchemeParams = CustomTabColorSchemeParams.Builder()
+                        .setToolbarColor(primaryColor)
+                        .build()
+                    val customTabsIntent = CustomTabsIntent.Builder()
+                        .setDefaultColorSchemeParams(colorSchemeParams)
+                        .build()
+                    customTabsIntent.launchUrl(
+                        context,
+                        "https://apps.apple.com/app/id6504527248".toUri()
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.PhoneIphone,
+                        contentDescription = null
+                    )
+                },
+            )
+
+            HorizontalDivider()
+
+            val isPrivacyMode by selections.isPrivacyMode.collectAsState()
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.privacy_mode)) },
+                onClick = { selections.setIsPrivacyMode(!isPrivacyMode) },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.VisibilityOff,
+                        contentDescription = null
+                    )
+                },
+                trailingIcon = {
+                    Switch(
+                        checked = isPrivacyMode,
+                        onCheckedChange = { selections.setIsPrivacyMode(it) }
+                    )
+                }
+            )
+
+            val isDemoMode = LocalDemoMode.current
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        stringResource(
+                            if (isDemoMode) R.string.exit_demo_mode else R.string.sign_out
+                        )
+                    )
+                },
+                onClick = {
+                    expanded = false
+                    unifier.setIsGoingToSignOut(true)
+                },
+            )
+        }
+    }
+}

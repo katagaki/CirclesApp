@@ -1,0 +1,136 @@
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.google.services)
+}
+
+fun loadProperties(filename: String): Map<String, String> {
+    val properties = mutableMapOf<String, String>()
+    val file = rootProject.file(filename)
+    if (file.exists()) {
+        file.reader().use { reader ->
+            reader.buffered().forEachLine { line ->
+                if (!line.startsWith("#") && line.contains("=")) {
+                    val (key, value) = line.split("=", limit = 2)
+                    properties[key.trim()] = value.trim()
+                }
+            }
+        }
+    }
+    return properties
+}
+
+fun playProjectNumber(): String {
+    val file = file("google-services.json")
+    if (!file.exists()) return ""
+    return Regex("\"project_number\"\\s*:\\s*\"(\\d+)\"")
+        .find(file.readText())?.groupValues?.get(1) ?: ""
+}
+
+android {
+    namespace = "com.tsubuzaki.circlesgo"
+    compileSdk = 37
+
+    defaultConfig {
+        applicationId = "com.tsubuzaki.circlesgo"
+        minSdk = 26
+        targetSdk = 37
+        versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 5
+        versionName = "109.1"
+        buildConfigField("String", "PLAY_PROJECT_NUMBER", "\"${playProjectNumber()}\"")
+    }
+
+    signingConfigs {
+        create("release") {
+            val localProperties = loadProperties("local.properties")
+            storeFile = localProperties["signing.storeFile"]?.let { file(it) }
+            storePassword = localProperties["signing.storePassword"]
+            keyAlias = localProperties["signing.keyAlias"]
+            keyPassword = localProperties["signing.keyPassword"]
+        }
+    }
+
+    buildTypes {
+        debug {
+            isDebuggable = true
+            buildConfigField("String", "CIRCLEMS_AUTH_ENDPOINT", "\"https://auth1.circle.ms\"")
+            buildConfigField("String", "CIRCLEMS_API_ENDPOINT", "\"https://api1.circle.ms\"")
+        }
+        release {
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            signingConfig = signingConfigs.getByName("release")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            buildConfigField("String", "CIRCLEMS_AUTH_ENDPOINT", "\"https://auth1.circle.ms\"")
+            buildConfigField("String", "CIRCLEMS_API_ENDPOINT", "\"https://api1.circle.ms\"")
+        }
+    }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
+    }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
+}
+
+kotlin {
+    jvmToolchain(17)
+}
+
+dependencies {
+    // Kotlin & Coroutines
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.serialization.json)
+
+    // Ktor HTTP client
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
+    implementation(libs.ktor.client.websockets)
+    implementation(libs.zxing.core)
+    implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+
+    // Google Play Services (QR code scanner for Guest Mode)
+    implementation(libs.play.services.code.scanner)
+
+    // Play Integrity (device attestation for the relay)
+    implementation(libs.play.integrity)
+
+    // Tink (per-device record signatures)
+    implementation(libs.tink.android)
+
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+
+    // AndroidX Browser (Custom Tabs)
+    implementation(libs.browser)
+
+    // AndroidX Core
+    implementation(libs.core.ktx)
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
+
+    // Compose
+    implementation(libs.activity.compose)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.material3.adaptive)
+    implementation(libs.compose.material3.adaptive.layout)
+    implementation(libs.compose.material3.adaptive.navigation)
+    implementation(libs.compose.material.icons.extended)
+    implementation(libs.activity.ktx)
+    implementation(libs.material3)
+}

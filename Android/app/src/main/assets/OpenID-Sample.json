@@ -1,0 +1,5 @@
+{
+  "client_id": "xxxxx",
+  "client_secret": "xxxxx",
+  "redirect_url": "circles-app://"
+}

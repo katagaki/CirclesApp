@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Same exclusion as backup_rules.xml, for Android 12 and later. -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="shared_buys.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="shared_buys.xml" />
+    </device-transfer>
+</data-extraction-rules>

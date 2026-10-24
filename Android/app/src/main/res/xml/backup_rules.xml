@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    The shared buys snapshot holds the room key, this device's relay key and its change
+    counter. Restored onto another phone it would speak as this device from a stale
+    counter, and the relay silently drops every change that reuses a sequence number.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="shared_buys.xml" />
+</full-backup-content>
