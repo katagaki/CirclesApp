@@ -7,17 +7,16 @@ Store-and-forward relay for the shared Buys feature of the CiRCLES apps: one Clo
 ```bash
 npm install && npm test
 npm run dev
-npx wrangler deploy --env staging
-npx wrangler deploy --env production
+npm run deploy
 ```
 
-CI deploys on published GitHub Releases: a prerelease goes to staging, a full release to production, using a `CLOUDFLARE_API_TOKEN` secret scoped to Edit Cloudflare Workers. App Attest and Play Integrity are verified before any room is accessed. Room and device HMACs are verified before the WebSocket is accepted; refused upgrades return an HTTP error with `{ t: "err", c, m }`, and there are no pending unauthenticated sockets. Room keys arrive from clients at runtime and live only in each object's storage, but the push path (below) does need Worker secrets.
+There is one relay, `circles-relay`, served at `circles.ktgk.app`. Cloudflare Workers Builds deploys it from `main` whenever `Relay/` changes, after `npm ci && npm run typecheck && npm test` passes; other branches only upload a preview version. Local app builds point at `npm run dev` with attestation turned off in `.dev.vars` (see below), since development-signed builds cannot pass App Attest against production. App Attest and Play Integrity are verified before any room is accessed. Room and device HMACs are verified before the WebSocket is accepted; refused upgrades return an HTTP error with `{ t: "err", c, m }`, and there are no pending unauthenticated sockets. Room keys arrive from clients at runtime and live only in each object's storage, but the push path (below) does need Worker secrets.
 
 ## Push wake-ups
 
 A member whose app is suspended is woken with a content-free push so it can reconnect and catch up. The relay never sees plaintext, so it never composes the notification body. Tokens ride in on `hello` and expire with the room.
 
-Secrets, set per environment with `npx wrangler secret put NAME --env staging` (and again for `--env production`), or in a gitignored `.dev.vars` for `wrangler dev`:
+Secrets, set with `npx wrangler secret put NAME`, or in a gitignored `.dev.vars` for `wrangler dev`:
 
 | Secret | Where it comes from |
 | --- | --- |
@@ -70,6 +69,6 @@ The plain vars are `APP_ATTEST_TEAM_ID`, `APP_ATTEST_BUNDLE_ID`, `APP_ATTEST_ENV
 
 Both clients send the hello in `X-Circles-Hello` instead of sending it as the first WebSocket message. Each header decodes to at most 16 KiB. Missing or invalid attestation returns HTTP 403, and more than 30 attestation checks a minute from one IP (`ATTEST_LIMITER`) returns HTTP 429, both before the room namespace is accessed. A bad or stale hello and invalid room/device credentials return HTTP 401 or another error before any socket is accepted; clients only discard attestation state on 403. Accepted sockets receive `held` followed by `ops` immediately.
 
-The `v2` migration adds the `IDENTITY` binding and SQLite-backed `Identity` class in both environments. Identity objects store App Attest enrollment and monotonically increasing assertion counters independently of rooms; only a verified enrollment is persisted, and enrollment of the same key is refused. Play Integrity tokens are decoded once before room routing.
+The `v2` migration adds the `IDENTITY` binding and SQLite-backed `Identity` class. Identity objects store App Attest enrollment and monotonically increasing assertion counters independently of rooms; only a verified enrollment is persisted, and enrollment of the same key is refused. Play Integrity tokens are decoded once before room routing.
 
 Deploy the updated clients together with the relay protocol change. Existing iOS installations reset their old key on the first HTTP 401 and enroll a fresh key on retry. Old clients that send hello after opening a socket are rejected. Local development overrides remain limited to loopback hosts.
