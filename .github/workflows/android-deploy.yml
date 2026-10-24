@@ -4,15 +4,20 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - 'Assets/**'
-      - 'README.md'
+    paths:
+      - 'Android/**'
+      - '!Android/Assets/**'
+      - '!Android/README.md'
+      - '.github/workflows/android-deploy.yml'
   workflow_dispatch:
 
 jobs:
   deploy:
     name: Build and deploy to internal track
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Android
 
     steps:
       - name: Checkout code
@@ -51,10 +56,10 @@ jobs:
           signing.keyPassword=${{ secrets.KEY_PASSWORD }}
           EOF
 
+      # Run numbers restarted when this workflow moved from CirclesGo, whose last upload was run 41
       - name: Build release AAB
-        env:
-          VERSION_CODE: ${{ github.run_number }}
         run: >
+          VERSION_CODE=$((GITHUB_RUN_NUMBER + 41))
           ./gradlew bundleRelease
           -Porg.gradle.java.installations.fromEnv=JAVA_HOME_17_X64,JAVA_HOME_21_X64
           -Porg.gradle.java.installations.auto-download=false
@@ -64,6 +69,6 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: com.tsubuzaki.circlesgo
-          releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          releaseFiles: Android/app/build/outputs/bundle/release/app-release.aab
           tracks: internal
           status: completed
