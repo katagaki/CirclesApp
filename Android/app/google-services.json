@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "196250156654",
-    "project_id": "circles-808af",
-    "storage_bucket": "circles-808af.firebasestorage.app"
+    "project_number": "459092645068",
+    "project_id": "circles-for-android",
+    "storage_bucket": "circles-for-android.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:196250156654:android:0fd7db83c62720e9c2307f",
+        "mobilesdk_app_id": "1:459092645068:android:cbed1a498ac4c7ff39de69",
         "android_client_info": {
           "package_name": "com.tsubuzaki.circlesgo"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAScmlFOlVOYal8TMQ9i7sVb_DvBHa1G5c"
+          "current_key": "AIzaSyAEWNKLMgM_Z1pBkwv0QtN49OzrSS8nGRY"
         }
       ],
       "services": {
