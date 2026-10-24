@@ -9,7 +9,7 @@ export { Room, Identity };
 export { ATTEST_HEADER, HELLO_HEADER } from "./admission";
 
 const ROOM_PATH = /^\/r\/([0-9a-f]{32})$/;
-const HOMEPAGE = "https://github.com/katagaki/CirclesRelay";
+const HOMEPAGE = "https://github.com/katagaki/CirclesApp";
 
 export interface Env extends PushEnv, AttestEnv {
   ROOM: DurableObjectNamespace<Room>;
