@@ -35,3 +35,20 @@
 1. Commit after every change that builds/runs.
 2. No comments in code, except when absolutely necessary to explain a hack or workaround.
 3. Keep code simple where possible.
+
+## Android
+
+Android/ is a Jetpack Compose port of the iOS app. When porting features, the iOS codebase is the reference for behavior, data models, and visuals. However, the following iOS features are **intentionally not implemented on Android** — do not port them:
+
+- **My view** (circle.ms profile + participation planning)
+- **Licenses / attributions view**
+- **Share extension** (iOS-only concept)
+- **Manual offline mode toggle** — Android handles offline automatically via reachability
+- **TipKit tips and App Store review prompts** (iOS platform features)
+
+Conventions:
+
+- Commit messages are imperative ("Add X", "Fix Y").
+- User-facing strings are localized in both `values/strings.xml` and `values-ja/strings.xml`.
+- State classes live in `state/`, persisted caches in `data/local/` (SharedPreferences-JSON or files), API clients in `api/`.
+- The favorites color palette (`WebCatalogColor`) mirrors the iOS 18-color palette in `Apple/RADiUS/WebCatalogColor.swift`.
