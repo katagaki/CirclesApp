@@ -2,6 +2,7 @@ package com.tsubuzaki.circlesgo.sharedbuys
 
 import android.content.Context
 import android.net.Uri
+import com.tsubuzaki.circlesgo.BuildConfig
 import com.tsubuzaki.circlesgo.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -17,7 +18,8 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
 
     private val store = SharedBuysStore(context)
     private val relay = SharedBuysRelay(context, scope)
-    private val bluetooth = SharedBuysBluetooth(context)
+    private val bluetooth =
+        if (BuildConfig.SHARED_BUYS_BLUETOOTH) SharedBuysBluetooth(context) else null
     private val json = Json { ignoreUnknownKeys = true; explicitNulls = false }
 
     var status by mutableStateOf("idle")
@@ -323,7 +325,7 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
         reconnectJob = null
         flushJob?.cancel()
         flushJob = null
-        bluetooth.stop()
+        bluetooth?.stop()
         relay.close()
     }
 
@@ -456,7 +458,7 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
         flushJob?.cancel()
         flushJob = null
         outbox.clear()
-        bluetooth.stop()
+        bluetooth?.stop()
         bluetoothPeers = 0
         relay.disconnect()
         sessionKey = null
@@ -498,7 +500,7 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
     fun startBluetooth() {
         if (!isBluetoothEnabled) return
         val key = sessionKey ?: return
-        bluetooth.start(key, SharedBuysDigest.bytes(bluetoothDigestVector)) { event ->
+        bluetooth?.start(key, SharedBuysDigest.bytes(bluetoothDigestVector)) { event ->
             when (event) {
                 is BluetoothEvent.PeerCount -> {
                     bluetoothPeers = event.count
@@ -513,12 +515,12 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
     }
 
     fun stopBluetooth() {
-        bluetooth.stop()
+        bluetooth?.stop()
         bluetoothPeers = 0
         wantedPeers.clear()
     }
 
-    fun missingBluetoothPermissions(): List<String> = bluetooth.missingPermissions()
+    fun missingBluetoothPermissions(): List<String> = bluetooth?.missingPermissions().orEmpty()
 
     /**
      * Opens the exchange on a link we connected, unless the peer is already level.
@@ -550,7 +552,7 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
      */
     private fun sendWant(peer: BluetoothPeer) {
         wantedPeers.add(peer)
-        SharedBuysWire.wantFrames(versionVector).forEach { bluetooth.send(it, peer) }
+        SharedBuysWire.wantFrames(versionVector).forEach { bluetooth?.send(it, peer) }
     }
 
     private fun handleBluetooth(payload: ByteArray, peer: BluetoothPeer) {
@@ -576,7 +578,7 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
         val room = roomId ?: return
         val records = eligible.mapNotNull { seal(it, key, room) }
         if (records.isEmpty()) return
-        SharedBuysWire.changeFrames(records).forEach { bluetooth.send(it, peer) }
+        SharedBuysWire.changeFrames(records).forEach { bluetooth?.send(it, peer) }
     }
 
     fun runSelfTest() {
@@ -845,7 +847,7 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
         persist()
         seal(change, key, room)?.let { if (!isRekeying) enqueue(it) }
         sendOverBluetooth(listOf(change))
-        bluetooth.update(SharedBuysDigest.bytes(bluetoothDigestVector))
+        bluetooth?.update(SharedBuysDigest.bytes(bluetoothDigestVector))
         return change
     }
 
@@ -1066,7 +1068,7 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
         if (added.isNotEmpty()) {
             invalidateFold()
             persist()
-            bluetooth.update(SharedBuysDigest.bytes(bluetoothDigestVector))
+            bluetooth?.update(SharedBuysDigest.bytes(bluetoothDigestVector))
             note("received ${added.size}")
             followRekeys(added)
         }
