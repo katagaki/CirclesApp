@@ -1,3 +1,4 @@
+#if SHARED_BUYS_BLUETOOTH
 import CoreBluetooth
 import CryptoKit
 import Foundation
@@ -589,3 +590,4 @@ extension SharedBuysBluetooth: @preconcurrency CBPeripheralDelegate {
         deliverFromPeripheral(value, from: peripheral.identifier)
     }
 }
+#endif

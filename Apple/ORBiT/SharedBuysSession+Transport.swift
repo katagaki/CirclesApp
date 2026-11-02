@@ -128,6 +128,7 @@ public extension SharedBuysSession {
         return rewritten
     }
 
+    #if SHARED_BUYS_BLUETOOTH
     func startBluetooth() {
         guard isBluetoothEnabled, let sessionKey else { return }
         bluetooth.start(
@@ -156,6 +157,15 @@ public extension SharedBuysSession {
         bluetooth.stop()
         bluetoothPeers = 0
         wantedPeers.removeAll()
+    }
+
+    internal func shareOverBluetooth(_ change: SharedBuyChange) {
+        sendOverBluetooth([change])
+        refreshBluetoothDigest()
+    }
+
+    internal func refreshBluetoothDigest() {
+        bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothDigestVector))
     }
 
     /// Opens the exchange on a link we connected, unless the peer is already level.
@@ -216,4 +226,13 @@ public extension SharedBuysSession {
             bluetooth.send(frame, to: peer)
         }
     }
+    #else
+    func startBluetooth() {}
+
+    func stopBluetooth() {}
+
+    internal func shareOverBluetooth(_ change: SharedBuyChange) {}
+
+    internal func refreshBluetoothDigest() {}
+    #endif
 }

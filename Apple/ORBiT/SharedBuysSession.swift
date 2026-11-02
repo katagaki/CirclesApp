@@ -98,8 +98,10 @@ public final class SharedBuysSession {
     private var relayTask: Task<Void, Never>?
     @ObservationIgnored var pendingWrite: SharedBuysStore.Pending?
     @ObservationIgnored var writeTask: Task<Void, Never>?
+    #if SHARED_BUYS_BLUETOOTH
     /// Links we have already sent a want down, so each asks at most once.
     @ObservationIgnored var wantedPeers: Set<BluetoothPeer> = []
+    #endif
     /// Each change sealed once, rather than on every want reply and every reconnect.
     @ObservationIgnored var sealed: [String: RelayRecord] = [:]
     @ObservationIgnored var keyCache: (sessionKey: Data, keys: SharedBuysKeys)?
@@ -108,7 +110,9 @@ public final class SharedBuysSession {
     @ObservationIgnored var ingestTask: Task<Void, Never>?
     public var activity: Any?
     let relay = SharedBuysRelay()
+    #if SHARED_BUYS_BLUETOOTH
     let bluetooth = SharedBuysBluetooth()
+    #endif
 
     public var bluetoothPeers: Int = 0
     public var bluetoothNote: String = ""
@@ -270,8 +274,7 @@ public final class SharedBuysSession {
         flushTask?.cancel()
         flushTask = nil
         outbox = []
-        bluetooth.stop()
-        bluetoothPeers = 0
+        stopBluetooth()
         serializeRelay { [relay] in await relay.disconnect() }
         sessionKey = nil
         deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
@@ -424,8 +427,7 @@ public final class SharedBuysSession {
         persist()
         guard let record = seal(change, sessionKey: sessionKey, roomID: roomID) else { return }
         enqueue(record)
-        sendOverBluetooth([change])
-        bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothDigestVector))
+        shareOverBluetooth(change)
         updateActivity()
     }
 
