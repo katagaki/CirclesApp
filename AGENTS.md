@@ -17,7 +17,7 @@
 - If a trailer does land in a commit, rewrite it out rather than leaving it, and
   confirm the tree is unchanged (`git diff <old> HEAD` must be empty).
 - Commit after each unit of work, not after a large batch of changes. Only commit when the work did not require confirmation from the user.
-- Never push. Pushing is the user's job — ask them to do it.
+- Pushing feature branches is fine. Never push to `main`: pushes there deploy (see Deploys).
 
 ## Testing
 
