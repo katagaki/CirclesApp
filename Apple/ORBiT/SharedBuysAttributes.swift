@@ -7,6 +7,8 @@ public struct SharedBuysAttributes: ActivityAttributes, Sendable {
     public struct ContentState: Codable, Hashable, Sendable {
         public var nextItemName: String
         public var nextItemDetail: String
+        public var circleName: String?
+        public var circleSpace: String?
         public var boughtCount: Int
         public var assignedCount: Int
         public var memberInitials: [String]
