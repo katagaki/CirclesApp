@@ -1,6 +1,7 @@
 import AXiS
 import ORBiT
 import SwiftUI
+import TipKit
 
 struct BuysView: View {
 
@@ -88,6 +89,7 @@ struct BuysView: View {
                     Text("Buys.Scope.Shared").tag(BuysScope.shared)
                 }
                 .pickerStyle(.menu)
+                .popoverTip(BuysScopeTip())
             }
         }
         .alert("Buys.Info.Title", isPresented: $isShowingInfoAlert) {
