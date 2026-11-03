@@ -8,8 +8,7 @@ struct SharedBuysLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: SharedBuysAttributes.self) { context in
             lockScreen(context.state)
-                .padding(.horizontal, 16.0)
-                .padding(.vertical, 14.0)
+                .activityBackgroundTint(.clear)
                 .activitySystemActionForegroundColor(.pink)
         } dynamicIsland: { context in
             DynamicIsland {
@@ -26,7 +25,10 @@ struct SharedBuysLiveActivity: Widget {
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack(alignment: .leading, spacing: 10.0) {
-                        headline(context.state)
+                        VStack(alignment: .leading, spacing: 4.0) {
+                            circle(context.state)
+                            headline(context.state)
+                        }
                         progress(context.state)
                     }
                     .padding(.horizontal, 4.0)
@@ -49,7 +51,7 @@ struct SharedBuysLiveActivity: Widget {
 
     @ViewBuilder
     func lockScreen(_ state: SharedBuysAttributes.ContentState) -> some View {
-        VStack(alignment: .leading, spacing: 12.0) {
+        VStack(alignment: .leading, spacing: 0.0) {
             HStack(spacing: 6.0) {
                 Image(systemName: "bag.fill")
                     .font(.caption2)
@@ -57,12 +59,39 @@ struct SharedBuysLiveActivity: Widget {
                     .font(.caption2)
                     .fontWeight(.semibold)
                 Spacer(minLength: 8.0)
+                avatars(state: state)
             }
-            .foregroundStyle(.secondary)
-            .overlay(alignment: .trailing) { avatars(state: state) }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16.0)
+            .padding(.vertical, 8.0)
+            .background(Self.accent.opacity(0.7))
 
-            headline(state)
-            progress(state)
+            VStack(alignment: .leading, spacing: 12.0) {
+                VStack(alignment: .leading, spacing: 4.0) {
+                    circle(state)
+                    headline(state)
+                }
+                progress(state)
+            }
+            .padding(.horizontal, 16.0)
+            .padding(.vertical, 12.0)
+        }
+    }
+
+    @ViewBuilder
+    func circle(_ state: SharedBuysAttributes.ContentState) -> some View {
+        if !state.isComplete, let name = state.circleName, !name.isEmpty {
+            HStack(spacing: 6.0) {
+                if let space = state.circleSpace, !space.isEmpty {
+                    Text(space)
+                        .fontWeight(.semibold)
+                        .monospacedDigit()
+                }
+                Text(name)
+                    .lineLimit(1)
+            }
+            .font(.caption)
+            .foregroundStyle(.secondary)
         }
     }
 
@@ -145,6 +174,12 @@ struct SharedBuysLiveActivity: Widget {
             }
         }
     }
+
+    static let accent = Color(UIColor { traits in
+        traits.userInterfaceStyle == .dark
+            ? UIColor(displayP3Red: 0.544, green: 0.647, blue: 1.0, alpha: 1.0)
+            : UIColor(displayP3Red: 0.361, green: 0.488, blue: 1.0, alpha: 1.0)
+    })
 
     func fraction(_ state: SharedBuysAttributes.ContentState) -> Double {
         guard state.assignedCount > 0 else { return 0.0 }

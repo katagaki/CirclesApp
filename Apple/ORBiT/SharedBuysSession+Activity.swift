@@ -9,9 +9,12 @@ public extension SharedBuysSession {
         let mine = items.filter { $0.assignee == actorPID }
         let pending = mine.filter { $0.status == .pending }
         let next = pending.first
+        let circle = next.flatMap { relayedCircles[$0.circleID] }
         return SharedBuysAttributes.ContentState(
             nextItemName: next?.name ?? "担当分はすべて完了しました",
             nextItemDetail: next.map { "¥\($0.cost.formatted(.number))" } ?? "",
+            circleName: circle?.name,
+            circleSpace: circle?.space,
             boughtCount: mine.filter { $0.status == .bought }.count,
             assignedCount: mine.count,
             memberInitials: members.values.sorted().map { String($0.prefix(1)) }
