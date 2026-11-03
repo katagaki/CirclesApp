@@ -9,7 +9,7 @@ struct SharedBuysLiveActivity: Widget {
         ActivityConfiguration(for: SharedBuysAttributes.self) { context in
             lockScreen(context.state)
                 .activityBackgroundTint(.clear)
-                .activitySystemActionForegroundColor(.pink)
+                .activitySystemActionForegroundColor(Self.accent)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
@@ -37,7 +37,7 @@ struct SharedBuysLiveActivity: Widget {
             } compactLeading: {
                 Image(systemName: "bag.fill")
                     .font(.caption)
-                    .foregroundStyle(.pink)
+                    .foregroundStyle(Self.accent)
             } compactTrailing: {
                 ring(context.state)
                     .frame(width: 18.0, height: 18.0)
@@ -45,7 +45,7 @@ struct SharedBuysLiveActivity: Widget {
                 ring(context.state)
                     .frame(width: 18.0, height: 18.0)
             }
-            .keylineTint(.pink)
+            .keylineTint(Self.accent)
         }
     }
 
@@ -104,7 +104,7 @@ struct SharedBuysLiveActivity: Widget {
             if state.isComplete {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.subheadline)
-                    .foregroundStyle(.pink)
+                    .foregroundStyle(Self.accent)
             }
             Text(state.isComplete ? "担当分はすべて完了しました" : state.nextItemName)
                 .font(state.isComplete ? .subheadline : .title3)
@@ -125,12 +125,12 @@ struct SharedBuysLiveActivity: Widget {
     func progress(_ state: SharedBuysAttributes.ContentState) -> some View {
         HStack(spacing: 10.0) {
             Capsule()
-                .fill(.pink.opacity(0.25))
+                .fill(Self.accent.opacity(0.25))
                 .frame(height: 6.0)
                 .overlay(alignment: .leading) {
                     GeometryReader { proxy in
                         Capsule()
-                            .fill(.pink.gradient)
+                            .fill(Self.accent.gradient)
                             .frame(width: proxy.size.width * fraction(state))
                     }
                 }
@@ -148,15 +148,15 @@ struct SharedBuysLiveActivity: Widget {
     func ring(_ state: SharedBuysAttributes.ContentState) -> some View {
         ZStack {
             Circle()
-                .stroke(.pink.opacity(0.25), lineWidth: 3.0)
+                .stroke(Self.accent.opacity(0.25), lineWidth: 3.0)
             Circle()
                 .trim(from: 0.0, to: fraction(state))
-                .stroke(.pink, style: StrokeStyle(lineWidth: 3.0, lineCap: .round))
+                .stroke(Self.accent, style: StrokeStyle(lineWidth: 3.0, lineCap: .round))
                 .rotationEffect(.degrees(-90.0))
             if state.isComplete {
                 Image(systemName: "checkmark")
                     .font(.system(size: 8.0, weight: .black))
-                    .foregroundStyle(.pink)
+                    .foregroundStyle(Self.accent)
             }
         }
     }
@@ -167,10 +167,10 @@ struct SharedBuysLiveActivity: Widget {
             ForEach(Array(state.memberInitials.prefix(4).enumerated()), id: \.offset) { _, initial in
                 Text(initial)
                     .font(.system(size: 10.0, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Self.accent)
                     .frame(width: 20.0, height: 20.0)
-                    .background(Circle().fill(Color.pink.gradient))
-                    .overlay { Circle().strokeBorder(.background, lineWidth: 1.5) }
+                    .background(Circle().fill(.white))
+                    .overlay { Circle().strokeBorder(Self.accent, lineWidth: 1.5) }
             }
         }
     }
