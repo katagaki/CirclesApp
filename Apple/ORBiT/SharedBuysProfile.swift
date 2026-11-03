@@ -1,12 +1,16 @@
+#if SHARED_BUYS_BLUETOOTH
 import CoreBluetooth
+#endif
 import CryptoKit
 import Foundation
 
 enum SharedBuysProfile {
 
+#if SHARED_BUYS_BLUETOOTH
     nonisolated(unsafe) static let serviceUUID = CBUUID(string: "A7C1F2E0-5B3D-4E8A-9F16-3C2D8E4B7A90")
     nonisolated(unsafe) static let inboxUUID = CBUUID(string: "A7C1F2E1-5B3D-4E8A-9F16-3C2D8E4B7A90")
     nonisolated(unsafe) static let outboxUUID = CBUUID(string: "A7C1F2E2-5B3D-4E8A-9F16-3C2D8E4B7A90")
+#endif
 
     static let advertisementWindow: TimeInterval = 900.0
     static let maxPayloadPerChunk = 160

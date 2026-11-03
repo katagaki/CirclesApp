@@ -138,7 +138,7 @@ public extension SharedBuysSession {
         if rejected > 0 { note("dropped \(rejected) unopenable or unsigned") }
         if added > 0 {
             persist()
-            bluetooth.update(digest: SharedBuysDigest.data(of: bluetoothDigestVector))
+            refreshBluetoothDigest()
             updateActivity()
             note("received \(added)")
         }

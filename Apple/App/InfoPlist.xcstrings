@@ -141,18 +141,6 @@
         }
       }
     },
-    "NSBluetoothAlwaysUsageDescription" : {
-      "comment" : "Privacy - Bluetooth Always Usage Description",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "ja" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "宝物の共同購入リストを近くの端末と同期するために使用します。"
-          }
-        }
-      }
-    },
     "NSCalendarsWriteOnlyAccessUsageDescription" : {
       "extractionState" : "manual",
       "localizations" : {

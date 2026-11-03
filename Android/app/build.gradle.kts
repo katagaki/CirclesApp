@@ -39,6 +39,7 @@ android {
         versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 5
         versionName = "109.1"
         buildConfigField("String", "PLAY_PROJECT_NUMBER", "\"${playProjectNumber()}\"")
+        buildConfigField("boolean", "SHARED_BUYS_BLUETOOTH", "false")
     }
 
     signingConfigs {
