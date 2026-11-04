@@ -1,9 +1,8 @@
 package com.tsubuzaki.circlesgo.ui.sharedbuys
 
 import androidx.compose.foundation.background
+import com.tsubuzaki.circlesgo.ui.buys.BuyThumbnail
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -219,26 +218,10 @@ internal fun SharedBuyRow(session: SharedBuysSession, item: SharedBuyItem) {
         Spacer(modifier = Modifier.size(10.dp))
         val send = session.imageSends[item.id]
         if (item.imageId != null || send != null) {
-            val data = session.image(item)
-            val bitmap = remember(data) {
-                data?.let { android.graphics.BitmapFactory.decodeByteArray(it, 0, it.size) }
-            }
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(6.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .clickable(enabled = send?.isFailed == true) { session.retryImage(item) }
-            ) {
-                bitmap?.let {
-                    androidx.compose.foundation.Image(
-                        bitmap = it.asImageBitmap(),
-                        contentDescription = null,
-                        contentScale = androidx.compose.ui.layout.ContentScale.Crop,
-                        modifier = Modifier.size(36.dp)
-                    )
-                }
-            }
+            BuyThumbnail(
+                session.image(item),
+                Modifier.clickable(enabled = send?.isFailed == true) { session.retryImage(item) }
+            )
             Spacer(modifier = Modifier.size(10.dp))
         }
         Column(modifier = Modifier.weight(1f)) {

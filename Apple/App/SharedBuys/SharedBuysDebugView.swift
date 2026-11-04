@@ -11,7 +11,6 @@ struct SharedBuysDebugView: View {
     @State var itemCost: String = "1000"
     @State var joinLink: String = ""
     @State var nickname: String = "Tester"
-    @State var composition: SharedBuyComposition?
     @State var isEditingBuys: Bool = false
 
     var body: some View {
@@ -71,25 +70,13 @@ struct SharedBuysDebugView: View {
                             .disabled(itemName.isEmpty)
                         }
                         Button("Edit Buys") { isEditingBuys = true }
-                        Button("Compose") { composition = SharedBuyComposition() }
-                        Button("Convert sample") {
-                            composition = SharedBuyComposition(
-                                name: "Converted",
-                                cost: 1500,
-                                imageData: samplePhoto,
-                                personalItemID: "sample"
-                            )
-                        }
                         ForEach(session.items) { item in
                             Button {
                                 session.cycle(item)
                             } label: {
                                 HStack {
                                     Image(systemName: symbol(for: item))
-                                    Text(
-                                        "[\(item.rawStatus)] \(item.name)"
-                                            + (session.image(for: item).map { " img=\($0.count)" } ?? "")
-                                    )
+                                    Text("[\(item.rawStatus)] \(item.name)")
                                     Spacer()
                                     if let assignee = item.assignee {
                                         Text(session.members[assignee] ?? String(assignee))
@@ -101,11 +88,6 @@ struct SharedBuysDebugView: View {
                                 }
                             }
                             .buttonStyle(.plain)
-                            .swipeActions(edge: .trailing) {
-                                Button("Delete", role: .destructive) {
-                                    session.remove(itemID: item.id, circleID: item.circleID)
-                                }
-                            }
                         }
                     } header: {
                         Text("Items (\(session.items.count))")
@@ -147,11 +129,6 @@ struct SharedBuysDebugView: View {
                     Text("Log")
                 }
             }
-            .sheet(item: $composition) { composition in
-                NavigationStack {
-                    SharedBuyComposerView(circleID: 1, attachments: [samplePhoto], composition: composition)
-                }
-            }
             .navigationDestination(isPresented: $isEditingBuys) {
                 BuysEditView(circleID: 1, eventNumber: 0)
             }
@@ -163,17 +140,6 @@ struct SharedBuysDebugView: View {
                 }
             }
         }
-    }
-
-    /// Larger than the 1000 point limit, so the real resize and encode both run.
-    var samplePhoto: Data {
-        let size = CGSize(width: 2400.0, height: 1600.0)
-        return UIGraphicsImageRenderer(size: size).image { context in
-            for band in 0..<24 {
-                UIColor(hue: CGFloat(band) / 24.0, saturation: 0.8, brightness: 0.9, alpha: 1.0).setFill()
-                context.fill(CGRect(x: CGFloat(band) * 100.0, y: 0.0, width: 100.0, height: 1600.0))
-            }
-        }.jpegData(compressionQuality: 0.9) ?? Data()
     }
 
     var statusText: String {

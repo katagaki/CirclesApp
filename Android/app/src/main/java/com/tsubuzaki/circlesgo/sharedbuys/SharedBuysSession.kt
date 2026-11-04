@@ -798,15 +798,14 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
         cost: Int,
         circleId: Int,
         circleName: String? = null,
-        circleSpace: String? = null,
-        assignToSelf: Boolean = true
+        circleSpace: String? = null
     ): String {
         val itemId = UUID.randomUUID().toString().take(8)
         if (!circleName.isNullOrEmpty() && circles[circleId] == null) {
             append(SharedBuyKind.CIRCLE_INFO, "-", circleId, circleName, null, circleSpace)
         }
         append(SharedBuyKind.ADD_ITEM, itemId, circleId, name, cost)
-        if (assignToSelf) append(SharedBuyKind.SET_ASSIGNEE, itemId, circleId, null, actorPid)
+        append(SharedBuyKind.SET_ASSIGNEE, itemId, circleId, null, actorPid)
         return itemId
     }
 
@@ -896,6 +895,10 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
 
     fun rename(itemId: String, circleId: Int, name: String) {
         append(SharedBuyKind.RENAME_ITEM, itemId, circleId, name, null)
+    }
+
+    fun setStatus(itemId: String, circleId: Int, status: Int) {
+        append(SharedBuyKind.SET_STATUS, itemId, circleId, null, status)
     }
 
     fun setCost(itemId: String, circleId: Int, cost: Int) {

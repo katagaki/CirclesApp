@@ -45,6 +45,14 @@ class Unifier {
         _sheetCollapseRequest.value += 1
     }
 
+    // Raised for keyboard entry, which needs the sheet at full height
+    private val _sheetExpandRequest = MutableStateFlow(0)
+    val sheetExpandRequest: StateFlow<Int> = _sheetExpandRequest
+
+    fun requestSheetExpand() {
+        _sheetExpandRequest.value += 1
+    }
+
     fun show() {
         _isPresenting.value = true
     }

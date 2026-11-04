@@ -2161,41 +2161,6 @@
         }
       }
     },
-    "Buys.Shared.Add.AssignToMe": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Assign to me"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自分が担当する"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "내가 담당"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "指定给我"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "指定給我"
-          }
-        }
-      }
-    },
     "Buys.Shared.Add.Move": {
       "extractionState": "manual",
       "localizations": {
@@ -2262,41 +2227,6 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "新增照片"
-          }
-        }
-      }
-    },
-    "Buys.Shared.Add.RemoveFromBuys": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Remove from your Buys"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自分の宝物リストから削除"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "내 구매 목록에서 삭제"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "从我的宝贝清单中移除"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "needs_review",
-            "value": "從我的寶藏清單中移除"
           }
         }
       }

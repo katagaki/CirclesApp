@@ -533,17 +533,14 @@ public extension SharedBuysSession {
         cost: Int,
         circleID: Int,
         circleName: String? = nil,
-        circleSpace: String? = nil,
-        assignToSelf: Bool = true
+        circleSpace: String? = nil
     ) -> String {
         let itemID = String(UUID().uuidString.prefix(8)).lowercased()
         if let circleName, !circleName.isEmpty, SharedBuyFold.circles(from: changes)[circleID] == nil {
             append(.circleInfo, itemID: "-", circleID: circleID, text: circleName, space: circleSpace)
         }
         append(.addItem, itemID: itemID, circleID: circleID, text: name, value: cost)
-        if assignToSelf {
-            append(.setAssignee, itemID: itemID, circleID: circleID, value: actorPID)
-        }
+        append(.setAssignee, itemID: itemID, circleID: circleID, value: actorPID)
         return itemID
     }
 

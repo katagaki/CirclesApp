@@ -70,6 +70,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.tsubuzaki.circlesgo.R
+import com.tsubuzaki.circlesgo.ui.shared.LocalSharedBuys
+import com.tsubuzaki.circlesgo.ui.buys.BuysEditView
 import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.api.catalog.WebCatalogColor
 import com.tsubuzaki.circlesgo.auth.Authenticator
@@ -177,6 +179,24 @@ fun CircleDetailView(
     }
 
     val extInfo = circle.extendedInformation
+
+    var isEditingBuys by remember { mutableStateOf(false) }
+    if (isEditingBuys && buysCache != null && events != null) {
+        BuysEditView(
+            session = LocalSharedBuys.current,
+            circleId = circle.id,
+            eventNumber = events.activeEventNumber,
+            buysCache = buysCache,
+            circleName = circle.circleName,
+            circleSpace = circle.spaceName(),
+            attachmentsCache = attachmentsCache,
+            onClose = {
+                isEditingBuys = false
+                unifier.requestSheetCollapse()
+            }
+        )
+        return
+    }
 
     Column(
         modifier = if (visibleHeight != null) {
@@ -431,10 +451,12 @@ fun CircleDetailView(
         if (buysCache != null && events != null) {
             CircleDetailBuysSection(
                 circleID = circle.id,
-                circleName = circle.circleName,
-                circleSpace = circle.spaceName(),
                 eventNumber = events.activeEventNumber,
                 buysCache = buysCache,
+                onEdit = {
+                    isEditingBuys = true
+                    unifier.requestSheetExpand()
+                },
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
             )
             HorizontalDivider(modifier = Modifier.padding(horizontal = 20.dp))

@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import java.io.File
 import java.util.UUID
 
 class BuysCache(context: Context) {
@@ -44,6 +45,9 @@ class BuysCache(context: Context) {
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
+    /** Photos live in files: SharedPreferences rewrites its whole store on every save. */
+    private val imageDirectory = File(context.filesDir, "buys-images").apply { mkdirs() }
+
     private val _version = MutableStateFlow(0)
     val version: StateFlow<Int> = _version
 
@@ -53,6 +57,14 @@ class BuysCache(context: Context) {
 
     fun entry(circleID: Int, eventNumber: Int): BuyEntry? {
         return loadAll(eventNumber).firstOrNull { it.circleID == circleID }
+    }
+
+    fun image(itemID: String): ByteArray? =
+        runCatching { File(imageDirectory, itemID).readBytes() }.getOrNull()
+
+    fun setImage(itemID: String, image: ByteArray) {
+        File(imageDirectory, itemID).writeBytes(image)
+        _version.value += 1
     }
 
     fun addItem(circleID: Int, eventNumber: Int, item: BuyItem = BuyItem()): BuyItem {
@@ -88,6 +100,7 @@ class BuysCache(context: Context) {
         val index = all.indexOfFirst { it.circleID == circleID }
         if (index < 0) return
         val entry = all[index]
+        File(imageDirectory, itemID).delete()
         val remaining = entry.items.filter { it.id != itemID }
         if (remaining.isEmpty()) {
             all.removeAt(index)
@@ -99,6 +112,7 @@ class BuysCache(context: Context) {
 
     fun clearAll() {
         prefs.edit { clear() }
+        imageDirectory.listFiles()?.forEach { it.delete() }
         _version.value += 1
     }
 

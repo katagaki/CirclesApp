@@ -2,6 +2,30 @@ import AXiS
 import ORBiT
 import PhotosUI
 import SwiftUI
+import WebP
+
+enum SharedBuyImageEncoder {
+
+    static let maxDimension: CGFloat = 1000.0
+
+    /// Scales a photo down to 1000 points on its long edge and encodes it as WebP, lowering
+    /// the quality until it fits under the relay's limit.
+    static func webp(from data: Data) -> Data? {
+        guard let image = UIImage(data: data) else { return nil }
+        let scale = min(1.0, maxDimension / max(image.size.width, image.size.height))
+        let size = CGSize(width: floor(image.size.width * scale), height: floor(image.size.height * scale))
+        let format = UIGraphicsImageRendererFormat()
+        format.scale = 1.0
+        let resized = UIGraphicsImageRenderer(size: size, format: format).image { _ in
+            image.draw(in: CGRect(origin: .zero, size: size))
+        }
+        for quality: Float in [80.0, 65.0, 50.0, 35.0, 20.0] {
+            let encoded = try? WebPEncoder().encode(resized, config: .preset(.photo, quality: quality))
+            if let encoded, encoded.count <= SharedBuysSession.maxImageBytes { return encoded }
+        }
+        return nil
+    }
+}
 
 /// The row being edited. New rows exist only here until they have a name, so an abandoned
 /// one is never written to the database or sent to the room.
@@ -379,10 +403,11 @@ struct BuysEditThumbnail: View {
     let onChooseAttachment: () -> Void
 
     @State private var picked: PhotosPickerItem?
+    @State private var isPicking: Bool = false
 
     var body: some View {
         Menu {
-            PhotosPicker("Buys.Shared.Add.Photo", selection: $picked, matching: .images)
+            Button("Buys.Shared.Add.Photo") { isPicking = true }
             if hasAttachments {
                 Button("Buys.SelectFromAttachments", action: onChooseAttachment)
             }
@@ -402,6 +427,8 @@ struct BuysEditThumbnail: View {
             .background(Color(.systemGray5))
             .clipShape(RoundedRectangle(cornerRadius: 6.0))
         }
+        // Not a PhotosPicker in the menu: closing the menu takes its presentation with it.
+        .photosPicker(isPresented: $isPicking, selection: $picked, matching: .images)
         .onChange(of: picked) { _, item in
             Task {
                 if let data = try? await item?.loadTransferable(type: Data.self) { onPhoto(data) }
