@@ -86,6 +86,11 @@ struct SharedBuysDebugView: View {
                                 }
                             }
                             .buttonStyle(.plain)
+                            .swipeActions(edge: .trailing) {
+                                Button("Delete", role: .destructive) {
+                                    session.remove(itemID: item.id, circleID: item.circleID)
+                                }
+                            }
                         }
                     } header: {
                         Text("Items (\(session.items.count))")

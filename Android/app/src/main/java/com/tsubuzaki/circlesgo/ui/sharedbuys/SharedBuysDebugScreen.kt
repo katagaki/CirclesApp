@@ -97,8 +97,13 @@ fun SharedBuysDebugScreen(session: SharedBuysSession, onClose: () -> Unit) {
                     Text("Items (${session.items.size})", style = MaterialTheme.typography.titleMedium)
                 }
                 items(session.items) { buyItem ->
-                    TextButton(onClick = { session.cycle(buyItem) }) {
-                        Text("[${buyItem.status}] ${buyItem.name}  ¥${buyItem.cost}")
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        TextButton(onClick = { session.cycle(buyItem) }, modifier = Modifier.weight(1f)) {
+                            Text("[${buyItem.status}] ${buyItem.name}  ¥${buyItem.cost}")
+                        }
+                        TextButton(onClick = { session.remove(buyItem.id, buyItem.circleId) }) {
+                            Text("Delete ${buyItem.name}")
+                        }
                     }
                 }
                 item {
