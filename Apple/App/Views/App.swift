@@ -64,8 +64,14 @@ struct CirclesApp: App {
             // `UnifiedView` and no login — is configured too.
             .task {
                 let config = await RemoteConfigProvider().fetchRelayConfig()
+                #if DEBUG
+                // Development-signed builds cannot attest, so they stay on `npm run dev`.
+                let relayBaseURL: String? = nil
+                #else
+                let relayBaseURL = config?.baseURL
+                #endif
                 sharedBuys.applyRelayConfig(
-                    baseURL: config?.baseURL,
+                    baseURL: relayBaseURL,
                     isFeatureEnabled: config?.isFeatureEnabled ?? true
                 )
                 if !sharedBuys.isFeatureEnabled && unifier.current == .buys {
