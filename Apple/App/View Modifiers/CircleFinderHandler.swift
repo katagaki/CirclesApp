@@ -10,31 +10,9 @@ struct CircleFinderHandlerModifier: ViewModifier {
     @Environment(Unifier.self) var unifier
 
     @State var router = CircleFinderRouter.shared
-    @State var circleToOpen: ComiketCircle?
 
     func body(content: Content) -> some View {
         content
-            .sheet(isPresented: Binding(
-                get: { router.pendingText != nil },
-                set: { if !$0 { router.pendingText = nil } }
-            )) {
-                unifier.show()
-                if let circleToOpen {
-                    self.circleToOpen = nil
-                    unifier.append(.circleDetail(circle: circleToOpen))
-                }
-            } content: {
-                if let text = router.pendingText {
-                    CircleFinderView(text: text) { circle in
-                        circleToOpen = circle
-                    }
-                }
-            }
-            .onChange(of: router.pendingText) { _, newValue in
-                if newValue != nil {
-                    unifier.hide()
-                }
-            }
             .task(id: router.pendingCircle) {
                 guard let identifier = router.pendingCircle else { return }
                 // A cold launch from an intent arrives before the catalog is open, and a
@@ -55,8 +33,40 @@ struct CircleFinderHandlerModifier: ViewModifier {
     }
 }
 
+/// Shows the circles found in shared text above the panel, which stays open underneath.
+struct CircleFinderSheetModifier: ViewModifier {
+
+    @Environment(Unifier.self) var unifier
+
+    @State var router = CircleFinderRouter.shared
+    @State var circleToOpen: ComiketCircle?
+
+    func body(content: Content) -> some View {
+        content
+            .sheet(isPresented: Binding(
+                get: { router.pendingText != nil },
+                set: { if !$0 { router.pendingText = nil } }
+            )) {
+                if let circleToOpen {
+                    self.circleToOpen = nil
+                    unifier.append(.circleDetail(circle: circleToOpen))
+                }
+            } content: {
+                if let text = router.pendingText {
+                    CircleFinderView(text: text) { circle in
+                        circleToOpen = circle
+                    }
+                }
+            }
+    }
+}
+
 extension View {
     func circleFinderHandler() -> some View {
         self.modifier(CircleFinderHandlerModifier())
+    }
+
+    func circleFinderSheet() -> some View {
+        self.modifier(CircleFinderSheetModifier())
     }
 }
