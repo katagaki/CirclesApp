@@ -40,6 +40,8 @@ struct CircleDetailView: View {
     @State var buysCropImage: UIImage?
     @State var buysCropItemID: String?
     @State var buysViewerImage: UIImage?
+    @State var sharedComposition: SharedBuyComposition?
+    @State var sharedAssigningItem: SharedBuyItem?
 
     @AppStorage(wrappedValue: "", "Circles.Detail.SectionOrder") var sectionOrderStorage: String
     @AppStorage(wrappedValue: "", "Circles.Detail.HiddenSections") var hiddenSectionsStorage: String
@@ -126,6 +128,12 @@ struct CircleDetailView: View {
         )) { item in
             BuyImageViewer(image: item.image)
         }
+        .modifier(SharedBuyComposerPresenter(
+            circle: circle,
+            attachments: attachments.map(\.attachmentBlob),
+            composition: $sharedComposition,
+            assigningItem: $sharedAssigningItem
+        ))
         .opacity(unifier.isMinimized ? 0.0 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: unifier.selectedDetent)
         .contentMargins(.top, 0.0)
@@ -238,11 +246,16 @@ struct CircleDetailView: View {
                     buysAttachmentPickerCircle: $buysAttachmentPickerCircle,
                     buysCropImage: $buysCropImage,
                     buysCropItemID: $buysCropItemID,
-                    buysViewerImage: $buysViewerImage
+                    buysViewerImage: $buysViewerImage,
+                    sharedComposition: $sharedComposition,
+                    sharedAssigningItem: $sharedAssigningItem
                 )
             }
         }
     }
+}
+
+extension CircleDetailView {
 
     func decodeSectionOrder(_ string: String) -> [CircleDetailSection] {
         guard !string.isEmpty, let data = string.data(using: .utf8),

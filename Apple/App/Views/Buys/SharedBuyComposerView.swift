@@ -1,15 +1,18 @@
+import AXiS
 import ORBiT
 import PhotosUI
 import SwiftUI
 import WebP
 
-/// What the sheet opens with: blank for a new item, filled in for a personal one.
-struct SharedBuyComposition: Identifiable {
+/// What the composer opens with: blank for a new item, filled in for a personal one.
+struct SharedBuyComposition: Identifiable, Hashable {
     let id = UUID()
     var name: String = ""
     var cost: Int = 0
     var imageData: Data?
-    var isConversion: Bool = false
+    var personalItemID: String?
+
+    var isConversion: Bool { personalItemID != nil }
 }
 
 enum SharedBuyImageEncoder {
@@ -35,7 +38,9 @@ enum SharedBuyImageEncoder {
     }
 }
 
-struct SharedBuyComposerSheet: View {
+/// Pushed inside the panel rather than presented over it: circle detail is already in a
+/// sheet, and a second one both hides the map and is dismissed along with its host row.
+struct SharedBuyComposerView: View {
 
     @Environment(SharedBuysSession.self) var sharedBuys
     @Environment(\.dismiss) var dismiss
@@ -53,44 +58,47 @@ struct SharedBuyComposerSheet: View {
     @State private var pickedPhoto: PhotosPickerItem?
     @State private var assignToSelf: Bool = true
     @State private var removeFromBuys: Bool = true
+    @State private var isPrepared: Bool = false
 
     var trimmedName: String { name.trimmingCharacters(in: .whitespaces) }
 
     var body: some View {
-        NavigationStack {
-            Form {
-                Section {
-                    photoPicker
-                }
-                Section {
-                    TextField("Buys.ItemName.Placeholder", text: $name)
-                    TextField("Buys.ItemCost.Placeholder", text: $cost)
-                        .keyboardType(.numberPad)
-                }
-                Section {
-                    Toggle("Buys.Shared.Add.AssignToMe", isOn: $assignToSelf)
-                    if composition.isConversion {
-                        Toggle("Buys.Shared.Add.RemoveFromBuys", isOn: $removeFromBuys)
-                    }
-                } footer: {
-                    if composition.isConversion {
-                        Text("Buys.Shared.Add.Visible")
-                    }
-                }
+        Form {
+            Section {
+                photoPicker
             }
-            .navigationTitle(composition.isConversion ? "Buys.Shared.Add.Move" : "Buys.AddItem.Shared")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(role: .cancel) { dismiss() }
+            Section {
+                TextField("Buys.ItemName.Placeholder", text: $name)
+                TextField("Buys.ItemCost.Placeholder", text: $cost)
+                    .keyboardType(.numberPad)
+            }
+            Section {
+                Toggle("Buys.Shared.Add.AssignToMe", isOn: $assignToSelf)
+                if composition.isConversion {
+                    Toggle("Buys.Shared.Add.RemoveFromBuys", isOn: $removeFromBuys)
                 }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(role: .confirm) { commit() }
-                        .disabled(trimmedName.isEmpty)
+            } footer: {
+                if composition.isConversion {
+                    Text("Buys.Shared.Add.Visible")
                 }
             }
         }
+        .navigationTitle(composition.isConversion ? "Buys.Shared.Add.Move" : "Buys.AddItem.Shared")
+        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarBackButtonHidden()
+        .toolbar {
+            ToolbarItem(placement: .cancellationAction) {
+                Button(role: .cancel) { dismiss() }
+            }
+            ToolbarItem(placement: .confirmationAction) {
+                Button(role: .confirm) { commit() }
+                    .disabled(trimmedName.isEmpty)
+            }
+        }
         .onAppear {
+            // A pushed view appears again when the photo picker closes.
+            guard !isPrepared else { return }
+            isPrepared = true
             name = composition.name
             cost = composition.cost == 0 ? "" : String(composition.cost)
             imageData = composition.imageData
@@ -169,5 +177,53 @@ struct SharedBuyComposerSheet: View {
         }
         if composition.isConversion, removeFromBuys { onMoved?() }
         dismiss()
+    }
+}
+
+/// Pushes the composer inside the panel, raising it to full height for the keyboard and
+/// putting it back afterwards. Applied to the detail view, not a row, so that neither
+/// presentation is lost when the row scrolls out of the list.
+struct SharedBuyComposerPresenter: ViewModifier {
+
+    @Environment(Unifier.self) var unifier
+    @Environment(Events.self) var planner
+
+    let circle: ComiketCircle
+    let attachments: [Data]
+    @Binding var composition: SharedBuyComposition?
+    @Binding var assigningItem: SharedBuyItem?
+
+    @State private var detentBeforeComposer: PresentationDetent?
+
+    func body(content: Content) -> some View {
+        content
+            .sheet(item: $assigningItem) { item in
+                SharedBuyAssignSheet(item: item)
+            }
+            .navigationDestination(item: $composition) { composition in
+                SharedBuyComposerView(
+                    circleID: circle.id,
+                    circleName: circle.circleName,
+                    circleSpace: circle.spaceName(),
+                    attachments: attachments,
+                    composition: composition,
+                    onMoved: {
+                        guard let itemID = composition.personalItemID else { return }
+                        BuysDatabase.shared.deleteItem(id: itemID, eventNumber: planner.activeEventNumber)
+                    }
+                )
+                .opacity(unifier.isMinimized ? 0.0 : 1.0)
+                .toolbarVisibility(unifier.isMinimized ? .hidden : .visible, for: .navigationBar, .bottomBar)
+            }
+            .onChange(of: composition == nil) { _, isClosed in
+                guard unifier.displayMode == .sheet else { return }
+                if isClosed {
+                    if let detentBeforeComposer { unifier.selectedDetent = detentBeforeComposer }
+                    detentBeforeComposer = nil
+                } else {
+                    detentBeforeComposer = unifier.selectedDetent
+                    unifier.selectedDetent = .large
+                }
+            }
     }
 }

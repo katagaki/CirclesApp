@@ -11,14 +11,13 @@ struct CircleDetailBuysSection: View {
 
     @State private var buyEntry: BuyEntry?
     @State private var isEditing: Bool = false
-    @State private var composition: SharedBuyComposition?
-    @State private var convertingItemID: String?
-    @State private var assigningItem: SharedBuyItem?
 
     @Binding var buysAttachmentPickerCircle: ComiketCircle?
     @Binding var buysCropImage: UIImage?
     @Binding var buysCropItemID: String?
     @Binding var buysViewerImage: UIImage?
+    @Binding var sharedComposition: SharedBuyComposition?
+    @Binding var sharedAssigningItem: SharedBuyItem?
 
     var body: some View {
         Section {
@@ -43,7 +42,7 @@ struct CircleDetailBuysSection: View {
             }
             if sharedBuys.isActive {
                 ForEach(sharedBuys.items.filter { $0.circleID == circle.id }) { item in
-                    SharedBuyItemRow(item: item) { assigningItem = item }
+                    SharedBuyItemRow(item: item) { sharedAssigningItem = item }
                         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             Button(role: .destructive) {
                                 sharedBuys.remove(itemID: item.id, circleID: item.circleID)
@@ -65,26 +64,9 @@ struct CircleDetailBuysSection: View {
             }
             if sharedBuys.isActive {
                 Button {
-                    composition = SharedBuyComposition()
+                    sharedComposition = SharedBuyComposition()
                 } label: {
                     Label("Buys.AddItem.Shared", systemImage: "person.2.badge.plus")
-                }
-                .sheet(item: $composition) { composition in
-                    SharedBuyComposerSheet(
-                        circleID: circle.id,
-                        circleName: circle.circleName,
-                        circleSpace: circle.spaceName(),
-                        attachments: AttachmentsDatabase.shared
-                            .attachments(eventNumber: circle.eventNumber, circleID: circle.id)
-                            .map(\.attachmentBlob),
-                        composition: composition,
-                        onMoved: {
-                            if let convertingItemID { deleteItem(id: convertingItemID) }
-                        }
-                    )
-                }
-                .sheet(item: $assigningItem) { item in
-                    SharedBuyAssignSheet(item: item)
                 }
             }
         } header: {
@@ -101,6 +83,9 @@ struct CircleDetailBuysSection: View {
             }
         }
         .onAppear {
+            reloadEntry()
+        }
+        .onChange(of: sharedComposition == nil) {
             reloadEntry()
         }
         .onChange(of: buysCropImage) {
@@ -166,12 +151,11 @@ struct CircleDetailBuysSection: View {
     func moveToSharedButton(item: BuyItem) -> some View {
         if sharedBuys.isActive {
             Button {
-                convertingItemID = item.id
-                composition = SharedBuyComposition(
+                sharedComposition = SharedBuyComposition(
                     name: item.name,
                     cost: item.cost,
                     imageData: item.imageData,
-                    isConversion: true
+                    personalItemID: item.id
                 )
             } label: {
                 Label("Buys.Shared.Add.Move", systemImage: "person.2.fill")

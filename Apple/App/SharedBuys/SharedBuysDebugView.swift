@@ -75,7 +75,7 @@ struct SharedBuysDebugView: View {
                                 name: "Converted",
                                 cost: 1500,
                                 imageData: samplePhoto,
-                                isConversion: true
+                                personalItemID: "sample"
                             )
                         }
                         ForEach(session.items) { item in
@@ -146,7 +146,9 @@ struct SharedBuysDebugView: View {
                 }
             }
             .sheet(item: $composition) { composition in
-                SharedBuyComposerSheet(circleID: 1, attachments: [samplePhoto], composition: composition)
+                NavigationStack {
+                    SharedBuyComposerView(circleID: 1, attachments: [samplePhoto], composition: composition)
+                }
             }
             .navigationTitle("Shared Buys")
             .navigationBarTitleDisplayMode(.inline)
