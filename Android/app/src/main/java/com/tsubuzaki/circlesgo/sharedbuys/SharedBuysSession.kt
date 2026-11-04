@@ -857,6 +857,17 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
         }
     }
 
+    /**
+     * Encodes and sends a photo on the session's scope. The sheet that picked it closes
+     * straight away, and work on its own scope would be cancelled with it.
+     */
+    fun attachImage(itemId: String, circleId: Int, encode: () -> ByteArray?) {
+        scope.launch {
+            val encoded = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) { encode() }
+            encoded?.let { attachImage(it, itemId, circleId) }
+        }
+    }
+
     fun retryImage(item: SharedBuyItem) {
         imageSends[item.id]?.let { attachImage(it.image, item.id, item.circleId) }
     }

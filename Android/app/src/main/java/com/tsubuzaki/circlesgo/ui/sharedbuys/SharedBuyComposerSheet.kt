@@ -34,7 +34,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,9 +46,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.sharedbuys.SharedBuysSession
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
 /** What the sheet opens with: blank for a new item, filled in for a personal one. */
@@ -112,7 +108,6 @@ fun SharedBuyComposerSheet(
     onMoved: () -> Unit = {}
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
     var name by remember { mutableStateOf(composition.name) }
     var costText by remember {
         mutableStateOf(if (composition.cost == 0) "" else composition.cost.toString())
@@ -136,10 +131,7 @@ fun SharedBuyComposerSheet(
             assignToSelf
         )
         image?.let { picked ->
-            scope.launch {
-                val encoded = withContext(Dispatchers.Default) { SharedBuyImageEncoder.webp(picked) }
-                encoded?.let { session.attachImage(it, itemId, circleId) }
-            }
+            session.attachImage(itemId, circleId) { SharedBuyImageEncoder.webp(picked) }
         }
         if (composition.isConversion && removeFromBuys) onMoved()
         onDismiss()
