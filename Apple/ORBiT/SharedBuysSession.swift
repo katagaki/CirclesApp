@@ -139,6 +139,9 @@ public final class SharedBuysSession {
         members: [Int: String],
         circles: [Int: SharedBuyCircle]
     ) {
+        // Read first: the cache is not observed, so a view served from it would otherwise
+        // never subscribe to the log and stop updating when records arrive.
+        _ = changes
         if let foldCache { return foldCache }
         let folded = (
             items: SharedBuyFold.items(from: changes),
@@ -546,6 +549,10 @@ public extension SharedBuysSession {
 
     public func rename(itemID: String, circleID: Int, to name: String) {
         append(.renameItem, itemID: itemID, circleID: circleID, text: name)
+    }
+
+    func setStatus(itemID: String, circleID: Int, to rawStatus: Int) {
+        append(.setStatus, itemID: itemID, circleID: circleID, value: rawStatus)
     }
 
     public func setCost(itemID: String, circleID: Int, to cost: Int) {
