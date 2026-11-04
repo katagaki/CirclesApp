@@ -6,7 +6,6 @@ import { type AttestEnv, type Verified, attestMode, isLoopback, verifyAttestatio
 import { attestInput, b64urlDecode, b64urlEncode, sha256 } from "./proto";
 
 export { Room, Identity };
-export { ATTEST_HEADER, HELLO_HEADER } from "./admission";
 
 const ROOM_PATH = /^\/r\/([0-9a-f]{32})$/;
 const HOMEPAGE = "https://github.com/katagaki/CirclesApp";

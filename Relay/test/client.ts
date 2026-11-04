@@ -1,5 +1,6 @@
 import { env } from "cloudflare:test";
-import worker, { ATTEST_HEADER, HELLO_HEADER, type Env } from "../src/index";
+import worker, { type Env } from "../src/index";
+import { ATTEST_HEADER, HELLO_HEADER } from "../src/admission";
 import { b64urlEncode, helloInput, importAuthKey, recordInput, tag } from "../src/proto";
 
 export interface CloseInfo {

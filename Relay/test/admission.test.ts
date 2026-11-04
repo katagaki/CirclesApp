@@ -1,6 +1,7 @@
 import { env, runInDurableObject } from "cloudflare:test";
 import { describe, expect, it, vi } from "vitest";
-import worker, { ATTEST_HEADER, HELLO_HEADER, type Env } from "../src/index";
+import worker, { type Env } from "../src/index";
+import { ATTEST_HEADER, HELLO_HEADER } from "../src/admission";
 import { AUTHENTICATED_HEADER } from "../src/admission";
 import { attestInput, b64urlEncode, sha256 } from "../src/proto";
 import { assertionKeys, assertion, appIdHash } from "./attest";
