@@ -5,6 +5,7 @@
   "compatibility_date": "2026-08-22",
   "observability": { "enabled": true },
   "routes": [{ "pattern": "circles.ktgk.app", "custom_domain": true }],
+  "dev": { "ip": "127.0.0.1", "port": 8787, "host": "127.0.0.1" },
   "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Room"] }, { "tag": "v2", "new_sqlite_classes": ["Identity"] }],
   "durable_objects": {
     "bindings": [{ "name": "ROOM", "class_name": "Room" }, { "name": "IDENTITY", "class_name": "Identity" }]
