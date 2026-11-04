@@ -33,6 +33,7 @@ struct UnifiedPanel: View {
         )) {
             SharedBuysDebugView()
         }
+        .circleFinderSheet()
         .presentationBackgroundInteraction(.enabled)
         .presentationDetents([unifier.compactDetent, .height(360), .large], selection: $unifier.selectedDetent)
         .presentationContentInteraction(.scrolls)
