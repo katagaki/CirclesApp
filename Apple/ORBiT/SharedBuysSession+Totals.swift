@@ -36,12 +36,14 @@ public extension SharedBuysSession {
     /// Leaving `actorPID` at 0 made every signed-out member the same actor: `members`
     /// collapsed to a single entry, every item looked assigned to you, and `yourShare`
     /// equalled `groupTotal` on both phones. Negative so it cannot collide with a real
-    /// circle.ms PID, and stored so it survives relaunches.
+    /// circle.ms PID, and stored so it survives relaunches. Kept within 32 bits because
+    /// Android decodes the actor as an `Int`, and refuses a record whose actor overflows
+    /// it; an ID minted wider than that by an older build is replaced.
     static func localActorID() -> Int {
         let key = "My.LocalActorID"
         let existing = UserDefaults.standard.integer(forKey: key)
-        if existing != 0 { return existing }
-        let minted = -Int(UInt32.random(in: 1...UInt32.max))
+        if existing != 0, Int32(exactly: existing) != nil { return existing }
+        let minted = -Int(Int32.random(in: 1...Int32.max))
         UserDefaults.standard.set(minted, forKey: key)
         return minted
     }
