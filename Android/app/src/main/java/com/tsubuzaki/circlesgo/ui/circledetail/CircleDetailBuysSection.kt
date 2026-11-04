@@ -10,8 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -26,15 +24,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.data.local.BuysCache
-import com.tsubuzaki.circlesgo.ui.buys.BuyThumbnail
+import com.tsubuzaki.circlesgo.sharedbuys.SharedBuyItem
+import com.tsubuzaki.circlesgo.ui.buys.BuyItemGrid
+import com.tsubuzaki.circlesgo.ui.buys.BuyItemTile
 import com.tsubuzaki.circlesgo.ui.shared.LocalSharedBuys
-import com.tsubuzaki.circlesgo.ui.sharedbuys.SharedBuyRow
+import com.tsubuzaki.circlesgo.ui.sharedbuys.SharedBuyTile
 
 @Composable
 fun CircleDetailBuysSection(
@@ -66,24 +64,27 @@ fun CircleDetailBuysSection(
             TextButton(onClick = onEdit) { Text(stringResource(R.string.buys_edit)) }
         }
 
-        for (item in items) {
-            ReadOnlyBuyItemRow(
-                item = item,
-                photo = buysCache.image(item.id).takeIf { buysVersion >= 0 },
-                onTap = {
-                    buysCache.updateItem(
-                        circleID,
-                        eventNumber,
-                        item.copy(status = BuysCache.nextStatus(item.status))
-                    )
-                }
-            )
-        }
-
         val session = LocalSharedBuys.current?.takeIf { it.isActive }
         val sharedItems = session?.items?.filter { it.circleId == circleID }.orEmpty()
-        if (session != null) {
-            sharedItems.forEach { SharedBuyRow(session, it) }
+
+        BuyItemGrid<Any>(items + sharedItems) { tile ->
+            if (tile is BuysCache.BuyItem) {
+                BuyItemTile(
+                    name = tile.name,
+                    cost = tile.cost,
+                    photo = buysCache.image(tile.id).takeIf { buysVersion >= 0 },
+                    status = tile.status,
+                    onTap = {
+                        buysCache.updateItem(
+                            circleID,
+                            eventNumber,
+                            tile.copy(status = BuysCache.nextStatus(tile.status))
+                        )
+                    }
+                )
+            } else if (tile is SharedBuyItem && session != null) {
+                SharedBuyTile(session, tile)
+            }
         }
 
         if (items.isEmpty() && sharedItems.isEmpty()) {
@@ -109,69 +110,5 @@ fun CircleDetailBuysSection(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun ReadOnlyBuyItemRow(
-    item: BuysCache.BuyItem,
-    photo: ByteArray?,
-    onTap: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onTap() }
-            .padding(vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        when (item.status) {
-            BuysCache.STATUS_BOUGHT -> Icon(
-                imageVector = Icons.Filled.Check,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp),
-                tint = MaterialTheme.colorScheme.primary
-            )
-
-            BuysCache.STATUS_CANCELLED -> Icon(
-                imageVector = Icons.Filled.Close,
-                contentDescription = null,
-                modifier = Modifier.size(18.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            else -> Spacer(modifier = Modifier.size(18.dp))
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        if (photo != null) {
-            BuyThumbnail(photo)
-            Spacer(modifier = Modifier.width(8.dp))
-        }
-        Text(
-            text = item.name.ifBlank { stringResource(R.string.buys_item_name_placeholder) },
-            style = MaterialTheme.typography.bodyMedium,
-            textDecoration = if (item.status == BuysCache.STATUS_CANCELLED) {
-                TextDecoration.LineThrough
-            } else {
-                TextDecoration.None
-            },
-            color = if (item.status != BuysCache.STATUS_PENDING || item.name.isBlank()) {
-                MaterialTheme.colorScheme.onSurfaceVariant
-            } else {
-                MaterialTheme.colorScheme.onSurface
-            },
-            modifier = Modifier.weight(1f)
-        )
-        Text(
-            text = stringResource(R.string.buys_cost_value, item.cost),
-            style = MaterialTheme.typography.bodyMedium,
-            fontFamily = FontFamily.Monospace,
-            textDecoration = if (item.status == BuysCache.STATUS_CANCELLED) {
-                TextDecoration.LineThrough
-            } else {
-                TextDecoration.None
-            },
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }

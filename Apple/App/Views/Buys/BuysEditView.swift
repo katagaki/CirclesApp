@@ -419,13 +419,13 @@ struct BuysEditThumbnail: View {
                         .scaledToFill()
                 } else {
                     Image(systemName: "photo")
-                        .font(.system(size: 14.0))
+                        .font(.system(size: 22.0))
                         .foregroundStyle(.secondary)
                 }
             }
-            .frame(width: 36.0, height: 36.0)
+            .frame(width: 64.0, height: 64.0)
             .background(Color(.systemGray5))
-            .clipShape(RoundedRectangle(cornerRadius: 6.0))
+            .clipShape(RoundedRectangle(cornerRadius: 8.0))
         }
         // Not a PhotosPicker in the menu: closing the menu takes its presentation with it.
         .photosPicker(isPresented: $isPicking, selection: $picked, matching: .images)

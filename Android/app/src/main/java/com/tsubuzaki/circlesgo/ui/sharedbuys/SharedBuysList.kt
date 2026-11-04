@@ -1,8 +1,7 @@
 package com.tsubuzaki.circlesgo.ui.sharedbuys
 
-import androidx.compose.foundation.background
-import com.tsubuzaki.circlesgo.ui.buys.BuyThumbnail
-import androidx.compose.runtime.remember
+import com.tsubuzaki.circlesgo.ui.buys.BuyItemGrid
+import com.tsubuzaki.circlesgo.ui.buys.BuyItemTile
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,21 +16,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material3.Button
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
@@ -43,6 +37,7 @@ import com.tsubuzaki.circlesgo.sharedbuys.SharedBuysSession
 fun SharedBuysList(
     session: SharedBuysSession,
     circlesByID: Map<Int, ComiketCircle>,
+    onCircleTapped: (ComiketCircle) -> Unit,
     onOpenSession: () -> Unit,
     onStart: () -> Unit
 ) {
@@ -126,18 +121,29 @@ fun SharedBuysList(
                     ?: relayed?.name?.takeIf { it.isNotEmpty() }
                     ?: stringResource(R.string.buys_unknown_circle, circleID)
                 val space = catalog?.spaceName() ?: relayed?.space
-                Text(
-                    text = if (space != null) "$name  $space" else name,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp)
-                )
-            }
-            items.filter { it.circleId == circleID }.forEach { item ->
-                item(key = item.id) {
-                    SharedBuyRow(session, item)
-                    HorizontalDivider(modifier = Modifier.padding(start = 16.dp))
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(enabled = catalog != null) { catalog?.let(onCircleTapped) }
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (space != null) "$name  $space" else name,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (catalog != null) {
+                        Text("›", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
+            }
+            item {
+                BuyItemGrid(
+                    items = items.filter { it.circleId == circleID },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                ) { SharedBuyTile(session, it) }
             }
         }
 
@@ -193,78 +199,32 @@ private fun SharedWithRow(session: SharedBuysSession, onOpen: () -> Unit) {
 }
 
 @Composable
-internal fun SharedBuyRow(session: SharedBuysSession, item: SharedBuyItem) {
+internal fun SharedBuyTile(session: SharedBuysSession, item: SharedBuyItem) {
     val isMine = item.assignee == session.actorPid
     val toucher = session.members[item.lastTouchedBy]
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                if (isMine) MaterialTheme.colorScheme.primary.copy(alpha = 0.07f) else Color.Transparent
-            )
-            .clickable { session.cycle(item) }
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        when (item.status) {
-            SharedBuyStatus.BOUGHT -> Icon(
-                Icons.Filled.Check, null, tint = MaterialTheme.colorScheme.primary
-            )
-            SharedBuyStatus.CANCELLED -> Icon(
-                Icons.Filled.Close, null, tint = MaterialTheme.colorScheme.error
-            )
-            else -> Text("○", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Spacer(modifier = Modifier.size(10.dp))
-        val send = session.imageSends[item.id]
-        if (item.imageId != null || send != null) {
-            BuyThumbnail(
-                session.image(item),
-                Modifier.clickable(enabled = send?.isFailed == true) { session.retryImage(item) }
-            )
-            Spacer(modifier = Modifier.size(10.dp))
-        }
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = item.name,
-                textDecoration = if (item.status == SharedBuyStatus.CANCELLED) {
-                    TextDecoration.LineThrough
-                } else {
-                    TextDecoration.None
-                }
-            )
-            val photoNote = when {
-                send?.isFailed == true -> R.string.buys_shared_image_failed
-                send != null -> R.string.buys_shared_image_sending
-                session.isImageMissing(item) -> R.string.buys_shared_image_expired
-                else -> null
-            }
-            if (photoNote != null) {
-                Text(
-                    text = stringResource(photoNote),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            } else if (item.status != SharedBuyStatus.PENDING &&
-                toucher != null &&
-                item.lastTouchedBy != session.actorPid
-            ) {
-                Text(
-                    text = stringResource(
-                        if (item.status == SharedBuyStatus.BOUGHT) {
-                            R.string.buys_shared_bought
-                        } else {
-                            R.string.buys_shared_cancelled
-                        },
-                        toucher
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-        Text("¥${item.cost}", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Spacer(modifier = Modifier.size(10.dp))
-        item.assignee?.let { session.members[it] }?.let { MemberInitial(nickname = it, isMine = isMine) }
+    val send = session.imageSends[item.id]
+    val note = when {
+        send?.isFailed == true -> stringResource(R.string.buys_shared_image_failed)
+        send != null -> stringResource(R.string.buys_shared_image_sending)
+        session.isImageMissing(item) -> stringResource(R.string.buys_shared_image_expired)
+        item.status == SharedBuyStatus.PENDING || toucher == null ||
+            item.lastTouchedBy == session.actorPid -> null
+        item.status == SharedBuyStatus.BOUGHT -> stringResource(R.string.buys_shared_bought, toucher)
+        else -> stringResource(R.string.buys_shared_cancelled, toucher)
     }
+    BuyItemTile(
+        name = item.name,
+        cost = item.cost,
+        photo = session.image(item),
+        status = item.status,
+        note = note,
+        isHighlighted = isMine,
+        onTap = { session.cycle(item) },
+        onPhotoTap = {
+            if (send?.isFailed == true) session.retryImage(item) else session.cycle(item)
+        },
+        accessory = {
+            item.assignee?.let { session.members[it] }?.let { MemberInitial(nickname = it, isMine = isMine) }
+        }
+    )
 }

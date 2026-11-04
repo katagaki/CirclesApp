@@ -103,10 +103,12 @@ struct GuestView: View {
             }
             ForEach(Array(circleIDs).sorted(), id: \.self) { circleID in
                 Section {
-                    ForEach(items.filter { $0.circleID == circleID }) { item in
-                        // A guest cannot reassign, so the avatar is shown but does
-                        // nothing when tapped — it still says who is responsible.
-                        SharedBuyItemRow(item: item) { }
+                    BuyItemGrid {
+                        ForEach(items.filter { $0.circleID == circleID }) { item in
+                            // A guest cannot reassign, so the avatar is shown but does
+                            // nothing when tapped — it still says who is responsible.
+                            SharedBuyItemTile(item: item, onAssign: { })
+                        }
                     }
                 } header: {
                     // The only description of a circle a guest will ever have is the one

@@ -8,7 +8,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +23,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -32,7 +30,6 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -52,11 +49,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -111,34 +106,6 @@ object BuyImageEncoder {
             }
         }
         return null
-    }
-}
-
-@Composable
-fun BuyThumbnail(data: ByteArray?, modifier: Modifier = Modifier) {
-    val bitmap = remember(data) { data?.let { BitmapFactory.decodeByteArray(it, 0, it.size) } }
-    Box(
-        modifier = modifier
-            .size(36.dp)
-            .clip(RoundedCornerShape(6.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant),
-        contentAlignment = Alignment.Center
-    ) {
-        if (bitmap != null) {
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(36.dp)
-            )
-        } else {
-            Icon(
-                imageVector = Icons.Filled.PhotoCamera,
-                contentDescription = stringResource(R.string.buys_shared_add_photo),
-                modifier = Modifier.size(16.dp),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
     }
 }
 
@@ -475,7 +442,11 @@ private fun EditRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box {
-            BuyThumbnail(photo, Modifier.clickable { isPhotoMenuOpen = true })
+            BuyPhoto(
+                photo,
+                Modifier.size(64.dp).clickable { isPhotoMenuOpen = true },
+                stringResource(R.string.buys_shared_add_photo)
+            )
             DropdownMenu(expanded = isPhotoMenuOpen, onDismissRequest = { isPhotoMenuOpen = false }) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.buys_shared_add_photo)) },

@@ -16,8 +16,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.ShoppingBag
 import androidx.compose.material3.AlertDialog
@@ -41,7 +39,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
@@ -80,11 +77,13 @@ fun BuysView(
     var circlesByID by remember { mutableStateOf<Map<Int, ComiketCircle>>(emptyMap()) }
     var isShowingInfo by remember { mutableStateOf(false) }
 
-    LaunchedEffect(buysVersion, eventNumber) {
+    val sharedCircleIDs = sharedBuys?.items?.map { it.circleId }?.distinct().orEmpty()
+
+    LaunchedEffect(buysVersion, eventNumber, sharedCircleIDs) {
         withContext(Dispatchers.IO) {
             val loaded = buysCache.entries(eventNumber)
                 .filter { entry -> entry.items.any { it.name.isNotBlank() } }
-            val circles = database.circles(loaded.map { it.circleID })
+            val circles = database.circles((loaded.map { it.circleID } + sharedCircleIDs).distinct())
             entries = loaded
             circlesByID = circles.associateBy { it.id }
         }
@@ -162,6 +161,7 @@ fun BuysView(
             SharedBuysList(
                 session = sharedBuys,
                 circlesByID = circlesByID,
+                onCircleTapped = { unifier.showCircleDetail(it) },
                 onOpenSession = { isShowingSharedSheet = true },
                 onStart = {
                     sharedBuys.adoptIdentity()
@@ -337,65 +337,14 @@ private fun BuysEntryCard(
                 }
             }
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-            for (item in entry.items.filter { it.name.isNotBlank() }.sortedBy { it.sortOrder }) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onItemTapped(item) }
-                        .padding(vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    when (item.status) {
-                        BuysCache.STATUS_BOUGHT -> Icon(
-                            imageVector = Icons.Filled.Check,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-
-                        BuysCache.STATUS_CANCELLED -> Icon(
-                            imageVector = Icons.Filled.Close,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-
-                        else -> Spacer(modifier = Modifier.size(18.dp))
-                    }
-                    Spacer(modifier = Modifier.padding(start = 8.dp))
-                    buysCache.image(item.id)?.let { photo ->
-                        BuyThumbnail(photo)
-                        Spacer(modifier = Modifier.width(8.dp))
-                    }
-                    Text(
-                        text = item.name,
-                        style = MaterialTheme.typography.bodyMedium,
-                        textDecoration = if (item.status == BuysCache.STATUS_CANCELLED) {
-                            TextDecoration.LineThrough
-                        } else {
-                            TextDecoration.None
-                        },
-                        color = if (item.status != BuysCache.STATUS_PENDING) {
-                            MaterialTheme.colorScheme.onSurfaceVariant
-                        } else {
-                            MaterialTheme.colorScheme.onSurface
-                        },
-                        modifier = Modifier.weight(1f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = stringResource(R.string.buys_cost_value, item.cost),
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontFamily = FontFamily.Monospace,
-                        textDecoration = if (item.status == BuysCache.STATUS_CANCELLED) {
-                            TextDecoration.LineThrough
-                        } else {
-                            TextDecoration.None
-                        },
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+            BuyItemGrid(entry.items.filter { it.name.isNotBlank() }.sortedBy { it.sortOrder }) { item ->
+                BuyItemTile(
+                    name = item.name,
+                    cost = item.cost,
+                    photo = buysCache.image(item.id),
+                    status = item.status,
+                    onTap = { onItemTapped(item) }
+                )
             }
         }
     }
