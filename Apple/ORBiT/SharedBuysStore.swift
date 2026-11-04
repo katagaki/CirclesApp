@@ -9,6 +9,8 @@ struct SharedBuysSnapshot: Codable, Sendable {
     var lastSeq: Int
     var changes: [SharedBuyChange]
     var clock: Int?
+    var agreementKey: Data?
+    var ownerDevice: String?
 }
 
 enum SharedBuysStore {
@@ -113,7 +115,9 @@ extension SharedBuysSession {
                         eventNumber: eventNumber,
                         lastSeq: lastSeq,
                         changes: changes,
-                        clock: clock
+                        clock: clock,
+                        agreementKey: agreementKey,
+                        ownerDevice: ownerDevice
                     )
                 )
             }

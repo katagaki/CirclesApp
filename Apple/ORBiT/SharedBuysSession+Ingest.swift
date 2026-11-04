@@ -141,6 +141,7 @@ public extension SharedBuysSession {
             refreshBluetoothDigest()
             updateActivity()
             note("received \(added)")
+            followRekey(in: Array(changes.suffix(added)))
         }
     }
 }

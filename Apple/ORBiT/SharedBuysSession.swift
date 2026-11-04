@@ -74,6 +74,9 @@ public final class SharedBuysSession {
     public private(set) var deviceID: String = ""
     private(set) var deviceAuthKey: Data = SharedBuysCrypto.newDeviceAuthKey()
     private(set) var signingKey: Data = SharedBuysCrypto.newSigningKey()
+    private(set) var agreementKey: Data = SharedBuysCrypto.newAgreementKey()
+    /// The device that started the room, from the join link's `o`. Only it can re-key us.
+    public private(set) var ownerDevice: String?
     var pushToken: String?
     var pushEnvironment: String = "sandbox"
     public private(set) var eventNumber: Int = 0
@@ -91,8 +94,8 @@ public final class SharedBuysSession {
     )?
     var lastSeq: Int = 0
     var clock: Int = 0
-    private var reconnectAttempt: Int = 0
-    private var reconnectTask: Task<Void, Never>?
+    fileprivate var reconnectAttempt: Int = 0
+    fileprivate var reconnectTask: Task<Void, Never>?
     var outbox: [RelayRecord] = []
     var flushTask: Task<Void, Never>?
     private var relayTask: Task<Void, Never>?
@@ -188,10 +191,15 @@ public final class SharedBuysSession {
         deviceID = snapshot.deviceID
         deviceAuthKey = snapshot.deviceAuthKey ?? SharedBuysCrypto.newDeviceAuthKey()
         signingKey = snapshot.signingKey ?? SharedBuysCrypto.newSigningKey()
+        agreementKey = snapshot.agreementKey ?? SharedBuysCrypto.newAgreementKey()
+        ownerDevice = snapshot.ownerDevice
         eventNumber = snapshot.eventNumber
         lastSeq = snapshot.lastSeq
         changes = snapshot.changes
         clock = snapshot.clock ?? changes.map(\.order).max() ?? 0
+        if SharedBuyFold.memberKeys(from: changes)[deviceID] != agreementPublicKeyText {
+            announceAgreementKey()
+        }
         note("restored room \(roomID ?? "?") as \(deviceID)")
         adoptActivity()
         connect()
@@ -203,16 +211,7 @@ public final class SharedBuysSession {
         // relay connection, the Bluetooth advertiser and the Live Activity all belong to
         // the room being replaced, and only `leave()` can still reach them.
         if isActive { leave() }
-        sessionKey = SharedBuysCrypto.newSessionKey()
-        deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
-        deviceID = SharedBuysCrypto.deviceID(deviceAuthKey: deviceAuthKey)
-        signingKey = SharedBuysCrypto.newSigningKey()
-        self.eventNumber = eventNumber
-        lastSeq = 0
-        clock = 0
-        changes = []
-        persist()
-        append(.memberJoined, itemID: "-", circleID: 0, text: nickname, value: actorPID)
+        enter(SharedBuysCrypto.newSessionKey(), owner: nil, eventNumber: eventNumber, nickname: nickname)
         note("started room \(roomID ?? "?") as \(deviceID)")
         connect()
         startBluetooth()
@@ -232,16 +231,8 @@ public final class SharedBuysSession {
         // identity. `adoptActivity()` catches what got away on the next launch; this
         // keeps it from getting away in the first place.
         if isActive { leave() }
-        sessionKey = key
-        deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
-        deviceID = SharedBuysCrypto.deviceID(deviceAuthKey: deviceAuthKey)
-        signingKey = SharedBuysCrypto.newSigningKey()
-        eventNumber = event
-        lastSeq = 0
-        clock = 0
-        changes = []
-        persist()
-        append(.memberJoined, itemID: "-", circleID: 0, text: nickname, value: actorPID)
+        let owner = components.queryItems?.first(where: { $0.name == "o" })?.value
+        enter(key, owner: owner.flatMap { Data(hex: $0) == nil ? nil : $0 }, eventNumber: event, nickname: nickname)
         note("joined room \(roomID ?? "?") as \(deviceID)")
         connect()
         startBluetooth()
@@ -279,6 +270,8 @@ public final class SharedBuysSession {
         sessionKey = nil
         deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
         signingKey = SharedBuysCrypto.newSigningKey()
+        agreementKey = SharedBuysCrypto.newAgreementKey()
+        ownerDevice = nil
         changes = []
         lastSeq = 0
         clock = 0
@@ -389,7 +382,7 @@ public final class SharedBuysSession {
         append(.setAssignee, itemID: item.id, circleID: item.circleID, value: pid)
     }
 
-    private func append(
+    fileprivate func append(
         _ kind: SharedBuyKind,
         itemID: String,
         circleID: Int,
@@ -402,7 +395,7 @@ public final class SharedBuysSession {
         // The restriction is the app honouring its own role, not something the log can
         // enforce -- see `isGuest`. `memberJoined` is how a guest appears in the members
         // list at all, so it is allowed alongside the status flips they are here for.
-        guard !isGuest || kind == .setStatus || kind == .memberJoined else { return }
+        guard !isGuest || kind == .setStatus || kind == .memberJoined || kind == .memberKey else { return }
         lastSeq += 1
         clock += 1
         var payload = SharedBuyPayload(
@@ -491,5 +484,71 @@ public final class SharedBuysSession {
     public func note(_ message: String) {
         log.insert(message, at: 0)
         if log.count > 40 { log.removeLast() }
+    }
+}
+
+// MARK: Entering and re-keying
+
+@MainActor
+extension SharedBuysSession {
+
+    fileprivate func enter(_ key: Data, owner: String?, eventNumber: Int, nickname: String) {
+        sessionKey = key
+        deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
+        deviceID = SharedBuysCrypto.deviceID(deviceAuthKey: deviceAuthKey)
+        signingKey = SharedBuysCrypto.newSigningKey()
+        agreementKey = SharedBuysCrypto.newAgreementKey()
+        ownerDevice = owner
+        self.eventNumber = eventNumber
+        lastSeq = 0
+        clock = 0
+        changes = []
+        persist()
+        append(.memberJoined, itemID: "-", circleID: 0, text: nickname, value: actorPID)
+        announceAgreementKey()
+    }
+
+    fileprivate var agreementPublicKeyText: String? {
+        SharedBuysCrypto.agreementPublicKey(agreementKey: agreementKey)?.base64URL
+    }
+
+    fileprivate func announceAgreementKey() {
+        guard let agreementPublicKeyText else { return }
+        append(.memberKey, itemID: "-", circleID: 0, text: agreementPublicKeyText)
+    }
+
+    /// Moves to the room the owner re-keyed us into, if one of these changes says so.
+    ///
+    /// Only a `rekey` naming this device and written by the link's owner counts, and its
+    /// signature was already checked on ingest. The owner carries the list across, so
+    /// nothing is copied here.
+    func followRekey(in added: [SharedBuyChange]) {
+        guard let ownerDevice, ownerDevice != deviceID, let roomID,
+              let rekey = added.first(where: {
+                  $0.payload.kind == .rekey && $0.payload.itemID == deviceID && $0.device == ownerDevice
+              }) else { return }
+        guard let box = rekey.payload.text.flatMap({ Data(base64URL: $0) }),
+              let opened = SharedBuysCrypto.openRekey(
+                  box,
+                  agreementKey: agreementKey,
+                  roomID: roomID,
+                  deviceID: deviceID
+              ) else {
+            note("could not open re-key")
+            return
+        }
+        reconnectTask?.cancel()
+        reconnectTask = nil
+        reconnectAttempt = 0
+        flushTask?.cancel()
+        flushTask = nil
+        outbox = []
+        stopBluetooth()
+        serializeRelay { [relay] in await relay.disconnect() }
+        status = .idle
+        enter(opened.sessionKey, owner: opened.ownerDevice, eventNumber: eventNumber, nickname: nickname)
+        note("followed re-key into room \(self.roomID ?? "?")")
+        connect()
+        startBluetooth()
     }
 }
