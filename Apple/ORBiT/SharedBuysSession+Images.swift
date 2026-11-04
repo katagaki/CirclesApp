@@ -31,7 +31,7 @@ enum SharedBuysImageCache {
 public extension SharedBuysSession {
 
     /// The largest encoded photo. Sealing adds 28 bytes, which stays under the relay's 1 MiB.
-    static var maxImageBytes: Int { 1_000_000 }
+    nonisolated static var maxImageBytes: Int { 1_000_000 }
 
     private static var imageSealOverhead: Int {
         SharedBuysCrypto.nonceLength + SharedBuysCrypto.tagLength

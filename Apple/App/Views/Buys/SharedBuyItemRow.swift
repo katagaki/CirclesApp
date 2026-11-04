@@ -24,11 +24,17 @@ struct SharedBuyItemRow: View {
             }
             .buttonStyle(.plain)
 
+            if hasPhoto { thumbnail }
+
             VStack(alignment: .leading, spacing: 2.0) {
                 Text(item.name)
                     .strikethrough(item.status == .cancelled)
                     .foregroundStyle(item.status == .cancelled ? .secondary : .primary)
-                if let byline {
+                if let photoNote {
+                    Text(photoNote)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                } else if let byline {
                     Text(byline)
                         .font(.caption2)
                         .foregroundStyle(.tertiary)
@@ -55,6 +61,36 @@ struct SharedBuyItemRow: View {
         }
         .font(.subheadline)
         .listRowBackground(isMine ? Color.accentColor.opacity(0.07) : nil)
+    }
+
+    var hasPhoto: Bool { item.imageID != nil || sharedBuys.imageSends[item.id] != nil }
+
+    var photoNote: LocalizedStringKey? {
+        if let send = sharedBuys.imageSends[item.id] {
+            return send.isFailed ? "Buys.Shared.Image.Failed" : "Buys.Shared.Image.Sending"
+        }
+        return sharedBuys.isImageMissing(for: item) ? "Buys.Shared.Image.Expired" : nil
+    }
+
+    @ViewBuilder
+    var thumbnail: some View {
+        Group {
+            if let data = sharedBuys.image(for: item), let image = UIImage(data: data) {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Image(systemName: "photo")
+                    .font(.system(size: 14.0))
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .frame(width: 36.0, height: 36.0)
+        .background(Color(.systemGray5))
+        .clipShape(RoundedRectangle(cornerRadius: 6.0))
+        .onTapGesture {
+            if sharedBuys.imageSends[item.id]?.isFailed == true { sharedBuys.retryImage(for: item) }
+        }
     }
 
     var byline: LocalizedStringKey? {

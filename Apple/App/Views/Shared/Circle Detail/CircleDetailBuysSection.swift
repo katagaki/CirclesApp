@@ -11,7 +11,9 @@ struct CircleDetailBuysSection: View {
 
     @State private var buyEntry: BuyEntry?
     @State private var isEditing: Bool = false
-    @State private var sharedDrafts: [SharedBuyDraft] = []
+    @State private var composition: SharedBuyComposition?
+    @State private var convertingItemID: String?
+    @State private var assigningItem: SharedBuyItem?
 
     @Binding var buysAttachmentPickerCircle: ComiketCircle?
     @Binding var buysCropImage: UIImage?
@@ -39,20 +41,17 @@ struct CircleDetailBuysSection: View {
                 }
                 .moveDisabled(!isEditing)
             }
-            ForEach($sharedDrafts) { $draft in
-                SharedBuyDraftRow(
-                    circleID: circle.id,
-                    circleName: circle.circleName,
-                    circleSpace: circle.spaceName(),
-                    itemID: $draft.itemID
-                )
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        Button(role: .destructive) {
-                            discardDraft(draft)
-                        } label: {
-                            Label("Shared.Delete", systemImage: "trash")
+            if sharedBuys.isActive {
+                ForEach(sharedBuys.items.filter { $0.circleID == circle.id }) { item in
+                    SharedBuyItemRow(item: item) { assigningItem = item }
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                            Button(role: .destructive) {
+                                sharedBuys.remove(itemID: item.id, circleID: item.circleID)
+                            } label: {
+                                Label("Shared.Delete", systemImage: "trash")
+                            }
                         }
-                    }
+                }
             }
             if isEditing || buyEntry == nil || buyEntry?.items.isEmpty == true {
                 Button {
@@ -63,12 +62,29 @@ struct CircleDetailBuysSection: View {
                 } label: {
                     Label("Buys.AddItem", systemImage: "plus.circle.fill")
                 }
-                if sharedBuys.isActive {
-                    Button {
-                        sharedDrafts.append(SharedBuyDraft())
-                    } label: {
-                        Label("Buys.AddItem.Shared", systemImage: "person.2.badge.plus")
-                    }
+            }
+            if sharedBuys.isActive {
+                Button {
+                    composition = SharedBuyComposition()
+                } label: {
+                    Label("Buys.AddItem.Shared", systemImage: "person.2.badge.plus")
+                }
+                .sheet(item: $composition) { composition in
+                    SharedBuyComposerSheet(
+                        circleID: circle.id,
+                        circleName: circle.circleName,
+                        circleSpace: circle.spaceName(),
+                        attachments: AttachmentsDatabase.shared
+                            .attachments(eventNumber: circle.eventNumber, circleID: circle.id)
+                            .map(\.attachmentBlob),
+                        composition: composition,
+                        onMoved: {
+                            if let convertingItemID { deleteItem(id: convertingItemID) }
+                        }
+                    )
+                }
+                .sheet(item: $assigningItem) { item in
+                    SharedBuyAssignSheet(item: item)
                 }
             }
         } header: {
@@ -142,6 +158,26 @@ struct CircleDetailBuysSection: View {
             }
             .buttonStyle(.plain)
         }
+        .swipeActions(edge: .leading) { moveToSharedButton(item: item) }
+        .contextMenu { moveToSharedButton(item: item) }
+    }
+
+    @ViewBuilder
+    func moveToSharedButton(item: BuyItem) -> some View {
+        if sharedBuys.isActive {
+            Button {
+                convertingItemID = item.id
+                composition = SharedBuyComposition(
+                    name: item.name,
+                    cost: item.cost,
+                    imageData: item.imageData,
+                    isConversion: true
+                )
+            } label: {
+                Label("Buys.Shared.Add.Move", systemImage: "person.2.fill")
+            }
+            .tint(.accentColor)
+        }
     }
 
     @ViewBuilder
@@ -174,6 +210,7 @@ struct CircleDetailBuysSection: View {
             .multilineTextAlignment(.trailing)
             .foregroundStyle(.secondary)
         }
+        .swipeActions(edge: .leading) { moveToSharedButton(item: item) }
         .swipeActions(edge: .trailing, allowsFullSwipe: true) {
             Button(role: .destructive) {
                 deleteItem(id: item.id)
@@ -213,13 +250,6 @@ struct CircleDetailBuysSection: View {
         } else {
             buysAttachmentPickerCircle = circle
         }
-    }
-
-    func discardDraft(_ draft: SharedBuyDraft) {
-        if let itemID = draft.itemID {
-            sharedBuys.remove(itemID: itemID, circleID: circle.id)
-        }
-        sharedDrafts.removeAll { $0.id == draft.id }
     }
 
     func addBlankItem() {
@@ -283,9 +313,4 @@ struct BuyImageViewer: View {
             }
         }
     }
-}
-
-struct SharedBuyDraft: Identifiable {
-    let id = UUID()
-    var itemID: String?
 }

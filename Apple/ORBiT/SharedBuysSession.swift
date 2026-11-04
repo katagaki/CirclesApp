@@ -340,62 +340,6 @@ public final class SharedBuysSession {
         }
     }
 
-    /// Adds an item, carrying the circle's identity into the log the first time that
-    /// circle appears in the room.
-    ///
-    /// `circleName` and `circleSpace` come from the caller's catalog database, which a
-    /// guest does not have. Relayed once per circle rather than per item: the check is
-    /// against the folded circle map, so it is idempotent across a restore and a
-    /// second contributor adding from a circle someone else already introduced.
-    @discardableResult
-    public func addItem(
-        name: String,
-        cost: Int,
-        circleID: Int,
-        circleName: String? = nil,
-        circleSpace: String? = nil,
-        assignToSelf: Bool = true
-    ) -> String {
-        let itemID = String(UUID().uuidString.prefix(8)).lowercased()
-        if let circleName, !circleName.isEmpty, SharedBuyFold.circles(from: changes)[circleID] == nil {
-            append(.circleInfo, itemID: "-", circleID: circleID, text: circleName, space: circleSpace)
-        }
-        append(.addItem, itemID: itemID, circleID: circleID, text: name, value: cost)
-        if assignToSelf {
-            append(.setAssignee, itemID: itemID, circleID: circleID, value: actorPID)
-        }
-        return itemID
-    }
-
-    public func rename(itemID: String, circleID: Int, to name: String) {
-        append(.renameItem, itemID: itemID, circleID: circleID, text: name)
-    }
-
-    public func setCost(itemID: String, circleID: Int, to cost: Int) {
-        append(.setCost, itemID: itemID, circleID: circleID, value: cost)
-    }
-
-    func recordImage(_ imageID: String, itemID: String, circleID: Int) {
-        append(.setImage, itemID: itemID, circleID: circleID, text: imageID)
-    }
-
-    public func remove(itemID: String, circleID: Int) {
-        append(.removeItem, itemID: itemID, circleID: circleID)
-    }
-
-    public func cycle(_ item: SharedBuyItem) {
-        append(
-            .setStatus,
-            itemID: item.id,
-            circleID: item.circleID,
-            value: SharedBuyStatus.next(after: item.rawStatus).rawValue
-        )
-    }
-
-    public func assign(_ item: SharedBuyItem, to pid: Int?) {
-        append(.setAssignee, itemID: item.id, circleID: item.circleID, value: pid)
-    }
-
     fileprivate func append(
         _ kind: SharedBuyKind,
         itemID: String,
@@ -565,5 +509,67 @@ extension SharedBuysSession {
         note("followed re-key into room \(self.roomID ?? "?")")
         connect()
         startBluetooth()
+    }
+}
+
+// MARK: Item changes
+
+@MainActor
+public extension SharedBuysSession {
+
+    /// Adds an item, carrying the circle's identity into the log the first time that
+    /// circle appears in the room.
+    ///
+    /// `circleName` and `circleSpace` come from the caller's catalog database, which a
+    /// guest does not have. Relayed once per circle rather than per item: the check is
+    /// against the folded circle map, so it is idempotent across a restore and a
+    /// second contributor adding from a circle someone else already introduced.
+    @discardableResult
+    public func addItem(
+        name: String,
+        cost: Int,
+        circleID: Int,
+        circleName: String? = nil,
+        circleSpace: String? = nil,
+        assignToSelf: Bool = true
+    ) -> String {
+        let itemID = String(UUID().uuidString.prefix(8)).lowercased()
+        if let circleName, !circleName.isEmpty, SharedBuyFold.circles(from: changes)[circleID] == nil {
+            append(.circleInfo, itemID: "-", circleID: circleID, text: circleName, space: circleSpace)
+        }
+        append(.addItem, itemID: itemID, circleID: circleID, text: name, value: cost)
+        if assignToSelf {
+            append(.setAssignee, itemID: itemID, circleID: circleID, value: actorPID)
+        }
+        return itemID
+    }
+
+    public func rename(itemID: String, circleID: Int, to name: String) {
+        append(.renameItem, itemID: itemID, circleID: circleID, text: name)
+    }
+
+    public func setCost(itemID: String, circleID: Int, to cost: Int) {
+        append(.setCost, itemID: itemID, circleID: circleID, value: cost)
+    }
+
+    internal func recordImage(_ imageID: String, itemID: String, circleID: Int) {
+        append(.setImage, itemID: itemID, circleID: circleID, text: imageID)
+    }
+
+    public func remove(itemID: String, circleID: Int) {
+        append(.removeItem, itemID: itemID, circleID: circleID)
+    }
+
+    public func cycle(_ item: SharedBuyItem) {
+        append(
+            .setStatus,
+            itemID: item.id,
+            circleID: item.circleID,
+            value: SharedBuyStatus.next(after: item.rawStatus).rawValue
+        )
+    }
+
+    public func assign(_ item: SharedBuyItem, to pid: Int?) {
+        append(.setAssignee, itemID: item.id, circleID: item.circleID, value: pid)
     }
 }
