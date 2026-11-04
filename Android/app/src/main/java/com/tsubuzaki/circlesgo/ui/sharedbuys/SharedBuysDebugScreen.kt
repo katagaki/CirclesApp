@@ -69,6 +69,9 @@ fun SharedBuysDebugScreen(session: SharedBuysSession, onClose: () -> Unit) {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(onClick = { session.connect() }) { Text("Reconnect") }
                         Button(onClick = { session.leave() }) { Text("Leave") }
+                        Button(onClick = { session.rotateKey() }, enabled = session.canRotateKey) {
+                            Text("Rotate")
+                        }
                     }
                     Row(
                         modifier = Modifier.fillMaxWidth(),
