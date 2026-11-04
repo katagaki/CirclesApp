@@ -110,8 +110,12 @@ struct SharedBuyComposerSheet: View {
                             .resizable()
                             .scaledToFill()
                     } else {
-                        Label("Buys.Shared.Add.Photo", systemImage: "photo.badge.plus")
-                            .font(.footnote)
+                        VStack(spacing: 6.0) {
+                            Image(systemName: "photo.badge.plus")
+                                .font(.title2)
+                            Text("Buys.Shared.Add.Photo")
+                                .font(.footnote)
+                        }
                     }
                 }
                 .frame(width: 120.0, height: 120.0)
