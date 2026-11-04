@@ -181,6 +181,9 @@ fun CircleDetailView(
     val extInfo = circle.extendedInformation
 
     var isEditingBuys by remember { mutableStateOf(false) }
+    // A null height means the sheet is already full, so it stays that way on the way back.
+    var collapsesAfterEditing by remember { mutableStateOf(false) }
+    val contentScroll = rememberScrollState()
     if (isEditingBuys && buysCache != null && events != null) {
         BuysEditView(
             session = LocalSharedBuys.current,
@@ -192,7 +195,7 @@ fun CircleDetailView(
             attachmentsCache = attachmentsCache,
             onClose = {
                 isEditingBuys = false
-                unifier.requestSheetCollapse()
+                if (collapsesAfterEditing) unifier.requestSheetCollapse()
             }
         )
         return
@@ -294,7 +297,7 @@ fun CircleDetailView(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(contentScroll)
         ) {
 
         Row(
@@ -454,6 +457,7 @@ fun CircleDetailView(
                 eventNumber = events.activeEventNumber,
                 buysCache = buysCache,
                 onEdit = {
+                    collapsesAfterEditing = visibleHeight != null
                     isEditingBuys = true
                     unifier.requestSheetExpand()
                 },
