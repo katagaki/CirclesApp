@@ -238,7 +238,7 @@
     <string name="buys_shared_add_photo">Add photo</string>
     <string name="buys_shared_assign_to_me">Assign to me</string>
     <string name="buys_shared_remove_from_buys">Remove from your Buys</string>
-    <string name="buys_shared_visible">Members can see this name, price and photo.</string>
+    <string name="buys_shared_visible">Members can see this name, cost and photo.</string>
     <string name="buys_shared_image_sending">Sending photo…</string>
     <string name="buys_shared_image_failed">Photo not sent. Tap the photo to retry.</string>
     <string name="buys_shared_image_expired">Photo no longer available</string>
