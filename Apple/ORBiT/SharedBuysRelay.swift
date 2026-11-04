@@ -28,6 +28,8 @@ actor SharedBuysRelay {
     private var lastPong: Date = .distantPast
     private var heldSeen: Bool = false
     private var sentEvidence: Bool = false
+    private var slotWaiters: [Int: CheckedContinuation<String?, Never>] = [:]
+    private var nextSlotRequest: Int = 0
 
     struct Endpoint: Sendable {
         var baseURL: String
@@ -82,6 +84,24 @@ actor SharedBuysRelay {
         session?.invalidateAndCancel()
         session = nil
         handler = nil
+        for waiter in slotWaiters.values { waiter.resume(returning: nil) }
+        slotWaiters = [:]
+    }
+
+    /// Asks the relay for an upload slot of `size` bytes, over the attested socket.
+    func requestImageSlot(size: Int) async -> String? {
+        guard let task else { return nil }
+        nextSlotRequest += 1
+        let request = nextSlotRequest
+        return await withCheckedContinuation { continuation in
+            slotWaiters[request] = continuation
+            task.send(.string(#"{"t":"img","n":\#(size),"c":\#(request)}"#)) { _ in }
+        }
+    }
+
+    /// Tells the relay this device holds the image, so it can stop storing it.
+    func acknowledgeImage(_ imageID: String) async {
+        try? await task?.send(.string(#"{"t":"got","i":"\#(imageID)"}"#))
     }
 
     func send(records: [RelayRecord]) async {
@@ -222,6 +242,10 @@ actor SharedBuysRelay {
                         return RelayRecord(device: device, seq: seq, blob: blob, tag: tag)
                     }
                     handler?(.records(records))
+                case "img":
+                    if let request = object["c"] as? Int {
+                        slotWaiters.removeValue(forKey: request)?.resume(returning: object["i"] as? String)
+                    }
                 case "err":
                     await fail(object["c"] as? String ?? "error")
                 default:

@@ -11,6 +11,7 @@ enum SharedBuysCrypto {
     static let deviceIDLength = 16
     static let signInfo = "circles-buys/v1/sign"
     static let rekeyInfo = "circles-buys/v1/rekey"
+    static let imageInfo = "circles-buys/v1/image"
     static let agreementPublicKeyLength = 65
     static let rekeyPlaintextLength = 36
     static let tagLength = 16
@@ -146,6 +147,27 @@ enum SharedBuysCrypto {
     static func verifies(_ signature: Data, input: Data, publicKey: Data) -> Bool {
         guard let key = try? Curve25519.Signing.PublicKey(rawRepresentation: publicKey) else { return false }
         return key.isValidSignature(signature, for: input)
+    }
+
+    /// Seals an image as `nonce(12) ‖ ciphertext ‖ tag(16)`, bound to its room and ID.
+    static func sealImage(_ image: Data, sessionKey: Data, roomID: String, imageID: String) -> Data? {
+        guard let aad = imageAssociatedData(roomID: roomID, imageID: imageID) else { return nil }
+        return try? AES.GCM.seal(
+            image,
+            using: derive(imageInfo, from: sessionKey),
+            authenticating: aad
+        ).combined
+    }
+
+    static func openImage(_ blob: Data, sessionKey: Data, roomID: String, imageID: String) -> Data? {
+        guard let aad = imageAssociatedData(roomID: roomID, imageID: imageID),
+              let box = try? AES.GCM.SealedBox(combined: blob) else { return nil }
+        return try? AES.GCM.open(box, using: derive(imageInfo, from: sessionKey), authenticating: aad)
+    }
+
+    private static func imageAssociatedData(roomID: String, imageID: String) -> Data? {
+        guard let room = Data(hex: roomID), let image = Data(hex: imageID) else { return nil }
+        return room + image
     }
 
     static func newAgreementKey() -> Data { P256.KeyAgreement.PrivateKey().rawRepresentation }

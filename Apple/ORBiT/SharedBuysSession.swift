@@ -117,6 +117,12 @@ public final class SharedBuysSession {
     let bluetooth = SharedBuysBluetooth()
     #endif
 
+    /// Items whose photo is on its way up, or failed to get there.
+    public internal(set) var imageSends: [String: SharedBuyImageSend] = [:]
+    /// Moves when a photo lands in the cache, so rows showing a placeholder redraw.
+    public internal(set) var imageRevision: Int = 0
+    @ObservationIgnored var imageFetches: Set<String> = []
+
     public var bluetoothPeers: Int = 0
     public var bluetoothNote: String = ""
     public var isBluetoothEnabled: Bool = true
@@ -201,6 +207,7 @@ public final class SharedBuysSession {
             announceAgreementKey()
         }
         note("restored room \(roomID ?? "?") as \(deviceID)")
+        fetchMissingImages()
         adoptActivity()
         connect()
         startBluetooth()
@@ -346,14 +353,17 @@ public final class SharedBuysSession {
         cost: Int,
         circleID: Int,
         circleName: String? = nil,
-        circleSpace: String? = nil
+        circleSpace: String? = nil,
+        assignToSelf: Bool = true
     ) -> String {
         let itemID = String(UUID().uuidString.prefix(8)).lowercased()
         if let circleName, !circleName.isEmpty, SharedBuyFold.circles(from: changes)[circleID] == nil {
             append(.circleInfo, itemID: "-", circleID: circleID, text: circleName, space: circleSpace)
         }
         append(.addItem, itemID: itemID, circleID: circleID, text: name, value: cost)
-        append(.setAssignee, itemID: itemID, circleID: circleID, value: actorPID)
+        if assignToSelf {
+            append(.setAssignee, itemID: itemID, circleID: circleID, value: actorPID)
+        }
         return itemID
     }
 
@@ -363,6 +373,10 @@ public final class SharedBuysSession {
 
     public func setCost(itemID: String, circleID: Int, to cost: Int) {
         append(.setCost, itemID: itemID, circleID: circleID, value: cost)
+    }
+
+    func recordImage(_ imageID: String, itemID: String, circleID: Int) {
+        append(.setImage, itemID: itemID, circleID: circleID, text: imageID)
     }
 
     public func remove(itemID: String, circleID: Int) {
@@ -430,6 +444,7 @@ public final class SharedBuysSession {
             status = .connected
             reconnectAttempt = 0
             note("connected")
+            fetchMissingImages()
         case .held(let seq):
             // Our own history coming back from the relay means a save was lost; never
             // reuse a sequence number it already holds. `held` carries no tag, so it is
