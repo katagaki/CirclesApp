@@ -14,8 +14,10 @@ struct BuysEntrySection: View {
         let circle = database.circles([entry.circleID]).first
 
         Section {
-            ForEach(entry.items.filter { !$0.name.trimmingCharacters(in: .whitespaces).isEmpty }) { item in
-                BuyItemRow(item: item, expandedImage: $expandedImage, onReload: onReload)
+            BuyItemGrid {
+                ForEach(entry.items.filter { !$0.name.trimmingCharacters(in: .whitespaces).isEmpty }) { item in
+                    MyBuyItemTile(item: item, expandedImage: $expandedImage, onReload: onReload)
+                }
             }
         } header: {
             if let circle {

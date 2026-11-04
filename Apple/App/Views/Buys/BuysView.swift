@@ -219,8 +219,14 @@ struct BuysView: View {
                 }
                 ForEach(Array(circleIDs).sorted(), id: \.self) { circleID in
                     Section {
-                        ForEach(sharedBuys.items.filter { $0.circleID == circleID }) { item in
-                            SharedBuyItemRow(item: item) { assignmentTarget = item }
+                        BuyItemGrid {
+                            ForEach(sharedBuys.items.filter { $0.circleID == circleID }) { item in
+                                SharedBuyItemTile(
+                                    item: item,
+                                    onAssign: { assignmentTarget = item },
+                                    onViewPhoto: { expandedImage = $0 }
+                                )
+                            }
                         }
                     } header: {
                         if let circle = circles.first(where: { $0.id == circleID }) {
