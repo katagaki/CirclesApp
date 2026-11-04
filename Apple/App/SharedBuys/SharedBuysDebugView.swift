@@ -12,6 +12,7 @@ struct SharedBuysDebugView: View {
     @State var joinLink: String = ""
     @State var nickname: String = "Tester"
     @State var composition: SharedBuyComposition?
+    @State var isEditingBuys: Bool = false
 
     var body: some View {
         @Bindable var session = session
@@ -69,6 +70,7 @@ struct SharedBuysDebugView: View {
                             }
                             .disabled(itemName.isEmpty)
                         }
+                        Button("Edit Buys") { isEditingBuys = true }
                         Button("Compose") { composition = SharedBuyComposition() }
                         Button("Convert sample") {
                             composition = SharedBuyComposition(
@@ -149,6 +151,9 @@ struct SharedBuysDebugView: View {
                 NavigationStack {
                     SharedBuyComposerView(circleID: 1, attachments: [samplePhoto], composition: composition)
                 }
+            }
+            .navigationDestination(isPresented: $isEditingBuys) {
+                BuysEditView(circleID: 1, eventNumber: 0)
             }
             .navigationTitle("Shared Buys")
             .navigationBarTitleDisplayMode(.inline)

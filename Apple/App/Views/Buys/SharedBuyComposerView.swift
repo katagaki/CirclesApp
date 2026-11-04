@@ -1,4 +1,3 @@
-import AXiS
 import ORBiT
 import PhotosUI
 import SwiftUI
@@ -177,53 +176,5 @@ struct SharedBuyComposerView: View {
         }
         if composition.isConversion, removeFromBuys { onMoved?() }
         dismiss()
-    }
-}
-
-/// Pushes the composer inside the panel, raising it to full height for the keyboard and
-/// putting it back afterwards. Applied to the detail view, not a row, so that neither
-/// presentation is lost when the row scrolls out of the list.
-struct SharedBuyComposerPresenter: ViewModifier {
-
-    @Environment(Unifier.self) var unifier
-    @Environment(Events.self) var planner
-
-    let circle: ComiketCircle
-    let attachments: [Data]
-    @Binding var composition: SharedBuyComposition?
-    @Binding var assigningItem: SharedBuyItem?
-
-    @State private var detentBeforeComposer: PresentationDetent?
-
-    func body(content: Content) -> some View {
-        content
-            .sheet(item: $assigningItem) { item in
-                SharedBuyAssignSheet(item: item)
-            }
-            .navigationDestination(item: $composition) { composition in
-                SharedBuyComposerView(
-                    circleID: circle.id,
-                    circleName: circle.circleName,
-                    circleSpace: circle.spaceName(),
-                    attachments: attachments,
-                    composition: composition,
-                    onMoved: {
-                        guard let itemID = composition.personalItemID else { return }
-                        BuysDatabase.shared.deleteItem(id: itemID, eventNumber: planner.activeEventNumber)
-                    }
-                )
-                .opacity(unifier.isMinimized ? 0.0 : 1.0)
-                .toolbarVisibility(unifier.isMinimized ? .hidden : .visible, for: .navigationBar, .bottomBar)
-            }
-            .onChange(of: composition == nil) { _, isClosed in
-                guard unifier.displayMode == .sheet else { return }
-                if isClosed {
-                    if let detentBeforeComposer { unifier.selectedDetent = detentBeforeComposer }
-                    detentBeforeComposer = nil
-                } else {
-                    detentBeforeComposer = unifier.selectedDetent
-                    unifier.selectedDetent = .large
-                }
-            }
     }
 }
