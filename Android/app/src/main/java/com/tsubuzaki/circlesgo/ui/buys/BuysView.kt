@@ -77,11 +77,13 @@ fun BuysView(
     var circlesByID by remember { mutableStateOf<Map<Int, ComiketCircle>>(emptyMap()) }
     var isShowingInfo by remember { mutableStateOf(false) }
 
-    LaunchedEffect(buysVersion, eventNumber) {
+    val sharedCircleIDs = sharedBuys?.items?.map { it.circleId }?.distinct().orEmpty()
+
+    LaunchedEffect(buysVersion, eventNumber, sharedCircleIDs) {
         withContext(Dispatchers.IO) {
             val loaded = buysCache.entries(eventNumber)
                 .filter { entry -> entry.items.any { it.name.isNotBlank() } }
-            val circles = database.circles(loaded.map { it.circleID })
+            val circles = database.circles((loaded.map { it.circleID } + sharedCircleIDs).distinct())
             entries = loaded
             circlesByID = circles.associateBy { it.id }
         }
@@ -159,6 +161,7 @@ fun BuysView(
             SharedBuysList(
                 session = sharedBuys,
                 circlesByID = circlesByID,
+                onCircleTapped = { unifier.showCircleDetail(it) },
                 onOpenSession = { isShowingSharedSheet = true },
                 onStart = {
                     sharedBuys.adoptIdentity()

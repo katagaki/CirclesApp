@@ -37,6 +37,7 @@ import com.tsubuzaki.circlesgo.sharedbuys.SharedBuysSession
 fun SharedBuysList(
     session: SharedBuysSession,
     circlesByID: Map<Int, ComiketCircle>,
+    onCircleTapped: (ComiketCircle) -> Unit,
     onOpenSession: () -> Unit,
     onStart: () -> Unit
 ) {
@@ -120,12 +121,23 @@ fun SharedBuysList(
                     ?: relayed?.name?.takeIf { it.isNotEmpty() }
                     ?: stringResource(R.string.buys_unknown_circle, circleID)
                 val space = catalog?.spaceName() ?: relayed?.space
-                Text(
-                    text = if (space != null) "$name  $space" else name,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp)
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(enabled = catalog != null) { catalog?.let(onCircleTapped) }
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (space != null) "$name  $space" else name,
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.weight(1f)
+                    )
+                    if (catalog != null) {
+                        Text("›", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
             }
             item {
                 BuyItemGrid(
