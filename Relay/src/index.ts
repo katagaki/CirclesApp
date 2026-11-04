@@ -3,7 +3,7 @@ import { Room, HELLO_SKEW_SECONDS } from "./room";
 import { Identity } from "./identity";
 import type { PushEnv } from "./push";
 import { type AttestEnv, type Verified, attestMode, isLoopback, verifyAttestation } from "./attest";
-import { attestInput, b64urlDecode, b64urlEncode, sha256 } from "./proto";
+import { DEVICE_ID, attestInput, b64urlDecode, b64urlEncode, sha256 } from "./proto";
 
 export { Room, Identity };
 
@@ -29,7 +29,7 @@ export default {
     const hello = readHello(request);
     if (!hello) return rejection(401, "auth", "authenticated hello required");
     const frame = hello.frame;
-    if (typeof frame.d !== "string" || !/^[0-9a-f]{8}$/.test(frame.d)) return rejection(400, "proto", "bad device id");
+    if (typeof frame.d !== "string" || !DEVICE_ID.test(frame.d)) return rejection(400, "proto", "bad device id");
     if (!Number.isSafeInteger(frame.ts) || (frame.ts as number) < 0) return rejection(400, "proto", "bad timestamp");
     if (Math.abs(Math.floor(Date.now() / 1000) - (frame.ts as number)) > HELLO_SKEW_SECONDS) return rejection(401, "auth", "stale hello");
     const mode = attestMode(env, isLoopback(url.hostname));

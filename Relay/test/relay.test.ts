@@ -129,6 +129,34 @@ describe("fan-out", () => {
   });
 });
 
+describe("device ids", () => {
+  const LONG = "0123456789abcdef0123456789abcdef";
+
+  it("relays between 8 and 32 hex devices in one room", async () => {
+    const room = roomId();
+    const key = authKey();
+    const short = await join(room, key, "aaaaaaaa", {}, true);
+    expect(await short.next()).toEqual({ t: "ops", o: [] });
+    const long = await join(room, key, LONG);
+    expect(await long.next()).toEqual({ t: "ops", o: [] });
+
+    const fromLong = await record(key, LONG, 1, "from-long");
+    long.send({ t: "ops", o: [fromLong] });
+    expect(await short.next()).toEqual({ t: "ops", o: [fromLong] });
+
+    const fromShort = await record(key, "aaaaaaaa", 1, "from-short");
+    short.send({ t: "ops", o: [fromShort] });
+    expect(await long.next()).toEqual({ t: "ops", o: [fromShort] });
+  });
+
+  it("refuses any other length", async () => {
+    const room = roomId();
+    const key = authKey();
+    const client = await join(room, key, "abcdef012345", {}, true);
+    expect(await client.next()).toMatchObject({ t: "err", c: "proto" });
+  });
+});
+
 describe("authentication", () => {
   it("closes with 4004 on a bad record tag and stores nothing", async () => {
     const room = roomId();

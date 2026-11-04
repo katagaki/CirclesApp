@@ -1,4 +1,5 @@
 export const TAG_LEN = 16;
+export const DEVICE_ID = /^[0-9a-f]{8}(?:[0-9a-f]{24})?$/;
 
 const B64URL = /^[A-Za-z0-9_-]*$/;
 

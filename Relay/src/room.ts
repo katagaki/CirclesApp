@@ -3,6 +3,7 @@ import { type Environment, type Platform, type PushEnv, type Target, push } from
 import type { AttestEnv } from "./attest";
 import { AUTHENTICATED_HEADER, readHello, rejection } from "./admission";
 import {
+  DEVICE_ID,
   TAG_LEN,
   b64urlDecode,
   b64urlEncode,
@@ -36,7 +37,6 @@ export const CLOSE_STORAGE_FULL = 4005;
 export const CLOSE_UNKNOWN_ROOM = 4006;
 export const CLOSE_REPLACED = 4007;
 
-const DEVICE_ID = /^[0-9a-f]{8}$/;
 const PUSH_TOKEN = /^[A-Za-z0-9_:.-]{1,512}$/;
 
 interface Attachment {

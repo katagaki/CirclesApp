@@ -284,7 +284,8 @@ relayAuthKey  = HKDF-SHA256(sessionKey, info: "circles-buys/v1/relay-auth", len 
 handshakeKey  = HKDF-SHA256(sessionKey, info: "circles-buys/v1/ble-handshake", len 32)
 agreementKey  = P-256 key pair, fresh per device per room                 <span class="c">→ public half announced as memberKey</span>
 
-deviceID      = 4 random bytes                                            <span class="c">→ 8 hex chars</span>
+deviceID      = 4 random bytes (Android)                                  <span class="c">→ 8 hex chars</span>
+deviceID      = SHA-256("circles-buys/v1/device" ‖ 0 ‖ deviceKey)[0..16] (iOS) <span class="c">→ 32 hex chars</span>
 nonce         = 12 random bytes                                           <span class="c">→ AES-GCM</span>
 aad           = roomID(16) ‖ deviceID(4) ‖ u64be(seq)                     <span class="c">→ 28 bytes</span>
 blob          = 53 42 32 00 ‖ nonce ‖ AES-256-GCM(contentKey, nonce, aad, payloadJSON) ‖ gcmTag(16)
@@ -352,7 +353,7 @@ signature     = Ed25519(signingKey, signInput)                              <spa
         <table>
           <thead><tr><th>Field</th><th>Type</th><th>Rule</th></tr></thead>
           <tbody>
-            <tr><td class="mono">d</td><td>string</td><td>Must match <code>/^[0-9a-f]{8}$/</code>. Bound to the socket; every later record must claim this same device or the socket closes 4004.</td></tr>
+            <tr><td class="mono">d</td><td>string</td><td>Must match <code>/^[0-9a-f]{8}(?:[0-9a-f]{24})?$/</code>: 8 hex from Android, 32 hex from iOS. Bound to the socket; every later record must claim this same device or the socket closes 4004.</td></tr>
             <tr><td class="mono">v</td><td>object</td><td>Device → sequence number. The relay returns every stored record whose <code>seq</code> exceeds the value given, and everything for a device absent from the map. Values are the <em>contiguous</em> prefix, so a record above a gap is re-sent rather than skipped forever.</td></tr>
             <tr><td class="mono">k</td><td>string?</td><td>Registers the room on first use. Ignored once a room has a key. Omitted by the client over plaintext non-loopback links; a relay that has never seen the key answers 4006.</td></tr>
             <tr><td class="mono">ts</td><td>number</td><td>Safe integer ≥ 0. Beyond ±300 s of relay time refuses the upgrade with HTTP 401. The room remembers the SHA-256 of every hello it admits until its <code>ts</code> falls outside that window, and refuses the exact same hello bytes a second time with HTTP 401 and <code>m: "replayed hello"</code>, leaving the socket that first sent them alone. A client builds a new hello for every upgrade, so a retry after this refusal passes.</td></tr>
