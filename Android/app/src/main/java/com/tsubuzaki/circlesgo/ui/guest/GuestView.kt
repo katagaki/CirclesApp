@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -35,7 +34,8 @@ import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.sharedbuys.SharedBuysScanner
 import com.tsubuzaki.circlesgo.sharedbuys.SharedBuysSession
-import com.tsubuzaki.circlesgo.ui.sharedbuys.SharedBuyRow
+import com.tsubuzaki.circlesgo.ui.buys.BuyItemGrid
+import com.tsubuzaki.circlesgo.ui.sharedbuys.SharedBuyTile
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -164,11 +164,11 @@ private fun JoinedList(session: SharedBuysSession, onLeave: () -> Unit) {
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 4.dp)
                 )
             }
-            items.filter { it.circleId == circleID }.forEach { item ->
-                item(key = item.id) {
-                    SharedBuyRow(session, item)
-                    HorizontalDivider(modifier = Modifier.padding(start = 16.dp))
-                }
+            item {
+                BuyItemGrid(
+                    items = items.filter { it.circleId == circleID },
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                ) { SharedBuyTile(session, it) }
             }
         }
         item {
