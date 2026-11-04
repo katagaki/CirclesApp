@@ -895,6 +895,13 @@ signature  f2d23784ace1922d4c1de1309b8c92dec096802082acc71a40b77c66281fbe63
            3ea7a7f6304f98ba06295e7ecd0b66eac2c4230538613b66c85d4c31c26f200c</pre>
   </section>
 
+  <section id="images">
+    <h2>Item images</h2>
+    <p>Images are sealed by the client and stored in R2, never in frames. Client sends <code>{"t":"img","n":size,"c":corr}</code> and receives <code>{"t":"img","c":corr,"i":id}</code>, or <code>"e":"size"</code> / <code>"e":"quota"</code>. It then uploads with <code>PUT /r/&lt;room&gt;/i/&lt;id&gt;</code> and writes a <code>setImage</code> change, k 10, with <code>t</code> holding the id. Members fetch with <code>GET</code> and acknowledge with <code>{"t":"got","i":id}</code>. The image is deleted once every other device has acknowledged it, or after 24 hours. Bodies over 1 MiB are refused from <code>Content-Length</code> before they are read.</p>
+<pre>imageKey = HKDF-SHA256(sessionKey, info: "circles-buys/v1/image", len 32)
+blob     = nonce(12) ‖ AES-256-GCM(imageKey, nonce, aad: roomID(16) ‖ imageID(16), webp) ‖ gcmTag(16)</pre>
+  </section>
+
   <section id="rekey">
     <h2>Re-keying a room</h2>
     <p class="lede">

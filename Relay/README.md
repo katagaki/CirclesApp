@@ -28,6 +28,14 @@ Secrets, set with `npx wrangler secret put NAME`, or in a gitignored `.dev.vars`
 
 `APNS_TEAM_ID` and `APNS_TOPIC` are plain vars in `wrangler.jsonc`. An environment whose key is missing is skipped silently — devices on the other environment still get woken.
 
+## Shared images
+
+Item photos live in the dedicated `circles-relay-images` R2 bucket, sealed by the clients, so the relay only ever holds ciphertext. A push cannot carry them (APNs and FCM stop at about 4 KB), so the content-free wake-up tells members to fetch, and retention is kept short instead: an image is deleted as soon as every other device in the room has acknowledged it, and after 24 hours regardless. A member who joins after that sees the item without its photo.
+
+A client asks for a slot over its attested socket, which returns a random 128-bit id that doubles as the capability for `PUT` and `GET /r/<room>/i/<id>`. Uploads over 1 MiB are refused from `Content-Length` before the body is read, and the body streams through a `FixedLengthStream` into R2, so a false length fails without the image ever being buffered.
+
+Create the bucket before deploying: `npx wrangler r2 bucket create circles-relay-images`.
+
 ## Device attestation
 
 The WebSocket upgrade must carry `X-Circles-Hello`, the base64url-encoded UTF-8 JSON hello, and `X-Circles-Attest`, the base64url-encoded UTF-8 JSON evidence bound to those exact hello bytes, proving the socket belongs to a genuine build on genuine hardware — App Attest from Apple platforms, Play Integrity from Android. It is a tagged union with no default branch: an unrecognised kind is refused rather than waved through. See `PROTOCOL.html` for the wire format and what each path checks.

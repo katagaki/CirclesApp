@@ -1,7 +1,8 @@
 import { env, runDurableObjectAlarm, runInDurableObject, SELF } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
 import { Client, authKey, helloFrame, record, roomId } from "./client";
-import { type Room } from "../src/room";
+import { IMAGE_TTL_MS, MAX_IMAGE_BYTES, type Room } from "../src/room";
+import worker from "../src/index";
 
 async function join(
   room: string,
@@ -157,6 +158,128 @@ describe("device ids", () => {
   });
 });
 
+describe("images", () => {
+  const url = (room: string, id: string) => `http://localhost/r/${room}/i/${id}`;
+  const fetchImage = (room: string, id: string, init?: RequestInit) =>
+    worker.fetch(new Request(url(room, id), init), env as never);
+
+  async function members() {
+    const room = roomId();
+    const key = authKey();
+    const owner = await join(room, key, "aaaaaaaa", {}, true);
+    await owner.next();
+    const peer = await join(room, key, "bbbbbbbb");
+    await peer.next();
+    return { room, owner, peer };
+  }
+
+  async function slot(client: Client, size: number): Promise<string> {
+    client.send({ t: "img", n: size, c: 1 });
+    const frame = await client.next();
+    expect(frame.t).toBe("img");
+    return frame.i;
+  }
+
+  it("stores, serves and deletes an image once every other member has it", async () => {
+    const { room, owner, peer } = await members();
+    const bytes = new Uint8Array([1, 2, 3, 4]);
+    const id = await slot(owner, 4);
+    const put = await fetchImage(room, id, { method: "PUT", body: bytes, headers: { "Content-Length": "4" } });
+    expect(put.status).toBe(204);
+    const got = await fetchImage(room, id);
+    expect(new Uint8Array(await got.arrayBuffer())).toEqual(bytes);
+    peer.send({ t: "got", i: id });
+    await peer.quiet();
+    expect((await fetchImage(room, id)).status).toBe(404);
+    expect(await env.IMAGES.get(id)).toBe(null);
+  });
+
+  it("keeps an image while another member still lacks it", async () => {
+    const { room, owner } = await members();
+    const id = await slot(owner, 2);
+    await fetchImage(room, id, { method: "PUT", body: new Uint8Array(2), headers: { "Content-Length": "2" } });
+    owner.send({ t: "got", i: id });
+    await owner.quiet();
+    expect((await fetchImage(room, id)).status).toBe(200);
+  });
+
+  it("refuses an oversized image by its header, before reading the body", async () => {
+    const { room, owner } = await members();
+    const id = await slot(owner, 4);
+    let pulled = false;
+    const body = new ReadableStream({ pull() { pulled = true; } }, { highWaterMark: 0 });
+    const response = await worker.fetch(
+      new Request(url(room, id), {
+        method: "PUT",
+        body,
+        headers: { "Content-Length": String(MAX_IMAGE_BYTES + 1) },
+        duplex: "half",
+      } as RequestInit),
+      env as never,
+    );
+    expect(response.status).toBe(413);
+    expect(pulled).toBe(false);
+  });
+
+  it("refuses a slot larger than the limit", async () => {
+    const { owner } = await members();
+    owner.send({ t: "img", n: MAX_IMAGE_BYTES + 1, c: 7 });
+    expect(await owner.next()).toEqual({ t: "img", c: 7, e: "size" });
+  });
+
+  it("refuses a body that does not match its slot or its claimed length", async () => {
+    const { room, owner } = await members();
+    const id = await slot(owner, 4);
+    const wrongSlot = await fetchImage(room, id, { method: "PUT", body: new Uint8Array(3), headers: { "Content-Length": "3" } });
+    expect(wrongSlot.status).toBe(413);
+    const lying = new ReadableStream({
+      start(controller) { controller.enqueue(new Uint8Array(9)); controller.close(); },
+    });
+    const response = await stub(room).fetch(new Request(url(room, id), {
+      method: "PUT",
+      body: lying,
+      headers: { "Content-Length": "4" },
+      duplex: "half",
+    } as RequestInit));
+    expect(response.status).toBe(400);
+    expect(await env.IMAGES.get(id)).toBe(null);
+  });
+
+  it("refuses an unknown image and a second upload", async () => {
+    const { room, owner } = await members();
+    expect((await fetchImage(room, "0".repeat(32))).status).toBe(404);
+    const id = await slot(owner, 1);
+    const init = { method: "PUT", body: new Uint8Array(1), headers: { "Content-Length": "1" } };
+    await fetchImage(room, id, init);
+    expect((await fetchImage(room, id, init)).status).toBe(409);
+  });
+
+  it("expires an unclaimed image without ending the room", async () => {
+    const { room, owner } = await members();
+    const id = await slot(owner, 1);
+    await fetchImage(room, id, { method: "PUT", body: new Uint8Array(1), headers: { "Content-Length": "1" } });
+    await runInDurableObject(stub(room), async (instance: Room, state: DurableObjectState) => {
+      state.storage.sql.exec("UPDATE images SET created = ?", Date.now() - IMAGE_TTL_MS - 1);
+      await instance.alarm();
+      expect(await state.storage.getAlarm()).not.toBe(null);
+    });
+    expect((await fetchImage(room, id)).status).toBe(404);
+    expect(await env.IMAGES.get(id)).toBe(null);
+    expect((await state(room)).tables).toContain("ops");
+  });
+
+  it("removes stored images when the room expires", async () => {
+    const { room, owner } = await members();
+    const id = await slot(owner, 1);
+    await fetchImage(room, id, { method: "PUT", body: new Uint8Array(1), headers: { "Content-Length": "1" } });
+    await runInDurableObject(stub(room), async (instance: Room, state: DurableObjectState) => {
+      await state.storage.put("expires", 0);
+      await instance.alarm();
+    });
+    expect(await env.IMAGES.get(id)).toBe(null);
+  });
+});
+
 describe("authentication", () => {
   it("closes with 4004 on a bad record tag and stores nothing", async () => {
     const room = roomId();
@@ -238,7 +361,8 @@ describe("authentication", () => {
     const key = authKey();
     const first = await join(room, key, "aaaaaaaa", {}, true);
     await first.next();
-    await runInDurableObject(stub(room), async (instance: Room) => {
+    await runInDurableObject(stub(room), async (instance: Room, state: DurableObjectState) => {
+      await state.storage.put("expires", 0);
       await instance.alarm();
     });
 
@@ -545,6 +669,7 @@ describe("lifetime", () => {
     a.send({ t: "ops", o: [await record(key, "aaaaaaaa", 1, "doomed")] });
     await new Promise((resolve) => setTimeout(resolve, 50));
 
+    await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) => state.storage.put("expires", 0));
     expect(await runDurableObjectAlarm(stub(room))).toBe(true);
     await runInDurableObject(stub(room), (_instance: Room, state: DurableObjectState) => {
       expect(tables(state)).toEqual([]);
