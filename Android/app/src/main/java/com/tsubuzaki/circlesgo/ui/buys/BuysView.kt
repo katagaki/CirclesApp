@@ -224,6 +224,7 @@ fun BuysView(
                     BuysEntryCard(
                         entry = entry,
                         circle = circle,
+                        buysCache = buysCache,
                         onItemTapped = { item ->
                             buysCache.updateItem(
                                 circleID = entry.circleID,
@@ -303,6 +304,7 @@ private fun TotalRow(label: String, cost: Int, emphasized: Boolean) {
 private fun BuysEntryCard(
     entry: BuysCache.BuyEntry,
     circle: ComiketCircle?,
+    buysCache: BuysCache,
     onItemTapped: (BuysCache.BuyItem) -> Unit,
     onCircleTapped: () -> Unit
 ) {
@@ -361,6 +363,10 @@ private fun BuysEntryCard(
                         else -> Spacer(modifier = Modifier.size(18.dp))
                     }
                     Spacer(modifier = Modifier.padding(start = 8.dp))
+                    buysCache.image(item.id)?.let { photo ->
+                        BuyThumbnail(photo)
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
                     Text(
                         text = item.name,
                         style = MaterialTheme.typography.bodyMedium,

@@ -26,6 +26,9 @@ object SharedBuyKind {
     const val MEMBER_KEY = 8
     const val REKEY = 9
 
+    /** The item's photo, as the relay's image ID in text. The bytes live in R2. */
+    const val SET_IMAGE = 10
+
     /**
      * Whether this kind is carried over the peer-to-peer Bluetooth path.
      *
@@ -43,7 +46,7 @@ object SharedBuyKind {
      * in the deferred map instead, waiting for an addItem that would never make it
      * applicable, and the map grew for the life of the session.
      */
-    fun isKnown(kind: Int): Boolean = kind in ADD_ITEM..REKEY
+    fun isKnown(kind: Int): Boolean = kind in ADD_ITEM..SET_IMAGE
 }
 
 object SharedBuyStatus {
@@ -127,7 +130,8 @@ data class SharedBuyItem(
     val status: Int,
     val assignee: Int?,
     val isRemoved: Boolean,
-    val lastTouchedBy: Int
+    val lastTouchedBy: Int,
+    val imageId: String? = null
 )
 
 object SharedBuyFold {
@@ -188,6 +192,7 @@ object SharedBuyFold {
             SharedBuyKind.RENAME_ITEM ->
                 current.copy(name = payload.text.orEmpty(), lastTouchedBy = payload.actor)
             SharedBuyKind.REMOVE_ITEM -> current.copy(isRemoved = true)
+            SharedBuyKind.SET_IMAGE -> current.copy(imageId = payload.text)
             else -> return
         }
     }

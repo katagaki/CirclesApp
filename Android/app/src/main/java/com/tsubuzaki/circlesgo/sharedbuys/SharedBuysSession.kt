@@ -6,6 +6,7 @@ import com.tsubuzaki.circlesgo.BuildConfig
 import com.tsubuzaki.circlesgo.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.CoroutineScope
@@ -13,6 +14,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.Json
 import java.util.UUID
+
+/** A photo that has not reached the relay yet. Failed sends keep their bytes for a retry. */
+data class SharedBuyImageSend(val image: ByteArray, val isFailed: Boolean)
 
 class SharedBuysSession(private val context: Context, private val scope: CoroutineScope) {
 
@@ -46,6 +50,16 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
 
     /** Fires whenever the folded list moves, so the Live Update can follow it. */
     var onChanged: (() -> Unit)? = null
+
+    /** Items whose photo is on its way up, or failed to get there. */
+    val imageSends = mutableStateMapOf<String, SharedBuyImageSend>()
+    /** Moves when a photo lands in the cache, so rows showing a placeholder redraw. */
+    var imageRevision by mutableStateOf(0)
+        private set
+    private val imageFetches = mutableSetOf<String>()
+    private val imageCache = java.io.File(context.cacheDir, "shared-buys-images").apply { mkdirs() }
+    /** Photos to send once a socket is up, which is how a rotation carries them across. */
+    private val pendingImages = mutableListOf<Triple<ByteArray, String, Int>>()
 
     val log = mutableStateListOf<String>()
     val changes = mutableStateListOf<SharedBuyChange>()
@@ -293,6 +307,7 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
             announceAgreementKey()
         }
         note("restored room $roomId as $deviceId")
+        fetchMissingImages()
         SharedBuysLiveUpdateService.start(context)
         // A restored session reported isActive but had no transport behind it: the relay
         // was never reconnected and Bluetooth never started, so the room was dead until
@@ -304,12 +319,13 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
     /**
      * Brings the transports back after the process, or the user, went away.
      *
-     * Safe to call repeatedly: connect() cancels any pending reconnect before dialling,
-     * and startBluetooth() no-ops without a session key or the permissions.
+     * A live or opening socket is left alone: redialling dropped it on every foreground,
+     * and a second hello in the same second is byte-identical, so the relay refused it as
+     * a replay. startBluetooth() no-ops without a session key or the permissions.
      */
     fun resume() {
         if (!isActive) return
-        connect()
+        if (status != "connected" && status != "connecting") connect()
         startBluetooth()
     }
 
@@ -389,6 +405,9 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
         val carriedItems = items
         val carriedMembers = members
         val carriedCircles = circles
+        val carriedImages = carriedItems.mapNotNull { item ->
+            item.imageId?.let(::cachedImage)?.let { Triple(it, item.id, item.circleId) }
+        }
         isRekeying = true
         val records = recipients.entries.sortedBy { it.key }.mapNotNull { (device, publicKey) ->
             val box = runCatching {
@@ -415,6 +434,7 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
             }
         }
         isRekeying = false
+        pendingImages.addAll(carriedImages)
         note("re-keyed ${records.size} members into room $roomId")
         connect()
         startBluetooth()
@@ -789,8 +809,96 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
         return itemId
     }
 
+    private fun cachedImage(imageId: String): ByteArray? =
+        runCatching { java.io.File(imageCache, imageId).readBytes() }.getOrNull()
+
+    private fun imageUrl(room: String, imageId: String): String {
+        val http = relayBaseUrl.replaceFirst("wss://", "https://").replaceFirst("ws://", "http://")
+        return "$http/r/$room/i/$imageId"
+    }
+
+    /** The photo for an item, from the cache. Reads imageRevision so a fetch redraws rows. */
+    fun image(item: SharedBuyItem): ByteArray? {
+        imageRevision
+        imageSends[item.id]?.let { return it.image }
+        return item.imageId?.let(::cachedImage)
+    }
+
+    /** Whether the relay has already dropped a photo this device never received. */
+    fun isImageMissing(item: SharedBuyItem): Boolean {
+        imageRevision
+        val imageId = item.imageId ?: return false
+        return cachedImage(imageId) == null && imageId !in imageFetches
+    }
+
+    /** Sends a WebP photo for an item. The item itself is already synced; only this waits. */
+    fun attachImage(image: ByteArray, itemId: String, circleId: Int) {
+        if (image.size > MAX_IMAGE_BYTES) return
+        val key = sessionKey ?: return
+        val room = roomId ?: return
+        imageSends[itemId] = SharedBuyImageSend(image, false)
+        scope.launch {
+            val imageId = relay.requestImageSlot(image.size + SharedBuysCrypto.IMAGE_SEAL_OVERHEAD)
+            val sent = imageId != null && relay.uploadImage(
+                imageUrl(room, imageId),
+                SharedBuysCrypto.sealImage(image, key, room, imageId)
+            )
+            if (!sent) {
+                imageSends[itemId] = SharedBuyImageSend(image, true)
+                note("image upload failed")
+                return@launch
+            }
+            if (sessionKey?.contentEquals(key) != true) return@launch
+            java.io.File(imageCache, imageId!!).writeBytes(image)
+            append(SharedBuyKind.SET_IMAGE, itemId, circleId, imageId, null)
+            imageSends.remove(itemId)
+            imageRevision += 1
+        }
+    }
+
+    /**
+     * Encodes and sends a photo on the session's scope. The sheet that picked it closes
+     * straight away, and work on its own scope would be cancelled with it.
+     */
+    fun attachImage(itemId: String, circleId: Int, encode: () -> ByteArray?) {
+        scope.launch {
+            val encoded = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Default) { encode() }
+            encoded?.let { attachImage(it, itemId, circleId) }
+        }
+    }
+
+    fun retryImage(item: SharedBuyItem) {
+        imageSends[item.id]?.let { attachImage(it.image, item.id, item.circleId) }
+    }
+
+    /** Fetches every photo in the room this device lacks, then lets the relay drop them. */
+    private fun fetchMissingImages() {
+        val key = sessionKey ?: return
+        val room = roomId ?: return
+        items.mapNotNull { it.imageId }.distinct()
+            .filter { cachedImage(it) == null && imageFetches.add(it) }
+            .forEach { imageId ->
+                scope.launch {
+                    val blob = relay.downloadImage(imageUrl(room, imageId))
+                    val image = blob?.let {
+                        runCatching { SharedBuysCrypto.openImage(it, key, room, imageId) }.getOrNull()
+                    }
+                    if (image != null) {
+                        java.io.File(imageCache, imageId).writeBytes(image)
+                        relay.acknowledgeImage(imageId)
+                    }
+                    imageFetches.remove(imageId)
+                    imageRevision += 1
+                }
+            }
+    }
+
     fun rename(itemId: String, circleId: Int, name: String) {
         append(SharedBuyKind.RENAME_ITEM, itemId, circleId, name, null)
+    }
+
+    fun setStatus(itemId: String, circleId: Int, status: Int) {
+        append(SharedBuyKind.SET_STATUS, itemId, circleId, null, status)
     }
 
     fun setCost(itemId: String, circleId: Int, cost: Int) {
@@ -894,6 +1002,7 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
                 status = "connected"
                 reconnectAttempt = 0
                 note("connected")
+                fetchMissingImages()
             }
             is RelayEvent.Held -> {
                 // Our own history coming back from the relay means a save was lost;
@@ -903,6 +1012,8 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
                 val held = event.seq.coerceIn(0L, MAX_STORED_RECORDS)
                 lastSeq = maxOf(lastSeq, held)
                 resend(held)
+                pendingImages.toList().also { pendingImages.clear() }
+                    .forEach { (image, itemId, circleId) -> attachImage(image, itemId, circleId) }
             }
             is RelayEvent.Records -> ingest(event.records)
             // The relay refuses writes once a room holds 500 records, and closes the
@@ -1070,6 +1181,7 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
             persist()
             bluetooth?.update(SharedBuysDigest.bytes(bluetoothDigestVector))
             note("received ${added.size}")
+            fetchMissingImages()
             followRekeys(added)
         }
     }
@@ -1157,6 +1269,9 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
             "4968b067252cb291c8edd8244e1269fd7740abbf41ebf4e842663ebb" +
                 "0b89fbce886e51c8036b9e64d95c57379e5bcf35fac8aba9"
         private const val MAX_STORED_RECORDS = 500L
+
+        /** The largest encoded photo. Sealing adds 28 bytes, under the relay's 1 MiB. */
+        const val MAX_IMAGE_BYTES = 1_000_000
 
     }
 }

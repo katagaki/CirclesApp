@@ -9,7 +9,8 @@ import {
   isLoopback,
   verifyAttestation,
 } from "../src/attest";
-import worker, { ATTEST_HEADER, HELLO_HEADER, type Env } from "../src/index";
+import worker, { type Env } from "../src/index";
+import { ATTEST_HEADER, HELLO_HEADER } from "../src/admission";
 import { attestInput, b64urlEncode, sha256 } from "../src/proto";
 import { resetBearers } from "../src/push";
 import type { Room } from "../src/room";

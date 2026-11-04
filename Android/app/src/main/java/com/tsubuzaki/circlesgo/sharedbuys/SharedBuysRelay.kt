@@ -6,9 +6,14 @@ import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.ResponseException
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocketSession
+import io.ktor.client.request.get
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.readRawBytes
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.consumeEach
@@ -65,6 +70,8 @@ class SharedBuysRelay(private val context: Context, private val scope: Coroutine
     private var job: Job? = null
     private var sentEvidence = false
     private var suppressClose = false
+    private val slotWaiters = mutableMapOf<Long, CompletableDeferred<String?>>()
+    private var nextSlotRequest = 0L
 
     fun connect(endpoint: Endpoint, onEvent: (RelayEvent) -> Unit) {
         disconnect()
@@ -117,9 +124,34 @@ class SharedBuysRelay(private val context: Context, private val scope: Coroutine
         }
     }
 
+    /** Asks the relay for an upload slot of size bytes, over the attested socket. */
+    suspend fun requestImageSlot(size: Int): String? {
+        val socket = session ?: return null
+        nextSlotRequest += 1
+        val request = nextSlotRequest
+        val waiter = CompletableDeferred<String?>()
+        slotWaiters[request] = waiter
+        val sent = runCatching { socket.send(Frame.Text("{\"t\":\"img\",\"n\":$size,\"c\":$request}")) }
+        if (sent.isFailure) slotWaiters.remove(request)?.complete(null)
+        return waiter.await()
+    }
+
+    /** Tells the relay this device holds the image, so it can stop storing it. */
+    suspend fun acknowledgeImage(imageId: String) {
+        runCatching { session?.send(Frame.Text("{\"t\":\"got\",\"i\":\"$imageId\"}")) }
+    }
+
+    suspend fun uploadImage(url: String, sealed: ByteArray): Boolean =
+        runCatching { client.put(url) { setBody(sealed) } }.isSuccess
+
+    suspend fun downloadImage(url: String): ByteArray? =
+        runCatching { client.get(url).readRawBytes() }.getOrNull()
+
     fun disconnect(records: List<RelayRecord> = emptyList()) {
         job?.cancel()
         job = null
+        slotWaiters.values.forEach { it.complete(null) }
+        slotWaiters.clear()
         val socket = session
         session = null
         if (socket != null) {
@@ -144,11 +176,8 @@ class SharedBuysRelay(private val context: Context, private val scope: Coroutine
     }
 
     fun send(records: List<RelayRecord>, onEvent: (RelayEvent) -> Unit = {}) {
-        val socket = session
-        if (socket == null) {
-            onEvent(RelayEvent.Failed("no socket"))
-            return
-        }
+        // Nothing is lost without a socket: held triggers a resend once one opens.
+        val socket = session ?: return
         if (records.isEmpty()) return
         val frames = pages(records).map(::opsFrame)
         scope.launch {
@@ -268,6 +297,11 @@ class SharedBuysRelay(private val context: Context, private val scope: Coroutine
                 }
                 onEvent(RelayEvent.Records(records))
                 return true
+            }
+            "img" -> {
+                val request = runCatching { frame["c"]?.jsonPrimitive?.long }.getOrNull()
+                val id = (frame["i"] as? JsonPrimitive)?.content
+                request?.let { slotWaiters.remove(it)?.complete(id) }
             }
             "err" -> onEvent(RelayEvent.Failed(errorSlug(frame["c"]?.jsonPrimitive?.content ?: "error")))
         }

@@ -29,6 +29,15 @@ struct CirclesApp: App {
 
     @State var hasAppLaunchedForTheFirstTime: Bool = false
 
+    /// Lets a signed-out Simulator reach the member flows, which sit behind login.
+    static var isSharedBuysDebugRoot: Bool {
+        #if DEBUG
+        CommandLine.arguments.contains("-SharedBuysDebugRoot")
+        #else
+        false
+        #endif
+    }
+
     var body: some Scene {
         WindowGroup {
             // Guest Mode is a different app, not a mode of this one: no catalog, so no
@@ -38,7 +47,9 @@ struct CirclesApp: App {
                 // A guest shell with the feature switched off is an empty app: send them
                 // back to login rather than to a room they cannot reach. Guest Mode is
                 // left set, so flipping the switch on returns them to it.
-                if sharedBuys.isGuest && sharedBuys.isFeatureEnabled {
+                if Self.isSharedBuysDebugRoot {
+                    SharedBuysDebugView()
+                } else if sharedBuys.isGuest && sharedBuys.isFeatureEnabled {
                     GuestView()
                 } else {
                     unifiedShell()
@@ -64,8 +75,14 @@ struct CirclesApp: App {
             // `UnifiedView` and no login — is configured too.
             .task {
                 let config = await RemoteConfigProvider().fetchRelayConfig()
+                #if DEBUG
+                // Development-signed builds cannot attest, so they stay on `npm run dev`.
+                let relayBaseURL: String? = nil
+                #else
+                let relayBaseURL = config?.baseURL
+                #endif
                 sharedBuys.applyRelayConfig(
-                    baseURL: config?.baseURL,
+                    baseURL: relayBaseURL,
                     isFeatureEnabled: config?.isFeatureEnabled ?? true
                 )
                 if !sharedBuys.isFeatureEnabled && unifier.current == .buys {

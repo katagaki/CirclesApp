@@ -1120,7 +1120,7 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "新增至共用列表"
+            "value": "新增至共享清單"
           }
         }
       }
@@ -1155,6 +1155,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "¥%lld"
+          }
+        }
+      }
+    },
+    "Buys.Edit.AddToMine": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add to your Buys"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自分の宝物リストに追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "내 구매 목록에 추가"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "添加到我的宝贝清单"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "新增至我的寶藏清單"
+          }
+        }
+      }
+    },
+    "Buys.Edit.Title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Buys"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "宝物を編集"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "구매 목록 편집"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "编辑宝贝"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "編輯寶藏"
           }
         }
       }
@@ -1971,19 +2041,19 @@
         "ko": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "내 전리품"
+            "value": "내 구매 목록"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "我的战利品"
+            "value": "我的宝贝"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "我的戰利品"
+            "value": "我的寶藏"
           }
         }
       }
@@ -2087,6 +2157,111 @@
           "stringUnit": {
             "state": "translated",
             "value": "從附件中選擇"
+          }
+        }
+      }
+    },
+    "Buys.Shared.Add.Move": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move to shared list"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共同購入リストに移動"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "공유 목록으로 이동"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "移至共享列表"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "移至共享清單"
+          }
+        }
+      }
+    },
+    "Buys.Shared.Add.Photo": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add photo"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "写真を追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "사진 추가"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "添加照片"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "新增照片"
+          }
+        }
+      }
+    },
+    "Buys.Shared.Add.Visible": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Members can see this name, cost and photo."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この名前、値段、写真は参加者に表示されます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "이 이름, 가격, 사진은 참가자에게 표시됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "此名称、价格和照片对参与者可见。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "此名稱、價格和照片對參與者可見。"
           }
         }
       }
@@ -2196,6 +2371,41 @@
         }
       }
     },
+    "Buys.Shared.Copy": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy to your Buys"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自分の宝物リストにコピー"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "내 구매 목록에 복사"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "复制到我的宝贝清单"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "複製到我的寶藏清單"
+          }
+        }
+      }
+    },
     "Buys.Shared.End": {
       "extractionState": "manual",
       "localizations": {
@@ -2249,19 +2459,19 @@
         "ko": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "내 전리품 목록은 비공개로 유지됩니다. 공유 목록은 참가자 모두가 보고 편집할 수 있는 별도의 목록입니다."
+            "value": "내 구매 목록은 비공개로 유지됩니다. 공유 목록은 참가자 모두가 보고 편집할 수 있는 별도의 목록입니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "你自己的战利品列表仍为私密。共享列表是所有参与者都能查看和编辑的另一个列表。"
+            "value": "你自己的宝贝清单仍为私密。共享列表是所有参与者都能查看和编辑的另一个列表。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "needs_review",
-            "value": "你自己的戰利品清單仍為私密。共享清單是所有參與者都能檢視和編輯的另一個清單。"
+            "value": "你自己的寶藏清單仍為私密。共享清單是所有參與者都能檢視和編輯的另一個清單。"
           }
         }
       }
@@ -2297,6 +2507,111 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "全員合計"
+          }
+        }
+      }
+    },
+    "Buys.Shared.Image.Expired": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo no longer available"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "写真は利用できなくなりました"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "사진을 더 이상 볼 수 없습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "照片已无法查看"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "照片已無法檢視"
+          }
+        }
+      }
+    },
+    "Buys.Shared.Image.Failed": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Photo not sent. Tap the photo to retry."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "写真を送信できませんでした。写真をタップして再試行してください。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "사진을 보내지 못했습니다. 사진을 탭하여 다시 시도하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "照片未发送。点击照片重试。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "照片未傳送。點選照片重試。"
+          }
+        }
+      }
+    },
+    "Buys.Shared.Image.Sending": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sending photo…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "写真を送信中…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "사진 전송 중…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "正在发送照片…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "正在傳送照片…"
           }
         }
       }
@@ -2402,6 +2717,41 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "參與者"
+          }
+        }
+      }
+    },
+    "Buys.Shared.Move.Confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move to shared list?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共同購入リストに移動しますか？"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "공유 목록으로 이동할까요?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "要移至共享列表吗？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "needs_review",
+            "value": "要移至共享清單嗎？"
           }
         }
       }

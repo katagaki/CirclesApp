@@ -11,6 +11,7 @@ struct SharedBuysDebugView: View {
     @State var itemCost: String = "1000"
     @State var joinLink: String = ""
     @State var nickname: String = "Tester"
+    @State var isEditingBuys: Bool = false
 
     var body: some View {
         @Bindable var session = session
@@ -68,13 +69,14 @@ struct SharedBuysDebugView: View {
                             }
                             .disabled(itemName.isEmpty)
                         }
+                        Button("Edit Buys") { isEditingBuys = true }
                         ForEach(session.items) { item in
                             Button {
                                 session.cycle(item)
                             } label: {
                                 HStack {
                                     Image(systemName: symbol(for: item))
-                                    Text(item.name)
+                                    Text("[\(item.rawStatus)] \(item.name)")
                                     Spacer()
                                     if let assignee = item.assignee {
                                         Text(session.members[assignee] ?? String(assignee))
@@ -126,6 +128,9 @@ struct SharedBuysDebugView: View {
                 } header: {
                     Text("Log")
                 }
+            }
+            .navigationDestination(isPresented: $isEditingBuys) {
+                BuysEditView(circleID: 1, eventNumber: 0)
             }
             .navigationTitle("Shared Buys")
             .navigationBarTitleDisplayMode(.inline)

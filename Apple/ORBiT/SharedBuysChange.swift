@@ -19,6 +19,15 @@ public enum SharedBuyKind: Int, Codable, Sendable {
     /// reads the header off the log instead. Sent once per circle per room.
     case circleInfo = 7
 
+    /// This device's P-256 agreement key, which the room owner seals a new key to.
+    case memberKey = 8
+
+    /// A new room's key, sealed by the owner to one device, named by `itemID`.
+    case rekey = 9
+
+    /// The item's photo, as the relay's image ID in `text`. The bytes live in R2.
+    case setImage = 10
+
     /// Whether this kind is carried over the peer-to-peer Bluetooth path.
     ///
     /// Bluetooth frames are chunked at 160 bytes and reassembled by hand, so the
@@ -176,6 +185,7 @@ public struct SharedBuyItem: Identifiable, Sendable, Hashable {
     public var assignee: Int?
     public var isRemoved: Bool
     public var lastTouchedBy: Int
+    public var imageID: String?
 
     public var status: SharedBuyStatus { SharedBuyStatus(rawValue: rawStatus) ?? .pending }
 }
@@ -203,7 +213,8 @@ public enum SharedBuyFold {
                     rawStatus: SharedBuyStatus.pending.rawValue,
                     assignee: nil,
                     isRemoved: false,
-                    lastTouchedBy: payload.actor
+                    lastTouchedBy: payload.actor,
+                    imageID: nil
                 )
                 // A mutation can land before the addItem it targets: Bluetooth carries
                 // status flips but never the item itself, so a peer can learn that
@@ -212,7 +223,7 @@ public enum SharedBuyFold {
                 for pending in deferred.removeValue(forKey: payload.itemID) ?? [] {
                     apply(pending, to: &byID)
                 }
-            case .memberJoined, .circleInfo:
+            case .memberJoined, .circleInfo, .memberKey, .rekey:
                 continue
             default:
                 if byID[payload.itemID] == nil {
@@ -245,7 +256,9 @@ public enum SharedBuyFold {
             byID[payload.itemID]?.lastTouchedBy = payload.actor
         case .removeItem:
             byID[payload.itemID]?.isRemoved = true
-        case .addItem, .memberJoined, .circleInfo:
+        case .setImage:
+            byID[payload.itemID]?.imageID = payload.text
+        case .addItem, .memberJoined, .circleInfo, .memberKey, .rekey:
             break
         }
     }
@@ -262,6 +275,15 @@ public enum SharedBuyFold {
                 name: change.payload.text ?? "",
                 space: change.payload.space
             )
+        }
+        return result
+    }
+
+    /// The agreement key each device last announced, as base64url text.
+    static func memberKeys(from changes: [SharedBuyChange]) -> [String: String] {
+        var result: [String: String] = [:]
+        for change in changes.sorted(by: { $0.seq < $1.seq }) where change.payload.kind == .memberKey {
+            result[change.device] = change.payload.text
         }
         return result
     }

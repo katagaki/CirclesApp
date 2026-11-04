@@ -25,6 +25,8 @@ import javax.crypto.Mac
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
+private const val NONCE_LENGTH_VALUE = 12
+
 object SharedBuysCrypto {
 
     const val TOPIC_INFO = "circles-buys/v1/topic"
@@ -32,11 +34,14 @@ object SharedBuysCrypto {
     const val RELAY_AUTH_INFO = "circles-buys/v1/relay-auth"
     const val HANDSHAKE_INFO = "circles-buys/v1/ble-handshake"
     const val REKEY_INFO = "circles-buys/v1/rekey"
+    const val IMAGE_INFO = "circles-buys/v1/image"
+    /** The bytes sealing adds to an image: its nonce and GCM tag. */
+    const val IMAGE_SEAL_OVERHEAD = NONCE_LENGTH_VALUE + 16
     const val PUBLIC_KEY_LENGTH = 65
     private const val REKEY_PLAINTEXT_LENGTH = 36
     const val SIGN_INFO = "circles-buys/v1/sign"
     const val TAG_LENGTH = 16
-    const val NONCE_LENGTH = 12
+    const val NONCE_LENGTH = NONCE_LENGTH_VALUE
     val RANDOM_NONCE_MARKER = byteArrayOf(0x53, 0x42, 0x32, 0x00)
 
     private val random = SecureRandom()
@@ -200,6 +205,30 @@ object SharedBuysCrypto {
         return cipher.doFinal(sealed)
     }
 
+    /** Seals an image as nonce(12) ‖ ciphertext ‖ tag(16), bound to its room and ID. */
+    fun sealImage(image: ByteArray, sessionKey: ByteArray, roomId: String, imageId: String): ByteArray {
+        val nonce = randomNonce(NONCE_LENGTH)
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(
+            Cipher.ENCRYPT_MODE,
+            SecretKeySpec(derive(IMAGE_INFO, sessionKey), "AES"),
+            GCMParameterSpec(128, nonce)
+        )
+        cipher.updateAAD(roomId.fromHex() + imageId.fromHex())
+        return nonce + cipher.doFinal(image)
+    }
+
+    fun openImage(blob: ByteArray, sessionKey: ByteArray, roomId: String, imageId: String): ByteArray {
+        val cipher = Cipher.getInstance("AES/GCM/NoPadding")
+        cipher.init(
+            Cipher.DECRYPT_MODE,
+            SecretKeySpec(derive(IMAGE_INFO, sessionKey), "AES"),
+            GCMParameterSpec(128, blob.copyOfRange(0, NONCE_LENGTH))
+        )
+        cipher.updateAAD(roomId.fromHex() + imageId.fromHex())
+        return cipher.doFinal(blob, NONCE_LENGTH, blob.size - NONCE_LENGTH)
+    }
+
     private val p256: ECParameterSpec by lazy { (newAgreementKey().public as ECPublicKey).params }
 
     fun newAgreementKey(): KeyPair =
@@ -277,11 +306,7 @@ object SharedBuysCrypto {
         ByteBuffer.allocate(12).put(deviceId.fromHex()).putLong(seq).array()
 
     private fun associatedData(roomId: String, deviceId: String, seq: Long): ByteArray =
-        ByteBuffer.allocate(16 + 4 + 8)
-            .put(roomId.fromHex())
-            .put(deviceId.fromHex())
-            .putLong(seq)
-            .array()
+        roomId.fromHex() + deviceId.fromHex() + ByteBuffer.allocate(8).putLong(seq).array()
 
     fun hmac(key: ByteArray, message: ByteArray): ByteArray {
         val mac = Mac.getInstance("HmacSHA256")

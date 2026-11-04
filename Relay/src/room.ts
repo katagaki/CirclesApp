@@ -3,6 +3,7 @@ import { type Environment, type Platform, type PushEnv, type Target, push } from
 import type { AttestEnv } from "./attest";
 import { AUTHENTICATED_HEADER, readHello, rejection } from "./admission";
 import {
+  DEVICE_ID,
   TAG_LEN,
   b64urlDecode,
   b64urlEncode,
@@ -27,6 +28,9 @@ export const HELLO_SKEW_SECONDS = 300;
 export const ROOM_TTL_MS = 48 * 60 * 60 * 1000;
 export const PUSH_COALESCE_MS = 10_000;
 export const MAX_TOKEN_LENGTH = 512;
+export const MAX_IMAGE_BYTES = 1024 * 1024;
+export const MAX_IMAGES_PER_DEVICE = 100;
+export const IMAGE_TTL_MS = 24 * 60 * 60 * 1000;
 
 export const CLOSE_RATE = 4001;
 export const CLOSE_PROTOCOL = 4002;
@@ -36,7 +40,9 @@ export const CLOSE_STORAGE_FULL = 4005;
 export const CLOSE_UNKNOWN_ROOM = 4006;
 export const CLOSE_REPLACED = 4007;
 
-const DEVICE_ID = /^[0-9a-f]{8}$/;
+const IMAGE_ID = /^[0-9a-f]{32}$/;
+const IMAGE_PATH = /\/i\/([0-9a-f]{32})$/;
+const EXPIRES_KEY = "expires";
 const PUSH_TOKEN = /^[A-Za-z0-9_:.-]{1,512}$/;
 
 interface Attachment {
@@ -93,6 +99,8 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
   }
 
   override async fetch(request: Request): Promise<Response> {
+    const image = IMAGE_PATH.exec(new URL(request.url).pathname);
+    if (image) return this.serveImage(request, image[1]);
     if (request.headers.get("Upgrade")?.toLowerCase() !== "websocket") {
       return new Response("expected websocket", { status: 400 });
     }
@@ -134,6 +142,13 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
   }
 
   override async alarm(): Promise<void> {
+    const expires = await this.ctx.storage.get<number>(EXPIRES_KEY);
+    if (expires !== undefined && Date.now() < expires) {
+      await this.sweepImages();
+      await this.arm();
+      return;
+    }
+    await this.deleteImages(this.imageIds());
     await this.ctx.storage.deleteAll();
     for (const ws of this.ctx.getWebSockets()) ws.close(1001, "room expired");
   }
@@ -154,6 +169,8 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
 
     const type = (frame as { t?: unknown }).t;
     if (type === "ops") await this.onOps(ws, frame as never, attachment);
+    else if (type === "img") await this.onImageSlot(ws, frame as never, attachment);
+    else if (type === "got") await this.onImageReceived(frame as never, attachment);
     else if (type === "bye") ws.close(1000, "bye");
     else throw new Fail(CLOSE_PROTOCOL, "unknown frame type");
   }
@@ -219,7 +236,7 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
         keyBytes,
         Math.floor(Date.now() / 1000),
       );
-      await this.ctx.storage.setAlarm(Date.now() + ROOM_TTL_MS);
+      await this.extend();
     }
     if (!registeredDeviceKey) {
       this.sql.exec("INSERT INTO devices (device, auth_key) VALUES (?, ?)", device, deviceKeyBytes);
@@ -283,7 +300,7 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     }
     if (fresh.length === 0) return;
 
-    await this.ctx.storage.setAlarm(Date.now() + ROOM_TTL_MS);
+    await this.extend();
     const connected = new Set<string>();
     for (const peer of this.ctx.getWebSockets()) {
       const peerAttachment = peer.deserializeAttachment() as Attachment | null;
@@ -293,6 +310,107 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
       this.send(peer, fresh);
     }
     this.wake(connected);
+  }
+
+  private async onImageSlot(ws: WebSocket, frame: { n?: unknown; c?: unknown }, attachment: Attachment): Promise<void> {
+    if (!attachment.d) throw new Fail(CLOSE_PROTOCOL, "hello required");
+    const size = frame.n;
+    if (!isPositiveSeq(size) || size > MAX_IMAGE_BYTES) {
+      ws.send(JSON.stringify({ t: "img", c: frame.c, e: "size" }));
+      return;
+    }
+    const held = this.sql.exec("SELECT COUNT(*) AS c FROM images WHERE device = ?", attachment.d).one().c;
+    if (Number(held) >= MAX_IMAGES_PER_DEVICE) {
+      ws.send(JSON.stringify({ t: "img", c: frame.c, e: "quota" }));
+      return;
+    }
+    const id = [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, "0")).join("");
+    this.sql.exec(
+      "INSERT INTO images (id, device, size, stored, created) VALUES (?, ?, ?, 0, ?)",
+      id,
+      attachment.d,
+      size,
+      Date.now(),
+    );
+    await this.arm();
+    ws.send(JSON.stringify({ t: "img", c: frame.c, i: id }));
+  }
+
+  private async onImageReceived(frame: { i?: unknown }, attachment: Attachment): Promise<void> {
+    if (!attachment.d) throw new Fail(CLOSE_PROTOCOL, "hello required");
+    const id = frame.i;
+    if (typeof id !== "string" || !IMAGE_ID.test(id)) throw new Fail(CLOSE_PROTOCOL, "bad image id");
+    const owner = this.sql.exec("SELECT device FROM images WHERE id = ?", id).toArray()[0];
+    if (!owner) return;
+    this.sql.exec("INSERT OR IGNORE INTO image_acks (id, device) VALUES (?, ?)", id, attachment.d);
+    const waiting = this.sql.exec(
+      `SELECT COUNT(*) AS c FROM devices WHERE device != ?
+       AND device NOT IN (SELECT device FROM image_acks WHERE id = ?)`,
+      owner.device as string,
+      id,
+    ).one().c;
+    if (Number(waiting) === 0) {
+      await this.deleteImages([id]);
+      await this.arm();
+    }
+  }
+
+  private async serveImage(request: Request, id: string): Promise<Response> {
+    if (!this.hasTables()) return rejection(404, "unknown", "no such image");
+    const row = this.sql.exec("SELECT size, stored FROM images WHERE id = ?", id).toArray()[0];
+    if (!row) return rejection(404, "unknown", "no such image");
+    if (request.method === "GET") {
+      const object = row.stored ? await this.env.IMAGES.get(id) : null;
+      if (!object) return rejection(404, "unknown", "no such image");
+      return new Response(object.body, {
+        headers: { "Content-Length": String(object.size), "Cache-Control": "no-store" },
+      });
+    }
+    if (row.stored) return rejection(409, "proto", "image already stored");
+    const length = Number(request.headers.get("Content-Length"));
+    if (length !== Number(row.size) || !request.body) return rejection(413, "proto", "size does not match the slot");
+    const verified = new FixedLengthStream(length);
+    const piped = request.body.pipeTo(verified.writable);
+    try {
+      await Promise.all([this.env.IMAGES.put(id, verified.readable), piped]);
+    } catch {
+      await this.env.IMAGES.delete(id);
+      return rejection(400, "proto", "body did not match its length");
+    }
+    this.sql.exec("UPDATE images SET stored = 1 WHERE id = ?", id);
+    return new Response(null, { status: 204 });
+  }
+
+  private imageIds(): string[] {
+    if (!this.hasTables()) return [];
+    return this.sql.exec("SELECT id FROM images").toArray().map((row) => row.id as string);
+  }
+
+  private async deleteImages(ids: string[]): Promise<void> {
+    if (ids.length === 0) return;
+    await this.env.IMAGES.delete(ids);
+    for (const id of ids) {
+      this.sql.exec("DELETE FROM images WHERE id = ?", id);
+      this.sql.exec("DELETE FROM image_acks WHERE id = ?", id);
+    }
+  }
+
+  private async sweepImages(): Promise<void> {
+    if (!this.hasTables()) return;
+    const stale = this.sql.exec("SELECT id FROM images WHERE created <= ?", Date.now() - IMAGE_TTL_MS).toArray();
+    await this.deleteImages(stale.map((row) => row.id as string));
+  }
+
+  private async extend(): Promise<void> {
+    await this.ctx.storage.put(EXPIRES_KEY, Date.now() + ROOM_TTL_MS);
+    await this.arm();
+  }
+
+  private async arm(): Promise<void> {
+    const expires = (await this.ctx.storage.get<number>(EXPIRES_KEY)) ?? Date.now() + ROOM_TTL_MS;
+    const oldest = this.sql.exec("SELECT MIN(created) AS m FROM images").one().m;
+    const sweep = oldest === null ? expires : Number(oldest) + IMAGE_TTL_MS;
+    await this.ctx.storage.setAlarm(Math.min(expires, sweep));
   }
 
   private admit(ws: WebSocket, device: string): void {
@@ -381,6 +499,18 @@ export class Room extends DurableObject<PushEnv & AttestEnv> {
     this.sql.exec(`CREATE TABLE IF NOT EXISTS devices (
       device   TEXT PRIMARY KEY,
       auth_key BLOB NOT NULL
+    )`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS images (
+      id      TEXT    PRIMARY KEY,
+      device  TEXT    NOT NULL,
+      size    INTEGER NOT NULL,
+      stored  INTEGER NOT NULL,
+      created INTEGER NOT NULL
+    )`);
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS image_acks (
+      id     TEXT NOT NULL,
+      device TEXT NOT NULL,
+      PRIMARY KEY (id, device)
     )`);
     this.sql.exec(`CREATE TABLE IF NOT EXISTS hellos (
       digest BLOB    PRIMARY KEY,

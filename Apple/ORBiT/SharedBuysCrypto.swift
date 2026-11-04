@@ -10,6 +10,10 @@ enum SharedBuysCrypto {
     static let deviceInfo = "circles-buys/v1/device"
     static let deviceIDLength = 16
     static let signInfo = "circles-buys/v1/sign"
+    static let rekeyInfo = "circles-buys/v1/rekey"
+    static let imageInfo = "circles-buys/v1/image"
+    static let agreementPublicKeyLength = 65
+    static let rekeyPlaintextLength = 36
     static let tagLength = 16
     static let nonceLength = 12
     static let randomNonceMarker = Data([0x53, 0x42, 0x32, 0x00])
@@ -143,6 +147,70 @@ enum SharedBuysCrypto {
     static func verifies(_ signature: Data, input: Data, publicKey: Data) -> Bool {
         guard let key = try? Curve25519.Signing.PublicKey(rawRepresentation: publicKey) else { return false }
         return key.isValidSignature(signature, for: input)
+    }
+
+    /// Seals an image as `nonce(12) ‖ ciphertext ‖ tag(16)`, bound to its room and ID.
+    static func sealImage(_ image: Data, sessionKey: Data, roomID: String, imageID: String) -> Data? {
+        guard let aad = imageAssociatedData(roomID: roomID, imageID: imageID) else { return nil }
+        return try? AES.GCM.seal(
+            image,
+            using: derive(imageInfo, from: sessionKey),
+            authenticating: aad
+        ).combined
+    }
+
+    static func openImage(_ blob: Data, sessionKey: Data, roomID: String, imageID: String) -> Data? {
+        guard let aad = imageAssociatedData(roomID: roomID, imageID: imageID),
+              let box = try? AES.GCM.SealedBox(combined: blob) else { return nil }
+        return try? AES.GCM.open(box, using: derive(imageInfo, from: sessionKey), authenticating: aad)
+    }
+
+    private static func imageAssociatedData(roomID: String, imageID: String) -> Data? {
+        guard let room = Data(hex: roomID), let image = Data(hex: imageID) else { return nil }
+        return room + image
+    }
+
+    static func newAgreementKey() -> Data { P256.KeyAgreement.PrivateKey().rawRepresentation }
+
+    /// The X9.63 public half, `04 ‖ x ‖ y`, which is what Android writes in `memberKey`.
+    static func agreementPublicKey(agreementKey: Data) -> Data? {
+        try? P256.KeyAgreement.PrivateKey(rawRepresentation: agreementKey).publicKey.x963Representation
+    }
+
+    /// Opens a `rekey` box: `ephemeralPublic(65) ‖ nonce(12) ‖ ciphertext(36) ‖ tag(16)`.
+    static func openRekey(
+        _ box: Data,
+        agreementKey: Data,
+        roomID: String,
+        deviceID: String
+    ) -> (sessionKey: Data, ownerDevice: String)? {
+        let bytes = [UInt8](box)
+        let nonceEnd = agreementPublicKeyLength + nonceLength
+        let cipherEnd = nonceEnd + rekeyPlaintextLength
+        guard bytes.count == cipherEnd + tagLength,
+              let room = Data(hex: roomID), let device = Data(hex: deviceID),
+              let privateKey = try? P256.KeyAgreement.PrivateKey(rawRepresentation: agreementKey),
+              let ephemeral = try? P256.KeyAgreement.PublicKey(
+                  x963Representation: Data(bytes[..<agreementPublicKeyLength])
+              ),
+              let shared = try? privateKey.sharedSecretFromKeyAgreement(with: ephemeral),
+              let nonce = try? AES.GCM.Nonce(data: Data(bytes[agreementPublicKeyLength..<nonceEnd])),
+              let sealed = try? AES.GCM.SealedBox(
+                  nonce: nonce,
+                  ciphertext: Data(bytes[nonceEnd..<cipherEnd]),
+                  tag: Data(bytes[cipherEnd...])
+              ) else { return nil }
+        let wrapKey = shared.hkdfDerivedSymmetricKey(
+            using: SHA256.self,
+            salt: Data(),
+            sharedInfo: Data(rekeyInfo.utf8),
+            outputByteCount: 32
+        )
+        guard let plaintext = try? AES.GCM.open(sealed, using: wrapKey, authenticating: room + device)
+        else { return nil }
+        let opened = [UInt8](plaintext)
+        let owner = opened[32...].map { String(format: "%02x", $0) }.joined()
+        return (Data(opened[..<32]), owner)
     }
 
     static func rollingTag(sessionKey: Data, window: Int) -> Data {

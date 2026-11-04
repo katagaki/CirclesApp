@@ -36,10 +36,9 @@ struct CircleDetailView: View {
     @State var isLastCircleAlertShowing: Bool = false
 
     // Buys image selection/viewing (hoisted to avoid nested sheet dismissal)
-    @State var buysAttachmentPickerCircle: ComiketCircle?
-    @State var buysCropImage: UIImage?
-    @State var buysCropItemID: String?
     @State var buysViewerImage: UIImage?
+    @State var isEditingBuys: Bool = false
+    @State var sharedAssigningItem: SharedBuyItem?
 
     @AppStorage(wrappedValue: "", "Circles.Detail.SectionOrder") var sectionOrderStorage: String
     @AppStorage(wrappedValue: "", "Circles.Detail.HiddenSections") var hiddenSectionsStorage: String
@@ -91,41 +90,17 @@ struct CircleDetailView: View {
                 }
             )
         }
-        .sheet(item: $buysAttachmentPickerCircle) { pickerCircle in
-            AttachmentPickerView(
-                circle: pickerCircle,
-                onSelect: { image in
-                    buysAttachmentPickerCircle = nil
-                    buysCropImage = image
-                },
-                onCancel: {
-                    buysCropItemID = nil
-                    buysAttachmentPickerCircle = nil
-                }
-            )
-        }
-        .fullScreenCover(item: Binding(
-            get: { buysCropImage.map { BuysCropItem(image: $0) } },
-            set: { if $0 == nil { buysCropImage = nil } }
-        )) { cropItem in
-            ImageCropView(
-                image: cropItem.image,
-                onCrop: { croppedImage in
-                    applyBuysImage(croppedImage)
-                    buysCropImage = nil
-                },
-                onCancel: {
-                    buysCropImage = nil
-                    buysCropItemID = nil
-                }
-            )
-        }
         .fullScreenCover(item: Binding(
             get: { buysViewerImage.map { BuyImageViewerItem(image: $0) } },
             set: { if $0 == nil { buysViewerImage = nil } }
         )) { item in
             BuyImageViewer(image: item.image)
         }
+        .modifier(BuysEditPresenter(
+            circle: circle,
+            isEditing: $isEditingBuys,
+            assigningItem: $sharedAssigningItem
+        ))
         .opacity(unifier.isMinimized ? 0.0 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: unifier.selectedDetent)
         .contentMargins(.top, 0.0)
@@ -235,14 +210,16 @@ struct CircleDetailView: View {
             if sharedBuys.isFeatureEnabled {
                 CircleDetailBuysSection(
                     circle: circle,
-                    buysAttachmentPickerCircle: $buysAttachmentPickerCircle,
-                    buysCropImage: $buysCropImage,
-                    buysCropItemID: $buysCropItemID,
-                    buysViewerImage: $buysViewerImage
+                    buysViewerImage: $buysViewerImage,
+                    isEditingBuys: $isEditingBuys,
+                    sharedAssigningItem: $sharedAssigningItem
                 )
             }
         }
     }
+}
+
+extension CircleDetailView {
 
     func decodeSectionOrder(_ string: String) -> [CircleDetailSection] {
         guard !string.isEmpty, let data = string.data(using: .utf8),
@@ -368,17 +345,6 @@ struct CircleDetailView: View {
             unifier.selectedDetent = .height(360)
         }
         mapper.highlightTarget = circle
-    }
-
-    func applyBuysImage(_ image: UIImage) {
-        guard let itemID = buysCropItemID else { return }
-        let eventNumber = planner.activeEventNumber
-        if let entry = BuysDatabase.shared.entry(for: circle.id, eventNumber: eventNumber),
-           var item = entry.items.first(where: { $0.id == itemID }) {
-            item.imageData = image.jpegData(compressionQuality: 0.7)
-            BuysDatabase.shared.updateItem(item, eventNumber: eventNumber)
-        }
-        buysCropItemID = nil
     }
 }
 

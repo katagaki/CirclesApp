@@ -11,6 +11,7 @@ export type Environment = "sandbox" | "production";
 export type Outcome = "sent" | "gone" | "failed" | "unconfigured";
 
 export interface PushEnv {
+  IMAGES: R2Bucket;
   APNS_TEAM_ID?: string;
   APNS_TOPIC?: string;
   APNS_SANDBOX_KEY_ID?: string;

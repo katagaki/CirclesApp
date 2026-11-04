@@ -194,6 +194,14 @@ fun UnifiedView(
         }
     }
 
+    val sheetExpandRequest by unifier.sheetExpandRequest.collectAsState()
+    LaunchedEffect(sheetExpandRequest) {
+        if (sheetExpandRequest > 0) {
+            isSheetMinimized = false
+            bottomSheetState.expand()
+        }
+    }
+
     // Handle system back gesture: navigate within the bottom sheet before closing the app
     BackHandler(
         enabled = unifier.hasSheetContent()

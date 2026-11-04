@@ -1,6 +1,8 @@
 package com.tsubuzaki.circlesgo.ui.sharedbuys
 
 import androidx.compose.foundation.background
+import com.tsubuzaki.circlesgo.ui.buys.BuyThumbnail
+import androidx.compose.runtime.remember
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -214,6 +216,14 @@ internal fun SharedBuyRow(session: SharedBuysSession, item: SharedBuyItem) {
             else -> Text("○", color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Spacer(modifier = Modifier.size(10.dp))
+        val send = session.imageSends[item.id]
+        if (item.imageId != null || send != null) {
+            BuyThumbnail(
+                session.image(item),
+                Modifier.clickable(enabled = send?.isFailed == true) { session.retryImage(item) }
+            )
+            Spacer(modifier = Modifier.size(10.dp))
+        }
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = item.name,
@@ -223,7 +233,19 @@ internal fun SharedBuyRow(session: SharedBuysSession, item: SharedBuyItem) {
                     TextDecoration.None
                 }
             )
-            if (item.status != SharedBuyStatus.PENDING &&
+            val photoNote = when {
+                send?.isFailed == true -> R.string.buys_shared_image_failed
+                send != null -> R.string.buys_shared_image_sending
+                session.isImageMissing(item) -> R.string.buys_shared_image_expired
+                else -> null
+            }
+            if (photoNote != null) {
+                Text(
+                    text = stringResource(photoNote),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else if (item.status != SharedBuyStatus.PENDING &&
                 toucher != null &&
                 item.lastTouchedBy != session.actorPid
             ) {

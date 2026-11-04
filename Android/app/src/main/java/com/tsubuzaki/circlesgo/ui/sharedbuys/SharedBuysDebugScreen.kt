@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -21,15 +22,28 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.sharedbuys.SharedBuysSession
+import com.tsubuzaki.circlesgo.ui.buys.BuysEditView
 
 @Composable
 fun SharedBuysDebugScreen(session: SharedBuysSession, onClose: () -> Unit) {
     var itemName by remember { mutableStateOf("") }
     var itemCost by remember { mutableStateOf("1000") }
     var nickname by remember { mutableStateOf("Tester") }
+    var isEditingBuys by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val buysCache = remember { BuysCache(context.applicationContext) }
+
+    if (isEditingBuys) {
+        Surface(modifier = Modifier.fillMaxSize().safeDrawingPadding()) {
+            BuysEditView(session, 1, 0, buysCache, onClose = { isEditingBuys = false })
+        }
+        return
+    }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -94,6 +108,7 @@ fun SharedBuysDebugScreen(session: SharedBuysSession, onClose: () -> Unit) {
                         },
                         enabled = itemName.isNotBlank()
                     ) { Text("Add") }
+                    Button(onClick = { isEditingBuys = true }) { Text("Edit Buys") }
                     Text("Items (${session.items.size})", style = MaterialTheme.typography.titleMedium)
                 }
                 items(session.items) { buyItem ->
