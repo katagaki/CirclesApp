@@ -74,7 +74,7 @@ struct SharedBuysDebugView: View {
                             } label: {
                                 HStack {
                                     Image(systemName: symbol(for: item))
-                                    Text(item.name)
+                                    Text("[\(item.rawStatus)] \(item.name)")
                                     Spacer()
                                     if let assignee = item.assignee {
                                         Text(session.members[assignee] ?? String(assignee))
