@@ -4,7 +4,6 @@ import AXiS
 struct BuysEntrySection: View {
 
     @Environment(Database.self) var database
-    @Environment(Unifier.self) var unifier
 
     let entry: BuyEntry
     @Binding var expandedImage: UIImage?
@@ -21,25 +20,32 @@ struct BuysEntrySection: View {
             }
         } header: {
             if let circle {
-                Button {
-                    unifier.append(.circleDetail(circle: circle))
-                } label: {
-                    HStack(spacing: 6.0) {
-                        Text(circle.circleName)
-                            .fontWeight(.semibold)
-                        if let spaceName = circle.spaceName() {
-                            CircleBlockPill(LocalizedStringKey(spaceName))
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .font(.caption2)
-                            .foregroundStyle(.tertiary)
-                    }
-                }
-                .buttonStyle(.plain)
+                BuysCircleLink(circle: circle)
             } else {
                 Text("Buys.UnknownCircle.\(entry.circleID)")
             }
         }
+    }
+}
+
+struct BuysCircleLink: View {
+
+    @Environment(Unifier.self) var unifier
+
+    let circle: ComiketCircle
+
+    var body: some View {
+        Button {
+            unifier.append(.circleDetail(circle: circle))
+        } label: {
+            HStack(spacing: 6.0) {
+                SharedBuyCircleHeader(name: circle.circleName, space: circle.spaceName())
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.caption2)
+                    .foregroundStyle(.tertiary)
+            }
+        }
+        .buttonStyle(.plain)
     }
 }

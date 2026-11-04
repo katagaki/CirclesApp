@@ -230,10 +230,7 @@ struct BuysView: View {
                         }
                     } header: {
                         if let circle = circles.first(where: { $0.id == circleID }) {
-                            SharedBuyCircleHeader(
-                                name: circle.circleName,
-                                space: circle.spaceName()
-                            )
+                            BuysCircleLink(circle: circle)
                         } else if let relayed = sharedBuys.relayedCircles[circleID] {
                             SharedBuyCircleHeader(name: relayed.name, space: relayed.space)
                         } else {
