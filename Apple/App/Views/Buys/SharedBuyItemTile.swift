@@ -37,9 +37,14 @@ struct SharedBuyItemTile: View {
                     if let nickname = sharedBuys.members[item.assignee ?? -1] {
                         MemberInitial(nickname: nickname, isMine: isMine)
                     } else {
-                        Image(systemName: "person.crop.circle.badge.questionmark")
-                            .font(.system(size: 22.0))
+                        Image(systemName: "person.fill.questionmark")
+                            .font(.system(size: 11.0, weight: .bold))
                             .foregroundStyle(.white)
+                            .frame(width: 26.0, height: 26.0)
+                            .background(.black.opacity(0.25), in: .circle)
+                            .overlay {
+                                Circle().strokeBorder(.white, lineWidth: 1.5)
+                            }
                             .shadow(color: .black.opacity(0.3), radius: 2.0, y: 1.0)
                     }
                 }

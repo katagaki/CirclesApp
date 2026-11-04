@@ -34,11 +34,6 @@ struct CircleDetailBuysSection: View {
                             onAssign: { sharedAssigningItem = item },
                             onViewPhoto: { buysViewerImage = $0 }
                         )
-                        .contextMenu {
-                            Button("Shared.Delete", systemImage: "trash", role: .destructive) {
-                                sharedBuys.remove(itemID: item.id, circleID: item.circleID)
-                            }
-                        }
                     }
                 }
             }

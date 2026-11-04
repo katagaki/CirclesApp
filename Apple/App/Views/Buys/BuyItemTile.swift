@@ -55,7 +55,6 @@ struct BuyItemTile<Accessory: View>: View {
             }
             .buttonStyle(.plain)
         }
-        .contentShape(.contextMenuPreview, shape)
     }
 
     func photoView(_ image: UIImage?) -> some View {
