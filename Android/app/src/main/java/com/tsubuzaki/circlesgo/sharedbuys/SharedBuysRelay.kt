@@ -144,11 +144,8 @@ class SharedBuysRelay(private val context: Context, private val scope: Coroutine
     }
 
     fun send(records: List<RelayRecord>, onEvent: (RelayEvent) -> Unit = {}) {
-        val socket = session
-        if (socket == null) {
-            onEvent(RelayEvent.Failed("no socket"))
-            return
-        }
+        // Nothing is lost without a socket: held triggers a resend once one opens.
+        val socket = session ?: return
         if (records.isEmpty()) return
         val frames = pages(records).map(::opsFrame)
         scope.launch {

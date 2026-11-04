@@ -304,12 +304,13 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
     /**
      * Brings the transports back after the process, or the user, went away.
      *
-     * Safe to call repeatedly: connect() cancels any pending reconnect before dialling,
-     * and startBluetooth() no-ops without a session key or the permissions.
+     * A live or opening socket is left alone: redialling dropped it on every foreground,
+     * and a second hello in the same second is byte-identical, so the relay refused it as
+     * a replay. startBluetooth() no-ops without a session key or the permissions.
      */
     fun resume() {
         if (!isActive) return
-        connect()
+        if (status != "connected" && status != "connecting") connect()
         startBluetooth()
     }
 

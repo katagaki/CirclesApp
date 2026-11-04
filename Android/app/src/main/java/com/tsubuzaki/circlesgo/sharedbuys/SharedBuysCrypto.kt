@@ -277,11 +277,7 @@ object SharedBuysCrypto {
         ByteBuffer.allocate(12).put(deviceId.fromHex()).putLong(seq).array()
 
     private fun associatedData(roomId: String, deviceId: String, seq: Long): ByteArray =
-        ByteBuffer.allocate(16 + 4 + 8)
-            .put(roomId.fromHex())
-            .put(deviceId.fromHex())
-            .putLong(seq)
-            .array()
+        roomId.fromHex() + deviceId.fromHex() + ByteBuffer.allocate(8).putLong(seq).array()
 
     fun hmac(key: ByteArray, message: ByteArray): ByteArray {
         val mac = Mac.getInstance("HmacSHA256")
