@@ -230,4 +230,13 @@
     <string name="shared_buys_live_done">担当分はすべて完了しました</string>
     <string name="shared_buys_live_next">¥%1$d・%2$d/%3$d 購入済み</string>
     <string name="shared_buys_live_progress">%1$d/%2$d 購入済み</string>
+    <string name="buys_shared_add">追加</string>
+    <string name="buys_shared_move">共同購入リストに移動</string>
+    <string name="buys_shared_add_photo">写真を追加</string>
+    <string name="buys_shared_assign_to_me">自分に割り当てる</string>
+    <string name="buys_shared_remove_from_buys">自分の宝物リストから削除</string>
+    <string name="buys_shared_visible">この名前、価格、写真はメンバーに表示されます。</string>
+    <string name="buys_shared_image_sending">写真を送信中…</string>
+    <string name="buys_shared_image_failed">写真を送信できませんでした。写真をタップして再試行してください。</string>
+    <string name="buys_shared_image_expired">写真は利用できなくなりました</string>
 </resources>

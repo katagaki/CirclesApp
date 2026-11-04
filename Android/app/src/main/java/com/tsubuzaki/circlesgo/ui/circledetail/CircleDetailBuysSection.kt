@@ -24,8 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,6 +39,9 @@ import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.data.local.BuysCache
 import com.tsubuzaki.circlesgo.ui.shared.LocalSharedBuys
+import com.tsubuzaki.circlesgo.ui.sharedbuys.SharedBuyComposerSheet
+import com.tsubuzaki.circlesgo.ui.sharedbuys.SharedBuyComposition
+import com.tsubuzaki.circlesgo.ui.sharedbuys.SharedBuyRow
 
 @Composable
 fun CircleDetailBuysSection(
@@ -54,7 +55,8 @@ fun CircleDetailBuysSection(
     val buysVersion by buysCache.version.collectAsState()
     var items by remember { mutableStateOf<List<BuysCache.BuyItem>>(emptyList()) }
     var isEditing by remember { mutableStateOf(false) }
-    val sharedDrafts = remember { mutableStateListOf<SharedBuyDraft>() }
+    var composition by remember { mutableStateOf<SharedBuyComposition?>(null) }
+    var convertingItemId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(buysVersion, circleID, eventNumber) {
         items = buysCache.entry(circleID, eventNumber)?.items?.sortedBy { it.sortOrder }
@@ -103,24 +105,28 @@ fun CircleDetailBuysSection(
                             eventNumber,
                             item.copy(status = BuysCache.nextStatus(item.status))
                         )
+                    },
+                    onMoveToShared = if (LocalSharedBuys.current?.isActive == true) {
+                        {
+                            convertingItemId = item.id
+                            composition = SharedBuyComposition(item.name, item.cost, isConversion = true)
+                        }
+                    } else {
+                        null
                     }
                 )
             }
         }
 
-        val activeSession = LocalSharedBuys.current
-        if (activeSession != null && activeSession.isActive) {
-            sharedDrafts.forEach { draft ->
-                key(draft.id) {
-                    SharedBuyDraftRow(
-                        circleID = circleID,
-                        circleName = circleName,
-                        circleSpace = circleSpace,
-                        draft = draft,
-                        onDelete = {
-                            draft.itemId?.let { activeSession.remove(it, circleID) }
-                            sharedDrafts.remove(draft)
-                        }
+        val activeSession = LocalSharedBuys.current?.takeIf { it.isActive }
+        activeSession?.items?.filter { it.circleId == circleID }?.forEach { item ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f)) { SharedBuyRow(activeSession, item) }
+                IconButton(onClick = { activeSession.remove(item.id, circleID) }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = stringResource(R.string.buys_delete),
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
             }
@@ -156,7 +162,7 @@ fun CircleDetailBuysSection(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { sharedDrafts.add(SharedBuyDraft()) }
+                    .clickable { composition = SharedBuyComposition() }
                     .padding(vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -175,13 +181,28 @@ fun CircleDetailBuysSection(
                 )
             }
         }
+        val opened = composition
+        if (sharedBuys != null && opened != null) {
+            SharedBuyComposerSheet(
+                session = sharedBuys,
+                circleId = circleID,
+                composition = opened,
+                onDismiss = { composition = null },
+                circleName = circleName,
+                circleSpace = circleSpace,
+                onMoved = {
+                    convertingItemId?.let { buysCache.deleteItem(circleID, eventNumber, it) }
+                }
+            )
+        }
     }
 }
 
 @Composable
 private fun ReadOnlyBuyItemRow(
     item: BuysCache.BuyItem,
-    onTap: () -> Unit
+    onTap: () -> Unit,
+    onMoveToShared: (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
@@ -234,6 +255,15 @@ private fun ReadOnlyBuyItemRow(
             },
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
+        if (onMoveToShared != null) {
+            IconButton(onClick = onMoveToShared) {
+                Icon(
+                    imageVector = Icons.Filled.PersonAdd,
+                    contentDescription = stringResource(R.string.buys_shared_move),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
     }
 }
 

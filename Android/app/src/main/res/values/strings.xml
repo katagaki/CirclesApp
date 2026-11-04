@@ -233,4 +233,13 @@
     <string name="shared_buys_live_done">You\'ve bought everything on your list</string>
     <string name="shared_buys_live_next">¥%1$d · %2$d of %3$d bought</string>
     <string name="shared_buys_live_progress">%1$d of %2$d bought</string>
+    <string name="buys_shared_add">Add</string>
+    <string name="buys_shared_move">Move to shared list</string>
+    <string name="buys_shared_add_photo">Add photo</string>
+    <string name="buys_shared_assign_to_me">Assign to me</string>
+    <string name="buys_shared_remove_from_buys">Remove from your Buys</string>
+    <string name="buys_shared_visible">Members can see this name, price and photo.</string>
+    <string name="buys_shared_image_sending">Sending photo…</string>
+    <string name="buys_shared_image_failed">Photo not sent. Tap the photo to retry.</string>
+    <string name="buys_shared_image_expired">Photo no longer available</string>
 </resources>

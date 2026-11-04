@@ -30,6 +30,11 @@ fun SharedBuysDebugScreen(session: SharedBuysSession, onClose: () -> Unit) {
     var itemName by remember { mutableStateOf("") }
     var itemCost by remember { mutableStateOf("1000") }
     var nickname by remember { mutableStateOf("Tester") }
+    var composition by remember { mutableStateOf<SharedBuyComposition?>(null) }
+
+    composition?.let {
+        SharedBuyComposerSheet(session, 1, it, onDismiss = { composition = null })
+    }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -97,12 +102,22 @@ fun SharedBuysDebugScreen(session: SharedBuysSession, onClose: () -> Unit) {
                         },
                         enabled = itemName.isNotBlank()
                     ) { Text("Add") }
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = { composition = SharedBuyComposition() }) { Text("Compose") }
+                        Button(onClick = {
+                            composition = SharedBuyComposition("Converted", 1500, samplePhoto(), true)
+                        }) { Text("Convert sample") }
+                    }
                     Text("Items (${session.items.size})", style = MaterialTheme.typography.titleMedium)
                 }
                 items(session.items) { buyItem ->
                     Row(modifier = Modifier.fillMaxWidth()) {
                         TextButton(onClick = { session.cycle(buyItem) }, modifier = Modifier.weight(1f)) {
-                            Text("[${buyItem.status}] ${buyItem.name}  ¥${buyItem.cost}")
+                            val size = session.image(buyItem)?.size
+                            Text(
+                                "[${buyItem.status}] ${buyItem.name}  ¥${buyItem.cost}" +
+                                    (size?.let { " img=$it" } ?: "")
+                            )
                         }
                         TextButton(onClick = { session.remove(buyItem.id, buyItem.circleId) }) {
                             Text("Delete ${buyItem.name}")
@@ -136,4 +151,18 @@ fun SharedBuysDebugScreen(session: SharedBuysSession, onClose: () -> Unit) {
             }
         }
     }
+}
+
+/** Larger than the 1000 pixel limit, so the real resize and encode both run. */
+private fun samplePhoto(): ByteArray {
+    val bitmap = android.graphics.Bitmap.createBitmap(2400, 1600, android.graphics.Bitmap.Config.ARGB_8888)
+    val canvas = android.graphics.Canvas(bitmap)
+    val paint = android.graphics.Paint()
+    for (band in 0 until 24) {
+        paint.color = android.graphics.Color.HSVToColor(floatArrayOf(band * 15f, 0.8f, 0.9f))
+        canvas.drawRect(band * 100f, 0f, band * 100f + 100f, 1600f, paint)
+    }
+    val out = java.io.ByteArrayOutputStream()
+    bitmap.compress(android.graphics.Bitmap.CompressFormat.JPEG, 90, out)
+    return out.toByteArray()
 }
