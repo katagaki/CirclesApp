@@ -132,6 +132,7 @@ struct SharedBuyAssignSheet: View {
                                         .foregroundStyle(Color.accentColor)
                                 }
                             }
+                            .contentShape(.rect)
                         }
                         .buttonStyle(.plain)
                     }
