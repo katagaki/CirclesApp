@@ -176,7 +176,7 @@ struct BuysEditView: View {
                             Label("Shared.Delete", systemImage: "trash")
                         }
                     }
-                    .swipeActions(edge: .leading) { moveButton(item) }
+                    .swipeActions(edge: .leading) { moveButton(item).tint(.accentColor) }
                     .contextMenu { moveButton(item) }
             }
             .onMove { from, destination in
@@ -208,7 +208,7 @@ struct BuysEditView: View {
                             Label("Shared.Delete", systemImage: "trash")
                         }
                     }
-                    .swipeActions(edge: .leading) { copyButton(item) }
+                    .swipeActions(edge: .leading) { copyButton(item).tint(.accentColor) }
                     .contextMenu { copyButton(item) }
             }
             if editing == .newShared {
@@ -227,7 +227,6 @@ struct BuysEditView: View {
             } label: {
                 Label("Buys.Shared.Add.Move", systemImage: "person.2.fill")
             }
-            .tint(.accentColor)
         }
     }
 
@@ -237,7 +236,6 @@ struct BuysEditView: View {
         } label: {
             Label("Buys.Shared.Copy", systemImage: "doc.on.doc")
         }
-        .tint(.accentColor)
     }
 
     func row(_ target: BuysEditTarget, name: String, cost: Int, photo: Data?) -> some View {
