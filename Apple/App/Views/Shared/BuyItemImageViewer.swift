@@ -17,6 +17,10 @@ struct BuyItemImageViewer: View {
                     .scaledToFit()
                     .scaleEffect(currentScale, anchor: anchor)
                     .frame(width: geometry.size.width, height: geometry.size.height)
+                    .contentShape(.rect)
+                    .onTapGesture {
+                        dismiss()
+                    }
                     .gesture(
                         MagnifyGesture()
                             .onChanged { value in
@@ -33,7 +37,7 @@ struct BuyItemImageViewer: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Shared.Back", systemImage: "chevron.left") {
+                    Button(role: .close) {
                         dismiss()
                     }
                 }
