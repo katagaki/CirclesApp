@@ -43,6 +43,7 @@ struct UnifiedOfflineStatus: View {
                 )
                 .contentShape(.rect)
                 .onTapGesture {}
+                .accessibilityElement(children: .contain)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
