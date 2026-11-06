@@ -91,14 +91,12 @@ struct CirclePlacement: Equatable, Hashable, Sendable {
 
     private static let weekdays = ["日", "月", "火", "水", "木", "金", "土"]
 
-    // swiftlint:disable line_length
     /// `貴方のサークル「〇〇」は、〇曜日 〇地区 “〇”ブロック－〇〇(〇〇ホール) に配置されました`
     nonisolated(unsafe) private static let noticePattern = #/サークル[「『](?<name>.+?)[」』]は[、,]?\s*(?:(?<weekday>[日月火水木金土])曜日?)?\s*(?:\S{1,2}?地区)?\s*["“”'‘’「『]?(?<block>[^\s"“”'‘’」』]{1,2}?)["“”'‘’」』]?\s*ブロック\s*[\-－ー―‐−]?\s*(?<space>\d{1,3})\s*(?<suffix>ab|[ab])?/#
         .ignoresCase()
 
     /// `火曜日 東マ64b`, `2日目 西れ-12ab`, `(土)南a-01a`
     nonisolated(unsafe) private static let shorthandPattern = #/(?:(?:(?<dayNumber>\d)\s*日目|[(（]?(?<weekday>[日月火水木金土])(?:曜日?)?[)）]?)\s*)?(?<area>[東西南北])?\s*(?<block>[\p{Katakana}\p{Hiragana}A-Za-z])\s*[\-－ー―‐−]?\s*(?<space>\d{1,2})(?!\d)\s*(?<suffix>(?:ab|[ab])(?![A-Za-z]))?/#
-    // swiftlint:enable line_length
 
     private static func weekdayIndex(_ weekday: String?) -> Int? {
         guard let weekday else { return nil }

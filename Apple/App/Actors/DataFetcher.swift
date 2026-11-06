@@ -3,8 +3,6 @@ import SQLite
 import RADiUS
 import AXiS
 
-// swiftlint:disable type_body_length
-
 actor DataFetcher {
 
     let database: Connection?
@@ -440,5 +438,3 @@ actor DataFetcher {
         return nil
     }
 }
-
-// swiftlint:enable type_body_length

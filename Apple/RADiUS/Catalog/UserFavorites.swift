@@ -1,4 +1,3 @@
-// swiftlint:disable nesting
 public struct UserFavorites: Codable {
     public let status: String
     public let response: Response
@@ -25,4 +24,3 @@ public struct UserFavorites: Codable {
         }
     }
 }
-// swiftlint:enable nesting

@@ -47,7 +47,6 @@ struct MapPopover<Content: View>: View {
         )
     }
 
-    // swiftlint:disable function_body_length
     func calculatePopoverPosition() -> CGPoint {
         let canvasSize = mapper.canvasSize
         let popoverWidth = mapper.popoverWidth / zoomScale
@@ -119,5 +118,4 @@ struct MapPopover<Content: View>: View {
 
         return CGPoint(x: positionX, y: positionY)
     }
-    // swiftlint:enable function_body_length
 }

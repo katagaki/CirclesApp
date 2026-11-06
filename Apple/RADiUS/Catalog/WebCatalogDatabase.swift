@@ -1,6 +1,5 @@
 import Foundation
 
-// swiftlint:disable nesting
 public struct WebCatalogDatabase: Codable, Sendable {
     public let status: String
     public let response: Response
@@ -51,4 +50,3 @@ public struct WebCatalogDatabase: Codable, Sendable {
         }
     }
 }
-// swiftlint:enable nesting

@@ -7,7 +7,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
     case circles
     case favorites
     case buys
-    case my // swiftlint:disable:this identifier_name
+    case my
     case moreEventData
     case moreBackup
     case moreAttributions
@@ -48,7 +48,6 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
 
     @MainActor
     @ViewBuilder
-    // swiftlint:disable:next cyclomatic_complexity
     func view() -> some View {
         switch self {
         case .map: MapView()

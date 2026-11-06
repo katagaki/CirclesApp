@@ -3,11 +3,6 @@ import CoreBluetooth
 import CryptoKit
 import Foundation
 
-// The class conforms to three CoreBluetooth delegates and owns both GATT roles, so it
-// runs past 400 lines. Splitting it would mean exposing most of its private state to a
-// second file for no benefit to the reader.
-// swiftlint:disable file_length
-
 /// One end of one link. The same phone connected both ways is two peers.
 enum BluetoothPeer: Hashable, Sendable {
     /// A central connected to our peripheral.
@@ -316,8 +311,6 @@ final class SharedBuysBluetooth: NSObject {
     }
 }
 
-// The teardown lives in an extension so it does not count against the class body,
-// which is already at the limit SwiftLint allows.
 private extension SharedBuysBluetooth {
 
     /// Drops every live link without ending the session.

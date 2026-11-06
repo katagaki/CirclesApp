@@ -1,4 +1,3 @@
-// swiftlint:disable nesting
 public struct WebCatalogFavorite: Codable, Hashable, Sendable {
     public let webCatalogID: Int
     public let circleName: String
@@ -42,4 +41,3 @@ public struct WebCatalogFavorite: Codable, Hashable, Sendable {
         return lhs.webCatalogID == rhs.webCatalogID
     }
 }
-// swiftlint:enable nesting

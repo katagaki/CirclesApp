@@ -27,7 +27,6 @@ class Mapper {
         layouts.removeAll()
     }
 
-    // swiftlint:disable function_body_length
     @MainActor
     func highlightCircle(
         spaceSize: Int
@@ -94,5 +93,4 @@ class Mapper {
 
         return true
     }
-    // swiftlint:enable function_body_length
 }
