@@ -1,6 +1,5 @@
 import CoreGraphics
 
-// swiftlint:disable identifier_name
 public struct Point: Codable {
     public var x: Int
     public var y: Int
@@ -14,4 +13,3 @@ public struct Point: Codable {
         return CGPoint(x: x, y: y)
     }
 }
-// swiftlint:enable identifier_name

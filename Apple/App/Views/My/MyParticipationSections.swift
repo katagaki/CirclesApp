@@ -137,7 +137,6 @@ struct MyParticipationSections: View {
         }
     }
 
-    // swiftlint:disable function_body_length
     func addToCalendar(dayID: Int) async {
         if let eventTitle, let eventDates, let date = eventDates[dayID],
            let participationInfo = planner.participationInfo(for: dayID),
@@ -204,5 +203,4 @@ struct MyParticipationSections: View {
             }
         }
     }
-    // swiftlint:enable function_body_length
 }

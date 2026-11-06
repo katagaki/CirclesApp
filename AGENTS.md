@@ -30,6 +30,13 @@
 - Relay: Cloudflare Workers Builds deploys `circles-relay` to `circles.ktgk.app` on pushes to `main` that touch `Relay/`. There is no staging relay.
 - Local app builds talk to `npm run dev` in `Relay/`, with attestation turned off in `.dev.vars`.
 
+## Views
+
+Applies to both apps (SwiftUI and Compose):
+
+- One view per file. Split a view's distinct parts out into their own views and files.
+- Reuse an existing view where it fits, but don't force it: no generic abstractions or configuration flags just to share a view between screens that merely look alike.
+
 ## Relay
 
 1. Commit after every change that builds/runs.

@@ -101,7 +101,6 @@ struct NotificationItem: Identifiable {
         return ""
     }
 
-    // swiftlint:disable cyclomatic_complexity function_body_length
     func requestObject() -> UNNotificationRequest? {
         let contents = UNMutableNotificationContent()
         contents.userInfo = [
@@ -198,7 +197,6 @@ struct NotificationItem: Identifiable {
         }
         return nil
     }
-    // swiftlint:enable cyclomatic_complexity function_body_length
 
     func identifier(from components: DateComponents) -> String? {
         if let year = components.year, let month = components.month, let day = components.day,

@@ -1,4 +1,3 @@
-// swiftlint:disable nesting
 public struct WebCatalogEvent: Codable {
     public let status: String
     public let response: Response
@@ -30,4 +29,3 @@ public struct WebCatalogEvent: Codable {
         }
     }
 }
-// swiftlint:enable nesting

@@ -439,7 +439,6 @@
 				F168020BE19E3F6FF48D8BF2 /* Sources */,
 				E54F4C59AFB3EBA19EF0241E /* Frameworks */,
 				50C4A89A51899B0F05F176FF /* Resources */,
-				E480AA932C449C04009C1445 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -507,7 +506,6 @@
 				E4A769422C21A20A00BE3491 /* Sources */,
 				E4A769432C21A20A00BE3491 /* Frameworks */,
 				E4A769442C21A20A00BE3491 /* Resources */,
-				E480AA922C449C04009C1445 /* ShellScript */,
 				F1A0B0052F31700000000001 /* Embed Foundation Extensions */,
 				E41643012F5D2F5300708895 /* Embed Frameworks */,
 				0A11D00B000000000000000B /* Embed Watch Content */,
@@ -677,45 +675,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		E480AA922C449C04009C1445 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which periphery > /dev/null; then\n  periphery scan --format xcode --skip-build\nelse\n  echo \"warning: Periphery not installed, download from https://github.com/peripheryapp/periphery\"\nfi\nif which swiftlint > /dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
-		};
-		E480AA932C449C04009C1445 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "export PATH=\"$PATH:/opt/homebrew/bin\"\nif which swiftlint > /dev/null; then\n  swiftlint lint \"$SRCROOT/ORBiT\"\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0A11D0050000000000000005 /* Sources */ = {

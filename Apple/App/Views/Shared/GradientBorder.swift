@@ -1,6 +1,5 @@
 import SwiftUI
 
-// swiftlint:disable identifier_name line_length
 struct GradientBorder: View {
     var body: some View {
         GeometryReader { reader in
@@ -66,4 +65,3 @@ struct GradientBorder: View {
         .allowsHitTesting(false)
     }
 }
-// swiftlint:enable identifier_name line_length

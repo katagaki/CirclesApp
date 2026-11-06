@@ -1,4 +1,3 @@
-// swiftlint:disable nesting
 public struct UserCircle: Codable, Sendable {
     public let status: String
     public let response: Response
@@ -22,4 +21,3 @@ public struct UserCircle: Codable, Sendable {
         }
     }
 }
-// swiftlint:enable nesting

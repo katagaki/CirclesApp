@@ -40,7 +40,6 @@ struct MapLayoutLayer: View {
         }
     }
 
-    // swiftlint:disable identifier_name
     func openMapPopoverIn(x: Int, y: Int) {
         for (layout, webCatalogIDs) in mapper.layouts {
             let xMin: Int = Int(Double(layout.positionX))
@@ -65,7 +64,6 @@ struct MapLayoutLayer: View {
         }
         closeMapPopover()
     }
-    // swiftlint:enable identifier_name
 
     func closeMapPopover() {
         mapper.popoverData = nil
