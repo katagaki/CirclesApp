@@ -5,7 +5,8 @@ public class WebCatalog {
     public static let eventCacheKey = "WebCatalog.Events"
 
     public static func events(authToken: OpenIDToken) async -> WebCatalogEvent.Response? {
-        let request = urlRequestForWebCatalogAPI(endpoint: "GetEventList", authToken: authToken)
+        var request = urlRequestForWebCatalogAPI(endpoint: "GetEventList", authToken: authToken)
+        request.cachePolicy = .reloadIgnoringLocalCacheData
         if let (data, _) = try? await URLSession.shared.data(for: request),
            let events = try? JSONDecoder().decode(WebCatalogEvent.self, from: data) {
             UserDefaults.standard.set(data, forKey: eventCacheKey)
