@@ -50,6 +50,8 @@ enum BuysEditField: Hashable {
 /// allows 20 messages per 10 seconds, and a half-typed name should not reach other members.
 struct BuysEditView: View {
 
+    static let quickCosts: [Int] = [500, 1000, 1500, 2000, 3000]
+
     @Environment(SharedBuysSession.self) var sharedBuys
 
     var circle: ComiketCircle?
@@ -100,6 +102,10 @@ struct BuysEditView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 trailingButton
             }
+            ToolbarItem(placement: .keyboard) {
+                if focus == .cost { quickCostButtons }
+            }
+            .sharedBackgroundVisibility(.hidden)
         }
         .confirmationDialog(
             "Buys.Shared.Move.Confirm",
@@ -161,6 +167,26 @@ struct BuysEditView: View {
         } else {
             Button("Buys.AddItem", systemImage: "plus") { begin(.newPersonal) }
         }
+    }
+
+    var quickCostButtons: some View {
+        ScrollView(.horizontal) {
+            HStack(spacing: 8.0) {
+                ForEach(Self.quickCosts, id: \.self) { cost in
+                    Button {
+                        draftCost = String(cost)
+                    } label: {
+                        Text(verbatim: "¥\(cost.formatted(.number))")
+                            .monospacedDigit()
+                            .padding(.horizontal, 10.0)
+                    }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.capsule)
+                }
+            }
+        }
+        .scrollIndicators(.hidden)
+        .scrollClipDisabled()
     }
 
     @ViewBuilder

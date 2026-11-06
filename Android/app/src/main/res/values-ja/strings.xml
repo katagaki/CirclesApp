@@ -141,6 +141,7 @@
     <string name="buys_total">合計</string>
     <string name="buys_grand_total">総合計(全日程)</string>
     <string name="buys_cost_value">%1$d円</string>
+    <string name="buys_quick_cost">¥%1$,d</string>
     <string name="buys_no_buys">買い物リストがありません</string>
     <string name="buys_no_buys_description">サークルの詳細ページから購入予定のアイテムを追加できます。</string>
     <string name="buys_no_buys_on_day">この日の買い物はありません</string>
