@@ -39,7 +39,9 @@ struct MapView: View {
                 MapScrollView(zoomScale: Binding(
                     get: { CGFloat(zoomScale) },
                     set: { zoomScale = Double($0) }
-                )) {
+                ), onTap: {
+                    unifier.closeOfflineStatus()
+                }, content: {
                     ZStack(alignment: .topLeading) {
                         MapLayer(image: mapImage)
                         MapFavoritesLayer(spaceSize: spaceSize)
@@ -54,7 +56,7 @@ struct MapView: View {
                             MapPopoverDetail(selection: selection)
                         }
                     }
-                }
+                })
                 .onChange(of: mapper.popoverPosition) { _, newValue in
                     if scrollType == .popover {
                         mapper.scrollToPosition = newValue

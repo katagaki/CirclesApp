@@ -6,10 +6,16 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
     @Environment(Mapper.self) var mapper
 
     @Binding var zoomScale: CGFloat
+    let onTap: @MainActor () -> Void
     let content: Content
 
-    init(zoomScale: Binding<CGFloat>, @ViewBuilder content: () -> Content) {
+    init(
+        zoomScale: Binding<CGFloat>,
+        onTap: @escaping @MainActor () -> Void,
+        @ViewBuilder content: () -> Content
+    ) {
         self._zoomScale = zoomScale
+        self.onTap = onTap
         self.content = content()
     }
 
@@ -28,6 +34,14 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
 
         scrollView.clipsToBounds = false
         scrollView.addSubview(hostingController.view)
+
+        let tapRecognizer = UITapGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleTap)
+        )
+        tapRecognizer.cancelsTouchesInView = false
+        tapRecognizer.delegate = context.coordinator
+        scrollView.addGestureRecognizer(tapRecognizer)
 
         context.coordinator.hostingController = hostingController
 
@@ -86,7 +100,7 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
         Coordinator(self)
     }
 
-    class Coordinator: NSObject, UIScrollViewDelegate {
+    class Coordinator: NSObject, UIScrollViewDelegate, UIGestureRecognizerDelegate {
         var parent: MapScrollView
         var hostingController: UIHostingController<Content>?
 
@@ -100,6 +114,17 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
 
         func scrollViewDidZoom(_ scrollView: UIScrollView) {
             parent.zoomScale = scrollView.zoomScale
+        }
+
+        @MainActor @objc func handleTap() {
+            parent.onTap()
+        }
+
+        func gestureRecognizer(
+            _ gestureRecognizer: UIGestureRecognizer,
+            shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer
+        ) -> Bool {
+            true
         }
     }
 }

@@ -40,6 +40,7 @@ struct DebugOverlayModifier: ViewModifier {
                         .font(.system(size: 10.0))
                     }
                 }
+                .allowsHitTesting(false)
             }
     }
 }

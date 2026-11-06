@@ -57,6 +57,13 @@ struct UnifiedView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea(.all, edges: isiPad ? [] : .top) // HACK: .top breaks iPad UI
+                .contentShape(.rect)
+                .simultaneousGesture(TapGesture().onEnded { unifier.closeOfflineStatus() })
+                .overlay(alignment: .top) {
+                    UnifiedOfflineStatus()
+                        .padding(.horizontal, 12.0)
+                        .padding(.top, 8.0)
+                }
                 .safeAreaPadding(.leading, mapLeadingPadding)
                 .safeAreaPadding(.trailing, mapTrailingPadding)
                 .safeAreaPadding(.bottom, mapBottomPadding)
