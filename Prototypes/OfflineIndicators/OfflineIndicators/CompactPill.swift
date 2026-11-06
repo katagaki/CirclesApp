@@ -58,6 +58,7 @@ struct CompactPill: View {
             }
         }
         .glassEffect(glass, in: .rect(cornerRadius: isExpanded ? 22.0 : 16.0))
+        .absorbsTaps()
     }
 
     private var inline: some View {
@@ -83,6 +84,7 @@ struct CompactPill: View {
             }
         }
         .glassEffect(glass, in: .rect(cornerRadius: 16.0))
+        .absorbsTaps()
     }
 
     private var callout: some View {
@@ -95,6 +97,12 @@ struct CompactPill: View {
                     .transition(.scale(scale: 0.9, anchor: .topLeading).combined(with: .opacity))
             }
         }
+    }
+}
+
+private extension View {
+    func absorbsTaps() -> some View {
+        contentShape(.rect).onTapGesture {}
     }
 }
 
@@ -197,6 +205,7 @@ struct CalloutBubble: View {
         }
         .compositingGroup()
         .shadow(color: .black.opacity(0.18), radius: 10.0, y: 3.0)
+        .absorbsTaps()
     }
 }
 
