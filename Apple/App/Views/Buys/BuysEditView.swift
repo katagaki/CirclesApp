@@ -169,17 +169,19 @@ struct BuysEditView: View {
     }
 
     var quickCostButtons: some View {
-        HStack {
-            ForEach(Self.quickCosts, id: \.self) { cost in
-                Button {
-                    draftCost = String(cost)
-                } label: {
-                    Text(verbatim: "¥\(cost.formatted(.number))")
-                        .monospacedDigit()
-                        .frame(maxWidth: .infinity)
+        ScrollView(.horizontal) {
+            HStack(spacing: 20.0) {
+                ForEach(Self.quickCosts, id: \.self) { cost in
+                    Button {
+                        draftCost = String(cost)
+                    } label: {
+                        Text(verbatim: "¥\(cost.formatted(.number))")
+                            .monospacedDigit()
+                    }
                 }
             }
         }
+        .scrollIndicators(.hidden)
     }
 
     @ViewBuilder
