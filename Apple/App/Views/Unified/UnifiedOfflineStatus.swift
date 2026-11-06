@@ -42,8 +42,6 @@ struct UnifiedOfflineStatus: View {
                     in: .rect(cornerRadius: isExpanded ? 22.0 : 16.0)
                 )
                 .contentShape(.rect)
-                .onTapGesture {}
-                .accessibilityElement(children: .contain)
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
