@@ -119,27 +119,20 @@ struct FactList: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10.0) {
-            ForEach(harness.facts) { fact in
-                FactRow(fact: fact)
+            ForEach(harness.facts, id: \.self) { fact in
+                FactRow(text: fact)
             }
         }
     }
 }
 
 struct FactRow: View {
-    @Environment(Harness.self) private var harness
-    let fact: OfflineFact
+    let text: String
 
     var body: some View {
-        Label {
-            Text(fact.text)
-                .fixedSize(horizontal: false, vertical: true)
-        } icon: {
-            Image(systemName: fact.symbol)
-                .foregroundStyle(harness.tint)
-                .frame(width: 22.0)
-        }
-        .font(.subheadline)
+        Text(text)
+            .font(.subheadline)
+            .fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -157,13 +150,9 @@ struct TimelineDetail: View {
                 }
             } else {
                 VStack(spacing: 4.0) {
-                    HStack {
-                        Text(harness.remaining)
-                            .fontWeight(.semibold)
-                        Spacer(minLength: 8.0)
-                        Text(harness.expiry)
-                    }
-                    .font(.footnote)
+                    Text(harness.expiry)
+                        .font(.footnote)
+                        .frame(maxWidth: .infinity, alignment: .trailing)
                     ProgressView(value: harness.remainingFraction)
                         .tint(harness.tint)
                 }
@@ -221,8 +210,8 @@ struct PanelDetailPage: View {
     var body: some View {
         Form {
             Section {
-                ForEach(harness.facts) { fact in
-                    FactRow(fact: fact)
+                ForEach(harness.facts, id: \.self) { fact in
+                    FactRow(text: fact)
                 }
             }
             Section {

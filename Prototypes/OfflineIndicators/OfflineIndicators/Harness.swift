@@ -50,13 +50,6 @@ enum ExpandedStyle: String, CaseIterable, Identifiable {
     }
 }
 
-struct OfflineFact: Identifiable {
-    let symbol: String
-    let text: String
-
-    var id: String { symbol }
-}
-
 enum ConnectionStatus: String, CaseIterable, Identifiable {
     case online, manual, lost
 
@@ -196,35 +189,19 @@ final class Harness {
     }
 
     var compactLabel: String {
-        status == .lost ? title : "\(shortTitle) · \(summary)"
+        status == .lost ? title : shortTitle
     }
 
-    var facts: [OfflineFact] {
+    var facts: [String] {
         if status == .lost {
             return [
-                OfflineFact(
-                    symbol: "externaldrive",
-                    text: localized("Showing downloaded data", "ダウンロード済みのデータを表示しています")
-                ),
-                OfflineFact(
-                    symbol: "arrow.clockwise",
-                    text: localized("Reconnects on its own", "接続が戻ると自動で再開します")
-                )
+                localized("Showing downloaded data", "ダウンロード済みのデータを表示しています"),
+                localized("Reconnects on its own", "接続が戻ると自動で再開します")
             ]
         }
         return [
-            OfflineFact(
-                symbol: "clock",
-                text: localized("Available until \(expiry)", "\(expiry)まで利用できます")
-            ),
-            OfflineFact(
-                symbol: "star.slash",
-                text: localized("Favorites can't be edited", "お気に入りは編集できません")
-            ),
-            OfflineFact(
-                symbol: "person.crop.circle",
-                text: localized("Sign in again after it ends", "終了後は再度ログインが必要です")
-            )
+            localized("Available until \(expiry)", "\(expiry)まで利用できます"),
+            localized("Favorites can't be edited", "お気に入りは編集できません")
         ]
     }
 
@@ -241,8 +218,8 @@ final class Harness {
                 "接続が戻るまで、ダウンロード済みのデータを表示します。"
             )
             : localized(
-                "Favorites can't be edited. Sign in again after \(expiry).",
-                "お気に入りは編集できません。\(expiry)以降は再度ログインが必要です。"
+                "Available until \(expiry). Favorites can't be edited.",
+                "\(expiry)まで利用できます。お気に入りは編集できません。"
             )
     }
 
