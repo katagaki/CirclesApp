@@ -102,9 +102,10 @@ struct BuysEditView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 trailingButton
             }
-            ToolbarItemGroup(placement: .keyboard) {
+            ToolbarItem(placement: .keyboard) {
                 if focus == .cost { quickCostButtons }
             }
+            .sharedBackgroundVisibility(.hidden)
         }
         .confirmationDialog(
             "Buys.Shared.Move.Confirm",
@@ -170,18 +171,22 @@ struct BuysEditView: View {
 
     var quickCostButtons: some View {
         ScrollView(.horizontal) {
-            HStack(spacing: 20.0) {
+            HStack(spacing: 8.0) {
                 ForEach(Self.quickCosts, id: \.self) { cost in
                     Button {
                         draftCost = String(cost)
                     } label: {
                         Text(verbatim: "¥\(cost.formatted(.number))")
                             .monospacedDigit()
+                            .padding(.horizontal, 10.0)
                     }
+                    .buttonStyle(.glass)
+                    .buttonBorderShape(.capsule)
                 }
             }
         }
         .scrollIndicators(.hidden)
+        .scrollClipDisabled()
     }
 
     @ViewBuilder
