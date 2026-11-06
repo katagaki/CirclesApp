@@ -74,7 +74,7 @@ class Events(private val context: Context) {
 
     suspend fun prepare(authToken: OpenIDToken) {
         if (eventData != null && latestEvent != null) {
-            if (activeEventNumber == -1) {
+            if (eventData!!.list.none { it.number == activeEventNumber }) {
                 activeEventNumber = latestEvent!!.number
                 prefs.edit { putInt(ACTIVE_EVENT_NUMBER_KEY, activeEventNumber) }
                 isActiveEventLatest = true
