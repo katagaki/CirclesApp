@@ -23,7 +23,11 @@ class FavoritesAPI(private val cache: FavoritesCache) {
             Map<Int, UserFavorites.Response.FavoriteItem>
             > = withContext(Dispatchers.IO) {
         try {
-            val connection = urlRequestForReadersAPI("FavoriteCircles", authToken = authToken)
+            val connection = urlRequestForReadersAPI(
+                "FavoriteCircles/",
+                method = "GET",
+                authToken = authToken
+            )
             val responseCode = connection.responseCode
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 val responseBody = connection.inputStream.bufferedReader().readText()
@@ -58,6 +62,21 @@ class FavoritesAPI(private val cache: FavoritesCache) {
         color: WebCatalogColor,
         memo: String = "",
         authToken: OpenIDToken
+    ): Boolean = save(webCatalogID, color, memo, "POST", authToken)
+
+    suspend fun update(
+        webCatalogID: Int,
+        color: WebCatalogColor,
+        memo: String,
+        authToken: OpenIDToken
+    ): Boolean = save(webCatalogID, color, memo, "PUT", authToken)
+
+    private suspend fun save(
+        webCatalogID: Int,
+        color: WebCatalogColor,
+        memo: String,
+        method: String,
+        authToken: OpenIDToken
     ): Boolean = withContext(Dispatchers.IO) {
         try {
             val params = mapOf(
@@ -66,8 +85,12 @@ class FavoritesAPI(private val cache: FavoritesCache) {
                 "color" to color.value.toString(),
                 "memo" to memo
             )
-            val connection =
-                urlRequestForReadersAPI("Favorite", parameters = params, authToken = authToken)
+            val connection = urlRequestForReadersAPI(
+                "Favorite",
+                method = method,
+                parameters = params,
+                authToken = authToken
+            )
             val responseCode = connection.responseCode
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 val responseBody = connection.inputStream.bufferedReader().readText()
@@ -91,11 +114,11 @@ class FavoritesAPI(private val cache: FavoritesCache) {
                     false
                 }
             } else {
-                Log.e(TAG, "Failed to add favorite: HTTP $responseCode")
+                Log.e(TAG, "Failed to save favorite: HTTP $responseCode")
                 false
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to add favorite", e)
+            Log.e(TAG, "Failed to save favorite", e)
             false
         }
     }
@@ -143,7 +166,7 @@ class FavoritesAPI(private val cache: FavoritesCache) {
         parameters: Map<String, String> = emptyMap(),
         authToken: OpenIDToken
     ): HttpURLConnection {
-        val baseURL = "${Endpoints.circleMsAPIEndpoint}/Readers/$endpoint"
+        val baseURL = "${Endpoints.circleMsAPIEndpoint}/v2/Readers/$endpoint"
         val urlString = if (parameters.isNotEmpty()) {
             val queryString = parameters.entries.joinToString("&") { (key, value) ->
                 "$key=${URLEncoder.encode(value, "UTF-8")}"

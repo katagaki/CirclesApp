@@ -646,7 +646,11 @@ fun CircleDetailView(
                 if (token != null) {
                     isSaving = true
                     scope.launch(Dispatchers.IO) {
-                        val success = favoritesAPI.add(webCatalogID, selectedColor, memo, token)
+                        val success = if (isFavorited) {
+                            favoritesAPI.update(webCatalogID, selectedColor, memo, token)
+                        } else {
+                            favoritesAPI.add(webCatalogID, selectedColor, memo, token)
+                        }
                         if (success) {
                             val (items, wcIDMapped) = favoritesAPI.all(token)
                             favorites.setItems(items)
