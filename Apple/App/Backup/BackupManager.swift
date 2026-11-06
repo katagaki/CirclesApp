@@ -94,13 +94,11 @@ final class BackupManager {
             return
         }
         restorablePID = pid
-        isRestorePromptShowing = true
     }
 
     func promptRestore() {
         guard let pid else { return }
         restorablePID = pid
-        isRestorePromptShowing = true
     }
 
     func loadDetails() async {
