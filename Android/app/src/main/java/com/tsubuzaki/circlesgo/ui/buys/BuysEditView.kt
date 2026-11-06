@@ -11,6 +11,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -51,12 +52,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
@@ -109,6 +113,8 @@ object BuyImageEncoder {
     }
 }
 
+private val quickCosts = listOf(500, 1000, 1500, 2000, 3000)
+
 /** The row being edited. New rows exist only here until they have a name. */
 private sealed interface EditTarget {
     data class Personal(val id: String) : EditTarget
@@ -150,7 +156,8 @@ fun BuysEditView(
 
     var editing by remember { mutableStateOf<EditTarget?>(null) }
     var draftName by remember { mutableStateOf("") }
-    var draftCost by remember { mutableStateOf("") }
+    var draftCost by remember { mutableStateOf(TextFieldValue("")) }
+    var isCostFocused by remember { mutableStateOf(false) }
     var moving by remember { mutableStateOf<BuysCache.BuyItem?>(null) }
     var isAddMenuOpen by remember { mutableStateOf(false) }
     val nameFocus = remember { FocusRequester() }
@@ -162,7 +169,7 @@ fun BuysEditView(
         val target = editing ?: return
         editing = null
         val name = draftName.trim()
-        val cost = draftCost.toIntOrNull() ?: 0
+        val cost = draftCost.text.toIntOrNull() ?: 0
         if (name.isEmpty()) return
         when (target) {
             EditTarget.NewPersonal ->
@@ -181,7 +188,7 @@ fun BuysEditView(
     fun begin(target: EditTarget, name: String = "", cost: Int = 0) {
         finishEditing()
         draftName = name
-        draftCost = if (cost == 0) "" else cost.toString()
+        draftCost = TextFieldValue(if (cost == 0) "" else cost.toString())
         editing = target
     }
 
@@ -247,9 +254,9 @@ fun BuysEditView(
         Spacer(modifier = Modifier.width(8.dp))
         OutlinedTextField(
             value = draftCost,
-            onValueChange = { value -> draftCost = value.filter { it.isDigit() } },
+            onValueChange = { value -> draftCost = value.copy(text = value.text.filter { it.isDigit() }) },
             placeholder = { Text(stringResource(R.string.buys_item_cost_placeholder)) },
-            modifier = Modifier.width(100.dp),
+            modifier = Modifier.width(100.dp).onFocusChanged { isCostFocused = it.isFocused },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions(onDone = {
@@ -306,7 +313,7 @@ fun BuysEditView(
             }
         }
         HorizontalDivider()
-        LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+        LazyColumn(state = listState, modifier = Modifier.fillMaxWidth().weight(1f)) {
             item { SectionTitle(stringResource(R.string.buys_section_title)) }
             items(personal, key = { it.id }) { item ->
                 val target = EditTarget.Personal(item.id)
@@ -382,6 +389,13 @@ fun BuysEditView(
                 }
             }
         }
+        if (editing != null && isCostFocused) {
+            HorizontalDivider()
+            QuickCostBar(onSelect = { cost ->
+                val text = cost.toString()
+                draftCost = TextFieldValue(text, TextRange(text.length))
+            })
+        }
     }
 
     moving?.let { item ->
@@ -401,6 +415,21 @@ fun BuysEditView(
                 TextButton(onClick = { moving = null }) { Text(stringResource(R.string.cancel)) }
             }
         )
+    }
+}
+
+@Composable
+private fun QuickCostBar(onSelect: (Int) -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)) {
+        quickCosts.forEach { cost ->
+            TextButton(
+                onClick = { onSelect(cost) },
+                contentPadding = PaddingValues(horizontal = 4.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(stringResource(R.string.buys_quick_cost, cost), maxLines = 1)
+            }
+        }
     }
 }
 

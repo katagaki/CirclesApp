@@ -143,6 +143,7 @@
     <string name="buys_total">Total</string>
     <string name="buys_grand_total">Grand Total (All Days)</string>
     <string name="buys_cost_value">%1$d yen</string>
+    <string name="buys_quick_cost">¥%1$,d</string>
     <string name="buys_no_buys">No Buys</string>
     <string name="buys_no_buys_description">Add items you plan to buy from a circle\'s detail page.</string>
     <string name="buys_no_buys_on_day">No Buys On This Day</string>
