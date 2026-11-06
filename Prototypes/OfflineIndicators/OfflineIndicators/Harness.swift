@@ -126,6 +126,8 @@ enum OfflineAlert: Identifiable {
 @MainActor
 @Observable
 final class Harness {
+    static let pillAnimation: Animation = .smooth.speed(2.0)
+
     var variant: IndicatorVariant
     var pillStyle: PillStyle
     var expandedStyle: ExpandedStyle
@@ -300,8 +302,13 @@ final class Harness {
         }
     }
 
+    func closeDetail() {
+        guard isDetailExpanded, !usesPanelDetail else { return }
+        withAnimation(Self.pillAnimation) { isDetailExpanded = false }
+    }
+
     func selectExpandedStyle(_ style: ExpandedStyle) {
-        withAnimation(.smooth) {
+        withAnimation(Self.pillAnimation) {
             expandedStyle = style
             isDetailExpanded = style != .panel
         }

@@ -19,7 +19,7 @@ struct CompactPill: View {
 
     private var chip: some View {
         Button {
-            withAnimation(.smooth) { harness.toggleCompactDetail() }
+            withAnimation(Harness.pillAnimation) { harness.toggleCompactDetail() }
         } label: {
             HStack(spacing: 5.0) {
                 Image(systemName: harness.symbol)

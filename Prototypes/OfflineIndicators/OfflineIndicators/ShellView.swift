@@ -9,6 +9,7 @@ struct ShellView: View {
             ZStack(alignment: .top) {
                 MapMock()
                     .ignoresSafeArea()
+                    .simultaneousGesture(TapGesture().onEnded { harness.closeDetail() })
                 IndicatorLayer()
             }
             .navigationBarTitleDisplayMode(.inline)
