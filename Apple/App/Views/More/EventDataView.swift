@@ -167,7 +167,9 @@ struct EventDataView: View {
     }
 
     private func reloadEventList() async {
-        guard isOnline, let token = authenticator.token else { return }
+        guard isOnline else { return }
+        await authenticator.refreshAuthenticationTokenInBackground()
+        guard let token = authenticator.token else { return }
         await events.reloadEventList(authToken: token)
     }
 
