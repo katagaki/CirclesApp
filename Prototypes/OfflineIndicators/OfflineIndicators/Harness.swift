@@ -34,6 +34,29 @@ enum PillStyle: String, CaseIterable, Identifiable {
     }
 }
 
+enum ExpandedStyle: String, CaseIterable, Identifiable {
+    case facts, callout, inline, timeline, panel
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .facts: "1 Fact rows"
+        case .callout: "2 Callout"
+        case .inline: "3 Inline action"
+        case .timeline: "4 Timeline"
+        case .panel: "5 Panel page"
+        }
+    }
+}
+
+struct OfflineFact: Identifiable {
+    let symbol: String
+    let text: String
+
+    var id: String { symbol }
+}
+
 enum ConnectionStatus: String, CaseIterable, Identifiable {
     case online, manual, lost
 
@@ -112,6 +135,7 @@ enum OfflineAlert: Identifiable {
 final class Harness {
     var variant: IndicatorVariant
     var pillStyle: PillStyle
+    var expandedStyle: ExpandedStyle
     var status: ConnectionStatus
     var timeLeft: TimeLeft
     var language: HarnessLanguage
@@ -124,7 +148,8 @@ final class Harness {
     init() {
         let defaults = UserDefaults.standard
         variant = defaults.string(forKey: "variant").flatMap(IndicatorVariant.init) ?? .pill
-        pillStyle = defaults.string(forKey: "pillStyle").flatMap(PillStyle.init) ?? .glass
+        pillStyle = defaults.string(forKey: "pillStyle").flatMap(PillStyle.init) ?? .compact
+        expandedStyle = defaults.string(forKey: "expandedStyle").flatMap(ExpandedStyle.init) ?? .facts
         status = defaults.string(forKey: "status").flatMap(ConnectionStatus.init) ?? .manual
         timeLeft = defaults.string(forKey: "timeLeft").flatMap(TimeLeft.init) ?? .days
         language = defaults.string(forKey: "lang").flatMap(HarnessLanguage.init) ?? .en
@@ -168,6 +193,61 @@ final class Harness {
         case .days: localized("2 days left", "残り2日")
         case .hours: localized("5 hours left", "残り5時間")
         }
+    }
+
+    var compactLabel: String {
+        status == .lost ? title : "\(shortTitle) · \(summary)"
+    }
+
+    var facts: [OfflineFact] {
+        if status == .lost {
+            return [
+                OfflineFact(
+                    symbol: "externaldrive",
+                    text: localized("Showing downloaded data", "ダウンロード済みのデータを表示しています")
+                ),
+                OfflineFact(
+                    symbol: "arrow.clockwise",
+                    text: localized("Reconnects on its own", "接続が戻ると自動で再開します")
+                )
+            ]
+        }
+        return [
+            OfflineFact(
+                symbol: "clock",
+                text: localized("Available until \(expiry)", "\(expiry)まで利用できます")
+            ),
+            OfflineFact(
+                symbol: "star.slash",
+                text: localized("Favorites can't be edited", "お気に入りは編集できません")
+            ),
+            OfflineFact(
+                symbol: "person.crop.circle",
+                text: localized("Sign in again after it ends", "終了後は再度ログインが必要です")
+            )
+        ]
+    }
+
+    var inlineNote: String {
+        status == .lost
+            ? localized("Showing downloaded data", "ダウンロード済みのデータを表示しています")
+            : localized("Favorites can't be edited", "お気に入りは編集できません")
+    }
+
+    var calloutText: String {
+        status == .lost
+            ? localized(
+                "Showing downloaded data until the connection returns.",
+                "接続が戻るまで、ダウンロード済みのデータを表示します。"
+            )
+            : localized(
+                "Favorites can't be edited. Sign in again after \(expiry).",
+                "お気に入りは編集できません。\(expiry)以降は再度ログインが必要です。"
+            )
+    }
+
+    var usesPanelDetail: Bool {
+        variant == .pill && pillStyle == .compact && expandedStyle == .panel && isOffline
     }
 
     var remainingFraction: Double {
@@ -219,6 +299,20 @@ final class Harness {
             isDetailExpanded = false
         }
         toastPlayback += 1
+    }
+
+    func toggleCompactDetail() {
+        isDetailExpanded.toggle()
+        if usesPanelDetail && isDetailExpanded && PanelDetent(detent) == .compact {
+            detent = .height(360)
+        }
+    }
+
+    func selectExpandedStyle(_ style: ExpandedStyle) {
+        withAnimation(.smooth) {
+            expandedStyle = style
+            isDetailExpanded = style != .panel
+        }
     }
 
     func step(by offset: Int) {

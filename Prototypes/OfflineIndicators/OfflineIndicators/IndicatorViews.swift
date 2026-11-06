@@ -48,6 +48,14 @@ struct PillIndicator: View {
     private var style: PillStyle { harness.pillStyle }
 
     var body: some View {
+        if style == .compact {
+            CompactPill()
+        } else {
+            standardPill
+        }
+    }
+
+    private var standardPill: some View {
         VStack(alignment: .leading, spacing: 12.0) {
             Button {
                 withAnimation(.smooth) { harness.isDetailExpanded.toggle() }
@@ -61,36 +69,25 @@ struct PillIndicator: View {
                 DetailContent(isOnSolid: style == .solid)
             }
         }
-        .padding(.horizontal, style == .compact ? 10.0 : 14.0)
-        .padding(.vertical, style == .compact ? 7.0 : 10.0)
+        .padding(.horizontal, 14.0)
+        .padding(.vertical, 10.0)
         .pillBackground(style, tint: harness.tint)
-        .frame(maxWidth: .infinity, alignment: style == .compact ? .leading : .center)
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 
-    @ViewBuilder
     private var label: some View {
-        if style == .compact {
-            HStack(spacing: 5.0) {
-                Image(systemName: harness.symbol)
-                    .foregroundStyle(harness.tint)
-                Text("\(harness.shortTitle) · \(harness.summary)")
-                    .fontWeight(.semibold)
-            }
-            .font(.caption)
-        } else {
-            HStack(spacing: 6.0) {
-                icon
-                Text(harness.title)
-                    .fontWeight(.semibold)
-                Text(harness.summary)
-                    .foregroundStyle(secondaryStyle)
-                Image(systemName: harness.isDetailExpanded ? "chevron.up" : "chevron.down")
-                    .font(.caption2.bold())
-                    .foregroundStyle(secondaryStyle)
-            }
-            .font(.footnote)
-            .foregroundStyle(style == .solid ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
+        HStack(spacing: 6.0) {
+            icon
+            Text(harness.title)
+                .fontWeight(.semibold)
+            Text(harness.summary)
+                .foregroundStyle(secondaryStyle)
+            Image(systemName: harness.isDetailExpanded ? "chevron.up" : "chevron.down")
+                .font(.caption2.bold())
+                .foregroundStyle(secondaryStyle)
         }
+        .font(.footnote)
+        .foregroundStyle(style == .solid ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
     }
 
     @ViewBuilder

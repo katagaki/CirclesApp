@@ -25,6 +25,9 @@ struct PanelView: View {
                     controls
                         .navigationTitle("Harness")
                         .navigationBarTitleDisplayMode(.inline)
+                        .navigationDestination(isPresented: isPanelDetailPresented) {
+                            PanelDetailPage()
+                        }
                         .safeAreaInset(edge: .top, spacing: 0.0) {
                             if showsPanelStrip {
                                 PanelStrip()
@@ -45,6 +48,13 @@ struct PanelView: View {
         } message: { alert in
             Text(alert == .enter ? enterMessage : exitMessage)
         }
+    }
+
+    private var isPanelDetailPresented: Binding<Bool> {
+        Binding(
+            get: { harness.usesPanelDetail && harness.isDetailExpanded },
+            set: { harness.isDetailExpanded = $0 }
+        )
     }
 
     private var compactBar: some View {
@@ -99,6 +109,15 @@ struct PanelView: View {
                         ForEach(PillStyle.allCases) { Text($0.label).tag($0) }
                     }
                     .pickerStyle(.menu)
+                    if harness.pillStyle == .compact {
+                        Picker("Expanded view", selection: Binding(
+                            get: { harness.expandedStyle },
+                            set: { harness.selectExpandedStyle($0) }
+                        )) {
+                            ForEach(ExpandedStyle.allCases) { Text($0.label).tag($0) }
+                        }
+                        .pickerStyle(.menu)
+                    }
                 }
                 Toggle("Keep the gradient too", isOn: $harness.keepsGradient)
                     .disabled(harness.variant == .current)
