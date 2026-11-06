@@ -55,7 +55,8 @@ struct CircleDetailToolbar: ToolbarContent {
 
         ToolbarSpacer(.flexible, placement: .bottomBar)
 
-        if let webCatalogInformation, !webCatalogInformation.onlineStores.isEmpty {
+        if authenticator.effectiveOnlineState == .online,
+           let webCatalogInformation, !webCatalogInformation.onlineStores.isEmpty {
             ToolbarSpacer(.fixed, placement: .bottomBar)
 
             ToolbarItem(placement: .bottomBar) {
