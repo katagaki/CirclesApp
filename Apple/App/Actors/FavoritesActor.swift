@@ -9,7 +9,7 @@ actor FavoritesActor {
         items: [UserFavorites.Response.FavoriteItem],
         wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem]
     ) {
-        let request = urlRequestForReadersAPI(endpoint: "FavoriteCircles", authToken: authToken)
+        let request = urlRequestForReadersAPI(endpoint: "FavoriteCircles/", method: "GET", authToken: authToken)
 
         var wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem] = [:]
         var items: [UserFavorites.Response.FavoriteItem] = []
@@ -66,8 +66,28 @@ actor FavoritesActor {
         memo: String = "",
         authToken: OpenIDToken
     ) async -> Bool {
+        await save(webCatalogID, to: color, memo: memo, method: "POST", authToken: authToken)
+    }
+
+    func update(
+        _ webCatalogID: Int,
+        to color: WebCatalogColor,
+        memo: String,
+        authToken: OpenIDToken
+    ) async -> Bool {
+        await save(webCatalogID, to: color, memo: memo, method: "PUT", authToken: authToken)
+    }
+
+    private func save(
+        _ webCatalogID: Int,
+        to color: WebCatalogColor,
+        memo: String,
+        method: String,
+        authToken: OpenIDToken
+    ) async -> Bool {
         let request = urlRequestForReadersAPI(
             endpoint: "Favorite",
+            method: method,
             parameters: [
                 "access_token": authToken.accessToken,
                 "wcid": String(webCatalogID),
@@ -85,6 +105,7 @@ actor FavoritesActor {
                     let favoriteItem = UserFavorites.Response.FavoriteItem(
                         circle: circle, favorite: favorite
                     )
+                    deleteCached(webCatalogID)
                     modelContext.insert(
                         CirclesFavorite(
                             webCatalogID: webCatalogID,
@@ -115,23 +136,27 @@ actor FavoritesActor {
         if let (data, _) = try? await URLSession.shared.data(for: request),
            let response = try? JSONDecoder().decode(UserResponse.self, from: data) {
             if response.status == "success" {
-                let fetchDescriptor = FetchDescriptor<CirclesFavorite>(
-                    predicate: #Predicate<CirclesFavorite> {
-                        $0.webCatalogID == webCatalogID
-                    }
-                )
-                if let matchedFavorites = try? modelContext.fetch(fetchDescriptor) {
-                    try? modelContext.transaction {
-                        matchedFavorites.forEach {
-                            modelContext.delete($0)
-                        }
-                        try? modelContext.save()
-                    }
-                }
+                deleteCached(webCatalogID)
                 return true
             }
         }
         return false
+    }
+
+    private func deleteCached(_ webCatalogID: Int) {
+        let fetchDescriptor = FetchDescriptor<CirclesFavorite>(
+            predicate: #Predicate<CirclesFavorite> {
+                $0.webCatalogID == webCatalogID
+            }
+        )
+        if let matchedFavorites = try? modelContext.fetch(fetchDescriptor) {
+            try? modelContext.transaction {
+                matchedFavorites.forEach {
+                    modelContext.delete($0)
+                }
+                try? modelContext.save()
+            }
+        }
     }
 
     func urlRequestForReadersAPI(
@@ -140,7 +165,7 @@ actor FavoritesActor {
         parameters: [String: String] = [:],
         authToken: OpenIDToken
     ) -> URLRequest {
-        var endpointComponents = URLComponents(string: "\(circleMsAPIEndpoint)/Readers/\(endpoint)")!
+        var endpointComponents = URLComponents(string: "\(circleMsAPIEndpoint)/v2/Readers/\(endpoint)")!
 
         if parameters.keys.count > 0 {
             var queryItems: [URLQueryItem] = []
