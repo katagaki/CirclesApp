@@ -7,6 +7,10 @@ extension Authenticator {
         isOfflineModeActive ? .offline : onlineState
     }
 
+    var offlineModeExpiryDate: Date? {
+        UserDefaults.standard.object(forKey: offlineModeExpiryDateKey) as? Date
+    }
+
     var canUseOfflineMode: Bool {
         UserDefaults.standard.bool(forKey: hasAuthenticatedOnceKey) &&
         UserDefaults.standard.bool(forKey: databaseInitializedKey)
@@ -45,9 +49,9 @@ extension Authenticator {
 
     func enforceOfflineModeExpiry() {
         guard isOfflineModeActive else { return }
-        let offlineModeExpiryDate = UserDefaults.standard.object(forKey: offlineModeExpiryDateKey) as? Date
-        if offlineModeExpiryDate == nil || offlineModeExpiryDate! <= .now {
+        guard let offlineModeExpiryDate, offlineModeExpiryDate > .now else {
             exitOfflineMode()
+            return
         }
     }
 }

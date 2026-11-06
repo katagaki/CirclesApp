@@ -76,6 +76,7 @@ class Unifier {
     var isGoingToEnterOfflineMode: Bool = false
     var isGoingToExitOfflineMode: Bool = false
     var isOfflineModeTipShowing: Bool = false
+    var isOfflineStatusExpanded: Bool = false
 
     var isSearchRequested: Bool = false
 
@@ -110,6 +111,19 @@ class Unifier {
         case .namespacedCircleDetail(let circle, _, _, _): circle
         default: nil
         }
+    }
+
+    @MainActor
+    func toggleOfflineStatus() {
+        withAnimation(.smooth.speed(2.0)) {
+            isOfflineStatusExpanded.toggle()
+        }
+    }
+
+    @MainActor
+    func closeOfflineStatus() {
+        guard isOfflineStatusExpanded else { return }
+        toggleOfflineStatus()
     }
 
     @MainActor
