@@ -24,6 +24,6 @@ Use the panel to switch the indicator, state, time left and language. At the com
 
 ## Launch arguments
 
-`-variant <above>`, `-status online|manual|lost`, `-timeLeft days|hours`, `-lang en|ja`, `-detent compact|medium|large`, `-expanded YES`, `-gradient YES`
+`-variant <above>`, `-pillStyle glass|tinted|solid|ring|compact`, `-status online|manual|lost`, `-timeLeft days|hours`, `-lang en|ja`, `-detent compact|medium|large`, `-expanded YES`, `-gradient YES`
 
 iPhone only: the iPad floating panel is not mocked.

@@ -18,6 +18,22 @@ enum IndicatorVariant: String, CaseIterable, Identifiable {
     }
 }
 
+enum PillStyle: String, CaseIterable, Identifiable {
+    case glass, tinted, solid, ring, compact
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .glass: "A Glass"
+        case .tinted: "B Tinted glass"
+        case .solid: "C Solid"
+        case .ring: "D Countdown ring"
+        case .compact: "E Compact"
+        }
+    }
+}
+
 enum ConnectionStatus: String, CaseIterable, Identifiable {
     case online, manual, lost
 
@@ -95,6 +111,7 @@ enum OfflineAlert: Identifiable {
 @Observable
 final class Harness {
     var variant: IndicatorVariant
+    var pillStyle: PillStyle
     var status: ConnectionStatus
     var timeLeft: TimeLeft
     var language: HarnessLanguage
@@ -107,6 +124,7 @@ final class Harness {
     init() {
         let defaults = UserDefaults.standard
         variant = defaults.string(forKey: "variant").flatMap(IndicatorVariant.init) ?? .pill
+        pillStyle = defaults.string(forKey: "pillStyle").flatMap(PillStyle.init) ?? .glass
         status = defaults.string(forKey: "status").flatMap(ConnectionStatus.init) ?? .manual
         timeLeft = defaults.string(forKey: "timeLeft").flatMap(TimeLeft.init) ?? .days
         language = defaults.string(forKey: "lang").flatMap(HarnessLanguage.init) ?? .en
@@ -150,6 +168,10 @@ final class Harness {
         case .days: localized("2 days left", "残り2日")
         case .hours: localized("5 hours left", "残り5時間")
         }
+    }
+
+    var remainingFraction: Double {
+        status == .lost ? 0.0 : timeLeft.interval / (3 * 86400)
     }
 
     var detail: String {

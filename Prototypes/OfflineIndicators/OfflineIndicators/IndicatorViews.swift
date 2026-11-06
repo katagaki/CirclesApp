@@ -23,18 +23,20 @@ struct IndicatorLayer: View {
 
 struct DetailContent: View {
     @Environment(Harness.self) private var harness
+    var isOnSolid = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12.0) {
             Text(harness.detail)
                 .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(isOnSolid ? AnyShapeStyle(.white.opacity(0.9)) : AnyShapeStyle(.secondary))
                 .fixedSize(horizontal: false, vertical: true)
             Button(harness.actionTitle) {
                 harness.performAction()
             }
             .buttonStyle(.glassProminent)
-            .tint(harness.tint)
+            .tint(isOnSolid ? .white : harness.tint)
+            .foregroundStyle(isOnSolid ? harness.tint : .white)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -43,34 +45,94 @@ struct DetailContent: View {
 struct PillIndicator: View {
     @Environment(Harness.self) private var harness
 
+    private var style: PillStyle { harness.pillStyle }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 12.0) {
             Button {
                 withAnimation(.smooth) { harness.isDetailExpanded.toggle() }
             } label: {
-                HStack(spacing: 6.0) {
-                    Image(systemName: harness.symbol)
-                        .foregroundStyle(harness.tint)
-                    Text(harness.title)
-                        .fontWeight(.semibold)
-                    Text(harness.summary)
-                        .foregroundStyle(.secondary)
-                    Image(systemName: harness.isDetailExpanded ? "chevron.up" : "chevron.down")
-                        .font(.caption2.bold())
-                        .foregroundStyle(.secondary)
-                }
-                .font(.footnote)
-                .lineLimit(1)
-                .contentShape(.rect)
+                label
+                    .lineLimit(1)
+                    .contentShape(.rect)
             }
             .buttonStyle(.plain)
             if harness.isDetailExpanded {
-                DetailContent()
+                DetailContent(isOnSolid: style == .solid)
             }
         }
-        .padding(.horizontal, 14.0)
-        .padding(.vertical, 10.0)
-        .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 20.0))
+        .padding(.horizontal, style == .compact ? 10.0 : 14.0)
+        .padding(.vertical, style == .compact ? 7.0 : 10.0)
+        .pillBackground(style, tint: harness.tint)
+        .frame(maxWidth: .infinity, alignment: style == .compact ? .leading : .center)
+    }
+
+    @ViewBuilder
+    private var label: some View {
+        if style == .compact {
+            HStack(spacing: 5.0) {
+                Image(systemName: harness.symbol)
+                    .foregroundStyle(harness.tint)
+                Text("\(harness.shortTitle) · \(harness.summary)")
+                    .fontWeight(.semibold)
+            }
+            .font(.caption)
+        } else {
+            HStack(spacing: 6.0) {
+                icon
+                Text(harness.title)
+                    .fontWeight(.semibold)
+                Text(harness.summary)
+                    .foregroundStyle(secondaryStyle)
+                Image(systemName: harness.isDetailExpanded ? "chevron.up" : "chevron.down")
+                    .font(.caption2.bold())
+                    .foregroundStyle(secondaryStyle)
+            }
+            .font(.footnote)
+            .foregroundStyle(style == .solid ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
+        }
+    }
+
+    @ViewBuilder
+    private var icon: some View {
+        switch style {
+        case .ring:
+            ZStack {
+                Circle()
+                    .stroke(harness.tint.opacity(0.2), lineWidth: 2.5)
+                Circle()
+                    .trim(from: 0.0, to: harness.remainingFraction)
+                    .stroke(harness.tint, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                    .rotationEffect(.degrees(-90.0))
+                Image(systemName: harness.symbol)
+                    .font(.system(size: 10.0, weight: .semibold))
+                    .foregroundStyle(harness.tint)
+            }
+            .frame(width: 24.0, height: 24.0)
+        case .solid:
+            Image(systemName: harness.symbol)
+        default:
+            Image(systemName: harness.symbol)
+                .foregroundStyle(harness.tint)
+        }
+    }
+
+    private var secondaryStyle: AnyShapeStyle {
+        style == .solid ? AnyShapeStyle(.white.opacity(0.85)) : AnyShapeStyle(.secondary)
+    }
+}
+
+private extension View {
+    @ViewBuilder
+    func pillBackground(_ style: PillStyle, tint: Color) -> some View {
+        switch style {
+        case .solid:
+            background(tint.mix(with: .black, by: 0.15), in: .rect(cornerRadius: 20.0))
+        case .tinted:
+            glassEffect(.regular.tint(tint.opacity(0.35)).interactive(), in: .rect(cornerRadius: 20.0))
+        default:
+            glassEffect(.regular.interactive(), in: .rect(cornerRadius: 20.0))
+        }
     }
 }
 

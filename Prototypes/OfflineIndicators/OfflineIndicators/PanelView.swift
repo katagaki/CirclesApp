@@ -11,6 +11,10 @@ struct PanelView: View {
         harness.variant == .panel && harness.isOffline
     }
 
+    private var showsPillInPanel: Bool {
+        harness.variant == .pill && harness.isOffline && PanelDetent(harness.detent) == .large
+    }
+
     var body: some View {
         @Bindable var harness = harness
         Group {
@@ -24,6 +28,10 @@ struct PanelView: View {
                         .safeAreaInset(edge: .top, spacing: 0.0) {
                             if showsPanelStrip {
                                 PanelStrip()
+                            } else if showsPillInPanel {
+                                PillIndicator()
+                                    .padding(.horizontal, 16.0)
+                                    .padding(.bottom, 6.0)
                             }
                         }
                 }
@@ -86,6 +94,12 @@ struct PanelView: View {
                     ForEach(IndicatorVariant.allCases) { Text($0.label).tag($0) }
                 }
                 .pickerStyle(.menu)
+                if harness.variant == .pill {
+                    Picker("Pill style", selection: $harness.pillStyle) {
+                        ForEach(PillStyle.allCases) { Text($0.label).tag($0) }
+                    }
+                    .pickerStyle(.menu)
+                }
                 Toggle("Keep the gradient too", isOn: $harness.keepsGradient)
                     .disabled(harness.variant == .current)
                 if harness.variant == .toast {
