@@ -135,6 +135,7 @@ final class Harness {
     var keepsGradient: Bool
     var detent: PresentationDetent
     var isDetailExpanded: Bool
+    var offlineStart = Date.now
     var toastPlayback = 0
     var alert: OfflineAlert?
 
@@ -244,8 +245,21 @@ final class Harness {
         )
     }
 
+    var expiryDate: Date {
+        offlineStart.addingTimeInterval(timeLeft.interval)
+    }
+
+    func countdown(at date: Date) -> String {
+        let seconds = max(0, Int(expiryDate.timeIntervalSince(date)))
+        let days = seconds / 86400
+        let clock = String(format: "%02d:%02d:%02d", seconds % 86400 / 3600, seconds % 3600 / 60, seconds % 60)
+        return days > 0
+            ? localized("\(days)d \(clock) left", "残り\(days)日 \(clock)")
+            : localized("\(clock) left", "残り\(clock)")
+    }
+
     var expiry: String {
-        Date.now.addingTimeInterval(timeLeft.interval).formatted(
+        expiryDate.formatted(
             .dateTime.month().day().hour().minute().locale(Locale(identifier: language.rawValue))
         )
     }
@@ -273,6 +287,7 @@ final class Harness {
     func confirm(_ alert: OfflineAlert) {
         withAnimation(.smooth) {
             status = alert == .enter ? .manual : .online
+            offlineStart = .now
             isDetailExpanded = false
         }
         toastPlayback += 1

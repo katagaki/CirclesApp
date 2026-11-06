@@ -118,9 +118,16 @@ struct FactList: View {
     @Environment(Harness.self) private var harness
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10.0) {
-            ForEach(harness.facts, id: \.self) { fact in
-                FactRow(text: fact)
+        if harness.status == .manual {
+            TimelineView(.periodic(from: .now, by: 1.0)) { context in
+                Text(harness.countdown(at: context.date))
+                    .font(.title2.weight(.semibold).monospacedDigit())
+            }
+        } else {
+            VStack(alignment: .leading, spacing: 10.0) {
+                ForEach(harness.facts, id: \.self) { fact in
+                    FactRow(text: fact)
+                }
             }
         }
     }
