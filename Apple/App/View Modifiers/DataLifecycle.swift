@@ -5,6 +5,7 @@ import AXiS
 struct DataLifecycleModifier: ViewModifier {
 
     @Environment(Authenticator.self) var authenticator
+    @Environment(BackupManager.self) var backupManager
     @Environment(Favorites.self) var favorites
     @Environment(Database.self) var database
     @Environment(ImageCache.self) var imageCache
@@ -32,6 +33,11 @@ struct DataLifecycleModifier: ViewModifier {
             .onChange(of: authenticator.isReady) { _, newValue in
                 if newValue && !authenticator.isAuthenticating {
                     reloadData(animated: false)
+                }
+            }
+            .onChange(of: authenticator.isAuthenticating) { _, newValue in
+                if newValue {
+                    unifier.isDataReady = false
                 }
             }
             .onChange(of: authenticator.didFinishAuthenticating) { _, newValue in
@@ -90,6 +96,7 @@ struct DataLifecycleModifier: ViewModifier {
                 if isUpdatingData {
                     isUpdatingData = false
                     isReloadingData = false
+                    unifier.isDataReady = true
                 } else {
                     revertToPreviousEvent()
                 }
@@ -154,6 +161,7 @@ extension DataLifecycleModifier {
         guard !isReloadingData, !authenticator.isOfflineModeActive,
               let activeEvent = planner.activeEvent else { return }
         isReloadingData = true
+        unifier.isDataReady = false
         isUpdatingData = true
         pendingDownloadShouldResetSelections = true
         isInitialDownload = false
@@ -179,6 +187,7 @@ extension DataLifecycleModifier {
     func reloadData(forceDownload: Bool = false, shouldResetSelections: Bool = false, animated: Bool = true) {
         if !isReloadingData {
             isReloadingData = true
+            unifier.isDataReady = false
             unifier.animatesReload = animated
             database.reset()
             if forceDownload {
@@ -233,10 +242,11 @@ extension DataLifecycleModifier {
             selections.map = selections.fetchDefaultMapSelection(database: database)
         }
 
-        if !authenticator.isAuthenticating {
+        if !authenticator.isAuthenticating && backupManager.restorablePID == nil {
             unifier.show(animated: unifier.animatesReload)
         }
         isReloadingData = false
+        unifier.isDataReady = true
         Task.detached(priority: .userInitiated) {
             await loadImages()
         }

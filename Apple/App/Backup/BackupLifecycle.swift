@@ -12,6 +12,11 @@ struct BackupLifecycleModifier: ViewModifier {
 
     @AppStorage(wrappedValue: 0, "My.LastKnownPID") var lastKnownPID: Int
 
+    /// Waits for the catalog so the prompt never competes with the data download alerts.
+    var isRestorePromptDue: Bool {
+        backupManager.restorablePID != nil && !backupManager.isRestoring && unifier.isDataReady
+    }
+
     func body(content: Content) -> some View {
         @Bindable var backupManager = backupManager
         content
@@ -23,6 +28,13 @@ struct BackupLifecycleModifier: ViewModifier {
                     backupInBackground()
                 }
             }
+            .onChange(of: isRestorePromptDue) { _, isDue in
+                if isDue {
+                    presentRestorePrompt()
+                } else {
+                    backupManager.isRestorePromptShowing = false
+                }
+            }
             .alert("Alerts.Backup.Restore.Title", isPresented: $backupManager.isRestorePromptShowing) {
                 Button("Alerts.Backup.Restore.Restore") {
                     if let pid = backupManager.restorablePID {
@@ -31,10 +43,21 @@ struct BackupLifecycleModifier: ViewModifier {
                 }
                 Button("Alerts.Backup.Restore.Skip", role: .cancel) {
                     backupManager.declineRestore()
+                    unifier.show()
                 }
             } message: {
                 Text("Alerts.Backup.Restore.Message")
             }
+    }
+
+    func presentRestorePrompt() {
+        unifier.hide()
+        Task {
+            try? await Task.sleep(for: .seconds(0.5))
+            if isRestorePromptDue {
+                backupManager.isRestorePromptShowing = true
+            }
+        }
     }
 
     func resolvePID() async {

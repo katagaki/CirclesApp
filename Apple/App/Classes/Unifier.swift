@@ -81,6 +81,7 @@ class Unifier {
     var isSearchRequested: Bool = false
 
     var shouldUpdateData: Bool = false
+    var isDataReady: Bool = false
 
     var animatesReload: Bool = true
 
