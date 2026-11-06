@@ -1,4 +1,4 @@
-#if canImport(VisualIntelligence)
+#if canImport(VisualIntelligence) && !targetEnvironment(macCatalyst)
 import AppIntents
 import CoreImage
 import VisualIntelligence
