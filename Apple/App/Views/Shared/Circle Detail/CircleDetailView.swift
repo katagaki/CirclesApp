@@ -94,7 +94,7 @@ struct CircleDetailView: View {
             get: { buysViewerImage.map { BuyImageViewerItem(image: $0) } },
             set: { if $0 == nil { buysViewerImage = nil } }
         )) { item in
-            BuyImageViewer(image: item.image)
+            BuyItemImageViewer(image: item.image)
         }
         .modifier(BuysEditPresenter(
             circle: circle,
