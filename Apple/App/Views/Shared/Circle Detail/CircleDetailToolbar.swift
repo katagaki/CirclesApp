@@ -103,16 +103,14 @@ struct CircleDetailToolbar: ToolbarContent {
         favoriteMemo = favorites.wcIDMappedItems?[extendedInformation.webCatalogID]?.favorite.memo ?? ""
     }
 
-    func saveFavorite(color: WebCatalogColor, memo: String) async {
+    func saveFavorite(color: WebCatalogColor, memo: String, isExisting: Bool) async {
         if let token = authenticator.token {
             let actor = FavoritesActor(modelContainer: sharedModelContainer)
-            let favoritesAddResult = await actor.add(
-                extendedInformation.webCatalogID,
-                to: color,
-                memo: memo,
-                authToken: token
-            )
-            if favoritesAddResult {
+            let webCatalogID = extendedInformation.webCatalogID
+            let favoritesSaveResult = isExisting ?
+                await actor.update(webCatalogID, to: color, memo: memo, authToken: token) :
+                await actor.add(webCatalogID, to: color, memo: memo, authToken: token)
+            if favoritesSaveResult {
                 let (items, wcIDMappedItems) = await actor.all(authToken: token)
                 await MainActor.run {
                     favorites.items = items
@@ -151,8 +149,9 @@ struct CircleDetailToolbar: ToolbarContent {
             isExistingFavorite: favorites.contains(webCatalogID: extendedInformation.webCatalogID),
             onSave: { color, memo in
                 isCallingFavoritesAPI = true
+                let isExisting = favorites.contains(webCatalogID: extendedInformation.webCatalogID)
                 Task.detached {
-                    await saveFavorite(color: color, memo: memo)
+                    await saveFavorite(color: color, memo: memo, isExisting: isExisting)
                     await MainActor.run {
                         isCallingFavoritesAPI = false
                     }
