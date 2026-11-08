@@ -41,9 +41,12 @@ struct UnifiedRouteStatus: View {
                     in: .rect(cornerRadius: isExpanded ? 22.0 : 16.0)
                 )
                 .contentShape(.rect)
+                .geometryGroup()
                 .frame(maxWidth: isExpanded ? .infinity : nil, alignment: .trailing)
+                .transition(.scale(scale: 0.6, anchor: .trailing).combined(with: .opacity))
             }
         }
+        .animation(.smooth.speed(2.0), value: isVisible)
     }
 
     var pill: some View {
