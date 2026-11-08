@@ -12,20 +12,10 @@ struct DatePicker: View {
                 unifier.presentedControlMenu = .date
             }
         } label: {
-            HStack(spacing: 10.0) {
-                if let selectedDate = selections.date {
-                    VStack(alignment: .leading) {
-                        Text("Shared.\(selectedDate.id)th.Day")
-                            .font(.caption)
-                            .bold()
-                            .foregroundStyle(.primary)
-                        Text(selectedDate.date, style: .date)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                } else {
-                    Text("Shared.Placeholder.NoDay")
-                }
+            if let selectedDate = selections.date {
+                Text("Shared.\(selectedDate.id)th.Day")
+            } else {
+                Text("Shared.Placeholder.NoDay")
             }
         }
         .buttonStyle(.plain)

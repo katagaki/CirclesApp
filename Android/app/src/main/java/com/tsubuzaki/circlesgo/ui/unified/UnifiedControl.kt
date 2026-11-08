@@ -2,17 +2,13 @@ package com.tsubuzaki.circlesgo.ui.unified
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -27,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tsubuzaki.circlesgo.R
@@ -35,8 +30,6 @@ import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.tables.ComiketDate
 import com.tsubuzaki.circlesgo.database.tables.ComiketMap
 import com.tsubuzaki.circlesgo.state.UserSelections
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun UnifiedControl(
@@ -72,7 +65,6 @@ private fun DatePickerButton(
     // active event changes
     val commonImagesLoadCount by database.commonImagesLoadCount.collectAsState()
     val dates = remember(commonImagesLoadCount) { database.dates() }
-    val dateFormatter = remember { SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()) }
 
     // The menu anchors to its parent layout, so keep it in a box around the
     // button instead of letting it align to the whole toolbar
@@ -82,21 +74,12 @@ private fun DatePickerButton(
                 .clip(CircleShape),
             onClick = { expanded = true }
         ) {
-            Column {
-                selectedDate?.let { date ->
-                    Text(
-                        text = stringResource(R.string.day_format, date.id),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Text(
-                        text = dateFormatter.format(date.date),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                    )
-                } ?: Text(stringResource(R.string.no_day))
-            }
+            Text(
+                text = selectedDate?.let { stringResource(R.string.day_format, it.id) }
+                    ?: stringResource(R.string.no_day),
+                fontSize = 17.sp,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
         }
 
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
@@ -140,23 +123,12 @@ private fun HallPickerButton(
                 .padding(horizontal = 4.dp),
             onClick = { expanded = true },
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            Text(
+                text = selectedMap?.name ?: stringResource(R.string.no_hall),
+                color = Color.White,
+                fontSize = 17.sp,
                 modifier = Modifier.padding(horizontal = 4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Business,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp),
-                    tint = Color.White
-                )
-                Text(
-                    text = selectedMap?.name ?: stringResource(R.string.no_hall),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 13.sp
-                )
-            }
+            )
         }
 
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
