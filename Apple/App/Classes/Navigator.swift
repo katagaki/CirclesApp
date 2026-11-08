@@ -1,6 +1,7 @@
 import AXiS
 import CoreGraphics
 import Observation
+import RADiUS
 import SwiftUI
 
 /// Plans a walk through the favourites on the open hall map and steps through it.
@@ -15,8 +16,14 @@ final class Navigator {
         let hall: ComiketHall
         let day: Int
         let layouts: Mapper.Layouts
-        let favoriteWebCatalogIDs: Set<Int>
+        let favoriteColors: [Int: WebCatalogColor]
         let visitedCircleIDs: [Int]
+        let colorPriority: [WebCatalogColor]?
+    }
+
+    enum Mode {
+        case efficient
+        case prioritized
     }
 
     static let planningSpaceSize: CGFloat = 40.0
@@ -25,9 +32,21 @@ final class Navigator {
     private(set) var stepIndex: Int = 0
     private(set) var isPlanning: Bool = false
     private(set) var origin: CGPoint?
+    private(set) var closures: [RouteClosure] = []
+    private(set) var skippedSpaces: [String] = []
+    private(set) var pendingPoint: CGPoint?
+    private(set) var selectedClosureID: UUID?
     var isNoStopsAlertPresented: Bool = false
+    var isOnboardingPresented: Bool = false
+    var isPriorityPresented: Bool = false
+    var pendingMode: Mode?
+    var priorityCounts: [WebCatalogColor: Int] = [:]
+    var chosenPriority: [WebCatalogColor]?
+    var onboardingDismissals: Int = 0
+    var priorityDismissals: Int = 0
 
     @ObservationIgnored private var context: Context?
+    @ObservationIgnored private var remainingStopIDs: Set<Int>?
     @ObservationIgnored private var mapCache: [String: WalkableMap] = [:]
     @ObservationIgnored var activity: AnyObject?
     @ObservationIgnored private var planningTask: Task<Void, Never>?
@@ -49,9 +68,23 @@ final class Navigator {
         return currentStep.instruction(stop: currentStop)
     }
 
+    var activeClosures: [RouteClosure] {
+        closures.filter(\.isActive)
+    }
+
+    var canReportBlocked: Bool {
+        guard let currentStep else { return false }
+        return currentStep.action != .begin
+    }
+
     func start(_ context: Context, database: Database) {
         self.context = context
+        remainingStopIDs = nil
         plan(database: database)
+    }
+
+    var colorPriority: [WebCatalogColor]? {
+        context?.colorPriority
     }
 
     func plan(database: Database) {
@@ -59,7 +92,10 @@ final class Navigator {
         planningTask?.cancel()
         isPlanning = true
         planningTask = Task {
-            let route = await Self.makeRoute(context: context, origin: origin, database: database, cache: mapCache)
+            let route = await Self.makeRoute(
+                context: context, origin: origin, closures: activeClosures,
+                remainingStopIDs: remainingStopIDs, database: database, cache: mapCache
+            )
             guard !Task.isCancelled else { return }
             if let map = route.map {
                 mapCache[Self.cacheKey(context)] = map
@@ -67,6 +103,7 @@ final class Navigator {
             let planned = route.route.flatMap { $0.steps.isEmpty ? nil : $0 }
             withAnimation(.smooth) {
                 self.route = planned
+                self.skippedSpaces = route.route?.skippedSpaces ?? []
                 self.stepIndex = 0
                 self.isPlanning = false
             }
@@ -79,16 +116,113 @@ final class Navigator {
         }
     }
 
-    /// Sets where the visitor is standing, in the map's display coordinates, and plans the
-    /// rest of the route again from there.
-    func setOrigin(_ point: CGPoint, spaceSize: CGFloat, database: Database) {
+    // MARK: Long Press
+
+    /// Holds a long-pressed spot, in the map's display coordinates, until the visitor says
+    /// whether they are standing there or the way is closed there.
+    func hold(_ point: CGPoint, spaceSize: CGFloat) {
         let scale = Self.planningSpaceSize / spaceSize
         withAnimation(.smooth) {
-            origin = CGPoint(x: point.x * scale, y: point.y * scale)
+            selectedClosureID = nil
+            pendingPoint = CGPoint(x: point.x * scale, y: point.y * scale)
         }
+    }
+
+    func cancelHold() {
+        withAnimation(.smooth) {
+            pendingPoint = nil
+            selectedClosureID = nil
+        }
+    }
+
+    func setOriginAtHold(database: Database) {
+        guard let pendingPoint else { return }
+        withAnimation(.smooth) {
+            origin = pendingPoint
+            self.pendingPoint = nil
+        }
+        keepRemainingStops()
         if context != nil {
             plan(database: database)
         }
+    }
+
+    func closePathAtHold(database: Database) {
+        guard let pendingPoint else { return }
+        withAnimation(.smooth) {
+            closures.append(RouteClosure(point: pendingPoint))
+            self.pendingPoint = nil
+        }
+        replanFromCurrentStep(database: database)
+    }
+
+    // MARK: Closures
+
+    /// The way ahead is closed: seals off the aisle the current step turns into, or the
+    /// stretch it walks if it ends at a stop, and plans again from where the step began.
+    func reportBlocked(database: Database) {
+        guard let route, let step = currentStep, canReportBlocked else { return }
+        let next = route.steps.indices.contains(stepIndex + 1) ? route.steps[stepIndex + 1] : nil
+        let stretch: [CGPoint]
+        if !step.isArrival, let next, next.stopIndex == step.stopIndex, next.path.count > 1 {
+            stretch = Array(next.path.prefix(12))
+        } else {
+            stretch = step.path
+        }
+        let closure: RouteClosure
+        if let map = context.flatMap({ mapCache[Self.cacheKey($0)] }),
+           let crossing = map.narrowestCrossing(along: stretch) {
+            closure = RouteClosure(point: crossing.point, across: crossing.across)
+        } else {
+            closure = RouteClosure(point: stretch[stretch.count / 2])
+        }
+        withAnimation(.smooth) {
+            closures.append(closure)
+        }
+        replanFromCurrentStep(database: database)
+    }
+
+    @discardableResult
+    func selectClosure(near point: CGPoint, spaceSize: CGFloat) -> Bool {
+        let scale = Self.planningSpaceSize / spaceSize
+        let target = CGPoint(x: point.x * scale, y: point.y * scale)
+        guard let closure = activeClosures.first(where: {
+            hypot($0.point.x - target.x, $0.point.y - target.y) < Self.planningSpaceSize
+        }) else { return false }
+        withAnimation(.smooth) {
+            pendingPoint = nil
+            selectedClosureID = closure.id
+        }
+        return true
+    }
+
+    func reopenSelectedClosure(database: Database) {
+        guard let selectedClosureID else { return }
+        withAnimation(.smooth) {
+            closures.removeAll { $0.id == selectedClosureID }
+            self.selectedClosureID = nil
+        }
+        replanFromCurrentStep(database: database)
+    }
+
+    func clearClosures() {
+        closures.removeAll()
+        pendingPoint = nil
+        selectedClosureID = nil
+    }
+
+    private func keepRemainingStops() {
+        guard let route, let step = currentStep else { return }
+        remainingStopIDs = Set(route.stops[step.stopIndex...].map(\.id))
+    }
+
+    private func replanFromCurrentStep(database: Database) {
+        guard context != nil else { return }
+        if let step = currentStep, step.action != .begin, let start = step.path.first {
+            origin = start
+        }
+        keepRemainingStops()
+        plan(database: database)
     }
 
     func next() {
@@ -124,10 +258,14 @@ final class Navigator {
         withAnimation(.smooth) {
             route = nil
             origin = nil
+            pendingPoint = nil
+            selectedClosureID = nil
+            skippedSpaces = []
             isPlanning = false
             stepIndex = 0
         }
         context = nil
+        remainingStopIDs = nil
         endActivity()
     }
 
@@ -143,12 +281,19 @@ final class Navigator {
     }
 
     private static func makeRoute(
-        context: Context, origin: CGPoint?, database: Database, cache: [String: WalkableMap]
+        context: Context, origin: CGPoint?, closures: [RouteClosure], remainingStopIDs: Set<Int>?,
+        database: Database, cache: [String: WalkableMap]
     ) async -> Outcome {
         var stopIDs: [Int] = []
         var layoutsByStop: [Int: (LayoutCatalogMapping, Int)] = [:]
         for (layout, webCatalogIDs) in context.layouts {
-            for webCatalogID in webCatalogIDs where context.favoriteWebCatalogIDs.contains(webCatalogID) {
+            for webCatalogID in webCatalogIDs
+            where context.favoriteColors[webCatalogID] != nil
+                && remainingStopIDs?.contains(webCatalogID) ?? true {
+                if let priority = context.colorPriority,
+                   let color = context.favoriteColors[webCatalogID], !priority.contains(color) {
+                    continue
+                }
                 stopIDs.append(webCatalogID)
                 layoutsByStop[webCatalogID] = (layout, webCatalogIDs.count)
             }
@@ -185,9 +330,11 @@ final class Navigator {
             let rect = opensSideways
                 ? CGRect(x: base.minX + index * space / total, y: base.minY, width: space / total, height: space)
                 : CGRect(x: base.minX, y: base.minY + index * space / total, width: space, height: space / total)
+            let color = context.favoriteColors[webCatalogID] ?? .uncolored
             return RouteStopRequest(
                 webCatalogID: webCatalogID, circleID: circle.circleID, name: circle.name,
-                spaceName: circle.spaceName, spaceRect: rect, opensSideways: opensSideways
+                spaceName: circle.spaceName, spaceRect: rect, opensSideways: opensSideways,
+                rank: context.colorPriority?.firstIndex(of: color) ?? 0, colorRawValue: color.rawValue
             )
         }
         guard !requests.isEmpty else { return Outcome(route: nil, map: nil) }
@@ -203,7 +350,7 @@ final class Navigator {
         }
         guard let map else { return Outcome(route: nil, map: nil) }
         let route = await Task.detached(priority: .userInitiated) {
-            RoutePlanner.plan(map: map, stops: requests, origin: origin)
+            RoutePlanner.plan(map: map, stops: requests, origin: origin, closures: closures)
         }.value
         return Outcome(route: route, map: map)
     }

@@ -21,6 +21,8 @@ nonisolated struct RouteStopRequest: Sendable {
     let spaceName: String
     let spaceRect: CGRect
     let opensSideways: Bool
+    let rank: Int
+    let colorRawValue: Int
 }
 
 nonisolated struct RouteStop: Sendable, Identifiable, Hashable {
@@ -30,6 +32,7 @@ nonisolated struct RouteStop: Sendable, Identifiable, Hashable {
     let spaceName: String
     let accessPoint: CGPoint
     let spaceCenter: CGPoint
+    let colorRawValue: Int
 }
 
 nonisolated enum RouteTurn: Sendable, Hashable {
@@ -65,9 +68,37 @@ nonisolated struct RouteStep: Sendable, Identifiable, Hashable {
     let path: [CGPoint]
 }
 
+/// A path staff have closed off, in high-resolution map pixels. Closures lapse on their
+/// own, since a queue or crowd that closes an aisle rarely lasts.
+nonisolated struct RouteClosure: Sendable, Identifiable, Hashable {
+    static let lifetime: TimeInterval = 30 * 60
+
+    let id: UUID
+    let point: CGPoint
+    let across: GridPoint?
+    let expiresAt: Date
+
+    init(point: CGPoint, across: GridPoint? = nil, now: Date = .now) {
+        self.id = UUID()
+        self.point = point
+        self.across = across
+        self.expiresAt = now.addingTimeInterval(Self.lifetime)
+    }
+
+    var isActive: Bool { expiresAt > .now }
+}
+
+nonisolated struct RouteClosureLine: Sendable, Hashable {
+    let id: UUID
+    let from: CGPoint
+    let to: CGPoint
+}
+
 nonisolated struct PlannedRoute: Sendable, Hashable {
     let stops: [RouteStop]
     let legs: [[CGPoint]]
     let steps: [RouteStep]
     let origin: CGPoint?
+    let closures: [RouteClosureLine]
+    let skippedSpaces: [String]
 }

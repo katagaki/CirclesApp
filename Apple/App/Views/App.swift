@@ -58,7 +58,7 @@ struct CirclesApp: App {
             }
             .onAppear {
                 orientation.update()
-                navigator.connectActivityButtons()
+                navigator.connectActivityButtons(database: database)
                 sharedBuys.restore()
                 appDelegate.onSharedBuysEvent = { token in
                     if let token {

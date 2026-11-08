@@ -34,7 +34,7 @@ struct RouteLiveActivity: Widget {
                             .lineLimit(2)
                             .minimumScaleFactor(0.8)
                         Spacer(minLength: 4.0)
-                        stepButtons
+                        stepButtons(context.state)
                     }
                     .padding(.horizontal, 4.0)
                 }
@@ -87,7 +87,7 @@ struct RouteLiveActivity: Widget {
                     stopLine(context.state)
                 }
                 Spacer(minLength: 4.0)
-                stepButtons
+                stepButtons(context.state)
             }
             .padding(.horizontal, 16.0)
             .padding(.vertical, 12.0)
@@ -113,8 +113,18 @@ struct RouteLiveActivity: Widget {
         .foregroundStyle(.secondary)
     }
 
-    var stepButtons: some View {
+    func stepButtons(_ state: RouteAttributes.ContentState) -> some View {
         HStack(spacing: 6.0) {
+            if state.canReportBlocked {
+                Button(intent: RouteBlockedIntent()) {
+                    Image(systemName: "nosign")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(.red)
+                        .frame(width: 36.0, height: 36.0)
+                }
+                .buttonStyle(.plain)
+                .background(.quaternary, in: .circle)
+            }
             Button(intent: RouteStepIntent(isForward: false)) {
                 Image(systemName: "chevron.backward")
                     .font(.subheadline.weight(.bold))

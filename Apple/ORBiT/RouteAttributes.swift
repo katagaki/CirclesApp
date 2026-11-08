@@ -13,10 +13,11 @@ public struct RouteAttributes: ActivityAttributes, Sendable {
         public var stopNumber: Int
         public var stopCount: Int
         public var isArriving: Bool
+        public var canReportBlocked: Bool
 
         public init(
             instruction: String, symbolName: String, stopSpace: String, stopName: String,
-            progress: String, stopNumber: Int, stopCount: Int, isArriving: Bool
+            progress: String, stopNumber: Int, stopCount: Int, isArriving: Bool, canReportBlocked: Bool
         ) {
             self.instruction = instruction
             self.symbolName = symbolName
@@ -26,6 +27,7 @@ public struct RouteAttributes: ActivityAttributes, Sendable {
             self.stopNumber = stopNumber
             self.stopCount = stopCount
             self.isArriving = isArriving
+            self.canReportBlocked = canReportBlocked
         }
     }
 

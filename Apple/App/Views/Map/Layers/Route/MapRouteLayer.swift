@@ -1,3 +1,4 @@
+import RADiUS
 import SwiftUI
 
 struct MapRouteLayer: View {
@@ -38,14 +39,31 @@ struct MapRouteLayer: View {
                         .stroke(.white, style: StrokeStyle(lineWidth: lineWidth * 0.45, lineCap: .round, lineJoin: .round,
                                                            dash: [lineWidth * 0.2, lineWidth * 0.9]))
                 }
+                ForEach(route.closures, id: \.id) { closure in
+                    polyline([closure.from, closure.to])
+                        .stroke(Color.red, style: StrokeStyle(lineWidth: lineWidth * 1.4, lineCap: .round,
+                                                              dash: [lineWidth * 0.8, lineWidth * 0.6]))
+                }
                 ForEach(Array(route.stops.enumerated()), id: \.element.id) { index, stop in
                     MapRouteStopBadge(
                         number: index + 1,
                         state: index < currentStop ? .done : (index == currentStop ? .current : .upcoming),
+                        tint: WebCatalogColor(rawValue: stop.colorRawValue) ?? .uncolored,
                         size: CGFloat(spaceSize) * (index == currentStop ? 0.95 : 0.7)
                     )
                     .position(scaled(stop.accessPoint))
                 }
+            }
+            ForEach(navigator.activeClosures) { closure in
+                MapRouteClosureBadge(
+                    size: CGFloat(spaceSize) * 0.85,
+                    isSelected: navigator.selectedClosureID == closure.id
+                )
+                .position(scaled(closure.point))
+            }
+            if let pendingPoint = navigator.pendingPoint {
+                MapRouteHoldMarker(size: CGFloat(spaceSize) * 0.8)
+                    .position(scaled(pendingPoint))
             }
             if let origin = navigator.origin {
                 MapRouteOriginPin(size: CGFloat(spaceSize) * 0.8)

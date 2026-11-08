@@ -6,6 +6,7 @@ struct MapLayoutLayer: View {
     @Environment(Database.self) var database
     @Environment(Mapper.self) var mapper
     @Environment(Unifier.self) var unifier
+    @Environment(Navigator.self) var navigator
 
     let spaceSize: Int
 
@@ -41,6 +42,13 @@ struct MapLayoutLayer: View {
     }
 
     func openMapPopoverIn(x: Int, y: Int) {
+        if navigator.selectClosure(near: CGPoint(x: x, y: y), spaceSize: CGFloat(spaceSize)) {
+            return
+        }
+        if navigator.pendingPoint != nil || navigator.selectedClosureID != nil {
+            navigator.cancelHold()
+            return
+        }
         for (layout, webCatalogIDs) in mapper.layouts {
             let xMin: Int = Int(Double(layout.positionX))
             let xMax: Int = Int(Double(layout.positionX + spaceSize))

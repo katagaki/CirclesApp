@@ -1,3 +1,4 @@
+import AXiS
 import Foundation
 #if os(iOS) && !targetEnvironment(macCatalyst)
 import ActivityKit
@@ -15,7 +16,8 @@ extension Navigator {
             progress: String(localized: "Route.Stop.\(currentStep.stopIndex + 1).\(route.stops.count)"),
             stopNumber: currentStep.stopIndex + 1,
             stopCount: route.stops.count,
-            isArriving: currentStep.isArrival
+            isArriving: currentStep.isArrival,
+            canReportBlocked: canReportBlocked
         )
     }
 
@@ -52,7 +54,7 @@ extension Navigator {
         await activity.end(nil, dismissalPolicy: .immediate)
     }
 
-    func connectActivityButtons() {
+    func connectActivityButtons(database: Database) {
         RouteIntentBridge.handler = { [weak self] isForward in
             if isForward {
                 self?.next()
@@ -60,12 +62,15 @@ extension Navigator {
                 self?.previous()
             }
         }
+        RouteIntentBridge.blockedHandler = { [weak self] in
+            self?.reportBlocked(database: database)
+        }
     }
 }
 #else
 extension Navigator {
     func updateActivity(hallName: String? = nil) {}
     func endActivity() {}
-    func connectActivityButtons() {}
+    func connectActivityButtons(database: Database) {}
 }
 #endif

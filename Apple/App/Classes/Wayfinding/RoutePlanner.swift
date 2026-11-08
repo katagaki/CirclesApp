@@ -2,18 +2,49 @@ import CoreGraphics
 
 nonisolated enum RoutePlanner {
 
-    static func plan(map: WalkableMap, stops requests: [RouteStopRequest], origin: CGPoint?) -> PlannedRoute? {
-        let pathfinder = Pathfinder(map: map)
-        var stops: [(request: RouteStopRequest, cell: GridPoint)] = []
-        for request in requests {
-            if let cell = accessCell(for: request, in: map) {
-                stops.append((request, cell))
+    static func plan(
+        map baseMap: WalkableMap, stops requests: [RouteStopRequest], origin: CGPoint?, closures: [RouteClosure] = []
+    ) -> PlannedRoute? {
+        var closureLines: [RouteClosureLine] = []
+        var blockedCells: [GridPoint] = []
+        for closure in closures where closure.isActive {
+            let cells = baseMap.closureCells(at: closure.point, across: closure.across)
+            blockedCells += cells
+            if let line = line(through: cells, in: baseMap) {
+                closureLines.append(RouteClosureLine(id: closure.id, from: line.0, to: line.1))
             }
         }
-        guard !stops.isEmpty else { return nil }
+        let map = baseMap.blocking(blockedCells)
+        let pathfinder = Pathfinder(map: map)
+        var candidates: [(request: RouteStopRequest, cell: GridPoint)] = []
+        for request in requests {
+            if let cell = accessCell(for: request, in: map) {
+                candidates.append((request, cell))
+            }
+        }
+        guard !candidates.isEmpty else { return nil }
 
         let originCell = origin.flatMap { map.nearestWalkable(to: map.cell(at: $0)) }
-        let fields = stops.map { pathfinder.costs(from: $0.cell) }
+        let candidateFields = candidates.map { pathfinder.costs(from: $0.cell) }
+
+        // A closure can cut a stop off entirely. Only the stops reachable from where the
+        // walk starts are kept; the rest are reported so the visitor knows why they vanished.
+        let reachCounts = candidates.indices.map { from in
+            candidates.indices.filter { candidateFields[from][map.index(candidates[$0].cell)].isFinite }.count
+        }
+        let hub = candidates.indices.max { reachCounts[$0] < reachCounts[$1] } ?? 0
+        let reachable: [Int] = candidates.indices.filter { index in
+            if let originCell { return candidateFields[index][map.index(originCell)].isFinite }
+            return candidateFields[hub][map.index(candidates[index].cell)].isFinite
+        }
+        let skippedSpaces = candidates.indices.filter { !reachable.contains($0) }.map { candidates[$0].request.spaceName }
+        let stops = reachable.map { candidates[$0] }
+        let fields = reachable.map { candidateFields[$0] }
+        guard !stops.isEmpty else {
+            return PlannedRoute(stops: [], legs: [], steps: [], origin: nil, closures: closureLines,
+                                skippedSpaces: skippedSpaces)
+        }
+
         let costs = stops.indices.map { from in
             stops.indices.map { to in fields[from][map.index(stops[to].cell)] }
         }
@@ -21,7 +52,7 @@ nonisolated enum RoutePlanner {
             guard let originCell else { return 0 }
             return fields[index][map.index(originCell)]
         }
-        let order = StopOrderer.order(costs: costs, startCosts: startCosts)
+        let order = StopOrderer.order(costs: costs, startCosts: startCosts, ranks: stops.map(\.request.rank))
 
         let narrator = RouteNarrator(map: map)
         var plannedStops: [RouteStop] = []
@@ -33,7 +64,8 @@ nonisolated enum RoutePlanner {
             let center = CGPoint(x: stop.request.spaceRect.midX, y: stop.request.spaceRect.midY)
             plannedStops.append(RouteStop(
                 id: stop.request.webCatalogID, circleID: stop.request.circleID, name: stop.request.name,
-                spaceName: stop.request.spaceName, accessPoint: map.center(of: stop.cell), spaceCenter: center
+                spaceName: stop.request.spaceName, accessPoint: map.center(of: stop.cell), spaceCenter: center,
+                colorRawValue: stop.request.colorRawValue
             ))
             guard let from = current else {
                 legs.append([map.center(of: stop.cell)])
@@ -48,7 +80,19 @@ nonisolated enum RoutePlanner {
             steps += narrator.steps(for: path, stopIndex: position, spaceCenter: center, firstID: steps.count)
             current = stop.cell
         }
-        return PlannedRoute(stops: plannedStops, legs: legs, steps: steps, origin: originCell.map { map.center(of: $0) })
+        return PlannedRoute(stops: plannedStops, legs: legs, steps: steps, origin: originCell.map { map.center(of: $0) },
+                            closures: closureLines, skippedSpaces: skippedSpaces)
+    }
+
+    private static func line(through cells: [GridPoint], in map: WalkableMap) -> (CGPoint, CGPoint)? {
+        guard let first = cells.first else { return nil }
+        let sameRow = cells.filter { $0.row == first.row }
+        let sameColumn = cells.filter { $0.column == first.column }
+        let band = sameRow.count >= sameColumn.count
+            ? sameRow.sorted { $0.column < $1.column }
+            : sameColumn.sorted { $0.row < $1.row }
+        guard let start = band.first, let end = band.last else { return nil }
+        return (map.center(of: start), map.center(of: end))
     }
 
     /// The aisle cell in front of a space. Every space has one side facing an aisle; the

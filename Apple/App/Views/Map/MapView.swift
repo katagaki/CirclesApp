@@ -43,7 +43,7 @@ struct MapView: View {
                 ), onTap: {
                     unifier.closeOfflineStatus()
                 }, onLongPress: { location in
-                    navigator.setOrigin(location, spaceSize: CGFloat(spaceSize), database: database)
+                    navigator.hold(location, spaceSize: CGFloat(spaceSize))
                 }, content: {
                     ZStack(alignment: .topLeading) {
                         MapLayer(image: mapImage)
@@ -92,6 +92,7 @@ struct MapView: View {
             if navigator.isActive {
                 navigator.end()
             }
+            navigator.clearClosures()
             reloadAll()
         }
         .onChange(of: popoverInvalidationID) {

@@ -13,6 +13,7 @@ struct UnifiedView: View {
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
     @Environment(Oasis.self) var oasis
+    @Environment(Navigator.self) var navigator
 
     @Namespace var namespace
 
@@ -51,6 +52,7 @@ struct UnifiedView: View {
 
     var body: some View {
         @Bindable var unifier = unifier
+        @Bindable var navigator = navigator
         NavigationStack(path: $unifier.stackPath) {
             MapView()
                 .navigationTitle("ViewTitle.Map")
@@ -63,6 +65,7 @@ struct UnifiedView: View {
                     VStack(spacing: 8.0) {
                         UnifiedOfflineStatus()
                         UnifiedRouteCard()
+                        UnifiedRouteHoldBar()
                     }
                     .padding(.horizontal, 12.0)
                     .padding(.top, 8.0)
@@ -74,6 +77,22 @@ struct UnifiedView: View {
                     UnifiedToolbar(namespace: namespace)
                 }
                 .unifierPanel(namespace: namespace)
+                .sheet(isPresented: $navigator.isOnboardingPresented, onDismiss: {
+                    if navigator.pendingMode != .prioritized {
+                        unifier.show()
+                    }
+                    navigator.onboardingDismissals += 1
+                }) {
+                    RouteOnboardingView()
+                        .presentationDetents([.large])
+                }
+                .sheet(isPresented: $navigator.isPriorityPresented, onDismiss: {
+                    unifier.show()
+                    navigator.priorityDismissals += 1
+                }) {
+                    RoutePriorityView()
+                        .presentationDetents([.medium, .large])
+                }
                 .sheet(isPresented: $unifier.isMyComiketPresenting) {
                     NavigationStack {
                         MyView()

@@ -1,3 +1,4 @@
+import RADiUS
 import SwiftUI
 
 struct MapRouteStopBadge: View {
@@ -10,14 +11,19 @@ struct MapRouteStopBadge: View {
 
     let number: Int
     let state: Phase
+    let tint: WebCatalogColor
     let size: CGFloat
 
     var fill: Color {
         switch state {
         case .done: .gray
         case .current: .red
-        case .upcoming: .accentColor
+        case .upcoming: tint == .uncolored ? .accentColor : tint.backgroundColor()
         }
+    }
+
+    var glyph: Color {
+        state == .upcoming && tint != .uncolored ? tint.foregroundColor() : .white
     }
 
     var body: some View {
@@ -35,7 +41,7 @@ struct MapRouteStopBadge: View {
                     .monospacedDigit()
             }
         }
-        .foregroundStyle(.white)
+        .foregroundStyle(glyph)
         .frame(width: size, height: size)
         .shadow(color: .black.opacity(0.3), radius: size * 0.08, y: size * 0.04)
     }
