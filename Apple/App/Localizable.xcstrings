@@ -11257,31 +11257,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "End Route"
+            "value": "End Navigation"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ルートを終了"
+            "value": "コミケナビを終了"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "경로 종료"
+            "value": "내비게이션 종료"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "结束路线"
+            "value": "结束导航"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "結束路線"
+            "value": "結束導航"
           }
         }
       }
@@ -11903,31 +11903,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "How Route Guidance Works"
+            "value": "How Navigation Works"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ルート案内の使い方"
+            "value": "コミケナビの使い方"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "경로 안내 사용법"
+            "value": "내비게이션 사용법"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "路线导航使用方法"
+            "value": "导航使用方法"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "路線導航使用方法"
+            "value": "導航使用方法"
           }
         }
       }
@@ -12141,31 +12141,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Route Guidance"
+            "value": "Navigation"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ルート案内"
+            "value": "コミケナビ"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "경로 안내"
+            "value": "내비게이션"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "路线导航"
+            "value": "导航"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "路線導航"
+            "value": "導航"
           }
         }
       }
@@ -12561,31 +12561,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Route"
+            "value": "Navigation"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ルート"
+            "value": "コミケナビ"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "경로"
+            "value": "내비게이션"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "路线"
+            "value": "导航"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "路線"
+            "value": "導航"
           }
         }
       }
