@@ -13,7 +13,7 @@ struct MapRouteHoldPopover: View {
             if navigator.pendingPoint != nil {
                 Text("Route.Hold.Title")
                     .font(.body.weight(.semibold))
-                    .padding(.bottom, 6.0)
+                    .padding(.bottom, 2.0)
                 row("Route.Hold.SetOrigin", systemImage: "figure.walk") {
                     navigator.setOriginAtHold(database: database)
                 }
@@ -39,13 +39,14 @@ struct MapRouteHoldPopover: View {
                 }
             }
         }
+        .padding(.vertical, 8.0)
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
     }
 
     /// Rows are padded above and below, except under the last one, where the popover's own
-    /// padding already sits. A gap between rows holds two lines' leading where an edge holds
-    /// one, so 6 points a side reads the same as the popover's 16-point margin.
+    /// padding sits. A gap between rows holds two lines' leading where an edge holds one, so
+    /// the popover's edges get extra room to match the gaps between rows.
     func row(
         _ title: LocalizedStringKey, systemImage: String, isLast: Bool = false, perform: @escaping () -> Void
     ) -> some View {
@@ -62,8 +63,8 @@ struct MapRouteHoldPopover: View {
                 Spacer(minLength: 0.0)
             }
             .font(.body)
-            .padding(.top, 6.0)
-            .padding(.bottom, isLast ? 0.0 : 6.0)
+            .padding(.top, 10.0)
+            .padding(.bottom, isLast ? 0.0 : 10.0)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
