@@ -14,6 +14,7 @@ struct MapRouteClosureBadge: View {
             }
             Circle()
                 .fill(Color.primary)
+                .shadow(color: .black.opacity(0.3), radius: size * 0.08)
             Circle()
                 .strokeBorder(Color(uiColor: .systemBackground), lineWidth: size * 0.1)
             Image(systemName: "nosign")
@@ -21,6 +22,5 @@ struct MapRouteClosureBadge: View {
                 .foregroundStyle(Color(uiColor: .systemBackground))
         }
         .frame(width: size, height: size)
-        .shadow(color: .black.opacity(0.3), radius: size * 0.08)
     }
 }
