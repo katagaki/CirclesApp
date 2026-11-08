@@ -7,28 +7,21 @@ struct UnifiedTopStatus: View {
     @Environment(Navigator.self) var navigator
     @Environment(Unifier.self) var unifier
 
-    let namespace: Namespace.ID
-
     var isRouteExpanded: Bool {
         navigator.isStatusExpanded || navigator.isNoStopsAlertPresented
     }
 
     var body: some View {
-        GlassEffectContainer(spacing: 8.0) {
-            VStack(alignment: .trailing, spacing: 8.0) {
-                if isRouteExpanded {
-                    UnifiedRouteStatus(namespace: namespace)
-                } else {
-                    HStack(alignment: .top, spacing: 8.0) {
-                        UnifiedOfflineStatus()
-                        if !unifier.isOfflineStatusExpanded {
-                            Spacer(minLength: 0.0)
-                            UnifiedRouteStatus(namespace: namespace)
-                        }
-                    }
+        HStack(alignment: .top, spacing: 8.0) {
+            if !isRouteExpanded {
+                UnifiedOfflineStatus()
+            }
+            if !unifier.isOfflineStatusExpanded {
+                if !isRouteExpanded {
+                    Spacer(minLength: 0.0)
                 }
+                UnifiedRouteStatus()
             }
         }
-        .animation(.smooth, value: isRouteExpanded)
     }
 }

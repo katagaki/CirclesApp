@@ -60,7 +60,7 @@ struct UnifiedView: View {
                 .contentShape(.rect)
                 .simultaneousGesture(TapGesture().onEnded { unifier.closeOfflineStatus() })
                 .overlay(alignment: .top) {
-                    UnifiedTopStatus(namespace: namespace)
+                    UnifiedTopStatus()
                     .padding(.horizontal, 12.0)
                     .padding(.top, 8.0)
                 }

@@ -9,6 +9,8 @@ struct MapRouteHoldLayer: View {
     let zoomScale: CGFloat
     let spaceSize: Int
 
+    @State var contentHeight: CGFloat = 140.0
+
     var anchor: CGPoint? {
         if let pendingPoint = navigator.pendingPoint {
             return pendingPoint
@@ -25,8 +27,13 @@ struct MapRouteHoldLayer: View {
 
     var body: some View {
         if let sourceRect {
-            MapPopover(zoomScale: zoomScale, sourceRect: sourceRect, isDismissing: false) {
+            MapPopover(zoomScale: zoomScale, sourceRect: sourceRect, isDismissing: false, height: contentHeight + 32.0) {
                 MapRouteHoldPopover()
+                    .onGeometryChange(for: CGFloat.self) { proxy in
+                        proxy.size.height
+                    } action: { newValue in
+                        contentHeight = newValue
+                    }
             }
             .id("\(sourceRect.midX),\(sourceRect.midY),\(navigator.selectedClosureID?.uuidString ?? "")")
         }

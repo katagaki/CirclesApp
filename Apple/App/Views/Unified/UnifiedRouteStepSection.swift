@@ -11,7 +11,7 @@ struct UnifiedRouteStepSection: View {
     @Query var visits: [CirclesVisitEntry]
 
     var body: some View {
-        if let route = navigator.route, let step = navigator.currentStep,
+        if navigator.route != nil, let step = navigator.currentStep,
            let stop = navigator.currentStop, let instruction = navigator.currentInstruction {
             VStack(alignment: .leading, spacing: 12.0) {
                 HStack(alignment: .top, spacing: 12.0) {
@@ -35,26 +35,10 @@ struct UnifiedRouteStepSection: View {
                                 .fontWeight(.semibold)
                             Text(stop.name)
                                 .lineLimit(1)
-                            Spacer(minLength: 6.0)
-                            Text("\(step.stopIndex + 1)/\(route.stops.count)")
-                                .fontWeight(.semibold)
-                                .monospacedDigit()
-                                .fixedSize()
                         }
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     }
-                    Button("Route.Collapse", systemImage: "chevron.up") {
-                        withAnimation(.smooth) {
-                            navigator.isStatusExpanded = false
-                        }
-                    }
-                    .labelStyle(.iconOnly)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .buttonStyle(.plain)
-                    .frame(width: 28.0, height: 28.0)
-                    .contentShape(.rect)
                 }
                 if !navigator.skippedSpaces.isEmpty {
                     Label(

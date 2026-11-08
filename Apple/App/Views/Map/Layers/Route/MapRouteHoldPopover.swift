@@ -39,9 +39,9 @@ struct MapRouteHoldPopover: View {
                     navigator.reopenSelectedClosure(database: database)
                 }
             }
-            Spacer(minLength: 0.0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .fixedSize(horizontal: false, vertical: true)
     }
 
     func row(_ title: LocalizedStringKey, systemImage: String, perform: @escaping () -> Void) -> some View {
