@@ -34,11 +34,10 @@ final class Navigator {
     private(set) var origin: CGPoint?
     private(set) var closures: [RouteClosure] = []
     private(set) var skippedSpaces: [String] = []
+    private(set) var halls: [RouteHall] = []
     private(set) var pendingPoint: CGPoint?
     private(set) var selectedClosureID: UUID?
     var isNoStopsAlertPresented: Bool = false
-    var isOnboardingPresented: Bool = false
-    var isPriorityPresented: Bool = false
     var pendingMode: Mode?
     var priorityCounts: [WebCatalogColor: Int] = [:]
     var chosenPriority: [WebCatalogColor]?
@@ -74,7 +73,10 @@ final class Navigator {
 
     var canReportBlocked: Bool {
         guard let currentStep else { return false }
-        return currentStep.action != .begin
+        switch currentStep.action {
+        case .begin, .enter: return false
+        case .turn, .arrive, .exit: return true
+        }
     }
 
     func start(_ context: Context, database: Database) {
@@ -99,6 +101,9 @@ final class Navigator {
             guard !Task.isCancelled else { return }
             if let map = route.map {
                 mapCache[Self.cacheKey(context)] = map
+            }
+            if !route.halls.isEmpty {
+                halls = route.halls
             }
             let planned = route.route.flatMap { $0.steps.isEmpty ? nil : $0 }
             withAnimation(.smooth) {
@@ -145,6 +150,32 @@ final class Navigator {
         if context != nil {
             plan(database: database)
         }
+    }
+
+    /// The lines where neighbouring halls meet. Where the printed ranges overlap, the
+    /// boundary is taken as the middle of the overlap.
+    var hallBoundaries: [CGFloat] {
+        zip(halls, halls.dropFirst()).map { left, right in (left.rect.maxX + right.rect.minX) / 2.0 }
+    }
+
+    /// Loads the halls of the open map, so their boundaries can be closed off before a
+    /// route has been planned on it.
+    func loadHalls(inMap mapID: Int, database: Database) {
+        Task {
+            let fetcher = DataFetcher(database: database.newReadOnlyTextConnection())
+            let halls = await fetcher.hallAreas(inMap: mapID)
+            self.halls = halls
+        }
+    }
+
+    func closeHallsAtHold(database: Database) {
+        guard let pendingPoint,
+              let boundary = hallBoundaries.min(by: { abs($0 - pendingPoint.x) < abs($1 - pendingPoint.x) }) else { return }
+        withAnimation(.smooth) {
+            closures.append(RouteClosure(point: CGPoint(x: boundary, y: pendingPoint.y), hallBoundaryX: boundary))
+            self.pendingPoint = nil
+        }
+        replanFromCurrentStep(database: database)
     }
 
     func closePathAtHold(database: Database) {
@@ -205,8 +236,13 @@ final class Navigator {
         replanFromCurrentStep(database: database)
     }
 
+    var selectedClosureIsHallBoundary: Bool {
+        closures.first { $0.id == selectedClosureID }?.hallBoundaryX != nil
+    }
+
     func clearClosures() {
         closures.removeAll()
+        halls = []
         pendingPoint = nil
         selectedClosureID = nil
     }
@@ -274,6 +310,7 @@ final class Navigator {
     private struct Outcome: Sendable {
         let route: PlannedRoute?
         let map: WalkableMap?
+        var halls: [RouteHall] = []
     }
 
     private static func cacheKey(_ context: Context) -> String {
@@ -305,6 +342,7 @@ final class Navigator {
         let circles = await fetcher.routeCircles(withWebCatalogIDs: stopIDs)
         let visited = Set(await fetcher.webCatalogIDs(forCircleIDs: context.visitedCircleIDs))
         let blockNames = Dictionary(database.blocks().map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
+        let halls = await fetcher.hallAreas(inMap: context.mapID)
 
         let space = planningSpaceSize
         var positions: [String: LayoutCatalogMapping] = [:]
@@ -350,8 +388,8 @@ final class Navigator {
         }
         guard let map else { return Outcome(route: nil, map: nil) }
         let route = await Task.detached(priority: .userInitiated) {
-            RoutePlanner.plan(map: map, stops: requests, origin: origin, closures: closures)
+            RoutePlanner.plan(map: map, stops: requests, origin: origin, closures: closures, halls: halls)
         }.value
-        return Outcome(route: route, map: map)
+        return Outcome(route: route, map: map, halls: halls)
     }
 }

@@ -12,12 +12,48 @@ nonisolated struct RouteNarrator {
     }
 
     let map: WalkableMap
+    var doorName: (GridPoint) -> String = { _ in "" }
+    var outside: (GridPoint, GridPoint) -> [CGPoint] = { _, _ in [] }
+
+    /// A path split wherever it leaves the hall through one door and comes back in through
+    /// another, which shows up as two neighbouring cells that are not next to each other.
+    static func segments(of path: [GridPoint]) -> [[GridPoint]] {
+        var segments: [[GridPoint]] = [[]]
+        for cell in path {
+            if let last = segments[segments.count - 1].last,
+               abs(last.row - cell.row) + abs(last.column - cell.column) > 1 {
+                segments.append([])
+            }
+            segments[segments.count - 1].append(cell)
+        }
+        return segments.filter { !$0.isEmpty }
+    }
 
     func steps(
         for path: [GridPoint], stopIndex: Int, spaceCenter: CGPoint, firstID: Int
     ) -> [RouteStep] {
+        let segments = Self.segments(of: path)
+        var steps: [RouteStep] = []
+        for (position, segment) in segments.enumerated() {
+            let isLast = position == segments.count - 1
+            let ending: RouteAction? = isLast ? nil : .exit(hall: doorName(segment[segment.count - 1]))
+            steps += insideSteps(for: segment, stopIndex: stopIndex, spaceCenter: spaceCenter,
+                                 firstID: firstID + steps.count, ending: ending)
+            if !isLast, let exit = segment.last, let entry = segments[position + 1].first {
+                steps.append(RouteStep(id: firstID + steps.count, stopIndex: stopIndex, blocks: 0,
+                                       action: .enter(hall: doorName(entry)), path: outside(exit, entry)))
+            }
+        }
+        return steps
+    }
+
+    /// Directions for one stretch indoors. It ends at the stop, or at a door when `ending`
+    /// says the walk carries on outside.
+    private func insideSteps(
+        for path: [GridPoint], stopIndex: Int, spaceCenter: CGPoint, firstID: Int, ending: RouteAction?
+    ) -> [RouteStep] {
         guard path.count > 1 else {
-            return [RouteStep(id: firstID, stopIndex: stopIndex, blocks: 0, action: .arrive(.ahead),
+            return [RouteStep(id: firstID, stopIndex: stopIndex, blocks: 0, action: ending ?? .arrive(.ahead),
                               path: path.map { map.center(of: $0) })]
         }
         let runs = simplified(runs(in: path))
@@ -30,6 +66,8 @@ nonisolated struct RouteNarrator {
                 let next = runs[index + 1]
                 action = .turn(turn(from: run.direction, to: next.direction),
                                into: passage(from: path[next.start], along: next.direction, length: next.length))
+            } else if let ending {
+                action = ending
             } else {
                 action = .arrive(side(of: spaceCenter, from: path[run.end], heading: run.direction))
             }

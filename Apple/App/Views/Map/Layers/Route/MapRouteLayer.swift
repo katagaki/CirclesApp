@@ -39,6 +39,11 @@ struct MapRouteLayer: View {
                         .stroke(.white, style: StrokeStyle(lineWidth: lineWidth * 0.45, lineCap: .round, lineJoin: .round,
                                                            dash: [lineWidth * 0.2, lineWidth * 0.9]))
                 }
+                ForEach(Array(route.outsidePaths.enumerated()), id: \.offset) { _, walk in
+                    polyline(walk)
+                        .stroke(Color.orange, style: StrokeStyle(lineWidth: lineWidth * 0.9, lineCap: .round,
+                                                                 lineJoin: .round, dash: [lineWidth * 0.3, lineWidth * 1.2]))
+                }
                 ForEach(route.closures, id: \.id) { closure in
                     polyline([closure.from, closure.to])
                         .stroke(Color.red, style: StrokeStyle(lineWidth: lineWidth * 1.4, lineCap: .round,

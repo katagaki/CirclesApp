@@ -13,7 +13,11 @@ struct UnifiedRouteCard: View {
 
     var body: some View {
         Group {
-            if navigator.isPlanning {
+            if navigator.isNoStopsAlertPresented {
+                UnifiedRouteNoStopsCard {
+                    navigator.isNoStopsAlertPresented = false
+                }
+            } else if navigator.isPlanning {
                 HStack(spacing: 10.0) {
                     ProgressView()
                     Text("Route.Planning")
@@ -90,5 +94,6 @@ struct UnifiedRouteCard: View {
             }
         }
         .animation(.smooth, value: navigator.stepIndex)
+
     }
 }

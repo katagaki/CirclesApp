@@ -7,6 +7,7 @@ nonisolated struct MapRaster {
     let dark: [UInt8]
     let fillOrDark: [UInt8]
     let neutralGray: [UInt8]
+    let gray: [UInt8]
 
     init?(image: CGImage) {
         let width = image.width
@@ -28,6 +29,7 @@ nonisolated struct MapRaster {
         var dark = [UInt8](repeating: 0, count: width * height)
         var fillOrDark = [UInt8](repeating: 0, count: width * height)
         var neutralGray = [UInt8](repeating: 255, count: width * height)
+        var plainGray = [UInt8](repeating: 255, count: width * height)
         pixels.withUnsafeBufferPointer { rgba in
             for index in 0..<(width * height) {
                 let red = Int(rgba[index * 4])
@@ -41,10 +43,12 @@ nonisolated struct MapRaster {
                 dark[index] = isDark ? 255 : 0
                 fillOrDark[index] = (isDark || isFill) ? 255 : 0
                 neutralGray[index] = isLabel ? 255 : UInt8(gray)
+                plainGray[index] = UInt8(gray)
             }
         }
         self.dark = dark
         self.fillOrDark = fillOrDark
         self.neutralGray = neutralGray
+        self.gray = plainGray
     }
 }

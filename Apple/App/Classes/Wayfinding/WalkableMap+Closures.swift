@@ -61,8 +61,21 @@ extension WalkableMap {
         }
         return WalkableMap(
             rows: rows, columns: columns, walkable: walkable, clearance: clearance,
-            stepCost: stepCost, islandLabels: islandLabels, islands: islands
+            stepCost: stepCost, islandLabels: islandLabels, islands: islands, doors: doors
         )
+    }
+
+    /// Every walkable cell within a cell of a vertical line, so nothing crosses it.
+    func boundaryCells(atX x: CGFloat) -> [GridPoint] {
+        let column = Int(x) / Self.cellSize
+        var cells: [GridPoint] = []
+        for row in 0..<rows {
+            for offset in -1...1 {
+                let cell = GridPoint(row: row, column: column + offset)
+                if isWalkable(cell) { cells.append(cell) }
+            }
+        }
+        return cells
     }
 
     private func openRun(from start: GridPoint, along direction: (Int, Int)) -> Int {

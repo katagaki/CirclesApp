@@ -24,6 +24,7 @@ nonisolated struct WalkableMap: Sendable {
     let stepCost: [Float]
     let islandLabels: [Int32]
     let islands: [Island]
+    let doors: [RouteDoor]
 
     func index(_ point: GridPoint) -> Int { point.row * columns + point.column }
 
@@ -121,7 +122,10 @@ extension WalkableMap {
             }
         }
 
-        let interior = hallInterior(walls: wallCells, zones: zoneCells, rows: rows, columns: columns)
+        var interior = hallInterior(walls: wallCells, zones: zoneCells, rows: rows, columns: columns)
+        if interior.filter({ $0 }).count < rows * columns / 4 {
+            interior = aroundTables(tables, rows: rows, columns: columns)
+        }
         var walkable = (0..<(rows * columns)).map { interior[$0] && blockedFraction[$0] < 0.05 }
         walkable = GridLabels.largestComponent(of: walkable, rows: rows, columns: columns)
 
@@ -129,10 +133,12 @@ extension WalkableMap {
         let stepCost = clearance.map { 1.0 + 3.0 / max($0, 1.0) }
         let (islandLabels, islands) = islandsOf(tables: tables, rows: rows, columns: columns)
 
-        return WalkableMap(
+        var map = WalkableMap(
             rows: rows, columns: columns, walkable: walkable, clearance: clearance,
-            stepCost: stepCost, islandLabels: islandLabels, islands: islands
+            stepCost: stepCost, islandLabels: islandLabels, islands: islands, doors: []
         )
+        map = map.with(doors: doorSigns(in: raster, width: width, height: height).compactMap { map.door(at: $0) })
+        return map
     }
 
     private static func fill(_ mask: inout [Bool], rect: CGRect, width: Int, height: Int) {
@@ -213,6 +219,25 @@ extension WalkableMap {
         let outsideOfHall = (0..<(rows * columns)).map { Int(labels.values[$0]) != hall }
         let outside = GridLabels.reachableFromBorder(outsideOfHall, rows: rows, columns: columns)
         return outside.map { !$0 }
+    }
+
+    /// Where the outline has door gaps too wide to seal, the outside floods into the hall.
+    /// The tables' extent, padded out to reach the corridors along the walls, stands in.
+    private static func aroundTables(_ tables: [RouteTable], rows: Int, columns: Int) -> [Bool] {
+        guard let first = tables.first?.rect else { return [Bool](repeating: true, count: rows * columns) }
+        let bounds = tables.reduce(first) { $0.union($1.rect) }
+        let pad = 15
+        let top = max(0, Int(bounds.minY) / cellSize - pad)
+        let bottom = min(rows - 1, Int(bounds.maxY) / cellSize + pad)
+        let left = max(0, Int(bounds.minX) / cellSize - pad)
+        let right = min(columns - 1, Int(bounds.maxX) / cellSize + pad)
+        var interior = [Bool](repeating: false, count: rows * columns)
+        for row in top...bottom {
+            for column in left...right {
+                interior[row * columns + column] = true
+            }
+        }
+        return interior
     }
 
     private static func distanceToObstacle(_ walkable: [Bool], rows: Int, columns: Int) -> [Float] {

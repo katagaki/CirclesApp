@@ -18,7 +18,6 @@ struct UnifiedRouteButton: View {
     @AppStorage(wrappedValue: false, "Route.HasSeenOnboarding") var hasSeenOnboarding: Bool
 
     var body: some View {
-        @Bindable var navigator = navigator
         Group {
             if navigator.isActive {
                 Button("Route.End", systemImage: "xmark") {
@@ -48,11 +47,6 @@ struct UnifiedRouteButton: View {
                 }
                 .disabled(selections.map == nil || selections.date == nil)
             }
-        }
-        .alert("Route.NoStops.Title", isPresented: $navigator.isNoStopsAlertPresented) {
-            Button("Shared.OK", role: .cancel) {}
-        } message: {
-            Text("Route.NoStops.Message")
         }
         .onChange(of: navigator.onboardingDismissals) {
             guard hasSeenOnboarding, let mode = navigator.pendingMode else {
@@ -84,14 +78,12 @@ struct UnifiedRouteButton: View {
             startRoute(colorPriority: nil)
         case .prioritized:
             navigator.priorityCounts = colorCounts()
-            unifier.hide()
-            navigator.isPriorityPresented = true
+            unifier.openRouteScreen(.routePriority)
         }
     }
 
     func presentOnboarding() {
-        unifier.hide()
-        navigator.isOnboardingPresented = true
+        unifier.openRouteScreen(.routeOnboarding)
     }
 
     /// How many favourites of each colour sit on the open map, so the colour list only

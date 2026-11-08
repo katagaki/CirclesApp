@@ -6,6 +6,7 @@ nonisolated struct Pathfinder {
     private static let directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
 
     let map: WalkableMap
+    var portals: [Int: [(to: Int, cost: Float)]] = [:]
 
     func costs(from start: GridPoint) -> [Float] {
         var cost = [Float](repeating: .infinity, count: map.walkable.count)
@@ -25,6 +26,13 @@ nonisolated struct Pathfinder {
                 if total < cost[nextIndex] {
                     cost[nextIndex] = total
                     heap.push(total, nextIndex)
+                }
+            }
+            for portal in portals[index] ?? [] {
+                let total = current + portal.cost
+                if total < cost[portal.to] {
+                    cost[portal.to] = total
+                    heap.push(total, portal.to)
                 }
             }
         }
@@ -57,17 +65,35 @@ nonisolated struct Pathfinder {
             }
             let row = index / map.columns
             let column = index % map.columns
-            for (nextHeading, (dy, dx)) in Self.directions.enumerated() where (nextHeading + 2) % 4 != heading {
+            for (nextHeading, (dy, dx)) in Self.directions.enumerated() {
                 let next = GridPoint(row: row + dy, column: column + dx)
                 guard map.isWalkable(next) else { continue }
                 let nextIndex = map.index(next)
-                let turn = nextHeading != heading && index != startIndex ? Self.turnPenalty : 0
+                let turn: Float
+                if index == startIndex || nextHeading == heading {
+                    turn = 0
+                } else if (nextHeading + 2) % 4 == heading {
+                    turn = Self.turnPenalty * 3
+                } else {
+                    turn = Self.turnPenalty
+                }
                 let total = current + map.stepCost[nextIndex] + turn
                 let nextState = nextIndex * 4 + nextHeading
                 if total < cost[nextState] {
                     cost[nextState] = total
                     previous[nextState] = Int32(state)
                     heap.push(total, nextState)
+                }
+            }
+            for portal in portals[index] ?? [] {
+                let total = current + portal.cost
+                for arrival in 0..<4 {
+                    let nextState = portal.to * 4 + arrival
+                    if total < cost[nextState] {
+                        cost[nextState] = total
+                        previous[nextState] = Int32(state)
+                        heap.push(total, nextState)
+                    }
                 }
             }
         }

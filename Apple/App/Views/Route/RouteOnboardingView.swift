@@ -2,7 +2,8 @@ import SwiftUI
 
 struct RouteOnboardingView: View {
 
-    @Environment(\.dismiss) var dismiss
+    @Environment(Navigator.self) var navigator
+    @Environment(Unifier.self) var unifier
 
     @AppStorage(wrappedValue: false, "Route.HasSeenOnboarding") var hasSeenOnboarding: Bool
 
@@ -48,7 +49,8 @@ struct RouteOnboardingView: View {
         .safeAreaInset(edge: .bottom) {
             Button {
                 hasSeenOnboarding = true
-                dismiss()
+                unifier.closeRouteScreen(.routeOnboarding)
+                navigator.onboardingDismissals += 1
             } label: {
                 Text("Route.Onboarding.Start")
                     .font(.headline)
@@ -59,6 +61,7 @@ struct RouteOnboardingView: View {
             .padding(.horizontal, 24.0)
             .padding(.bottom, 12.0)
         }
-        .interactiveDismissDisabled(!hasSeenOnboarding)
+        .navigationBarBackButtonHidden(!hasSeenOnboarding)
+        .toolbarVisibility(.hidden, for: .bottomBar)
     }
 }

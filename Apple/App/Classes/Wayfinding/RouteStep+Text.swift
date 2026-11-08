@@ -9,6 +9,10 @@ extension RouteStep {
         switch action {
         case .begin:
             return String(localized: "Route.Begin.\(stop.spaceName)")
+        case .exit(let hall):
+            return String(localized: "Route.Exit.\(walk).\(hall)")
+        case .enter(let hall):
+            return String(localized: "Route.Enter.\(hall)")
         case .turn(let turn, let passage):
             let into = passage.name
             switch turn {
@@ -32,13 +36,15 @@ extension RouteStep {
         case .turn(.straight, _): "arrow.up"
         case .arrive: "mappin.and.ellipse"
         case .begin: "figure.walk"
+        case .exit: "figure.walk.departure"
+        case .enter: "figure.walk.arrival"
         }
     }
 
     var isArrival: Bool {
         switch action {
         case .arrive, .begin: true
-        case .turn: false
+        case .turn, .exit, .enter: false
         }
     }
 }

@@ -1,3 +1,4 @@
+import CoreGraphics
 import Foundation
 import SQLite
 
@@ -21,6 +22,32 @@ struct RouteCircle: Sendable {
 }
 
 extension DataFetcher {
+
+    /// The halls a map is split into, in high-resolution map pixels. Areas without a
+    /// printed range are the walls around them and are left out.
+    func hallAreas(inMap mapID: Int) -> [RouteHall] {
+        guard let database else { return [] }
+        do {
+            let table = Table("ComiketAreaWC")
+            let colMapID = Expression<Int>("mapId")
+            let colName = Expression<String>("name")
+            let colX = Expression<Int>("x2")
+            let colY = Expression<Int>("y2")
+            let colW = Expression<Int>("w2")
+            let colH = Expression<Int>("h2")
+            return try database.prepare(table.filter(colMapID == mapID)).compactMap { row in
+                guard row[colW] > 0, row[colH] > 0 else { return nil }
+                return RouteHall(
+                    name: row[colName],
+                    rect: CGRect(x: row[colX], y: row[colY], width: row[colW], height: row[colH])
+                )
+            }
+            .sorted { $0.rect.minX < $1.rect.minX }
+        } catch {
+            debugPrint(error.localizedDescription)
+            return []
+        }
+    }
 
     func routeCircles(withWebCatalogIDs webCatalogIDs: [Int]) -> [Int: RouteCircle] {
         guard let database, !webCatalogIDs.isEmpty else { return [:] }

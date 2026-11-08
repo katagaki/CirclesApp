@@ -10742,6 +10742,40 @@
         }
       }
     },
+    "Route.Closure.Halls.Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halls Not Connected"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ホール間通行止め"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "홀 사이 통행 금지"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "展厅之间不可通行"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "展廳之間不可通行"
+          }
+        }
+      }
+    },
     "Route.Closure.Note": {
       "localizations": {
         "en": {
@@ -10878,36 +10912,138 @@
         }
       }
     },
-    "Route.Hold.Close": {
+    "Route.Enter.%@": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Path Closed"
+            "value": "Walk round outside and come back in at the %@ entrance"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "通行止め"
+            "value": "外を通って%@の出入口から入ります"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "통행 금지"
+            "value": "밖으로 돌아 %@ 출입구로 다시 들어오세요"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "通道封闭"
+            "value": "从外面绕行，由%@的出入口重新进入"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "通道封閉"
+            "value": "從外面繞行，由%@的出入口重新進入"
+          }
+        }
+      }
+    },
+    "Route.Exit.%@.%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@, then leave the hall through the %2$@ entrance"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@、%2$@の出入口から外に出ます"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ %2$@ 출입구로 홀 밖으로 나가세요"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@，然后从%2$@的出入口离开展厅"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@，然後從%2$@的出入口離開展廳"
+          }
+        }
+      }
+    },
+    "Route.Hold.Close": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close This Aisle"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この通路を通行止め"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 통로 통행 금지"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "封闭此通道"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "封閉此通道"
+          }
+        }
+      }
+    },
+    "Route.Hold.CloseHalls": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Halls Not Connected"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ホール間を通行止め"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "홀 사이 통행 금지"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "展厅之间不可通行"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "展廳之間不可通行"
           }
         }
       }
@@ -10942,6 +11078,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "設為目前位置"
+          }
+        }
+      }
+    },
+    "Route.Hold.Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This spot is…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "この場所は…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 위치는…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此处…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此處…"
           }
         }
       }
@@ -11223,31 +11393,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "If staff have closed the way, tap Blocked for another route. Closures clear themselves after 30 minutes."
+            "value": "If staff have closed the way, tap Blocked for another route. If the halls aren't connected inside, long-press the map and choose Halls Not Connected to go out and back in through another hall's entrance. Closures clear themselves after 30 minutes."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "スタッフが通路を閉鎖していたら「通れない」をタップすると、別の道を探します。通行止めは30分後に自動で解除されます。"
+            "value": "スタッフが通路を閉鎖していたら「通れない」をタップすると、別の道を探します。ホール間がつながっていないときは、マップを長押しして「ホール間を通行止め」を選ぶと、一度外に出て別のホールの出入口から入ります。通行止めは30分後に自動で解除されます。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "스태프가 통로를 막았다면 '막힘'을 누르세요. 다른 길을 찾아 줍니다. 통행 금지는 30분 후 자동으로 해제됩니다."
+            "value": "스태프가 통로를 막았다면 '막힘'을 누르세요. 다른 길을 찾아 줍니다. 홀 사이가 연결되어 있지 않다면 지도를 길게 누르고 '홀 사이 통행 금지'를 선택하세요. 밖으로 나가 다른 홀 출입구로 들어가는 길을 안내합니다. 통행 금지는 30분 후 자동으로 해제됩니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "如果工作人员封闭了通道，点按“无法通行”即可重新规划路线。封闭会在30分钟后自动解除。"
+            "value": "如果工作人员封闭了通道，点按“无法通行”即可重新规划路线。若展厅之间不相通，长按地图并选择“展厅之间不可通行”，将引导你先到外面，再从另一个展厅的出入口进入。封闭会在30分钟后自动解除。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "如果工作人員封閉了通道，點按「無法通行」即可重新規劃路線。封閉會在30分鐘後自動解除。"
+            "value": "如果工作人員封閉了通道，點按「無法通行」即可重新規劃路線。若展廳之間不相通，長按地圖並選擇「展廳之間不可通行」，將引導你先到外面，再從另一個展廳的出入口進入。封閉會在30分鐘後自動解除。"
           }
         }
       }

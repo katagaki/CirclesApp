@@ -3,11 +3,26 @@ import CoreGraphics
 nonisolated enum RoutePlanner {
 
     static func plan(
-        map baseMap: WalkableMap, stops requests: [RouteStopRequest], origin: CGPoint?, closures: [RouteClosure] = []
+        map baseMap: WalkableMap, stops requests: [RouteStopRequest], origin: CGPoint?,
+        closures: [RouteClosure] = [], halls: [RouteHall] = []
     ) -> PlannedRoute? {
         var closureLines: [RouteClosureLine] = []
         var blockedCells: [GridPoint] = []
         for closure in closures where closure.isActive {
+            if let boundaryX = closure.hallBoundaryX {
+                let cells = baseMap.boundaryCells(atX: boundaryX)
+                blockedCells += cells
+                let rows = cells.map(\.row)
+                if let top = rows.min(), let bottom = rows.max() {
+                    let size = CGFloat(WalkableMap.cellSize)
+                    closureLines.append(RouteClosureLine(
+                        id: closure.id,
+                        from: CGPoint(x: boundaryX, y: CGFloat(top) * size),
+                        to: CGPoint(x: boundaryX, y: CGFloat(bottom + 1) * size)
+                    ))
+                }
+                continue
+            }
             let cells = baseMap.closureCells(at: closure.point, across: closure.across)
             blockedCells += cells
             if let line = line(through: cells, in: baseMap) {
@@ -15,7 +30,24 @@ nonisolated enum RoutePlanner {
             }
         }
         let map = baseMap.blocking(blockedCells)
-        let pathfinder = Pathfinder(map: map)
+        var pathfinder = Pathfinder(map: map)
+        let boundaries = zip(halls, halls.dropFirst()).map { ($0.rect.maxX + $1.rect.minX) / 2.0 }
+        let doors = map.doors.filter { door in
+            !boundaries.contains { abs($0 - door.sign.midX) < 160.0 }
+        }
+        pathfinder.portals = portals(between: doors, in: map)
+        let doorsByCell = Dictionary(doors.map { (map.index($0.cell), $0) }, uniquingKeysWith: { first, _ in first })
+        let doorName: (GridPoint) -> String = { cell in
+            guard let door = doorsByCell[map.index(cell)] else { return "" }
+            return halls.first { $0.rect.minX <= door.sign.midX && door.sign.midX < $0.rect.maxX }?.name ?? ""
+        }
+        let outside: (GridPoint, GridPoint) -> [CGPoint] = { from, to in
+            guard let exit = doorsByCell[map.index(from)], let entry = doorsByCell[map.index(to)] else {
+                return [map.center(of: from), map.center(of: to)]
+            }
+            return [map.center(of: from), CGPoint(x: exit.sign.midX, y: exit.sign.midY),
+                    CGPoint(x: entry.sign.midX, y: entry.sign.midY), map.center(of: to)]
+        }
         var candidates: [(request: RouteStopRequest, cell: GridPoint)] = []
         for request in requests {
             if let cell = accessCell(for: request, in: map) {
@@ -42,7 +74,7 @@ nonisolated enum RoutePlanner {
         let fields = reachable.map { candidateFields[$0] }
         guard !stops.isEmpty else {
             return PlannedRoute(stops: [], legs: [], steps: [], origin: nil, closures: closureLines,
-                                skippedSpaces: skippedSpaces)
+                                outsidePaths: [], skippedSpaces: skippedSpaces)
         }
 
         let costs = stops.indices.map { from in
@@ -54,7 +86,8 @@ nonisolated enum RoutePlanner {
         }
         let order = StopOrderer.order(costs: costs, startCosts: startCosts, ranks: stops.map(\.request.rank))
 
-        let narrator = RouteNarrator(map: map)
+        let narrator = RouteNarrator(map: map, doorName: doorName, outside: outside)
+        var outsidePaths: [[CGPoint]] = []
         var plannedStops: [RouteStop] = []
         var legs: [[CGPoint]] = []
         var steps: [RouteStep] = []
@@ -76,12 +109,41 @@ nonisolated enum RoutePlanner {
             }
             let cells = pathfinder.path(from: from, to: stop.cell)
             let path = cells.isEmpty ? [stop.cell] : cells
-            legs.append(simplify(path.map { map.center(of: $0) }, tolerance: CGFloat(WalkableMap.cellSize)))
+            var leg: [CGPoint] = []
+            for segment in RouteNarrator.segments(of: path) {
+                if let last = leg.last, let first = segment.first {
+                    let walk = outside(map.cell(at: last), first)
+                    outsidePaths.append(walk)
+                    leg += walk.dropFirst().dropLast()
+                }
+                leg += simplify(segment.map { map.center(of: $0) }, tolerance: CGFloat(WalkableMap.cellSize))
+            }
+            legs.append(leg)
             steps += narrator.steps(for: path, stopIndex: position, spaceCenter: center, firstID: steps.count)
             current = stop.cell
         }
         return PlannedRoute(stops: plannedStops, legs: legs, steps: steps, origin: originCell.map { map.center(of: $0) },
-                            closures: closureLines, skippedSpaces: skippedSpaces)
+                            closures: closureLines, outsidePaths: outsidePaths, skippedSpaces: skippedSpaces)
+    }
+
+    /// Doors on the same wall open onto the same concourse, so a visitor can leave by one
+    /// and come back in by another. The walk outside costs its length plus a fixed charge
+    /// for the queue at each door, so routes only go outside when the way inside is shut
+    /// or much longer.
+    static let outsidePenalty: Float = 120.0
+
+    private static func portals(between doors: [RouteDoor], in map: WalkableMap) -> [Int: [(to: Int, cost: Float)]] {
+        var portals: [Int: [(to: Int, cost: Float)]] = [:]
+        let size = CGFloat(WalkableMap.cellSize)
+        for exit in doors where map.isWalkable(exit.cell) {
+            for entry in doors where entry != exit && entry.edge == exit.edge && map.isWalkable(entry.cell) {
+                let distance = hypot(exit.sign.midX - entry.sign.midX, exit.sign.midY - entry.sign.midY) / size
+                portals[map.index(exit.cell), default: []].append(
+                    (to: map.index(entry.cell), cost: Float(distance) + outsidePenalty)
+                )
+            }
+        }
+        return portals
     }
 
     private static func line(through cells: [GridPoint], in map: WalkableMap) -> (CGPoint, CGPoint)? {

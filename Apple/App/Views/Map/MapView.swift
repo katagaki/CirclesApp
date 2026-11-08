@@ -81,6 +81,9 @@ struct MapView: View {
             if !isInitialLoadCompleted {
                 isInitialLoadCompleted = true
                 reloadAll()
+                if let map = selections.map {
+                    navigator.loadHalls(inMap: map.id, database: database)
+                }
             }
         }
         .onChange(of: mapImage) { _, newImage in
@@ -94,6 +97,9 @@ struct MapView: View {
                 navigator.end()
             }
             navigator.clearClosures()
+            if let map = selections.map {
+                navigator.loadHalls(inMap: map.id, database: database)
+            }
             reloadAll()
         }
         .onChange(of: popoverInvalidationID) {
