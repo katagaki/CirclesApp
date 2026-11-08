@@ -179,7 +179,7 @@ nonisolated enum RoutePlanner {
         return portals
     }
 
-    private static func line(through cells: [GridPoint], in map: WalkableMap) -> (CGPoint, CGPoint)? {
+    static func line(through cells: [GridPoint], in map: WalkableMap) -> (CGPoint, CGPoint)? {
         guard let first = cells.first else { return nil }
         let sameRow = cells.filter { $0.row == first.row }
         let sameColumn = cells.filter { $0.column == first.column }

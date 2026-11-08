@@ -57,6 +57,11 @@ struct MapRouteLayer: View {
                     .position(scaled(stop.accessPoint))
                 }
             }
+            if let line = navigator.pendingClosureLine {
+                polyline([line.from, line.to])
+                    .stroke(Color.primary.opacity(0.5), style: StrokeStyle(lineWidth: lineWidth * 1.4, lineCap: .round,
+                                                                       dash: [lineWidth * 0.8, lineWidth * 0.6]))
+            }
             ForEach(navigator.activeClosures) { closure in
                 MapRouteClosureBadge(
                     size: CGFloat(spaceSize) * 0.85,

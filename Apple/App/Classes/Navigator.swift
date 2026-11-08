@@ -172,6 +172,13 @@ final class Navigator {
         }
     }
 
+    /// The aisle a closure at the long-pressed spot would seal, drawn before the visitor
+    /// chooses to close it, so they can see which way it runs.
+    var pendingClosureLine: (from: CGPoint, to: CGPoint)? {
+        guard let pendingPoint, let map = context.flatMap({ mapCache[Self.cacheKey($0)] }) else { return nil }
+        return RoutePlanner.line(through: map.closureCells(at: pendingPoint), in: map)
+    }
+
     func cancelHold() {
         withAnimation(.smooth) {
             pendingPoint = nil
