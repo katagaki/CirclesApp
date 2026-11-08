@@ -17,13 +17,13 @@ struct MapRouteHoldPopover: View {
                 row("Route.Hold.SetOrigin", systemImage: "figure.walk") {
                     navigator.setOriginAtHold(database: database)
                 }
-                Divider()
-                row("Route.Hold.Close", systemImage: "nosign",
-                    bottom: navigator.hallBoundaries.isEmpty ? 0.0 : 5.0) {
+                separator
+                row("Route.Hold.Close", systemImage: "nosign", isLast: navigator.hallBoundaries.isEmpty) {
                     navigator.closePathAtHold(database: database)
                 }
                 if !navigator.hallBoundaries.isEmpty {
-                    row("Route.Hold.CloseHalls", systemImage: "rectangle.split.2x1", top: 5.0, bottom: 0.0) {
+                    separator
+                    row("Route.Hold.CloseHalls", systemImage: "rectangle.split.2x1", isLast: true) {
                         navigator.closeHallsAtHold(database: database)
                     }
                 }
@@ -35,7 +35,7 @@ struct MapRouteHoldPopover: View {
                     .foregroundStyle(.secondary)
                     .padding(.bottom, 6.0)
                 Divider()
-                row("Route.Closure.Reopen", systemImage: "arrow.uturn.backward", bottom: 0.0) {
+                row("Route.Closure.Reopen", systemImage: "arrow.uturn.backward", isLast: true) {
                     navigator.reopenSelectedClosure(database: database)
                 }
             }
@@ -44,12 +44,16 @@ struct MapRouteHoldPopover: View {
         .fixedSize(horizontal: false, vertical: true)
     }
 
-    /// A row sits 10 points from a divider on either side. Under the last row the popover's
-    /// own padding takes over, and rows in the same group sit as close to each other as a
-    /// row sits to a divider, so the group reads as one.
+    /// Starts under the row titles rather than the icons, the way a list's separators do.
+    var separator: some View {
+        Divider()
+            .padding(.leading, 28.0)
+    }
+
+    /// Rows are padded above and below, except under the last one, where the popover's own
+    /// padding already sits.
     func row(
-        _ title: LocalizedStringKey, systemImage: String, top: CGFloat = 10.0, bottom: CGFloat = 10.0,
-        perform: @escaping () -> Void
+        _ title: LocalizedStringKey, systemImage: String, isLast: Bool = false, perform: @escaping () -> Void
     ) -> some View {
         Button {
             withAnimation(.smooth) {
@@ -64,8 +68,8 @@ struct MapRouteHoldPopover: View {
                 Spacer(minLength: 0.0)
             }
             .font(.body)
-            .padding(.top, top)
-            .padding(.bottom, bottom)
+            .padding(.top, 10.0)
+            .padding(.bottom, isLast ? 0.0 : 10.0)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
