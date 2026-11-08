@@ -5,5 +5,6 @@ import WidgetKit
 struct SharedBuysWidgetBundle: WidgetBundle {
     var body: some Widget {
         SharedBuysLiveActivity()
+        RouteLiveActivity()
     }
 }

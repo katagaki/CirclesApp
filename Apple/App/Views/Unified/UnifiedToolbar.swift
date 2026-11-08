@@ -25,6 +25,9 @@ struct UnifiedToolbar: ToolbarContent {
                     .adaptiveShadow()
             }
             ToolbarItem(placement: .topBarTrailing) {
+                UnifiedRouteButton()
+            }
+            ToolbarItem(placement: .topBarTrailing) {
                 UnifiedMoreMenu()
                     .popover(isPresented: $unifier.isOfflineModeTipShowing, arrowEdge: .top) {
                         VStack(alignment: .leading, spacing: 8.0) {
