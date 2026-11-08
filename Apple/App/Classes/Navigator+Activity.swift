@@ -81,10 +81,13 @@ extension Navigator {
     func connectActivityButtons(database: Database) {
         RouteIntentBridge.handler = { [weak self] isForward in
             if isForward {
-                self?.next()
+                self?.skip()
             } else {
                 self?.previous()
             }
+        }
+        RouteIntentBridge.visitedHandler = { [weak self] in
+            self?.markVisitedAndContinue()
         }
         RouteIntentBridge.blockedHandler = { [weak self] in
             self?.reportBlocked(database: database)

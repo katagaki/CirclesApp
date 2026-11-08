@@ -26,6 +26,21 @@ public struct RouteStepIntent: LiveActivityIntent {
     }
 }
 
+/// The visitor is done at this stop: marks the circle visited and moves on.
+public struct RouteVisitedIntent: LiveActivityIntent {
+
+    public static let title: LocalizedStringResource = "Route Visited"
+    public static let isDiscoverable: Bool = false
+
+    public init() {}
+
+    @MainActor
+    public func perform() async throws -> some IntentResult {
+        RouteIntentBridge.visitedHandler?()
+        return .result()
+    }
+}
+
 /// The way ahead is closed. The app seals that aisle off and plans a detour.
 public struct RouteBlockedIntent: LiveActivityIntent {
 
@@ -44,6 +59,7 @@ public struct RouteBlockedIntent: LiveActivityIntent {
 @MainActor
 public enum RouteIntentBridge {
     public static var handler: ((Bool) -> Void)?
+    public static var visitedHandler: (() -> Void)?
     public static var blockedHandler: (() -> Void)?
 }
 
