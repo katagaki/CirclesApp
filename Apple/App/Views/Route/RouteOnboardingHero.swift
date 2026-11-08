@@ -100,6 +100,7 @@ struct RouteOnboardingHero: View {
 
     func drawHall(in context: inout GraphicsContext, scale: CGFloat) {
         let line = Color(uiColor: .label)
+        let space = Color(uiColor: .secondarySystemGroupedBackground)
         let thin = 0.18 * scale
 
         context.fill(
@@ -120,6 +121,7 @@ struct RouteOnboardingHero: View {
             for index in 0..<8 {
                 let rect = CGRect(x: (CGFloat(start) + CGFloat(index) * Self.cell) * scale, y: 3.9 * scale,
                                   width: Self.cell * scale, height: Self.cell * scale)
+                context.fill(Path(rect), with: .color(space))
                 context.stroke(Path(rect), with: .color(line), lineWidth: thin)
             }
         }
@@ -133,6 +135,7 @@ struct RouteOnboardingHero: View {
                             y: (top + CGFloat(row) * Self.cell) * scale,
                             width: Self.cell * scale, height: Self.cell * scale
                         )
+                        context.fill(Path(rect), with: .color(space))
                         context.stroke(Path(rect), with: .color(line), lineWidth: thin)
                     }
                 }
