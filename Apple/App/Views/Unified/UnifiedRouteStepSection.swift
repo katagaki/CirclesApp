@@ -1,14 +1,10 @@
 import AXiS
-import SwiftData
 import SwiftUI
 
 struct UnifiedRouteStepSection: View {
 
     @Environment(Database.self) var database
-    @Environment(Events.self) var planner
     @Environment(Navigator.self) var navigator
-
-    @Query var visits: [CirclesVisitEntry]
 
     var body: some View {
         if navigator.route != nil, let step = navigator.currentStep,
@@ -54,16 +50,8 @@ struct UnifiedRouteStepSection: View {
                     canReportBlocked: navigator.canReportBlocked,
                     onBack: { navigator.previous() },
                     onBlocked: { navigator.reportBlocked(database: database) },
-                    onNext: {
-                        if step.isArrival {
-                            navigator.markVisitedAndContinue(
-                                eventNumber: planner.activeEventNumber,
-                                visitedCircleIDs: Set(visits.map(\.circleID))
-                            )
-                        } else {
-                            navigator.next()
-                        }
-                    }
+                    onSkip: { navigator.skip() },
+                    onVisited: { navigator.markVisitedAndContinue() }
                 )
             }
         }

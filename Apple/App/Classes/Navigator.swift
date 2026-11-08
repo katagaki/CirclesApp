@@ -351,20 +351,24 @@ final class Navigator {
         updateActivity()
     }
 
-    func markVisitedAndContinue(eventNumber: Int, visitedCircleIDs: Set<Int>) {
-        guard let currentStop else { return }
-        if !visitedCircleIDs.contains(currentStop.circleID) {
-            let circleID = currentStop.circleID
-            Task.detached {
-                let actor = VisitActor(modelContainer: sharedModelContainer)
-                await actor.toggleVisit(circleID: circleID, eventNumber: eventNumber)
-            }
-        }
+    /// Moves past the current step without marking anything; past the last stop, the
+    /// route is over.
+    func skip() {
         if let route, stepIndex + 1 < route.steps.count {
             next()
         } else {
             end()
         }
+    }
+
+    func markVisitedAndContinue() {
+        guard let currentStop, let eventNumber = context?.eventNumber else { return }
+        let circleID = currentStop.circleID
+        Task.detached {
+            let actor = VisitActor(modelContainer: sharedModelContainer)
+            await actor.markVisited(circleID: circleID, eventNumber: eventNumber)
+        }
+        skip()
     }
 
     func end() {

@@ -32,7 +32,7 @@ struct RouteLiveActivity: Widget {
                     HStack(alignment: .center, spacing: 10.0) {
                         Text(context.state.instruction)
                             .font(.headline)
-                            .lineLimit(2)
+                            .lineLimit(2, reservesSpace: true)
                             .minimumScaleFactor(0.8)
                         Spacer(minLength: 4.0)
                         stepButtons(context.state)
@@ -84,7 +84,7 @@ struct RouteLiveActivity: Widget {
                 VStack(alignment: .leading, spacing: 8.0) {
                     Text(context.state.instruction)
                         .font(.headline)
-                        .lineLimit(3)
+                        .lineLimit(2, reservesSpace: true)
                         .minimumScaleFactor(0.8)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     HStack(alignment: .center, spacing: 8.0) {
@@ -133,11 +133,22 @@ struct RouteLiveActivity: Widget {
             Button(intent: RouteStepIntent(isForward: true)) {
                 Image(systemName: "chevron.forward")
                     .font(.subheadline.weight(.bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(state.isArriving ? Color.primary : Color.white)
                     .frame(width: 36.0, height: 36.0)
             }
             .buttonStyle(.plain)
-            .background(SharedBuysLiveActivity.accent, in: .circle)
+            .background(state.isArriving ? AnyShapeStyle(.quaternary) : AnyShapeStyle(SharedBuysLiveActivity.accent),
+                        in: .circle)
+            if state.isArriving {
+                Button(intent: RouteVisitedIntent()) {
+                    Image(systemName: "checkmark")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 36.0, height: 36.0)
+                }
+                .buttonStyle(.plain)
+                .background(SharedBuysLiveActivity.accent, in: .circle)
+            }
         }
     }
 }
