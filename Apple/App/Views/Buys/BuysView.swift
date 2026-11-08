@@ -98,6 +98,7 @@ struct BuysView: View {
                 .pickerStyle(.segmented)
                 .popoverTip(BuysScopeTip())
             }
+            .sharedBackgroundVisibility(.hidden)
         }
         .alert("Buys.Info.Title", isPresented: $isShowingInfoAlert) {
             Button("Shared.OK", role: .cancel) { }
