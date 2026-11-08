@@ -15,12 +15,12 @@ struct BuysOnboardingHero: View {
     @State var joinedCount: Int = 0
     @State var boughtCount: Int = 0
 
-    let members = ["A", "M", "K"]
+    let members = ["H", "U", "K"]
 
     let items: [Item] = [
-        Item(tint: .pink, symbol: "book.closed.fill", cost: 500, buyer: "A"),
-        Item(tint: .teal, symbol: "photo.fill", cost: 1000, buyer: "M"),
-        Item(tint: .orange, symbol: "sparkles", cost: 1500, buyer: "K")
+        Item(tint: .purple, symbol: "book.closed.fill", cost: 500, buyer: "H"),
+        Item(tint: .blue, symbol: "photo.fill", cost: 1000, buyer: "U"),
+        Item(tint: .yellow, symbol: "sparkles", cost: 1500, buyer: "K")
     ]
 
     var total: Int {
