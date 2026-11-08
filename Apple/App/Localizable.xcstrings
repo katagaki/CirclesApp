@@ -11881,31 +11881,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Colors at the top are visited first. Unchecked colors are left out. Drag to reorder."
+            "value": "Tap a color to include or leave it out, and drag it to change the order. Numbered colors are visited first to last."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "上の色から順に回ります。チェックを外した色は回りません。ドラッグして並べ替えられます。"
+            "value": "タップで回るかどうかを切り替え、ドラッグで順番を入れ替えます。番号の順に回ります。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "위에 있는 색부터 방문합니다. 체크를 해제한 색은 제외됩니다. 드래그해서 순서를 바꿀 수 있습니다."
+            "value": "색을 눌러 포함하거나 제외하고, 드래그해서 순서를 바꾸세요. 번호 순서대로 방문합니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "从上方的颜色开始依次前往。取消勾选的颜色将被跳过。拖动即可调整顺序。"
+            "value": "点按颜色可选择是否前往，拖动可调整顺序。将按编号顺序前往。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "從上方的顏色開始依次前往。取消勾選的顏色將被略過。拖動即可調整順序。"
+            "value": "點按顏色可選擇是否前往，拖動可調整順序。將依編號順序前往。"
           }
         }
       }

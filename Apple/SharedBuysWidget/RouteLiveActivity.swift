@@ -117,7 +117,7 @@ struct RouteLiveActivity: Widget {
         HStack(spacing: 6.0) {
             if state.canReportBlocked {
                 Button(intent: RouteBlockedIntent()) {
-                    Image(systemName: "nosign")
+                    Image(systemName: "arrow.triangle.branch")
                         .font(.subheadline.weight(.bold))
                         .foregroundStyle(.red)
                         .frame(width: 36.0, height: 36.0)

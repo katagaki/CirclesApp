@@ -13,7 +13,7 @@ struct UnifiedRouteControls: View {
         HStack(spacing: 8.0) {
             if canReportBlocked {
                 Button(action: onBlocked) {
-                    Label("Route.Blocked", systemImage: "nosign")
+                    Label("Route.Blocked", systemImage: "arrow.triangle.branch")
                         .font(.subheadline.bold())
                         .lineLimit(1)
                         .fixedSize()

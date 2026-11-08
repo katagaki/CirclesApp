@@ -10,7 +10,6 @@ struct RouteOnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28.0) {
                 RouteOnboardingHero()
-                    .frame(height: 200.0)
                     .frame(maxWidth: .infinity)
                 VStack(alignment: .leading, spacing: 8.0) {
                     Text("Route.Onboarding.Title")
@@ -36,7 +35,7 @@ struct RouteOnboardingView: View {
                         message: "Route.Onboarding.Steps.Message"
                     )
                     RouteOnboardingRow(
-                        systemImage: "nosign",
+                        systemImage: "arrow.triangle.branch",
                         title: "Route.Onboarding.Detour.Title",
                         message: "Route.Onboarding.Detour.Message"
                     )

@@ -1,8 +1,8 @@
 import RADiUS
 import SwiftUI
 
-/// Lets the visitor rank their favourite colours. Checked colours are visited from the top
-/// down; the order is remembered for next time.
+/// Every favourite colour as a circle. Tapping one includes or leaves it out; dragging one
+/// onto another moves it there. Included colours are numbered in the order they are visited.
 struct RoutePriorityView: View {
 
     @Environment(\.dismiss) var dismiss
@@ -13,27 +13,54 @@ struct RoutePriorityView: View {
 
     @State var order: [WebCatalogColor] = []
     @State var included: Set<WebCatalogColor> = []
+    @State var dragging: WebCatalogColor?
+
+    let columns = [GridItem(.adaptive(minimum: 72.0, maximum: 96.0), spacing: 12.0)]
+
+    var canStart: Bool {
+        order.contains { included.contains($0) && (navigator.priorityCounts[$0] ?? 0) > 0 }
+    }
 
     var body: some View {
         NavigationStack {
-            List(selection: $included) {
-                Section {
-                    ForEach(order, id: \.self) { color in
-                        RoutePriorityRow(
-                            color: color,
-                            rank: rank(of: color),
-                            count: navigator.priorityCounts[color] ?? 0
-                        )
-                        .tag(color)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16.0) {
+                    LazyVGrid(columns: columns, spacing: 16.0) {
+                        ForEach(order, id: \.self) { color in
+                            RoutePriorityColorCell(
+                                color: color,
+                                rank: rank(of: color),
+                                count: navigator.priorityCounts[color] ?? 0
+                            )
+                            .onTapGesture {
+                                withAnimation(.smooth) {
+                                    if included.contains(color) {
+                                        included.remove(color)
+                                    } else {
+                                        included.insert(color)
+                                    }
+                                }
+                            }
+                            .onDrag {
+                                dragging = color
+                                return NSItemProvider(object: String(color.rawValue) as NSString)
+                            }
+                            .onDrop(
+                                of: [.text],
+                                delegate: RoutePriorityDropDelegate(target: color, order: $order, dragging: $dragging)
+                            )
+                        }
                     }
-                    .onMove { source, destination in
-                        order.move(fromOffsets: source, toOffset: destination)
-                    }
-                } footer: {
                     Text("Route.Priority.Footer")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
+                .padding(20.0)
             }
-            .environment(\.editMode, .constant(.active))
+            .onDrop(of: [.text], isTargeted: nil) { _ in
+                dragging = nil
+                return true
+            }
             .navigationTitle("Route.Priority.Title")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -48,7 +75,7 @@ struct RoutePriorityView: View {
                         navigator.chosenPriority = order.filter { included.contains($0) }
                         dismiss()
                     }
-                    .disabled(included.isEmpty)
+                    .disabled(!canStart)
                 }
             }
         }
@@ -61,20 +88,22 @@ struct RoutePriorityView: View {
     }
 
     func load() {
-        let saved = storedOrder.split(separator: ",").compactMap { Int($0) }.compactMap(WebCatalogColor.init(rawValue:))
-        let excluded = Set(storedExcluded.split(separator: ",").compactMap { Int($0) }.compactMap(WebCatalogColor.init(rawValue:)))
-        let present = Set(navigator.priorityCounts.keys)
-        let known = saved.filter { present.contains($0) }
-        let rest = present.subtracting(known).sorted { $0.rawValue < $1.rawValue }
-        order = known + rest
-        included = present.subtracting(excluded)
+        let saved = storedOrder.split(separator: ",").compactMap { Int($0) }
+            .compactMap(WebCatalogColor.init(rawValue:))
+            .filter { $0 != .uncolored }
+        let rest = WebCatalogColor.assignable.filter { !saved.contains($0) }
+        order = saved + rest
+        if storedOrder.isEmpty {
+            included = Set(order.filter { (navigator.priorityCounts[$0] ?? 0) > 0 })
+        } else {
+            let excluded = Set(storedExcluded.split(separator: ",").compactMap { Int($0) }
+                .compactMap(WebCatalogColor.init(rawValue:)))
+            included = Set(order).subtracting(excluded)
+        }
     }
 
     func save() {
-        let previous = storedOrder.split(separator: ",").compactMap { Int($0) }
-        let shown = order.map(\.rawValue)
-        storedOrder = (shown + previous.filter { !shown.contains($0) }).map(String.init).joined(separator: ",")
-        let excluded = order.filter { !included.contains($0) }.map(\.rawValue)
-        storedExcluded = excluded.map(String.init).joined(separator: ",")
+        storedOrder = order.map { String($0.rawValue) }.joined(separator: ",")
+        storedExcluded = order.filter { !included.contains($0) }.map { String($0.rawValue) }.joined(separator: ",")
     }
 }
