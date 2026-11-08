@@ -27,10 +27,6 @@ struct RoutePriorityColorCell: View {
             }
             .frame(width: 56.0, height: 56.0)
             .shadow(color: .black.opacity(rank == nil ? 0.0 : 0.15), radius: 3.0, y: 1.0)
-            Text("Route.Priority.Count.\(count)")
-                .font(.caption.weight(.semibold))
-                .monospacedDigit()
-                .foregroundStyle(.secondary)
         }
         .opacity(rank != nil && count == 0 ? 0.45 : 1.0)
         .contentShape(.rect)
