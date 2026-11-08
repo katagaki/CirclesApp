@@ -28,8 +28,5 @@ struct UnifiedRouteNoStopsCard: View {
                     .buttonStyle(.glassProminent)
             }
         }
-        .padding(14.0)
-        .glassEffect(.regular, in: .rect(cornerRadius: 22.0))
-        .transition(.move(edge: .top).combined(with: .opacity))
     }
 }

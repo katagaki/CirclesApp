@@ -60,11 +60,7 @@ struct UnifiedView: View {
                 .contentShape(.rect)
                 .simultaneousGesture(TapGesture().onEnded { unifier.closeOfflineStatus() })
                 .overlay(alignment: .top) {
-                    VStack(spacing: 8.0) {
-                        UnifiedOfflineStatus()
-                        UnifiedRouteCard()
-                        UnifiedRouteHoldBar()
-                    }
+                    UnifiedTopStatus(namespace: namespace)
                     .padding(.horizontal, 12.0)
                     .padding(.top, 8.0)
                 }

@@ -38,6 +38,7 @@ final class Navigator {
     private(set) var pendingPoint: CGPoint?
     private(set) var selectedClosureID: UUID?
     var isNoStopsAlertPresented: Bool = false
+    var isStatusExpanded: Bool = false
     var pendingMode: Mode?
     var priorityCounts: [WebCatalogColor: Int] = [:]
     var chosenPriority: [WebCatalogColor]?
