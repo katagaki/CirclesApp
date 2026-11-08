@@ -9,6 +9,7 @@ struct MapView: View {
     @Environment(UserSelections.self) var selections
     @Environment(Mapper.self) var mapper
     @Environment(Unifier.self) var unifier
+    @Environment(Navigator.self) var navigator
 
     @State var mapImage: UIImage?
     @State var genreImage: UIImage?
@@ -41,6 +42,9 @@ struct MapView: View {
                     set: { zoomScale = Double($0) }
                 ), onTap: {
                     unifier.closeOfflineStatus()
+                }, onLongPress: { location in
+                    guard navigator.isActive || favorites.isAvailable else { return }
+                    navigator.hold(location, spaceSize: CGFloat(spaceSize))
                 }, content: {
                     ZStack(alignment: .topLeading) {
                         MapLayer(image: mapImage)
@@ -51,10 +55,12 @@ struct MapView: View {
                             MapLayer(image: genreImage)
                         }
                         MapLayoutLayer(spaceSize: spaceSize)
+                        MapRouteLayer(spaceSize: spaceSize)
                         MapHighlightLayer()
                         MapPopoverLayer(zoomScale: zoomScale) { selection in
                             MapPopoverDetail(selection: selection)
                         }
+                        MapRouteHoldLayer(zoomScale: zoomScale, spaceSize: spaceSize)
                     }
                 })
                 .onChange(of: mapper.popoverPosition) { _, newValue in
@@ -76,6 +82,9 @@ struct MapView: View {
             if !isInitialLoadCompleted {
                 isInitialLoadCompleted = true
                 reloadAll()
+                if let map = selections.map {
+                    navigator.loadHalls(inMap: map.id, database: database)
+                }
             }
         }
         .onChange(of: mapImage) { _, newImage in
@@ -85,12 +94,26 @@ struct MapView: View {
         }
         .onChange(of: mapInvalidationID) {
             mapper.popoverData = nil
+            if navigator.isActive {
+                navigator.end()
+            }
+            navigator.clearClosures()
+            if let map = selections.map {
+                navigator.loadHalls(inMap: map.id, database: database)
+            }
             reloadAll()
         }
         .onChange(of: popoverInvalidationID) {
             mapper.popoverData = nil
             if let mapImage {
                 updateCanvasSize(mapImage)
+            }
+        }
+        .onChange(of: navigator.currentStep) { _, step in
+            if let step, let first = step.path.first, let last = step.path.last {
+                let scale = CGFloat(spaceSize) / Navigator.planningSpaceSize
+                mapper.scrollToPosition = CGPoint(x: (first.x + last.x) / 2.0 * scale,
+                                                  y: (first.y + last.y) / 2.0 * scale)
             }
         }
         .onChange(of: showGenreOverlay) {

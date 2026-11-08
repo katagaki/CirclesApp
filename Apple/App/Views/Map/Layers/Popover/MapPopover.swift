@@ -10,14 +10,19 @@ struct MapPopover<Content: View>: View {
 
     var sourceRect: CGRect
     var isDismissing: Bool
+    var height: CGFloat?
     var content: () -> Content
+
+    var popoverHeight: CGFloat {
+        height ?? mapper.popoverHeight
+    }
 
     @State var animationProgress: CGFloat = 0
 
     var body: some View {
         content()
             .padding(16.0)
-            .frame(width: mapper.popoverWidth, height: mapper.popoverHeight)
+            .frame(width: mapper.popoverWidth, height: popoverHeight)
             .glassEffect(.regular, in: .rect(cornerRadius: 20.0))
             .scaleEffect((0.3 + (0.7 * animationProgress)) / zoomScale)
             .opacity(animationProgress)
@@ -50,7 +55,7 @@ struct MapPopover<Content: View>: View {
     func calculatePopoverPosition() -> CGPoint {
         let canvasSize = mapper.canvasSize
         let popoverWidth = mapper.popoverWidth / zoomScale
-        let popoverHeight = mapper.popoverHeight / zoomScale
+        let popoverHeight = self.popoverHeight / zoomScale
         let popoverDistance: CGFloat = mapper.popoverDistance / zoomScale
         let edgePadding = mapper.popoverEdgePadding / zoomScale
 

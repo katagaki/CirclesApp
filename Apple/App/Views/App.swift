@@ -26,6 +26,7 @@ struct CirclesApp: App {
     @State var unifier = Unifier()
     @State var backupManager = BackupManager()
     @State var sharedBuys = SharedBuysSession()
+    @State var navigator = Navigator()
 
     @State var hasAppLaunchedForTheFirstTime: Bool = false
 
@@ -57,6 +58,7 @@ struct CirclesApp: App {
             }
             .onAppear {
                 orientation.update()
+                navigator.connectActivityButtons(database: database)
                 sharedBuys.restore()
                 appDelegate.onSharedBuysEvent = { token in
                     if let token {
@@ -109,6 +111,7 @@ struct CirclesApp: App {
         .environment(unifier)
         .environment(backupManager)
         .environment(sharedBuys)
+        .environment(navigator)
         .onChange(of: scenePhase) { _, newValue in
             if !hasAppLaunchedForTheFirstTime {
                 hasAppLaunchedForTheFirstTime = true

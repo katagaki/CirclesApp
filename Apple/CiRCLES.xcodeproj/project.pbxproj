@@ -11,6 +11,7 @@
 		0A11D00C000000000000000C /* CiRCLES.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 0A11D0020000000000000002 /* CiRCLES.app */; platformFilter = ios; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		2B6ED3A2BE1197DC6E6BDF3D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6F4DDFCCFE0D158B610EDEA8 /* Foundation.framework */; };
 		75D7CED44B17D66CF9B0855E /* SharedBuysLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */; };
+		A7E0C0DE0000000000000002 /* RouteLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E0C0DE0000000000000001 /* RouteLiveActivity.swift */; };
 		864CA3762F406E01D04EBD1C /* ORBiT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D631878DB8C8016D0BFE1C2 /* ORBiT.framework */; };
 		8C35BA4C2F7CC7A4959DF5BF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2745DAF4DF1C30D56B380624 /* WidgetKit.framework */; };
 		94CF64F6B10F21FEE927DC8B /* SharedBuysWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1298D61EBB64136051D35619 /* SharedBuysWidget.appex */; platformFilter = ios; };
@@ -142,6 +143,7 @@
 		2745DAF4DF1C30D56B380624 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		46BB8E922640B5602C651A04 /* ActivityKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ActivityKit.framework; path = System/Library/Frameworks/ActivityKit.framework; sourceTree = SDKROOT; };
 		4A21F4CBB6C46E07523E557A /* SharedBuysWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = SharedBuysWidget.entitlements; sourceTree = "<group>"; };
+		A7E0C0DE0000000000000001 /* RouteLiveActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RouteLiveActivity.swift; sourceTree = "<group>"; };
 		516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedBuysLiveActivity.swift; sourceTree = "<group>"; };
 		6F4DDFCCFE0D158B610EDEA8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		88E5AFDB5874BB1E45D0379C /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -317,6 +319,7 @@
 		7FE5283FCFFC00325CFC9776 /* SharedBuysWidget */ = {
 			isa = PBXGroup;
 			children = (
+				A7E0C0DE0000000000000001 /* RouteLiveActivity.swift */,
 				516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */,
 				171C3A7FD183AE1DE637FC0E /* SharedBuysWidgetBundle.swift */,
 				C6DA6538B4BE7801B0617C90 /* Info.plist */,
@@ -689,6 +692,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				75D7CED44B17D66CF9B0855E /* SharedBuysLiveActivity.swift in Sources */,
+				A7E0C0DE0000000000000002 /* RouteLiveActivity.swift in Sources */,
 				D187D843694B57F81185DD5B /* SharedBuysWidgetBundle.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -798,7 +802,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.OnHand;
 				PRODUCT_NAME = CiRCLES;
 				SDKROOT = watchos;
@@ -832,7 +836,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.OnHand;
 				PRODUCT_NAME = CiRCLES;
 				SDKROOT = watchos;
@@ -896,7 +900,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.SharedBuysWidget;
 				PRODUCT_NAME = SharedBuysWidget;
 				SDKROOT = iphoneos;
@@ -923,7 +927,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.SharedBuysWidget;
 				PRODUCT_NAME = SharedBuysWidget;
 				SDKROOT = iphoneos;
@@ -1314,7 +1318,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -1357,7 +1361,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -1388,7 +1392,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1416,7 +1420,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 109.1;
+				MARKETING_VERSION = 109.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

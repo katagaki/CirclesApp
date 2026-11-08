@@ -7,15 +7,18 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
 
     @Binding var zoomScale: CGFloat
     let onTap: @MainActor () -> Void
+    let onLongPress: @MainActor (CGPoint) -> Void
     let content: Content
 
     init(
         zoomScale: Binding<CGFloat>,
         onTap: @escaping @MainActor () -> Void,
+        onLongPress: @escaping @MainActor (CGPoint) -> Void,
         @ViewBuilder content: () -> Content
     ) {
         self._zoomScale = zoomScale
         self.onTap = onTap
+        self.onLongPress = onLongPress
         self.content = content()
     }
 
@@ -42,6 +45,12 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
         tapRecognizer.cancelsTouchesInView = false
         tapRecognizer.delegate = context.coordinator
         scrollView.addGestureRecognizer(tapRecognizer)
+
+        let longPressRecognizer = UILongPressGestureRecognizer(
+            target: context.coordinator,
+            action: #selector(Coordinator.handleLongPress(_:))
+        )
+        scrollView.addGestureRecognizer(longPressRecognizer)
 
         context.coordinator.hostingController = hostingController
 
@@ -118,6 +127,12 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
 
         @MainActor @objc func handleTap() {
             parent.onTap()
+        }
+
+        @MainActor @objc func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
+            guard recognizer.state == .began, let contentView = hostingController?.view else { return }
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            parent.onLongPress(recognizer.location(in: contentView))
         }
 
         func gestureRecognizer(

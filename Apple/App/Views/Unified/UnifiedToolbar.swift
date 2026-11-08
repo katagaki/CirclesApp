@@ -3,6 +3,8 @@ import SwiftUI
 struct UnifiedToolbar: ToolbarContent {
 
     @Environment(Authenticator.self) var authenticator
+    @Environment(Favorites.self) var favorites
+    @Environment(Navigator.self) var navigator
     @Environment(Oasis.self) var oasis
     @Environment(Unifier.self) var unifier
 
@@ -23,6 +25,11 @@ struct UnifiedToolbar: ToolbarContent {
                     .foregroundStyle(.primary)
                     .glassEffect(.regular.interactive())
                     .adaptiveShadow()
+            }
+            if navigator.isActive || favorites.isAvailable {
+                ToolbarItem(placement: .topBarTrailing) {
+                    UnifiedRouteButton()
+                }
             }
             ToolbarItem(placement: .topBarTrailing) {
                 UnifiedMoreMenu()
