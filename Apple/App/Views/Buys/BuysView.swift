@@ -9,15 +9,17 @@ struct BuysView: View {
     @Environment(Events.self) var planner
     @Environment(UserSelections.self) var selections
     @Environment(SharedBuysSession.self) var sharedBuys
+    @Environment(Unifier.self) var unifier
 
     @State var buyEntries: [BuyEntry] = []
     @State var dayMappedCircleIDs: [Int: Int] = [:]
     @State var expandedImage: UIImage?
-    @State var isShowingInfoAlert: Bool = false
     @State var isShowingSharedSheet: Bool = false
     @State var scope: BuysScope = .mine
     @State var hasChosenScope: Bool = false
     @State var assignmentTarget: SharedBuyItem?
+
+    @AppStorage(wrappedValue: false, "Buys.HasSeenOnboarding") var hasSeenOnboarding: Bool
 
     var entriesWithItems: [BuyEntry] {
         buyEntries.filter {
@@ -100,13 +102,9 @@ struct BuysView: View {
             }
             .sharedBackgroundVisibility(.hidden)
         }
-        .alert("Buys.Info.Title", isPresented: $isShowingInfoAlert) {
-            Button("Shared.OK", role: .cancel) { }
-        } message: {
-            Text("Buys.Info.Description")
-        }
         .onAppear {
             reloadEntries()
+            if !hasSeenOnboarding { unifier.openRouteScreen(.buysOnboarding) }
             if sharedBuys.isActive, !hasChosenScope { scope = .shared }
         }
         .onChange(of: sharedBuys.isActive) { _, isActive in
@@ -260,11 +258,10 @@ struct BuysView: View {
 
     @ViewBuilder
     func infoButton() -> some View {
-        Button {
-            isShowingInfoAlert = true
-        } label: {
-            Image(systemName: "info.circle")
+        Button("Buys.Onboarding.Open", systemImage: "questionmark.circle") {
+            unifier.openRouteScreen(.buysOnboarding)
         }
+        .labelStyle(.iconOnly)
     }
 
     func startSharedBuys() {

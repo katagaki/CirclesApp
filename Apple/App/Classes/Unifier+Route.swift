@@ -12,11 +12,16 @@ extension Unifier {
 
     @MainActor
     func closeRouteScreen(_ path: UnifiedPath) {
+        closePanelScreen(path)
+        selectedDetent = .height(360)
+    }
+
+    @MainActor
+    func closePanelScreen(_ path: UnifiedPath) {
         if sheetPath.last == path {
             sheetPath.removeLast()
         } else if current == path {
             current = .circles
         }
-        selectedDetent = .height(360)
     }
 }

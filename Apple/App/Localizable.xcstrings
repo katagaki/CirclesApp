@@ -1683,74 +1683,6 @@
         }
       }
     },
-    "Buys.Info.Description": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "To add items to your Buys list, open a circle's detail screen, tap 'Edit' in the 'Buys' section, and add your items.\nIf you add a catalog to 'Attachments', you can also crop product images directly from the catalog."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "宝物リストに頒布品を追加するには、サークルの詳細画面を開き、「宝物」セクションの「編集」押下し、頒布品を追加してください。\n「添付ファイル」にお品書きを追加すると、頒布品の画像をお品書きから切り取ることもできます。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "보물 목록에 상품을 추가하려면 서클 상세 화면을 열고 '보물' 섹션의 '편집'을 눌러 상품을 추가하세요.\n'첨부 파일'에 카탈로그를 추가하면 카탈로그에서 상품 이미지를 잘라낼 수도 있습니다."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "要将商品添加到宝贝清单，请打开社团详情页面，点击「宝贝」栏目中的「编辑」，然后添加商品。\n在「附件」中添加目录后，还可以从目录中裁切商品图片。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "若要將商品加入寶藏清單，請開啟社團詳情頁面，點選「寶藏」區塊中的「編輯」並新增商品。\n在「附件」中新增目錄後，也可以從目錄中裁切商品圖片。"
-          }
-        }
-      }
-    },
-    "Buys.Info.Title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "How to Manage Your Buys"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "宝物リストの管理方法"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "보물 목록 관리 방법"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "宝贝清单管理方法"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "寶藏清單管理方法"
-          }
-        }
-      }
-    },
     "Buys.ItemCost.Placeholder": {
       "localizations": {
         "en": {
@@ -2019,6 +1951,414 @@
           "stringUnit": {
             "state": "translated",
             "value": "請選擇其他日期以查看其餘的寶藏。"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Add.Message": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In a circle's details, tap Edit under Buys."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サークル詳細の「宝物」で「編集」をタップ。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "서클 상세의 '보물'에서 '편집'을 누르세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在社团详情的「宝贝」中点按「编辑」。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在社團詳情的「寶藏」中點按「編輯」。"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Add.Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add from a Circle"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サークルから追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "서클에서 추가"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从社团添加"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從社團新增"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Open": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How Buys Works"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "宝物リストの使い方"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구매 목록 사용법"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "宝贝清单使用方法"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "寶藏清單使用方法"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Share.Message": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Friends join with a QR code. Your own list stays private."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "友達はQRコードで参加。自分のリストは非公開。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "친구는 QR 코드로 참가합니다. 내 목록은 비공개입니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "朋友扫描二维码即可加入。你的清单仍为私密。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "朋友掃描 QR 碼即可加入。你的清單仍為私密。"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Share.Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shop Together"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共同購入"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "함께 구매"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一起购买"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一起購買"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Split.Message": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose who buys what, and see your share."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "誰が何を買うか決めて、負担額を確認。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "누가 무엇을 살지 정하고 내 부담액을 확인하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分配谁买什么，查看你的分摊金额。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分配誰買什麼，查看你的分攤金額。"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Split.Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Split Up the Work"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手分けして購入"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "나눠서 구매"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分工购买"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分工購買"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Start": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get Started"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "はじめる"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시작하기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Subtitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plan what to buy, and shop with friends."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "買いたいものをまとめて、友達と共同購入も。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "살 것을 정리하고 친구와 함께 구매하세요."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "整理想买的商品，还能和朋友一起买。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "整理想買的商品，還能和朋友一起買。"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buys"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "宝物リスト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구매 목록"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "宝贝清单"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "寶藏清單"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Track.Message": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap once when bought, twice if you couldn't get it."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1回タップで購入済み、2回で買えなかった。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한 번 누르면 구매 완료, 두 번 누르면 구매 못 함."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点按一次为已购买，两次为未能购买。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "點按一次為已購買，兩次為未能購買。"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Track.Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tick Off as You Go"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "買ったらチェック"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구매하면 체크"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "买到就打勾"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "買到就打勾"
           }
         }
       }
@@ -11427,31 +11767,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "If the way is closed, tap Blocked for another route. If the halls aren't connected inside, long-press the map and choose Closed (Hall) to go out and back in through another hall's entrance. Closures clear themselves after 30 minutes."
+            "value": "Tap Blocked for another way, or long-press the map to close off a hall."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "通路が閉鎖されていたら「通れない」をタップすると、別の道を探します。ホール間がつながっていないときは、マップを長押しして「通行止め（ホール）」を選ぶと、一度外に出て別のホールの出入口から入ります。通行止めは30分後に自動で解除されます。"
+            "value": "「通れない」で別の道へ。ホールごと閉じるときはマップを長押し。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "통로가 막혀 있다면 '막힘'을 누르세요. 다른 길을 찾아 줍니다. 홀 사이가 연결되어 있지 않다면 지도를 길게 누르고 '통행 금지(홀)'를 선택하세요. 밖으로 나가 다른 홀 출입구로 들어가는 길을 안내합니다. 통행 금지는 30분 후 자동으로 해제됩니다."
+            "value": "'막힘'을 누르면 다른 길로 안내합니다. 홀 전체는 지도를 길게 누르세요."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "如果通道被封闭，点按“无法通行”即可重新规划路线。若展厅之间不相通，长按地图并选择“封闭（展厅）”，将引导你先到外面，再从另一个展厅的出入口进入。封闭会在30分钟后自动解除。"
+            "value": "点按“无法通行”换条路；要封闭整个展厅，请长按地图。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "如果通道被封閉，點按「無法通行」即可重新規劃路線。若展廳之間不相通，長按地圖並選擇「封閉（展廳）」，將引導你先到外面，再從另一個展廳的出入口進入。封閉會在30分鐘後自動解除。"
+            "value": "點按「無法通行」換條路；要封閉整個展廳，請長按地圖。"
           }
         }
       }
@@ -11495,31 +11835,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Efficient visits every favorite in the shortest walk. Prioritized goes color by color, in the order you choose."
+            "value": "Efficient takes the shortest walk. Prioritized goes color by color."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "「効率重視」はすべてのお気に入りを最短で回ります。「優先順」はお気に入りの色の順番を決めて、その順に回ります。"
+            "value": "「効率重視」は最短で、「優先順」は色の順に回ります。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "'효율 우선'은 모든 즐겨찾기를 가장 짧은 동선으로, '우선순위'는 정한 즐겨찾기 색 순서대로 돕니다."
+            "value": "'효율 우선'은 최단 동선으로, '우선순위'는 색 순서대로 돕니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "“效率优先”以最短路线前往所有收藏；“按优先顺序”按你设定的收藏颜色顺序前往。"
+            "value": "“效率优先”走最短路线，“按优先顺序”按颜色顺序前往。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "「效率優先」以最短路線前往所有收藏；「依優先順序」依你設定的收藏顏色順序前往。"
+            "value": "「效率優先」走最短路線，「依優先順序」依顏色順序前往。"
           }
         }
       }
@@ -11597,31 +11937,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Long-press the map and choose You Are Here to get directions from that spot."
+            "value": "Long-press the map and choose You Are Here."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "マップを長押しして「現在地」を選ぶと、その場所から案内します。"
+            "value": "マップを長押しして「現在地」を選択。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "지도를 길게 누르고 '현재 위치'를 선택하면 그곳부터 안내합니다."
+            "value": "지도를 길게 누르고 '현재 위치'를 선택하세요."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "长按地图并选择“当前位置”，即可从该处开始导航。"
+            "value": "长按地图并选择“当前位置”。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "長按地圖並選擇「目前位置」，即可從該處開始導航。"
+            "value": "長按地圖並選擇「目前位置」。"
           }
         }
       }
@@ -11699,31 +12039,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tap Next as you go, in the app or on the Live Activity on your Lock Screen. Your location is never used."
+            "value": "Tap Next as you go, here or on the Lock Screen."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "「次へ」で次の案内に進みます。ロック画面のライブアクティビティからも操作できます。位置情報は使用しません。"
+            "value": "「次へ」で進みます。ロック画面からも操作できます。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "이동하면서 '다음'을 누르세요. 잠금 화면의 실시간 현황에서도 조작할 수 있습니다. 위치 정보는 사용하지 않습니다."
+            "value": "'다음'을 눌러 진행하세요. 잠금 화면에서도 됩니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "边走边点按“下一步”，也可在锁定屏幕的实时活动中操作。不会使用你的位置信息。"
+            "value": "点按“下一步”前进，也可在锁定屏幕上操作。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "邊走邊點按「下一步」，也可在鎖定畫面的即時動態中操作。不會使用你的位置資訊。"
+            "value": "點按「下一步」前進，也可在鎖定畫面上操作。"
           }
         }
       }
@@ -11767,31 +12107,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Directions from favorite to favorite, drawn right on the hall map."
+            "value": "Directions to your favorites, right on the hall map."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "お気に入りのサークルを回る道順を、会場マップの上に表示します。"
+            "value": "お気に入りへの道順を会場マップに表示。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "즐겨찾기한 서클을 도는 길을 홀 지도 위에 보여 줍니다."
+            "value": "즐겨찾기로 가는 길을 홀 지도에 보여 줍니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在展馆地图上显示前往收藏社团的路线。"
+            "value": "在展馆地图上显示前往收藏的路线。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "在展館地圖上顯示前往收藏社團的路線。"
+            "value": "在展館地圖上顯示前往收藏的路線。"
           }
         }
       }
