@@ -77,17 +77,20 @@ struct RouteLiveActivity: Widget {
             .padding(.vertical, 8.0)
             .background(SharedBuysLiveActivity.accent.opacity(0.75))
 
-            HStack(alignment: .center, spacing: 12.0) {
-                turnIcon(context.state, size: 48.0)
-                VStack(alignment: .leading, spacing: 4.0) {
+            VStack(alignment: .leading, spacing: 8.0) {
+                HStack(alignment: .center, spacing: 12.0) {
+                    turnIcon(context.state, size: 48.0)
                     Text(context.state.instruction)
                         .font(.headline)
                         .lineLimit(3)
                         .minimumScaleFactor(0.8)
-                    stopLine(context.state)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                Spacer(minLength: 4.0)
-                stepButtons(context.state)
+                HStack(alignment: .center, spacing: 8.0) {
+                    stopLine(context.state)
+                    Spacer(minLength: 4.0)
+                    stepButtons(context.state)
+                }
             }
             .padding(.horizontal, 16.0)
             .padding(.vertical, 12.0)
