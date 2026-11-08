@@ -14,7 +14,8 @@ struct RouteLiveActivity: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    RouteActivityCut(circleID: context.state.circleID, height: 56.0)
+                    RouteActivityCut(circleID: context.state.circleID)
+                        .frame(height: 56.0)
                         .padding(.leading, 4.0)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
@@ -77,21 +78,23 @@ struct RouteLiveActivity: Widget {
             .padding(.vertical, 8.0)
             .background(SharedBuysLiveActivity.accent.opacity(0.75))
 
-            VStack(alignment: .leading, spacing: 8.0) {
-                HStack(alignment: .center, spacing: 12.0) {
-                    RouteActivityCut(circleID: context.state.circleID, height: 64.0)
+            HStack(alignment: .center, spacing: 12.0) {
+                RouteActivityCut(circleID: context.state.circleID)
+                    .frame(minHeight: 0.0, idealHeight: 0.0, maxHeight: .infinity)
+                VStack(alignment: .leading, spacing: 8.0) {
                     Text(context.state.instruction)
                         .font(.headline)
                         .lineLimit(3)
                         .minimumScaleFactor(0.8)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                HStack(alignment: .center, spacing: 8.0) {
-                    stopLine(context.state)
-                    Spacer(minLength: 4.0)
-                    stepButtons(context.state)
+                    HStack(alignment: .center, spacing: 8.0) {
+                        stopLine(context.state)
+                        Spacer(minLength: 4.0)
+                        stepButtons(context.state)
+                    }
                 }
             }
+            .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, 16.0)
             .padding(.vertical, 12.0)
         }

@@ -4,7 +4,6 @@ import SwiftUI
 struct RouteActivityCut: View {
 
     let circleID: Int
-    let height: CGFloat
 
     var body: some View {
         Group {
@@ -17,6 +16,6 @@ struct RouteActivityCut: View {
                     .fill(.quaternary)
             }
         }
-        .frame(width: height * 40.0 / 57.0, height: height)
+        .aspectRatio(40.0 / 57.0, contentMode: .fit)
     }
 }
