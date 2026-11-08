@@ -48,10 +48,10 @@ nonisolated enum RoutePlanner {
             return [map.center(of: from), CGPoint(x: exit.sign.midX, y: exit.sign.midY),
                     CGPoint(x: entry.sign.midX, y: entry.sign.midY), map.center(of: to)]
         }
-        var candidates: [(request: RouteStopRequest, cell: GridPoint, point: CGPoint)] = []
+        var candidates: [(request: RouteStopRequest, cell: GridPoint, point: CGPoint, axis: CGPoint?)] = []
         for request in requests {
             if let access = access(for: request, in: map) {
-                candidates.append((request, access.cell, access.point))
+                candidates.append((request, access.cell, access.point, access.axis))
             }
         }
         guard !candidates.isEmpty else { return nil }
@@ -97,12 +97,15 @@ nonisolated enum RoutePlanner {
         for (position, index) in order.enumerated() {
             let stop = stops[index]
             let center = CGPoint(x: stop.request.spaceRect.midX, y: stop.request.spaceRect.midY)
-            plannedStops.append(RouteStop(
-                id: stop.request.webCatalogID, circleID: stop.request.circleID, name: stop.request.name,
-                spaceName: stop.request.spaceName, accessPoint: stop.point, spaceCenter: center,
-                colorRawValue: stop.request.colorRawValue
-            ))
+            let addStop: (CGPoint) -> Void = { point in
+                plannedStops.append(RouteStop(
+                    id: stop.request.webCatalogID, circleID: stop.request.circleID, name: stop.request.name,
+                    spaceName: stop.request.spaceName, accessPoint: point, spaceCenter: center,
+                    colorRawValue: stop.request.colorRawValue
+                ))
+            }
             guard let from = current, let fromPoint = currentPoint else {
+                addStop(stop.point)
                 legs.append([stop.point])
                 steps.append(RouteStep(id: steps.count, stopIndex: position, blocks: 0, action: .begin,
                                        path: [stop.point]))
@@ -123,13 +126,16 @@ nonisolated enum RoutePlanner {
                 }
                 var points = segment.map { map.center(of: $0) }
                 if segmentIndex == 0 { points.insert(fromPoint, at: 0) }
-                if segmentIndex == segments.count - 1 { points.append(stop.point) }
-                leg += RouteStraightener.straighten(points)
+                let isLast = segmentIndex == segments.count - 1
+                if isLast { points.append(stop.point) }
+                leg += RouteStraightener.straighten(points, arrivalAxis: isLast ? stop.axis : nil)
             }
+            let arrival = leg.last ?? stop.point
+            addStop(arrival)
             legs.append(leg)
             steps += narrator.steps(for: path, stopIndex: position, spaceCenter: center, firstID: steps.count)
             current = stop.cell
-            currentPoint = stop.point
+            currentPoint = arrival
         }
         return PlannedRoute(stops: plannedStops, legs: legs, steps: steps, origin: originCell.map { map.center(of: $0) },
                             closures: closureLines, outsidePaths: outsidePaths, skippedSpaces: skippedSpaces)
@@ -186,17 +192,19 @@ nonisolated enum RoutePlanner {
 
     /// The aisle cell in front of a space, and the point in it level with the middle of the
     /// space, since a half space covers two cells and either cell's centre sits off its middle.
-    static func access(for request: RouteStopRequest, in map: WalkableMap) -> (cell: GridPoint, point: CGPoint)? {
+    static func access(
+        for request: RouteStopRequest, in map: WalkableMap
+    ) -> (cell: GridPoint, point: CGPoint, axis: CGPoint?)? {
         guard let cell = accessCell(for: request, in: map) else { return nil }
         let center = map.center(of: cell)
         let rect = request.spaceRect
         if rect.minX <= center.x && center.x <= rect.maxX {
-            return (cell, CGPoint(x: rect.midX, y: center.y))
+            return (cell, CGPoint(x: rect.midX, y: center.y), CGPoint(x: 1, y: 0))
         }
         if rect.minY <= center.y && center.y <= rect.maxY {
-            return (cell, CGPoint(x: center.x, y: rect.midY))
+            return (cell, CGPoint(x: center.x, y: rect.midY), CGPoint(x: 0, y: 1))
         }
-        return (cell, center)
+        return (cell, center, nil)
     }
 
     /// The aisle cell in front of a space. Every space has one side facing an aisle; the

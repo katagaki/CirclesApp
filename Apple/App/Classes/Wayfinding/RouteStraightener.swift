@@ -8,7 +8,10 @@ nonisolated enum RouteStraightener {
     /// Runs this long or shorter are sidesteps, not stretches of aisle.
     static let jogLength = CGFloat(WalkableMap.cellSize) * 2.0
 
-    static func straighten(_ points: [CGPoint]) -> [CGPoint] {
+    /// `arrivalAxis` is the way the aisle runs in front of the stop the walk ends at. When
+    /// the walk comes down that aisle and only steps aside to reach the stop, the end moves
+    /// onto the line instead, so the line runs through the stop's badge rather than past it.
+    static func straighten(_ points: [CGPoint], arrivalAxis: CGPoint? = nil) -> [CGPoint] {
         let walk = corners(of: points)
         guard walk.count > 2 else { return walk }
         let isLong = zip(walk, walk.dropFirst()).map { distance($0, $1) > jogLength }
@@ -24,7 +27,7 @@ nonisolated enum RouteStraightener {
             var end = index
             while end < isLong.count && !isLong[end] { end += 1 }
             result.removeLast()
-            result += bend(walk, from: index, to: end)
+            result += bend(walk, from: index, to: end, arrivalAxis: arrivalAxis)
             index = end
         }
         return corners(of: result)
@@ -32,7 +35,9 @@ nonisolated enum RouteStraightener {
 
     /// Replaces the short runs between corners `start` and `end` with one stroke, pulled
     /// back into the long runs on either side so it leaves them at 45 degrees.
-    private static func bend(_ corners: [CGPoint], from start: Int, to end: Int) -> [CGPoint] {
+    private static func bend(
+        _ corners: [CGPoint], from start: Int, to end: Int, arrivalAxis: CGPoint?
+    ) -> [CGPoint] {
         let from = corners[start]
         let to = corners[end]
         let before = start > 0 ? unit(corners[start - 1], from) : nil
@@ -47,6 +52,9 @@ nonisolated enum RouteStraightener {
         let offset = CGPoint(x: to.x - from.x, y: to.y - from.y)
         let along = dot(offset, direction)
         let across = hypot(offset.x - along * direction.x, offset.y - along * direction.y)
+        if after == nil, let before, let arrivalAxis, abs(dot(before, arrivalAxis)) > 0.9, across <= jogLength {
+            return [CGPoint(x: from.x + direction.x * along, y: from.y + direction.y * along)]
+        }
         let extra = max(across - along, 0)
         let backLength = start > 0 ? distance(corners[start - 1], from) / 2.0 : 0
         let aheadLength = end < corners.count - 1 ? distance(to, corners[end + 1]) / 2.0 : 0
