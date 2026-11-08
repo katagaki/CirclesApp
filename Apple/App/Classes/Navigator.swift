@@ -84,8 +84,33 @@ final class Navigator {
 
     func start(_ context: Context, database: Database) {
         self.context = context
+        isStatusExpanded = false
         remainingStopIDs = nil
         plan(database: database)
+    }
+
+    /// A message the visitor has to see grows out of the pill, so the pill lands at the
+    /// trailing edge first and only then expands, the way a tap would expand it.
+    private func expandAfterAppearing() {
+        Task {
+            try? await Task.sleep(for: .seconds(0.4))
+            withAnimation(.smooth.speed(2.0)) {
+                isStatusExpanded = true
+            }
+        }
+    }
+
+    /// Shrinks the message back into the pill, then lets the pill go.
+    func dismissNoStops() {
+        withAnimation(.smooth.speed(2.0)) {
+            isStatusExpanded = false
+        }
+        Task {
+            try? await Task.sleep(for: .seconds(0.35))
+            withAnimation(.smooth.speed(2.0)) {
+                isNoStopsAlertPresented = false
+            }
+        }
     }
 
     var colorPriority: [WebCatalogColor]? {
@@ -116,16 +141,17 @@ final class Navigator {
                 self.stepIndex = 0
                 self.isPlanning = false
                 self.isTrapped = trapped
-                if trapped {
-                    self.isStatusExpanded = true
+                if planned == nil && !trapped {
+                    self.isNoStopsAlertPresented = true
                 }
             }
             if trapped {
                 endActivity()
                 retryWhenClosuresLapse(database: database)
+                expandAfterAppearing()
             } else if planned == nil {
-                isNoStopsAlertPresented = true
                 endActivity()
+                expandAfterAppearing()
             } else {
                 updateActivity(hallName: context.mapName)
             }

@@ -11,7 +11,7 @@ struct UnifiedRouteStatus: View {
     }
 
     var isExpanded: Bool {
-        navigator.isStatusExpanded || navigator.isNoStopsAlertPresented
+        navigator.isStatusExpanded
     }
 
     var body: some View {
@@ -23,9 +23,7 @@ struct UnifiedRouteStatus: View {
                         Group {
                             if navigator.isNoStopsAlertPresented {
                                 UnifiedRouteNoStopsCard {
-                                    withAnimation(.smooth.speed(2.0)) {
-                                        navigator.isNoStopsAlertPresented = false
-                                    }
+                                    navigator.dismissNoStops()
                                 }
                             } else if navigator.isTrapped {
                                 UnifiedRouteTrappedSection()

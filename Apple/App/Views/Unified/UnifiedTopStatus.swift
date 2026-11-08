@@ -8,7 +8,7 @@ struct UnifiedTopStatus: View {
     @Environment(Unifier.self) var unifier
 
     var isRouteExpanded: Bool {
-        navigator.isStatusExpanded || navigator.isNoStopsAlertPresented
+        navigator.isStatusExpanded
     }
 
     var body: some View {
