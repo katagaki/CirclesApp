@@ -7,11 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Business
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.tsubuzaki.circlesgo.R
@@ -81,8 +77,7 @@ private fun DatePickerButton(
             Text(
                 text = selectedDate?.let { stringResource(R.string.day_format, it.id) }
                     ?: stringResource(R.string.no_day),
-                fontWeight = FontWeight.Bold,
-                fontSize = 13.sp,
+                fontSize = 17.sp,
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
@@ -128,23 +123,12 @@ private fun HallPickerButton(
                 .padding(horizontal = 4.dp),
             onClick = { expanded = true },
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
+            Text(
+                text = selectedMap?.name ?: stringResource(R.string.no_hall),
+                color = Color.White,
+                fontSize = 17.sp,
                 modifier = Modifier.padding(horizontal = 4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Outlined.Business,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 4.dp),
-                    tint = Color.White
-                )
-                Text(
-                    text = selectedMap?.name ?: stringResource(R.string.no_hall),
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 13.sp
-                )
-            }
+            )
         }
 
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
