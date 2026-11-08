@@ -12,7 +12,7 @@ struct MapRouteHoldPopover: View {
         VStack(alignment: .leading, spacing: 0.0) {
             if navigator.pendingPoint != nil {
                 Text("Route.Hold.Title")
-                    .font(.subheadline.weight(.semibold))
+                    .font(.body.weight(.semibold))
                     .padding(.bottom, 2.0)
                 row("Route.Hold.SetOrigin", systemImage: "figure.walk") {
                     navigator.setOriginAtHold(database: database)
@@ -28,7 +28,7 @@ struct MapRouteHoldPopover: View {
                 }
             } else {
                 Text(navigator.selectedClosureIsHallBoundary ? "Route.Closure.Halls.Title" : "Route.Closure.Title")
-                    .font(.subheadline.weight(.semibold))
+                    .font(.body.weight(.semibold))
                 Text("Route.Closure.Note")
                     .font(.caption)
                     .foregroundStyle(.secondary)
@@ -53,14 +53,14 @@ struct MapRouteHoldPopover: View {
                 perform()
             }
         } label: {
-            HStack(spacing: 10.0) {
+            HStack(spacing: 6.0) {
                 Image(systemName: systemImage)
                     .foregroundStyle(.tint)
                     .frame(width: 22.0)
                 Text(title)
                 Spacer(minLength: 0.0)
             }
-            .font(.subheadline)
+            .font(.body)
             .padding(.top, 10.0)
             .padding(.bottom, isLast ? 0.0 : 10.0)
             .contentShape(.rect)
