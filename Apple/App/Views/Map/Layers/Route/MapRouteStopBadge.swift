@@ -42,6 +42,10 @@ struct MapRouteStopBadge: View {
         }
         .foregroundStyle(state == .upcoming ? Color.accentColor : .white)
         .frame(width: size, height: size)
-        .shadow(color: .black.opacity(0.3), radius: size * 0.08, y: size * 0.04)
+        .background {
+            Circle()
+                .fill(Color(uiColor: .systemBackground))
+                .shadow(color: .black.opacity(0.3), radius: size * 0.08, y: size * 0.04)
+        }
     }
 }
