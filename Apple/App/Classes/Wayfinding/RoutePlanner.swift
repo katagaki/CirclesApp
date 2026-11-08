@@ -92,6 +92,7 @@ nonisolated enum RoutePlanner {
         var legs: [[CGPoint]] = []
         var steps: [RouteStep] = []
         var current = originCell
+        pathfinder.wear = [Float](repeating: 0, count: map.walkable.count)
         for (position, index) in order.enumerated() {
             let stop = stops[index]
             let center = CGPoint(x: stop.request.spaceRect.midX, y: stop.request.spaceRect.midY)
@@ -109,6 +110,7 @@ nonisolated enum RoutePlanner {
             }
             let cells = pathfinder.path(from: from, to: stop.cell)
             let path = cells.isEmpty ? [stop.cell] : cells
+            wear(path, in: map, into: &pathfinder.wear)
             var leg: [CGPoint] = []
             for segment in RouteNarrator.segments(of: path) {
                 if let last = leg.last, let first = segment.first {
@@ -131,6 +133,24 @@ nonisolated enum RoutePlanner {
     /// for the queue at each door, so routes only go outside when the way inside is shut
     /// or much longer.
     static let outsidePenalty: Float = 120.0
+
+    /// What walking a cell again costs on top of its usual step. A cell in the middle of an
+    /// aisle costs about 2, so retracing a stretch costs nearly twice as much as a fresh one.
+    static let wearPenalty: Float = 1.5
+
+    /// Marks a leg's cells and the lanes beside them as walked, so a later leg running
+    /// alongside it one cell over still counts as the same stretch of aisle.
+    private static func wear(_ path: [GridPoint], in map: WalkableMap, into wear: inout [Float]) {
+        for cell in path {
+            for dy in -1...1 {
+                for dx in -1...1 {
+                    let neighbour = GridPoint(row: cell.row + dy, column: cell.column + dx)
+                    guard map.contains(neighbour) else { continue }
+                    wear[map.index(neighbour)] = wearPenalty
+                }
+            }
+        }
+    }
 
     private static func portals(between doors: [RouteDoor], in map: WalkableMap) -> [Int: [(to: Int, cost: Float)]] {
         var portals: [Int: [(to: Int, cost: Float)]] = [:]

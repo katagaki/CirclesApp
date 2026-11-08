@@ -7,6 +7,9 @@ nonisolated struct Pathfinder {
 
     let map: WalkableMap
     var portals: [Int: [(to: Int, cost: Float)]] = [:]
+    /// Extra cost for cells earlier legs of the route already walked, so a later leg takes
+    /// a parallel aisle when one is about as short instead of retracing the same stretch.
+    var wear: [Float] = []
 
     func costs(from start: GridPoint) -> [Float] {
         var cost = [Float](repeating: .infinity, count: map.walkable.count)
@@ -77,7 +80,8 @@ nonisolated struct Pathfinder {
                 } else {
                     turn = Self.turnPenalty
                 }
-                let total = current + map.stepCost[nextIndex] + turn
+                let worn = wear.isEmpty ? 0 : wear[nextIndex]
+                let total = current + map.stepCost[nextIndex] + turn + worn
                 let nextState = nextIndex * 4 + nextHeading
                 if total < cost[nextState] {
                     cost[nextState] = total
