@@ -77,6 +77,7 @@ class Unifier {
     var isGoingToExitOfflineMode: Bool = false
     var isOfflineModeTipShowing: Bool = false
     var isOfflineStatusExpanded: Bool = false
+    var topStatusInset: CGFloat = 0.0
 
     var isSearchRequested: Bool = false
 

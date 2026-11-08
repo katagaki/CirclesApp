@@ -4,6 +4,7 @@ import UIKit
 struct MapScrollView<Content: View>: UIViewRepresentable {
 
     @Environment(Mapper.self) var mapper
+    @Environment(Unifier.self) var unifier
 
     @Binding var zoomScale: CGFloat
     let onTap: @MainActor () -> Void
@@ -72,6 +73,10 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
             hostingController.view.invalidateIntrinsicContentSize()
         }
 
+        if scrollView.contentInset.top != unifier.topStatusInset {
+            scrollView.contentInset.top = unifier.topStatusInset
+        }
+
         if scrollView.zoomScale != zoomScale {
             scrollView.setZoomScale(zoomScale, animated: false)
         }
@@ -88,8 +93,7 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
             let centeredX = max(0, min(scaledX - halfWidth,
                                        scrollView.contentSize.width - scrollView.bounds.width))
 
-            // Allow scrolling to top inset (e.g. under navigation bar)
-            let minScrollY = -scrollView.safeAreaInsets.top
+            let minScrollY = -scrollView.adjustedContentInset.top
             let maxScrollY = max(
                 minScrollY,
                 scrollView.contentSize.height - scrollView.bounds.height + scrollView.safeAreaInsets.bottom
