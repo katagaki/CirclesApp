@@ -54,7 +54,7 @@ struct MapRouteLayer: View {
             }
             ForEach(navigator.closureLines, id: \.id) { closure in
                 polyline([closure.from, closure.to])
-                    .stroke(Color.primary, style: StrokeStyle(lineWidth: lineWidth * 0.7, lineCap: .round,
+                    .stroke(Color.red, style: StrokeStyle(lineWidth: lineWidth * 0.7, lineCap: .round,
                                                           dash: [lineWidth * 0.8, lineWidth * 0.6]))
             }
             if let line = navigator.pendingClosureLine {
