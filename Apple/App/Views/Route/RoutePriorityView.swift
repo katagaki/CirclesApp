@@ -25,6 +25,10 @@ struct RoutePriorityView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16.0) {
+                    Text("Route.Priority.Footer")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                     LazyVGrid(columns: columns, spacing: 16.0) {
                         ForEach(order, id: \.self) { color in
                             RoutePriorityColorCell(
@@ -51,9 +55,6 @@ struct RoutePriorityView: View {
                             )
                         }
                     }
-                    Text("Route.Priority.Footer")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
                 }
                 .padding(20.0)
             }

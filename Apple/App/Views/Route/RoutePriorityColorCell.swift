@@ -28,7 +28,6 @@ struct RoutePriorityColorCell: View {
             .frame(width: 56.0, height: 56.0)
             .shadow(color: .black.opacity(rank == nil ? 0.0 : 0.15), radius: 3.0, y: 1.0)
         }
-        .opacity(rank != nil && count == 0 ? 0.45 : 1.0)
         .contentShape(.rect)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(color.name()))
