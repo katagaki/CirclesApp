@@ -3,6 +3,7 @@ import Foundation
 #if os(iOS) && !targetEnvironment(macCatalyst)
 import ActivityKit
 import ORBiT
+import UIKit
 
 extension Navigator {
 
@@ -13,6 +14,7 @@ extension Navigator {
             symbolName: currentStep.symbolName,
             stopSpace: currentStop.spaceName,
             stopName: currentStop.name,
+            circleID: currentStop.circleID,
             progress: String(localized: "Route.Stop.\(currentStep.stopIndex + 1).\(route.stops.count)"),
             stopNumber: currentStep.stopIndex + 1,
             stopCount: route.stops.count,
@@ -41,7 +43,29 @@ extension Navigator {
         guard let current = activity as? Activity<RouteAttributes> else { return }
         let id = current.id
         activity = nil
+        RouteCutStore.removeAll()
         Task { await Self.finish(id) }
+    }
+
+    func storeActivityCuts(for stops: [RouteStop], database: Database) async {
+        for stop in stops where !RouteCutStore.contains(stop.circleID) {
+            guard !Task.isCancelled else { return }
+            guard let image = await database.circleImageAsync(for: stop.circleID),
+                  let data = Self.activityCutData(from: image) else { continue }
+            RouteCutStore.save(data, for: stop.circleID)
+        }
+    }
+
+    private static func activityCutData(from image: UIImage) -> Data? {
+        let largestSide = max(image.size.width, image.size.height)
+        guard largestSide > 0.0 else { return nil }
+        let scale = min(1.0, 200.0 / largestSide)
+        let size = CGSize(width: (image.size.width * scale).rounded(), height: (image.size.height * scale).rounded())
+        let format = UIGraphicsImageRendererFormat.default()
+        format.scale = 1.0
+        return UIGraphicsImageRenderer(size: size, format: format)
+            .image { _ in image.draw(in: CGRect(origin: .zero, size: size)) }
+            .jpegData(compressionQuality: 0.8)
     }
 
     nonisolated private static func update(_ id: String, with state: RouteAttributes.ContentState) async {
@@ -71,6 +95,7 @@ extension Navigator {
 extension Navigator {
     func updateActivity(hallName: String? = nil) {}
     func endActivity() {}
+    func storeActivityCuts(for stops: [RouteStop], database: Database) async {}
     func connectActivityButtons(database: Database) {}
 }
 #endif

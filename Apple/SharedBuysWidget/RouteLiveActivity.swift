@@ -14,7 +14,8 @@ struct RouteLiveActivity: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    turnIcon(context.state, size: 44.0)
+                    RouteActivityCut(circleID: context.state.circleID)
+                        .frame(height: 56.0)
                         .padding(.leading, 4.0)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
@@ -78,28 +79,25 @@ struct RouteLiveActivity: Widget {
             .background(SharedBuysLiveActivity.accent.opacity(0.75))
 
             HStack(alignment: .center, spacing: 12.0) {
-                turnIcon(context.state, size: 48.0)
-                VStack(alignment: .leading, spacing: 4.0) {
+                RouteActivityCut(circleID: context.state.circleID)
+                    .frame(minHeight: 0.0, idealHeight: 0.0, maxHeight: .infinity)
+                VStack(alignment: .leading, spacing: 8.0) {
                     Text(context.state.instruction)
                         .font(.headline)
                         .lineLimit(3)
                         .minimumScaleFactor(0.8)
-                    stopLine(context.state)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    HStack(alignment: .center, spacing: 8.0) {
+                        stopLine(context.state)
+                        Spacer(minLength: 4.0)
+                        stepButtons(context.state)
+                    }
                 }
-                Spacer(minLength: 4.0)
-                stepButtons(context.state)
             }
+            .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, 16.0)
             .padding(.vertical, 12.0)
         }
-    }
-
-    func turnIcon(_ state: RouteAttributes.ContentState, size: CGFloat) -> some View {
-        Image(systemName: state.symbolName)
-            .font(.system(size: size * 0.45, weight: .bold))
-            .foregroundStyle(.white)
-            .frame(width: size, height: size)
-            .background(SharedBuysLiveActivity.accent, in: .rect(cornerRadius: size * 0.28))
     }
 
     func stopLine(_ state: RouteAttributes.ContentState) -> some View {

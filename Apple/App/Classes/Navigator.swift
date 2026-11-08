@@ -152,7 +152,9 @@ final class Navigator {
             } else if planned == nil {
                 endActivity()
                 expandAfterAppearing()
-            } else {
+            } else if let planned {
+                await storeActivityCuts(for: planned.stops, database: database)
+                guard !Task.isCancelled else { return }
                 updateActivity(hallName: context.mapName)
             }
         }
