@@ -1,24 +1,33 @@
 import SwiftUI
 
+/// Where the visitor is standing, shown with their My Comiket photo.
 struct MapRouteOriginPin: View {
+
+    @AppStorage("My.ProfilePicture") var profilePicture: Data?
 
     let size: CGFloat
 
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(Color.accentColor.opacity(0.25))
-                .frame(width: size * 1.8, height: size * 1.8)
-            Circle()
-                .fill(Color.accentColor)
-                .frame(width: size, height: size)
-            Circle()
-                .strokeBorder(.white, lineWidth: size * 0.15)
-                .frame(width: size, height: size)
-            Image(systemName: "figure.walk")
-                .font(.system(size: size * 0.5, weight: .bold))
-                .foregroundStyle(.white)
+    var photo: Image {
+        if let profilePicture, let image = UIImage(data: profilePicture) {
+            return Image(uiImage: image)
         }
-        .shadow(color: .black.opacity(0.3), radius: size * 0.08)
+        return Image(.profile1)
+    }
+
+    var body: some View {
+        photo
+            .resizable()
+            .scaledToFill()
+            .frame(width: size, height: size)
+            .clipShape(.circle)
+            .overlay {
+                Circle()
+                    .strokeBorder(.white, lineWidth: size * 0.1)
+            }
+            .background {
+                Circle()
+                    .fill(.white)
+                    .shadow(color: .black.opacity(0.3), radius: size * 0.08)
+            }
     }
 }

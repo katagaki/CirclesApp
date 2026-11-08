@@ -17,11 +17,12 @@ struct MapRouteHoldPopover: View {
                 row("Route.Hold.SetOrigin", systemImage: "figure.walk") {
                     navigator.setOriginAtHold(database: database)
                 }
-                Divider()
+                separator
                 row("Route.Hold.Close", systemImage: "nosign", isLast: navigator.hallBoundaries.isEmpty) {
                     navigator.closePathAtHold(database: database)
                 }
                 if !navigator.hallBoundaries.isEmpty {
+                    separator
                     row("Route.Hold.CloseHalls", systemImage: "rectangle.split.2x1", isLast: true) {
                         navigator.closeHallsAtHold(database: database)
                     }
@@ -43,8 +44,14 @@ struct MapRouteHoldPopover: View {
         .fixedSize(horizontal: false, vertical: true)
     }
 
+    /// Starts under the row titles rather than the icons, the way a list's separators do.
+    var separator: some View {
+        Divider()
+            .padding(.leading, 32.0)
+    }
+
     /// Rows are padded above and below, except under the last one, where the popover's own
-    /// padding already sits, so the bottom margin matches the top.
+    /// padding already sits.
     func row(
         _ title: LocalizedStringKey, systemImage: String, isLast: Bool = false, perform: @escaping () -> Void
     ) -> some View {
@@ -53,7 +60,7 @@ struct MapRouteHoldPopover: View {
                 perform()
             }
         } label: {
-            HStack(spacing: 6.0) {
+            HStack(spacing: 10.0) {
                 Image(systemName: systemImage)
                     .foregroundStyle(.tint)
                     .frame(width: 22.0)

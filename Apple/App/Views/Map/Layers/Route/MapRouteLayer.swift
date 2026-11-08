@@ -43,11 +43,6 @@ struct MapRouteLayer: View {
                         .stroke(Color.accentColor, style: StrokeStyle(lineWidth: lineWidth * 0.9, lineCap: .round,
                                                                  lineJoin: .round, dash: [lineWidth * 0.3, lineWidth * 1.2]))
                 }
-                ForEach(route.closures, id: \.id) { closure in
-                    polyline([closure.from, closure.to])
-                        .stroke(Color.red, style: StrokeStyle(lineWidth: lineWidth * 1.4, lineCap: .round,
-                                                          dash: [lineWidth * 0.8, lineWidth * 0.6]))
-                }
                 ForEach(Array(route.stops.enumerated()), id: \.element.id) { index, stop in
                     MapRouteStopBadge(
                         number: index + 1,
@@ -56,6 +51,16 @@ struct MapRouteLayer: View {
                     )
                     .position(scaled(stop.accessPoint))
                 }
+            }
+            ForEach(navigator.closureLines, id: \.id) { closure in
+                polyline([closure.from, closure.to])
+                    .stroke(Color.red, style: StrokeStyle(lineWidth: lineWidth * 0.3, lineCap: .butt,
+                                                          dash: [lineWidth * 0.6, lineWidth * 0.4]))
+            }
+            if let line = navigator.pendingClosureLine {
+                polyline([line.from, line.to])
+                    .stroke(Color.primary.opacity(0.5), style: StrokeStyle(lineWidth: lineWidth * 0.3, lineCap: .butt,
+                                                                       dash: [lineWidth * 0.6, lineWidth * 0.4]))
             }
             ForEach(navigator.activeClosures) { closure in
                 MapRouteClosureBadge(

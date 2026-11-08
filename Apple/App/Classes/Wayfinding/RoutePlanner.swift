@@ -6,29 +6,7 @@ nonisolated enum RoutePlanner {
         map baseMap: WalkableMap, stops requests: [RouteStopRequest], origin: CGPoint?,
         closures: [RouteClosure] = [], halls: [RouteHall] = []
     ) -> PlannedRoute? {
-        var closureLines: [RouteClosureLine] = []
-        var blockedCells: [GridPoint] = []
-        for closure in closures where closure.isActive {
-            if let boundaryX = closure.hallBoundaryX {
-                let cells = baseMap.boundaryCells(atX: boundaryX)
-                blockedCells += cells
-                let rows = cells.map(\.row)
-                if let top = rows.min(), let bottom = rows.max() {
-                    let size = CGFloat(WalkableMap.cellSize)
-                    closureLines.append(RouteClosureLine(
-                        id: closure.id,
-                        from: CGPoint(x: boundaryX, y: CGFloat(top) * size),
-                        to: CGPoint(x: boundaryX, y: CGFloat(bottom + 1) * size)
-                    ))
-                }
-                continue
-            }
-            let cells = baseMap.closureCells(at: closure.point, across: closure.across)
-            blockedCells += cells
-            if let line = line(through: cells, in: baseMap) {
-                closureLines.append(RouteClosureLine(id: closure.id, from: line.0, to: line.1))
-            }
-        }
+        let (blockedCells, closureLines) = seal(closures, in: baseMap)
         let map = baseMap.blocking(blockedCells)
         var pathfinder = Pathfinder(map: map)
         let boundaries = zip(halls, halls.dropFirst()).map { ($0.rect.maxX + $1.rect.minX) / 2.0 }
@@ -48,10 +26,10 @@ nonisolated enum RoutePlanner {
             return [map.center(of: from), CGPoint(x: exit.sign.midX, y: exit.sign.midY),
                     CGPoint(x: entry.sign.midX, y: entry.sign.midY), map.center(of: to)]
         }
-        var candidates: [(request: RouteStopRequest, cell: GridPoint)] = []
+        var candidates: [(request: RouteStopRequest, cell: GridPoint, point: CGPoint, axis: CGPoint?)] = []
         for request in requests {
-            if let cell = accessCell(for: request, in: map) {
-                candidates.append((request, cell))
+            if let access = access(for: request, in: map) {
+                candidates.append((request, access.cell, access.point, access.axis))
             }
         }
         guard !candidates.isEmpty else { return nil }
@@ -92,40 +70,81 @@ nonisolated enum RoutePlanner {
         var legs: [[CGPoint]] = []
         var steps: [RouteStep] = []
         var current = originCell
+        var currentPoint = originCell.map { map.center(of: $0) }
         pathfinder.wear = [Float](repeating: 0, count: map.walkable.count)
         for (position, index) in order.enumerated() {
             let stop = stops[index]
             let center = CGPoint(x: stop.request.spaceRect.midX, y: stop.request.spaceRect.midY)
-            plannedStops.append(RouteStop(
-                id: stop.request.webCatalogID, circleID: stop.request.circleID, name: stop.request.name,
-                spaceName: stop.request.spaceName, accessPoint: map.center(of: stop.cell), spaceCenter: center,
-                colorRawValue: stop.request.colorRawValue
-            ))
-            guard let from = current else {
-                legs.append([map.center(of: stop.cell)])
+            let addStop: (CGPoint) -> Void = { point in
+                plannedStops.append(RouteStop(
+                    id: stop.request.webCatalogID, circleID: stop.request.circleID, name: stop.request.name,
+                    spaceName: stop.request.spaceName, accessPoint: point, spaceCenter: center,
+                    colorRawValue: stop.request.colorRawValue
+                ))
+            }
+            guard let from = current, let fromPoint = currentPoint else {
+                addStop(stop.point)
+                legs.append([stop.point])
                 steps.append(RouteStep(id: steps.count, stopIndex: position, blocks: 0, action: .begin,
-                                       path: [map.center(of: stop.cell)]))
+                                       path: [stop.point]))
                 current = stop.cell
+                currentPoint = stop.point
                 continue
             }
             let cells = pathfinder.path(from: from, to: stop.cell)
             let path = cells.isEmpty ? [stop.cell] : cells
             wear(path, in: map, into: &pathfinder.wear)
+            let segments = RouteNarrator.segments(of: path)
             var leg: [CGPoint] = []
-            for segment in RouteNarrator.segments(of: path) {
-                if let last = leg.last, let first = segment.first {
-                    let walk = outside(map.cell(at: last), first)
+            for (segmentIndex, segment) in segments.enumerated() {
+                if let lastCell = leg.isEmpty ? nil : segments[segmentIndex - 1].last, let first = segment.first {
+                    let walk = outside(lastCell, first)
                     outsidePaths.append(walk)
                     leg += walk.dropFirst().dropLast()
                 }
-                leg += simplify(segment.map { map.center(of: $0) }, tolerance: CGFloat(WalkableMap.cellSize))
+                var points = segment.map { map.center(of: $0) }
+                if segmentIndex == 0 { points.insert(fromPoint, at: 0) }
+                let isLast = segmentIndex == segments.count - 1
+                if isLast { points.append(stop.point) }
+                leg += RouteStraightener.straighten(points, arrivalAxis: isLast ? stop.axis : nil)
             }
+            let arrival = leg.last ?? stop.point
+            addStop(arrival)
             legs.append(leg)
             steps += narrator.steps(for: path, stopIndex: position, spaceCenter: center, firstID: steps.count)
             current = stop.cell
+            currentPoint = arrival
         }
         return PlannedRoute(stops: plannedStops, legs: legs, steps: steps, origin: originCell.map { map.center(of: $0) },
                             closures: closureLines, outsidePaths: outsidePaths, skippedSpaces: skippedSpaces)
+    }
+
+    /// The cells each active closure blocks, and the line drawn across each on the map.
+    static func seal(_ closures: [RouteClosure], in map: WalkableMap) -> (cells: [GridPoint], lines: [RouteClosureLine]) {
+        var lines: [RouteClosureLine] = []
+        var blocked: [GridPoint] = []
+        for closure in closures where closure.isActive {
+            if let boundaryX = closure.hallBoundaryX {
+                let cells = map.boundaryCells(atX: boundaryX)
+                blocked += cells
+                let rows = cells.map(\.row)
+                if let top = rows.min(), let bottom = rows.max() {
+                    let size = CGFloat(WalkableMap.cellSize)
+                    lines.append(RouteClosureLine(
+                        id: closure.id,
+                        from: CGPoint(x: boundaryX, y: CGFloat(top) * size),
+                        to: CGPoint(x: boundaryX, y: CGFloat(bottom + 1) * size)
+                    ))
+                }
+                continue
+            }
+            let cells = map.closureCells(at: closure.point, across: closure.across)
+            blocked += cells
+            if let line = line(through: cells, in: map) {
+                lines.append(RouteClosureLine(id: closure.id, from: line.0, to: line.1))
+            }
+        }
+        return (blocked, lines)
     }
 
     /// Doors on the same wall open onto the same concourse, so a visitor can leave by one
@@ -166,7 +185,7 @@ nonisolated enum RoutePlanner {
         return portals
     }
 
-    private static func line(through cells: [GridPoint], in map: WalkableMap) -> (CGPoint, CGPoint)? {
+    static func line(through cells: [GridPoint], in map: WalkableMap) -> (CGPoint, CGPoint)? {
         guard let first = cells.first else { return nil }
         let sameRow = cells.filter { $0.row == first.row }
         let sameColumn = cells.filter { $0.column == first.column }
@@ -175,6 +194,23 @@ nonisolated enum RoutePlanner {
             : sameColumn.sorted { $0.row < $1.row }
         guard let start = band.first, let end = band.last else { return nil }
         return (map.center(of: start), map.center(of: end))
+    }
+
+    /// The aisle cell in front of a space, and the point in it level with the middle of the
+    /// space, since a half space covers two cells and either cell's centre sits off its middle.
+    static func access(
+        for request: RouteStopRequest, in map: WalkableMap
+    ) -> (cell: GridPoint, point: CGPoint, axis: CGPoint?)? {
+        guard let cell = accessCell(for: request, in: map) else { return nil }
+        let center = map.center(of: cell)
+        let rect = request.spaceRect
+        if rect.minX <= center.x && center.x <= rect.maxX {
+            return (cell, CGPoint(x: rect.midX, y: center.y), CGPoint(x: 1, y: 0))
+        }
+        if rect.minY <= center.y && center.y <= rect.maxY {
+            return (cell, CGPoint(x: center.x, y: rect.midY), CGPoint(x: 0, y: 1))
+        }
+        return (cell, center, nil)
     }
 
     /// The aisle cell in front of a space. Every space has one side facing an aisle; the
@@ -205,27 +241,5 @@ nonisolated enum RoutePlanner {
         }
         if let best { return best.cell }
         return map.nearestWalkable(to: GridPoint(row: (top + bottom) / 2, column: (left + right) / 2))
-    }
-
-    /// Douglas–Peucker, so a staircase along a diagonal wall draws as one straight line.
-    static func simplify(_ points: [CGPoint], tolerance: CGFloat) -> [CGPoint] {
-        guard points.count > 2, let first = points.first, let last = points.last else { return points }
-        var farthest = 0
-        var distance: CGFloat = 0
-        let dx = last.x - first.x
-        let dy = last.y - first.y
-        let length = max((dx * dx + dy * dy).squareRoot(), 0.0001)
-        for index in 1..<(points.count - 1) {
-            let point = points[index]
-            let offset = abs(dy * point.x - dx * point.y + last.x * first.y - last.y * first.x) / length
-            if offset > distance {
-                distance = offset
-                farthest = index
-            }
-        }
-        guard distance > tolerance else { return [first, last] }
-        let head = simplify(Array(points[...farthest]), tolerance: tolerance)
-        let tail = simplify(Array(points[farthest...]), tolerance: tolerance)
-        return head.dropLast() + tail
     }
 }
