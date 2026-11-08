@@ -66,7 +66,6 @@ struct RouteOnboardingHero: View {
             }
         }
         .aspectRatio(Self.width / Self.height, contentMode: .fit)
-        .clipShape(.rect(cornerRadius: 20.0))
         .accessibilityHidden(true)
         .onAppear {
             withAnimation(.easeInOut(duration: 3.0)) {
@@ -100,9 +99,6 @@ struct RouteOnboardingHero: View {
     }
 
     func drawHall(in context: inout GraphicsContext, scale: CGFloat) {
-        let floor = CGRect(x: 0, y: 0, width: Self.width * scale, height: Self.height * scale)
-        context.fill(Path(floor), with: .color(Color(uiColor: .systemBackground)))
-
         let line = Color(uiColor: .label)
         let thin = 0.18 * scale
 
