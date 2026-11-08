@@ -2,7 +2,6 @@ package com.tsubuzaki.circlesgo.ui.unified
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -35,8 +34,6 @@ import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.tables.ComiketDate
 import com.tsubuzaki.circlesgo.database.tables.ComiketMap
 import com.tsubuzaki.circlesgo.state.UserSelections
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun UnifiedControl(
@@ -72,7 +69,6 @@ private fun DatePickerButton(
     // active event changes
     val commonImagesLoadCount by database.commonImagesLoadCount.collectAsState()
     val dates = remember(commonImagesLoadCount) { database.dates() }
-    val dateFormatter = remember { SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()) }
 
     // The menu anchors to its parent layout, so keep it in a box around the
     // button instead of letting it align to the whole toolbar
@@ -82,21 +78,13 @@ private fun DatePickerButton(
                 .clip(CircleShape),
             onClick = { expanded = true }
         ) {
-            Column {
-                selectedDate?.let { date ->
-                    Text(
-                        text = stringResource(R.string.day_format, date.id),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                    Text(
-                        text = dateFormatter.format(date.date),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                    )
-                } ?: Text(stringResource(R.string.no_day))
-            }
+            Text(
+                text = selectedDate?.let { stringResource(R.string.day_format, it.id) }
+                    ?: stringResource(R.string.no_day),
+                fontWeight = FontWeight.Bold,
+                fontSize = 13.sp,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
         }
 
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
