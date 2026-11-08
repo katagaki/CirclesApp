@@ -14,7 +14,7 @@ struct RouteLiveActivity: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    turnIcon(context.state, size: 44.0)
+                    RouteActivityCut(circleID: context.state.circleID, height: 56.0)
                         .padding(.leading, 4.0)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
@@ -79,7 +79,7 @@ struct RouteLiveActivity: Widget {
 
             VStack(alignment: .leading, spacing: 8.0) {
                 HStack(alignment: .center, spacing: 12.0) {
-                    turnIcon(context.state, size: 48.0)
+                    RouteActivityCut(circleID: context.state.circleID, height: 64.0)
                     Text(context.state.instruction)
                         .font(.headline)
                         .lineLimit(3)
@@ -95,14 +95,6 @@ struct RouteLiveActivity: Widget {
             .padding(.horizontal, 16.0)
             .padding(.vertical, 12.0)
         }
-    }
-
-    func turnIcon(_ state: RouteAttributes.ContentState, size: CGFloat) -> some View {
-        Image(systemName: state.symbolName)
-            .font(.system(size: size * 0.45, weight: .bold))
-            .foregroundStyle(.white)
-            .frame(width: size, height: size)
-            .background(SharedBuysLiveActivity.accent, in: .rect(cornerRadius: size * 0.28))
     }
 
     func stopLine(_ state: RouteAttributes.ContentState) -> some View {
