@@ -46,7 +46,7 @@ struct RouteOnboardingHero: View {
                     drawLetters(in: &context, scale: scale)
                 }
                 Capsule()
-                    .fill(Color.primary)
+                    .fill(Color.red)
                     .frame(width: 1.0 * scale, height: 6.0 * scale)
                     .position(point(for: closure, scale: scale))
                 badge(systemImage: "nosign", fill: .primary, scale: scale)

@@ -45,8 +45,8 @@ struct MapRouteLayer: View {
                 }
                 ForEach(route.closures, id: \.id) { closure in
                     polyline([closure.from, closure.to])
-                        .stroke(Color.primary, style: StrokeStyle(lineWidth: lineWidth * 1.4, lineCap: .round,
-                                                              dash: [lineWidth * 0.8, lineWidth * 0.6]))
+                        .stroke(Color.red, style: StrokeStyle(lineWidth: lineWidth * 1.4, lineCap: .round,
+                                                          dash: [lineWidth * 0.8, lineWidth * 0.6]))
                 }
                 ForEach(Array(route.stops.enumerated()), id: \.element.id) { index, stop in
                     MapRouteStopBadge(
