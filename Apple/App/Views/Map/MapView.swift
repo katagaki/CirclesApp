@@ -83,7 +83,8 @@ struct MapView: View {
                 isInitialLoadCompleted = true
                 reloadAll()
                 if let map = selections.map {
-                    navigator.loadHalls(inMap: map.id, database: database)
+                    navigator.loadHalls(inMap: map.id, hall: ComiketHall(rawValue: map.filename),
+                                       day: selections.date?.id, database: database)
                 }
             }
         }
@@ -99,7 +100,8 @@ struct MapView: View {
             }
             navigator.clearClosures()
             if let map = selections.map {
-                navigator.loadHalls(inMap: map.id, database: database)
+                navigator.loadHalls(inMap: map.id, hall: ComiketHall(rawValue: map.filename),
+                                       day: selections.date?.id, database: database)
             }
             reloadAll()
         }

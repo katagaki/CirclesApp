@@ -48,7 +48,10 @@ final class Navigator {
 
     @ObservationIgnored private var context: Context?
     @ObservationIgnored private var remainingStopIDs: Set<Int>?
-    @ObservationIgnored private var mapCache: [String: WalkableMap] = [:]
+    /// Where a visitor can walk in the open hall, kept once read off the map image so closures
+    /// can be drawn, and routes planned, without reading it again.
+    private(set) var walkableMap: WalkableMap?
+    @ObservationIgnored private var walkableMapKey: String?
     @ObservationIgnored var activity: AnyObject?
     @ObservationIgnored private var planningTask: Task<Void, Never>?
     @ObservationIgnored private var retryTask: Task<Void, Never>?
@@ -124,11 +127,13 @@ final class Navigator {
         planningTask = Task {
             let route = await Self.makeRoute(
                 context: context, origin: origin, closures: activeClosures,
-                remainingStopIDs: remainingStopIDs, database: database, cache: mapCache
+                remainingStopIDs: remainingStopIDs, database: database,
+                cached: walkableMapKey == Self.cacheKey(context) ? walkableMap : nil
             )
             guard !Task.isCancelled else { return }
             if let map = route.map {
-                mapCache[Self.cacheKey(context)] = map
+                walkableMap = map
+                walkableMapKey = Self.cacheKey(context)
             }
             if !route.halls.isEmpty {
                 halls = route.halls
@@ -175,8 +180,14 @@ final class Navigator {
     /// The aisle a closure at the long-pressed spot would seal, drawn before the visitor
     /// chooses to close it, so they can see which way it runs.
     var pendingClosureLine: (from: CGPoint, to: CGPoint)? {
-        guard let pendingPoint, let map = context.flatMap({ mapCache[Self.cacheKey($0)] }) else { return nil }
-        return RoutePlanner.line(through: map.closureCells(at: pendingPoint), in: map)
+        guard let pendingPoint, let walkableMap else { return nil }
+        return RoutePlanner.line(through: walkableMap.closureCells(at: pendingPoint), in: walkableMap)
+    }
+
+    /// The lines across every closed way, drawn whether or not a route is up.
+    var closureLines: [RouteClosureLine] {
+        guard let walkableMap else { return [] }
+        return RoutePlanner.seal(activeClosures, in: walkableMap).lines
     }
 
     func cancelHold() {
@@ -206,11 +217,18 @@ final class Navigator {
 
     /// Loads the halls of the open map, so their boundaries can be closed off before a
     /// route has been planned on it.
-    func loadHalls(inMap mapID: Int, database: Database) {
+    func loadHalls(inMap mapID: Int, hall: ComiketHall?, day: Int?, database: Database) {
         Task {
             let fetcher = DataFetcher(database: database.newReadOnlyTextConnection())
             let halls = await fetcher.hallAreas(inMap: mapID)
             self.halls = halls
+            guard let hall, let day else { return }
+            let key = Self.mapKey(mapID: mapID, day: day)
+            guard walkableMapKey != key else { return }
+            let tables = await Self.tables(inMap: mapID, database: database)
+            guard let map = await Self.buildMap(hall: hall, day: day, tables: tables, database: database) else { return }
+            walkableMap = map
+            walkableMapKey = key
         }
     }
 
@@ -247,7 +265,7 @@ final class Navigator {
             stretch = step.path
         }
         let closure: RouteClosure
-        if let map = context.flatMap({ mapCache[Self.cacheKey($0)] }),
+        if let map = walkableMap,
            let crossing = map.narrowestCrossing(along: stretch) {
             closure = RouteClosure(point: crossing.point, across: crossing.across)
         } else {
@@ -289,6 +307,8 @@ final class Navigator {
     func clearClosures() {
         closures.removeAll()
         halls = []
+        walkableMap = nil
+        walkableMapKey = nil
         pendingPoint = nil
         selectedClosureID = nil
     }
@@ -374,12 +394,40 @@ final class Navigator {
     }
 
     private static func cacheKey(_ context: Context) -> String {
-        "\(context.eventNumber)-\(context.day)-\(context.mapID)"
+        mapKey(mapID: context.mapID, day: context.day)
+    }
+
+    private static func mapKey(mapID: Int, day: Int) -> String {
+        "\(day)-\(mapID)"
+    }
+
+    private static func tables(inMap mapID: Int, database: Database) async -> [RouteTable] {
+        let fetcher = DataFetcher(database: database.newReadOnlyTextConnection())
+        let layouts = await fetcher.layoutMappings(inMap: mapID, useHighResolutionMaps: true)
+        let blockNames = Dictionary(database.blocks().map { ($0.id, $0.name) }, uniquingKeysWith: { first, _ in first })
+        return layouts.map { layout in
+            RouteTable(
+                rect: CGRect(x: CGFloat(layout.positionX), y: CGFloat(layout.positionY),
+                             width: planningSpaceSize, height: planningSpaceSize),
+                blockName: blockNames[layout.blockID] ?? "",
+                opensSideways: layout.layoutType != .aOnTop && layout.layoutType != .aOnBottom
+            )
+        }
+    }
+
+    private static func buildMap(
+        hall: ComiketHall, day: Int, tables: [RouteTable], database: Database
+    ) async -> WalkableMap? {
+        guard let image = await database.mapImageAsync(for: hall, on: day, usingHighDefinition: true),
+              let cgImage = image.cgImage else { return nil }
+        return await Task.detached(priority: .userInitiated) {
+            WalkableMap.build(image: cgImage, tables: tables)
+        }.value
     }
 
     private static func makeRoute(
         context: Context, origin: CGPoint?, closures: [RouteClosure], remainingStopIDs: Set<Int>?,
-        database: Database, cache: [String: WalkableMap]
+        database: Database, cached: WalkableMap?
     ) async -> Outcome {
         var stopIDs: [Int] = []
         var layoutsByStop: [Int: (LayoutCatalogMapping, Int)] = [:]
@@ -437,14 +485,9 @@ final class Navigator {
         }
         guard !requests.isEmpty else { return Outcome(route: nil, map: nil) }
 
-        let key = cacheKey(context)
-        var map = cache[key]
+        var map = cached
         if map == nil {
-            guard let image = await database.mapImageAsync(for: context.hall, on: context.day, usingHighDefinition: true),
-                  let cgImage = image.cgImage else { return Outcome(route: nil, map: nil) }
-            map = await Task.detached(priority: .userInitiated) {
-                WalkableMap.build(image: cgImage, tables: tables)
-            }.value
+            map = await buildMap(hall: context.hall, day: context.day, tables: tables, database: database)
         }
         guard let map else { return Outcome(route: nil, map: nil) }
         let route = await Task.detached(priority: .userInitiated) {

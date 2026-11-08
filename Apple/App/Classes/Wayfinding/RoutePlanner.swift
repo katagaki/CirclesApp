@@ -6,29 +6,7 @@ nonisolated enum RoutePlanner {
         map baseMap: WalkableMap, stops requests: [RouteStopRequest], origin: CGPoint?,
         closures: [RouteClosure] = [], halls: [RouteHall] = []
     ) -> PlannedRoute? {
-        var closureLines: [RouteClosureLine] = []
-        var blockedCells: [GridPoint] = []
-        for closure in closures where closure.isActive {
-            if let boundaryX = closure.hallBoundaryX {
-                let cells = baseMap.boundaryCells(atX: boundaryX)
-                blockedCells += cells
-                let rows = cells.map(\.row)
-                if let top = rows.min(), let bottom = rows.max() {
-                    let size = CGFloat(WalkableMap.cellSize)
-                    closureLines.append(RouteClosureLine(
-                        id: closure.id,
-                        from: CGPoint(x: boundaryX, y: CGFloat(top) * size),
-                        to: CGPoint(x: boundaryX, y: CGFloat(bottom + 1) * size)
-                    ))
-                }
-                continue
-            }
-            let cells = baseMap.closureCells(at: closure.point, across: closure.across)
-            blockedCells += cells
-            if let line = line(through: cells, in: baseMap) {
-                closureLines.append(RouteClosureLine(id: closure.id, from: line.0, to: line.1))
-            }
-        }
+        let (blockedCells, closureLines) = seal(closures, in: baseMap)
         let map = baseMap.blocking(blockedCells)
         var pathfinder = Pathfinder(map: map)
         let boundaries = zip(halls, halls.dropFirst()).map { ($0.rect.maxX + $1.rect.minX) / 2.0 }
@@ -139,6 +117,34 @@ nonisolated enum RoutePlanner {
         }
         return PlannedRoute(stops: plannedStops, legs: legs, steps: steps, origin: originCell.map { map.center(of: $0) },
                             closures: closureLines, outsidePaths: outsidePaths, skippedSpaces: skippedSpaces)
+    }
+
+    /// The cells each active closure blocks, and the line drawn across each on the map.
+    static func seal(_ closures: [RouteClosure], in map: WalkableMap) -> (cells: [GridPoint], lines: [RouteClosureLine]) {
+        var lines: [RouteClosureLine] = []
+        var blocked: [GridPoint] = []
+        for closure in closures where closure.isActive {
+            if let boundaryX = closure.hallBoundaryX {
+                let cells = map.boundaryCells(atX: boundaryX)
+                blocked += cells
+                let rows = cells.map(\.row)
+                if let top = rows.min(), let bottom = rows.max() {
+                    let size = CGFloat(WalkableMap.cellSize)
+                    lines.append(RouteClosureLine(
+                        id: closure.id,
+                        from: CGPoint(x: boundaryX, y: CGFloat(top) * size),
+                        to: CGPoint(x: boundaryX, y: CGFloat(bottom + 1) * size)
+                    ))
+                }
+                continue
+            }
+            let cells = map.closureCells(at: closure.point, across: closure.across)
+            blocked += cells
+            if let line = line(through: cells, in: map) {
+                lines.append(RouteClosureLine(id: closure.id, from: line.0, to: line.1))
+            }
+        }
+        return (blocked, lines)
     }
 
     /// Doors on the same wall open onto the same concourse, so a visitor can leave by one
