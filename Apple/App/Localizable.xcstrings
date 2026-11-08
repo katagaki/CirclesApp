@@ -11025,7 +11025,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@から出発します。現在地から始めるにはマップを長押し"
+            "value": "%@から出発します。現在地から始めるには、マップを長押ししてください"
           }
         },
         "ko": {
@@ -11257,31 +11257,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "End Route"
+            "value": "End Navigation"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ルートを終了"
+            "value": "コミケナビを終了"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "경로 종료"
+            "value": "내비게이션 종료"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "结束路线"
+            "value": "结束导航"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "結束路線"
+            "value": "結束導航"
           }
         }
       }
@@ -11291,7 +11291,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Walk round outside and come back in at the %@ entrance"
+            "value": "Walk around outside and come back in at the %@ entrance"
           }
         },
         "ja": {
@@ -11773,13 +11773,13 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "「通れない」で別の道へ。ホールごと閉じるときはマップを長押し。"
+            "value": "「通れない」をタップすると、別の道を案内します。ホールごと閉じるときは、マップを長押ししてください。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "'막힘'을 누르면 다른 길로 안내합니다. 홀 전체는 지도를 길게 누르세요."
+            "value": "'막힘'을 누르면 다른 길로 안내합니다. 홀 전체를 막으려면 지도를 길게 누르세요."
           }
         },
         "zh-Hans": {
@@ -11903,31 +11903,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "How Route Guidance Works"
+            "value": "How Navigation Works"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ルート案内の使い方"
+            "value": "コミケナビの使い方"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "경로 안내 사용법"
+            "value": "내비게이션 사용법"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "路线导航使用方法"
+            "value": "导航使用方法"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "路線導航使用方法"
+            "value": "導航使用方法"
           }
         }
       }
@@ -11943,7 +11943,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "マップを長押しして「現在地」を選択。"
+            "value": "マップを長押しして「現在地」を選択してください。"
           }
         },
         "ko": {
@@ -12051,7 +12051,7 @@
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "'다음'을 눌러 진행하세요. 잠금 화면에서도 됩니다."
+            "value": "'다음'을 눌러 진행하세요. 잠금 화면에서도 조작할 수 있습니다."
           }
         },
         "zh-Hans": {
@@ -12113,7 +12113,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "お気に入りへの道順を会場マップに表示。"
+            "value": "お気に入りへの道順を会場マップに表示します。"
           }
         },
         "ko": {
@@ -12141,31 +12141,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Route Guidance"
+            "value": "Navigation"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ルート案内"
+            "value": "コミケナビ"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "경로 안내"
+            "value": "내비게이션"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "路线导航"
+            "value": "导航"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "路線導航"
+            "value": "導航"
           }
         }
       }
@@ -12561,31 +12561,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Route"
+            "value": "Navigation"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ルート"
+            "value": "コミケナビ"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "경로"
+            "value": "내비게이션"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "路线"
+            "value": "导航"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "路線"
+            "value": "導航"
           }
         }
       }
