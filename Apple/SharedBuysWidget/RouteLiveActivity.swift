@@ -10,7 +10,7 @@ struct RouteLiveActivity: Widget {
         ActivityConfiguration(for: RouteAttributes.self) { context in
             lockScreen(context)
                 .activityBackgroundTint(.clear)
-                .activitySystemActionForegroundColor(.blue)
+                .activitySystemActionForegroundColor(SharedBuysLiveActivity.accent)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
@@ -41,7 +41,7 @@ struct RouteLiveActivity: Widget {
             } compactLeading: {
                 Image(systemName: context.state.symbolName)
                     .font(.caption.weight(.bold))
-                    .foregroundStyle(context.state.isArriving ? .red : .blue)
+                    .foregroundStyle(context.state.isArriving ? .red : SharedBuysLiveActivity.accent)
             } compactTrailing: {
                 Text(context.state.stopSpace)
                     .font(.caption2.weight(.semibold))
@@ -49,9 +49,9 @@ struct RouteLiveActivity: Widget {
             } minimal: {
                 Image(systemName: context.state.symbolName)
                     .font(.caption.weight(.bold))
-                    .foregroundStyle(context.state.isArriving ? .red : .blue)
+                    .foregroundStyle(context.state.isArriving ? .red : SharedBuysLiveActivity.accent)
             }
-            .keylineTint(.blue)
+            .keylineTint(SharedBuysLiveActivity.accent)
         }
     }
 
@@ -75,7 +75,7 @@ struct RouteLiveActivity: Widget {
             .foregroundStyle(.white)
             .padding(.horizontal, 16.0)
             .padding(.vertical, 8.0)
-            .background(Color.blue.opacity(0.75))
+            .background(SharedBuysLiveActivity.accent.opacity(0.75))
 
             HStack(alignment: .center, spacing: 12.0) {
                 turnIcon(context.state, size: 48.0)
@@ -99,7 +99,7 @@ struct RouteLiveActivity: Widget {
             .font(.system(size: size * 0.45, weight: .bold))
             .foregroundStyle(.white)
             .frame(width: size, height: size)
-            .background(state.isArriving ? Color.red : Color.blue, in: .rect(cornerRadius: size * 0.28))
+            .background(state.isArriving ? Color.red : SharedBuysLiveActivity.accent, in: .rect(cornerRadius: size * 0.28))
     }
 
     func stopLine(_ state: RouteAttributes.ContentState) -> some View {
@@ -129,7 +129,7 @@ struct RouteLiveActivity: Widget {
                     .frame(width: 36.0, height: 36.0)
             }
             .buttonStyle(.plain)
-            .background(Color.blue, in: .circle)
+            .background(SharedBuysLiveActivity.accent, in: .circle)
         }
     }
 }
