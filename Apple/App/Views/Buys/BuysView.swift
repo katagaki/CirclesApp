@@ -82,6 +82,13 @@ struct BuysView: View {
                 }
                 SidebarPositionToolbarItem()
             }
+            if scope == .shared && !sharedBuys.isActive {
+                ToolbarItem(placement: .bottomBar) {
+                    Button("Buys.Shared.Start", systemImage: "plus") {
+                        startSharedBuys()
+                    }
+                }
+            }
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
                 Picker("ViewTitle.Buys", selection: $scope) {
@@ -175,21 +182,11 @@ struct BuysView: View {
         let circleIDs = Set(sharedBuys.items.map(\.circleID))
         let circles = database.circles(Array(circleIDs))
         if !sharedBuys.isActive {
-            ContentUnavailableView {
-                Label("Buys.Shared.NotStarted", systemImage: "person.2")
-            } description: {
-                Text("Buys.Shared.Explain")
-            } actions: {
-                Button("Buys.Shared.Start") {
-                    sharedBuys.adoptIdentity()
-                    sharedBuys.start(
-                        eventNumber: planner.activeEventNumber,
-                        nickname: sharedBuys.nickname
-                    )
-                    isShowingSharedSheet = true
-                }
-                .buttonStyle(.borderedProminent)
-            }
+            ContentUnavailableView(
+                "Buys.Shared.NotStarted",
+                systemImage: "person.2",
+                description: Text("Buys.Shared.Explain")
+            )
         } else if sharedBuys.items.isEmpty {
             VStack(spacing: 0.0) {
                 List {
@@ -267,6 +264,15 @@ struct BuysView: View {
         } label: {
             Image(systemName: "info.circle")
         }
+    }
+
+    func startSharedBuys() {
+        sharedBuys.adoptIdentity()
+        sharedBuys.start(
+            eventNumber: planner.activeEventNumber,
+            nickname: sharedBuys.nickname
+        )
+        isShowingSharedSheet = true
     }
 
     func reloadEntries() {
