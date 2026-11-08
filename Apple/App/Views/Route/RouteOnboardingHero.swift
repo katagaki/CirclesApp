@@ -69,7 +69,7 @@ struct RouteOnboardingHero: View {
         .clipShape(.rect(cornerRadius: 20.0))
         .accessibilityHidden(true)
         .onAppear {
-            withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: false)) {
+            withAnimation(.easeInOut(duration: 3.0)) {
                 progress = 1.0
             }
         }
