@@ -41,7 +41,6 @@ struct UnifiedRouteStatus: View {
                     in: .rect(cornerRadius: isExpanded ? 22.0 : 16.0)
                 )
                 .contentShape(.rect)
-                .geometryGroup()
                 .frame(maxWidth: isExpanded ? .infinity : nil, alignment: .trailing)
                 .transition(.scale(scale: 0.6, anchor: .trailing).combined(with: .opacity))
             }
@@ -55,7 +54,16 @@ struct UnifiedRouteStatus: View {
                 navigator.isStatusExpanded.toggle()
             }
         } label: {
-            UnifiedRoutePill()
+            HStack(spacing: 8.0) {
+                UnifiedRoutePill()
+                if isExpanded {
+                    Spacer(minLength: 0.0)
+                    Image(systemName: "chevron.up")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .accessibilityLabel(Text("Route.Collapse"))
+                }
+            }
                 .padding(.horizontal, isExpanded ? 14.0 : 10.0)
                 .padding(.vertical, isExpanded ? 10.0 : 7.0)
                 .contentShape(.rect.inset(by: -8.0))
