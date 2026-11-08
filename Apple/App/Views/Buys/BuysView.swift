@@ -95,7 +95,7 @@ struct BuysView: View {
                     Text("Buys.Scope.Mine").tag(BuysScope.mine)
                     Text("Buys.Scope.Shared").tag(BuysScope.shared)
                 }
-                .pickerStyle(.menu)
+                .pickerStyle(.segmented)
                 .popoverTip(BuysScopeTip())
             }
         }
