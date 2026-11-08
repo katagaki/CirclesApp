@@ -1683,74 +1683,6 @@
         }
       }
     },
-    "Buys.Info.Description": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "To add items to your Buys list, open a circle's detail screen, tap 'Edit' in the 'Buys' section, and add your items.\nIf you add a catalog to 'Attachments', you can also crop product images directly from the catalog."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "宝物リストに頒布品を追加するには、サークルの詳細画面を開き、「宝物」セクションの「編集」押下し、頒布品を追加してください。\n「添付ファイル」にお品書きを追加すると、頒布品の画像をお品書きから切り取ることもできます。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "보물 목록에 상품을 추가하려면 서클 상세 화면을 열고 '보물' 섹션의 '편집'을 눌러 상품을 추가하세요.\n'첨부 파일'에 카탈로그를 추가하면 카탈로그에서 상품 이미지를 잘라낼 수도 있습니다."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "要将商品添加到宝贝清单，请打开社团详情页面，点击「宝贝」栏目中的「编辑」，然后添加商品。\n在「附件」中添加目录后，还可以从目录中裁切商品图片。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "若要將商品加入寶藏清單，請開啟社團詳情頁面，點選「寶藏」區塊中的「編輯」並新增商品。\n在「附件」中新增目錄後，也可以從目錄中裁切商品圖片。"
-          }
-        }
-      }
-    },
-    "Buys.Info.Title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "How to Manage Your Buys"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "宝物リストの管理方法"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "보물 목록 관리 방법"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "宝贝清单管理方法"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "寶藏清單管理方法"
-          }
-        }
-      }
-    },
     "Buys.ItemCost.Placeholder": {
       "localizations": {
         "en": {
@@ -2019,6 +1951,414 @@
           "stringUnit": {
             "state": "translated",
             "value": "請選擇其他日期以查看其餘的寶藏。"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Add.Message": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open a circle, tap Edit in the Buys section, and add each item with its cost. If the circle has a catalog in Attachments, you can crop item photos straight from it."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サークルの詳細画面で「宝物」セクションの「編集」をタップし、頒布品と金額を追加します。「添付ファイル」にお品書きがあれば、頒布品の画像をそこから切り取れます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "서클 상세 화면에서 '보물' 섹션의 '편집'을 누르고 상품과 금액을 추가하세요. '첨부 파일'에 카탈로그가 있다면 상품 이미지를 바로 잘라낼 수 있습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在社团详情页面点按「宝贝」栏目中的「编辑」，添加商品和价格。若「附件」中有目录，可直接从中裁切商品图片。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在社團詳情頁面點按「寶藏」區塊中的「編輯」，新增商品和價格。若「附件」中有目錄，可直接從中裁切商品圖片。"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Add.Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add from a Circle"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サークルから追加"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "서클에서 추가"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从社团添加"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從社團新增"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Open": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How Buys Works"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "宝物リストの使い方"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구매 목록 사용법"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "宝贝清单使用方法"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "寶藏清單使用方法"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Share.Message": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start a shared list under Shared, and friends join by scanning its QR code. Your own Buys stay private."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "「共同購入」で共同購入リストを作成し、友達にQRコードを読み取ってもらうと参加できます。自分の宝物リストは非公開のままです。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "'공유 목록'에서 공유 목록을 만들고 친구가 QR 코드를 스캔하면 참가할 수 있습니다. 내 구매 목록은 비공개로 유지됩니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在「共享列表」中创建共享列表，朋友扫描二维码即可加入。你自己的宝贝清单仍为私密。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在「共享清單」中建立共享清單，朋友掃描 QR 碼即可加入。你自己的寶藏清單仍為私密。"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Share.Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shop Together"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共同購入"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "함께 구매"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一起购买"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一起購買"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Split.Message": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose who's buying each item and everyone sees it tick off as it's bought, along with your share and the group total."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "頒布品ごとに誰が買うかを決めると、購入状況が全員に共有されます。自分の負担額とグループの合計も確認できます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "상품마다 누가 살지 정하면 구매 상황이 모두에게 공유됩니다. 내 부담액과 그룹 합계도 확인할 수 있습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "为每件商品指定购买人，购买进度会同步给所有人。还能查看你的分摊金额和小组合计。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "為每件商品指定購買人，購買進度會同步給所有人。還能查看你的分攤金額和小組合計。"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Split.Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Split Up the Work"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "手分けして購入"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "나눠서 구매"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分工购买"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分工購買"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Start": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get Started"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "はじめる"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시작하기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开始"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "開始"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Subtitle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plan what to buy at each circle, keep track of what you've spent, and shop together with friends."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サークルごとに買いたいものをまとめて、使った金額を確認できます。友達と共同購入もできます。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "서클별로 살 것을 정리하고 쓴 금액을 확인할 수 있습니다. 친구와 함께 구매할 수도 있습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按社团整理想买的商品，查看花费金额，还能和朋友一起购买。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "依社團整理想買的商品，查看花費金額，還能和朋友一起購買。"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buys"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "宝物リスト"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구매 목록"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "宝贝清单"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "寶藏清單"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Track.Message": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap an item to mark it bought, and tap again if it sold out. Totals cover the selected day and every day."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "頒布品をタップすると購入済みに、もう一度タップすると売り切れなどで買えなかったことにできます。合計は選択中の日と全日程の両方を表示します。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "상품을 누르면 구매 완료로, 한 번 더 누르면 품절 등으로 사지 못한 것으로 표시됩니다. 합계는 선택한 날과 전체 일정을 모두 보여 줍니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "点按商品标记为已购买，再点按一次可标记为售罄等未能购买。合计会同时显示所选日期和全部日期的金额。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "點按商品標記為已購買，再點按一次可標記為售罄等未能購買。合計會同時顯示所選日期和全部日期的金額。"
+          }
+        }
+      }
+    },
+    "Buys.Onboarding.Track.Title": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tick Off as You Go"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "買ったらチェック"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "구매하면 체크"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "买到就打勾"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "買到就打勾"
           }
         }
       }

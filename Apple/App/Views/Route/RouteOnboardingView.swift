@@ -20,22 +20,22 @@ struct RouteOnboardingView: View {
                         .foregroundStyle(.secondary)
                 }
                 VStack(alignment: .leading, spacing: 22.0) {
-                    RouteOnboardingRow(
+                    OnboardingRow(
                         systemImage: "list.number",
                         title: "Route.Onboarding.Modes.Title",
                         message: "Route.Onboarding.Modes.Message"
                     )
-                    RouteOnboardingRow(
+                    OnboardingRow(
                         systemImage: "hand.point.up.left.fill",
                         title: "Route.Onboarding.Origin.Title",
                         message: "Route.Onboarding.Origin.Message"
                     )
-                    RouteOnboardingRow(
+                    OnboardingRow(
                         systemImage: "chevron.forward.circle.fill",
                         title: "Route.Onboarding.Steps.Title",
                         message: "Route.Onboarding.Steps.Message"
                     )
-                    RouteOnboardingRow(
+                    OnboardingRow(
                         systemImage: "arrow.triangle.branch",
                         title: "Route.Onboarding.Detour.Title",
                         message: "Route.Onboarding.Detour.Message"

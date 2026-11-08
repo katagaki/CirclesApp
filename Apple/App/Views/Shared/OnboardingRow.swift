@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct RouteOnboardingRow: View {
+struct OnboardingRow: View {
 
     let systemImage: String
     let title: LocalizedStringKey
