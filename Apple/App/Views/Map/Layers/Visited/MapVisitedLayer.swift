@@ -8,6 +8,7 @@ struct MapVisitedLayer: View {
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
     @Environment(Mapper.self) var mapper
+    @Environment(Navigator.self) var navigator
 
     @Query var visits: [CirclesVisitEntry]
 
@@ -36,6 +37,17 @@ struct MapVisitedLayer: View {
                 await reloadVisits()
             }
         }
+        .onChange(of: routeStopIDs) {
+            Task.detached {
+                await reloadVisits()
+            }
+        }
+    }
+
+    /// A route's own badges tick off the stops it has passed, so the map leaves those
+    /// spaces alone while the route is up rather than ticking them twice.
+    var routeStopIDs: Set<Int> {
+        Set(navigator.route?.stops.map(\.id) ?? [])
     }
 
     func reloadVisits() async {
@@ -55,7 +67,7 @@ struct MapVisitedLayer: View {
         }
 
         let webCatalogIDs = await actor.webCatalogIDs(forCircleIDs: circleIDs)
-        let visitedWCIDSet = Set(webCatalogIDs)
+        let visitedWCIDSet = Set(webCatalogIDs).subtracting(await MainActor.run { routeStopIDs })
 
         let allLayoutWCIDs = Array(Set(mapper.layouts.values.flatMap { $0 }))
         let spaceNumberSuffixes = await actor.spaceNumberSuffixes(forWebCatalogIDs: allLayoutWCIDs)
