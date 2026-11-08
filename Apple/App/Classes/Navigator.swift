@@ -38,6 +38,7 @@ final class Navigator {
     private(set) var pendingPoint: CGPoint?
     private(set) var selectedClosureID: UUID?
     var isNoStopsAlertPresented: Bool = false
+    private(set) var isTrapped: Bool = false
     var isStatusExpanded: Bool = false
     var pendingMode: Mode?
     var priorityCounts: [WebCatalogColor: Int] = [:]
@@ -50,8 +51,9 @@ final class Navigator {
     @ObservationIgnored private var mapCache: [String: WalkableMap] = [:]
     @ObservationIgnored var activity: AnyObject?
     @ObservationIgnored private var planningTask: Task<Void, Never>?
+    @ObservationIgnored private var retryTask: Task<Void, Never>?
 
-    var isActive: Bool { route != nil || isPlanning }
+    var isActive: Bool { route != nil || isPlanning || isTrapped }
 
     var currentStep: RouteStep? {
         guard let route, route.steps.indices.contains(stepIndex) else { return nil }
@@ -107,13 +109,21 @@ final class Navigator {
                 halls = route.halls
             }
             let planned = route.route.flatMap { $0.steps.isEmpty ? nil : $0 }
+            let trapped = planned == nil && !(route.route?.skippedSpaces.isEmpty ?? true)
             withAnimation(.smooth) {
                 self.route = planned
                 self.skippedSpaces = route.route?.skippedSpaces ?? []
                 self.stepIndex = 0
                 self.isPlanning = false
+                self.isTrapped = trapped
+                if trapped {
+                    self.isStatusExpanded = true
+                }
             }
-            if planned == nil {
+            if trapped {
+                endActivity()
+                retryWhenClosuresLapse(database: database)
+            } else if planned == nil {
                 isNoStopsAlertPresented = true
                 endActivity()
             } else {
@@ -248,6 +258,18 @@ final class Navigator {
         selectedClosureID = nil
     }
 
+    /// Every way out is closed. Closures lapse on their own, so the route is planned again
+    /// as soon as the first of them does.
+    private func retryWhenClosuresLapse(database: Database) {
+        retryTask?.cancel()
+        guard let next = activeClosures.map(\.expiresAt).min() else { return }
+        retryTask = Task {
+            try? await Task.sleep(for: .seconds(max(1.0, next.timeIntervalSinceNow + 1.0)))
+            guard !Task.isCancelled, isTrapped else { return }
+            plan(database: database)
+        }
+    }
+
     private func keepRemainingStops() {
         guard let route, let step = currentStep else { return }
         remainingStopIDs = Set(route.stops[step.stopIndex...].map(\.id))
@@ -292,12 +314,14 @@ final class Navigator {
 
     func end() {
         planningTask?.cancel()
+        retryTask?.cancel()
         withAnimation(.smooth) {
             route = nil
             origin = nil
             pendingPoint = nil
             selectedClosureID = nil
             skippedSpaces = []
+            isTrapped = false
             isPlanning = false
             stepIndex = 0
         }

@@ -20,6 +20,11 @@ struct UnifiedRoutePill: View {
                 Text("\(step.stopIndex + 1)/\(route.stops.count)")
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
+            } else if navigator.isTrapped {
+                Image(systemName: "hourglass")
+                    .foregroundStyle(.tint)
+                Text("Route.Trapped.Pill")
+                    .fontWeight(.semibold)
             } else {
                 Image(systemName: "point.bottomleft.forward.to.point.topright.scurvepath")
                     .foregroundStyle(.tint)

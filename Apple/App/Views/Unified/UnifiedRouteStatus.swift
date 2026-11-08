@@ -27,6 +27,8 @@ struct UnifiedRouteStatus: View {
                                         navigator.isNoStopsAlertPresented = false
                                     }
                                 }
+                            } else if navigator.isTrapped {
+                                UnifiedRouteTrappedSection()
                             } else {
                                 UnifiedRouteStepSection()
                             }

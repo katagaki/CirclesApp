@@ -8,20 +8,15 @@ struct UnifiedRouteNoStopsCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10.0) {
-            HStack(alignment: .top, spacing: 10.0) {
-                Image(systemName: "heart.slash")
-                    .font(.title3)
+            VStack(alignment: .leading, spacing: 4.0) {
+                Text("Route.NoStops.Title")
+                    .font(.headline)
+                Text("Route.NoStops.Message")
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
-                VStack(alignment: .leading, spacing: 4.0) {
-                    Text("Route.NoStops.Title")
-                        .font(.headline)
-                    Text("Route.NoStops.Message")
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                Spacer(minLength: 0.0)
+                    .fixedSize(horizontal: false, vertical: true)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             HStack {
                 Spacer()
                 Button(role: .confirm, action: onDismiss)
