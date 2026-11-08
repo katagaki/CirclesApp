@@ -23,9 +23,9 @@ struct RouteOnboardingHero: View {
     ]
 
     let stops: [(CGPoint, Color)] = [
-        (CGPoint(x: 22.1, y: 21.0), Color(red: 1.0, green: 0.58, blue: 0.29)),
-        (CGPoint(x: 52.1, y: 47.0), Color(red: 1.0, green: 0.0, blue: 1.0)),
-        (CGPoint(x: 81.0, y: 45.0), Color(red: 0.0, green: 0.71, blue: 0.29))
+        (CGPoint(x: 22.1, y: 21.0), Color.accentColor),
+        (CGPoint(x: 52.1, y: 47.0), Color.accentColor),
+        (CGPoint(x: 81.0, y: 45.0), Color.accentColor)
     ]
 
     let closure = CGPoint(x: 35.1, y: 34.3)
@@ -46,10 +46,10 @@ struct RouteOnboardingHero: View {
                     drawLetters(in: &context, scale: scale)
                 }
                 Capsule()
-                    .fill(.red)
+                    .fill(Color.primary)
                     .frame(width: 1.0 * scale, height: 6.0 * scale)
                     .position(point(for: closure, scale: scale))
-                badge(systemImage: "nosign", fill: .red, scale: scale)
+                badge(systemImage: "nosign", fill: .primary, scale: scale)
                     .position(point(for: CGPoint(x: closure.x, y: closure.y - 4.2), scale: scale))
                 ForEach(Array(stops.enumerated()), id: \.offset) { index, stop in
                     Text("\(index + 1)")
@@ -61,7 +61,7 @@ struct RouteOnboardingHero: View {
                         .shadow(color: .black.opacity(0.2), radius: 0.4 * scale)
                         .position(point(for: stop.0, scale: scale))
                 }
-                badge(systemImage: "figure.walk", fill: .green, scale: scale)
+                badge(systemImage: "figure.walk", fill: .accentColor, scale: scale)
                     .position(point(for: route[0], scale: scale))
             }
         }

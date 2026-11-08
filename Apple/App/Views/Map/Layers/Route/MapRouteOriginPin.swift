@@ -7,10 +7,10 @@ struct MapRouteOriginPin: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(Color.green.opacity(0.25))
+                .fill(Color.accentColor.opacity(0.25))
                 .frame(width: size * 1.8, height: size * 1.8)
             Circle()
-                .fill(.green)
+                .fill(Color.accentColor)
                 .frame(width: size, height: size)
             Circle()
                 .strokeBorder(.white, lineWidth: size * 0.15)

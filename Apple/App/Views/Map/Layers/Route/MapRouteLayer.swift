@@ -1,4 +1,3 @@
-import RADiUS
 import SwiftUI
 
 struct MapRouteLayer: View {
@@ -23,7 +22,7 @@ struct MapRouteLayer: View {
                 ForEach(Array(route.legs.enumerated()), id: \.offset) { index, leg in
                     polyline(leg)
                         .stroke(
-                            index < currentStop ? Color.gray.opacity(0.45) : Color.accentColor.opacity(0.35),
+                            index < currentStop ? Color.secondary.opacity(0.45) : Color.accentColor.opacity(0.35),
                             style: StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round)
                         )
                 }
@@ -41,19 +40,18 @@ struct MapRouteLayer: View {
                 }
                 ForEach(Array(route.outsidePaths.enumerated()), id: \.offset) { _, walk in
                     polyline(walk)
-                        .stroke(Color.orange, style: StrokeStyle(lineWidth: lineWidth * 0.9, lineCap: .round,
+                        .stroke(Color.accentColor, style: StrokeStyle(lineWidth: lineWidth * 0.9, lineCap: .round,
                                                                  lineJoin: .round, dash: [lineWidth * 0.3, lineWidth * 1.2]))
                 }
                 ForEach(route.closures, id: \.id) { closure in
                     polyline([closure.from, closure.to])
-                        .stroke(Color.red, style: StrokeStyle(lineWidth: lineWidth * 1.4, lineCap: .round,
+                        .stroke(Color.primary, style: StrokeStyle(lineWidth: lineWidth * 1.4, lineCap: .round,
                                                               dash: [lineWidth * 0.8, lineWidth * 0.6]))
                 }
                 ForEach(Array(route.stops.enumerated()), id: \.element.id) { index, stop in
                     MapRouteStopBadge(
                         number: index + 1,
                         state: index < currentStop ? .done : (index == currentStop ? .current : .upcoming),
-                        tint: WebCatalogColor(rawValue: stop.colorRawValue) ?? .uncolored,
                         size: CGFloat(spaceSize) * (index == currentStop ? 0.95 : 0.7)
                     )
                     .position(scaled(stop.accessPoint))

@@ -1,5 +1,4 @@
 import AXiS
-import RADiUS
 import SwiftData
 import SwiftUI
 
@@ -16,23 +15,22 @@ struct UnifiedRouteStepSection: View {
            let stop = navigator.currentStop, let instruction = navigator.currentInstruction {
             VStack(alignment: .leading, spacing: 12.0) {
                 HStack(alignment: .top, spacing: 12.0) {
-                    Image(systemName: step.symbolName)
-                        .font(.title3.weight(.bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 40.0, height: 40.0)
-                        .background(step.isArrival ? Color.red : Color.accentColor, in: .rect(cornerRadius: 12.0))
-                        .contentTransition(.symbolEffect(.replace))
+                    if step.isArrival {
+                        UnifiedRouteCircleCut(circleID: stop.circleID)
+                    } else {
+                        Image(systemName: step.symbolName)
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 40.0, height: 40.0)
+                            .background(Color.accentColor, in: .rect(cornerRadius: 12.0))
+                            .contentTransition(.symbolEffect(.replace))
+                    }
                     VStack(alignment: .leading, spacing: 4.0) {
                         Text(instruction)
                             .font(.headline)
                             .fixedSize(horizontal: false, vertical: true)
                             .contentTransition(.opacity)
                         HStack(spacing: 6.0) {
-                            if let color = WebCatalogColor(rawValue: stop.colorRawValue), color != .uncolored {
-                                Circle()
-                                    .fill(color.backgroundColor())
-                                    .frame(width: 8.0, height: 8.0)
-                            }
                             Text(stop.spaceName)
                                 .fontWeight(.semibold)
                             Text(stop.name)
@@ -48,7 +46,6 @@ struct UnifiedRouteStepSection: View {
                     }
                     Button("Route.Collapse", systemImage: "chevron.up") {
                         withAnimation(.smooth) {
-                            navigator.cancelHold()
                             navigator.isStatusExpanded = false
                         }
                     }
@@ -65,7 +62,7 @@ struct UnifiedRouteStepSection: View {
                         systemImage: "exclamationmark.triangle.fill"
                     )
                     .font(.caption)
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(.secondary)
                 }
                 UnifiedRouteControls(
                     isArrival: step.isArrival,

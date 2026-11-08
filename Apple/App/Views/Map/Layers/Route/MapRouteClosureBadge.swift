@@ -9,16 +9,16 @@ struct MapRouteClosureBadge: View {
         ZStack {
             if isSelected {
                 Circle()
-                    .fill(Color.red.opacity(0.25))
+                    .fill(Color.primary.opacity(0.2))
                     .frame(width: size * 1.8, height: size * 1.8)
             }
             Circle()
-                .fill(.red)
+                .fill(Color.primary)
             Circle()
-                .strokeBorder(.white, lineWidth: size * 0.1)
+                .strokeBorder(Color(uiColor: .systemBackground), lineWidth: size * 0.1)
             Image(systemName: "nosign")
                 .font(.system(size: size * 0.5, weight: .bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(Color(uiColor: .systemBackground))
         }
         .frame(width: size, height: size)
         .shadow(color: .black.opacity(0.3), radius: size * 0.08)

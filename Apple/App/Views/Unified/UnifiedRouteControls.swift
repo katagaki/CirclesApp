@@ -19,7 +19,6 @@ struct UnifiedRouteControls: View {
                         .fixedSize()
                 }
                 .buttonStyle(.glass)
-                .tint(.red)
             }
             Spacer(minLength: 8.0)
             Button("Route.Previous", systemImage: "chevron.backward", action: onBack)
@@ -34,7 +33,7 @@ struct UnifiedRouteControls: View {
                     .fixedSize()
             }
             .buttonStyle(.glassProminent)
-            .tint(isArrival ? .red : .accentColor)
+            .tint(.accentColor)
         }
     }
 }

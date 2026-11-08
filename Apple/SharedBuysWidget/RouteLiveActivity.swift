@@ -41,7 +41,7 @@ struct RouteLiveActivity: Widget {
             } compactLeading: {
                 Image(systemName: context.state.symbolName)
                     .font(.caption.weight(.bold))
-                    .foregroundStyle(context.state.isArriving ? .red : SharedBuysLiveActivity.accent)
+                    .foregroundStyle(SharedBuysLiveActivity.accent)
             } compactTrailing: {
                 Text(context.state.stopSpace)
                     .font(.caption2.weight(.semibold))
@@ -49,7 +49,7 @@ struct RouteLiveActivity: Widget {
             } minimal: {
                 Image(systemName: context.state.symbolName)
                     .font(.caption.weight(.bold))
-                    .foregroundStyle(context.state.isArriving ? .red : SharedBuysLiveActivity.accent)
+                    .foregroundStyle(SharedBuysLiveActivity.accent)
             }
             .keylineTint(SharedBuysLiveActivity.accent)
         }
@@ -99,7 +99,7 @@ struct RouteLiveActivity: Widget {
             .font(.system(size: size * 0.45, weight: .bold))
             .foregroundStyle(.white)
             .frame(width: size, height: size)
-            .background(state.isArriving ? Color.red : SharedBuysLiveActivity.accent, in: .rect(cornerRadius: size * 0.28))
+            .background(SharedBuysLiveActivity.accent, in: .rect(cornerRadius: size * 0.28))
     }
 
     func stopLine(_ state: RouteAttributes.ContentState) -> some View {
@@ -119,7 +119,7 @@ struct RouteLiveActivity: Widget {
                 Button(intent: RouteBlockedIntent()) {
                     Image(systemName: "arrow.triangle.branch")
                         .font(.subheadline.weight(.bold))
-                        .foregroundStyle(.red)
+                        .foregroundStyle(.primary)
                         .frame(width: 36.0, height: 36.0)
                 }
                 .buttonStyle(.plain)

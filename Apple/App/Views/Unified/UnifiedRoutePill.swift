@@ -16,7 +16,7 @@ struct UnifiedRoutePill: View {
                     .font(.caption.weight(.bold))
                     .foregroundStyle(.white)
                     .frame(width: 20.0, height: 20.0)
-                    .background(step.isArrival ? Color.red : Color.accentColor, in: .circle)
+                    .background(Color.accentColor, in: .circle)
                     .contentTransition(.symbolEffect(.replace))
                 Text(stop.spaceName)
                     .fontWeight(.semibold)

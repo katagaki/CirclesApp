@@ -60,6 +60,7 @@ struct MapView: View {
                         MapPopoverLayer(zoomScale: zoomScale) { selection in
                             MapPopoverDetail(selection: selection)
                         }
+                        MapRouteHoldLayer(zoomScale: zoomScale, spaceSize: spaceSize)
                     }
                 })
                 .onChange(of: mapper.popoverPosition) { _, newValue in

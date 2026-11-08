@@ -1,8 +1,7 @@
 import SwiftUI
 
 /// Route guidance at the top trailing edge of the map. Collapsed, it is a pill with the
-/// next turn and the stop; expanded, the pill grows into the full directions, with what can
-/// be done about a closed way underneath.
+/// next turn and the stop; expanded, the pill grows into the full directions.
 struct UnifiedRouteStatus: View {
 
     @Environment(Navigator.self) var navigator
@@ -10,13 +9,11 @@ struct UnifiedRouteStatus: View {
     let namespace: Namespace.ID
 
     var isVisible: Bool {
-        navigator.isActive || navigator.pendingPoint != nil
-            || navigator.selectedClosureID != nil || navigator.isNoStopsAlertPresented
+        navigator.isActive || navigator.isNoStopsAlertPresented
     }
 
     var isExpanded: Bool {
-        navigator.isStatusExpanded || navigator.pendingPoint != nil
-            || navigator.selectedClosureID != nil || navigator.isNoStopsAlertPresented
+        navigator.isStatusExpanded || navigator.isNoStopsAlertPresented
     }
 
     var body: some View {
@@ -33,12 +30,6 @@ struct UnifiedRouteStatus: View {
                         UnifiedRouteStepSection()
                     } else if navigator.isPlanning {
                         UnifiedRoutePill()
-                    }
-                    if navigator.pendingPoint != nil || navigator.selectedClosureID != nil {
-                        if navigator.route != nil {
-                            Divider()
-                        }
-                        UnifiedRouteHoldSection()
                     }
                 }
                 .padding(14.0)
