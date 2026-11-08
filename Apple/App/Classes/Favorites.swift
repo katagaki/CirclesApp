@@ -63,6 +63,12 @@ class Favorites {
         return favoriteCircleIdentifiers
     }
 
+    /// Whether there are any favourites to work with, which features built on them, such
+    /// as route guidance, need before they are offered.
+    var isAvailable: Bool {
+        !(wcIDMappedItems?.isEmpty ?? true)
+    }
+
     func contains(webCatalogID: Int) -> Bool {
         if let items {
             return items.contains(where: { $0.circle.webCatalogID == webCatalogID})

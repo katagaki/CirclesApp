@@ -43,6 +43,7 @@ struct MapView: View {
                 ), onTap: {
                     unifier.closeOfflineStatus()
                 }, onLongPress: { location in
+                    guard navigator.isActive || favorites.isAvailable else { return }
                     navigator.hold(location, spaceSize: CGFloat(spaceSize))
                 }, content: {
                     ZStack(alignment: .topLeading) {
