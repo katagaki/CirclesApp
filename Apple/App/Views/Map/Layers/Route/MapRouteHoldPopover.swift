@@ -13,17 +13,16 @@ struct MapRouteHoldPopover: View {
             if navigator.pendingPoint != nil {
                 Text("Route.Hold.Title")
                     .font(.subheadline.weight(.semibold))
-                    .padding(.bottom, 6.0)
+                    .padding(.bottom, 2.0)
                 row("Route.Hold.SetOrigin", systemImage: "figure.walk") {
                     navigator.setOriginAtHold(database: database)
                 }
                 Divider()
-                row("Route.Hold.Close", systemImage: "nosign") {
+                row("Route.Hold.Close", systemImage: "nosign", isLast: navigator.hallBoundaries.isEmpty) {
                     navigator.closePathAtHold(database: database)
                 }
                 if !navigator.hallBoundaries.isEmpty {
-                    Divider()
-                    row("Route.Hold.CloseHalls", systemImage: "rectangle.split.2x1") {
+                    row("Route.Hold.CloseHalls", systemImage: "rectangle.split.2x1", isLast: true) {
                         navigator.closeHallsAtHold(database: database)
                     }
                 }
@@ -35,7 +34,7 @@ struct MapRouteHoldPopover: View {
                     .foregroundStyle(.secondary)
                     .padding(.bottom, 6.0)
                 Divider()
-                row("Route.Closure.Reopen", systemImage: "arrow.uturn.backward") {
+                row("Route.Closure.Reopen", systemImage: "arrow.uturn.backward", isLast: true) {
                     navigator.reopenSelectedClosure(database: database)
                 }
             }
@@ -44,7 +43,11 @@ struct MapRouteHoldPopover: View {
         .fixedSize(horizontal: false, vertical: true)
     }
 
-    func row(_ title: LocalizedStringKey, systemImage: String, perform: @escaping () -> Void) -> some View {
+    /// Rows are padded above and below, except under the last one, where the popover's own
+    /// padding already sits, so the bottom margin matches the top.
+    func row(
+        _ title: LocalizedStringKey, systemImage: String, isLast: Bool = false, perform: @escaping () -> Void
+    ) -> some View {
         Button {
             withAnimation(.smooth) {
                 perform()
@@ -58,7 +61,8 @@ struct MapRouteHoldPopover: View {
                 Spacer(minLength: 0.0)
             }
             .font(.subheadline)
-            .frame(minHeight: 40.0)
+            .padding(.top, 10.0)
+            .padding(.bottom, isLast ? 0.0 : 10.0)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
