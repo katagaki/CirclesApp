@@ -10747,31 +10747,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Halls Not Connected"
+            "value": "Closed (Hall)"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ホール間通行止め"
+            "value": "通行止め（ホール）"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "홀 사이 통행 금지"
+            "value": "통행 금지(홀)"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "展厅之间不可通行"
+            "value": "封闭（展厅）"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "展廳之間不可通行"
+            "value": "封閉（展廳）"
           }
         }
       }
@@ -10849,31 +10849,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Path Closed"
+            "value": "Closed (Aisle)"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "通行止め"
+            "value": "通行止め（通路）"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "통행 금지"
+            "value": "통행 금지(통로)"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "通道封闭"
+            "value": "封闭（通道）"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "通道封閉"
+            "value": "封閉（通道）"
           }
         }
       }
@@ -10985,31 +10985,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Close This Aisle"
+            "value": "Closed (Aisle)"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "この通路を通行止め"
+            "value": "通行止め（通路）"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "이 통로 통행 금지"
+            "value": "통행 금지(통로)"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "封闭此通道"
+            "value": "封闭（通道）"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "封閉此通道"
+            "value": "封閉（通道）"
           }
         }
       }
@@ -11019,31 +11019,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Halls Not Connected"
+            "value": "Closed (Hall)"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "ホール間を通行止め"
+            "value": "通行止め（ホール）"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "홀 사이 통행 금지"
+            "value": "통행 금지(홀)"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "展厅之间不可通行"
+            "value": "封闭（展厅）"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "展廳之間不可通行"
+            "value": "封閉（展廳）"
           }
         }
       }
@@ -11053,31 +11053,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "I'm Here"
+            "value": "You Are Here"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "現在地に設定"
+            "value": "現在地"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "현재 위치로 설정"
+            "value": "현재 위치"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "设为当前位置"
+            "value": "当前位置"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "設為目前位置"
+            "value": "目前位置"
           }
         }
       }
@@ -11393,31 +11393,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "If staff have closed the way, tap Blocked for another route. If the halls aren't connected inside, long-press the map and choose Halls Not Connected to go out and back in through another hall's entrance. Closures clear themselves after 30 minutes."
+            "value": "If the way is closed, tap Blocked for another route. If the halls aren't connected inside, long-press the map and choose Closed (Hall) to go out and back in through another hall's entrance. Closures clear themselves after 30 minutes."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "スタッフが通路を閉鎖していたら「通れない」をタップすると、別の道を探します。ホール間がつながっていないときは、マップを長押しして「ホール間を通行止め」を選ぶと、一度外に出て別のホールの出入口から入ります。通行止めは30分後に自動で解除されます。"
+            "value": "通路が閉鎖されていたら「通れない」をタップすると、別の道を探します。ホール間がつながっていないときは、マップを長押しして「通行止め（ホール）」を選ぶと、一度外に出て別のホールの出入口から入ります。通行止めは30分後に自動で解除されます。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "스태프가 통로를 막았다면 '막힘'을 누르세요. 다른 길을 찾아 줍니다. 홀 사이가 연결되어 있지 않다면 지도를 길게 누르고 '홀 사이 통행 금지'를 선택하세요. 밖으로 나가 다른 홀 출입구로 들어가는 길을 안내합니다. 통행 금지는 30분 후 자동으로 해제됩니다."
+            "value": "통로가 막혀 있다면 '막힘'을 누르세요. 다른 길을 찾아 줍니다. 홀 사이가 연결되어 있지 않다면 지도를 길게 누르고 '통행 금지(홀)'를 선택하세요. 밖으로 나가 다른 홀 출입구로 들어가는 길을 안내합니다. 통행 금지는 30분 후 자동으로 해제됩니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "如果工作人员封闭了通道，点按“无法通行”即可重新规划路线。若展厅之间不相通，长按地图并选择“展厅之间不可通行”，将引导你先到外面，再从另一个展厅的出入口进入。封闭会在30分钟后自动解除。"
+            "value": "如果通道被封闭，点按“无法通行”即可重新规划路线。若展厅之间不相通，长按地图并选择“封闭（展厅）”，将引导你先到外面，再从另一个展厅的出入口进入。封闭会在30分钟后自动解除。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "如果工作人員封閉了通道，點按「無法通行」即可重新規劃路線。若展廳之間不相通，長按地圖並選擇「展廳之間不可通行」，將引導你先到外面，再從另一個展廳的出入口進入。封閉會在30分鐘後自動解除。"
+            "value": "如果通道被封閉，點按「無法通行」即可重新規劃路線。若展廳之間不相通，長按地圖並選擇「封閉（展廳）」，將引導你先到外面，再從另一個展廳的出入口進入。封閉會在30分鐘後自動解除。"
           }
         }
       }
@@ -11563,31 +11563,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Long-press the map and choose I'm Here to get directions from that spot."
+            "value": "Long-press the map and choose You Are Here to get directions from that spot."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "マップを長押しして「現在地に設定」を選ぶと、その場所から案内します。"
+            "value": "マップを長押しして「現在地」を選ぶと、その場所から案内します。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "지도를 길게 누르고 '현재 위치로 설정'을 선택하면 그곳부터 안내합니다."
+            "value": "지도를 길게 누르고 '현재 위치'를 선택하면 그곳부터 안내합니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "长按地图并选择“设为当前位置”，即可从该处开始导航。"
+            "value": "长按地图并选择“当前位置”，即可从该处开始导航。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "長按地圖並選擇「設為目前位置」，即可從該處開始導航。"
+            "value": "長按地圖並選擇「目前位置」，即可從該處開始導航。"
           }
         }
       }
