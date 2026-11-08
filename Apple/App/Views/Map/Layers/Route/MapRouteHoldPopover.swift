@@ -18,11 +18,12 @@ struct MapRouteHoldPopover: View {
                     navigator.setOriginAtHold(database: database)
                 }
                 Divider()
-                row("Route.Hold.Close", systemImage: "nosign", isLast: navigator.hallBoundaries.isEmpty) {
+                row("Route.Hold.Close", systemImage: "nosign",
+                    bottom: navigator.hallBoundaries.isEmpty ? 0.0 : 5.0) {
                     navigator.closePathAtHold(database: database)
                 }
                 if !navigator.hallBoundaries.isEmpty {
-                    row("Route.Hold.CloseHalls", systemImage: "rectangle.split.2x1", isLast: true) {
+                    row("Route.Hold.CloseHalls", systemImage: "rectangle.split.2x1", top: 5.0, bottom: 0.0) {
                         navigator.closeHallsAtHold(database: database)
                     }
                 }
@@ -34,21 +35,21 @@ struct MapRouteHoldPopover: View {
                     .foregroundStyle(.secondary)
                     .padding(.bottom, 6.0)
                 Divider()
-                row("Route.Closure.Reopen", systemImage: "arrow.uturn.backward", isLast: true) {
+                row("Route.Closure.Reopen", systemImage: "arrow.uturn.backward", bottom: 0.0) {
                     navigator.reopenSelectedClosure(database: database)
                 }
             }
         }
-        .padding(.vertical, 8.0)
         .frame(maxWidth: .infinity, alignment: .leading)
         .fixedSize(horizontal: false, vertical: true)
     }
 
-    /// Rows are padded above and below, except under the last one, where the popover's own
-    /// padding sits. A gap between rows holds two lines' leading where an edge holds one, so
-    /// the popover's edges get extra room to match the gaps between rows.
+    /// A row sits 10 points from a divider on either side. Under the last row the popover's
+    /// own padding takes over, and rows in the same group sit as close to each other as a
+    /// row sits to a divider, so the group reads as one.
     func row(
-        _ title: LocalizedStringKey, systemImage: String, isLast: Bool = false, perform: @escaping () -> Void
+        _ title: LocalizedStringKey, systemImage: String, top: CGFloat = 10.0, bottom: CGFloat = 10.0,
+        perform: @escaping () -> Void
     ) -> some View {
         Button {
             withAnimation(.smooth) {
@@ -63,8 +64,8 @@ struct MapRouteHoldPopover: View {
                 Spacer(minLength: 0.0)
             }
             .font(.body)
-            .padding(.top, 10.0)
-            .padding(.bottom, isLast ? 0.0 : 10.0)
+            .padding(.top, top)
+            .padding(.bottom, bottom)
             .contentShape(.rect)
         }
         .buttonStyle(.plain)
