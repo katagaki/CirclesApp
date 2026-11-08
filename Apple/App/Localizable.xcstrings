@@ -1960,31 +1960,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open a circle, tap Edit in the Buys section, and add each item with its cost. If the circle has a catalog in Attachments, you can crop item photos straight from it."
+            "value": "In a circle's details, tap Edit under Buys."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "サークルの詳細画面で「宝物」セクションの「編集」をタップし、頒布品と金額を追加します。「添付ファイル」にお品書きがあれば、頒布品の画像をそこから切り取れます。"
+            "value": "サークル詳細の「宝物」で「編集」をタップ。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "서클 상세 화면에서 '보물' 섹션의 '편집'을 누르고 상품과 금액을 추가하세요. '첨부 파일'에 카탈로그가 있다면 상품 이미지를 바로 잘라낼 수 있습니다."
+            "value": "서클 상세의 '보물'에서 '편집'을 누르세요."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在社团详情页面点按「宝贝」栏目中的「编辑」，添加商品和价格。若「附件」中有目录，可直接从中裁切商品图片。"
+            "value": "在社团详情的「宝贝」中点按「编辑」。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "在社團詳情頁面點按「寶藏」區塊中的「編輯」，新增商品和價格。若「附件」中有目錄，可直接從中裁切商品圖片。"
+            "value": "在社團詳情的「寶藏」中點按「編輯」。"
           }
         }
       }
@@ -2062,31 +2062,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Start a shared list under Shared, and friends join by scanning its QR code. Your own Buys stay private."
+            "value": "Friends join with a QR code. Your own list stays private."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "「共同購入」で共同購入リストを作成し、友達にQRコードを読み取ってもらうと参加できます。自分の宝物リストは非公開のままです。"
+            "value": "友達はQRコードで参加。自分のリストは非公開。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "'공유 목록'에서 공유 목록을 만들고 친구가 QR 코드를 스캔하면 참가할 수 있습니다. 내 구매 목록은 비공개로 유지됩니다."
+            "value": "친구는 QR 코드로 참가합니다. 내 목록은 비공개입니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在「共享列表」中创建共享列表，朋友扫描二维码即可加入。你自己的宝贝清单仍为私密。"
+            "value": "朋友扫描二维码即可加入。你的清单仍为私密。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "在「共享清單」中建立共享清單，朋友掃描 QR 碼即可加入。你自己的寶藏清單仍為私密。"
+            "value": "朋友掃描 QR 碼即可加入。你的清單仍為私密。"
           }
         }
       }
@@ -2130,31 +2130,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Choose who's buying each item and everyone sees it tick off as it's bought, along with your share and the group total."
+            "value": "Choose who buys what, and see your share."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "頒布品ごとに誰が買うかを決めると、購入状況が全員に共有されます。自分の負担額とグループの合計も確認できます。"
+            "value": "誰が何を買うか決めて、負担額を確認。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "상품마다 누가 살지 정하면 구매 상황이 모두에게 공유됩니다. 내 부담액과 그룹 합계도 확인할 수 있습니다."
+            "value": "누가 무엇을 살지 정하고 내 부담액을 확인하세요."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "为每件商品指定购买人，购买进度会同步给所有人。还能查看你的分摊金额和小组合计。"
+            "value": "分配谁买什么，查看你的分摊金额。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "為每件商品指定購買人，購買進度會同步給所有人。還能查看你的分攤金額和小組合計。"
+            "value": "分配誰買什麼，查看你的分攤金額。"
           }
         }
       }
@@ -2232,31 +2232,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Plan what to buy at each circle, keep track of what you've spent, and shop together with friends."
+            "value": "Plan what to buy, and shop with friends."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "サークルごとに買いたいものをまとめて、使った金額を確認できます。友達と共同購入もできます。"
+            "value": "買いたいものをまとめて、友達と共同購入も。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "서클별로 살 것을 정리하고 쓴 금액을 확인할 수 있습니다. 친구와 함께 구매할 수도 있습니다."
+            "value": "살 것을 정리하고 친구와 함께 구매하세요."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按社团整理想买的商品，查看花费金额，还能和朋友一起购买。"
+            "value": "整理想买的商品，还能和朋友一起买。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "依社團整理想買的商品，查看花費金額，還能和朋友一起購買。"
+            "value": "整理想買的商品，還能和朋友一起買。"
           }
         }
       }
@@ -2300,31 +2300,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tap an item to mark it bought, and tap again if it sold out. Totals cover the selected day and every day."
+            "value": "Tap once when bought, twice if you couldn't get it."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "頒布品をタップすると購入済みに、もう一度タップすると売り切れなどで買えなかったことにできます。合計は選択中の日と全日程の両方を表示します。"
+            "value": "1回タップで購入済み、2回で買えなかった。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "상품을 누르면 구매 완료로, 한 번 더 누르면 품절 등으로 사지 못한 것으로 표시됩니다. 합계는 선택한 날과 전체 일정을 모두 보여 줍니다."
+            "value": "한 번 누르면 구매 완료, 두 번 누르면 구매 못 함."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "点按商品标记为已购买，再点按一次可标记为售罄等未能购买。合计会同时显示所选日期和全部日期的金额。"
+            "value": "点按一次为已购买，两次为未能购买。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "點按商品標記為已購買，再點按一次可標記為售罄等未能購買。合計會同時顯示所選日期和全部日期的金額。"
+            "value": "點按一次為已購買，兩次為未能購買。"
           }
         }
       }
