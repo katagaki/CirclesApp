@@ -47,7 +47,7 @@ struct MapRouteHoldPopover: View {
     /// Starts under the row titles rather than the icons, the way a list's separators do.
     var separator: some View {
         Divider()
-            .padding(.leading, 28.0)
+            .padding(.leading, 32.0)
     }
 
     /// Rows are padded above and below, except under the last one, where the popover's own
@@ -60,7 +60,7 @@ struct MapRouteHoldPopover: View {
                 perform()
             }
         } label: {
-            HStack(spacing: 6.0) {
+            HStack(spacing: 10.0) {
                 Image(systemName: systemImage)
                     .foregroundStyle(.tint)
                     .frame(width: 22.0)
