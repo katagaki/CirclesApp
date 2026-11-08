@@ -58,8 +58,6 @@ struct BuysOnboardingHero: View {
         }
         .padding(18.0)
         .background(Color(.secondarySystemGroupedBackground), in: .rect(cornerRadius: 20.0))
-        .padding(14.0)
-        .background(Color(.systemGroupedBackground), in: .rect(cornerRadius: 20.0))
         .accessibilityHidden(true)
         .task {
             await play()
