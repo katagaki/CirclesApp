@@ -30,12 +30,11 @@ struct UnifiedRouteCircleCut: View {
                 }
                 .buttonStyle(.plain)
             } else {
-                RoundedRectangle(cornerRadius: 6.0)
+                Rectangle()
                     .fill(.quaternary)
             }
         }
         .frame(width: 40.0, height: 57.0)
-        .clipShape(.rect(cornerRadius: 6.0))
         .task(id: circleID) {
             circle = database.circles([circleID]).first
         }
