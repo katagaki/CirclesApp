@@ -18,6 +18,5 @@ struct RouteActivityCut: View {
             }
         }
         .frame(width: height * 40.0 / 57.0, height: height)
-        .clipShape(.rect(cornerRadius: 4.0))
     }
 }
