@@ -11,7 +11,14 @@ struct RouteOnboardingView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28.0) {
                 RouteOnboardingHero()
+                    .padding(.horizontal, 24.0)
+                    .padding(.top, 16.0)
+                    .padding(.bottom, 28.0)
                     .frame(maxWidth: .infinity)
+                    .background {
+                        Color(.systemGroupedBackground)
+                            .padding(.top, -1000.0)
+                    }
                 VStack(alignment: .leading, spacing: 8.0) {
                     Text("Route.Onboarding.Title")
                         .font(.largeTitle.weight(.bold))
@@ -19,6 +26,7 @@ struct RouteOnboardingView: View {
                         .font(.body)
                         .foregroundStyle(.secondary)
                 }
+                .padding(.horizontal, 24.0)
                 VStack(alignment: .leading, spacing: 22.0) {
                     OnboardingRow(
                         systemImage: "list.number",
@@ -41,9 +49,8 @@ struct RouteOnboardingView: View {
                         message: "Route.Onboarding.Detour.Message"
                     )
                 }
+                .padding(.horizontal, 24.0)
             }
-            .padding(.horizontal, 24.0)
-            .padding(.top, 32.0)
             .padding(.bottom, 16.0)
         }
         .safeAreaInset(edge: .bottom) {
