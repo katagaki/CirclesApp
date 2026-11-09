@@ -92,7 +92,7 @@ struct BuysView: View {
                 ToolbarSpacer(.fixed, placement: .bottomBar)
             }
             ToolbarItem(placement: .bottomBar) {
-                Button("Buys.Onboarding.Open", systemImage: "questionmark.circle") {
+                Button("Buys.Onboarding.Open", systemImage: "questionmark") {
                     unifier.openRouteScreen(.buysOnboarding)
                 }
                 .labelStyle(.iconOnly)

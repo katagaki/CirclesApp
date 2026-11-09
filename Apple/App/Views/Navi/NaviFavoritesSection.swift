@@ -4,7 +4,6 @@ struct NaviFavoritesSection: View {
 
     let isEnabled: Bool
     let onChoose: (Navigator.Mode) -> Void
-    let onHelp: () -> Void
 
     var body: some View {
         Section {
@@ -24,9 +23,6 @@ struct NaviFavoritesSection: View {
             }
         } header: {
             Text("Navi.Favorites")
-        } footer: {
-            Button("Route.Onboarding.Open", action: onHelp)
-                .font(.footnote)
         }
         .disabled(!isEnabled)
     }

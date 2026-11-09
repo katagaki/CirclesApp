@@ -20,9 +20,12 @@ struct NaviView: View {
     @State var searchTerm: String = ""
     @State var isSearchActive: Bool = false
     @State var results: [ComiketCircle]?
+    @State var pendingDestination: ComiketCircle?
 
     @AppStorage(wrappedValue: false, "Route.HasSeenOnboarding") var hasSeenOnboarding: Bool
+    @AppStorage(wrappedValue: .grid, "Circles.DisplayMode") var displayMode: CircleDisplayMode
     @AppStorage(wrappedValue: .regular, "Circles.ListSize") var listDisplayMode: ListDisplayMode
+    @AppStorage(wrappedValue: .medium, "Circles.GridSize") var gridDisplayMode: GridDisplayMode
 
     var isMapReady: Bool {
         selections.map != nil && selections.date != nil
@@ -34,12 +37,22 @@ struct NaviView: View {
                 if results.isEmpty {
                     ContentUnavailableView.search(text: searchTerm)
                 } else {
-                    CircleList(
-                        circles: results,
-                        displayMode: listDisplayMode,
-                        namespace: namespace,
-                        onSelect: startDirections(to:)
-                    )
+                    switch displayMode {
+                    case .grid:
+                        CircleGrid(
+                            displayMode: gridDisplayMode,
+                            circles: results,
+                            namespace: namespace,
+                            onSelect: startDirections(to:)
+                        )
+                    case .list:
+                        CircleList(
+                            circles: results,
+                            displayMode: listDisplayMode,
+                            namespace: namespace,
+                            onSelect: startDirections(to:)
+                        )
+                    }
                 }
             } else if navigator.isActive {
                 NaviActiveRoute()
@@ -54,11 +67,7 @@ struct NaviView: View {
                     }
                     NaviFavoritesSection(
                         isEnabled: isMapReady,
-                        onChoose: choose(_:),
-                        onHelp: {
-                            navigator.pendingMode = nil
-                            unifier.openRouteScreen(.routeOnboarding)
-                        }
+                        onChoose: choose(_:)
                     )
                 }
             }
@@ -71,14 +80,21 @@ struct NaviView: View {
             placement: unifier.displayMode == .panel && unifier.isPanelSideDocked
                 ? .navigationBarDrawer(displayMode: .always)
                 : .toolbar,
-            prompt: "Navi.Search.Prompt"
+            prompt: "Circles.Search.Prompt"
         )
         .toolbar {
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            ToolbarSpacer(.fixed, placement: .bottomBar)
             if navigator.isActive {
-                ToolbarSpacer(.fixed, placement: .bottomBar)
                 ToolbarItem(placement: .bottomBar) {
                     NaviEndButton()
+                }
+            } else {
+                ToolbarItem(placement: .bottomBar) {
+                    Button("Route.Onboarding.Open", systemImage: "questionmark") {
+                        navigator.pendingMode = nil
+                        unifier.openRouteScreen(.routeOnboarding)
+                    }
                 }
             }
             SidebarPositionToolbarItem()
@@ -87,6 +103,13 @@ struct NaviView: View {
             try? await Task.sleep(for: .milliseconds(250))
             if Task.isCancelled { return }
             await search()
+        }
+        .onChange(of: mapper.layouts) {
+            guard let destination = pendingDestination,
+                  let webCatalogID = destination.extendedInformation?.webCatalogID,
+                  mapper.layouts.values.contains(where: { $0.contains(webCatalogID) }) else { return }
+            pendingDestination = nil
+            routeDirectly(to: webCatalogID)
         }
         .onChange(of: navigator.onboardingDismissals) {
             guard hasSeenOnboarding, let mode = navigator.pendingMode else {
@@ -103,15 +126,10 @@ struct NaviView: View {
     }
 
     func search() async {
-        let term = searchTerm.trimmingCharacters(in: .whitespaces)
-        guard !term.isEmpty, let identifiers = await CatalogCache.searchCircles(term, database: database) else {
+        if let identifiers = await CatalogCache.searchCircles(searchTerm, database: database) {
+            results = database.circles(identifiers)
+        } else {
             results = nil
-            return
-        }
-        let onMap = Set(mapper.layouts.values.flatMap { $0 })
-        results = database.circles(identifiers).filter { circle in
-            guard let webCatalogID = circle.extendedInformation?.webCatalogID else { return false }
-            return onMap.contains(webCatalogID)
         }
     }
 
@@ -139,8 +157,33 @@ struct NaviView: View {
         guard let webCatalogID = circle.extendedInformation?.webCatalogID else { return }
         searchTerm = ""
         isSearchActive = false
+        if mapper.layouts.values.contains(where: { $0.contains(webCatalogID) }) {
+            routeDirectly(to: webCatalogID)
+        } else {
+            pendingDestination = circle
+            Task {
+                await openMap(for: circle)
+            }
+        }
+    }
+
+    func routeDirectly(to webCatalogID: Int) {
         let color = favoriteColors()[webCatalogID] ?? .uncolored
         startRoute(favoriteColors: [webCatalogID: color], colorPriority: nil, includesVisited: true)
+    }
+
+    /// The circle is on another hall or day: opens that map first, and the route starts once
+    /// its layouts have loaded.
+    func openMap(for circle: ComiketCircle) async {
+        let actor = DataFetcher(database: database.getTextDatabase())
+        guard let mapID = await actor.mapID(forBlock: circle.blockID),
+              let map = database.maps().first(where: { $0.id == mapID }),
+              let date = database.dates().first(where: { $0.id == circle.day }) else {
+            pendingDestination = nil
+            return
+        }
+        selections.map = map
+        selections.date = date
     }
 
     /// How many favourites of each colour sit on the open map, so the colour list only

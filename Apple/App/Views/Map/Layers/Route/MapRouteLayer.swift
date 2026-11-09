@@ -73,9 +73,9 @@ struct MapRouteLayer: View {
                 MapRouteHoldMarker(size: CGFloat(spaceSize) * 0.8)
                     .position(scaled(pendingPoint))
             }
-            if let origin = navigator.origin {
+            if let location = navigator.currentLocation {
                 MapRouteOriginPin(size: CGFloat(spaceSize) * 0.8)
-                    .position(scaled(origin))
+                    .position(scaled(location))
             }
         }
         .frame(width: mapper.canvasSize.width, height: mapper.canvasSize.height, alignment: .topLeading)

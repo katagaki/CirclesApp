@@ -15,10 +15,11 @@ struct UnifiedRouteStepSection: View {
                         UnifiedRouteCircleCut(circleID: stop.circleID)
                     } else {
                         Image(systemName: step.symbolName)
-                            .font(.title3.weight(.bold))
+                            .font(.title2.weight(.bold))
                             .foregroundStyle(.white)
-                            .frame(width: 40.0, height: 40.0)
-                            .background(Color.accentColor, in: .rect(cornerRadius: 12.0))
+                            .frame(width: 48.0, height: 48.0)
+                            .background(Color.accentColor, in: .rect(cornerRadius: 14.0))
+                            .frame(width: 56.0, alignment: .leading)
                             .contentTransition(.symbolEffect(.replace))
                     }
                     VStack(alignment: .leading, spacing: 4.0) {
@@ -32,10 +33,11 @@ struct UnifiedRouteStepSection: View {
                             Text(stop.name)
                                 .lineLimit(1)
                         }
-                        .font(.caption)
+                        .font(.subheadline)
                         .foregroundStyle(.secondary)
                     }
                 }
+                .frame(minHeight: 80.0, alignment: .top)
                 if !navigator.skippedSpaces.isEmpty {
                     Label(
                         String(localized: "Route.Skipped.\(navigator.skippedSpaces.joined(separator: "、"))"),

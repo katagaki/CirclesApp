@@ -11160,31 +11160,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Blocked"
+            "value": "Detour"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "通れない"
+            "value": "迂回"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "막힘"
+            "value": "우회"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "无法通行"
+            "value": "绕行"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "無法通行"
+            "value": "繞行"
           }
         }
       }
@@ -11942,31 +11942,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tap Blocked for another way, or long-press the map to close off a hall."
+            "value": "Tap Detour for another way, or long-press the map to close off a hall."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "「通れない」をタップすると、別の道を案内します。ホールごと閉じるときは、マップを長押ししてください。"
+            "value": "「迂回」をタップすると、別の道を案内します。ホールごと閉じるときは、マップを長押ししてください。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "'막힘'을 누르면 다른 길로 안내합니다. 홀 전체를 막으려면 지도를 길게 누르세요."
+            "value": "'우회'을 누르면 다른 길로 안내합니다. 홀 전체를 막으려면 지도를 길게 누르세요."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "点按“无法通行”换条路；要封闭整个展厅，请长按地图。"
+            "value": "点按“绕行”换条路；要封闭整个展厅，请长按地图。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "點按「無法通行」換條路；要封閉整個展廳，請長按地圖。"
+            "value": "點按「繞行」換條路；要封閉整個展廳，請長按地圖。"
           }
         }
       }
@@ -15935,41 +15935,6 @@
         }
       }
     },
-    "Navi.Search.Prompt": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Search circles for directions"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "サークルを検索して経路を表示"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "서클을 검색해 경로 보기"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "搜索社团以查看路线"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "搜尋社團以查看路線"
-          }
-        }
-      }
-    },
     "Navi.Favorites": {
       "extractionState": "manual",
       "localizations": {
@@ -16106,6 +16071,111 @@
           "stringUnit": {
             "state": "translated",
             "value": "要結束導航嗎？"
+          }
+        }
+      }
+    },
+    "Navi.Planning": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finding the best route…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "経路を探しています…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "경로를 찾는 중…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在查找路线…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在尋找路線…"
+          }
+        }
+      }
+    },
+    "Navi.Finished.Title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You're all done!"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "お疲れ様でした"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "수고하셨습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "辛苦了"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "辛苦了"
+          }
+        }
+      }
+    },
+    "Navi.Finished.Message.%lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You've been through all %lld stops on this route."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このルートの%lld件をすべて回りました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 경로의 %lld곳을 모두 돌았습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已走完本路线的全部%lld个地点。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已走完本路線的全部%lld個地點。"
           }
         }
       }

@@ -6,20 +6,20 @@ struct NaviActiveRoute: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 16.0) {
-                Group {
-                    if navigator.isTrapped {
-                        UnifiedRouteTrappedSection()
-                    } else {
-                        UnifiedRouteStepSection()
-                    }
+            Group {
+                if navigator.isFinished {
+                    NaviFinishedCard()
+                } else if navigator.isTrapped {
+                    UnifiedRouteTrappedSection()
+                } else if navigator.currentStep == nil {
+                    NaviPlanningCard()
+                } else {
+                    UnifiedRouteStepSection()
                 }
-                .padding(16.0)
-                .background(Color(uiColor: .secondarySystemGroupedBackground), in: .rect(cornerRadius: 22.0))
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 20.0)
             .padding(.vertical, 12.0)
         }
-        .background(Color(uiColor: .systemGroupedBackground))
     }
 }

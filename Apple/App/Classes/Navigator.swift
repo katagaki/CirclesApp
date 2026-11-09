@@ -39,6 +39,7 @@ final class Navigator {
     private(set) var selectedClosureID: UUID?
     var isNoStopsAlertPresented: Bool = false
     private(set) var isTrapped: Bool = false
+    private(set) var isFinished: Bool = false
     var isStatusExpanded: Bool = false
     var pendingMode: Mode?
     var priorityCounts: [WebCatalogColor: Int] = [:]
@@ -66,6 +67,18 @@ final class Navigator {
     var currentStop: RouteStop? {
         guard let route, let currentStep else { return nil }
         return route.stops[currentStep.stopIndex]
+    }
+
+    /// Where the visitor is standing: the start of the step they are on while a route is up,
+    /// so it follows them as they step through it, otherwise the spot they long-pressed.
+    var currentLocation: CGPoint? {
+        if isFinished, let end = currentStep?.path.last {
+            return end
+        }
+        if let start = currentStep?.path.first {
+            return start
+        }
+        return origin
     }
 
     var currentInstruction: String? {
@@ -144,6 +157,7 @@ final class Navigator {
                 self.route = planned
                 self.skippedSpaces = route.route?.skippedSpaces ?? []
                 self.stepIndex = 0
+                self.isFinished = false
                 self.isPlanning = false
                 self.isTrapped = trapped
                 if planned == nil && !trapped {
@@ -346,18 +360,24 @@ final class Navigator {
     }
 
     func previous() {
+        if isFinished {
+            withAnimation(.smooth) { isFinished = false }
+            updateActivity()
+            return
+        }
         guard stepIndex > 0 else { return }
         withAnimation(.smooth) { stepIndex -= 1 }
         updateActivity()
     }
 
     /// Moves past the current step without marking anything; past the last stop, the
-    /// route is over.
+    /// visitor is told they are done, and the route stays up until they end it.
     func skip() {
         if let route, stepIndex + 1 < route.steps.count {
             next()
-        } else {
-            end()
+        } else if route != nil, !isFinished {
+            withAnimation(.smooth) { isFinished = true }
+            endActivity()
         }
     }
 
@@ -381,6 +401,7 @@ final class Navigator {
             selectedClosureID = nil
             skippedSpaces = []
             isTrapped = false
+            isFinished = false
             isPlanning = false
             stepIndex = 0
         }

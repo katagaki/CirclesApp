@@ -10,13 +10,6 @@ struct UnifiedPanel: View {
             ZStack {
                 self.unifier.view()
             }
-            .safeAreaInset(edge: .top, spacing: 0.0) {
-                if unifier.displayMode == .sheet && unifier.selectedDetent == .large {
-                    UnifiedOfflineStatus()
-                        .padding(.horizontal, 16.0)
-                        .padding(.bottom, 6.0)
-                }
-            }
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     UnifiedViewPicker()
