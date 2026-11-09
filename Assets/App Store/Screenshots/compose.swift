@@ -302,14 +302,17 @@ struct Frame {
               let (bytes, perPixel, perRow) = samples(of: image) else { return nil }
         self.image = image
         func isClear(_ x: Int, _ y: Int) -> Bool { bytes[y * perRow + x * perPixel + 3] == 0 }
-        // Walk out from the middle of the screen to the bezel on each side.
+        // Walk out from the middle of the screen to the bezel on each side. Up and down
+        // go a third of the way across, clear of the iPhone's Dynamic Island and of the
+        // screen's rounded corners.
         let midX = width / 2
         let midY = height / 2
+        let column = width / 3
         var left = midX, right = midX, top = midY, bottom = midY
         while left > 0, isClear(left - 1, midY) { left -= 1 }
         while right < width - 1, isClear(right + 1, midY) { right += 1 }
-        while top > 0, isClear(midX, top - 1) { top -= 1 }
-        while bottom < height - 1, isClear(midX, bottom + 1) { bottom += 1 }
+        while top > 0, isClear(column, top - 1) { top -= 1 }
+        while bottom < height - 1, isClear(column, bottom + 1) { bottom += 1 }
         // CoreGraphics counts rows from the bottom.
         screen = CGRect(x: left, y: height - bottom - 1, width: right - left + 1, height: bottom - top + 1)
     }
