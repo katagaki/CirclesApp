@@ -313,7 +313,12 @@ struct SharedWithRow: View {
         HStack(spacing: 10.0) {
             HStack(spacing: -8.0) {
                 ForEach(sharedBuys.members.sorted(by: { $0.value < $1.value }), id: \.key) { member in
-                    MemberInitial(nickname: member.value, size: 26.0)
+                    MemberAvatar(
+                        nickname: member.value,
+                        pid: member.key,
+                        isMine: member.key == sharedBuys.actorPID,
+                        size: 26.0
+                    )
                         .overlay {
                             Circle().strokeBorder(Color(.secondarySystemGroupedBackground), lineWidth: 2.0)
                         }

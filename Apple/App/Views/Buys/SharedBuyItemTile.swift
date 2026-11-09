@@ -34,8 +34,8 @@ struct SharedBuyItemTile: View {
             },
             accessory: {
                 Button(action: onAssign) {
-                    if let nickname = sharedBuys.members[item.assignee ?? -1] {
-                        MemberInitial(nickname: nickname, isMine: isMine)
+                    if let assignee = item.assignee, let nickname = sharedBuys.members[assignee] {
+                        MemberAvatar(nickname: nickname, pid: assignee, isMine: isMine, isHighlighted: isMine)
                     } else {
                         Image(systemName: "person.fill.questionmark")
                             .font(.system(size: 11.0, weight: .bold))

@@ -30,9 +30,11 @@ struct SharedBuysSheet: View {
                     Section {
                         ForEach(sharedBuys.members.sorted(by: { $0.value < $1.value }), id: \.key) { member in
                             HStack(spacing: 10.0) {
-                                MemberInitial(
+                                MemberAvatar(
                                     nickname: member.value,
+                                    pid: member.key,
                                     isMine: member.key == sharedBuys.actorPID,
+                                    isHighlighted: member.key == sharedBuys.actorPID,
                                     size: 30.0
                                 )
                                 Text(member.value)
@@ -124,7 +126,12 @@ struct SharedBuyAssignSheet: View {
                             dismiss()
                         } label: {
                             HStack(spacing: 10.0) {
-                                MemberInitial(nickname: member.value, size: 28.0)
+                                MemberAvatar(
+                                    nickname: member.value,
+                                    pid: member.key,
+                                    isMine: member.key == sharedBuys.actorPID,
+                                    size: 28.0
+                                )
                                 Text(member.value)
                                 Spacer()
                                 if item.assignee == member.key {
