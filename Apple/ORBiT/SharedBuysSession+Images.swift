@@ -48,6 +48,7 @@ public extension SharedBuysSession {
     func attachImage(_ image: Data, to itemID: String, circleID: Int) {
         guard image.count <= Self.maxImageBytes, let sessionKey, let roomID else { return }
         imageSends[itemID] = SharedBuyImageSend(image: image, isFailed: false)
+        imageRevision += 1
         let base = relayBaseURL
         Task {
             guard let imageID = await uploadImage(image, sessionKey: sessionKey, roomID: roomID, base: base) else {

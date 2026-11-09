@@ -11,7 +11,9 @@ public struct SharedBuysAttributes: ActivityAttributes, Sendable {
         public var circleSpace: String?
         public var boughtCount: Int
         public var assignedCount: Int
-        public var memberInitials: [String]
+        public var memberNames: [String]
+        public var imageKey: String?
+        public var canFlip: Bool
 
         public var isComplete: Bool { assignedCount > 0 && boughtCount >= assignedCount }
     }

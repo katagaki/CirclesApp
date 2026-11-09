@@ -120,8 +120,11 @@ public final class SharedBuysSession {
     /// Items whose photo is on its way up, or failed to get there.
     public internal(set) var imageSends: [String: SharedBuyImageSend] = [:]
     /// Moves when a photo lands in the cache, so rows showing a placeholder redraw.
-    public internal(set) var imageRevision: Int = 0
+    public internal(set) var imageRevision: Int = 0 {
+        didSet { updateActivity() }
+    }
     @ObservationIgnored var imageFetches: Set<String> = []
+    @ObservationIgnored var activityItemID: String?
 
     public var bluetoothPeers: Int = 0
     public var bluetoothNote: String = ""

@@ -8,7 +8,7 @@ public extension SharedBuysSession {
     public var activityState: SharedBuysAttributes.ContentState {
         let mine = items.filter { $0.assignee == actorPID }
         let pending = mine.filter { $0.status == .pending }
-        let next = pending.first
+        let next = pending.first { $0.id == activityItemID } ?? pending.first
         let circle = next.flatMap { relayedCircles[$0.circleID] }
         return SharedBuysAttributes.ContentState(
             nextItemName: next?.name ?? "担当分はすべて完了しました",
@@ -17,8 +17,34 @@ public extension SharedBuysSession {
             circleSpace: circle?.space,
             boughtCount: mine.filter { $0.status == .bought }.count,
             assignedCount: mine.count,
-            memberInitials: members.values.sorted().map { String($0.prefix(1)) }
+            memberNames: members.values.sorted(),
+            imageKey: next.flatMap(activityImageKey),
+            canFlip: pending.count > 1
         )
+    }
+
+    /// Moves the activity to the next or previous item this member still has to buy,
+    /// wrapping at either end.
+    func flipActivity(forward: Bool) {
+        let pending = items.filter { $0.assignee == actorPID && $0.status == .pending }
+        guard pending.count > 1 else { return }
+        let current = pending.firstIndex { $0.id == activityItemID } ?? 0
+        let offset = forward ? 1 : pending.count - 1
+        activityItemID = pending[(current + offset) % pending.count].id
+        updateActivity()
+    }
+
+    func connectActivityButtons() {
+        SharedBuysIntentBridge.flipHandler = { [weak self] isForward in
+            self?.flipActivity(forward: isForward)
+        }
+    }
+
+    private func activityImageKey(for item: SharedBuyItem) -> String? {
+        let key = item.imageID ?? "pending-\(item.id)"
+        guard let image = image(for: item),
+              SharedBuysActivityImageStore.save(image, for: key) else { return nil }
+        return key
     }
 
     public var activityCount: Int {
@@ -106,6 +132,7 @@ public extension SharedBuysSession {
             return
         }
         activity = nil
+        SharedBuysActivityImageStore.removeAll()
         Task { await Self.finish(identifier) }
         note("live activity ended")
     }
@@ -137,6 +164,7 @@ public extension SharedBuysSession {
     var activityCount: Int { 0 }
     var activitiesEnabled: Bool { false }
     func adoptActivity() {}
+    func connectActivityButtons() {}
     func startActivity() {}
     func updateActivity() {}
     func endActivity() {}
