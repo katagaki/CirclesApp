@@ -52,15 +52,16 @@ struct SharedBuysLiveActivity: Widget {
     @ViewBuilder
     func lockScreen(_ state: SharedBuysAttributes.ContentState) -> some View {
         VStack(alignment: .leading, spacing: 0.0) {
-            HStack(spacing: 6.0) {
+            HStack(spacing: 5.0) {
                 Image(systemName: "bag.fill")
-                    .font(.caption2)
+                    .frame(width: 18.0)
                 Text("共同購入リスト")
-                    .font(.caption2)
-                    .fontWeight(.semibold)
-                Spacer(minLength: 8.0)
+                Spacer(minLength: 12.0)
                 avatars(state: state)
             }
+            .font(.system(size: 13.0, weight: .semibold))
+            .fontDesign(.rounded)
+            .lineLimit(1)
             .foregroundStyle(.white)
             .padding(.horizontal, 16.0)
             .padding(.vertical, 8.0)
