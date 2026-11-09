@@ -59,24 +59,24 @@ struct RouteLiveActivity: Widget {
     @ViewBuilder
     func lockScreen(_ context: ActivityViewContext<RouteAttributes>) -> some View {
         VStack(alignment: .leading, spacing: 0.0) {
-            HStack(spacing: 6.0) {
+            HStack(spacing: 5.0) {
                 Image(systemName: "point.bottomleft.forward.to.point.topright.scurvepath")
-                    .font(.caption2)
+                    .frame(width: 18.0)
                 Text(context.attributes.title)
-                    .font(.caption2.weight(.semibold))
                 if !context.attributes.hallName.isEmpty {
                     Text(context.attributes.hallName)
-                        .font(.caption2)
+                        .fontWeight(.regular)
                 }
-                Spacer(minLength: 8.0)
+                Spacer(minLength: 12.0)
                 Text(context.state.progress)
-                    .font(.caption2.weight(.semibold))
                     .monospacedDigit()
             }
+            .font(.system(size: 13.0, weight: .semibold))
+            .fontDesign(.rounded)
+            .lineLimit(1)
             .foregroundStyle(.white)
             .padding(.horizontal, 16.0)
-            .padding(.top, 10.0)
-            .padding(.bottom, 6.0)
+            .padding(.vertical, 8.0)
             .background(SharedBuysLiveActivity.accent.opacity(0.75))
 
             HStack(alignment: .center, spacing: 12.0) {
