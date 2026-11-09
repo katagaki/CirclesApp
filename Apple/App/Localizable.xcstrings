@@ -11704,31 +11704,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Efficient"
+            "value": "Automatic"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "効率重視"
+            "value": "おまかせ"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "효율 우선"
+            "value": "자동"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "效率优先"
+            "value": "自动"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "效率優先"
+            "value": "自動"
           }
         }
       }
@@ -11772,31 +11772,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Prioritized"
+            "value": "Choose Colors"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "優先順"
+            "value": "色を選択"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "우선순위"
+            "value": "색상 선택"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按优先顺序"
+            "value": "选择颜色"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "依優先順序"
+            "value": "選擇顏色"
           }
         }
       }
@@ -12010,31 +12010,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Efficient takes the shortest walk. Prioritized goes color by color."
+            "value": "Automatic takes the shortest walk. Choose Colors goes color by color."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "「効率重視」は最短で、「優先順」は色の順に回ります。"
+            "value": "「おまかせ」は最短で、「色を選択」は色の順に回ります。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "'효율 우선'은 최단 동선으로, '우선순위'는 색 순서대로 돕니다."
+            "value": "'자동'은 최단 동선으로, '색상 선택'은 색 순서대로 돕니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "“效率优先”走最短路线，“按优先顺序”按颜色顺序前往。"
+            "value": "“自动”走最短路线，“选择颜色”按颜色顺序前往。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "「效率優先」走最短路線，「依優先順序」依顏色順序前往。"
+            "value": "「自動」走最短路線，「選擇顏色」依顏色順序前往。"
           }
         }
       }
@@ -15935,37 +15935,37 @@
         }
       }
     },
-    "Navi.Favorites": {
+    "Navi.Modes": {
       "extractionState": "manual",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Visit Favorites"
+            "value": "Choose a Route"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "お気に入りを巡る"
+            "value": "巡り方を選択"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "즐겨찾기 순회"
+            "value": "순회 방법 선택"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "巡游收藏"
+            "value": "选择巡游方式"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "巡遊收藏"
+            "value": "選擇巡遊方式"
           }
         }
       }
@@ -16176,41 +16176,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "已走完本路線的全部%lld個地點。"
-          }
-        }
-      }
-    },
-    "Navi.Buys": {
-      "extractionState": "manual",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Visit Buys"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "宝物を巡る"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "구매 목록 순회"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "巡游宝贝"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "巡遊寶藏"
           }
         }
       }

@@ -67,18 +67,16 @@ struct NaviView: View {
                             }
                         }
                     }
-                    NaviFavoritesSection(
+                    NaviModesSection(
                         isEnabled: isMapReady,
-                        onChoose: choose(_:)
-                    )
-                    NaviBuysSection(
-                        isEnabled: isMapReady,
-                        ownCount: ownBuysOnMap.count,
-                        sharedCount: sharedBuys.isActive ? sharedBuysOnMap.count : nil,
-                        onOwn: { routeThrough(ownBuysOnMap) },
-                        onShared: { routeThrough(sharedBuysOnMap) }
+                        ownBuysCount: ownBuysOnMap.count,
+                        sharedBuysCount: sharedBuys.isActive ? sharedBuysOnMap.count : nil,
+                        onChoose: choose(_:),
+                        onOwnBuys: { routeThrough(ownBuysOnMap) },
+                        onSharedBuys: { routeThrough(sharedBuysOnMap) }
                     )
                 }
+                .listSectionSpacing(.compact)
             }
         }
         .navigationTitle("ViewTitle.Navi")
