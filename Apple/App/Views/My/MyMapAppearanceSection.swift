@@ -5,7 +5,7 @@ struct MyMapAppearanceSection: View {
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
-    @AppStorage(wrappedValue: .none, "Map.ScrollType") var scrollType: MapAutoScrollType
+    @AppStorage(wrappedValue: .popover, "Map.ScrollType") var scrollType: MapAutoScrollType
 
     var body: some View {
         Section {

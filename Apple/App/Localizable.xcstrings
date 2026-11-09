@@ -882,74 +882,6 @@
         }
       }
     },
-    "Alerts.OfflineMode.Tip.Message": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "To exit offline mode, open My Comiket in the top right corner and turn off Offline Mode."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "オフラインモードを終了するには、右上のマイコミケを開いて「オフラインモード」をオフにしてください。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "오프라인 모드를 종료하려면 오른쪽 상단의 프로필을 열고 오프라인 모드를 끄세요."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "要退出离线模式，请打开右上角的“个人资料”并关闭离线模式。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "若要結束離線模式，請打開右上角的「個人資料」並關閉離線模式。"
-          }
-        }
-      }
-    },
-    "Alerts.OfflineMode.Tip.Title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Offline Mode"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "オフラインモード"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "오프라인 모드"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "离线模式"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "離線模式"
-          }
-        }
-      }
-    },
     "Alerts.SwitchEvent.Action": {
       "extractionState": "manual",
       "localizations": {
@@ -11194,31 +11126,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Start at %@, or long-press the map to start from where you are"
+            "value": "Start at %@"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@から出発します。現在地から始めるには、マップを長押ししてください"
+            "value": "%@から出発します"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@에서 출발합니다. 현재 위치에서 시작하려면 지도를 길게 누르세요"
+            "value": "%@에서 출발합니다"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "从%@出发。长按地图可从你所在的位置开始"
+            "value": "从%@出发"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "從%@出發。長按地圖可從你所在的位置開始"
+            "value": "從%@出發"
           }
         }
       }
@@ -11432,7 +11364,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "End Navigation"
+            "value": "End Guide"
           }
         },
         "ja": {
@@ -11500,31 +11432,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Go in through the entrance shown on the map, or long-press the map to start from where you are"
+            "value": "Go in through the entrance shown on the map"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "マップに示した出入口から入場します。現在地から始めるには、マップを長押ししてください"
+            "value": "マップに示した出入口から入場します"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "지도에 표시된 출입구로 들어가세요. 현재 위치에서 시작하려면 지도를 길게 누르세요"
+            "value": "지도에 표시된 출입구로 들어가세요"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "从地图上标出的出入口进入。长按地图可从你所在的位置开始"
+            "value": "从地图上标出的出入口进入"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "從地圖上標出的出入口進入。長按地圖可從你所在的位置開始"
+            "value": "從地圖上標出的出入口進入"
           }
         }
       }
@@ -11534,31 +11466,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Go in through the %@ entrance shown on the map, or long-press the map to start from where you are"
+            "value": "Go in through the %@ entrance shown on the map"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "マップに示した%@の出入口から入場します。現在地から始めるには、マップを長押ししてください"
+            "value": "マップに示した%@の出入口から入場します"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "지도에 표시된 %@ 출입구로 들어가세요. 현재 위치에서 시작하려면 지도를 길게 누르세요"
+            "value": "지도에 표시된 %@ 출입구로 들어가세요"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "从地图上标出的%@出入口进入。长按地图可从你所在的位置开始"
+            "value": "从地图上标出的%@出入口进入"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "從地圖上標出的%@出入口進入。長按地圖可從你所在的位置開始"
+            "value": "從地圖上標出的%@出入口進入"
           }
         }
       }
@@ -12146,7 +12078,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "How Navigation Works"
+            "value": "About Guide…"
           }
         },
         "ja": {
@@ -12384,7 +12316,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Navigation"
+            "value": "Guide"
           }
         },
         "ja": {
@@ -12838,7 +12770,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Navigation"
+            "value": "Guide"
           }
         },
         "ja": {
@@ -15974,7 +15906,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Route"
+            "value": "Guide"
           }
         },
         "ja": {
@@ -16104,6 +16036,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "出發"
+          }
+        }
+      }
+    },
+    "Route.End.Short": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "終了"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "종료"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "結束"
+          }
+        }
+      }
+    },
+    "Route.End.Confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End the guide?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ナビを終了しますか？"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내비를 종료할까요?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要结束导航吗？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要結束導航嗎？"
           }
         }
       }

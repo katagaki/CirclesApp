@@ -162,24 +162,6 @@ struct UnifiedView: View {
         } message: {
             Text("Alerts.OfflineMode.Exit.Message")
         }
-        .onChange(of: authenticator.isAuthenticating) { oldValue, newValue in
-            if oldValue && !newValue && authenticator.isOfflineModeActive {
-                Task {
-                    try? await Task.sleep(for: .seconds(1))
-                    while oasis.isShowing {
-                        try? await Task.sleep(for: .seconds(0.5))
-                    }
-                    unifier.hide()
-                    try? await Task.sleep(for: .seconds(0.6))
-                    unifier.isOfflineModeTipShowing = true
-                }
-            }
-        }
-        .onChange(of: unifier.isOfflineModeTipShowing) { oldValue, newValue in
-            if oldValue && !newValue {
-                unifier.show()
-            }
-        }
     }
 
     func prepareTipKit() {

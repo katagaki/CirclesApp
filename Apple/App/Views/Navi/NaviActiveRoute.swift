@@ -16,16 +16,6 @@ struct NaviActiveRoute: View {
                 }
                 .padding(16.0)
                 .background(Color(uiColor: .secondarySystemGroupedBackground), in: .rect(cornerRadius: 22.0))
-                Button(role: .destructive) {
-                    navigator.end()
-                } label: {
-                    Text("Route.End")
-                        .fontWeight(.semibold)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 4.0)
-                }
-                .buttonStyle(.glass)
-                .tint(.red)
             }
             .padding(.horizontal, 20.0)
             .padding(.vertical, 12.0)

@@ -9,7 +9,6 @@ struct UnifiedToolbar: ToolbarContent {
     let namespace: Namespace.ID
 
     var body: some ToolbarContent {
-        @Bindable var unifier = unifier
         if !oasis.isShowing && !authenticator.isAuthenticating {
             ToolbarItem(placement: .topBarLeading) {
                 UnifiedControl()
@@ -23,17 +22,6 @@ struct UnifiedToolbar: ToolbarContent {
         }
         ToolbarItem(placement: .topBarTrailing) {
             MyComiketButton()
-                .popover(isPresented: $unifier.isOfflineModeTipShowing, arrowEdge: .top) {
-                    VStack(alignment: .leading, spacing: 8.0) {
-                        Text("Alerts.OfflineMode.Tip.Title")
-                            .font(.headline)
-                        Text("Alerts.OfflineMode.Tip.Message")
-                            .font(.subheadline)
-                    }
-                    .padding()
-                    .frame(idealWidth: 320.0)
-                    .presentationCompactAdaptation(.popover)
-                }
         }
         .sharedBackgroundVisibility(.hidden)
         if unifier.displayMode == .sheet {

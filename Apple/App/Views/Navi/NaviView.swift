@@ -22,6 +22,7 @@ struct NaviView: View {
     @State var results: [ComiketCircle]?
 
     @AppStorage(wrappedValue: false, "Route.HasSeenOnboarding") var hasSeenOnboarding: Bool
+    @AppStorage(wrappedValue: .regular, "Circles.ListSize") var listDisplayMode: ListDisplayMode
 
     var isMapReady: Bool {
         selections.map != nil && selections.date != nil
@@ -35,7 +36,7 @@ struct NaviView: View {
                 } else {
                     CircleList(
                         circles: results,
-                        displayMode: .compact,
+                        displayMode: listDisplayMode,
                         namespace: namespace,
                         onSelect: startDirections(to:)
                     )
@@ -44,6 +45,13 @@ struct NaviView: View {
                 NaviActiveRoute()
             } else {
                 List {
+                    if navigator.isNoStopsAlertPresented {
+                        Section {
+                            UnifiedRouteNoStopsCard {
+                                navigator.dismissNoStops()
+                            }
+                        }
+                    }
                     NaviFavoritesSection(
                         isEnabled: isMapReady,
                         onChoose: choose(_:),
@@ -67,6 +75,12 @@ struct NaviView: View {
         )
         .toolbar {
             DefaultToolbarItem(kind: .search, placement: .bottomBar)
+            if navigator.isActive {
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+                ToolbarItem(placement: .bottomBar) {
+                    NaviEndButton()
+                }
+            }
             SidebarPositionToolbarItem()
         }
         .task(id: searchTerm) {

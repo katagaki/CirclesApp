@@ -114,7 +114,9 @@ struct MyView: View {
 
     func reloadDataInBackground(forceReload: Bool = false) {
         if authenticator.effectiveOnlineState == .offline {
-            isInitialLoadCompleted = true
+            Task {
+                await reloadLocalData()
+            }
             return
         }
         if let token = authenticator.token, !token.accessToken.isEmpty,
@@ -132,6 +134,23 @@ struct MyView: View {
                 }
 
             }
+        }
+    }
+
+    func reloadLocalData() async {
+        var eventDates: [Int: Date]?
+        if let eventNumber = planner.activeEvent?.number {
+            let actor = DataFetcher(database: database.getTextDatabase())
+            eventDates = await actor.dates(for: eventNumber)
+        }
+        withAnimation(.smooth.speed(2.0)) {
+            self.eventDates = eventDates
+            self.eventCoverImage = database.coverImage()
+            events = database.events()
+            eventTitle = events.first(where: {
+                $0.eventNumber == planner.activeEventNumber
+            })?.name
+            isInitialLoadCompleted = true
         }
     }
 
