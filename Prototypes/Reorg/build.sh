@@ -9,7 +9,8 @@ xcodebuild -project $target.xcodeproj -scheme $target -sdk iphonesimulator -conf
   -derivedDataPath $derived -destination 'generic/platform=iOS Simulator' build -quiet 2>&1 | grep -E "error|warning: unre" || true
 app=$derived/Build/Products/Debug-iphonesimulator/$target.app
 test -d $app
-for sim in "Reorg iPhone" "Reorg iPhone Duo" "Reorg iPad"; do
+sims=(${(s:,:)${REORG_SIMS:-Reorg iPhone,Reorg iPhone Duo,Reorg iPad}})
+for sim in "${sims[@]}"; do
   xcrun simctl install "$sim" $app
 done
 echo "installed $app"
