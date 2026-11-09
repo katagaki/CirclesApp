@@ -80,7 +80,7 @@ final class Navigator {
     var canReportBlocked: Bool {
         guard let currentStep else { return false }
         switch currentStep.action {
-        case .begin, .enter: return false
+        case .begin, .entrance, .enter: return false
         case .turn, .arrive, .exit: return true
         }
     }
@@ -332,7 +332,7 @@ final class Navigator {
 
     private func replanFromCurrentStep(database: Database) {
         guard context != nil else { return }
-        if let step = currentStep, step.action != .begin, let start = step.path.first {
+        if let step = currentStep, !step.isStart, let start = step.path.first {
             origin = start
         }
         keepRemainingStops()

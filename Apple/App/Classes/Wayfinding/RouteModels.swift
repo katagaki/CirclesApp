@@ -56,6 +56,7 @@ nonisolated enum RoutePassage: Sendable, Hashable {
 
 nonisolated enum RouteAction: Sendable, Hashable {
     case begin
+    case entrance(hall: String)
     case exit(hall: String)
     case enter(hall: String)
     case turn(RouteTurn, into: RoutePassage)

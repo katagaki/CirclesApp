@@ -58,19 +58,22 @@ nonisolated enum RoutePlanner {
         let costs = stops.indices.map { from in
             stops.indices.map { to in fields[from][map.index(stops[to].cell)] }
         }
-        let startCosts: [Float] = stops.indices.map { index in
-            guard let originCell else { return 0 }
-            return fields[index][map.index(originCell)]
-        }
-        let order = StopOrderer.order(costs: costs, startCosts: startCosts, ranks: stops.map(\.request.rank))
+        let (order, entrance) = order(
+            from: originCell, through: doors, in: map, fields: fields, costs: costs, ranks: stops.map(\.request.rank)
+        )
 
         let narrator = RouteNarrator(map: map, doorName: doorName, outside: outside)
         var outsidePaths: [[CGPoint]] = []
         var plannedStops: [RouteStop] = []
         var legs: [[CGPoint]] = []
         var steps: [RouteStep] = []
-        var current = originCell
+        var current = originCell ?? entrance?.cell
         var currentPoint = originCell.map { map.center(of: $0) }
+            ?? entrance.map { CGPoint(x: $0.sign.midX, y: $0.sign.midY) }
+        if let entrance, let signPoint = currentPoint {
+            steps.append(RouteStep(id: 0, stopIndex: 0, blocks: 0, action: .entrance(hall: doorName(entrance.cell)),
+                                   path: [signPoint, map.center(of: entrance.cell)]))
+        }
         pathfinder.wear = [Float](repeating: 0, count: map.walkable.count)
         for (position, index) in order.enumerated() {
             let stop = stops[index]
@@ -117,6 +120,38 @@ nonisolated enum RoutePlanner {
         }
         return PlannedRoute(stops: plannedStops, legs: legs, steps: steps, origin: originCell.map { map.center(of: $0) },
                             closures: closureLines, outsidePaths: outsidePaths, skippedSpaces: skippedSpaces)
+    }
+
+    private static func order(
+        from originCell: GridPoint?, through doors: [RouteDoor], in map: WalkableMap,
+        fields: [[Float]], costs: [[Float]], ranks: [Int]
+    ) -> (order: [Int], entrance: RouteDoor?) {
+        if let originCell {
+            let startCosts = fields.map { $0[map.index(originCell)] }
+            return (StopOrderer.order(costs: costs, startCosts: startCosts, ranks: ranks), nil)
+        }
+        if let best = bestEntrance(through: doors, in: map, fields: fields, costs: costs, ranks: ranks) {
+            return (best.order, best.door)
+        }
+        return (StopOrderer.order(costs: costs, startCosts: fields.map { _ in 0 }, ranks: ranks), nil)
+    }
+
+    /// Without knowing where the visitor stands, they are taken to be outside the hall, so
+    /// the walk starts at whichever entrance makes the whole route shortest.
+    private static func bestEntrance(
+        through doors: [RouteDoor], in map: WalkableMap, fields: [[Float]], costs: [[Float]], ranks: [Int]
+    ) -> (door: RouteDoor, order: [Int])? {
+        var best: (door: RouteDoor, order: [Int], length: Float)?
+        for door in doors where map.isWalkable(door.cell) {
+            let startCosts = fields.map { $0[map.index(door.cell)] }
+            guard startCosts.allSatisfy(\.isFinite) else { continue }
+            let order = StopOrderer.order(costs: costs, startCosts: startCosts, ranks: ranks)
+            let length = StopOrderer.length(of: order, costs: costs, startCosts: startCosts)
+            if best == nil || length < best!.length {
+                best = (door, order, length)
+            }
+        }
+        return best.map { ($0.door, $0.order) }
     }
 
     /// The cells each active closure blocks, and the line drawn across each on the map.
