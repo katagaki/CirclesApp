@@ -9,18 +9,18 @@ struct BuysOnboardingHero: View {
         let tint: Color
         let symbol: String
         let cost: Int
-        let buyer: String
+        let buyer: Int
     }
 
     @State var joinedCount: Int = 0
     @State var boughtCount: Int = 0
 
-    let members = ["H", "U", "K"]
+    let members: [(nickname: String, pid: Int)] = [("H", 1), ("U", 3), ("K", 6)]
 
     let items: [Item] = [
-        Item(tint: .purple, symbol: "book.closed.fill", cost: 500, buyer: "H"),
-        Item(tint: .blue, symbol: "photo.fill", cost: 1000, buyer: "U"),
-        Item(tint: .yellow, symbol: "sparkles", cost: 1500, buyer: "K")
+        Item(tint: .purple, symbol: "book.closed.fill", cost: 500, buyer: 0),
+        Item(tint: .blue, symbol: "photo.fill", cost: 1000, buyer: 1),
+        Item(tint: .yellow, symbol: "sparkles", cost: 1500, buyer: 2)
     ]
 
     var total: Int {
@@ -31,7 +31,7 @@ struct BuysOnboardingHero: View {
         VStack(alignment: .leading, spacing: 14.0) {
             HStack(spacing: -8.0) {
                 ForEach(Array(members.enumerated()), id: \.offset) { index, member in
-                    MemberInitial(nickname: member, size: 28.0)
+                    MemberAvatar(nickname: member.nickname, pid: member.pid, size: 28.0)
                         .overlay {
                             Circle().strokeBorder(Color(.secondarySystemGroupedBackground), lineWidth: 2.0)
                         }
@@ -82,7 +82,7 @@ struct BuysOnboardingHero: View {
                         .padding(6.0)
                 }
                 .overlay(alignment: .topTrailing) {
-                    MemberInitial(nickname: item.buyer, size: 22.0)
+                    MemberAvatar(nickname: members[item.buyer].nickname, pid: members[item.buyer].pid, size: 22.0)
                         .padding(6.0)
                         .scaleEffect(isAssigned ? 1.0 : 0.2)
                         .opacity(isAssigned ? 1.0 : 0.0)

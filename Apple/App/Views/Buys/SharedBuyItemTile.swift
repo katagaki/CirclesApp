@@ -34,8 +34,8 @@ struct SharedBuyItemTile: View {
             },
             accessory: {
                 Button(action: onAssign) {
-                    if let nickname = sharedBuys.members[item.assignee ?? -1] {
-                        MemberInitial(nickname: nickname, isMine: isMine)
+                    if let assignee = item.assignee, let nickname = sharedBuys.members[assignee] {
+                        MemberAvatar(nickname: nickname, pid: assignee, isMine: isMine, isHighlighted: isMine)
                     } else {
                         Image(systemName: "person.fill.questionmark")
                             .font(.system(size: 11.0, weight: .bold))
@@ -67,31 +67,5 @@ struct SharedBuyItemTile: View {
         return item.status == .bought
             ? "Buys.Shared.Bought.\(nickname)"
             : "Buys.Shared.Cancelled.\(nickname)"
-    }
-}
-
-struct MemberInitial: View {
-
-    let nickname: String
-    var isMine: Bool = false
-    var size: CGFloat = 26.0
-
-    var body: some View {
-        Circle()
-            .fill(color.gradient)
-            .frame(width: size, height: size)
-            .overlay {
-                Text(String(nickname.prefix(1)))
-                    .font(.system(size: size * 0.45, weight: .bold))
-                    .foregroundStyle(.white)
-            }
-            .overlay {
-                Circle().strokeBorder(isMine ? Color.accentColor : .clear, lineWidth: 2.0)
-            }
-    }
-
-    var color: Color {
-        let palette: [Color] = [.orange, .teal, .purple, .pink, .indigo, .green]
-        return palette[SharedBuysPalette.index(for: nickname, count: palette.count)]
     }
 }

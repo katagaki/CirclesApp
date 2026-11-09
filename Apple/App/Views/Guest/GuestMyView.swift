@@ -35,7 +35,7 @@ struct GuestMyView: View {
                             if let profilePictureState {
                                 profilePictureState.resizable()
                             } else {
-                                Image(.profile1).resizable()
+                                GenericProfilePicture(name: sharedBuys.nickname, userID: sharedBuys.actorPID)
                             }
                         }
                         .scaledToFill()
@@ -59,9 +59,11 @@ struct GuestMyView: View {
                 Section {
                     ForEach(sharedBuys.members.sorted(by: { $0.value < $1.value }), id: \.key) { member in
                         HStack(spacing: 10.0) {
-                            MemberInitial(
+                            MemberAvatar(
                                 nickname: member.value,
+                                pid: member.key,
                                 isMine: member.key == sharedBuys.actorPID,
+                                isHighlighted: member.key == sharedBuys.actorPID,
                                 size: 30.0
                             )
                             Text(member.value)

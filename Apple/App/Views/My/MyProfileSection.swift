@@ -36,8 +36,10 @@ struct MyProfileSection: View {
                             profilePictureState
                                 .resizable()
                         } else {
-                            Image(.profile1)
-                                .resizable()
+                            GenericProfilePicture(
+                                name: userInfo?.nickname ?? lastKnownNickname ?? "",
+                                userID: userInfo?.pid ?? lastKnownPID
+                            )
                         }
                     }
                     .scaledToFill()
