@@ -75,7 +75,8 @@ struct RouteLiveActivity: Widget {
             }
             .foregroundStyle(.white)
             .padding(.horizontal, 16.0)
-            .padding(.vertical, 8.0)
+            .padding(.top, 10.0)
+            .padding(.bottom, 6.0)
             .background(SharedBuysLiveActivity.accent.opacity(0.75))
 
             HStack(alignment: .center, spacing: 12.0) {
