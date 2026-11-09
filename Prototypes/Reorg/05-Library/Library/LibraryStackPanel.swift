@@ -20,6 +20,8 @@ struct LibraryStackPanel: View {
                         .padding(.top, 16.0)
                         .padding(.bottom, 4.0)
                 }
+                .contentMargins(.top, 8.0, for: .scrollContent)
+                .listSectionSpacing(.compact)
                 .toolbarVisibility(.hidden, for: .navigationBar)
                 .libraryDestinations()
         }
