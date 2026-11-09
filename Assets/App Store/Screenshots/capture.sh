@@ -89,7 +89,7 @@ seed() {
   boot $udid
   xcrun simctl status_bar $udid override --time 9:41 \
     --batteryState discharging --batteryLevel 100 \
-    --cellularMode active --cellularBars 4 --wifiBars 3 --operatorName ""
+    --cellularMode active --cellularBars 4 --dataNetwork 4g --operatorName ""
 }
 
 # MARK: - Capture
