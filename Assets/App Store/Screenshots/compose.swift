@@ -229,7 +229,7 @@ func inflate(_ data: Data) -> Data? {
 /// balanced.
 func removingClocks(from contents: Data) -> Data? {
     guard let text = String(data: contents, encoding: .isoLatin1) else { return nil }
-    guard let marker = try? NSRegularExpression(pattern: #"/P << /MCID \d+ >>\s*BDC"#) else { return nil }
+    guard let marker = try? NSRegularExpression(pattern: #"/P\s*<<\s*/MCID\s+\d+\s*>>\s*BDC"#) else { return nil }
     let starts = marker.matches(in: text, range: NSRange(text.startIndex..., in: text)).map(\.range.location)
     guard !starts.isEmpty else { return nil }
     let source = text as NSString
