@@ -55,6 +55,7 @@ struct UnifiedRouteStepSection: View {
                     onSkip: { navigator.skip() },
                     onVisited: { navigator.markVisitedAndContinue() }
                 )
+                NaviBuysCarousel(circleID: stop.circleID)
             }
         }
     }

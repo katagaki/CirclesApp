@@ -1,4 +1,5 @@
 import AXiS
+import ORBiT
 import RADiUS
 import SwiftData
 import SwiftUI
@@ -10,6 +11,7 @@ struct NaviView: View {
     @Environment(Favorites.self) var favorites
     @Environment(Mapper.self) var mapper
     @Environment(Navigator.self) var navigator
+    @Environment(SharedBuysSession.self) var sharedBuys
     @Environment(Unifier.self) var unifier
     @Environment(UserSelections.self) var selections
 
@@ -68,6 +70,13 @@ struct NaviView: View {
                     NaviFavoritesSection(
                         isEnabled: isMapReady,
                         onChoose: choose(_:)
+                    )
+                    NaviBuysSection(
+                        isEnabled: isMapReady,
+                        ownCount: ownBuysOnMap.count,
+                        sharedCount: sharedBuys.isActive ? sharedBuysOnMap.count : nil,
+                        onOwn: { routeThrough(ownBuysOnMap) },
+                        onShared: { routeThrough(sharedBuysOnMap) }
                     )
                 }
             }
@@ -131,6 +140,46 @@ struct NaviView: View {
         } else {
             results = nil
         }
+    }
+
+    /// Circles on the open map with something of yours still to buy.
+    var ownBuysOnMap: [Int] {
+        let circleIDs = BuysDatabase.shared.entries(for: planner.activeEventNumber)
+            .filter { entry in
+                entry.items.contains { $0.status == .pending && !$0.name.trimmingCharacters(in: .whitespaces).isEmpty }
+            }
+            .map(\.circleID)
+        return webCatalogIDsOnMap(for: circleIDs)
+    }
+
+    /// Circles on the open map with a shared item still to buy that is yours or nobody's.
+    var sharedBuysOnMap: [Int] {
+        let circleIDs = sharedBuys.items
+            .filter { $0.status == .pending && ($0.assignee == nil || $0.assignee == sharedBuys.actorPID) }
+            .map(\.circleID)
+        return webCatalogIDsOnMap(for: Array(Set(circleIDs)))
+    }
+
+    func webCatalogIDsOnMap(for circleIDs: [Int]) -> [Int] {
+        guard !circleIDs.isEmpty else { return [] }
+        let onMap = Set(mapper.layouts.values.flatMap { $0 })
+        return database.circles(circleIDs)
+            .compactMap { $0.extendedInformation?.webCatalogID }
+            .filter { onMap.contains($0) }
+    }
+
+    func routeThrough(_ webCatalogIDs: [Int]) {
+        guard !webCatalogIDs.isEmpty else { return }
+        let colors = favoriteColors()
+        let stops = Dictionary(
+            webCatalogIDs.map { ($0, colors[$0] ?? .uncolored) },
+            uniquingKeysWith: { first, _ in first }
+        )
+        startRoute(
+            favoriteColors: stops,
+            colorPriority: nil,
+            includesVisited: true
+        )
     }
 
     func choose(_ mode: Navigator.Mode) {
