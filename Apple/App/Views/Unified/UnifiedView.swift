@@ -8,8 +8,6 @@ struct UnifiedView: View {
     @Environment(\.requestReview) var requestReview
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(Authenticator.self) var authenticator
-    @Environment(Database.self) var database
-    @Environment(ImageCache.self) var imageCache
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
     @Environment(Oasis.self) var oasis
@@ -147,14 +145,6 @@ struct UnifiedView: View {
                 unifier.show()
             }
         }
-        .alert("Alerts.Logout.Title", isPresented: $unifier.isGoingToSignOut) {
-            Button("Shared.Cancel", role: .cancel) {
-                unifier.show()
-            }
-            Button("Shared.Logout", role: .destructive, action: logout)
-        } message: {
-            Text("Alerts.Logout.Message")
-        }
         .alert("Alerts.OfflineMode.Enter.Title", isPresented: $unifier.isGoingToEnterOfflineMode) {
             Button("Shared.Cancel", role: .cancel) {
                 unifier.show()
@@ -217,24 +207,5 @@ struct UnifiedView: View {
     func exitOfflineMode() {
         unifier.close()
         authenticator.exitOfflineMode()
-    }
-
-    func logout() {
-        database.delete()
-        imageCache.clear()
-        let dictionary = UserDefaults.standard.dictionaryRepresentation()
-        dictionary.keys.forEach { key in
-            UserDefaults.standard.removeObject(forKey: key)
-        }
-        UserDefaults.standard.synchronize()
-        Task.detached {
-            await MainActor.run {
-
-                imageCache.clear()
-                database.reset()
-                unifier.close()
-                authenticator.resetAuthentication()
-            }
-        }
     }
 }
