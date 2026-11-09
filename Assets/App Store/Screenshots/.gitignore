@@ -1,0 +1,4 @@
+# Captures and results show catalog data, so they stay out of the repository.
+/Raw/
+/iPhone/
+/iPad/
