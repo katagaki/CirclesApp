@@ -11320,6 +11320,74 @@
         }
       }
     },
+    "Route.Entrance": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go in through the entrance shown on the map, or long-press the map to start from where you are"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "マップに示した出入口から入場します。現在地から始めるには、マップを長押ししてください"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "지도에 표시된 출입구로 들어가세요. 현재 위치에서 시작하려면 지도를 길게 누르세요"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从地图上标出的出入口进入。长按地图可从你所在的位置开始"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從地圖上標出的出入口進入。長按地圖可從你所在的位置開始"
+          }
+        }
+      }
+    },
+    "Route.Entrance.%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go in through the %@ entrance shown on the map, or long-press the map to start from where you are"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "マップに示した%@の出入口から入場します。現在地から始めるには、マップを長押ししてください"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "지도에 표시된 %@ 출입구로 들어가세요. 현재 위치에서 시작하려면 지도를 길게 누르세요"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "从地图上标出的%@出入口进入。长按地图可从你所在的位置开始"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "從地圖上標出的%@出入口進入。長按地圖可從你所在的位置開始"
+          }
+        }
+      }
+    },
     "Route.Exit.%@.%@": {
       "localizations": {
         "en": {

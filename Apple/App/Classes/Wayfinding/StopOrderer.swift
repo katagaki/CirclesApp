@@ -23,16 +23,21 @@ nonisolated enum StopOrderer {
         return result
     }
 
+    static func length(of order: [Int], costs: [[Float]], startCosts: [Float]) -> Float {
+        guard let first = order.first else { return 0 }
+        var sum = startCosts[first]
+        for index in 0..<(order.count - 1) {
+            sum += costs[order[index]][order[index + 1]]
+        }
+        return sum
+    }
+
     static func order(costs: [[Float]], startCosts: [Float]) -> [Int] {
         let count = costs.count
         guard count > 1 else { return Array(0..<count) }
 
         func total(_ order: [Int]) -> Float {
-            var sum = startCosts[order[0]]
-            for index in 0..<(order.count - 1) {
-                sum += costs[order[index]][order[index + 1]]
-            }
-            return sum
+            length(of: order, costs: costs, startCosts: startCosts)
         }
 
         let starts = startCosts.allSatisfy { $0 == 0 } ? Array(0..<count) : [
