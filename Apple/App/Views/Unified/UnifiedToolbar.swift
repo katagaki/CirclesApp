@@ -3,8 +3,6 @@ import SwiftUI
 struct UnifiedToolbar: ToolbarContent {
 
     @Environment(Authenticator.self) var authenticator
-    @Environment(Favorites.self) var favorites
-    @Environment(Navigator.self) var navigator
     @Environment(Oasis.self) var oasis
     @Environment(Unifier.self) var unifier
 
@@ -13,17 +11,15 @@ struct UnifiedToolbar: ToolbarContent {
     var body: some ToolbarContent {
         @Bindable var unifier = unifier
         if !oasis.isShowing && !authenticator.isAuthenticating {
-            ToolbarItem(placement: .principal) {
+            ToolbarItem(placement: .topBarLeading) {
                 UnifiedControl()
+                    .fixedSize()
                     .foregroundStyle(.primary)
                     .glassEffect(.regular.interactive())
                     .adaptiveShadow()
+                    .opacity(unifier.presentedControlMenu == nil ? 1.0 : 0.0)
             }
-            if navigator.isActive || favorites.isAvailable {
-                ToolbarItem(placement: .topBarLeading) {
-                    UnifiedRouteButton()
-                }
-            }
+            .sharedBackgroundVisibility(.hidden)
         }
         ToolbarItem(placement: .topBarTrailing) {
             MyComiketButton()

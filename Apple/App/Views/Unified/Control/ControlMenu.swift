@@ -40,44 +40,51 @@ struct ControlMenu<Content: View>: View {
         contentWidth + padding * 2.0
     }
 
-    // Unfurls downwards out of the toolbar instead of resizing the content itself.
-    var revealHeight: CGFloat {
-        let collapsedHeight = min(anchor.height, menuHeight)
-        return collapsedHeight + (menuHeight - collapsedHeight) * animationProgress
+    func interpolate(_ from: CGFloat, _ to: CGFloat) -> CGFloat {
+        from + (to - from) * animationProgress
     }
 
+    // Grows out of the control's own capsule into the menu, so the two read as one shape.
     var body: some View {
         GeometryReader { proxy in
             let container = proxy.frame(in: .global)
+            let originX = interpolate(anchor.minX, menuOriginX(in: container)) - container.minX
+            let width = interpolate(anchor.width, menuWidth)
+            let height = menuHeight > 0.0 ? interpolate(anchor.height, menuHeight) : anchor.height
+            let radius = interpolate(anchor.height / 2.0, cornerRadius)
+            let shape = RoundedRectangle(cornerRadius: radius, style: .continuous)
             ZStack(alignment: .topLeading) {
                 Color.clear
                     .contentShape(.rect)
                     .onTapGesture { close() }
+                Color.clear
+                    .frame(width: width, height: height)
+                    .glassEffect(.regular, in: shape)
+                    .offset(x: originX, y: anchor.minY - container.minY)
                 content(close)
                     .padding(.vertical, padding)
                     .padding(.horizontal, isContentEdgeToEdge ? 0.0 : padding)
                     .frame(width: menuWidth)
-                    .glassEffect(.regular, in: .rect(cornerRadius: cornerRadius, style: .continuous))
                     .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { menuHeight = $0 }
-                    .mask(alignment: .top) {
-                        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                            .frame(height: menuHeight > 0.0 ? revealHeight : nil)
-                    }
                     .opacity(animationProgress)
-                    .offset(x: menuOriginX(in: container) - container.minX,
-                            y: anchor.minY - container.minY)
+                    .offset(x: originX, y: anchor.minY - container.minY)
+                    .mask(alignment: .topLeading) {
+                        shape
+                            .frame(width: width, height: height)
+                            .offset(x: originX, y: anchor.minY - container.minY)
+                    }
             }
         }
         .ignoresSafeArea()
         .onAppear {
-            withAnimation(.smooth(duration: 0.25)) {
+            withAnimation(.smooth(duration: 0.3)) {
                 animationProgress = 1.0
             }
         }
     }
 
     func menuOriginX(in container: CGRect) -> CGFloat {
-        let preferred = container.midX - menuWidth / 2.0
+        let preferred = anchor.minX
         let minimumX = container.minX + edgePadding
         let maximumX = container.maxX - menuWidth - edgePadding
         return min(max(preferred, minimumX), max(minimumX, maximumX))

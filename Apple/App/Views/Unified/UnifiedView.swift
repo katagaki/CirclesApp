@@ -53,6 +53,7 @@ struct UnifiedView: View {
             MapView()
                 .navigationTitle("ViewTitle.Map")
                 .navigationBarTitleDisplayMode(.inline)
+                .toolbar(removing: .title)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea(.all, edges: isiPad ? [] : .top) // HACK: .top breaks iPad UI
                 .contentShape(.rect)

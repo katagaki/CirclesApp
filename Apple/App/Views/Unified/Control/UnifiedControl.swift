@@ -20,7 +20,7 @@ struct UnifiedControl: View {
             }
         }
         .frame(minWidth: 100.0, maxWidth: 280.0)
-        .padding(6.0)
+        .padding(5.0)
         .background {
             GeometryReader { proxy in
                 Color.clear
