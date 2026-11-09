@@ -13,6 +13,7 @@ public struct SharedBuysAttributes: ActivityAttributes, Sendable {
         public var assignedCount: Int
         public var memberNames: [String]
         public var imageKey: String?
+        public var canFlip: Bool
 
         public var isComplete: Bool { assignedCount > 0 && boughtCount >= assignedCount }
     }

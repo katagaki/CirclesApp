@@ -146,6 +146,9 @@ struct SharedBuysLiveActivity: Widget {
                 .fontWeight(.semibold)
                 .monospacedDigit()
                 .foregroundStyle(.secondary)
+            if state.canFlip {
+                SharedBuysFlipButtons()
+            }
         }
     }
 

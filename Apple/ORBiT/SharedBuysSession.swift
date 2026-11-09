@@ -124,6 +124,7 @@ public final class SharedBuysSession {
         didSet { updateActivity() }
     }
     @ObservationIgnored var imageFetches: Set<String> = []
+    @ObservationIgnored var activityItemID: String?
 
     public var bluetoothPeers: Int = 0
     public var bluetoothNote: String = ""

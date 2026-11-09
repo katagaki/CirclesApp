@@ -14,6 +14,7 @@
 		A7E0C0DE0000000000000002 /* RouteLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E0C0DE0000000000000001 /* RouteLiveActivity.swift */; };
 		A7E0C0DE0000000000000004 /* RouteActivityCut.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E0C0DE0000000000000003 /* RouteActivityCut.swift */; };
 		A7E0C0DE0000000000000006 /* SharedBuysActivityPhoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E0C0DE0000000000000005 /* SharedBuysActivityPhoto.swift */; };
+		A7E0C0DE0000000000000008 /* SharedBuysFlipButtons.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E0C0DE0000000000000007 /* SharedBuysFlipButtons.swift */; };
 		864CA3762F406E01D04EBD1C /* ORBiT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D631878DB8C8016D0BFE1C2 /* ORBiT.framework */; };
 		8C35BA4C2F7CC7A4959DF5BF /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2745DAF4DF1C30D56B380624 /* WidgetKit.framework */; };
 		94CF64F6B10F21FEE927DC8B /* SharedBuysWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 1298D61EBB64136051D35619 /* SharedBuysWidget.appex */; platformFilter = ios; };
@@ -147,6 +148,7 @@
 		4A21F4CBB6C46E07523E557A /* SharedBuysWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = SharedBuysWidget.entitlements; sourceTree = "<group>"; };
 		A7E0C0DE0000000000000003 /* RouteActivityCut.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RouteActivityCut.swift; sourceTree = "<group>"; };
 		A7E0C0DE0000000000000005 /* SharedBuysActivityPhoto.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedBuysActivityPhoto.swift; sourceTree = "<group>"; };
+		A7E0C0DE0000000000000007 /* SharedBuysFlipButtons.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedBuysFlipButtons.swift; sourceTree = "<group>"; };
 		A7E0C0DE0000000000000001 /* RouteLiveActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RouteLiveActivity.swift; sourceTree = "<group>"; };
 		516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedBuysLiveActivity.swift; sourceTree = "<group>"; };
 		6F4DDFCCFE0D158B610EDEA8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
@@ -325,6 +327,7 @@
 			children = (
 				A7E0C0DE0000000000000003 /* RouteActivityCut.swift */,
 				A7E0C0DE0000000000000005 /* SharedBuysActivityPhoto.swift */,
+				A7E0C0DE0000000000000007 /* SharedBuysFlipButtons.swift */,
 				A7E0C0DE0000000000000001 /* RouteLiveActivity.swift */,
 				516AC59B1B770665BEB428AE /* SharedBuysLiveActivity.swift */,
 				171C3A7FD183AE1DE637FC0E /* SharedBuysWidgetBundle.swift */,
@@ -700,6 +703,7 @@
 				75D7CED44B17D66CF9B0855E /* SharedBuysLiveActivity.swift in Sources */,
 				A7E0C0DE0000000000000004 /* RouteActivityCut.swift in Sources */,
 				A7E0C0DE0000000000000006 /* SharedBuysActivityPhoto.swift in Sources */,
+				A7E0C0DE0000000000000008 /* SharedBuysFlipButtons.swift in Sources */,
 				A7E0C0DE0000000000000002 /* RouteLiveActivity.swift in Sources */,
 				D187D843694B57F81185DD5B /* SharedBuysWidgetBundle.swift in Sources */,
 			);
