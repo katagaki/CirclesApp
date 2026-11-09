@@ -95,19 +95,12 @@ struct CatalogView: View {
         .navigationTitle("ViewTitle.Circles")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
-            if UIDevice.current.userInterfaceIdiom == .phone {
-                ToolbarItem(placement: .topBarLeading) {
-                    displaySettingsMenu()
-                }
-            }
             CatalogToolbar()
-            if UIDevice.current.userInterfaceIdiom != .phone {
-                ToolbarSpacer(.flexible, placement: .bottomBar)
-                ToolbarItem(placement: .bottomBar) {
-                    displaySettingsMenu()
-                }
-                SidebarPositionToolbarItem()
+            ToolbarSpacer(.fixed, placement: .bottomBar)
+            ToolbarItem(placement: .bottomBar) {
+                displaySettingsMenu()
             }
+            SidebarPositionToolbarItem()
         }
         .searchable(
             text: $searchTerm,

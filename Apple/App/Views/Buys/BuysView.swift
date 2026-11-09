@@ -74,33 +74,30 @@ struct BuysView: View {
             SharedBuyAssignSheet(item: item)
         }
         .toolbar {
-            if UIDevice.current.userInterfaceIdiom == .phone {
-                ToolbarItem(placement: .topBarLeading) {
-                    infoButton()
-                }
-            } else {
-                ToolbarItem(placement: .bottomBar) {
-                    infoButton()
-                }
-                SidebarPositionToolbarItem()
-            }
-            if scope == .shared && !sharedBuys.isActive {
-                ToolbarItem(placement: .bottomBar) {
-                    Button("Buys.Shared.Start", systemImage: "plus") {
-                        startSharedBuys()
-                    }
-                }
-            }
-            ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {
                 Picker("ViewTitle.Buys", selection: $scope) {
                     Text("Buys.Scope.Mine").tag(BuysScope.mine)
                     Text("Buys.Scope.Shared").tag(BuysScope.shared)
                 }
                 .pickerStyle(.segmented)
-                .popoverTip(BuysScopeTip())
             }
             .sharedBackgroundVisibility(.hidden)
+            ToolbarSpacer(.flexible, placement: .bottomBar)
+            if scope == .shared && !sharedBuys.isActive {
+                ToolbarItem(placement: .bottomBar) {
+                    Button("Buys.Shared.Create") {
+                        startSharedBuys()
+                    }
+                }
+                ToolbarSpacer(.fixed, placement: .bottomBar)
+            }
+            ToolbarItem(placement: .bottomBar) {
+                Button("Buys.Onboarding.Open", systemImage: "questionmark.circle") {
+                    unifier.openRouteScreen(.buysOnboarding)
+                }
+                .labelStyle(.iconOnly)
+            }
+            SidebarPositionToolbarItem()
         }
         .onAppear {
             reloadEntries()
@@ -254,14 +251,6 @@ struct BuysView: View {
             .listStyle(.insetGrouped)
             .listSectionSpacing(.compact)
         }
-    }
-
-    @ViewBuilder
-    func infoButton() -> some View {
-        Button("Buys.Onboarding.Open", systemImage: "questionmark.circle") {
-            unifier.openRouteScreen(.buysOnboarding)
-        }
-        .labelStyle(.iconOnly)
     }
 
     func startSharedBuys() {

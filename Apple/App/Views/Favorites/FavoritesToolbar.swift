@@ -13,29 +13,20 @@ struct FavoritesToolbar: ToolbarContent {
 
     var body: some ToolbarContent {
 
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            ToolbarItem(placement: .topBarLeading) {
-                displaySettingsMenu()
-            }
-        }
-
         ToolbarSpacer(.fixed, placement: .bottomBar)
         ToolbarItemGroup(placement: .bottomBar) {
             FavoritesColorFilterButton()
             FavoritesHallFilterButton()
         }
         ToolbarSpacer(.flexible, placement: .bottomBar)
-        if UIDevice.current.userInterfaceIdiom == .phone {
-            ToolbarItem(placement: .bottomBar) {
-                refreshButton()
-            }
-        } else {
-            ToolbarItemGroup(placement: .bottomBar) {
-                displaySettingsMenu()
-                refreshButton()
-            }
-            SidebarPositionToolbarItem()
+        ToolbarItem(placement: .bottomBar) {
+            refreshButton()
         }
+        ToolbarSpacer(.fixed, placement: .bottomBar)
+        ToolbarItem(placement: .bottomBar) {
+            displaySettingsMenu()
+        }
+        SidebarPositionToolbarItem()
     }
 
     @ViewBuilder

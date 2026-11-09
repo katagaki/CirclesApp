@@ -3306,6 +3306,41 @@
         }
       }
     },
+    "Buys.Shared.Create": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "作成"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "만들기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创建"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建立"
+          }
+        }
+      }
+    },
     "Buys.Shared.Start": {
       "extractionState": "manual",
       "localizations": {
@@ -15655,74 +15690,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "附件與寶藏"
-          }
-        }
-      }
-    },
-    "Tip.BuysScope.Description": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Switch between your own Buys and the list you share with others."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自分の宝物と、他の人と共有している共同購入リストを切り替えられます。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "내 구매 목록과 다른 사람과 공유하는 목록을 전환할 수 있습니다."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在您自己的宝贝列表和与他人共享的列表之间切换。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在您自己的寶藏清單和與他人共享的清單之間切換。"
-          }
-        }
-      }
-    },
-    "Tip.BuysScope.Title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "My Buys & Shared"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自分と共同購入"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "내 목록 및 공유 목록"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "我的宝贝与共享"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "我的寶藏與共享"
           }
         }
       }
