@@ -67,13 +67,19 @@ struct SharedBuysLiveActivity: Widget {
             .padding(.vertical, 8.0)
             .background(Self.accent.opacity(0.7))
 
-            VStack(alignment: .leading, spacing: 12.0) {
-                VStack(alignment: .leading, spacing: 4.0) {
-                    circle(state)
-                    headline(state)
+            HStack(alignment: .center, spacing: 12.0) {
+                if let key = state.imageKey, let image = SharedBuysActivityImageStore.image(for: key) {
+                    SharedBuysActivityPhoto(image: image)
                 }
-                progress(state)
+                VStack(alignment: .leading, spacing: 12.0) {
+                    VStack(alignment: .leading, spacing: 4.0) {
+                        circle(state)
+                        headline(state)
+                    }
+                    progress(state)
+                }
             }
+            .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, 16.0)
             .padding(.vertical, 12.0)
         }
@@ -165,13 +171,9 @@ struct SharedBuysLiveActivity: Widget {
     @ViewBuilder
     func avatars(state: SharedBuysAttributes.ContentState) -> some View {
         HStack(spacing: -6.0) {
-            ForEach(Array(state.memberInitials.prefix(4).enumerated()), id: \.offset) { _, initial in
-                Text(initial)
-                    .font(.system(size: 10.0, weight: .bold))
-                    .foregroundStyle(Self.accent)
-                    .frame(width: 20.0, height: 20.0)
-                    .background(Circle().fill(.white))
-                    .overlay { Circle().strokeBorder(Self.accent, lineWidth: 1.5) }
+            ForEach(Array(state.memberNames.prefix(4).enumerated()), id: \.offset) { _, name in
+                MemberInitial(nickname: name, size: 20.0)
+                    .overlay { Circle().strokeBorder(.white, lineWidth: 1.5) }
             }
         }
     }

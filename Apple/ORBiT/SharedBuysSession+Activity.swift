@@ -17,8 +17,16 @@ public extension SharedBuysSession {
             circleSpace: circle?.space,
             boughtCount: mine.filter { $0.status == .bought }.count,
             assignedCount: mine.count,
-            memberInitials: members.values.sorted().map { String($0.prefix(1)) }
+            memberNames: members.values.sorted(),
+            imageKey: next.flatMap(activityImageKey)
         )
+    }
+
+    private func activityImageKey(for item: SharedBuyItem) -> String? {
+        let key = item.imageID ?? "pending-\(item.id)"
+        guard let image = image(for: item),
+              SharedBuysActivityImageStore.save(image, for: key) else { return nil }
+        return key
     }
 
     public var activityCount: Int {
@@ -106,6 +114,7 @@ public extension SharedBuysSession {
             return
         }
         activity = nil
+        SharedBuysActivityImageStore.removeAll()
         Task { await Self.finish(identifier) }
         note("live activity ended")
     }
