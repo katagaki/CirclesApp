@@ -71,12 +71,12 @@ struct UnifiedView: View {
                     UnifiedToolbar(namespace: namespace)
                 }
                 .unifierPanel(namespace: namespace)
-                .sheet(isPresented: $unifier.isMyComiketPresenting) {
-                    NavigationStack {
-                        MyView()
-                    }
-                    .navigationTransition(.zoom(sourceID: "My.View", in: namespace))
-                    .presentationDetents([.large])
+                .sheet(isPresented: Binding(
+                    get: { unifier.isMyComiketPresenting && !unifier.presentsMyComiketFromPanel },
+                    set: { unifier.isMyComiketPresenting = $0 }
+                )) {
+                    MyComiketSheet()
+                        .presentationDetents([.large])
                 }
                 .navigationDestination(for: UnifiedPath.self) { path in
                     path.view()

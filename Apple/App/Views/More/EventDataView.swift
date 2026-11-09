@@ -29,8 +29,6 @@ struct EventDataView: View {
                     .listRowSeparator(.hidden)
             } header: {
                 Text("More.Storage")
-            } footer: {
-                Text("More.Disclaimer")
             }
 
             if let activeEvent = events.activeEvent {

@@ -1,8 +1,6 @@
 import SwiftUI
 
 struct MyToolbar: ToolbarContent {
-    @Environment(\.dismiss) var dismiss
-
     @Binding var eventTitle: String?
     @Binding var eventCoverImage: UIImage?
     @Binding var isShowingEventCoverImage: Bool
@@ -15,11 +13,6 @@ struct MyToolbar: ToolbarContent {
                         isShowingEventCoverImage.toggle()
                     }
                 }
-            }
-        }
-        ToolbarItem(placement: .topBarLeading) {
-            Button(role: .close) {
-                dismiss()
             }
         }
     }

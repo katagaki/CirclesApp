@@ -44,6 +44,9 @@ struct MyView: View {
                     participationForNotifier: $participationForNotifier
                 )
             }
+            if !authenticator.isOfflineModeActive {
+                MyAccountActionsSection()
+            }
         }
         .refreshable {
             await refreshUserInfo()
@@ -51,7 +54,7 @@ struct MyView: View {
         .contentMargins(.top, 0.0)
         .listSectionSpacing(.compact)
         .scrollContentBackground(.hidden)
-        .navigationTitle(eventTitle ?? String(localized: "ViewTitle.My"))
+        .navigationTitle("My.Account")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             MyToolbar(

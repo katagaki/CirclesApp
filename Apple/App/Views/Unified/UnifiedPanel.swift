@@ -40,6 +40,13 @@ struct UnifiedPanel: View {
         )) {
             SharedBuysDebugView()
         }
+        .sheet(isPresented: Binding(
+            get: { unifier.isMyComiketPresenting && unifier.presentsMyComiketFromPanel },
+            set: { unifier.isMyComiketPresenting = $0 }
+        )) {
+            MyComiketSheet()
+                .presentationDetents([.large])
+        }
         .circleFinderSheet()
         .presentationBackgroundInteraction(.enabled)
         .presentationDetents([unifier.compactDetent, .height(360), .large], selection: $unifier.selectedDetent)

@@ -12,13 +12,6 @@ struct UnifiedToolbar: ToolbarContent {
 
     var body: some ToolbarContent {
         @Bindable var unifier = unifier
-        ToolbarItem(placement: .topBarLeading) {
-            Button("Tab.My", image: .buttonMy) {
-                unifier.hide()
-                unifier.isMyComiketPresenting = true
-            }
-            .matchedTransitionSource(id: "My.View", in: namespace)
-        }
         if !oasis.isShowing && !authenticator.isAuthenticating {
             ToolbarItem(placement: .principal) {
                 UnifiedControl()
@@ -27,25 +20,26 @@ struct UnifiedToolbar: ToolbarContent {
                     .adaptiveShadow()
             }
             if navigator.isActive || favorites.isAvailable {
-                ToolbarItem(placement: .topBarTrailing) {
+                ToolbarItem(placement: .topBarLeading) {
                     UnifiedRouteButton()
                 }
             }
-            ToolbarItem(placement: .topBarTrailing) {
-                UnifiedMoreMenu()
-                    .popover(isPresented: $unifier.isOfflineModeTipShowing, arrowEdge: .top) {
-                        VStack(alignment: .leading, spacing: 8.0) {
-                            Text("Alerts.OfflineMode.Tip.Title")
-                                .font(.headline)
-                            Text("Alerts.OfflineMode.Tip.Message")
-                                .font(.subheadline)
-                        }
-                        .padding()
-                        .frame(idealWidth: 320.0)
-                        .presentationCompactAdaptation(.popover)
-                    }
-            }
         }
+        ToolbarItem(placement: .topBarTrailing) {
+            MyComiketButton()
+                .popover(isPresented: $unifier.isOfflineModeTipShowing, arrowEdge: .top) {
+                    VStack(alignment: .leading, spacing: 8.0) {
+                        Text("Alerts.OfflineMode.Tip.Title")
+                            .font(.headline)
+                        Text("Alerts.OfflineMode.Tip.Message")
+                            .font(.subheadline)
+                    }
+                    .padding()
+                    .frame(idealWidth: 320.0)
+                    .presentationCompactAdaptation(.popover)
+                }
+        }
+        .sharedBackgroundVisibility(.hidden)
         if unifier.displayMode == .sheet {
             ToolbarSpacer(.flexible, placement: .bottomBar)
             ToolbarItem(placement: .bottomBar) {

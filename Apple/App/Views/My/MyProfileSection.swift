@@ -2,8 +2,6 @@ import PhotosUI
 import SwiftUI
 import RADiUS
 
-private let myPortalURL = "https://myportal.circle.ms/"
-
 struct MyProfileSection: View {
 
     @Environment(Authenticator.self) var authenticator
@@ -72,14 +70,6 @@ struct MyProfileSection: View {
                     }
                 }
                 .padding(.top, 2.0)
-                if userInfo != nil {
-                    Link(destination: URL(string: myPortalURL)!) {
-                        Text("Profile.Edit")
-                            .font(.caption)
-                            .underline()
-                            .foregroundStyle(.accent)
-                    }
-                }
             }
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity, alignment: .center)

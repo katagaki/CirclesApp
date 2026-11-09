@@ -3,16 +3,6 @@
     {
       "filename" : "UI Icons.010.png",
       "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "UI Icons.011.png",
-      "idiom" : "universal"
     }
   ],
   "info" : {

@@ -64,6 +64,9 @@ class Unifier {
 
     // Other sheets
     var isMyComiketPresenting: Bool = false
+    var presentsMyComiketFromPanel: Bool {
+        displayMode == .sheet && isPresenting
+    }
     var isSharedBuysDebugPresenting: Bool = false
 
     // Date and hall menus, drawn as overlays so the panel stays open
