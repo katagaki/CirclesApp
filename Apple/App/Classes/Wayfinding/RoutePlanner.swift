@@ -11,7 +11,7 @@ nonisolated enum RoutePlanner {
         var pathfinder = Pathfinder(map: map)
         let boundaries = zip(halls, halls.dropFirst()).map { ($0.rect.maxX + $1.rect.minX) / 2.0 }
         let doors = map.doors.filter { door in
-            !boundaries.contains { abs($0 - door.sign.midX) < 160.0 }
+            !door.isSign || !boundaries.contains { abs($0 - door.sign.midX) < 160.0 }
         }
         pathfinder.portals = portals(between: doors, in: map)
         let doorsByCell = Dictionary(doors.map { (map.index($0.cell), $0) }, uniquingKeysWith: { first, _ in first })

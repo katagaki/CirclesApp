@@ -445,8 +445,9 @@ final class Navigator {
     ) async -> WalkableMap? {
         guard let image = await database.mapImageAsync(for: hall, on: day, usingHighDefinition: true),
               let cgImage = image.cgImage else { return nil }
+        let entrances = hall.entrances
         return await Task.detached(priority: .userInitiated) {
-            WalkableMap.build(image: cgImage, tables: tables)
+            WalkableMap.build(image: cgImage, tables: tables, entrances: entrances)
         }.value
     }
 

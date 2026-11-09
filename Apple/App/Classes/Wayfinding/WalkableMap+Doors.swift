@@ -9,6 +9,12 @@ extension WalkableMap {
         )
     }
 
+    /// A way in that starts on open floor at the point given.
+    func door(startingAt point: CGPoint) -> RouteDoor? {
+        guard let cell = nearestWalkable(to: self.cell(at: point)) else { return nil }
+        return RouteDoor(cell: cell, sign: CGRect(x: point.x - 1, y: point.y - 1, width: 2, height: 2), edge: .bottom)
+    }
+
     /// Ties a hall sign on the map's edge to the floor just inside it, which is where the
     /// door it names opens into the hall.
     func door(at sign: CGRect) -> RouteDoor? {
@@ -27,7 +33,7 @@ extension WalkableMap {
         case .right: inside = CGPoint(x: sign.minX - size * 3, y: sign.midY)
         }
         guard let cell = nearestWalkable(to: self.cell(at: inside)) else { return nil }
-        return RouteDoor(cell: cell, sign: sign, edge: edge)
+        return RouteDoor(cell: cell, sign: sign, edge: edge, isSign: true)
     }
 
     /// Hall signs: solid dark plates with white lettering, set flush against the edge of the

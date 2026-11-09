@@ -77,7 +77,8 @@ nonisolated struct RouteHall: Sendable, Hashable {
     let rect: CGRect
 }
 
-/// A way in and out of the hall, found from the hall sign on the wall beside it.
+/// A way in and out of the hall. `sign` is where the walk in starts; for halls still read
+/// from their name plates it is the plate itself.
 nonisolated struct RouteDoor: Sendable, Hashable {
     enum Edge: Sendable, Hashable {
         case top
@@ -89,6 +90,7 @@ nonisolated struct RouteDoor: Sendable, Hashable {
     let cell: GridPoint
     let sign: CGRect
     let edge: Edge
+    var isSign: Bool = false
 }
 
 /// A path staff have closed off, in high-resolution map pixels. Closures lapse on their
