@@ -36,6 +36,16 @@ struct MyCircleAppearancePreviewCut: View {
                     Rectangle()
                         .fill(.white)
                         .strokeBorder(.black, lineWidth: width * 0.03)
+                        .overlay {
+                            if isVisited {
+                                Image(systemName: "checkmark")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .fontWeight(.black)
+                                    .foregroundStyle(.black)
+                                    .padding(width * 0.075)
+                            }
+                        }
                         .frame(width: width * 0.275, height: width * 0.275)
                     Rectangle()
                         .fill(.black)
@@ -43,15 +53,6 @@ struct MyCircleAppearancePreviewCut: View {
                         .offset(y: width * 0.245)
                     Rectangle()
                         .strokeBorder(.black, lineWidth: width * 0.03)
-                    if isVisited {
-                        Image(systemName: "checkmark")
-                            .resizable()
-                            .scaledToFit()
-                            .fontWeight(.black)
-                            .foregroundStyle(.black)
-                            .frame(width: width * 0.2, height: width * 0.2)
-                            .offset(x: width * 0.045, y: width * 0.045)
-                    }
                 }
             }
         }
