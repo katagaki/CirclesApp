@@ -48,10 +48,6 @@ struct MyMapAppearancePreview: View {
         .blur(radius: usesHighResolutionMap ? 0.0 : 0.8)
         .background(isDark ? Color.clear : Color.white)
         .clipShape(.rect(cornerRadius: 12.0))
-        .overlay {
-            RoundedRectangle(cornerRadius: 12.0)
-                .stroke(Color.primary.opacity(0.15), lineWidth: 1 / 3)
-        }
         .frame(height: 120.0)
         .accessibilityHidden(true)
     }
