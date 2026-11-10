@@ -93,13 +93,7 @@ struct DataLifecycleModifier: ViewModifier {
         }
         if !isInitialDownload {
             Button("Shared.Cancel", role: .cancel) {
-                if isUpdatingData {
-                    isUpdatingData = false
-                    isReloadingData = false
-                    unifier.isDataReady = true
-                } else {
-                    revertToPreviousEvent()
-                }
+                revertToPreviousEvent()
             }
         }
     }
@@ -133,9 +127,12 @@ extension DataLifecycleModifier {
                     if didLoad {
                         isUpdatingData = false
                         finishReload(shouldResetSelections: pendingDownloadShouldResetSelections)
+                    } else if isUpdatingData {
+                        isUpdatingData = false
+                        finishReload(shouldResetSelections: false)
+                        unifier.didDataUpdateFail = true
                     } else {
                         oasis.close()
-                        isUpdatingData = false
                         isReloadingData = false
                         isDownloadFailedAlertShowing = true
                     }
@@ -163,11 +160,10 @@ extension DataLifecycleModifier {
         isReloadingData = true
         unifier.isDataReady = false
         isUpdatingData = true
+        pendingDownloadEvent = activeEvent
         pendingDownloadShouldResetSelections = true
         isInitialDownload = false
-        Task {
-            await confirmDownload(of: activeEvent)
-        }
+        startPendingDownload()
     }
 
     func confirmDownload(of event: WebCatalogEvent.Response.Event) async {
