@@ -349,7 +349,8 @@ func draw(_ element: Element, in context: CGContext) {
         if let ramp {
             let start = numbers(ramp["start"]), end = numbers(ramp["end"]), alphas = numbers(ramp["alphas"])
             let colors = alphas.map { CGColor(gray: 0, alpha: $0) } as CFArray
-            if let gradient = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB), colors: colors, locations: [0, 1]) {
+            let locations = alphas.indices.map { CGFloat($0) / CGFloat(max(alphas.count - 1, 1)) }
+            if let gradient = CGGradient(colorsSpace: CGColorSpace(name: CGColorSpace.sRGB), colors: colors, locations: locations) {
                 context.setBlendMode(.destinationIn)
                 context.drawLinearGradient(gradient, start: CGPoint(x: start[0], y: start[1]), end: CGPoint(x: end[0], y: end[1]),
                                            options: [.drawsBeforeStartLocation, .drawsAfterEndLocation])
