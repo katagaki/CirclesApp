@@ -40,7 +40,7 @@ struct MyCircleAppearancePreviewCut: View {
                                 .resizable()
                                 .scaledToFit()
                                 .fontWeight(.black)
-                                .foregroundStyle(Color.accentColor)
+                                .foregroundStyle(.black)
                                 .padding(boxSize * 0.15)
                         }
                     }
