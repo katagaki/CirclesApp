@@ -8,7 +8,7 @@ struct MyMapAppearancePreview: View {
     var usesDarkModeMap: Bool
     var usesHighResolutionMap: Bool
 
-    let spacesPerIsland: Int = 5
+    let spacesPerIsland: Int = 4
     let genreColors: [Color] = [.pink, .orange, .green, .blue, .purple]
     let genreSpans: [Int] = [3, 2, 3, 1]
 
@@ -18,10 +18,7 @@ struct MyMapAppearancePreview: View {
 
     var body: some View {
         Canvas { context, size in
-            let accent = GraphicsContext.Shading.color(.accentColor.opacity(0.55))
-            let hall = CGRect(origin: .zero, size: size).insetBy(dx: 8.0, dy: 8.0)
-
-            let islandArea = hall.insetBy(dx: 18.0, dy: 14.0)
+            let islandArea = CGRect(origin: .zero, size: size).insetBy(dx: 16.0, dy: 12.0)
             let aisle: CGFloat = 8.0
             let islandHeight = (islandArea.height - aisle) / 2.0
             let islandWidth = islandHeight / CGFloat(spacesPerIsland) * 2.0
@@ -37,7 +34,7 @@ struct MyMapAppearancePreview: View {
                         width: islandWidth,
                         height: islandHeight
                     )
-                    drawIsland(island, in: &context, shading: accent)
+                    drawIsland(island, in: &context)
                     islands.append(island)
                 }
             }
@@ -46,13 +43,12 @@ struct MyMapAppearancePreview: View {
             }
         }
         .blur(radius: usesHighResolutionMap ? 0.0 : 0.8)
-        .background(isDark ? Color.clear : Color.white)
-        .clipShape(.rect(cornerRadius: 12.0))
+        .background(isDark ? Color.black : Color.white)
         .frame(height: 120.0)
         .accessibilityHidden(true)
     }
 
-    func drawIsland(_ island: CGRect, in context: inout GraphicsContext, shading: GraphicsContext.Shading) {
+    func drawIsland(_ island: CGRect, in context: inout GraphicsContext) {
         let spaceWidth = island.width / 2.0
         let spaceHeight = island.height / CGFloat(spacesPerIsland)
         for side in 0..<2 {
@@ -62,8 +58,9 @@ struct MyMapAppearancePreview: View {
                     y: island.minY + CGFloat(index) * spaceHeight,
                     width: spaceWidth,
                     height: spaceHeight
-                ).insetBy(dx: 0.5, dy: 0.5)
-                context.fill(Path(space), with: shading)
+                )
+                context.fill(Path(space), with: .color(.white))
+                context.stroke(Path(space), with: .color(.black), lineWidth: 1.0)
             }
         }
     }
