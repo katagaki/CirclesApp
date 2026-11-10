@@ -39,7 +39,7 @@ struct Banner {
     let width: CGFloat
     let height: CGFloat
     /// How much of the top the App Store shows where it crops the banner; the scene is
-    /// laid out in it, and Big Sight's pillars carry on below to the ground.
+    /// laid out in it, with white ground below.
     var visibleHeight: CGFloat? = nil
 }
 
@@ -76,15 +76,13 @@ func render(_ banner: Banner) {
     let scale = siteHeight / 322
     let site = CGAffineTransform(translationX: w / 2 - 512 * scale, y: v - 1024 * scale).scaledBy(x: scale, y: scale)
     // Below what the card shows, Big Sight stands on white ground, as in the feature graphic.
-    let ground = v + (h - v) * 0.3
-    let below = (ground - v) / scale
-    if ground < h {
+    if v < h {
         context.setFillColor(rgb(1, 1, 1))
-        context.fill(CGRect(x: 0, y: ground, width: w, height: h - ground))
+        context.fill(CGRect(x: 0, y: v, width: w, height: h - v))
     }
     for (faces, color) in [(bigSightFaces, rgb(1, 1, 1)), (bigSightShades, shade)] {
         for face in faces {
-            context.addLines(between: face.map { CGPoint(x: $0.x, y: $0.y == 1024 ? 1024 + below : $0.y).applying(site) })
+            context.addLines(between: face.map { $0.applying(site) })
             context.closePath()
         }
         context.setFillColor(color)
