@@ -18,11 +18,11 @@ struct MyMapAppearancePreview: View {
 
     var body: some View {
         Canvas { context, size in
-            let islandArea = CGRect(origin: .zero, size: size).insetBy(dx: 16.0, dy: 12.0)
-            let aisle: CGFloat = 8.0
+            let islandArea = CGRect(origin: .zero, size: size).insetBy(dx: 12.0, dy: 8.0)
+            let aisle: CGFloat = 6.0
             let islandHeight = (islandArea.height - aisle) / 2.0
             let islandWidth = islandHeight / CGFloat(spacesPerIsland) * 2.0
-            let islandCount = max(2, Int((islandArea.width + islandWidth) / (islandWidth * 2.2)))
+            let islandCount = max(2, Int((islandArea.width + islandWidth) / (islandWidth * 1.6)))
             let islandGap = (islandArea.width - CGFloat(islandCount) * islandWidth) / CGFloat(islandCount - 1)
             var islands: [CGRect] = []
             for column in 0..<islandCount {
