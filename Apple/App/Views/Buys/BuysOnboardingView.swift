@@ -2,7 +2,7 @@ import SwiftUI
 
 struct BuysOnboardingView: View {
 
-    @Environment(Unifier.self) var unifier
+    @Environment(\.dismiss) var dismiss
 
     @AppStorage(wrappedValue: false, "Buys.HasSeenOnboarding") var hasSeenOnboarding: Bool
 
@@ -15,7 +15,7 @@ struct BuysOnboardingView: View {
                     .padding(.bottom, 28.0)
                     .frame(maxWidth: .infinity)
                     .background {
-                        Color(.systemGroupedBackground)
+                        Color.onboardingHeroBackground
                             .padding(.top, -1000.0)
                     }
                 VStack(alignment: .leading, spacing: 8.0) {
@@ -59,7 +59,7 @@ struct BuysOnboardingView: View {
         .safeAreaInset(edge: .bottom) {
             Button {
                 hasSeenOnboarding = true
-                unifier.closePanelScreen(.buysOnboarding)
+                dismiss()
             } label: {
                 Text("Buys.Onboarding.Start")
                     .font(.headline)
@@ -70,7 +70,6 @@ struct BuysOnboardingView: View {
             .padding(.horizontal, 24.0)
             .padding(.bottom, 12.0)
         }
-        .navigationBarBackButtonHidden(!hasSeenOnboarding)
-        .toolbarVisibility(.hidden, for: .bottomBar)
+        .interactiveDismissDisabled(!hasSeenOnboarding)
     }
 }

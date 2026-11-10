@@ -24,7 +24,7 @@ struct NaviModeRow: View {
                     .foregroundStyle(.white)
                     .padding(.horizontal, 18.0)
                     .frame(height: 40.0)
-                    .background(Color.green, in: .capsule)
+                    .background(Color.accentColor, in: .capsule)
             }
             .contentShape(.rect)
         }

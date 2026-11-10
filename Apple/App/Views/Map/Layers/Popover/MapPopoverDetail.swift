@@ -8,6 +8,7 @@ struct MapPopoverDetail: View {
     @Environment(Unifier.self) var unifier
     @Environment(Favorites.self) var favorites
     @Environment(Events.self) var planner
+    @Environment(UserSelections.self) var selections
 
     @Environment(\.modelContext) var modelContext
 
@@ -24,6 +25,10 @@ struct MapPopoverDetail: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 8.0) {
                 if let circles {
+                    if let spaceName = spaceName(of: circles) {
+                        Text(spaceName)
+                            .font(.body.weight(.semibold))
+                    }
                     ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
                         HStack {
                             CircleCutImage(
@@ -73,6 +78,18 @@ struct MapPopoverDetail: View {
                 fetchCircles()
             }
         }
+    }
+
+    func spaceName(of circles: [ComiketCircle]) -> String? {
+        guard let first = circles.first, let block = first.block else { return nil }
+        let hallInitial = String(selections.map?.name.prefix(1) ?? "")
+        let hall = ["東", "西", "南"].contains(hallInitial) ? hallInitial : ""
+        let letters = ["a", "b", "c"]
+        let suffixes = Set(circles.map(\.spaceNumberSuffix)).sorted()
+            .filter { letters.indices.contains($0) }
+            .map { letters[$0] }
+            .joined()
+        return "\(hall)\(block.name)\(String(format: "%02d", first.spaceNumber))\(suffixes)"
     }
 
     func fetchCircles() {

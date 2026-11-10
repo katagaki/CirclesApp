@@ -44,7 +44,6 @@ final class Navigator {
     var pendingMode: Mode?
     var priorityCounts: [WebCatalogColor: Int] = [:]
     var chosenPriority: [WebCatalogColor]?
-    var onboardingDismissals: Int = 0
     var priorityDismissals: Int = 0
 
     @ObservationIgnored private var context: Context?

@@ -2,8 +2,7 @@ import SwiftUI
 
 struct RouteOnboardingView: View {
 
-    @Environment(Navigator.self) var navigator
-    @Environment(Unifier.self) var unifier
+    @Environment(\.dismiss) var dismiss
 
     @AppStorage(wrappedValue: false, "Route.HasSeenOnboarding") var hasSeenOnboarding: Bool
 
@@ -16,7 +15,7 @@ struct RouteOnboardingView: View {
                     .padding(.bottom, 28.0)
                     .frame(maxWidth: .infinity)
                     .background {
-                        Color(.systemGroupedBackground)
+                        Color.onboardingHeroBackground
                             .padding(.top, -1000.0)
                     }
                 VStack(alignment: .leading, spacing: 8.0) {
@@ -60,8 +59,7 @@ struct RouteOnboardingView: View {
         .safeAreaInset(edge: .bottom) {
             Button {
                 hasSeenOnboarding = true
-                unifier.closeRouteScreen(.routeOnboarding)
-                navigator.onboardingDismissals += 1
+                dismiss()
             } label: {
                 Text("Route.Onboarding.Start")
                     .font(.headline)
@@ -72,7 +70,6 @@ struct RouteOnboardingView: View {
             .padding(.horizontal, 24.0)
             .padding(.bottom, 12.0)
         }
-        .navigationBarBackButtonHidden(!hasSeenOnboarding)
-        .toolbarVisibility(.hidden, for: .bottomBar)
+        .interactiveDismissDisabled(!hasSeenOnboarding)
     }
 }
