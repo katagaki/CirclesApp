@@ -20,11 +20,6 @@ struct MyMapAppearancePreview: View {
         Canvas { context, size in
             let accent = GraphicsContext.Shading.color(.accentColor.opacity(0.55))
             let hall = CGRect(origin: .zero, size: size).insetBy(dx: 8.0, dy: 8.0)
-            context.stroke(
-                Path(roundedRect: hall, cornerRadius: 4.0),
-                with: .color(.accentColor.opacity(0.8)),
-                lineWidth: 1.5
-            )
 
             let islandArea = hall.insetBy(dx: 18.0, dy: 14.0)
             let aisle: CGFloat = 8.0
