@@ -38,11 +38,15 @@ struct Banner {
     let language: String
     let width: CGFloat
     let height: CGFloat
+    /// How much of the top the App Store shows where it crops the banner; the scene is
+    /// laid out in it, and Big Sight's pillars carry on below to the ground.
+    var visibleHeight: CGFloat? = nil
 }
 
 /// Draws in a top-left space, y down, so the layout reads like the artwork it comes from.
 func render(_ banner: Banner) {
     let w = banner.width, h = banner.height
+    let v = banner.visibleHeight ?? h
     guard let context = CGContext(
         data: nil, width: Int(w), height: Int(h), bitsPerComponent: 8, bytesPerRow: 0,
         space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
@@ -54,27 +58,33 @@ func render(_ banner: Banner) {
     context.drawLinearGradient(sky, start: .zero, end: CGPoint(x: 0, y: h), options: [])
 
     // Distant clouds on either side, paler and smaller, so the wide banner is not empty.
-    let unit = min(w, h * 2.33)
+    let unit = min(w, v * 2.33)
     for (x, y, size, alpha, seed) in [
         (0.07, 0.22, 0.24, 0.75, 11), (0.10, 0.76, 0.11, 0.55, 23), (0.93, 0.20, 0.21, 0.7, 37), (0.90, 0.78, 0.10, 0.5, 41),
     ] as [(CGFloat, CGFloat, CGFloat, CGFloat, UInt64)] {
-        cloud(at: CGPoint(x: w * x, y: h * y), width: unit * size, alpha: alpha, seed: seed, in: context)
+        cloud(at: CGPoint(x: w * x, y: v * y), width: unit * size, alpha: alpha, seed: seed, in: context)
     }
 
     // The dream: a broad cloud filling the middle of the banner, behind Big Sight.
-    let center = CGPoint(x: w / 2, y: h / 2)
-    let nameWidth = min(w * 0.26, h * 0.45)
-    // Raised a little above the name, clear of Big Sight's roof.
-    let cloudWidth = min(w * 0.63, h * 1.17)
+    let center = CGPoint(x: w / 2, y: v / 2)
+    let nameWidth = min(w * 0.26, v * 0.45)
+    let cloudWidth = min(w * 0.63, v * 1.17)
     cloud(at: CGPoint(x: center.x, y: center.y), width: cloudWidth, alpha: 1, seed: 7, puffs: 160, isRound: true, in: context)
 
     // Big Sight in front, its pillars running off the bottom edge as on the icon.
-    let siteHeight = min(h * 0.27, w * 0.15)
+    let siteHeight = min(v * 0.27, w * 0.15)
     let scale = siteHeight / 322
-    let site = CGAffineTransform(translationX: w / 2 - 512 * scale, y: h - 1024 * scale).scaledBy(x: scale, y: scale)
+    let site = CGAffineTransform(translationX: w / 2 - 512 * scale, y: v - 1024 * scale).scaledBy(x: scale, y: scale)
+    // Below what the card shows, Big Sight stands on white ground, as in the feature graphic.
+    let ground = v + (h - v) * 0.3
+    let below = (ground - v) / scale
+    if ground < h {
+        context.setFillColor(rgb(1, 1, 1))
+        context.fill(CGRect(x: 0, y: ground, width: w, height: h - ground))
+    }
     for (faces, color) in [(bigSightFaces, rgb(1, 1, 1)), (bigSightShades, shade)] {
         for face in faces {
-            context.addLines(between: face.map { $0.applying(site) })
+            context.addLines(between: face.map { CGPoint(x: $0.x, y: $0.y == 1024 ? 1024 + below : $0.y).applying(site) })
             context.closePath()
         }
         context.setFillColor(color)
@@ -192,5 +202,6 @@ func name(at center: CGPoint, width: CGFloat, language: String, in context: CGCo
 for language in ["en", "ja"] {
     try? FileManager.default.createDirectory(at: scriptDir.appendingPathComponent(language), withIntermediateDirectories: true)
     render(Banner(name: "Header", language: language, width: 3840, height: 1646))
-    render(Banner(name: "Search Results", language: language, width: 3840, height: 2560))
+    // The search results card shows only the top, at about 2.05:1.
+    render(Banner(name: "Search Results", language: language, width: 3840, height: 2560, visibleHeight: 3840 / 2.05))
 }
