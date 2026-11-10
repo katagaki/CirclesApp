@@ -205,6 +205,13 @@ final class AppStoreScreenshots: XCTestCase {
                 app.collectionViews.firstMatch.swipeUp(velocity: .slow)
             }
             try require(info.isHittable, "the useful links never came into view")
+            // The slide covers the bottom of the screen, so the section is drawn up to a
+            // quarter of the way down, held still so the list does not coast past it.
+            let window = app.windows.firstMatch.frame
+            let target = app.windows.firstMatch.coordinate(withNormalizedOffset: .zero)
+                .withOffset(CGVector(dx: window.width / 2, dy: window.height * 0.25))
+            info.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+                .press(forDuration: 0.1, thenDragTo: target, withVelocity: .slow, thenHoldForDuration: 0.5)
         case .showSharedBuys:
             try tap(app.segmentedControls.buttons["宝物"].firstMatch)
             try tap(app.buttons["共同購入"].firstMatch)
