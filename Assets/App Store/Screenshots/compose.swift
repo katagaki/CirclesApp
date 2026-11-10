@@ -318,6 +318,14 @@ func draw(_ element: Element, in context: CGContext) {
         let line = CTLineCreateWithAttributedString(CFAttributedStringCreate(nil, text as CFString, attributes)!)
         context.textMatrix = .identity
         context.textPosition = .zero
+        if let glow = element["glow"] as? [String: Any] {
+            // Only the blurred copy lands: the text itself is drawn far off the page.
+            let away: CGFloat = 100_000
+            let blur = CGFloat(truncating: glow["blur"] as? NSNumber ?? 0)
+            context.setShadow(offset: CGSize(width: away, height: 0), blur: blur * 2,
+                              color: cgColor(glow["color"], alpha: CGFloat(truncating: glow["alpha"] as? NSNumber ?? 1)))
+            context.textPosition = CGPoint(x: -away, y: 0)
+        }
         CTLineDraw(line, context)
     default:
         break
