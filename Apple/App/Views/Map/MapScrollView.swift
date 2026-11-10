@@ -54,6 +54,7 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
         scrollView.addGestureRecognizer(longPressRecognizer)
 
         context.coordinator.hostingController = hostingController
+        context.coordinator.mapper = mapper
 
         NSLayoutConstraint.activate([
             hostingController.view.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
@@ -77,8 +78,12 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
             scrollView.contentInset.top = unifier.topStatusInset
         }
 
-        if scrollView.zoomScale != zoomScale {
+        if context.coordinator.persistedZoomScale != zoomScale {
+            context.coordinator.persistedZoomScale = zoomScale
             scrollView.setZoomScale(zoomScale, animated: false)
+            if mapper.zoomScale != scrollView.zoomScale {
+                mapper.zoomScale = scrollView.zoomScale
+            }
         }
 
         if let position = mapper.scrollToPosition {
@@ -116,6 +121,8 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
     class Coordinator: NSObject, UIScrollViewDelegate, UIGestureRecognizerDelegate {
         var parent: MapScrollView
         var hostingController: UIHostingController<Content>?
+        var mapper: Mapper?
+        var persistedZoomScale: CGFloat?
 
         init(_ parent: MapScrollView) {
             self.parent = parent
@@ -126,7 +133,14 @@ struct MapScrollView<Content: View>: UIViewRepresentable {
         }
 
         func scrollViewDidZoom(_ scrollView: UIScrollView) {
-            parent.zoomScale = scrollView.zoomScale
+            if let mapper, mapper.zoomScale != scrollView.zoomScale {
+                mapper.zoomScale = scrollView.zoomScale
+            }
+        }
+
+        func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
+            persistedZoomScale = scale
+            parent.zoomScale = scale
         }
 
         @MainActor @objc func handleTap() {

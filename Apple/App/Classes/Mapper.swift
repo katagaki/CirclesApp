@@ -8,6 +8,7 @@ class Mapper {
     typealias Layouts = [LayoutCatalogMapping: [Int]]
 
     var canvasSize: CGSize = .zero
+    var zoomScale: CGFloat = 1.0
 
     var layouts: Layouts = [:]
 

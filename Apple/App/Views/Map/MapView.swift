@@ -57,10 +57,10 @@ struct MapView: View {
                         MapLayoutLayer(spaceSize: spaceSize)
                         MapRouteLayer(spaceSize: spaceSize)
                         MapHighlightLayer()
-                        MapPopoverLayer(zoomScale: zoomScale) { selection in
+                        MapPopoverLayer { selection in
                             MapPopoverDetail(selection: selection)
                         }
-                        MapRouteHoldLayer(zoomScale: zoomScale, spaceSize: spaceSize)
+                        MapRouteHoldLayer(spaceSize: spaceSize)
                     }
                 })
                 .onChange(of: mapper.popoverPosition) { _, newValue in

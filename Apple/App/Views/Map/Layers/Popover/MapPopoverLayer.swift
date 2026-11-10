@@ -4,8 +4,6 @@ struct MapPopoverLayer<Content: View>: View {
 
     @Environment(Mapper.self) var mapper
 
-    var zoomScale: CGFloat
-
     var content: (PopoverData) -> Content
 
     @State var currentItem: PopoverData?
@@ -15,7 +13,6 @@ struct MapPopoverLayer<Content: View>: View {
         Group {
             if let currentItem, !currentItem.sourceRect.isNull {
                 MapPopover(
-                    zoomScale: zoomScale,
                     sourceRect: currentItem.sourceRect,
                     isDismissing: false
                 ) {
@@ -25,7 +22,6 @@ struct MapPopoverLayer<Content: View>: View {
             }
             if let dismissingItem, !dismissingItem.sourceRect.isNull {
                 MapPopover(
-                    zoomScale: zoomScale,
                     sourceRect: dismissingItem.sourceRect,
                     isDismissing: true
                 ) {
