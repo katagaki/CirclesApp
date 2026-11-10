@@ -18,7 +18,7 @@ BUNDLE_ID=com.tsubuzaki.CiRCLES
 APP_GROUP=group.com.tsubuzaki.CiRCLES
 SOURCE_SIMULATOR=${SOURCE_SIMULATOR:-"CiRCLES Screenshots Source"}
 DERIVED_DATA=/tmp/circles-screenshots-dd
-RUNTIME=com.apple.CoreSimulator.SimRuntime.iOS-27-0
+RUNTIME=com.apple.CoreSimulator.SimRuntime.iOS-27-2
 SIMULATORS=~/Library/Developer/CoreSimulator/Devices
 # The Keynote frames are an iPhone 17 Pro and an iPad mini, so the captures
 # come from devices with the same screen shapes.
