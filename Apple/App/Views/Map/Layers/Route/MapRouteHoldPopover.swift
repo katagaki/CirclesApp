@@ -33,7 +33,7 @@ struct MapRouteHoldPopover: View {
                 Text("Route.Closure.Note")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                    .padding(.bottom, 6.0)
+                    .padding(.bottom, 12.0)
                 Divider()
                 row("Route.Closure.Reopen", systemImage: "arrow.uturn.backward", isLast: true) {
                     navigator.reopenSelectedClosure(database: database)
