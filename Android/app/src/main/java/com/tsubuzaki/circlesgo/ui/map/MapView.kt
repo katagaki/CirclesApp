@@ -253,11 +253,13 @@ fun MapView(
                         MapVisitedLayer(
                             layouts = layouts,
                             visits = visits,
+                            favoriteItems = favoriteItems ?: emptyMap(),
                             eventNumber = events.activeEventNumber,
                             spaceSize = spaceSize,
                             canvasWidth = canvasWidth,
                             canvasHeight = canvasHeight,
-                            database = database
+                            database = database,
+                            darkenInDarkMode = darkenMapInDarkMode
                         )
                     }
 
