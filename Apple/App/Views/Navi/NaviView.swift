@@ -85,11 +85,11 @@ struct NaviView: View {
         .modifier(NaviSearchModifier(text: $searchTerm, isPresented: $isSearchActive))
         .toolbar {
             if navigator.isActive {
-                NaviStepToolbar()
-                ToolbarSpacer(.flexible, placement: .bottomBar)
                 ToolbarItem(placement: .bottomBar) {
                     NaviEndButton()
                 }
+                ToolbarSpacer(.flexible, placement: .bottomBar)
+                NaviStepToolbar()
             } else {
                 DefaultToolbarItem(kind: .search, placement: .bottomBar)
                 ToolbarSpacer(.fixed, placement: .bottomBar)
