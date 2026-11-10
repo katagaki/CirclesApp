@@ -30,6 +30,8 @@ final class AppStoreScreenshots: XCTestCase {
         var isLandscape = false
     }
 
+    private static let translation = "A heartwarming manga mainly about Mika of the Trinity General School Tea Party. I also plan to bring a book about RABBIT Squad."
+
     private static let description = Step.open(circle: "黎明ネルトリンゲン", space: "ア29b")
     private static let links = Step.open(circle: "こいんとす", space: "ア37a")
     private static let unfavorited = Step.open(circle: "あるかねっと", space: "ア36b")
@@ -123,6 +125,8 @@ final class AppStoreScreenshots: XCTestCase {
             "-PrivacyMode.On", "YES", "-HidesAllTips",
             // capture.sh runs `npm run dev`; the production relay needs App Attest.
             "-SharedBuysRelayURL", "ws://127.0.0.1:8787",
+            // Simulators cannot translate, so the 翻訳 action shows this in place instead.
+            "-ScreenshotTranslation", Self.translation,
         ]
         app.launch()
         try require(app.buttons["サークル"].firstMatch.waitForExistence(timeout: 60), "the catalog never opened")
@@ -157,13 +161,9 @@ final class AppStoreScreenshots: XCTestCase {
             try require(description.waitForExistence(timeout: 5), "missing the description")
             description.press(forDuration: 1.0)
             try tap(app.buttons["翻訳"].firstMatch)
-            // Shown once per device, before the first translation.
-            let proceed = app.buttons["続ける"].firstMatch
-            if proceed.waitForExistence(timeout: 5) {
-                proceed.tap()
-            }
-            let copy = app.buttons["翻訳をコピー"].firstMatch
-            try require(copy.waitForExistence(timeout: 30), "the translation never arrived")
+            // The description is translated in place.
+            let translated = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "A heartwarming")).firstMatch
+            try require(translated.waitForExistence(timeout: 10), "the translation never appeared")
         case let .holdSearchResult(circle, space):
             try search(circle)
             let cut = app.staticTexts[space].firstMatch
