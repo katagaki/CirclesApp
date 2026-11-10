@@ -16,7 +16,7 @@ PROJECT=${SCRIPT_DIR:h:h:h}/Apple/CiRCLES.xcodeproj
 SCHEME="CiRCLES (Production API)"
 BUNDLE_ID=com.tsubuzaki.CiRCLES
 APP_GROUP=group.com.tsubuzaki.CiRCLES
-SOURCE_SIMULATOR=${SOURCE_SIMULATOR:-"CiRCLES Route Lines 2"}
+SOURCE_SIMULATOR=${SOURCE_SIMULATOR:-"CiRCLES Screenshots Source"}
 DERIVED_DATA=/tmp/circles-screenshots-dd
 RUNTIME=com.apple.CoreSimulator.SimRuntime.iOS-27-0
 SIMULATORS=~/Library/Developer/CoreSimulator/Devices
@@ -63,6 +63,9 @@ XCTESTRUN=$(ls $DERIVED_DATA/Build/Products/*.xctestrun | head -1)
 SOURCE=$(udid_of $SOURCE_SIMULATOR)
 [[ -n $SOURCE ]] || { echo "no simulator named $SOURCE_SIMULATOR"; exit 1 }
 boot $SOURCE
+# The copies share its Shared Buys identity, and two connections from one device
+# keep closing each other at the relay.
+xcrun simctl terminate $SOURCE $BUNDLE_ID 2>/dev/null || true
 SOURCE_DATA=$(xcrun simctl get_app_container $SOURCE $BUNDLE_ID data)
 SOURCE_GROUP=$(group_container $SOURCE)
 
@@ -78,19 +81,36 @@ seed() {
   group=$(group_container $udid)
   xcrun simctl shutdown $udid
   for dir in Documents Library; do
-    rm -rf "$data/$dir"
+    rm -rf "${data:?}/${dir:?}"
     cp -Rc "$SOURCE_DATA/$dir" "$data/$dir"
   done
-  rm -rf "$data/Library/Saved Application State" "$data/Library/SplashBoard"
-  rm -rf "$group"/*
+  rm -rf "${data:?}/Library/Saved Application State" "${data:?}/Library/SplashBoard"
+  rm -rf "${group:?}"/*
   cp -Rc "$SOURCE_GROUP"/* "$group/"
-  rm -rf $SIMULATORS/$udid/data/Library/Keychains
+  rm -rf "${SIMULATORS:?}/${udid:?}/data/Library/Keychains"
   cp -Rc $SIMULATORS/$SOURCE/data/Library/Keychains $SIMULATORS/$udid/data/Library/Keychains
   boot $udid
   xcrun simctl status_bar $udid override --time 9:41 \
     --batteryState discharging --batteryLevel 100 \
     --cellularMode active --cellularBars 4 --dataNetwork 4g --operatorName ""
 }
+
+# MARK: - Relay
+
+# Shared Buys only reads as connected against a relay, and a simulator cannot attest
+# to the production one, so the test points the app at `npm run dev` instead.
+RELAY_DIR=${SCRIPT_DIR:h:h:h}/Relay
+if ! lsof -nP -iTCP:8787 -sTCP:LISTEN >/dev/null 2>&1; then
+  [[ -f $RELAY_DIR/.dev.vars ]] || { echo "Relay/.dev.vars is missing"; exit 1 }
+  [[ -d $RELAY_DIR/node_modules ]] || npm ci --prefix "$RELAY_DIR" --silent
+  (cd "$RELAY_DIR" && npm run dev -- --port 8787 >/dev/null 2>&1) &
+  RELAY_PID=$!
+  trap 'pkill -P $RELAY_PID 2>/dev/null; kill $RELAY_PID 2>/dev/null' EXIT
+  for _ in {1..30}; do
+    lsof -nP -iTCP:8787 -sTCP:LISTEN >/dev/null 2>&1 && break
+    sleep 2
+  done
+fi
 
 # MARK: - Capture
 
@@ -118,6 +138,7 @@ capture() {
   mkdir -p "$raw_dir"
   seed $udid
   run_test $udid "$raw_dir" || { echo "capture failed on $device"; exit 1 }
+  xcrun simctl terminate $udid $BUNDLE_ID 2>/dev/null || true
   echo "captured $device"
 }
 
