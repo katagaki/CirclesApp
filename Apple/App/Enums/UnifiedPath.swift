@@ -12,8 +12,6 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
     case moreEventData
     case moreBackup
     case moreAttributions
-    case buysOnboarding
-    case routeOnboarding
     case routePriority
     case circleDetail(
         circle: ComiketCircle
@@ -44,8 +42,6 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
         case .moreEventData: "More.EventData"
         case .moreBackup: "More.Backup"
         case .moreAttributions: "More.Attributions"
-        case .buysOnboarding: "Buys.Onboarding"
-        case .routeOnboarding: "Route.Onboarding"
         case .routePriority: "Route.Priority"
         case .circleDetail(let circle): "Circles.\(circle.id)"
         case .namespacedCircleDetail(
@@ -67,8 +63,6 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
         case .moreEventData: EventDataView()
         case .moreBackup: BackupView()
         case .moreAttributions: MoreLicensesView()
-        case .buysOnboarding: BuysOnboardingView()
-        case .routeOnboarding: RouteOnboardingView()
         case .routePriority: RoutePriorityView()
         case .circleDetail(let circle):
             CircleDetailView(circle: circle)

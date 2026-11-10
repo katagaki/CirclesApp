@@ -23,6 +23,7 @@ struct NaviView: View {
     @State var isSearchActive: Bool = false
     @State var results: [ComiketCircle]?
     @State var pendingDestination: ComiketCircle?
+    @State var isOnboardingPresented: Bool = false
 
     @AppStorage(wrappedValue: false, "Route.HasSeenOnboarding") var hasSeenOnboarding: Bool
     @AppStorage(wrappedValue: .grid, "Circles.DisplayMode") var displayMode: CircleDisplayMode
@@ -100,7 +101,7 @@ struct NaviView: View {
                 ToolbarItem(placement: .bottomBar) {
                     Button("Route.Onboarding.Open", systemImage: "questionmark") {
                         navigator.pendingMode = nil
-                        unifier.openRouteScreen(.routeOnboarding)
+                        isOnboardingPresented = true
                     }
                 }
             }
@@ -118,12 +119,14 @@ struct NaviView: View {
             pendingDestination = nil
             routeDirectly(to: webCatalogID)
         }
-        .onChange(of: navigator.onboardingDismissals) {
+        .sheet(isPresented: $isOnboardingPresented) {
             guard hasSeenOnboarding, let mode = navigator.pendingMode else {
                 navigator.pendingMode = nil
                 return
             }
             proceed(with: mode)
+        } content: {
+            RouteOnboardingView()
         }
         .onChange(of: navigator.priorityDismissals) {
             guard let priority = navigator.chosenPriority else { return }
@@ -185,7 +188,7 @@ struct NaviView: View {
         if hasSeenOnboarding {
             proceed(with: mode)
         } else {
-            unifier.openRouteScreen(.routeOnboarding)
+            isOnboardingPresented = true
         }
     }
 

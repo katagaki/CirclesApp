@@ -18,6 +18,7 @@ struct BuysView: View {
     @State var scope: BuysScope = .mine
     @State var hasChosenScope: Bool = false
     @State var assignmentTarget: SharedBuyItem?
+    @State var isOnboardingPresented: Bool = false
 
     @AppStorage(wrappedValue: false, "Buys.HasSeenOnboarding") var hasSeenOnboarding: Bool
 
@@ -73,6 +74,9 @@ struct BuysView: View {
         .sheet(item: $assignmentTarget) { item in
             SharedBuyAssignSheet(item: item)
         }
+        .sheet(isPresented: $isOnboardingPresented) {
+            BuysOnboardingView()
+        }
         .toolbar {
             ToolbarItem(placement: .bottomBar) {
                 Picker("ViewTitle.Buys", selection: $scope) {
@@ -93,7 +97,7 @@ struct BuysView: View {
             }
             ToolbarItem(placement: .bottomBar) {
                 Button("Buys.Onboarding.Open", systemImage: "questionmark") {
-                    unifier.openRouteScreen(.buysOnboarding)
+                    isOnboardingPresented = true
                 }
                 .labelStyle(.iconOnly)
             }
@@ -101,7 +105,7 @@ struct BuysView: View {
         }
         .onAppear {
             reloadEntries()
-            if !hasSeenOnboarding { unifier.openRouteScreen(.buysOnboarding) }
+            if !hasSeenOnboarding { isOnboardingPresented = true }
             if sharedBuys.isActive, !hasChosenScope { scope = .shared }
         }
         .onChange(of: sharedBuys.isActive) { _, isActive in
