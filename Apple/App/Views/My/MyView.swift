@@ -52,7 +52,6 @@ struct MyView: View {
             await refreshUserInfo()
         }
         .contentMargins(.top, 0.0)
-        .listSectionSpacing(.compact)
         .scrollContentBackground(.hidden)
         .navigationTitle("My.Account")
         .navigationBarTitleDisplayMode(.inline)
