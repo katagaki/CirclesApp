@@ -1,7 +1,7 @@
 #!/usr/bin/env swift
 
 // Draws the App Store header and search results banners: the app icon's scene opened
-// up, with Tokyo Big Sight dreaming a cloud that carries the app's name, centred.
+// up, with Tokyo Big Sight dreaming a soft cloud that carries the app's name, centred.
 // Usage: ./banner.swift    (writes Header.png and Search Results.png next to this script)
 
 import AppKit
@@ -10,8 +10,6 @@ import ImageIO
 import UniformTypeIdentifiers
 
 let scriptDir = URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent()
-let fontURL = scriptDir.appendingPathComponent("../../ItcKabel Demi.ttf").standardizedFileURL
-CTFontManagerRegisterFontsForURL(fontURL as CFURL, .process, nil)
 
 func rgb(_ r: CGFloat, _ g: CGFloat, _ b: CGFloat, _ a: CGFloat = 1) -> CGColor {
     CGColor(srgbRed: r, green: g, blue: b, alpha: a)
@@ -21,12 +19,6 @@ let skyTop = rgb(0.40, 0.60, 0.94)
 let skyHorizon = rgb(0.80, 0.90, 0.99)
 let ink = rgb(0.38, 0.52, 0.93)
 let shade = rgb(0.84, 0.90, 1.0)
-
-/// The icon's cloud: overlapping circles, in a 1×0.58 box with its origin at the top left.
-let cloudLobes: [(x: CGFloat, y: CGFloat, r: CGFloat)] = [
-    (0.12, 0.28, 0.118), (0.36, 0.215, 0.18), (0.615, 0.158, 0.158), (0.875, 0.28, 0.125),
-    (0.36, 0.43, 0.15), (0.65, 0.435, 0.145),
-]
 
 /// Tokyo Big Sight as on the icon, in its artwork's 1024 space (y down), standing on y = 1024.
 let bigSightFaces: [[CGPoint]] = [
@@ -62,20 +54,20 @@ func render(_ banner: Banner) {
 
     // Distant clouds on either side, paler and smaller, so the wide banner is not empty.
     let unit = min(w, h * 2.33)
-    for (x, y, size, alpha) in [
-        (0.07, 0.24, 0.20, 0.5), (0.22, 0.70, 0.12, 0.35), (0.94, 0.20, 0.17, 0.45), (0.79, 0.72, 0.11, 0.35),
-    ] as [(CGFloat, CGFloat, CGFloat, CGFloat)] {
-        cloud(at: CGPoint(x: w * x, y: h * y), width: unit * size, alpha: alpha, in: context)
+    for (x, y, size, alpha, seed) in [
+        (0.07, 0.22, 0.24, 0.75, 11), (0.10, 0.76, 0.11, 0.55, 23), (0.93, 0.20, 0.21, 0.7, 37), (0.90, 0.78, 0.10, 0.5, 41),
+    ] as [(CGFloat, CGFloat, CGFloat, CGFloat, UInt64)] {
+        cloud(at: CGPoint(x: w * x, y: h * y), width: unit * size, alpha: alpha, seed: seed, in: context)
     }
 
-    // The dream: a cloud in the middle of the banner.
-    let cloudWidth = min(w * 0.42, h * 0.7)
+    // The dream: a broad cloud filling the middle of the banner, behind Big Sight.
     let center = CGPoint(x: w / 2, y: h / 2)
-    let cloudBottom = center.y + cloudWidth * 0.29
+    let nameWidth = min(w * 0.23, h * 0.4)
+    cloud(at: center, width: min(w * 0.7, h * 1.3), alpha: 1, seed: 7, in: context)
 
-    // Big Sight below it, its pillars running off the bottom edge as on the icon.
-    let roof = cloudBottom + (h - cloudBottom) * 0.36
-    let scale = (h - roof) / 322
+    // Big Sight in front, its pillars running off the bottom edge as on the icon.
+    let siteHeight = min(h * 0.27, w * 0.15)
+    let scale = siteHeight / 322
     let site = CGAffineTransform(translationX: w / 2 - 512 * scale, y: h - 1024 * scale).scaledBy(x: scale, y: scale)
     for (faces, color) in [(bigSightFaces, rgb(1, 1, 1)), (bigSightShades, shade)] {
         for face in faces {
@@ -86,18 +78,7 @@ func render(_ banner: Banner) {
         context.fillPath()
     }
 
-    cloud(at: center, width: cloudWidth, alpha: 1, in: context)
-    // The thought bubbles, stepping down from the cloud toward the roof.
-    for (t, r) in [(0.3, 0.04), (0.72, 0.026)] as [(CGFloat, CGFloat)] {
-        let p = CGPoint(x: center.x + cloudWidth * (0.2 + 0.1 * t), y: cloudBottom + (roof - cloudBottom) * t)
-        context.saveGState()
-        context.setShadow(offset: CGSize(width: 0, height: unit * 0.003), blur: unit * 0.01, color: rgb(0.15, 0.25, 0.6, 0.2))
-        context.setFillColor(rgb(1, 1, 1))
-        context.fillEllipse(in: CGRect(x: p.x - cloudWidth * r, y: p.y - cloudWidth * r, width: cloudWidth * r * 2, height: cloudWidth * r * 2))
-        context.restoreGState()
-    }
-
-    name(at: center, width: cloudWidth * 0.62, in: context)
+    name(at: center, width: nameWidth, in: context)
 
     let url = scriptDir.appendingPathComponent("\(banner.name).png")
     guard let image = context.makeImage(),
@@ -107,45 +88,62 @@ func render(_ banner: Banner) {
     print("wrote \(banner.name).png")
 }
 
-func cloud(at center: CGPoint, width: CGFloat, alpha: CGFloat, in context: CGContext) {
-    let height = width * 0.58
-    let origin = CGPoint(x: center.x - width / 2, y: center.y - height / 2)
-    let shape = CGMutablePath()
-    for lobe in cloudLobes {
-        shape.addEllipse(in: CGRect(x: origin.x + (lobe.x - lobe.r) * width, y: origin.y + lobe.y * width - lobe.r * width,
-                                    width: lobe.r * 2 * width, height: lobe.r * 2 * width))
+/// A small, repeatable random source, so every run draws the same clouds.
+struct Random {
+    var state: UInt64
+    mutating func next() -> CGFloat {
+        state = state &* 6364136223846793005 &+ 1442695040888963407
+        return CGFloat(state >> 33) / CGFloat(1 << 31)
     }
-    // The lobes' centres, joined, fill the middle so no sky shows between them.
-    let order = [0, 1, 2, 3, 5, 4]
-    shape.addLines(between: order.map { CGPoint(x: origin.x + cloudLobes[$0].x * width, y: origin.y + cloudLobes[$0].y * width) })
-    shape.closeSubpath()
+}
+
+/// A soft cumulus: feathered puffs heaped into a dome over a flatter base, white on top
+/// and shading to a pale blue-grey underneath. Returns the area it covers.
+@discardableResult
+func cloud(at center: CGPoint, width: CGFloat, alpha: CGFloat, seed: UInt64, puffs count: Int = 110, in context: CGContext) -> CGRect {
+    var random = Random(state: seed &* 2654435761 &+ 1)
+    var puffs: [(CGPoint, CGFloat)] = []
+    for index in 0..<count {
+        // The first few lie along the base, so the cloud has a body under its dome.
+        let t = index < count / 4 ? CGFloat(index) / CGFloat(max(count / 4 - 1, 1)) * 2 - 1 : random.next() * 2 - 1
+        let dome = width * 0.3 * sqrt(max(0, 1 - t * t))
+        let lift = index < count / 4 ? 0 : pow(random.next(), 0.8) * dome
+        let radius = width * (0.065 + 0.07 * pow(random.next(), 2)) * (1 - 0.4 * abs(t))
+        puffs.append((CGPoint(x: t * width * 0.4, y: -lift), radius))
+    }
+    let minX = puffs.map { $0.0.x - $0.1 }.min()!, maxX = puffs.map { $0.0.x + $0.1 }.max()!
+    let minY = puffs.map { $0.0.y - $0.1 }.min()!, maxY = puffs.map { $0.0.y + $0.1 * 0.7 }.max()!
+    let shift = CGPoint(x: center.x - (minX + maxX) / 2, y: center.y - (minY + maxY) / 2)
+    let bounds = CGRect(x: minX + shift.x, y: minY + shift.y, width: maxX - minX, height: maxY - minY)
+
+    let feather = CGGradient(colorsSpace: nil, colors: [rgb(1, 1, 1, 1), rgb(1, 1, 1, 0.85), rgb(1, 1, 1, 0.35), rgb(1, 1, 1, 0)] as CFArray,
+                             locations: [0, 0.4, 0.75, 1])!
     context.saveGState()
     context.setAlpha(alpha)
     context.beginTransparencyLayer(auxiliaryInfo: nil)
-    context.setShadow(offset: CGSize(width: 0, height: width * 0.02), blur: width * 0.06, color: rgb(0.15, 0.25, 0.6, 0.22))
-    context.addPath(shape)
-    context.setFillColor(rgb(1, 1, 1))
-    context.fillPath()
-    context.setShadow(offset: .zero, blur: 0, color: nil)
-    // A faint blue underside, as on the icon's glass cloud.
-    context.addPath(shape)
-    context.clip()
-    let underside = CGGradient(colorsSpace: nil, colors: [rgb(1, 1, 1, 0), rgb(0.86, 0.91, 1.0, 1)] as CFArray, locations: [0, 1])!
-    context.drawLinearGradient(underside, start: CGPoint(x: 0, y: origin.y + height * 0.35),
-                               end: CGPoint(x: 0, y: origin.y + height * 1.05), options: [])
+    for (point, radius) in puffs {
+        let p = CGPoint(x: point.x + shift.x, y: point.y + shift.y)
+        context.drawRadialGradient(feather, startCenter: p, startRadius: 0, endCenter: p, endRadius: radius, options: [])
+    }
+    // Light from above: the underside takes on the sky's shadowed blue.
+    context.setBlendMode(.sourceAtop)
+    let underside = CGGradient(colorsSpace: nil, colors: [rgb(1, 1, 1, 0), rgb(0.80, 0.86, 0.97, 1)] as CFArray, locations: [0, 1])!
+    context.drawLinearGradient(underside, start: CGPoint(x: 0, y: bounds.minY + bounds.height * 0.45),
+                               end: CGPoint(x: 0, y: bounds.maxY), options: [.drawsAfterEndLocation])
     context.endTransparencyLayer()
     context.restoreGState()
+    return bounds
 }
 
-/// The app's name in Kabel, the icon's blue, centred on `center` by its capital height.
+/// The app's name in Helvetica Neue, the icon's blue, centred on `center` by its capital height.
 func name(at center: CGPoint, width: CGFloat, in context: CGContext) {
-    let probe = CTFontCreateWithName("ItcKabelDemi" as CFString, 100, nil)
+    let probe = CTFontCreateWithName("HelveticaNeue-Bold" as CFString, 100, nil)
     func line(_ font: CTFont) -> CTLine {
         let attributes = [kCTFontAttributeName: font, kCTForegroundColorAttributeName: ink, kCTKernAttributeName: 2] as CFDictionary
         return CTLineCreateWithAttributedString(CFAttributedStringCreate(nil, "CiRCLES" as CFString, attributes)!)
     }
     let size = 100 * width / CTLineGetTypographicBounds(line(probe), nil, nil, nil)
-    let font = CTFontCreateWithName("ItcKabelDemi" as CFString, size, nil)
+    let font = CTFontCreateWithName("HelveticaNeue-Bold" as CFString, size, nil)
     let text = line(font)
     let bounds = CTLineGetBoundsWithOptions(text, .useGlyphPathBounds)
     context.saveGState()
