@@ -362,12 +362,13 @@ func newSlideBase(_ opening: [Element], shot: String?) -> (background: [Element]
         case "effect" where !cloud: base.append(element); cloud = true
         case "capture":
             guard let shot else { continue }
-            if index > 0, opening[index - 1]["type"] as? String == "effect" { device.append(opening[index - 1]) }
+            // The phone's glow sits just before it, behind the logo drawn in between.
+            if let glow = opening[..<index].last(where: { $0["type"] as? String == "effect" }) { device.append(glow) }
             var phone = element
             phone["shot"] = shot
+            // Its clip held it below the opening slide's copy; the phone moves, so it goes.
+            phone["clip"] = nil
             device.append(phone)
-            // Their clips held them below the opening slide's logo; the phone moves, so they go.
-            device = device.map { var unclipped = $0; unclipped["clip"] = nil; return unclipped }
         default: break
         }
     }
