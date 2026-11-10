@@ -13,7 +13,8 @@
 //
 // Features newer than the decks get slides drawn here on the opening slide's background,
 // with copy of their own, the phone raised so the copy sits centred above it. The slides
-// are written to <device>/<language>/.
+// are written to <device>/<language>/, and the iPhone's also to iPhone 6.3/<language>/ at the
+// 6.1- and 6.3-inch displays' 1206 × 2622.
 
 import AppKit
 import CoreText
@@ -167,13 +168,15 @@ func drawLandscapeDevice(_ shot: String, page: CGRect, in context: CGContext) {
 struct Deck {
     let device: String
     let newSlides: [NewSlide]
+    /// Display sizes the slides are also written at, each into a folder of its own.
+    var otherSizes: [(folder: String, size: CGSize)] = []
 }
 
 let decks = [
     Deck(device: "iPhone", newSlides: [
         NewSlide(after: 2, shot: "iPhone/12-shared-buys", copy: sharedBuysCopy),
         NewSlide(after: 2, shot: "iPhone/13-guide", copy: guideCopy),
-    ]),
+    ], otherSizes: [("iPhone 6.3", CGSize(width: 1206, height: 2622))]),
     Deck(device: "iPad", newSlides: [
         NewSlide(after: 2, shot: "iPad/12-shared-buys", copy: sharedBuysCopy, isLandscape: true),
         NewSlide(after: 2, shot: "iPad/13-guide", copy: guideCopy, isLandscape: true),
@@ -388,6 +391,29 @@ func centringRise(_ device: [Element], metrics: (title: (y: CGFloat, size: CGFlo
 
 // MARK: - Composition
 
+/// Writes `image` scaled to fill `size`, centred, trimming whatever the shapes do not share.
+func write(_ image: CGImage, size: CGSize, to url: URL) {
+    var image = image
+    if CGFloat(image.width) != size.width || CGFloat(image.height) != size.height {
+        guard let context = CGContext(
+            data: nil, width: Int(size.width), height: Int(size.height), bitsPerComponent: 8, bytesPerRow: 0,
+            space: CGColorSpace(name: CGColorSpace.sRGB)!, bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+        ) else { fail("no context for \(url.lastPathComponent)") }
+        context.interpolationQuality = .high
+        let scale = max(size.width / CGFloat(image.width), size.height / CGFloat(image.height))
+        let drawn = CGSize(width: CGFloat(image.width) * scale, height: CGFloat(image.height) * scale)
+        context.draw(image, in: CGRect(x: (size.width - drawn.width) / 2, y: (size.height - drawn.height) / 2,
+                                       width: drawn.width, height: drawn.height))
+        guard let scaled = context.makeImage() else { fail("could not scale \(url.lastPathComponent)") }
+        image = scaled
+    }
+    guard let destination = CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil)
+    else { fail("could not write \(url.lastPathComponent)") }
+    CGImageDestinationAddImage(destination, image, nil)
+    CGImageDestinationFinalize(destination)
+    print("wrote \(url.path.replacingOccurrences(of: scriptDir.path + "/", with: ""))")
+}
+
 func render(size: CGSize, to url: URL, _ draw: (CGContext, CGRect) -> Void) {
     guard let context = CGContext(
         data: nil, width: Int(size.width), height: Int(size.height), bitsPerComponent: 8, bytesPerRow: 0,
@@ -396,12 +422,16 @@ func render(size: CGSize, to url: URL, _ draw: (CGContext, CGRect) -> Void) {
     context.setFillColor(.white)
     context.fill(CGRect(origin: .zero, size: size))
     draw(context, CGRect(origin: .zero, size: size))
-    guard let image = context.makeImage(),
-          let destination = CGImageDestinationCreateWithURL(url as CFURL, "public.png" as CFString, 1, nil)
-    else { fail("could not write \(url.lastPathComponent)") }
-    CGImageDestinationAddImage(destination, image, nil)
-    CGImageDestinationFinalize(destination)
-    print("wrote \(url.path.replacingOccurrences(of: scriptDir.path + "/", with: ""))")
+    guard let image = context.makeImage() else { fail("could not draw \(url.lastPathComponent)") }
+    write(image, size: size, to: url)
+    // The same slide again for each other display size the deck is uploaded at.
+    let language = url.deletingLastPathComponent().lastPathComponent
+    let device = url.deletingLastPathComponent().deletingLastPathComponent().lastPathComponent
+    for other in decks.first(where: { $0.device == device })?.otherSizes ?? [] {
+        let directory = scriptDir.appendingPathComponent("\(other.folder)/\(language)")
+        try? FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        write(image, size: other.size, to: directory.appendingPathComponent(url.lastPathComponent))
+    }
 }
 
 func compose(_ deck: Deck) {
