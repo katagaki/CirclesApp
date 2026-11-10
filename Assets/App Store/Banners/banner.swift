@@ -65,7 +65,7 @@ func render(_ banner: Banner) {
     let center = CGPoint(x: w / 2, y: h / 2)
     let nameWidth = min(w * 0.26, h * 0.45)
     // Raised a little above the name, clear of Big Sight's roof.
-    let cloudWidth = min(w * 0.7, h * 1.3)
+    let cloudWidth = min(w * 0.63, h * 1.17)
     cloud(at: CGPoint(x: center.x, y: center.y), width: cloudWidth, alpha: 1, seed: 7, puffs: 160, isRound: true, in: context)
 
     // Big Sight in front, its pillars running off the bottom edge as on the icon.
