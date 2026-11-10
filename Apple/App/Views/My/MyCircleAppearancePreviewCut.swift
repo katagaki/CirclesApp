@@ -6,6 +6,7 @@ struct MyCircleAppearancePreviewCut: View {
     var center: SIMD2<Float>
     var spaceName: String
     var day: Int
+    var pillSize: CircleBlockPillSize
     var isVisited: Bool
     var showsColor: Bool
     var showsSpaceName: Bool
@@ -51,10 +52,10 @@ struct MyCircleAppearancePreviewCut: View {
             if showsSpaceName || showsDay {
                 VStack(alignment: .trailing, spacing: 2.0) {
                     if showsDay {
-                        CircleBlockPill("Shared.\(day)th.Day", size: .tiny)
+                        CircleBlockPill("Shared.\(day)th.Day", size: pillSize)
                     }
                     if showsSpaceName {
-                        CircleBlockPill(LocalizedStringKey(spaceName), size: .tiny)
+                        CircleBlockPill(LocalizedStringKey(spaceName), size: pillSize)
                     }
                 }
                 .padding(2.0)
