@@ -17,8 +17,11 @@ final class AppStoreScreenshots: XCTestCase {
         case translateDescription(startingWith: String)
         case holdSearchResult(circle: String, space: String)
         case writeFavoriteMemo(String)
-        case showMy
-        case showMore
+        case showMyComiket
+        case showAccount
+        case scrollToInfo
+        case showSharedBuys
+        case startGuide
     }
 
     private struct Shot {
@@ -40,9 +43,11 @@ final class AppStoreScreenshots: XCTestCase {
         Shot(name: "06-links", steps: [links]),
         Shot(name: "07-context-menu", steps: [.holdSearchResult(circle: "黎明ネルトリンゲン", space: "ア29b")]),
         Shot(name: "08-favorite", steps: [unfavorited, .writeFavoriteMemo("新譜を買う")]),
-        Shot(name: "09-my", steps: [.showMy]),
-        Shot(name: "10-more", steps: [.showMore]),
+        Shot(name: "09-my", steps: [.showMyComiket, .showAccount]),
+        Shot(name: "10-more", steps: [.showMyComiket, .scrollToInfo]),
         Shot(name: "11-visits", steps: [.showFavorites, .expandPanel]),
+        Shot(name: "12-shared-buys", steps: [.showSharedBuys, .expandPanel]),
+        Shot(name: "13-guide", steps: [.startGuide]),
         Shot(name: "03-list", steps: [.showList, .expandPanel]),
     ]
 
@@ -53,9 +58,11 @@ final class AppStoreScreenshots: XCTestCase {
         Shot(name: "06-links", steps: [links]),
         Shot(name: "07-context-menu", steps: [.holdSearchResult(circle: "黎明ネルトリンゲン", space: "ア29b")]),
         Shot(name: "08-favorite", steps: [unfavorited, .writeFavoriteMemo("新譜を買う")]),
-        Shot(name: "09-my", steps: [.showMy], isLandscape: true),
-        Shot(name: "10-more", steps: [.showMore], isLandscape: true),
+        Shot(name: "09-my", steps: [.showMyComiket, .showAccount], isLandscape: true),
+        Shot(name: "10-more", steps: [.showMyComiket, .scrollToInfo], isLandscape: true),
         Shot(name: "11-visits", steps: [.showFavorites], isLandscape: true),
+        Shot(name: "12-shared-buys", steps: [.showSharedBuys], isLandscape: true),
+        Shot(name: "13-guide", steps: [.startGuide], isLandscape: true),
         Shot(name: "02-list", steps: [.showList], isLandscape: true),
     ]
 
@@ -114,6 +121,8 @@ final class AppStoreScreenshots: XCTestCase {
         app.launchArguments += [
             "-AppleLanguages", "(ja)", "-AppleLocale", "ja_JP",
             "-PrivacyMode.On", "YES", "-HidesAllTips",
+            // capture.sh runs `npm run dev`; the production relay needs App Attest.
+            "-SharedBuysRelayURL", "ws://127.0.0.1:8787",
         ]
         app.launch()
         try require(app.buttons["サークル"].firstMatch.waitForExistence(timeout: 60), "the catalog never opened")
@@ -124,9 +133,15 @@ final class AppStoreScreenshots: XCTestCase {
         switch step {
         case .expandPanel:
             let grabber = app.buttons["シートグラバー"].firstMatch
-            try require(grabber.waitForExistence(timeout: 5), "missing the panel grabber")
-            grabber.press(forDuration: 0.1, thenDragTo: app.statusBars.firstMatch.exists
-                ? app.statusBars.firstMatch : app.buttons["マイコミケ"].firstMatch)
+            let top = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.05))
+            if grabber.waitForExistence(timeout: 5) {
+                grabber.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).press(forDuration: 0.1, thenDragTo: top)
+            } else {
+                // The iPad's panel has no grabber; it is dragged by its edge above the tabs.
+                let tabs = app.segmentedControls.firstMatch
+                try require(tabs.exists, "missing the panel")
+                tabs.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: -0.6)).press(forDuration: 0.1, thenDragTo: top)
+            }
         case .showList:
             try tap(app.buttons["表示設定"].firstMatch)
             try tap(app.buttons["リスト"].firstMatch)
@@ -176,10 +191,43 @@ final class AppStoreScreenshots: XCTestCase {
                 app.coordinate(withNormalizedOffset: CGVector(dx: 0.955, dy: 0.96)).tap()
             }
             try require(swatches.waitForExistence(timeout: 2), "the colour picker closed")
-        case .showMy:
+        case .showMyComiket:
             try tap(app.buttons["マイコミケ"].firstMatch)
-        case .showMore:
-            try tap(app.buttons["その他"].firstMatch)
+            try require(app.buttons["閉じる"].firstMatch.waitForExistence(timeout: 5), "My Comiket never opened")
+        case .showAccount:
+            // The profile row sums up the tickets, one day after another.
+            let profile = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "1日目")).firstMatch
+            try tap(profile)
+            try require(app.navigationBars["アカウント"].firstMatch.waitForExistence(timeout: 5), "the account never opened")
+        case .scrollToInfo:
+            let info = app.staticTexts["便利な情報"].firstMatch
+            for _ in 0..<6 where !(info.exists && info.isHittable) {
+                app.collectionViews.firstMatch.swipeUp(velocity: .slow)
+            }
+            try require(info.isHittable, "the useful links never came into view")
+        case .showSharedBuys:
+            try tap(app.segmentedControls.buttons["宝物"].firstMatch)
+            try tap(app.buttons["共同購入"].firstMatch)
+            let members = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "参加中")).firstMatch
+            try require(members.waitForExistence(timeout: 10), "the shared list never loaded")
+            // Shown until the relay has everything, which takes a moment after launch.
+            let unsent = app.staticTexts["まだ全員に届いていない変更があります。"].firstMatch
+            for _ in 0..<20 where unsent.exists {
+                Thread.sleep(forTimeInterval: 1)
+            }
+            try require(!unsent.exists, "the shared list never reached the relay")
+        case .startGuide:
+            try tap(app.segmentedControls.buttons["ナビ"].firstMatch)
+            try tap(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "おまかせ")).firstMatch)
+            let end = app.buttons["終了"].firstMatch
+            try require(end.waitForExistence(timeout: 20), "the route never started")
+            // On iPhone the panel opens over the map; it is lowered to show the route.
+            if UIDevice.current.userInterfaceIdiom == .phone {
+                let grabber = app.buttons["シートグラバー"].firstMatch
+                grabber.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).press(
+                    forDuration: 0.1, thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.62))
+                )
+            }
         }
         Thread.sleep(forTimeInterval: 1)
     }
