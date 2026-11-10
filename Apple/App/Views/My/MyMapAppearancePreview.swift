@@ -8,7 +8,6 @@ struct MyMapAppearancePreview: View {
     var usesDarkModeMap: Bool
     var usesHighResolutionMap: Bool
 
-    let islandCount: Int = 8
     let spacesPerIsland: Int = 5
     let genreColors: [Color] = [.pink, .orange, .green, .blue, .purple]
     let genreSpans: [Int] = [3, 2, 3, 1]
@@ -29,11 +28,13 @@ struct MyMapAppearancePreview: View {
 
             let islandArea = hall.insetBy(dx: 18.0, dy: 14.0)
             let aisle: CGFloat = 8.0
-            let islandWidth = islandArea.width / (CGFloat(islandCount) * 1.8 - 0.8)
             let islandHeight = (islandArea.height - aisle) / 2.0
+            let islandWidth = islandHeight / CGFloat(spacesPerIsland) * 2.0
+            let islandCount = max(2, Int((islandArea.width + islandWidth) / (islandWidth * 2.2)))
+            let islandGap = (islandArea.width - CGFloat(islandCount) * islandWidth) / CGFloat(islandCount - 1)
             var islands: [CGRect] = []
             for column in 0..<islandCount {
-                let originX = islandArea.minX + CGFloat(column) * islandWidth * 1.8
+                let originX = islandArea.minX + CGFloat(column) * (islandWidth + islandGap)
                 for row in 0..<2 {
                     let island = CGRect(
                         x: originX,
