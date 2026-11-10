@@ -247,7 +247,9 @@ func numbers(_ value: Any?) -> [CGFloat] {
 
 func cgColor(_ value: Any?, alpha: CGFloat = 1) -> CGColor {
     let c = numbers(value)
-    return CGColor(srgbRed: c.count > 0 ? c[0] : 0, green: c.count > 1 ? c[1] : 0, blue: c.count > 2 ? c[2] : 0, alpha: alpha)
+    // A fourth component is the colour's own opacity, as in a fade's gradient stops.
+    return CGColor(srgbRed: c.count > 0 ? c[0] : 0, green: c.count > 1 ? c[1] : 0, blue: c.count > 2 ? c[2] : 0,
+                   alpha: alpha * (c.count > 3 ? c[3] : 1))
 }
 
 func transform(_ value: Any?) -> CGAffineTransform {
