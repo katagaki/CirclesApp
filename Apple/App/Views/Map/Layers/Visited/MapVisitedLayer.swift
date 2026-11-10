@@ -7,20 +7,34 @@ struct MapVisitedLayer: View {
     @Environment(\.colorScheme) var colorScheme
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
+    @Environment(Favorites.self) var favorites
     @Environment(Mapper.self) var mapper
     @Environment(Navigator.self) var navigator
 
     @Query var visits: [CirclesVisitEntry]
 
-    @State var visitedPath: Path = Path()
+    @State var favoritePath: Path = Path()
+    @State var plainPath: Path = Path()
+
+    @AppStorage(wrappedValue: true, "Customization.UseDarkModeMaps") var useDarkModeMaps: Bool
 
     let spaceSize: Int
 
+    var isMapInverted: Bool {
+        useDarkModeMaps && colorScheme == .dark
+    }
+
     var body: some View {
         ZStack(alignment: .topLeading) {
-            visitedPath
+            favoritePath
                 .stroke(.white, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
                 .shadow(color: .black, radius: 2)
+            plainPath
+                .stroke(isMapInverted ? .black : .white,
+                        style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round))
+            plainPath
+                .stroke(isMapInverted ? .white : .black,
+                        style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
         }
         .frame(width: mapper.canvasSize.width, height: mapper.canvasSize.height)
         .allowsHitTesting(false)
@@ -33,6 +47,11 @@ struct MapVisitedLayer: View {
             }
         }
         .onChange(of: visits) {
+            Task.detached {
+                await reloadVisits()
+            }
+        }
+        .onChange(of: favorites.items) {
             Task.detached {
                 await reloadVisits()
             }
@@ -60,7 +79,8 @@ struct MapVisitedLayer: View {
         if circleIDs.isEmpty {
             await MainActor.run {
                 withAnimation {
-                    self.visitedPath = Path()
+                    self.favoritePath = Path()
+                    self.plainPath = Path()
                 }
             }
             return
@@ -68,11 +88,13 @@ struct MapVisitedLayer: View {
 
         let webCatalogIDs = await actor.webCatalogIDs(forCircleIDs: circleIDs)
         let visitedWCIDSet = Set(webCatalogIDs).subtracting(await MainActor.run { routeStopIDs })
+        let favoriteWCIDSet = Set(await MainActor.run { favorites.wcIDMappedItems?.keys.map { $0 } ?? [] })
 
         let allLayoutWCIDs = Array(Set(mapper.layouts.values.flatMap { $0 }))
         let spaceNumberSuffixes = await actor.spaceNumberSuffixes(forWebCatalogIDs: allLayoutWCIDs)
 
-        var newPath = Path()
+        var newFavoritePath = Path()
+        var newPlainPath = Path()
 
         for (layout, layoutWCIDs) in mapper.layouts {
             let sortedIDs = layoutWCIDs.sorted {
@@ -94,14 +116,20 @@ struct MapVisitedLayer: View {
             for (index, id) in orderedIDs.enumerated() where visitedWCIDSet.contains(id) {
                 let rect = getGenericRect(layout: layout, index: index, total: count)
                 let checkmark = checkmarkPath(in: rect)
-                newPath.addPath(checkmark)
+                if favoriteWCIDSet.contains(id) {
+                    newFavoritePath.addPath(checkmark)
+                } else {
+                    newPlainPath.addPath(checkmark)
+                }
             }
         }
 
-        let finalPath = newPath
+        let finalFavoritePath = newFavoritePath
+        let finalPlainPath = newPlainPath
         await MainActor.run {
             withAnimation(.smooth.speed(2.0)) {
-                self.visitedPath = finalPath
+                self.favoritePath = finalFavoritePath
+                self.plainPath = finalPlainPath
             }
         }
     }
