@@ -7,8 +7,6 @@ struct InfoStackSection: View {
     let canTranslate: Bool
     let showContextMenu: Bool
 
-    @State var isShowingTranslationPopover: Bool = false
-
     init(title: String, contents: String, canTranslate: Bool, showContextMenu: Bool = true) {
         self.title = title
         self.contents = contents
@@ -25,43 +23,8 @@ struct InfoStackSection: View {
                     .textCase(.uppercase)
 
                 if showContextMenu {
-                    if canTranslate {
-#if !targetEnvironment(macCatalyst) && !os(visionOS)
-                        Text(contents)
-                            .font(.subheadline)
-                            .textSelection(.enabled)
-                            .contextMenu {
-                                Button("Shared.Copy", systemImage: "doc.on.doc") {
-                                    UIPasteboard.general.string = contents
-                                }
-                                Button("Shared.Translate", systemImage: "character.bubble") {
-                                    isShowingTranslationPopover = true
-                                }
-                            }
-                            .translationPresentation(
-                                isPresented: $isShowingTranslationPopover,
-                                text: contents
-                            )
-#else
-                        Text(contents)
-                            .font(.subheadline)
-                            .textSelection(.enabled)
-                            .contextMenu {
-                                Button("Shared.Copy", systemImage: "doc.on.doc") {
-                                    UIPasteboard.general.string = contents
-                                }
-                            }
-#endif
-                    } else {
-                        Text(contents)
-                            .font(.subheadline)
-                            .textSelection(.enabled)
-                            .contextMenu {
-                                Button("Shared.Copy", systemImage: "doc.on.doc") {
-                                    UIPasteboard.general.string = contents
-                                }
-                            }
-                    }
+                    TranslatableText(contents, canTranslate: canTranslate)
+                        .font(.subheadline)
                 } else {
                     Text(contents)
                         .font(.subheadline)
