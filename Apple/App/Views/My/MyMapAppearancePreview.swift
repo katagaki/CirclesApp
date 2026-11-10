@@ -11,6 +11,7 @@ struct MyMapAppearancePreview: View {
     let islandCount: Int = 8
     let spacesPerIsland: Int = 5
     let genreColors: [Color] = [.pink, .orange, .green, .blue, .purple]
+    let genreLengths: [Int] = [8, 4, 13, 6, 9, 5, 11, 7, 10, 3, 9, 6, 12, 5]
 
     var isDark: Bool {
         colorScheme == .dark && usesDarkModeMap
@@ -47,6 +48,7 @@ struct MyMapAppearancePreview: View {
             let aisle: CGFloat = 8.0
             let islandWidth = islandArea.width / (CGFloat(islandCount) * 1.8 - 0.8)
             let islandHeight = (islandArea.height - aisle) / 2.0
+            var islands: [CGRect] = []
             for column in 0..<islandCount {
                 let originX = islandArea.minX + CGFloat(column) * islandWidth * 1.8
                 for row in 0..<2 {
@@ -57,14 +59,11 @@ struct MyMapAppearancePreview: View {
                         height: islandHeight
                     )
                     drawIsland(island, in: &context, shading: accent)
-                    if showsGenreOverlay {
-                        let genre = genreColors[(column / 2 + row * 2) % genreColors.count]
-                        context.fill(
-                            Path(island.insetBy(dx: -2.0, dy: -2.0)),
-                            with: .color(genre.opacity(0.45))
-                        )
-                    }
+                    islands.append(island)
                 }
+            }
+            if showsGenreOverlay {
+                drawGenres(over: islands, in: &context)
             }
         }
         .blur(radius: usesHighResolutionMap ? 0.0 : 0.8)
@@ -90,6 +89,34 @@ struct MyMapAppearancePreview: View {
                     height: spaceHeight
                 ).insetBy(dx: 0.5, dy: 0.5)
                 context.fill(Path(space), with: shading)
+            }
+        }
+    }
+
+    func drawGenres(over islands: [CGRect], in context: inout GraphicsContext) {
+        var genre = 0
+        var remaining = genreLengths[0]
+        for island in islands {
+            let spaceHeight = island.height / CGFloat(spacesPerIsland)
+            var start = 0
+            while start < spacesPerIsland {
+                let length = min(remaining, spacesPerIsland - start)
+                let segment = CGRect(
+                    x: island.minX,
+                    y: island.minY + CGFloat(start) * spaceHeight,
+                    width: island.width,
+                    height: CGFloat(length) * spaceHeight
+                ).insetBy(dx: -1.5, dy: -1.0)
+                context.fill(
+                    Path(roundedRect: segment, cornerRadius: 1.5),
+                    with: .color(genreColors[genre % genreColors.count].opacity(0.5))
+                )
+                start += length
+                remaining -= length
+                if remaining == 0 {
+                    genre += 1
+                    remaining = genreLengths[genre % genreLengths.count]
+                }
             }
         }
     }
