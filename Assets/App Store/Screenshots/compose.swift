@@ -12,7 +12,8 @@
 // of artwork are the image files inside the decks, which are zip archives.
 //
 // Features newer than the decks get slides drawn here on the opening slide's background,
-// with copy and stickers of their own. The slides are written to <device>/<language>/.
+// with copy of their own, the phone raised so the copy sits centred above it. The slides
+// are written to <device>/<language>/.
 
 import AppKit
 import CoreText
@@ -30,63 +31,23 @@ struct Copy {
     let caption: String
 }
 
-struct Sticker {
-    let symbol: String
-    let color: NSColor
-    /// Centre, as a fraction of the slide, from the top-left.
-    let x: CGFloat
-    let y: CGFloat
-    let angle: CGFloat
-}
-
 /// A slide drawn on the opening slide's background, placed after slide `after` of each language.
 struct NewSlide {
     let after: Int
     let shot: String
     let copy: [String: Copy]
-    let stickers: [Sticker]
     /// Drawn as a landscape device under the copy, instead of in the opening slide's phone.
     var isLandscape = false
-}
-
-func color(_ hex: UInt32) -> NSColor {
-    NSColor(
-        srgbRed: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255,
-        blue: CGFloat(hex & 0xFF) / 255, alpha: 1
-    )
 }
 
 let sharedBuysCopy = [
     "en": Copy(title: "Divide and Conquer", caption: "Share a shopping list and split who buys what"),
     "ja": Copy(title: "友達と共同購入", caption: "リストを共有して、誰が何を買うか分担"),
 ]
-let sharedBuysStickers = [
-    Sticker(symbol: "person.2.fill", color: color(0x7B4BD6), x: 0.09, y: 0.68, angle: 12),
-    Sticker(symbol: "qrcode", color: color(0x1C1C1E), x: 0.91, y: 0.49, angle: -10),
-    Sticker(symbol: "yensign", color: color(0x2EA666), x: 0.12, y: 0.86, angle: -8),
-]
 let guideCopy = [
     "en": Copy(title: "Never Get Lost", caption: "Navi walks you to every favorite, booth by booth"),
     "ja": Copy(title: "迷わずサークル巡り", caption: "コミケナビがお気に入りまで道順をご案内"),
 ]
-let guideStickers = [
-    Sticker(symbol: "figure.walk", color: color(0x34C759), x: 0.09, y: 0.58, angle: -11),
-    Sticker(symbol: "arrow.turn.up.right", color: color(0x3478F6), x: 0.91, y: 0.50, angle: 10),
-    Sticker(symbol: "flag.checkered", color: color(0xFF3B30), x: 0.90, y: 0.84, angle: 7),
-]
-
-let iPadSharedBuysStickers = [
-    Sticker(symbol: "person.2.fill", color: color(0x7B4BD6), x: 0.08, y: 0.24, angle: 12),
-    Sticker(symbol: "qrcode", color: color(0x1C1C1E), x: 0.88, y: 0.86, angle: -10),
-    Sticker(symbol: "yensign", color: color(0x2EA666), x: 0.10, y: 0.84, angle: -8),
-]
-let iPadGuideStickers = [
-    Sticker(symbol: "figure.walk", color: color(0x34C759), x: 0.09, y: 0.84, angle: -11),
-    Sticker(symbol: "arrow.turn.up.right", color: color(0x3478F6), x: 0.90, y: 0.24, angle: 10),
-    Sticker(symbol: "flag.checkered", color: color(0xFF3B30), x: 0.86, y: 0.86, angle: 7),
-]
-
-
 /// The 8-bit samples of a decoded image, read without any colour conversion.
 func samples(of image: CGImage) -> (bytes: [UInt8], perPixel: Int, perRow: Int)? {
     guard image.bitsPerComponent == 8, let data = image.dataProvider?.data as Data? else { return nil }
@@ -156,33 +117,6 @@ func drawLine(_ text: String, font name: String, japanese: String, size: CGFloat
     CTLineDraw(line, context)
 }
 
-/// A white tile with a coloured symbol, tilted like the decks' stickers.
-func drawSticker(_ sticker: Sticker, page: CGRect, in context: CGContext) {
-    let size = page.width * 0.17
-    guard let symbol = NSImage(systemSymbolName: sticker.symbol, accessibilityDescription: nil)?
-        .withSymbolConfiguration(.init(pointSize: size * 0.5, weight: .bold).applying(.init(paletteColors: [sticker.color])))
-    else { fail("no symbol \(sticker.symbol)") }
-    context.saveGState()
-    context.translateBy(x: page.width * sticker.x, y: page.height * (1 - sticker.y))
-    context.rotate(by: sticker.angle * .pi / 180)
-    let tile = CGRect(x: -size / 2, y: -size / 2, width: size, height: size)
-    context.setShadow(offset: CGSize(width: 0, height: -size * 0.04), blur: size * 0.12, color: CGColor(gray: 0, alpha: 0.3))
-    context.addPath(CGPath(roundedRect: tile, cornerWidth: size * 0.24, cornerHeight: size * 0.24, transform: nil))
-    context.setFillColor(CGColor(gray: 1, alpha: 1))
-    context.fillPath()
-    context.setShadow(offset: .zero, blur: 0)
-    let fitted = symbol.size.width > symbol.size.height
-        ? CGSize(width: size * 0.56, height: size * 0.56 * symbol.size.height / symbol.size.width)
-        : CGSize(width: size * 0.56 * symbol.size.width / symbol.size.height, height: size * 0.56)
-    let graphics = NSGraphicsContext(cgContext: context, flipped: false)
-    NSGraphicsContext.saveGraphicsState()
-    NSGraphicsContext.current = graphics
-    symbol.draw(in: CGRect(x: -fitted.width / 2, y: -fitted.height / 2, width: fitted.width, height: fitted.height))
-    NSGraphicsContext.restoreGraphicsState()
-    context.restoreGState()
-}
-
-/// A capture in its device frame, clear outside the frame.
 func framedImage(_ raw: CGImage, frame: Frame) -> CGImage? {
     let width = frame.image.width
     let height = frame.image.height
@@ -228,12 +162,12 @@ struct Deck {
 
 let decks = [
     Deck(device: "iPhone", newSlides: [
-        NewSlide(after: 2, shot: "iPhone/12-shared-buys", copy: sharedBuysCopy, stickers: sharedBuysStickers),
-        NewSlide(after: 2, shot: "iPhone/13-guide", copy: guideCopy, stickers: guideStickers),
+        NewSlide(after: 2, shot: "iPhone/12-shared-buys", copy: sharedBuysCopy),
+        NewSlide(after: 2, shot: "iPhone/13-guide", copy: guideCopy),
     ]),
     Deck(device: "iPad", newSlides: [
-        NewSlide(after: 2, shot: "iPad/12-shared-buys", copy: sharedBuysCopy, stickers: iPadSharedBuysStickers, isLandscape: true),
-        NewSlide(after: 2, shot: "iPad/13-guide", copy: guideCopy, stickers: iPadGuideStickers, isLandscape: true),
+        NewSlide(after: 2, shot: "iPad/12-shared-buys", copy: sharedBuysCopy, isLandscape: true),
+        NewSlide(after: 2, shot: "iPad/13-guide", copy: guideCopy, isLandscape: true),
     ]),
 ]
 
@@ -400,9 +334,10 @@ func copyMetrics(_ elements: [Element]) -> (title: (y: CGFloat, size: CGFloat), 
     return (title, caption)
 }
 
-/// The opening slide's background and clouds, and its phone with its shadow when `shot` is given.
-func newSlideBase(_ opening: [Element], shot: String?) -> [Element] {
+/// The opening slide's background and clouds, then its phone with its glow when `shot` is given.
+func newSlideBase(_ opening: [Element], shot: String?) -> (background: [Element], device: [Element]) {
     var base: [Element] = []
+    var device: [Element] = []
     var cloud = false
     for (index, element) in opening.enumerated() {
         switch element["type"] as? String {
@@ -410,14 +345,27 @@ func newSlideBase(_ opening: [Element], shot: String?) -> [Element] {
         case "effect" where !cloud: base.append(element); cloud = true
         case "capture":
             guard let shot else { continue }
-            if index > 0, opening[index - 1]["type"] as? String == "effect" { base.append(opening[index - 1]) }
+            if index > 0, opening[index - 1]["type"] as? String == "effect" { device.append(opening[index - 1]) }
             var phone = element
             phone["shot"] = shot
-            base.append(phone)
+            device.append(phone)
+            // Their clips held them below the opening slide's logo; the phone moves, so they go.
+            device = device.map { var unclipped = $0; unclipped["clip"] = nil; return unclipped }
         default: break
         }
     }
-    return base
+    return (base, device)
+}
+
+/// How far to raise the phone so the copy sits centred between the top of the slide and
+/// the top of the phone.
+func centringRise(_ device: [Element], metrics: (title: (y: CGFloat, size: CGFloat), caption: (y: CGFloat, size: CGFloat)), height: CGFloat) -> CGFloat {
+    guard let phone = device.last(where: { $0["type"] as? String == "capture" }) else { return 0 }
+    let m = numbers(phone["matrix"])
+    let top = m[5] + m[3]
+    let copyTop = metrics.title.y + metrics.title.size * 0.72
+    let copyBottom = metrics.caption.y - metrics.caption.size * 0.22
+    return (copyTop + copyBottom) - height - top
 }
 
 // MARK: - Composition
@@ -461,9 +409,13 @@ func compose(_ deck: Deck) {
             for slide in deck.newSlides where slide.after == position + 1 {
                 guard let copy = slide.copy[language], let metrics = copyMetrics(opening) else { fail("cannot read the opening slide's copy") }
                 render(size: size, to: next()) { context, bounds in
-                    for element in newSlideBase(opening, shot: slide.isLandscape ? nil : slide.shot) { draw(element, in: context) }
+                    let base = newSlideBase(opening, shot: slide.isLandscape ? nil : slide.shot)
+                    for element in base.background { draw(element, in: context) }
+                    context.saveGState()
+                    context.translateBy(x: 0, y: centringRise(base.device, metrics: metrics, height: bounds.height))
+                    for element in base.device { draw(element, in: context) }
+                    context.restoreGState()
                     if slide.isLandscape { drawLandscapeDevice(slide.shot, page: bounds, in: context) }
-                    for sticker in slide.stickers { drawSticker(sticker, page: bounds, in: context) }
                     let width = bounds.width * 0.9
                     drawLine(copy.title, font: "HelveticaNeue-CondensedBlack", japanese: "HiraginoSans-W8",
                              size: metrics.title.size, y: metrics.title.y, width: width, page: bounds, in: context)
