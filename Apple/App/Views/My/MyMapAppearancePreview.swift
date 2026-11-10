@@ -27,24 +27,7 @@ struct MyMapAppearancePreview: View {
                 lineWidth: 1.5
             )
 
-            let wallInset: CGFloat = 4.0
-            let wallHeight: CGFloat = 6.0
-            let wallCount = 18
-            let wallArea = hall.insetBy(dx: wallInset * 3, dy: wallInset)
-            let wallWidth = wallArea.width / CGFloat(wallCount)
-            for index in 0..<wallCount {
-                for originY in [wallArea.minY, wallArea.maxY - wallHeight] {
-                    let space = CGRect(
-                        x: wallArea.minX + CGFloat(index) * wallWidth,
-                        y: originY,
-                        width: wallWidth,
-                        height: wallHeight
-                    ).insetBy(dx: 0.5, dy: 0.5)
-                    context.fill(Path(space), with: accent)
-                }
-            }
-
-            let islandArea = hall.insetBy(dx: 18.0, dy: wallInset + wallHeight + 8.0)
+            let islandArea = hall.insetBy(dx: 18.0, dy: 14.0)
             let aisle: CGFloat = 8.0
             let islandWidth = islandArea.width / (CGFloat(islandCount) * 1.8 - 0.8)
             let islandHeight = (islandArea.height - aisle) / 2.0
@@ -67,7 +50,7 @@ struct MyMapAppearancePreview: View {
             }
         }
         .blur(radius: usesHighResolutionMap ? 0.0 : 0.8)
-        .background(isDark ? Color.black : Color.white)
+        .background(isDark ? Color.clear : Color.white)
         .clipShape(.rect(cornerRadius: 12.0))
         .overlay {
             RoundedRectangle(cornerRadius: 12.0)
