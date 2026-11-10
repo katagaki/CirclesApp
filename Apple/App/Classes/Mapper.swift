@@ -12,7 +12,7 @@ class Mapper {
     var layouts: Layouts = [:]
 
     let popoverWidth: CGFloat = 240.0
-    let popoverHeight: CGFloat = (16.0 * 2) + (70.0 * 2) + 8.0
+    let popoverHeight: CGFloat = (16.0 * 2) + 22.0 + 8.0 + (70.0 * 2) + 8.0
     let popoverDistance: CGFloat = 8.0
     let popoverEdgePadding: CGFloat = 16.0
 
