@@ -22,16 +22,16 @@ struct LoginView: View {
                     .padding(.top, 24.0)
                 Spacer()
                 VStack(alignment: .leading, spacing: 32.0) {
-                    LoginFeatureHero(imageName: "Hero.Map",
+                    LoginFeatureHero(icon: .map,
                                      title: "Hero.Map.Title",
                                      description: "Hero.Map.Description")
-                    LoginFeatureHero(imageName: "Hero.Circles",
+                    LoginFeatureHero(icon: .circles,
                                      title: "Hero.Circles.Title",
                                      description: "Hero.Circles.Description")
-                    LoginFeatureHero(imageName: "Hero.Favorites",
+                    LoginFeatureHero(icon: .favorites,
                                      title: "Hero.Favorites.Title",
                                      description: "Hero.Favorites.Description")
-                    LoginFeatureHero(imageName: "Hero.Buys",
+                    LoginFeatureHero(icon: .buys,
                                      title: "Hero.Buys.Title",
                                      description: "Hero.Buys.Description")
                 }
