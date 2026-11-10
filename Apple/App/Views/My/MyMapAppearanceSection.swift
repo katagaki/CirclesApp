@@ -9,6 +9,15 @@ struct MyMapAppearanceSection: View {
 
     var body: some View {
         Section {
+            MyMapAppearancePreview(
+                showsGenreOverlay: showGenreOverlay,
+                usesDarkModeMap: useDarkModeMaps,
+                usesHighResolutionMap: useHighResolutionMaps
+            )
+            .padding(.vertical, 4.0)
+            .animation(.smooth, value: showGenreOverlay)
+            .animation(.smooth, value: useDarkModeMaps)
+            .animation(.smooth, value: useHighResolutionMaps)
             Toggle("More.Customization.Map.ShowsGenreOverlays", isOn: $showGenreOverlay)
             Toggle("More.Customization.Map.UseDarkModeMap", isOn: $useDarkModeMaps)
             Toggle("More.Customization.Map.UseHighDefinitionMap", isOn: $useHighResolutionMaps)

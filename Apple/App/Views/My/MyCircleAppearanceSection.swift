@@ -9,6 +9,17 @@ struct MyCircleAppearanceSection: View {
 
     var body: some View {
         Section {
+            MyCircleAppearancePreview(
+                showsWebCut: showWebCut,
+                showsSpaceName: showSpaceName,
+                showsDay: showDay,
+                isDoubleTapToVisitEnabled: isDoubleTapToVisitEnabled
+            )
+            .padding(.vertical, 4.0)
+            .animation(.smooth, value: showWebCut)
+            .animation(.smooth, value: showSpaceName)
+            .animation(.smooth, value: showDay)
+            .animation(.smooth, value: isDoubleTapToVisitEnabled)
             Toggle("More.Customization.Circles.ShowWebCut", isOn: $showWebCut)
             Toggle("More.Customization.Circles.ShowHallAndBlock", isOn: $showSpaceName)
             Toggle("More.Customization.Circles.ShowDay", isOn: $showDay)
