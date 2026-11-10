@@ -63,7 +63,7 @@ func render(_ banner: Banner) {
     // The dream: a broad cloud filling the middle of the banner, behind Big Sight.
     let center = CGPoint(x: w / 2, y: h / 2)
     let nameWidth = min(w * 0.23, h * 0.4)
-    cloud(at: center, width: min(w * 0.7, h * 1.3), alpha: 1, seed: 7, in: context)
+    cloud(at: CGPoint(x: center.x, y: center.y - h * 0.05), width: min(w * 0.7, h * 1.3), alpha: 1, seed: 7, in: context)
 
     // Big Sight in front, its pillars running off the bottom edge as on the icon.
     let siteHeight = min(h * 0.27, w * 0.15)
