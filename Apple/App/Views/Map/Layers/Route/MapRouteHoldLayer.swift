@@ -6,7 +6,6 @@ struct MapRouteHoldLayer: View {
 
     @Environment(Navigator.self) var navigator
 
-    let zoomScale: CGFloat
     let spaceSize: Int
 
     @State var contentHeight: CGFloat = 140.0
@@ -27,7 +26,7 @@ struct MapRouteHoldLayer: View {
 
     var body: some View {
         if let sourceRect {
-            MapPopover(zoomScale: zoomScale, sourceRect: sourceRect, isDismissing: false, height: contentHeight + 32.0) {
+            MapPopover(sourceRect: sourceRect, isDismissing: false, height: contentHeight + 32.0) {
                 MapRouteHoldPopover()
                     .onGeometryChange(for: CGFloat.self) { proxy in
                         proxy.size.height

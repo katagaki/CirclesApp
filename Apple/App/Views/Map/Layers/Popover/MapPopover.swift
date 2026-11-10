@@ -6,8 +6,6 @@ struct MapPopover<Content: View>: View {
 
     let edgePadding: CGFloat = 16.0
 
-    var zoomScale: CGFloat
-
     var sourceRect: CGRect
     var isDismissing: Bool
     var height: CGFloat?
@@ -15,6 +13,10 @@ struct MapPopover<Content: View>: View {
 
     var popoverHeight: CGFloat {
         height ?? mapper.popoverHeight
+    }
+
+    var zoomScale: CGFloat {
+        mapper.zoomScale
     }
 
     @State var animationProgress: CGFloat = 0
