@@ -30,21 +30,21 @@ struct MyCircleAppearancePreviewCut: View {
         .aspectRatio(180.0 / 256.0, contentMode: .fit)
         .overlay {
             GeometryReader { proxy in
-                ZStack(alignment: .topLeading) {
-                    Rectangle()
-                        .fill(.white)
-                        .stroke(.black, lineWidth: 0.75)
-                        .frame(width: proxy.size.width * 0.22, height: proxy.size.width * 0.22)
-                    if isVisited {
-                        Image(systemName: "checkmark")
-                            .resizable()
-                            .scaledToFit()
-                            .fontWeight(.black)
-                            .foregroundStyle(Color.accentColor)
-                            .frame(width: proxy.size.width * 0.2)
-                            .padding(proxy.size.width * 0.045)
+                let boxSize = proxy.size.width * 0.22
+                Rectangle()
+                    .fill(.white)
+                    .stroke(.black, lineWidth: 0.75)
+                    .overlay {
+                        if isVisited {
+                            Image(systemName: "checkmark")
+                                .resizable()
+                                .scaledToFit()
+                                .fontWeight(.black)
+                                .foregroundStyle(Color.accentColor)
+                                .padding(boxSize * 0.15)
+                        }
                     }
-                }
+                    .frame(width: boxSize, height: boxSize)
             }
         }
         .overlay(alignment: .bottomTrailing) {
