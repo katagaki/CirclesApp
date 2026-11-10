@@ -2,7 +2,7 @@
 
 // Draws the App Store header and search results banners: the app icon's scene opened
 // up, with Tokyo Big Sight dreaming a soft cloud that carries the app's name, centred.
-// Usage: ./banner.swift    (writes Header.png and Search Results.png next to this script)
+// Usage: ./banner.swift    (writes en/ and ja/ Header.png and Search Results.png next to this script)
 
 import AppKit
 import CoreText
@@ -35,6 +35,7 @@ let bigSightShades: [[CGPoint]] = [
 
 struct Banner {
     let name: String
+    let language: String
     let width: CGFloat
     let height: CGFloat
 }
@@ -63,7 +64,10 @@ func render(_ banner: Banner) {
     // The dream: a broad cloud filling the middle of the banner, behind Big Sight.
     let center = CGPoint(x: w / 2, y: h / 2)
     let nameWidth = min(w * 0.26, h * 0.45)
-    cloud(at: CGPoint(x: center.x, y: center.y - h * 0.05), width: min(w * 0.7, h * 1.3), alpha: 1, seed: 7, puffs: 160, isRound: true, in: context)
+    // Its shaded underside melts into the sky and reads higher than its puffs, so it is
+    // set a little low to look centred on the name.
+    let cloudWidth = min(w * 0.7, h * 1.3)
+    cloud(at: CGPoint(x: center.x, y: center.y + cloudWidth * 0.032), width: cloudWidth, alpha: 1, seed: 7, puffs: 160, isRound: true, in: context)
 
     // Big Sight in front, its pillars running off the bottom edge as on the icon.
     let siteHeight = min(h * 0.27, w * 0.15)
@@ -78,14 +82,14 @@ func render(_ banner: Banner) {
         context.fillPath()
     }
 
-    name(at: center, width: nameWidth, in: context)
+    name(at: center, width: nameWidth, language: banner.language, in: context)
 
-    let url = scriptDir.appendingPathComponent("\(banner.name).png")
+    let url = scriptDir.appendingPathComponent("\(banner.language)/\(banner.name).png")
     guard let image = context.makeImage(),
           let destination = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil) else { fatalError() }
     CGImageDestinationAddImage(destination, image, nil)
     CGImageDestinationFinalize(destination)
-    print("wrote \(banner.name).png")
+    print("wrote \(banner.language)/\(banner.name).png")
 }
 
 /// A small, repeatable random source, so every run draws the same clouds.
@@ -119,8 +123,10 @@ func cloud(at center: CGPoint, width: CGFloat, alpha: CGFloat, seed: UInt64, puf
             puffs.append((CGPoint(x: t * width * 0.4, y: -lift), radius))
         }
     }
-    let minX = puffs.map { $0.0.x - $0.1 }.min()!, maxX = puffs.map { $0.0.x + $0.1 }.max()!
-    let minY = puffs.map { $0.0.y - $0.1 }.min()!, maxY = puffs.map { $0.0.y + $0.1 * (isRound ? 1 : 0.7) }.max()!
+    // Measured where the feathered puffs are still mostly opaque, so the visible cloud is what gets centred.
+    let body: CGFloat = isRound ? 0.6 : 1
+    let minX = puffs.map { $0.0.x - $0.1 * body }.min()!, maxX = puffs.map { $0.0.x + $0.1 * body }.max()!
+    let minY = puffs.map { $0.0.y - $0.1 * body }.min()!, maxY = puffs.map { $0.0.y + $0.1 * (isRound ? body : 0.7) }.max()!
     let shift = CGPoint(x: center.x - (minX + maxX) / 2, y: center.y - (minY + maxY) / 2)
     let bounds = CGRect(x: minX + shift.x, y: minY + shift.y, width: maxX - minX, height: maxY - minY)
 
@@ -143,24 +149,49 @@ func cloud(at center: CGPoint, width: CGFloat, alpha: CGFloat, seed: UInt64, puf
     return bounds
 }
 
-/// The app's name in Helvetica Neue, the icon's blue, centred on `center` by its capital height.
-func name(at center: CGPoint, width: CGFloat, in context: CGContext) {
-    let probe = CTFontCreateWithName("HelveticaNeue-Bold" as CFString, 100, nil)
-    func line(_ font: CTFont) -> CTLine {
-        let attributes = [kCTFontAttributeName: font, kCTForegroundColorAttributeName: ink, kCTKernAttributeName: 2] as CFDictionary
-        return CTLineCreateWithAttributedString(CFAttributedStringCreate(nil, "CiRCLES" as CFString, attributes)!)
+/// One line in the icon's blue, sized to span `width`.
+func fitted(_ text: String, font name: String, width: CGFloat) -> CTLine {
+    func line(_ size: CGFloat) -> CTLine {
+        let attributes = [
+            kCTFontAttributeName: CTFontCreateWithName(name as CFString, size, nil),
+            kCTForegroundColorAttributeName: ink, kCTKernAttributeName: size * 0.02,
+        ] as CFDictionary
+        return CTLineCreateWithAttributedString(CFAttributedStringCreate(nil, text as CFString, attributes)!)
     }
-    let size = 100 * width / CTLineGetTypographicBounds(line(probe), nil, nil, nil)
-    let font = CTFontCreateWithName("HelveticaNeue-Bold" as CFString, size, nil)
-    let text = line(font)
-    let bounds = CTLineGetBoundsWithOptions(text, .useGlyphPathBounds)
+    return line(100 * width / CTLineGetTypographicBounds(line(100), nil, nil, nil))
+}
+
+/// Draws a line with its glyphs' bounds centred on `center`.
+func draw(_ line: CTLine, centredAt center: CGPoint, in context: CGContext) {
+    let bounds = CTLineGetBoundsWithOptions(line, .useGlyphPathBounds)
     context.saveGState()
     context.translateBy(x: center.x - bounds.midX, y: center.y + bounds.midY)
     context.scaleBy(x: 1, y: -1)
     context.textPosition = .zero
-    CTLineDraw(text, context)
+    CTLineDraw(line, context)
     context.restoreGState()
 }
 
-render(Banner(name: "Header", width: 3840, height: 1646))
-render(Banner(name: "Search Results", width: 3840, height: 2560))
+/// The app's name, centred on `center`: in English alone, or in Japanese as the katakana
+/// name under a smaller English one, the pair centred together.
+func name(at center: CGPoint, width: CGFloat, language: String, in context: CGContext) {
+    let english = "CiRCLES"
+    guard language == "ja" else {
+        draw(fitted(english, font: "HelveticaNeue-Bold", width: width), centredAt: center, in: context)
+        return
+    }
+    let small = fitted(english, font: "HelveticaNeue-Bold", width: width * 0.4)
+    let large = fitted("サークルズ", font: "HiraginoSans-W7", width: width * 0.95)
+    let smallHeight = CTLineGetBoundsWithOptions(small, .useGlyphPathBounds).height
+    let largeHeight = CTLineGetBoundsWithOptions(large, .useGlyphPathBounds).height
+    let gap = smallHeight * 0.5
+    let top = center.y - (smallHeight + gap + largeHeight) / 2
+    draw(small, centredAt: CGPoint(x: center.x, y: top + smallHeight / 2), in: context)
+    draw(large, centredAt: CGPoint(x: center.x, y: top + smallHeight + gap + largeHeight / 2), in: context)
+}
+
+for language in ["en", "ja"] {
+    try? FileManager.default.createDirectory(at: scriptDir.appendingPathComponent(language), withIntermediateDirectories: true)
+    render(Banner(name: "Header", language: language, width: 3840, height: 1646))
+    render(Banner(name: "Search Results", language: language, width: 3840, height: 2560))
+}
