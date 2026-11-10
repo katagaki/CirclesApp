@@ -37,6 +37,12 @@ struct MyCircleAppearancePreviewCut: View {
                         .fill(.white)
                         .strokeBorder(.black, lineWidth: width * 0.03)
                         .frame(width: width * 0.275, height: width * 0.275)
+                    Rectangle()
+                        .fill(.black)
+                        .frame(width: width, height: width * 0.03)
+                        .offset(y: width * 0.245)
+                    Rectangle()
+                        .strokeBorder(.black, lineWidth: width * 0.03)
                     if isVisited {
                         Image(systemName: "checkmark")
                             .resizable()
