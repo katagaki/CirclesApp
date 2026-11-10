@@ -17,6 +17,9 @@ struct EventDataView: View {
     @State private var estimatedDownloadSize: String = ""
     @State private var isDownloadConfirmationShowing: Bool = false
     @State private var isDownloadFailedAlertShowing: Bool = false
+    @State private var isPreparingUpdate: Bool = false
+    @State private var updateDownloadSize: String = ""
+    @State private var isUpdateConfirmationShowing: Bool = false
 
     private var isOnline: Bool {
         authenticator.effectiveOnlineState == .online
@@ -42,12 +45,20 @@ struct EventDataView: View {
                                 .monospacedDigit()
                         }
                     }
-                    Button("More.UpdateData", systemImage: "arrow.triangle.2.circlepath") {
-                        unifier.shouldUpdateData = true
+                    Button {
+                        Task { await confirmUpdate(of: activeEvent) }
+                    } label: {
+                        HStack {
+                            Label("More.UpdateData", systemImage: "arrow.triangle.2.circlepath")
+                            if isPreparingUpdate {
+                                Spacer()
+                                ProgressView()
+                            }
+                        }
                     }
                     .foregroundStyle(.accent)
                     .tint(.accent)
-                    .disabled(!isOnline)
+                    .disabled(!isOnline || isPreparingUpdate || !unifier.isDataReady)
                 } header: {
                     Text("More.SelectedEvent")
                 }
@@ -119,6 +130,32 @@ struct EventDataView: View {
         } message: {
             Text("Alerts.DownloadFailed.Message")
         }
+        .alert("Alerts.DownloadConfirmation.Title", isPresented: $isUpdateConfirmationShowing) {
+            updateActions()
+        } message: {
+            Text("Alerts.DownloadConfirmation.Message \(updateDownloadSize)")
+        }
+        .alert("Alerts.DownloadFailed.Title", isPresented: Binding(
+            get: { unifier.didDataUpdateFail },
+            set: { unifier.didDataUpdateFail = $0 }
+        )) {
+            updateActions(label: "Shared.Retry")
+        } message: {
+            Text("Alerts.DownloadFailed.Message")
+        }
+        .onChange(of: unifier.isDataReady) { _, isReady in
+            if isReady {
+                Task { await refresh() }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func updateActions(label: LocalizedStringKey = "Shared.Download") -> some View {
+        Button(label) {
+            unifier.shouldUpdateData = true
+        }
+        Button("Shared.Cancel", role: .cancel) {}
     }
 
     @ViewBuilder
@@ -198,6 +235,20 @@ struct EventDataView: View {
         }
         pendingDownloadEvent = event
         isDownloadConfirmationShowing = true
+    }
+
+    private func confirmUpdate(of event: WebCatalogEvent.Response.Event) async {
+        guard !isPreparingUpdate else { return }
+        isPreparingUpdate = true
+        let token = authenticator.token ?? OpenIDToken()
+        let totalBytes = await database.fetchDownloadSizes(for: event, authToken: token)
+        isPreparingUpdate = false
+        if let totalBytes {
+            updateDownloadSize = ByteCountFormatter.string(fromByteCount: totalBytes, countStyle: .file)
+        } else {
+            updateDownloadSize = String(localized: "Shared.Unknown")
+        }
+        isUpdateConfirmationShowing = true
     }
 
     private func downloadEvent(_ event: WebCatalogEvent.Response.Event) async {

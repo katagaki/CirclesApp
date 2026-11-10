@@ -1,12 +1,14 @@
 import SwiftUI
 import RADiUS
 import AXiS
+import Komponents
 
 struct MyComiketSheet: View {
 
     @Environment(Authenticator.self) var authenticator
     @Environment(Database.self) var database
     @Environment(Events.self) var planner
+    @Environment(Oasis.self) var oasis
 
     @State var path: [MyComiketPath] = []
     @State var eventTitle: String = ""
@@ -15,6 +17,7 @@ struct MyComiketSheet: View {
     @AppStorage(wrappedValue: 0, "My.LastKnownPID") var lastKnownPID: Int
 
     var body: some View {
+        @Bindable var oasis = oasis
         NavigationStack(path: $path) {
             List {
                 MyAccountSection()
@@ -43,6 +46,13 @@ struct MyComiketSheet: View {
                 }
             }
         }
+        .progressAlert(
+            isModal: .constant(true),
+            isShowing: $oasis.isShowing,
+            headerText: $oasis.headerText,
+            bodyText: $oasis.bodyText,
+            progress: $oasis.progress
+        )
         .task(id: planner.activeEventNumber) {
             eventTitle = database.events()
                 .first(where: { $0.eventNumber == planner.activeEventNumber })?.name ?? ""
