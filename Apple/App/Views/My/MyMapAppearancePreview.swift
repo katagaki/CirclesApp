@@ -11,7 +11,7 @@ struct MyMapAppearancePreview: View {
     let islandCount: Int = 8
     let spacesPerIsland: Int = 5
     let genreColors: [Color] = [.pink, .orange, .green, .blue, .purple]
-    let genreLengths: [Int] = [8, 4, 13, 6, 9, 5, 11, 7, 10, 3, 9, 6, 12, 5]
+    let genreSpans: [Int] = [3, 2, 3, 1]
 
     var isDark: Bool {
         colorScheme == .dark && usesDarkModeMap
@@ -95,28 +95,22 @@ struct MyMapAppearancePreview: View {
 
     func drawGenres(over islands: [CGRect], in context: inout GraphicsContext) {
         var genre = 0
-        var remaining = genreLengths[0]
-        for island in islands {
-            let spaceHeight = island.height / CGFloat(spacesPerIsland)
-            var start = 0
-            while start < spacesPerIsland {
-                let length = min(remaining, spacesPerIsland - start)
-                let segment = CGRect(
-                    x: island.minX,
-                    y: island.minY + CGFloat(start) * spaceHeight,
-                    width: island.width,
-                    height: CGFloat(length) * spaceHeight
-                ).insetBy(dx: -1.5, dy: -1.0)
+        for row in 0..<2 {
+            let rowIslands = islands.enumerated().filter { $0.offset % 2 == row }.map(\.element)
+            var column = 0
+            var lengthIndex = row
+            while column < rowIslands.count {
+                let length = min(genreSpans[lengthIndex % genreSpans.count], rowIslands.count - column)
+                let first = rowIslands[column]
+                let last = rowIslands[column + length - 1]
+                let region = first.union(last).insetBy(dx: -2.0, dy: -2.0)
                 context.fill(
-                    Path(roundedRect: segment, cornerRadius: 1.5),
-                    with: .color(genreColors[genre % genreColors.count].opacity(0.5))
+                    Path(roundedRect: region, cornerRadius: 2.0),
+                    with: .color(genreColors[genre % genreColors.count].opacity(0.45))
                 )
-                start += length
-                remaining -= length
-                if remaining == 0 {
-                    genre += 1
-                    remaining = genreLengths[genre % genreLengths.count]
-                }
+                column += length
+                lengthIndex += 1
+                genre += 1
             }
         }
     }
