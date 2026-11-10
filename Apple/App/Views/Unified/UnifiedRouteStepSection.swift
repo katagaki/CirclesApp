@@ -3,7 +3,6 @@ import SwiftUI
 
 struct UnifiedRouteStepSection: View {
 
-    @Environment(Database.self) var database
     @Environment(Navigator.self) var navigator
 
     var body: some View {
@@ -46,15 +45,9 @@ struct UnifiedRouteStepSection: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 }
-                UnifiedRouteControls(
-                    isArrival: step.isArrival,
-                    canGoBack: navigator.stepIndex > 0,
-                    canReportBlocked: navigator.canReportBlocked,
-                    onBack: { navigator.previous() },
-                    onBlocked: { navigator.reportBlocked(database: database) },
-                    onSkip: { navigator.skip() },
-                    onVisited: { navigator.markVisitedAndContinue() }
-                )
+                if step.isArrival {
+                    NaviMarkVisitedButton()
+                }
                 NaviBuysCarousel(circleID: stop.circleID)
             }
         }

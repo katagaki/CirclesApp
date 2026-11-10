@@ -22,16 +22,6 @@ struct NaviFinishedCard: View {
                 }
             }
             .frame(minHeight: 80.0, alignment: .top)
-            UnifiedRouteControls(
-                isArrival: false,
-                canGoBack: true,
-                canReportBlocked: false,
-                canGoForward: false,
-                onBack: navigator.previous,
-                onBlocked: {},
-                onSkip: {},
-                onVisited: {}
-            )
         }
     }
 }
