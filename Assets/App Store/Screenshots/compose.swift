@@ -45,7 +45,7 @@ let sharedBuysCopy = [
     "ja": Copy(title: "友達と共同購入", caption: "リストを共有して、誰が何を買うか分担"),
 ]
 let guideCopy = [
-    "en": Copy(title: "Never Get Lost", caption: "Navi walks you to every favorite, booth by booth"),
+    "en": Copy(title: "Never Get Lost", caption: "Guide walks you to every favorite, booth by booth"),
     "ja": Copy(title: "迷わずサークル巡り", caption: "コミケナビがお気に入りまで道順をご案内"),
 ]
 /// The 8-bit samples of a decoded image, read without any colour conversion.
