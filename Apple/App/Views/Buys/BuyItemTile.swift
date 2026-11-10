@@ -1,13 +1,24 @@
 import AXiS
 import SwiftUI
 
+enum BuyItemGridMetrics {
+
+    static let columnCount = 3
+    static let spacing: CGFloat = 12.0
+
+    /// A tile's width in a grid this wide, so tiles shown outside the grid can match it.
+    static func tileWidth(in width: CGFloat) -> CGFloat {
+        max(0.0, (width - spacing * CGFloat(columnCount - 1)) / CGFloat(columnCount))
+    }
+}
+
 struct BuyItemGrid<Content: View>: View {
 
     @ViewBuilder let content: () -> Content
 
     private let columns = Array(
-        repeating: GridItem(.flexible(), spacing: 12.0, alignment: .top),
-        count: 3
+        repeating: GridItem(.flexible(), spacing: BuyItemGridMetrics.spacing, alignment: .top),
+        count: BuyItemGridMetrics.columnCount
     )
 
     var body: some View {

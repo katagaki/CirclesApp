@@ -28,25 +28,29 @@ struct BuysOnboardingView: View {
                 .padding(.horizontal, 24.0)
                 VStack(alignment: .leading, spacing: 22.0) {
                     OnboardingRow(
-                        systemImage: "bag.badge.plus",
                         title: "Buys.Onboarding.Add.Title",
                         message: "Buys.Onboarding.Add.Message"
-                    )
+                    ) {
+                        BuysOnboardingIcon(kind: .add)
+                    }
                     OnboardingRow(
-                        systemImage: "checkmark.circle.fill",
                         title: "Buys.Onboarding.Track.Title",
                         message: "Buys.Onboarding.Track.Message"
-                    )
+                    ) {
+                        BuysOnboardingIcon(kind: .track)
+                    }
                     OnboardingRow(
-                        systemImage: "qrcode",
                         title: "Buys.Onboarding.Share.Title",
                         message: "Buys.Onboarding.Share.Message"
-                    )
+                    ) {
+                        BuysOnboardingIcon(kind: .share)
+                    }
                     OnboardingRow(
-                        systemImage: "person.2.fill",
                         title: "Buys.Onboarding.Split.Title",
                         message: "Buys.Onboarding.Split.Message"
-                    )
+                    ) {
+                        BuysOnboardingIcon(kind: .split)
+                    }
                 }
                 .padding(.horizontal, 24.0)
             }

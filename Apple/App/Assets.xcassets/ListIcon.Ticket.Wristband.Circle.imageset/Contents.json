@@ -1,17 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "UI Icons.012.png",
-      "idiom" : "universal"
-    },
-    {
-      "appearances" : [
-        {
-          "appearance" : "luminosity",
-          "value" : "dark"
-        }
-      ],
-      "filename" : "UI Icons.013.png",
+      "filename" : "UI Icons.011.png",
       "idiom" : "universal"
     }
   ],

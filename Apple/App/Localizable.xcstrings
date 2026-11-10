@@ -882,74 +882,6 @@
         }
       }
     },
-    "Alerts.OfflineMode.Tip.Message": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "To exit offline mode, select \"Exit Offline Mode\" from the \"…\" menu in the top right corner."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "オフラインモードを終了するには、右上の「…」メニューから「オフラインモードを終了」を選択してください。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "오프라인 모드를 종료하려면 오른쪽 상단의 '…' 메뉴에서 '오프라인 모드 종료'를 선택하세요."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "要退出离线模式，请从右上角的“…”菜单中选择“退出离线模式”。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "要結束離線模式，請從右上角的「…」選單中選擇「結束離線模式」。"
-          }
-        }
-      }
-    },
-    "Alerts.OfflineMode.Tip.Title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Offline Mode"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "オフラインモード"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "오프라인 모드"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "离线模式"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "離線模式"
-          }
-        }
-      }
-    },
     "Alerts.SwitchEvent.Action": {
       "extractionState": "manual",
       "localizations": {
@@ -3302,6 +3234,41 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "掃描此 QR 碼即可加入共享清單"
+          }
+        }
+      }
+    },
+    "Buys.Shared.Create": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "作成"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "만들기"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "创建"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "建立"
           }
         }
       }
@@ -9599,6 +9566,76 @@
         }
       }
     },
+    "My.Account": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "アカウント"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계정"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "账户"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "帳號"
+          }
+        }
+      }
+    },
+    "My.Account.NoParticipation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Participation not set"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "参加情報が未設定"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "참가 정보 미설정"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未设置参加信息"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未設定參加資訊"
+          }
+        }
+      }
+    },
     "My.AddToCalendar": {
       "localizations": {
         "en": {
@@ -9629,6 +9666,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "新增至行事曆"
+          }
+        }
+      }
+    },
+    "My.CircleAppearance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Circle Appearance"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "サークル外観"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "서클 외관"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "社团外观"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "社團外觀"
           }
         }
       }
@@ -9699,6 +9771,41 @@
           "stringUnit": {
             "state": "needs_review",
             "value": "此名稱為自動指派。共享清單中的其他人會看到這個名稱。"
+          }
+        }
+      }
+    },
+    "My.MapAppearance": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Map Appearance"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "マップ外観"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "지도 외관"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地图外观"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地圖外觀"
           }
         }
       }
@@ -11019,31 +11126,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Start at %@, or long-press the map to start from where you are"
+            "value": "Start at %@"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@から出発します。現在地から始めるには、マップを長押ししてください"
+            "value": "%@から出発します"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@에서 출발합니다. 현재 위치에서 시작하려면 지도를 길게 누르세요"
+            "value": "%@에서 출발합니다"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "从%@出发。长按地图可从你所在的位置开始"
+            "value": "从%@出发"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "從%@出發。長按地圖可從你所在的位置開始"
+            "value": "從%@出發"
           }
         }
       }
@@ -11053,31 +11160,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Blocked"
+            "value": "Detour"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "通れない"
+            "value": "迂回"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "막힘"
+            "value": "우회"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "无法通行"
+            "value": "绕行"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "無法通行"
+            "value": "繞行"
           }
         }
       }
@@ -11257,7 +11364,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "End Navigation"
+            "value": "End Guide"
           }
         },
         "ja": {
@@ -11325,31 +11432,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Go in through the entrance shown on the map, or long-press the map to start from where you are"
+            "value": "Go in through the entrance shown on the map"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "マップに示した出入口から入場します。現在地から始めるには、マップを長押ししてください"
+            "value": "マップに示した出入口から入場します"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "지도에 표시된 출입구로 들어가세요. 현재 위치에서 시작하려면 지도를 길게 누르세요"
+            "value": "지도에 표시된 출입구로 들어가세요"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "从地图上标出的出入口进入。长按地图可从你所在的位置开始"
+            "value": "从地图上标出的出入口进入"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "從地圖上標出的出入口進入。長按地圖可從你所在的位置開始"
+            "value": "從地圖上標出的出入口進入"
           }
         }
       }
@@ -11359,31 +11466,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Go in through the %@ entrance shown on the map, or long-press the map to start from where you are"
+            "value": "Go in through the %@ entrance shown on the map"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "マップに示した%@の出入口から入場します。現在地から始めるには、マップを長押ししてください"
+            "value": "マップに示した%@の出入口から入場します"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "지도에 표시된 %@ 출입구로 들어가세요. 현재 위치에서 시작하려면 지도를 길게 누르세요"
+            "value": "지도에 표시된 %@ 출입구로 들어가세요"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "从地图上标出的%@出入口进入。长按地图可从你所在的位置开始"
+            "value": "从地图上标出的%@出入口进入"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "從地圖上標出的%@出入口進入。長按地圖可從你所在的位置開始"
+            "value": "從地圖上標出的%@出入口進入"
           }
         }
       }
@@ -11597,31 +11704,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Efficient"
+            "value": "Automatic"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "効率重視"
+            "value": "おまかせ"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "효율 우선"
+            "value": "자동"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "效率优先"
+            "value": "自动"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "效率優先"
+            "value": "自動"
           }
         }
       }
@@ -11665,31 +11772,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Prioritized"
+            "value": "Choose Colors"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "優先順"
+            "value": "色を選択"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "우선순위"
+            "value": "색상 선택"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "按优先顺序"
+            "value": "选择颜色"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "依優先順序"
+            "value": "選擇顏色"
           }
         }
       }
@@ -11835,31 +11942,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tap Blocked for another way, or long-press the map to close off a hall."
+            "value": "Tap Detour for another way, or long-press the map to close off a hall."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "「通れない」をタップすると、別の道を案内します。ホールごと閉じるときは、マップを長押ししてください。"
+            "value": "「迂回」をタップすると、別の道を案内します。ホールごと閉じるときは、マップを長押ししてください。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "'막힘'을 누르면 다른 길로 안내합니다. 홀 전체를 막으려면 지도를 길게 누르세요."
+            "value": "'우회'을 누르면 다른 길로 안내합니다. 홀 전체를 막으려면 지도를 길게 누르세요."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "点按“无法通行”换条路；要封闭整个展厅，请长按地图。"
+            "value": "点按“绕行”换条路；要封闭整个展厅，请长按地图。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "點按「無法通行」換條路；要封閉整個展廳，請長按地圖。"
+            "value": "點按「繞行」換條路；要封閉整個展廳，請長按地圖。"
           }
         }
       }
@@ -11903,31 +12010,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Efficient takes the shortest walk. Prioritized goes color by color."
+            "value": "Automatic takes the shortest walk. Choose Colors goes color by color."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "「効率重視」は最短で、「優先順」は色の順に回ります。"
+            "value": "「おまかせ」は最短で、「色を選択」は色の順に回ります。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "'효율 우선'은 최단 동선으로, '우선순위'는 색 순서대로 돕니다."
+            "value": "'자동'은 최단 동선으로, '색상 선택'은 색 순서대로 돕니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "“效率优先”走最短路线，“按优先顺序”按颜色顺序前往。"
+            "value": "“自动”走最短路线，“选择颜色”按颜色顺序前往。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "「效率優先」走最短路線，「依優先順序」依顏色順序前往。"
+            "value": "「自動」走最短路線，「選擇顏色」依顏色順序前往。"
           }
         }
       }
@@ -11971,7 +12078,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "How Navigation Works"
+            "value": "About Guide…"
           }
         },
         "ja": {
@@ -12209,7 +12316,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Navigation"
+            "value": "Guide"
           }
         },
         "ja": {
@@ -12663,7 +12770,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Navigation"
+            "value": "Guide"
           }
         },
         "ja": {
@@ -15519,74 +15626,6 @@
         }
       }
     },
-    "Tip.BuysScope.Description": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Switch between your own Buys and the list you share with others."
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自分の宝物と、他の人と共有している共同購入リストを切り替えられます。"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "내 구매 목록과 다른 사람과 공유하는 목록을 전환할 수 있습니다."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在您自己的宝贝列表和与他人共享的列表之间切换。"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "在您自己的寶藏清單和與他人共享的清單之間切換。"
-          }
-        }
-      }
-    },
-    "Tip.BuysScope.Title": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "My Buys & Shared"
-          }
-        },
-        "ja": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "自分と共同購入"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "내 목록 및 공유 목록"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "我的宝贝与共享"
-          }
-        },
-        "zh-Hant": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "我的寶藏與共享"
-          }
-        }
-      }
-    },
     "Tip.DoubleTapVisit.Description": {
       "localizations": {
         "en": {
@@ -15831,7 +15870,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Profile"
+            "value": "My Comiket"
           }
         },
         "ja": {
@@ -15860,7 +15899,462 @@
         }
       }
     },
-    "¥%lld": {}
+    "¥%lld": {},
+    "ViewTitle.Navi": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guide"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ナビ"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내비"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "导航"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "導航"
+          }
+        }
+      }
+    },
+    "Navi.Modes": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a Route"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "巡り方を選択"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "순회 방법 선택"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "选择巡游方式"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "選擇巡遊方式"
+          }
+        }
+      }
+    },
+    "Navi.Go": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出発"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "출발"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出发"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "出發"
+          }
+        }
+      }
+    },
+    "Route.End.Short": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "終了"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "종료"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "結束"
+          }
+        }
+      }
+    },
+    "Route.End.Confirm": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "End the guide?"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ナビを終了しますか？"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내비를 종료할까요?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要结束导航吗？"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要結束導航嗎？"
+          }
+        }
+      }
+    },
+    "Navi.Planning": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finding the best route…"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "経路を探しています…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "경로를 찾는 중…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在查找路线…"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在尋找路線…"
+          }
+        }
+      }
+    },
+    "Navi.Finished.Title": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You're all done!"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "お疲れ様でした"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "수고하셨습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "辛苦了"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "辛苦了"
+          }
+        }
+      }
+    },
+    "Navi.Finished.Message.%lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You've been through all %lld stops on this route."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このルートの%lld件をすべて回りました。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 경로의 %lld곳을 모두 돌았습니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已走完本路线的全部%lld个地点。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已走完本路線的全部%lld個地點。"
+          }
+        }
+      }
+    },
+    "Navi.Buys.Mine": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "My Buys"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自分の宝物"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내 구매 목록"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我的宝贝"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "我的寶藏"
+          }
+        }
+      }
+    },
+    "Navi.Buys.Shared": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shared Buys"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共同購入"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "공유 목록"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共享列表"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共享清單"
+          }
+        }
+      }
+    },
+    "Navi.Buys.Count.%lld": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld circles in this hall with items to buy"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このホールの未購入があるサークル%lld件"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 홀에서 살 물건이 있는 서클 %lld곳"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本展厅有待购物品的社团 %lld 个"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本展廳有待購物品的社團 %lld 個"
+          }
+        }
+      }
+    },
+    "Navi.Buys.None": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing left to buy in this hall"
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "このホールに未購入はありません"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 홀에는 살 물건이 없습니다"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本展厅没有待购物品"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本展廳沒有待購物品"
+          }
+        }
+      }
+    },
+    "Navi.Buys.Shared.Footer": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shared Buys visits items assigned to you or to no one."
+          }
+        },
+        "ja": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共同購入は、自分の担当と担当未定の宝物を回ります。"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "공유 목록은 내 담당과 담당 미정인 물건을 돕니다."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共享列表会前往分配给你或尚未分配的物品。"
+          }
+        },
+        "zh-Hant": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "共享清單會前往分配給你或尚未分配的物品。"
+          }
+        }
+      }
+    }
   },
   "version": "1.0"
 }

@@ -34,7 +34,7 @@ struct UnifiedRouteCircleCut: View {
                     .fill(.quaternary)
             }
         }
-        .frame(width: 40.0, height: 57.0)
+        .frame(width: 56.0, height: 80.0)
         .task(id: circleID) {
             circle = database.circles([circleID]).first
         }

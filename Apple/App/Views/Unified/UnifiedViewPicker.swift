@@ -20,6 +20,8 @@ struct UnifiedViewPicker: View {
                 Text("ViewTitle.Buys")
                     .tag(UnifiedPath.buys)
             }
+            Text("ViewTitle.Navi")
+                .tag(UnifiedPath.navi)
         } label: {
             // Label intentionally left empty; the picker uses segmented style.
         }

@@ -10,13 +10,6 @@ struct UnifiedPanel: View {
             ZStack {
                 self.unifier.view()
             }
-            .safeAreaInset(edge: .top, spacing: 0.0) {
-                if unifier.displayMode == .sheet && unifier.selectedDetent == .large {
-                    UnifiedOfflineStatus()
-                        .padding(.horizontal, 16.0)
-                        .padding(.bottom, 6.0)
-                }
-            }
             .toolbar {
                 ToolbarItem(placement: .principal) {
                     UnifiedViewPicker()
@@ -39,6 +32,13 @@ struct UnifiedPanel: View {
             set: { unifier.isSharedBuysDebugPresenting = $0 }
         )) {
             SharedBuysDebugView()
+        }
+        .sheet(isPresented: Binding(
+            get: { unifier.isMyComiketPresenting && unifier.presentsMyComiketFromPanel },
+            set: { unifier.isMyComiketPresenting = $0 }
+        )) {
+            MyComiketSheet()
+                .presentationDetents([.large])
         }
         .circleFinderSheet()
         .presentationBackgroundInteraction(.enabled)

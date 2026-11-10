@@ -1,5 +1,4 @@
 import EventKit
-import Komponents
 import SwiftUI
 
 struct MyParticipationSections: View {
@@ -19,20 +18,15 @@ struct MyParticipationSections: View {
                 HStack {
                     switch planner.participationInfo(for: dayID) {
                     case "Early":
-                        ListRow(image: "ListIcon.Ticket.Fami",
-                                title: "Ticket.Early")
+                        ListIconLabel(title: "Ticket.Early", image: "ListIcon.Ticket.Fami")
                     case "ChangingRoom":
-                        ListRow(image: "ListIcon.Ticket.Fami",
-                                title: "Ticket.ChangingRoom")
+                        ListIconLabel(title: "Ticket.ChangingRoom", image: "ListIcon.Ticket.Fami")
                     case "AM":
-                        ListRow(image: "ListIcon.Ticket.Wristband.AMPM",
-                                title: "Ticket.AM")
+                        ListIconLabel(title: "Ticket.AM", image: "ListIcon.Ticket.Wristband.AMPM")
                     case "PM":
-                        ListRow(image: "ListIcon.Ticket.Wristband.AMPM",
-                                title: "Ticket.PM")
+                        ListIconLabel(title: "Ticket.PM", image: "ListIcon.Ticket.Wristband.AMPM")
                     case "Circle":
-                        ListRow(image: "ListIcon.Ticket.Wristband.Circle",
-                                title: "Ticket.Circle")
+                        ListIconLabel(title: "Ticket.Circle", image: "ListIcon.Ticket.Wristband.Circle")
                     default:
                         Text("My.Ticket.NotParticipating")
                             .foregroundStyle(.secondary)

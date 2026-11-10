@@ -20,7 +20,7 @@ struct MapView: View {
     @AppStorage(wrappedValue: 3, "Map.ZoomDivisor") var zoomDivisor: Int
     @AppStorage(wrappedValue: false, "Map.ShowsGenreOverlays") var showGenreOverlay: Bool
     @AppStorage(wrappedValue: true, "Customization.UseHighResolutionMaps") var useHighResolutionMaps: Bool
-    @AppStorage(wrappedValue: .none, "Map.ScrollType") var scrollType: MapAutoScrollType
+    @AppStorage(wrappedValue: .popover, "Map.ScrollType") var scrollType: MapAutoScrollType
 
     var spaceSize: Int {
         useHighResolutionMaps ? 40 : 20

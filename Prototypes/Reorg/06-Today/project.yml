@@ -1,0 +1,27 @@
+name: Today
+options:
+  bundleIdPrefix: com.tsubuzaki.prototype.reorg
+  deploymentTarget:
+    iOS: "26.0"
+  createIntermediateGroups: true
+targets:
+  Today:
+    type: application
+    platform: iOS
+    sources:
+      - Today
+      - path: ../Kit
+        name: Kit
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.tsubuzaki.prototype.reorg.Today
+        INFOPLIST_KEY_CFBundleDisplayName: "06 Today"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UIApplicationSceneManifest_Generation: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
+        INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        SWIFT_VERSION: "6.0"
+        SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGNING_ALLOWED: NO

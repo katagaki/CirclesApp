@@ -19,8 +19,8 @@ struct HallPicker: View {
                     Text("Shared.Placeholder.NoBlock")
                 }
             }
-            .padding(.vertical, 8.0)
             .padding(.horizontal, 16.0)
+            .frame(height: 34.0)
             .foregroundStyle(.white)
         }
         .buttonStyle(.plain)

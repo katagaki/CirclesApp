@@ -72,7 +72,7 @@ nonisolated struct WalkableMap: Sendable {
 
 extension WalkableMap {
 
-    static func build(image: CGImage, tables: [RouteTable]) -> WalkableMap? {
+    static func build(image: CGImage, tables: [RouteTable], entrances: HallEntrances) -> WalkableMap? {
         let width = image.width
         let height = image.height
         guard width > 0, height > 0, let raster = MapRaster(image: image) else { return nil }
@@ -137,7 +137,13 @@ extension WalkableMap {
             rows: rows, columns: columns, walkable: walkable, clearance: clearance,
             stepCost: stepCost, islandLabels: islandLabels, islands: islands, doors: []
         )
-        map = map.with(doors: doorSigns(in: raster, width: width, height: height).compactMap { map.door(at: $0) })
+        switch entrances {
+        case .signs:
+            map = map.with(doors: doorSigns(in: raster, width: width, height: height).compactMap { map.door(at: $0) })
+        default:
+            let finder = EntranceFinder(raster: raster, width: width, height: height, tables: tables)
+            map = map.with(doors: finder.starts(for: entrances).compactMap { map.door(startingAt: $0) })
+        }
         return map
     }
 

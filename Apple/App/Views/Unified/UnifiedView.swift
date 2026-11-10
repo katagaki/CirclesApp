@@ -8,8 +8,6 @@ struct UnifiedView: View {
     @Environment(\.requestReview) var requestReview
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
     @Environment(Authenticator.self) var authenticator
-    @Environment(Database.self) var database
-    @Environment(ImageCache.self) var imageCache
     @Environment(Events.self) var planner
     @Environment(Unifier.self) var unifier
     @Environment(Oasis.self) var oasis
@@ -55,6 +53,7 @@ struct UnifiedView: View {
             MapView()
                 .navigationTitle("ViewTitle.Map")
                 .navigationBarTitleDisplayMode(.inline)
+                .toolbar(removing: .title)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea(.all, edges: isiPad ? [] : .top) // HACK: .top breaks iPad UI
                 .contentShape(.rect)
@@ -71,12 +70,12 @@ struct UnifiedView: View {
                     UnifiedToolbar(namespace: namespace)
                 }
                 .unifierPanel(namespace: namespace)
-                .sheet(isPresented: $unifier.isMyComiketPresenting) {
-                    NavigationStack {
-                        MyView()
-                    }
-                    .navigationTransition(.zoom(sourceID: "My.View", in: namespace))
-                    .presentationDetents([.large])
+                .sheet(isPresented: Binding(
+                    get: { unifier.isMyComiketPresenting && !unifier.presentsMyComiketFromPanel },
+                    set: { unifier.isMyComiketPresenting = $0 }
+                )) {
+                    MyComiketSheet()
+                        .presentationDetents([.large])
                 }
                 .navigationDestination(for: UnifiedPath.self) { path in
                     path.view()
@@ -147,14 +146,6 @@ struct UnifiedView: View {
                 unifier.show()
             }
         }
-        .alert("Alerts.Logout.Title", isPresented: $unifier.isGoingToSignOut) {
-            Button("Shared.Cancel", role: .cancel) {
-                unifier.show()
-            }
-            Button("Shared.Logout", role: .destructive, action: logout)
-        } message: {
-            Text("Alerts.Logout.Message")
-        }
         .alert("Alerts.OfflineMode.Enter.Title", isPresented: $unifier.isGoingToEnterOfflineMode) {
             Button("Shared.Cancel", role: .cancel) {
                 unifier.show()
@@ -170,24 +161,6 @@ struct UnifiedView: View {
             Button("More.ExitOfflineMode", action: exitOfflineMode)
         } message: {
             Text("Alerts.OfflineMode.Exit.Message")
-        }
-        .onChange(of: authenticator.isAuthenticating) { oldValue, newValue in
-            if oldValue && !newValue && authenticator.isOfflineModeActive {
-                Task {
-                    try? await Task.sleep(for: .seconds(1))
-                    while oasis.isShowing {
-                        try? await Task.sleep(for: .seconds(0.5))
-                    }
-                    unifier.hide()
-                    try? await Task.sleep(for: .seconds(0.6))
-                    unifier.isOfflineModeTipShowing = true
-                }
-            }
-        }
-        .onChange(of: unifier.isOfflineModeTipShowing) { oldValue, newValue in
-            if oldValue && !newValue {
-                unifier.show()
-            }
         }
     }
 
@@ -217,24 +190,5 @@ struct UnifiedView: View {
     func exitOfflineMode() {
         unifier.close()
         authenticator.exitOfflineMode()
-    }
-
-    func logout() {
-        database.delete()
-        imageCache.clear()
-        let dictionary = UserDefaults.standard.dictionaryRepresentation()
-        dictionary.keys.forEach { key in
-            UserDefaults.standard.removeObject(forKey: key)
-        }
-        UserDefaults.standard.synchronize()
-        Task.detached {
-            await MainActor.run {
-
-                imageCache.clear()
-                database.reset()
-                unifier.close()
-                authenticator.resetAuthentication()
-            }
-        }
     }
 }

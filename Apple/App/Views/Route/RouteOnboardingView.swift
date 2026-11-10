@@ -29,25 +29,29 @@ struct RouteOnboardingView: View {
                 .padding(.horizontal, 24.0)
                 VStack(alignment: .leading, spacing: 22.0) {
                     OnboardingRow(
-                        systemImage: "list.number",
                         title: "Route.Onboarding.Modes.Title",
                         message: "Route.Onboarding.Modes.Message"
-                    )
+                    ) {
+                        RouteOnboardingIcon(kind: .modes)
+                    }
                     OnboardingRow(
-                        systemImage: "hand.point.up.left.fill",
                         title: "Route.Onboarding.Origin.Title",
                         message: "Route.Onboarding.Origin.Message"
-                    )
+                    ) {
+                        RouteOnboardingIcon(kind: .origin)
+                    }
                     OnboardingRow(
-                        systemImage: "chevron.forward.circle.fill",
                         title: "Route.Onboarding.Steps.Title",
                         message: "Route.Onboarding.Steps.Message"
-                    )
+                    ) {
+                        RouteOnboardingIcon(kind: .steps)
+                    }
                     OnboardingRow(
-                        systemImage: "arrow.triangle.branch",
                         title: "Route.Onboarding.Detour.Title",
                         message: "Route.Onboarding.Detour.Message"
-                    )
+                    ) {
+                        RouteOnboardingIcon(kind: .detour)
+                    }
                 }
                 .padding(.horizontal, 24.0)
             }

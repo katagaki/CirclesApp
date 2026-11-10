@@ -7,6 +7,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
     case circles
     case favorites
     case buys
+    case navi
     case my
     case moreEventData
     case moreBackup
@@ -38,6 +39,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
         case .circles: "Circles"
         case .favorites: "Favorites"
         case .buys: "Buys"
+        case .navi: "Navi"
         case .my: "My"
         case .moreEventData: "More.EventData"
         case .moreBackup: "More.Backup"
@@ -60,6 +62,7 @@ enum UnifiedPath: Identifiable, CaseIterable, Equatable, Hashable, RawRepresenta
         case .circles: CatalogView()
         case .favorites: FavoritesView()
         case .buys: BuysView()
+        case .navi: NaviView()
         case .my: MyView()
         case .moreEventData: EventDataView()
         case .moreBackup: BackupView()

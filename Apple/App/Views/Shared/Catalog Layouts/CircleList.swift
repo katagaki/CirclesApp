@@ -43,6 +43,7 @@ struct CircleList: View {
                                     CircleListCompactRow(circle: circle, namespace: namespace)
                                 }
                             }
+                            .buttonStyle(.plain)
                         }
                     }
                     .padding([.leading, .trailing], 20.0)

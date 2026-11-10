@@ -2,8 +2,6 @@ import PhotosUI
 import SwiftUI
 import RADiUS
 
-private let myPortalURL = "https://myportal.circle.ms/"
-
 struct MyProfileSection: View {
 
     @Environment(Authenticator.self) var authenticator
@@ -22,29 +20,37 @@ struct MyProfileSection: View {
     var body: some View {
         Section {
             VStack(alignment: .center, spacing: 10.0) {
-                Menu {
-                    Button("My.ProfilePicture.SelectFromPhotos", systemImage: "photo") {
-                        isSelectingProfilePicture.toggle()
+                Group {
+                    if let profilePictureState {
+                        profilePictureState
+                            .resizable()
+                    } else {
+                        GenericProfilePicture(
+                            name: userInfo?.nickname ?? lastKnownNickname ?? "",
+                            userID: userInfo?.pid ?? lastKnownPID
+                        )
                     }
-                    Button("My.ProfilePicture.Remove", systemImage: "trash", role: .destructive) {
-                        profilePicture = nil
-                        profilePictureState = nil
-                    }
-                } label: {
-                    Group {
-                        if let profilePictureState {
-                            profilePictureState
-                                .resizable()
-                        } else {
-                            GenericProfilePicture(
-                                name: userInfo?.nickname ?? lastKnownNickname ?? "",
-                                userID: userInfo?.pid ?? lastKnownPID
-                            )
+                }
+                .scaledToFill()
+                .frame(width: 220.0, height: 220.0)
+                .clipShape(.circle)
+                .overlay {
+                    // The menu morphs out of its label and hides it while open, so the label is
+                    // a clear shape over the photo rather than the photo itself.
+                    Menu {
+                        Button("My.ProfilePicture.SelectFromPhotos", systemImage: "photo") {
+                            isSelectingProfilePicture.toggle()
                         }
+                        Button("My.ProfilePicture.Remove", systemImage: "trash", role: .destructive) {
+                            profilePicture = nil
+                            profilePictureState = nil
+                        }
+                    } label: {
+                        Color.clear
+                            .frame(width: 220.0, height: 220.0)
+                            .contentShape(.circle)
                     }
-                    .scaledToFill()
-                    .frame(width: 220.0, height: 220.0)
-                    .clipShape(.circle)
+                    .accessibilityLabel("My.ProfilePicture.SelectFromPhotos")
                 }
                 VStack(alignment: .center) {
                     Group {
@@ -72,14 +78,6 @@ struct MyProfileSection: View {
                     }
                 }
                 .padding(.top, 2.0)
-                if userInfo != nil {
-                    Link(destination: URL(string: myPortalURL)!) {
-                        Text("Profile.Edit")
-                            .font(.caption)
-                            .underline()
-                            .foregroundStyle(.accent)
-                    }
-                }
             }
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity, alignment: .center)
