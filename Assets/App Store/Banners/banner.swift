@@ -62,8 +62,8 @@ func render(_ banner: Banner) {
 
     // The dream: a broad cloud filling the middle of the banner, behind Big Sight.
     let center = CGPoint(x: w / 2, y: h / 2)
-    let nameWidth = min(w * 0.23, h * 0.4)
-    cloud(at: CGPoint(x: center.x, y: center.y - h * 0.05), width: min(w * 0.7, h * 1.3), alpha: 1, seed: 7, in: context)
+    let nameWidth = min(w * 0.26, h * 0.45)
+    cloud(at: CGPoint(x: center.x, y: center.y - h * 0.05), width: min(w * 0.7, h * 1.3), alpha: 1, seed: 7, puffs: 160, isRound: true, in: context)
 
     // Big Sight in front, its pillars running off the bottom edge as on the icon.
     let siteHeight = min(h * 0.27, w * 0.15)
@@ -100,7 +100,7 @@ struct Random {
 /// A soft cumulus: feathered puffs heaped into a dome over a flatter base, white on top
 /// and shading to a pale blue-grey underneath. Returns the area it covers.
 @discardableResult
-func cloud(at center: CGPoint, width: CGFloat, alpha: CGFloat, seed: UInt64, puffs count: Int = 110, in context: CGContext) -> CGRect {
+func cloud(at center: CGPoint, width: CGFloat, alpha: CGFloat, seed: UInt64, puffs count: Int = 110, isRound: Bool = false, in context: CGContext) -> CGRect {
     var random = Random(state: seed &* 2654435761 &+ 1)
     var puffs: [(CGPoint, CGFloat)] = []
     for index in 0..<count {
@@ -109,10 +109,18 @@ func cloud(at center: CGPoint, width: CGFloat, alpha: CGFloat, seed: UInt64, puf
         let dome = width * 0.3 * sqrt(max(0, 1 - t * t))
         let lift = index < count / 4 ? 0 : pow(random.next(), 0.8) * dome
         let radius = width * (0.065 + 0.07 * pow(random.next(), 2)) * (1 - 0.4 * abs(t))
-        puffs.append((CGPoint(x: t * width * 0.4, y: -lift), radius))
+        if isRound {
+            // Spread through an ellipse, larger towards the middle, so no edge is heavier.
+            let angle = random.next() * 2 * .pi
+            let reach = sqrt(random.next())
+            let size = width * (0.07 + 0.06 * pow(random.next(), 2)) * (1.25 - 0.5 * reach)
+            puffs.append((CGPoint(x: cos(angle) * reach * width * 0.34, y: sin(angle) * reach * width * 0.17), size))
+        } else {
+            puffs.append((CGPoint(x: t * width * 0.4, y: -lift), radius))
+        }
     }
     let minX = puffs.map { $0.0.x - $0.1 }.min()!, maxX = puffs.map { $0.0.x + $0.1 }.max()!
-    let minY = puffs.map { $0.0.y - $0.1 }.min()!, maxY = puffs.map { $0.0.y + $0.1 * 0.7 }.max()!
+    let minY = puffs.map { $0.0.y - $0.1 }.min()!, maxY = puffs.map { $0.0.y + $0.1 * (isRound ? 1 : 0.7) }.max()!
     let shift = CGPoint(x: center.x - (minX + maxX) / 2, y: center.y - (minY + maxY) / 2)
     let bounds = CGRect(x: minX + shift.x, y: minY + shift.y, width: maxX - minX, height: maxY - minY)
 
