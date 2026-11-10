@@ -15,7 +15,7 @@ struct BuysOnboardingView: View {
                     .padding(.bottom, 28.0)
                     .frame(maxWidth: .infinity)
                     .background {
-                        Color(.systemGroupedBackground)
+                        Color.onboardingHeroBackground
                             .padding(.top, -1000.0)
                     }
                 VStack(alignment: .leading, spacing: 8.0) {
