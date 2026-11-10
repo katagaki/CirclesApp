@@ -57,6 +57,10 @@ func samples(of image: CGImage) -> (bytes: [UInt8], perPixel: Int, perRow: Int)?
 struct Frame {
     let image: CGImage
     let screen: CGRect
+    let cornerRadius: CGFloat
+    /// How far the capture sits above the middle of the hole, so the status bar lines up
+    /// with the Dynamic Island.
+    let rise: CGFloat
 
     /// Frames are drawn at the size of the deck's framed images, with a clear screen.
     init?(width: Int, height: Int) {
@@ -67,6 +71,8 @@ struct Frame {
               image.width == width, image.height == height,
               let (bytes, perPixel, perRow) = samples(of: image) else { return nil }
         self.image = image
+        cornerRadius = ["iPhone": 162, "iPad": 40, "iPad Landscape": 42][name]!
+        rise = name == "iPhone" ? 3 : 0
         func isClear(_ x: Int, _ y: Int) -> Bool { bytes[y * perRow + x * perPixel + 3] == 0 }
         // Walk out from the middle of the screen to the bezel on each side. Up and down
         // go a third of the way across, clear of the iPhone's Dynamic Island and of the
@@ -129,8 +135,11 @@ func framedImage(_ raw: CGImage, frame: Frame) -> CGImage? {
     let size = isTurned ? CGSize(width: raw.height, height: raw.width) : CGSize(width: raw.width, height: raw.height)
     let scale = max(frame.screen.width / size.width, frame.screen.height / size.height)
     context.saveGState()
-    context.clip(to: frame.screen)
-    context.translateBy(x: frame.screen.midX, y: frame.screen.midY)
+    context.addPath(CGPath(
+        roundedRect: frame.screen, cornerWidth: frame.cornerRadius, cornerHeight: frame.cornerRadius, transform: nil
+    ))
+    context.clip()
+    context.translateBy(x: frame.screen.midX, y: frame.screen.midY + frame.rise)
     if isTurned { context.rotate(by: .pi / 2) }
     let upright = CGSize(width: CGFloat(raw.width) * scale, height: CGFloat(raw.height) * scale)
     context.draw(raw, in: CGRect(x: -upright.width / 2, y: -upright.height / 2, width: upright.width, height: upright.height))
