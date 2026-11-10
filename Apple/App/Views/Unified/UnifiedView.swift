@@ -165,6 +165,10 @@ struct UnifiedView: View {
     }
 
     func prepareTipKit() {
+        // Set by the AppStoreScreenshots UI test, so no tip covers a capture.
+        if CommandLine.arguments.contains("-HidesAllTips") {
+            Tips.hideAllTipsForTesting()
+        }
         try? Tips.configure([
             .displayFrequency(.immediate),
             .datastoreLocation(.applicationDefault)

@@ -75,6 +75,13 @@ struct TranslatableText: View {
     }
 
     func translate() {
+        // Set by the AppStoreScreenshots UI test: simulators cannot run the translator.
+        if let stub = UserDefaults.standard.string(forKey: "ScreenshotTranslation") {
+            withAnimation(.smooth) {
+                translatedText = stub
+            }
+            return
+        }
         if configuration == nil {
             configuration = TranslationSession.Configuration()
         } else {

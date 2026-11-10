@@ -82,7 +82,10 @@ struct CirclesApp: App {
                 // Development-signed builds cannot attest, so they stay on `npm run dev`.
                 let relayBaseURL: String? = nil
                 #else
-                let relayBaseURL = config?.baseURL
+                // The AppStoreScreenshots UI test points a Release build at `npm run dev`,
+                // since a simulator cannot attest to the production relay.
+                let relayBaseURL = UserDefaults.standard.string(forKey: "SharedBuysRelayURL")
+                    ?? config?.baseURL
                 #endif
                 sharedBuys.applyRelayConfig(
                     baseURL: relayBaseURL,
