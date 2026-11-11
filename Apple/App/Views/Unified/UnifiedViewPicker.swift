@@ -27,5 +27,10 @@ struct UnifiedViewPicker: View {
         }
             .id("Unifier.Picker")
             .pickerStyle(.segmented)
+            .onChange(of: planner.isActiveEventLatest, initial: true) {
+                if !planner.isActiveEventLatest && unifier.current == .favorites {
+                    unifier.current = .circles
+                }
+            }
     }
 }
