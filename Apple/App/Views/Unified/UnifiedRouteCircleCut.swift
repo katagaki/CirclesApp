@@ -1,8 +1,7 @@
 import AXiS
 import SwiftUI
 
-/// The cut of the circle a step arrives at, standing in for the turn icon. Tapping it opens
-/// the circle in the panel.
+/// The cut of the circle the route is heading to. Tapping it opens the circle in the panel.
 struct UnifiedRouteCircleCut: View {
 
     @Environment(Database.self) var database
