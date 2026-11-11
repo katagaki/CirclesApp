@@ -21,15 +21,15 @@ struct MyAccountSection: View {
         let days = planner.participation[String(planner.activeEventNumber)] ?? [:]
         let attending = days
             .compactMap { day, ticket -> (Int, String)? in
-                guard let dayID = Int(day), let ticketName = ticketName(ticket) else { return nil }
-                return (dayID, ticketName)
+                guard let dayID = Int(day), let summary = daySummary(dayID, ticket) else { return nil }
+                return (dayID, summary)
             }
             .sorted { $0.0 < $1.0 }
-            .map { "\(String(localized: "Shared.\($0.0)th.Day")) \($0.1)" }
+            .map(\.1)
         if attending.isEmpty {
             return String(localized: "My.Account.NoParticipation")
         }
-        return attending.joined(separator: " · ")
+        return attending.joined(separator: String(localized: "My.Account.Participation.Separator"))
     }
 
     var body: some View {
@@ -54,13 +54,13 @@ struct MyAccountSection: View {
         }
     }
 
-    func ticketName(_ ticket: String) -> String? {
+    func daySummary(_ dayID: Int, _ ticket: String) -> String? {
         switch ticket {
-        case "Early": String(localized: "Ticket.Early")
-        case "ChangingRoom": String(localized: "Ticket.ChangingRoom")
-        case "AM": String(localized: "Ticket.AM")
-        case "PM": String(localized: "Ticket.PM")
-        case "Circle": String(localized: "Ticket.Circle")
+        case "Early": String(localized: "My.Account.Participation.\(dayID).Early")
+        case "ChangingRoom": String(localized: "My.Account.Participation.\(dayID).ChangingRoom")
+        case "AM": String(localized: "My.Account.Participation.\(dayID).AM")
+        case "PM": String(localized: "My.Account.Participation.\(dayID).PM")
+        case "Circle": String(localized: "My.Account.Participation.\(dayID).Circle")
         default: nil
         }
     }
