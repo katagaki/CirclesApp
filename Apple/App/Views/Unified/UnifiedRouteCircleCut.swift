@@ -4,14 +4,11 @@ import SwiftUI
 /// The cut of the circle the route is heading to. Tapping it opens the circle in the panel.
 struct UnifiedRouteCircleCut: View {
 
-    @Environment(Database.self) var database
     @Environment(Unifier.self) var unifier
 
     @Namespace var namespace
 
-    let circleID: Int
-
-    @State var circle: ComiketCircle?
+    let circle: ComiketCircle?
 
     var body: some View {
         Group {
@@ -34,8 +31,5 @@ struct UnifiedRouteCircleCut: View {
             }
         }
         .frame(width: 56.0, height: 80.0)
-        .task(id: circleID) {
-            circle = database.circles([circleID]).first
-        }
     }
 }
