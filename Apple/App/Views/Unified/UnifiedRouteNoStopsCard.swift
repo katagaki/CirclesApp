@@ -19,7 +19,7 @@ struct UnifiedRouteNoStopsCard: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             HStack {
                 Spacer()
-                Button(role: .confirm, action: onDismiss)
+                Button("Shared.Done", action: onDismiss)
                     .buttonStyle(.glassProminent)
             }
         }
