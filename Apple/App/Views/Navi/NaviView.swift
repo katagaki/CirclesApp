@@ -82,22 +82,17 @@ struct NaviView: View {
         }
         .navigationTitle("ViewTitle.Navi")
         .navigationBarTitleDisplayMode(.inline)
-        .searchable(
-            text: $searchTerm,
-            isPresented: $isSearchActive,
-            placement: unifier.displayMode == .panel && unifier.isPanelSideDocked
-                ? .navigationBarDrawer(displayMode: .always)
-                : .toolbar,
-            prompt: "Circles.Search.Prompt"
-        )
+        .modifier(NaviSearchModifier(text: $searchTerm, isPresented: $isSearchActive))
         .toolbar {
-            DefaultToolbarItem(kind: .search, placement: .bottomBar)
-            ToolbarSpacer(.fixed, placement: .bottomBar)
             if navigator.isActive {
                 ToolbarItem(placement: .bottomBar) {
                     NaviEndButton()
                 }
+                ToolbarSpacer(.flexible, placement: .bottomBar)
+                NaviStepToolbar()
             } else {
+                DefaultToolbarItem(kind: .search, placement: .bottomBar)
+                ToolbarSpacer(.fixed, placement: .bottomBar)
                 ToolbarItem(placement: .bottomBar) {
                     Button("Route.Onboarding.Open", systemImage: "questionmark") {
                         navigator.pendingMode = nil
@@ -106,6 +101,12 @@ struct NaviView: View {
                 }
             }
             SidebarPositionToolbarItem()
+        }
+        .onChange(of: navigator.isActive) {
+            guard navigator.isActive else { return }
+            searchTerm = ""
+            isSearchActive = false
+            results = nil
         }
         .task(id: searchTerm) {
             try? await Task.sleep(for: .milliseconds(250))
