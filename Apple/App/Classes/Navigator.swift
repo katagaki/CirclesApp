@@ -55,6 +55,7 @@ final class Navigator {
     @ObservationIgnored var activity: AnyObject?
     @ObservationIgnored private var planningTask: Task<Void, Never>?
     @ObservationIgnored private var retryTask: Task<Void, Never>?
+    @ObservationIgnored private var savedSession: GuideSession? = GuideSession.load()
 
     var isActive: Bool { route != nil || isPlanning || isTrapped }
 
@@ -99,6 +100,7 @@ final class Navigator {
 
     func start(_ context: Context, database: Database) {
         self.context = context
+        savedSession = nil
         isStatusExpanded = false
         remainingStopIDs = nil
         plan(database: database)
@@ -163,6 +165,7 @@ final class Navigator {
                     self.isNoStopsAlertPresented = true
                 }
             }
+            persist()
             if trapped {
                 endActivity()
                 retryWhenClosuresLapse(database: database)
@@ -355,17 +358,20 @@ final class Navigator {
     func next() {
         guard let route, stepIndex + 1 < route.steps.count else { return }
         withAnimation(.smooth) { stepIndex += 1 }
+        persist()
         updateActivity()
     }
 
     func previous() {
         if isFinished {
             withAnimation(.smooth) { isFinished = false }
+            persist()
             updateActivity()
             return
         }
         guard stepIndex > 0 else { return }
         withAnimation(.smooth) { stepIndex -= 1 }
+        persist()
         updateActivity()
     }
 
@@ -376,6 +382,7 @@ final class Navigator {
             next()
         } else if route != nil, !isFinished {
             withAnimation(.smooth) { isFinished = true }
+            persist()
             endActivity()
         }
     }
@@ -406,7 +413,59 @@ final class Navigator {
         }
         context = nil
         remainingStopIDs = nil
+        savedSession = nil
+        GuideSession.remove()
         endActivity()
+    }
+
+    // MARK: Persistence
+
+    private func persist() {
+        guard let context, route != nil || isTrapped else {
+            GuideSession.remove()
+            return
+        }
+        GuideSession(
+            eventNumber: context.eventNumber, mapID: context.mapID, day: context.day,
+            favoriteColors: context.favoriteColors, visitedCircleIDs: context.visitedCircleIDs,
+            colorPriority: context.colorPriority, route: route, stepIndex: stepIndex, origin: origin,
+            closures: closures.filter(\.isActive), skippedSpaces: skippedSpaces,
+            remainingStopIDs: remainingStopIDs, isTrapped: isTrapped, isFinished: isFinished
+        ).save()
+    }
+
+    /// Picks up the session left when the app last closed, once the map it was on is open
+    /// again with its layouts loaded.
+    func resume(
+        eventNumber: Int, mapID: Int, mapName: String, hall: ComiketHall, day: Int,
+        layouts: Mapper.Layouts, database: Database
+    ) {
+        guard let session = savedSession, !isActive, context == nil, !layouts.isEmpty,
+              session.eventNumber == eventNumber, session.mapID == mapID, session.day == day else { return }
+        savedSession = nil
+        context = Context(
+            eventNumber: eventNumber, mapID: mapID, mapName: mapName, hall: hall, day: day,
+            layouts: layouts, favoriteColors: session.favoriteColors,
+            visitedCircleIDs: session.visitedCircleIDs, colorPriority: session.colorPriority
+        )
+        remainingStopIDs = session.remainingStopIDs
+        closures = session.closures.filter(\.isActive)
+        origin = session.origin
+        guard let route = session.route, !session.isTrapped, !route.steps.isEmpty else {
+            plan(database: database)
+            return
+        }
+        withAnimation(.smooth) {
+            self.route = route
+            stepIndex = min(max(session.stepIndex, 0), route.steps.count - 1)
+            skippedSpaces = session.skippedSpaces
+            isFinished = session.isFinished
+        }
+        guard !session.isFinished else { return }
+        Task {
+            await storeActivityCuts(for: route.stops, database: database)
+            updateActivity(hallName: mapName)
+        }
     }
 
     // MARK: Planning

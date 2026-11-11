@@ -92,4 +92,13 @@ extension MapView {
             }
         }
     }
+
+    func resumeGuide() {
+        guard let map = selections.map, let date = selections.date,
+              let hall = ComiketHall(rawValue: map.filename) else { return }
+        navigator.resume(
+            eventNumber: planner.activeEventNumber, mapID: map.id, mapName: map.name, hall: hall,
+            day: date.id, layouts: mapper.layouts, database: database
+        )
+    }
 }

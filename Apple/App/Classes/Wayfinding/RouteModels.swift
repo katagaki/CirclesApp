@@ -1,7 +1,7 @@
 import CoreGraphics
 import Foundation
 
-nonisolated struct GridPoint: Hashable, Sendable {
+nonisolated struct GridPoint: Hashable, Sendable, Codable {
     var row: Int
     var column: Int
 }
@@ -25,7 +25,7 @@ nonisolated struct RouteStopRequest: Sendable {
     let colorRawValue: Int
 }
 
-nonisolated struct RouteStop: Sendable, Identifiable, Hashable {
+nonisolated struct RouteStop: Sendable, Identifiable, Hashable, Codable {
     let id: Int
     let circleID: Int
     let name: String
@@ -35,26 +35,26 @@ nonisolated struct RouteStop: Sendable, Identifiable, Hashable {
     let colorRawValue: Int
 }
 
-nonisolated enum RouteTurn: Sendable, Hashable {
+nonisolated enum RouteTurn: Sendable, Hashable, Codable {
     case left
     case right
     case straight
 }
 
-nonisolated enum RouteSide: Sendable, Hashable {
+nonisolated enum RouteSide: Sendable, Hashable, Codable {
     case left
     case right
     case ahead
 }
 
-nonisolated enum RoutePassage: Sendable, Hashable {
+nonisolated enum RoutePassage: Sendable, Hashable, Codable {
     case corridor
     case corridorAlong(String)
     case aisleBetween(String, String)
     case aisleThrough(String)
 }
 
-nonisolated enum RouteAction: Sendable, Hashable {
+nonisolated enum RouteAction: Sendable, Hashable, Codable {
     case begin
     case entrance(hall: String)
     case exit(hall: String)
@@ -63,7 +63,7 @@ nonisolated enum RouteAction: Sendable, Hashable {
     case arrive(RouteSide)
 }
 
-nonisolated struct RouteStep: Sendable, Identifiable, Hashable {
+nonisolated struct RouteStep: Sendable, Identifiable, Hashable, Codable {
     let id: Int
     let stopIndex: Int
     let blocks: Int
@@ -95,7 +95,7 @@ nonisolated struct RouteDoor: Sendable, Hashable {
 
 /// A path staff have closed off, in high-resolution map pixels. Closures lapse on their
 /// own, since a queue or crowd that closes an aisle rarely lasts.
-nonisolated struct RouteClosure: Sendable, Identifiable, Hashable {
+nonisolated struct RouteClosure: Sendable, Identifiable, Hashable, Codable {
     static let lifetime: TimeInterval = 30 * 60
 
     let id: UUID
@@ -115,13 +115,13 @@ nonisolated struct RouteClosure: Sendable, Identifiable, Hashable {
     var isActive: Bool { expiresAt > .now }
 }
 
-nonisolated struct RouteClosureLine: Sendable, Hashable {
+nonisolated struct RouteClosureLine: Sendable, Hashable, Codable {
     let id: UUID
     let from: CGPoint
     let to: CGPoint
 }
 
-nonisolated struct PlannedRoute: Sendable, Hashable {
+nonisolated struct PlannedRoute: Sendable, Hashable, Codable {
     let stops: [RouteStop]
     let legs: [[CGPoint]]
     let steps: [RouteStep]
