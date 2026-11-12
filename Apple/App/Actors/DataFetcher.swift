@@ -89,12 +89,21 @@ actor DataFetcher {
                 let colSpaceNumber = Expression<Int>("spaceNo")
                 let colDay = Expression<Int>("day")
                 let colWebCatalogID = Expression<Int>("WCId")
+                let colEventNumber = Expression<Int>("comiketNo")
 
                 let blockIDs = Set(mappings.map { $0.blockID })
                 let spaceNumbers = Set(mappings.map { $0.spaceNumber })
 
+                // Joining on the whole primary key lets SQLite look each circle up. On the
+                // circle ID alone it scans the extended table once per circle, which took
+                // seconds for a hall.
                 let query = circlesTable
-                    .join(.leftOuter, extendedTable, on: circlesTable[colID] == extendedTable[colID])
+                    .join(
+                        .leftOuter, extendedTable,
+                        on: circlesTable[colID] == extendedTable[colID]
+                            && circlesTable[colEventNumber] == extendedTable[colEventNumber]
+                    )
+                    .select(circlesTable[colBlockID], circlesTable[colSpaceNumber], extendedTable[colWebCatalogID])
                     .filter(blockIDs.contains(colBlockID) && spaceNumbers.contains(colSpaceNumber) && colDay == dateID)
                     .order(circlesTable[colID].asc)
 
@@ -104,9 +113,9 @@ actor DataFetcher {
 
                 var result = [LayoutCatalogMapping: [Int]]()
                 for row in try database.prepare(query) {
-                    if let webCatalogID = try? row.get(colWebCatalogID) {
-                        let blockID = row[colBlockID]
-                        let spaceNumber = row[colSpaceNumber]
+                    if let webCatalogID = try? row.get(extendedTable[colWebCatalogID]) {
+                        let blockID = row[circlesTable[colBlockID]]
+                        let spaceNumber = row[circlesTable[colSpaceNumber]]
                         if let originalMapping = mappingLookup["\(blockID)-\(spaceNumber)"] {
                             result[originalMapping, default: []].append(webCatalogID)
                         }
