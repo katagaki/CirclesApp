@@ -35,6 +35,7 @@ struct UnifiedToolbar: ToolbarContent {
                 .animation(.easeInOut(duration: 0.2), value: unifier.isPresenting)
             }
             .matchedTransitionSource(id: "BottomPanel", in: namespace)
+            .sharedBackgroundVisibility(unifier.isPresenting ? .hidden : .visible)
         }
     }
 }
