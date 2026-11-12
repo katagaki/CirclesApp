@@ -5,6 +5,7 @@ import AXiS
 struct MapView: View {
 
     @Environment(Database.self) var database
+    @Environment(Events.self) var planner
     @Environment(Favorites.self) var favorites
     @Environment(UserSelections.self) var selections
     @Environment(Mapper.self) var mapper
@@ -110,6 +111,9 @@ struct MapView: View {
             if let mapImage {
                 updateCanvasSize(mapImage)
             }
+        }
+        .onChange(of: mapper.layouts) {
+            resumeGuide()
         }
         .onChange(of: navigator.currentStep) { _, step in
             if let step, let first = step.path.first, let last = step.path.last {

@@ -35,7 +35,20 @@ class Unifier {
         self.displayMode = UIDevice.current.userInterfaceIdiom == .phone ? .sheet : .panel
     }
 
-    var current: UnifiedPath? = .circles
+    private static var tabs: [UnifiedPath] { [.circles, .favorites, .buys, .navi] }
+    private static let tabKey = "Unifier.LastTab"
+
+    var current: UnifiedPath? = Unifier.lastTab {
+        didSet {
+            guard let current, Self.tabs.contains(current) else { return }
+            UserDefaults.standard.set(current.id, forKey: Self.tabKey)
+        }
+    }
+
+    private static var lastTab: UnifiedPath {
+        let id = UserDefaults.standard.string(forKey: tabKey)
+        return tabs.first { $0.id == id } ?? .circles
+    }
     var selectedDetent: PresentationDetent = .height(360)
     var isMinimized: Bool {
         displayMode == .sheet && selectedDetent != .height(360) && selectedDetent != .large
