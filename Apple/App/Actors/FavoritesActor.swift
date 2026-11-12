@@ -53,8 +53,8 @@ actor FavoritesActor {
                 .sorted(by: {
                     $0.favorite.color.rawValue < $1.favorite.color.rawValue
                 })
-            for favorite in cachedFavorites {
-                wcIDMappedItems[favorite.webCatalogID] = favorite.favoriteItem()
+            for item in items {
+                wcIDMappedItems[item.circle.webCatalogID] = item
             }
         }
         return (items, wcIDMappedItems)

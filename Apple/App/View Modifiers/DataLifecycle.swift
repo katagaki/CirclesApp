@@ -246,7 +246,7 @@ extension DataLifecycleModifier {
         Task.detached(priority: .userInitiated) {
             await loadImages()
         }
-        Task.detached(priority: .background) {
+        Task.detached(priority: .utility) {
             await loadFavorites()
         }
     }

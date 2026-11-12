@@ -19,15 +19,23 @@ class Favorites {
 
     var isRefreshing: Bool = false
 
+    /// Counts every change that came from circle.ms, so a refresh that started before a
+    /// newer change landed can tell its result is out of date.
+    @ObservationIgnored private var revision: Int = 0
+
     init() {
         let defaults = UserDefaults.standard
         self.isGroupedByColor = defaults.object(forKey: "Favorites.GroupByColor") as? Bool ?? true
     }
 
+    /// Fills in the favourites from the cache when nothing has been loaded yet. The cache
+    /// never replaces favourites that are already in memory, which are at least as new.
     @MainActor
     func loadFromCache() async {
+        guard items == nil else { return }
         let actor = FavoritesActor(modelContainer: sharedModelContainer)
         let (items, wcIDMappedItems) = await actor.cached()
+        guard self.items == nil else { return }
         self.items = items
         self.wcIDMappedItems = wcIDMappedItems
     }
@@ -36,11 +44,23 @@ class Favorites {
     func refresh(authToken: OpenIDToken?) async {
         guard !isRefreshing else { return }
         isRefreshing = true
+        let startingRevision = revision
         let actor = FavoritesActor(modelContainer: sharedModelContainer)
         let (items, wcIDMappedItems) = await actor.all(authToken: authToken ?? OpenIDToken())
+        if revision == startingRevision || self.items == nil {
+            apply(items: items, wcIDMappedItems: wcIDMappedItems)
+        }
+        isRefreshing = false
+    }
+
+    @MainActor
+    func apply(
+        items: [UserFavorites.Response.FavoriteItem],
+        wcIDMappedItems: [Int: UserFavorites.Response.FavoriteItem]
+    ) {
+        revision += 1
         self.items = items
         self.wcIDMappedItems = wcIDMappedItems
-        isRefreshing = false
     }
 
     static func mapped(

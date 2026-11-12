@@ -95,6 +95,11 @@ struct CirclesApp: App {
                     unifier.current = .circles
                 }
             }
+            // The cached favourites need neither a login nor the catalog, so they load
+            // straight away instead of waiting for the rest of launch.
+            .task(priority: .userInitiated) {
+                await favorites.loadFromCache()
+            }
             .onRotate { newOrientation in
                 orientation.update(to: newOrientation)
             }

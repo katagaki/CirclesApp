@@ -113,8 +113,7 @@ struct CircleDetailToolbar: ToolbarContent {
             if favoritesSaveResult {
                 let (items, wcIDMappedItems) = await actor.all(authToken: token)
                 await MainActor.run {
-                    favorites.items = items
-                    favorites.wcIDMappedItems = wcIDMappedItems
+                    favorites.apply(items: items, wcIDMappedItems: wcIDMappedItems)
                     selectedFavoriteColor = color
                     favoriteMemo = memo
                 }
@@ -132,8 +131,7 @@ struct CircleDetailToolbar: ToolbarContent {
             if favoritesDeleteResult {
                 let (items, wcIDMappedItems) = await actor.all(authToken: token)
                 await MainActor.run {
-                    favorites.items = items
-                    favorites.wcIDMappedItems = wcIDMappedItems
+                    favorites.apply(items: items, wcIDMappedItems: wcIDMappedItems)
                     selectedFavoriteColor = nil
                     favoriteMemo = ""
                 }
