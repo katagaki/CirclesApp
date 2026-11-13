@@ -24,8 +24,11 @@ struct NaviView: View {
     @State var results: [ComiketCircle]?
     @State var pendingDestination: ComiketCircle?
     @State var isOnboardingPresented: Bool = false
+    @State var pendingGo: (() -> Void)?
+    @State var isSafetyAlertPresented: Bool = false
 
     @AppStorage(wrappedValue: false, "Route.HasSeenOnboarding") var hasSeenOnboarding: Bool
+    @AppStorage(wrappedValue: false, "Route.HidesSafetyAlert") var hidesSafetyAlert: Bool
     @AppStorage(wrappedValue: .grid, "Circles.DisplayMode") var displayMode: CircleDisplayMode
     @AppStorage(wrappedValue: .regular, "Circles.ListSize") var listDisplayMode: ListDisplayMode
     @AppStorage(wrappedValue: .medium, "Circles.GridSize") var gridDisplayMode: GridDisplayMode
@@ -72,9 +75,9 @@ struct NaviView: View {
                         isEnabled: isMapReady,
                         ownBuysCount: ownBuysOnMap.count,
                         sharedBuysCount: sharedBuys.isActive ? sharedBuysOnMap.count : nil,
-                        onChoose: choose(_:),
-                        onOwnBuys: { routeThrough(ownBuysOnMap) },
-                        onSharedBuys: { routeThrough(sharedBuysOnMap) }
+                        onChoose: { mode in go { choose(mode) } },
+                        onOwnBuys: { go { routeThrough(ownBuysOnMap) } },
+                        onSharedBuys: { go { routeThrough(sharedBuysOnMap) } }
                     )
                 }
                 .listSectionSpacing(.compact)
@@ -119,6 +122,18 @@ struct NaviView: View {
                   mapper.layouts.values.contains(where: { $0.contains(webCatalogID) }) else { return }
             pendingDestination = nil
             routeDirectly(to: webCatalogID)
+        }
+        .alert(
+            "Route.SafetyAlert.Title",
+            isPresented: $isSafetyAlertPresented
+        ) {
+            Button("Route.SafetyAlert.GotIt", role: .cancel) {
+                continueGo()
+            }
+            Button("Route.SafetyAlert.DontShowAgain") {
+                hidesSafetyAlert = true
+                continueGo()
+            }
         }
         .sheet(isPresented: $isOnboardingPresented) {
             guard hasSeenOnboarding, let mode = navigator.pendingMode else {
@@ -182,6 +197,21 @@ struct NaviView: View {
             colorPriority: nil,
             includesVisited: true
         )
+    }
+
+    func go(_ action: @escaping () -> Void) {
+        if hidesSafetyAlert {
+            action()
+        } else {
+            pendingGo = action
+            isSafetyAlertPresented = true
+        }
+    }
+
+    func continueGo() {
+        let action = pendingGo
+        pendingGo = nil
+        action?()
     }
 
     func choose(_ mode: Navigator.Mode) {
