@@ -123,6 +123,8 @@ final class AppStoreScreenshots: XCTestCase {
         app.launchArguments += [
             "-AppleLanguages", "(ja)", "-AppleLocale", "ja_JP",
             "-PrivacyMode.On", "YES", "-HidesAllTips",
+            // Signing in stores the account's own nickname, so a generic one is shown.
+            "-My.LastKnownNickname", "DojinLover",
             // capture.sh runs `npm run dev`; the production relay needs App Attest.
             "-SharedBuysRelayURL", "ws://127.0.0.1:8787",
             // Simulators cannot translate, so the 翻訳 action shows this in place instead.
@@ -130,6 +132,8 @@ final class AppStoreScreenshots: XCTestCase {
         ]
         app.launch()
         try require(app.buttons["サークル"].firstMatch.waitForExistence(timeout: 60), "the catalog never opened")
+        // The app reopens on the tab it was left on, which the copied data decides.
+        app.segmentedControls.buttons["サークル"].firstMatch.tap()
         Thread.sleep(forTimeInterval: 2)
     }
 
@@ -226,6 +230,9 @@ final class AppStoreScreenshots: XCTestCase {
         case .startGuide:
             try tap(app.segmentedControls.buttons["ナビ"].firstMatch)
             try tap(app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "おまかせ")).firstMatch)
+            // The first route asks the walker to mind those around them.
+            let notice = app.buttons["二度と表示しない"].firstMatch
+            if notice.waitForExistence(timeout: 3) { notice.tap() }
             let end = app.buttons["終了"].firstMatch
             try require(end.waitForExistence(timeout: 20), "the route never started")
             // On iPhone the panel opens over the map; it is lowered to show the route.
