@@ -177,13 +177,36 @@
       }
     },
     "NSCameraUsageDescription" : {
-      "comment" : "Privacy - Camera Usage Description",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "manual",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CiRCLES uses the camera to scan QR codes for joining shared lists."
+          }
+        },
         "ja" : {
           "stringUnit" : {
-            "state" : "new",
+            "state" : "translated",
             "value" : "共同購入リストに参加するためのQRコードを読み取るために使用します。"
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CiRCLES는 공유 목록에 참가하기 위한 QR 코드를 스캔하는 데 카메라를 사용합니다."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CiRCLES使用摄像头扫描二维码以加入共享列表。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CiRCLES使用相機掃描 QR 碼以加入共享清單。"
           }
         }
       }
