@@ -66,8 +66,11 @@ boot $SOURCE
 # The copies share its Shared Buys identity, and two connections from one device
 # keep closing each other at the relay.
 xcrun simctl terminate $SOURCE $BUNDLE_ID 2>/dev/null || true
-SOURCE_DATA=$(xcrun simctl get_app_container $SOURCE $BUNDLE_ID data)
-SOURCE_GROUP=$(group_container $SOURCE)
+# A cloned simulator reports its original's containers, so the paths are taken
+# from under the source's own folder.
+in_source() { echo $SIMULATORS/$SOURCE/${1#$SIMULATORS/*/} }
+SOURCE_DATA=$(in_source $(xcrun simctl get_app_container $SOURCE $BUNDLE_ID data))
+SOURCE_GROUP=$(in_source $(group_container $SOURCE))
 
 # A fresh install with the source's app data, app group and keychain, which
 # holds the circle.ms login. The keychain is only swapped while shut down.
