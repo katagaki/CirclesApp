@@ -12152,31 +12152,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tap Detour for another way, or long-press the map to close off a hall."
+            "value": "Tap Detour when the way ahead is blocked, or long-press the map to close off an aisle or a hall. Closures reopen after 30 minutes."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "「迂回」をタップすると、別の道を案内します。ホールごと閉じるときは、マップを長押ししてください。"
+            "value": "先が通れないときは「迂回」をタップしてください。通路やホールを閉じるときは、マップを長押しします。通行止めは30分後に自動で解除されます。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "'우회'을 누르면 다른 길로 안내합니다. 홀 전체를 막으려면 지도를 길게 누르세요."
+            "value": "앞길이 막혔으면 '우회'를 누르세요. 통로나 홀을 막으려면 지도를 길게 누르세요. 통행 금지는 30분 후 자동으로 해제됩니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "点按“绕行”换条路；要封闭整个展厅，请长按地图。"
+            "value": "前方无法通行时，点按“绕行”。要封闭通道或展厅，请长按地图。封闭会在30分钟后自动解除。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "點按「繞行」換條路；要封閉整個展廳，請長按地圖。"
+            "value": "前方無法通行時，點按「繞行」。要封閉通道或展廳，請長按地圖。封閉會在30分鐘後自動解除。"
           }
         }
       }
@@ -12220,31 +12220,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Automatic takes the shortest walk. Choose Colors goes color by color."
+            "value": "Automatic takes the shortest walk, and Choose Colors goes color by color. My Buys and Shared Buys visit circles with items left to buy."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "「おまかせ」は最短で、「色を選択」は色の順に回ります。"
+            "value": "「おまかせ」は最短で、「色を選択」は色の順に回ります。「自分の宝物」と「共同購入」は、未購入があるサークルを回ります。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "'자동'은 최단 동선으로, '색상 선택'은 색 순서대로 돕니다."
+            "value": "'자동'은 최단 동선으로, '색상 선택'은 색 순서대로 돕니다. '내 구매 목록'과 '공유 목록'은 아직 사지 않은 물건이 있는 서클을 돕니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "“自动”走最短路线，“选择颜色”按颜色顺序前往。"
+            "value": "“自动”走最短路线，“选择颜色”按颜色顺序前往。“我的宝贝”和“共享列表”会前往还有未购物品的社团。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "「自動」走最短路線，「選擇顏色」依顏色順序前往。"
+            "value": "「自動」走最短路線，「選擇顏色」依顏色順序前往。「我的寶藏」和「共享清單」會前往還有未購物品的社團。"
           }
         }
       }
@@ -12254,31 +12254,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Two Ways to Go"
+            "value": "Choose How to Go"
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "2つの回り方"
+            "value": "回り方を選ぶ"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "두 가지 방법"
+            "value": "도는 방법 선택"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "两种前往方式"
+            "value": "选择前往方式"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "兩種前往方式"
+            "value": "選擇前往方式"
           }
         }
       }
@@ -12427,31 +12427,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Long-press the map and choose You Are Here."
+            "value": "Long-press the map and choose You Are Here. Otherwise, the route starts from an entrance."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "マップを長押しして「現在地」を選択してください。"
+            "value": "マップを長押しして「現在地」を選択してください。設定しない場合は、出入口から出発します。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "지도를 길게 누르고 '현재 위치'를 선택하세요."
+            "value": "지도를 길게 누르고 '현재 위치'를 선택하세요. 설정하지 않으면 출입구에서 출발합니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "长按地图并选择“当前位置”。"
+            "value": "长按地图并选择“当前位置”。如未设置，将从出入口出发。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "長按地圖並選擇「目前位置」。"
+            "value": "長按地圖並選擇「目前位置」。如未設定，將從出入口出發。"
           }
         }
       }
@@ -12529,31 +12529,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tap Next as you go, here or on the Lock Screen."
+            "value": "Tap Next as you go. At each circle, tap Visited or Skip. You can do this on the Lock Screen too."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "「次へ」で進みます。ロック画面からも操作できます。"
+            "value": "「次へ」で進みます。サークルに着いたら「訪問済み」か「スキップ」を選びます。ロック画面からも操作できます。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "'다음'을 눌러 진행하세요. 잠금 화면에서도 조작할 수 있습니다."
+            "value": "'다음'을 눌러 진행하세요. 서클에 도착하면 '방문 완료' 또는 '건너뛰기'를 누르세요. 잠금 화면에서도 조작할 수 있습니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "点按“下一步”前进，也可在锁定屏幕上操作。"
+            "value": "点按“下一步”前进。到达社团后，点按“已到访”或“跳过”。也可在锁定屏幕上操作。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "點按「下一步」前進，也可在鎖定畫面上操作。"
+            "value": "點按「下一步」前進。到達社團後，點按「已到訪」或「略過」。也可在鎖定畫面上操作。"
           }
         }
       }
@@ -12597,31 +12597,31 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Directions to your favorites, right on the hall map."
+            "value": "Directions to your favorites and buys, right on the hall map."
           }
         },
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "お気に入りへの道順を会場マップに表示します。"
+            "value": "お気に入りや宝物への道順を会場マップに表示します。"
           }
         },
         "ko": {
           "stringUnit": {
             "state": "translated",
-            "value": "즐겨찾기로 가는 길을 홀 지도에 보여 줍니다."
+            "value": "즐겨찾기와 구매 목록으로 가는 길을 홀 지도에 보여 줍니다."
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "在展馆地图上显示前往收藏的路线。"
+            "value": "在展馆地图上显示前往收藏和宝贝的路线。"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "在展館地圖上顯示前往收藏的路線。"
+            "value": "在展館地圖上顯示前往收藏和寶藏的路線。"
           }
         }
       }
