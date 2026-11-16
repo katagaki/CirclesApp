@@ -341,7 +341,6 @@ fun EventDataView(
                         Text(
                             stringResource(
                                 R.string.download_event_message,
-                                pending.event.number,
                                 Formatter.formatFileSize(context, pending.sizeBytes)
                             )
                         )

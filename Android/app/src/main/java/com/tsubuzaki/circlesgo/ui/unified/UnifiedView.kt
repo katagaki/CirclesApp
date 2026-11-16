@@ -237,7 +237,12 @@ fun UnifiedView(
             )
             AlertDialog(
                 onDismissRequest = { unifier.setIsGoingToSignOut(false) },
-                title = { Text(actionLabel) },
+                title = {
+                    Text(
+                        if (isDemoMode) actionLabel
+                        else stringResource(R.string.sign_out_confirm_title)
+                    )
+                },
                 text = {
                     Text(
                         stringResource(
