@@ -1,6 +1,7 @@
 package com.tsubuzaki.circlesgo.ui.map
 
 import android.graphics.Bitmap
+import android.graphics.PointF
 import android.graphics.RectF
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -30,8 +31,10 @@ import com.tsubuzaki.circlesgo.state.Events
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.MapAutoScrollType
 import com.tsubuzaki.circlesgo.state.Mapper
+import com.tsubuzaki.circlesgo.state.Navigator
 import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.state.VisitsState
+import com.tsubuzaki.circlesgo.ui.shared.LocalNavigator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -62,6 +65,7 @@ fun MapView(
     val darkenMapInDarkMode by selections.darkenMapInDarkMode.collectAsState()
 
     val persistedZoom by selections.mapZoomLevel.collectAsState()
+    val navigator = LocalNavigator.current
 
     var mapImage by remember { mutableStateOf<Bitmap?>(null) }
     var genreImage by remember { mutableStateOf<Bitmap?>(null) }
@@ -90,6 +94,40 @@ fun MapView(
     LaunchedEffect(selectedDate, selectedMap) {
         mapper.setPopoverData(null)
         mapper.setPopoverPosition(null)
+    }
+
+    // A route only makes sense on the map it was planned on, so changing the map ends it
+    // and drops its closures. The first map shown after launch is not a change.
+    var routeMapKey by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(selectedDate, selectedMap) {
+        val map = selectedMap ?: return@LaunchedEffect
+        val date = selectedDate ?: return@LaunchedEffect
+        val key = "${date.id}-${map.id}"
+        if (routeMapKey == key) return@LaunchedEffect
+        if (routeMapKey != null && navigator != null) {
+            if (navigator.isActive) navigator.end()
+            navigator.clearClosures()
+        }
+        routeMapKey = key
+        navigator?.loadHalls(map.id, ComiketHall.fromValue(map.filename), date.id)
+    }
+
+    LaunchedEffect(layouts) {
+        val map = selectedMap ?: return@LaunchedEffect
+        val date = selectedDate ?: return@LaunchedEffect
+        val hall = ComiketHall.fromValue(map.filename) ?: return@LaunchedEffect
+        val eventNumber = events?.activeEventNumber ?: return@LaunchedEffect
+        navigator?.resume(eventNumber, map.id, map.name, hall, date.id, layouts)
+    }
+
+    val currentStep = navigator?.currentStep
+    LaunchedEffect(currentStep) {
+        val first = currentStep?.path?.firstOrNull() ?: return@LaunchedEffect
+        val last = currentStep.path.last()
+        val scale = (spaceSize / Navigator.PLANNING_SPACE_SIZE).toFloat()
+        mapper.setScrollToPosition(
+            PointF(((first.x + last.x) / 2.0).toFloat() * scale, ((first.y + last.y) / 2.0).toFloat() * scale)
+        )
     }
 
     LaunchedEffect(mapImage) {
@@ -182,7 +220,27 @@ fun MapView(
                 },
                 scrollToPosition = scrollToPosition,
                 onScrollCompleted = { mapper.clearScrollToPosition() },
+                onLongPress = { x, y ->
+                    if (navigator != null && (navigator.isActive || favoriteItems != null)) {
+                        mapper.setPopoverData(null)
+                        navigator.hold(x, y, spaceSize)
+                    }
+                },
+                onTapIntercept = { x, y ->
+                    when {
+                        navigator == null -> false
+                        navigator.selectClosure(x, y, spaceSize) -> true
+                        navigator.pendingPoint != null || navigator.selectedClosureID != null -> {
+                            navigator.cancelHold()
+                            true
+                        }
+                        else -> false
+                    }
+                },
                 popoverContent = { offset, currentZoom, viewportSize ->
+                    if (navigator != null) {
+                        MapRouteHoldLayer(navigator, spaceSize, offset, currentZoom, viewportSize)
+                    }
                     val density = androidx.compose.ui.platform.LocalDensity.current
                     popoverData?.let { data ->
                         val dx = with(density) { offset.x.toDp().value }
@@ -259,8 +317,14 @@ fun MapView(
                             canvasWidth = canvasWidth,
                             canvasHeight = canvasHeight,
                             database = database,
-                            darkenInDarkMode = darkenMapInDarkMode
+                            darkenInDarkMode = darkenMapInDarkMode,
+                            excludedWebCatalogIDs = navigator?.route?.stops?.map { it.id }?.toSet()
+                                ?: emptySet()
                         )
+                    }
+
+                    if (navigator != null) {
+                        MapRouteLayer(navigator, spaceSize, canvasWidth, canvasHeight)
                     }
 
                     MapHighlightLayer(
