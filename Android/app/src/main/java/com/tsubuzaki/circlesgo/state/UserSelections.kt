@@ -31,6 +31,7 @@ class UserSelections(context: Context) {
         private const val LIST_SIZE_KEY = "Circles.ListSize"
         private const val FAVORITES_DISPLAY_MODE_KEY = "Favorites.DisplayMode"
         private const val FAVORITES_GROUP_BY_COLOR_KEY = "Favorites.GroupByColor"
+        private const val HAS_SEEN_BUYS_ONBOARDING_KEY = "Buys.HasSeenOnboarding"
     }
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
@@ -66,6 +67,11 @@ class UserSelections(context: Context) {
         prefs.getBoolean(SHOW_DAY_KEY, false)
     )
     val showDay: StateFlow<Boolean> = _showDay
+
+    private val _hasSeenBuysOnboarding = MutableStateFlow(
+        prefs.getBoolean(HAS_SEEN_BUYS_ONBOARDING_KEY, false)
+    )
+    val hasSeenBuysOnboarding: StateFlow<Boolean> = _hasSeenBuysOnboarding
 
     private val _darkenMapInDarkMode = MutableStateFlow(
         prefs.getBoolean(DARKEN_MAP_IN_DARK_MODE_KEY, true)
@@ -148,6 +154,11 @@ class UserSelections(context: Context) {
     fun setShowWebCuts(show: Boolean) {
         _showWebCuts.value = show
         prefs.edit { putBoolean(SHOW_WEB_CUTS_KEY, show) }
+    }
+
+    fun setHasSeenBuysOnboarding(hasSeen: Boolean) {
+        _hasSeenBuysOnboarding.value = hasSeen
+        prefs.edit { putBoolean(HAS_SEEN_BUYS_ONBOARDING_KEY, hasSeen) }
     }
 
     fun setShowDay(show: Boolean) {

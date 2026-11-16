@@ -16,16 +16,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.ShoppingBag
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -75,7 +73,8 @@ fun BuysView(
 
     var entries by remember { mutableStateOf<List<BuysCache.BuyEntry>>(emptyList()) }
     var circlesByID by remember { mutableStateOf<Map<Int, ComiketCircle>>(emptyMap()) }
-    var isShowingInfo by remember { mutableStateOf(false) }
+    val hasSeenOnboarding by selections.hasSeenBuysOnboarding.collectAsState()
+    var isOnboardingPresented by remember { mutableStateOf(!selections.hasSeenBuysOnboarding.value) }
 
     val sharedCircleIDs = sharedBuys?.items?.map { it.circleId }?.distinct().orEmpty()
 
@@ -120,12 +119,12 @@ fun BuysView(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     IconButton(
-                        onClick = { isShowingInfo = true },
+                        onClick = { isOnboardingPresented = true },
                         modifier = Modifier.padding(horizontal = 4.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = stringResource(R.string.buys_info_title),
+                            imageVector = Icons.AutoMirrored.Outlined.HelpOutline,
+                            contentDescription = stringResource(R.string.buys_onboarding_open),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -147,7 +146,7 @@ fun BuysView(
                                 text = { Text(stringResource(R.string.buys_scope_shared)) }
                             )
                         }
-                        // Balances the info button so the tabs stay centered
+                        // Balances the help button so the tabs stay centered
                         Spacer(modifier = Modifier.width(56.dp))
                     } else {
                         Spacer(modifier = Modifier.weight(1f))
@@ -264,16 +263,11 @@ fun BuysView(
         }
     }
 
-    if (isShowingInfo) {
-        AlertDialog(
-            onDismissRequest = { isShowingInfo = false },
-            title = { Text(stringResource(R.string.buys_info_title)) },
-            text = { Text(stringResource(R.string.buys_info_description)) },
-            confirmButton = {
-                TextButton(onClick = { isShowingInfo = false }) {
-                    Text(stringResource(R.string.ok))
-                }
-            }
+    if (isOnboardingPresented) {
+        BuysOnboardingSheet(
+            hasSeenOnboarding = hasSeenOnboarding,
+            onStart = { selections.setHasSeenBuysOnboarding(true) },
+            onDismiss = { isOnboardingPresented = false }
         )
     }
 }
