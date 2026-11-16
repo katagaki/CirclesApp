@@ -34,6 +34,9 @@ import com.tsubuzaki.circlesgo.ui.buys.BuysView
 import com.tsubuzaki.circlesgo.ui.catalog.CatalogView
 import com.tsubuzaki.circlesgo.ui.circledetail.CircleDetailView
 import com.tsubuzaki.circlesgo.ui.favorites.FavoritesView
+import com.tsubuzaki.circlesgo.ui.navi.NaviView
+import com.tsubuzaki.circlesgo.ui.route.RoutePriorityView
+import com.tsubuzaki.circlesgo.ui.shared.LocalNavigator
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -76,6 +79,7 @@ fun UnifiedPanel(
 
     val isShowingCircleDetail =
         sheetPath.lastOrNull() == UnifiedPath.CIRCLE_DETAIL && selectedCircle != null
+    val navigator = LocalNavigator.current
 
     Column(
         modifier = Modifier
@@ -98,11 +102,14 @@ fun UnifiedPanel(
                 navigationCircleIDs = detailNavigationIDs,
                 visibleHeight = visibleHeight
             )
+        } else if (navigator?.priorityRequest != null) {
+            RoutePriorityView(navigator)
         } else {
-            val tabs = if (isActiveEventLatest) {
-                listOf(UnifiedPath.CIRCLES, UnifiedPath.FAVORITES, UnifiedPath.BUYS)
-            } else {
-                listOf(UnifiedPath.CIRCLES, UnifiedPath.BUYS)
+            val tabs = buildList {
+                add(UnifiedPath.CIRCLES)
+                if (isActiveEventLatest) add(UnifiedPath.FAVORITES)
+                add(UnifiedPath.BUYS)
+                if (navigator != null) add(UnifiedPath.NAVI)
             }
             val selectedIndex = tabs.indexOf(currentPath).coerceAtLeast(0)
 
@@ -137,6 +144,7 @@ fun UnifiedPanel(
                                         when (tab) {
                                             UnifiedPath.FAVORITES -> R.string.tab_favorites
                                             UnifiedPath.BUYS -> R.string.tab_buys
+                                            UnifiedPath.NAVI -> R.string.tab_navi
                                             else -> R.string.tab_circles
                                         }
                                     )
@@ -162,6 +170,18 @@ fun UnifiedPanel(
                         events = events,
                         selections = selections,
                         unifier = unifier
+                    )
+
+                    UnifiedPath.NAVI -> if (navigator != null) NaviView(
+                        navigator = navigator,
+                        database = database,
+                        selections = selections,
+                        favorites = favorites,
+                        mapper = mapper,
+                        unifier = unifier,
+                        events = events,
+                        buysCache = buysCache,
+                        visitsState = visitsState
                     )
 
                     else -> CatalogView(

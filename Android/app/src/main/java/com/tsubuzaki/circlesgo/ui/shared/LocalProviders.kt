@@ -5,6 +5,7 @@ import com.tsubuzaki.circlesgo.auth.Authenticator
 import com.tsubuzaki.circlesgo.data.local.WebCutImageCache
 import com.tsubuzaki.circlesgo.sharedbuys.SharedBuysSession
 import com.tsubuzaki.circlesgo.state.Events
+import com.tsubuzaki.circlesgo.state.Navigator
 import com.tsubuzaki.circlesgo.state.VisitsState
 
 val LocalAuthenticator = staticCompositionLocalOf<Authenticator> {
@@ -22,3 +23,5 @@ val LocalVisitsState = staticCompositionLocalOf<VisitsState?> { null }
 val LocalEvents = staticCompositionLocalOf<Events?> { null }
 
 val LocalSharedBuys = staticCompositionLocalOf<SharedBuysSession?> { null }
+
+val LocalNavigator = staticCompositionLocalOf<Navigator?> { null }
