@@ -1,11 +1,21 @@
+import AXiS
 import SwiftUI
 
 /// Takes the place of the search bar while the Guide sheet is minimized, so the step being
 /// walked stays readable with the map in full view.
 struct UnifiedRouteStepBar: View {
 
+    @Environment(Database.self) var database
     @Environment(Navigator.self) var navigator
     @Environment(Unifier.self) var unifier
+
+    @Namespace var namespace
+
+    @State var circle: ComiketCircle?
+
+    var isOnStep: Bool {
+        navigator.currentStep != nil && !navigator.isFinished && !navigator.isTrapped
+    }
 
     var body: some View {
         Button {
@@ -22,6 +32,17 @@ struct UnifiedRouteStepBar: View {
                     .multilineTextAlignment(.leading)
                     .contentTransition(.opacity)
                 Spacer(minLength: 0.0)
+                if isOnStep, let circle {
+                    CircleCutImage(
+                        circle,
+                        in: namespace,
+                        showVisitStatus: false,
+                        showSpaceName: .constant(false),
+                        showDay: .constant(false)
+                    )
+                    .frame(height: 48.0)
+                    .transition(.opacity)
+                }
             }
             .frame(height: 48.0)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -30,6 +51,14 @@ struct UnifiedRouteStepBar: View {
         .buttonStyle(.plain)
         .accessibilityHint("Shared.OpenPanel")
         .animation(.easeInOut(duration: 0.2), value: navigator.stepIndex)
+        .animation(.easeInOut(duration: 0.2), value: circle?.id)
+        .task(id: navigator.currentStop?.circleID) {
+            guard let circleID = navigator.currentStop?.circleID else {
+                circle = nil
+                return
+            }
+            circle = database.circles([circleID]).first
+        }
         .padding(.horizontal, 20.0)
         .padding(.top, 20.0)
         .padding(.bottom, 20.0)
