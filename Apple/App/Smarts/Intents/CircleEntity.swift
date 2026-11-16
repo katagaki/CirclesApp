@@ -14,20 +14,26 @@ struct CircleEntity: AppEntity {
     let name: String
     let penName: String
     let spaceName: String
+    /// The circle's cut, small enough to send to the system with the rest of the entity.
+    let cut: Data?
+    /// Set on the one result that says Visual Intelligence found no circles.
+    let nothingFound: NothingFound?
 
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(
             title: "\(name)",
             subtitle: penName.isEmpty ? "\(spaceName)" : "\(spaceName)  \(penName)",
-            image: .init(systemName: "person.2.fill")
+            image: cut.map { .init(data: $0, displayStyle: .default) } ?? .init(systemName: "person.2.fill")
         )
     }
 
-    init(_ summary: CircleSummary, eventNumber: Int) {
+    init(_ summary: CircleSummary, eventNumber: Int, cut: Data? = nil) {
         self.id = Self.identifier(eventNumber: eventNumber, circleID: summary.id)
         self.name = summary.name
         self.penName = summary.penName
         self.spaceName = summary.spaceName
+        self.cut = cut
+        self.nothingFound = nil
     }
 
     static func identifier(eventNumber: Int, circleID: Int) -> String {
@@ -50,8 +56,9 @@ struct CircleEntity: AppEntity {
         guard let catalog = CircleFinder.catalog() else { return [] }
         let fetcher = DataFetcher(database: catalog.connection)
         let identifiers = Array(await find(fetcher).prefix(limit))
+        let cuts = CircleCutThumbnails(eventNumber: catalog.eventNumber)
         return await fetcher.circleSummaries(identifiers).map {
-            CircleEntity($0, eventNumber: catalog.eventNumber)
+            CircleEntity($0, eventNumber: catalog.eventNumber, cut: cuts.thumbnail(for: $0.id))
         }
     }
 }
@@ -59,11 +66,12 @@ struct CircleEntity: AppEntity {
 struct CircleEntityQuery: EntityStringQuery {
 
     func entities(for identifiers: [CircleEntity.ID]) async throws -> [CircleEntity] {
-        guard let eventNumber = CircleFinder.catalog()?.eventNumber else { return [] }
+        let nothingFound = identifiers.compactMap(CircleEntity.init(nothingFoundIdentifier:))
+        guard let eventNumber = CircleFinder.catalog()?.eventNumber else { return nothingFound }
         let circleIDs = identifiers.compactMap(CircleEntity.parse)
             .filter { $0.eventNumber == eventNumber }
             .map(\.circleID)
-        return await CircleEntity.entities(limit: circleIDs.count) { _ in circleIDs }
+        return nothingFound + (await CircleEntity.entities(limit: circleIDs.count) { _ in circleIDs })
     }
 
     func entities(matching string: String) async throws -> [CircleEntity] {

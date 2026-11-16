@@ -263,7 +263,7 @@ public class Database {
         }
     }
 
-    nonisolated static func readCircleImageData(from imageDatabase: Connection, id: Int) -> Data? {
+    public nonisolated static func readCircleImageData(from imageDatabase: Connection, id: Int) -> Data? {
         do {
             let colID = Expression<Int>("id")
             let colCutImage = Expression<Data>("cutImage")
