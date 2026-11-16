@@ -199,7 +199,7 @@ class Navigator(
                 guide, origin, activeClosures, remainingStopIDs,
                 if (walkableMapKey == key) walkableMap else null
             )
-            if (!isActive) return@launch
+            if (!this.isActive) return@launch
             outcome.map?.let {
                 walkableMap = it
                 walkableMapKey = key
@@ -282,7 +282,7 @@ class Navigator(
             val key = mapKey(mapID, day)
             if (walkableMapKey == key) return@launch
             val map = buildMap(hall, day, tables(mapID)) ?: return@launch
-            if (!isActive) return@launch
+            if (!this.isActive) return@launch
             walkableMap = map
             walkableMapKey = key
         }
