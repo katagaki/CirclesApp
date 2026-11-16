@@ -36,40 +36,32 @@ struct CirclePlacement: Equatable, Hashable, Sendable {
         var placements = matches.map(\.placement)
         let claimedRanges = matches.map(\.range)
 
-        // Matching only where a word starts keeps `コミ 2` from taking the 2 of `2日目 マ-64`.
-        var index = corrected.startIndex
-        while index < corrected.endIndex {
-            let previous = index > corrected.startIndex ? corrected[corrected.index(before: index)] : nil
-            guard !isWordCharacter(previous), !corrected[index].isWhitespace,
-                  let match = corrected[index...].prefixMatch(of: shorthandPattern),
-                  !claimedRanges.contains(where: { $0.overlaps(match.range) }) else {
-                index = corrected.index(after: index)
-                continue
-            }
+        // Matching only where a word starts keeps `あと3日` from reading as a placement.
+        for match in scan(corrected, for: shorthandPattern, accepting: { match in
+            let previous = match.range.lowerBound > corrected.startIndex
+                ? corrected[corrected.index(before: match.range.lowerBound)] : nil
             let blockName = String(match.output.block)
             let hasDayPrefix = match.output.dayNumber != nil || match.output.weekday != nil
             let hasDash = match.output.dash != nil
             let end = corrected[match.range].lastIndex(where: { !$0.isWhitespace }).map(corrected.index(after:))
                 ?? match.range.upperBound
             let next = end < corrected.endIndex ? corrected[end] : nil
-            guard knownBlocks.contains(blockName.lowercased()),
-                  let spaceNumber = Int(match.output.space), spaceNumber > 0,
-                  // A bare letter and number is too often something else ("A4", "C99").
-                  blockName.first?.isASCII != true || hasDash || hasDayPrefix,
-                  // Without a day or a dash, `あと3日` would read as a placement.
-                  hasDayPrefix || hasDash || !isWordCharacter(next) else {
-                index = corrected.index(after: index)
-                continue
-            }
+            return !isWordCharacter(previous)
+                && !claimedRanges.contains(where: { $0.overlaps(match.range) })
+                && knownBlocks.contains(blockName.lowercased())
+                && (Int(match.output.space) ?? 0) > 0
+                // A bare letter and number is too often something else ("A4", "C99").
+                && (blockName.first?.isASCII != true || hasDash || hasDayPrefix)
+                && (hasDayPrefix || hasDash || !isWordCharacter(next))
+        }) {
             placements.append(CirclePlacement(
                 circleName: nil,
                 weekday: weekdayIndex(match.output.weekday.map(String.init)),
                 dayNumber: match.output.dayNumber.flatMap { Int($0) },
-                blockName: blockName,
-                spaceNumber: spaceNumber,
+                blockName: String(match.output.block),
+                spaceNumber: Int(match.output.space) ?? 0,
                 spaceNumberSuffix: suffixIndex(match.output.suffix.map(String.init))
             ))
-            index = match.range.upperBound
         }
         return unique(placements)
     }
@@ -90,22 +82,43 @@ struct CirclePlacement: Equatable, Hashable, Sendable {
             ), match.range))
         }
 
-        for match in normalized.matches(of: shorthandPattern)
-        where !matches.contains(where: { $0.range.overlaps(match.range) }) {
+        let noticeRanges = matches.map(\.range)
+        for match in scan(normalized, for: shorthandPattern, accepting: { match in
             // Without a hall area and without a/b, a letter followed by a number is far
             // more likely to be something else ("C107", "A4") than a space.
-            guard match.output.area != nil || match.output.suffix != nil,
-                  let spaceNumber = Int(match.output.space), spaceNumber > 0 else { continue }
+            !noticeRanges.contains(where: { $0.overlaps(match.range) })
+                && (match.output.area != nil || match.output.suffix != nil)
+                && (Int(match.output.space) ?? 0) > 0
+        }) {
             matches.append((CirclePlacement(
                 circleName: nil,
                 weekday: weekdayIndex(match.output.weekday.map(String.init)),
                 dayNumber: match.output.dayNumber.flatMap { Int($0) },
                 blockName: String(match.output.block),
-                spaceNumber: spaceNumber,
+                spaceNumber: Int(match.output.space) ?? 0,
                 spaceNumberSuffix: suffixIndex(match.output.suffix.map(String.init))
             ), match.range))
         }
 
+        return matches
+    }
+
+    /// The matches the caller accepts, trying from every position in turn, so a match it
+    /// turns down does not use up text a later one needs: `コミ1` would take the 1 of `1日目`.
+    private static func scan<Output>(
+        _ text: String, for pattern: Regex<Output>, accepting accept: (Regex<Output>.Match) -> Bool
+    ) -> [Regex<Output>.Match] {
+        var matches: [Regex<Output>.Match] = []
+        var index = text.startIndex
+        while index < text.endIndex {
+            if !text[index].isWhitespace, let match = try? pattern.prefixMatch(in: text[index...]),
+               !match.range.isEmpty, accept(match) {
+                matches.append(match)
+                index = match.range.upperBound
+            } else {
+                index = text.index(after: index)
+            }
+        }
         return matches
     }
 
@@ -196,7 +209,7 @@ struct CirclePlacement: Equatable, Hashable, Sendable {
         .ignoresCase()
 
     /// `火曜日 東マ64b`, `2日目 西れ-12ab`, `(土)南a-01a`
-    nonisolated(unsafe) private static let shorthandPattern = #/(?:(?:(?<dayNumber>\d)\s*日目|[(（]?(?<weekday>[日月火水木金土])(?:曜日?)?[)）]?)\s*)?(?<area>[東西南北])?\s*(?<block>[\p{Katakana}\p{Hiragana}A-Za-z])\s*(?<dash>[\-－ー―‐−])?\s*(?<space>\d{1,2})(?!\d)\s*(?<suffix>(?:ab|[ab])(?![A-Za-z]))?/#
+    nonisolated(unsafe) private static let shorthandPattern = #/(?:(?:(?<dayNumber>\d)\s*日目|[(（]?(?<weekday>[日月火水木金土])(?!目)(?:曜日?)?[)）]?)\s*)?(?<area>[東西南北])?\s*(?<block>[\p{Katakana}\p{Hiragana}A-Za-z])\s*(?<dash>[\-－ー―‐−])?\s*(?<space>\d{1,2})(?!\d)\s*(?<suffix>(?:ab|[ab])(?![A-Za-z]))?/#
 
     private static func weekdayIndex(_ weekday: String?) -> Int? {
         guard let weekday else { return nil }
