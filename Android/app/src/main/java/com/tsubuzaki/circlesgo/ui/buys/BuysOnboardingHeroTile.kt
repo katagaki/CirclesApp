@@ -26,7 +26,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.data.local.BuysCache
@@ -86,9 +85,8 @@ fun BuysOnboardingHeroTile(item: BuysOnboardingHeroItem, buyer: String, isBought
         )
         Text(
             text = stringResource(R.string.buys_quick_cost, item.cost),
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            fontFamily = FontFamily.Monospace
+            style = MaterialTheme.typography.labelMedium.copy(fontFeatureSettings = "tnum"),
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
