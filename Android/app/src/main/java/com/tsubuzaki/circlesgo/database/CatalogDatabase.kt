@@ -67,6 +67,7 @@ class CatalogDatabase(private val context: Context) {
 
     // MARK: Database Connection
 
+    @Synchronized
     fun getTextDatabase(): SQLiteDatabase? {
         if (textDatabase == null && textDatabaseFile != null) {
             val file = textDatabaseFile!!
@@ -85,6 +86,7 @@ class CatalogDatabase(private val context: Context) {
         return textDatabase
     }
 
+    @Synchronized
     fun getImageDatabase(): SQLiteDatabase? {
         if (imageDatabase == null && imageDatabaseFile != null) {
             val file = imageDatabaseFile!!
@@ -103,6 +105,7 @@ class CatalogDatabase(private val context: Context) {
         return imageDatabase
     }
 
+    @Synchronized
     fun disconnect() {
         Log.d(TAG, "Disconnecting...")
         textDatabase?.close()

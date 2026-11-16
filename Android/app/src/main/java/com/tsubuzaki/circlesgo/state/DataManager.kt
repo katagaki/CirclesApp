@@ -109,7 +109,7 @@ class DataManager(
 
             val activeEvent = WebCatalogEvent.Response.Event(id = eventNumber, number = eventNumber)
             database.prepare(activeEvent)
-            selections.reloadData(database)
+            withContext(Dispatchers.IO) { selections.reloadData(database) }
 
             withContext(Dispatchers.IO) {
                 database.loadCommonImages()
@@ -180,7 +180,7 @@ class DataManager(
             oasis.setBodyText(context.getString(R.string.loading_database))
         }
 
-        selections.reloadData(database)
+        withContext(Dispatchers.IO) { selections.reloadData(database) }
 
         if (oasis.isShowing.value) {
             oasis.setHeaderText(context.getString(R.string.loading))

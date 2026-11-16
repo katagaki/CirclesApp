@@ -80,8 +80,12 @@ fun MapView(
         if (date != null && map != null) {
             val hall = ComiketHall.fromValue(map.filename)
             if (hall != null) {
-                mapImage = database.mapImage(hall.value, date.id, useHighResolutionMaps)
-                genreImage = database.genreImage(hall.value, date.id, useHighResolutionMaps)
+                mapImage = withContext(Dispatchers.Default) {
+                    database.mapImage(hall.value, date.id, useHighResolutionMaps)
+                }
+                genreImage = withContext(Dispatchers.Default) {
+                    database.genreImage(hall.value, date.id, useHighResolutionMaps)
+                }
             } else {
                 mapImage = null
                 genreImage = null
