@@ -36,6 +36,18 @@ class VisitsState(private val cache: VisitEntryCache) {
         reload()
     }
 
+    fun markVisited(circleID: Int, eventNumber: Int) {
+        if (isVisited(circleID, eventNumber)) return
+        cache.insert(
+            VisitEntryCache.VisitEntry(
+                eventNumber = eventNumber,
+                circleID = circleID,
+                visitDate = System.currentTimeMillis()
+            )
+        )
+        reload()
+    }
+
     fun clearAll() {
         cache.clear()
         reload()
