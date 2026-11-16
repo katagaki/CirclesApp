@@ -137,12 +137,20 @@ extension DataFetcher {
         return !lhs.isEmpty && !rhs.isEmpty && (lhs.contains(rhs) || rhs.contains(lhs))
     }
 
-    /// A name with width, case and spacing folded away, for comparing names however written.
+    /// A name with width, case, spacing and kana size folded away, for comparing names however
+    /// written. OCR often reads small kana as full-size ones: `しぇぶろん` as `しえぶろん`.
     static func foldedName(_ name: String) -> String {
-        CirclePlacement.normalize(name)
+        let folded = CirclePlacement.normalize(name)
             .folding(options: [.caseInsensitive, .widthInsensitive], locale: nil)
             .filter { !$0.isWhitespace }
+        guard folded.unicodeScalars.contains(where: { smallKana[$0] != nil }) else { return folded }
+        return String(String.UnicodeScalarView(folded.unicodeScalars.map { smallKana[$0] ?? $0 }))
     }
+
+    private static let smallKana: [Unicode.Scalar: Unicode.Scalar] = Dictionary(uniqueKeysWithValues: zip(
+        "ぁぃぅぇぉっゃゅょゎゕゖァィゥェォッャュョヮヵヶ".unicodeScalars,
+        "あいうえおつやゆよわかけアイウエオツヤユヨワカケ".unicodeScalars
+    ))
 }
 
 struct CircleSummary: Sendable, Hashable {
