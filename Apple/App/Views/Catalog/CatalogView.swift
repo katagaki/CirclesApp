@@ -17,11 +17,11 @@ struct CatalogView: View {
 
     @AppStorage(wrappedValue: .grid, "Circles.DisplayMode") var displayMode: CircleDisplayMode
     @AppStorage(wrappedValue: .regular, "Circles.ListSize") var listDisplayMode: ListDisplayMode
-    @AppStorage(wrappedValue: .medium, "Circles.GridSize") var gridDisplayMode: GridDisplayMode
+    @AppStorage(wrappedValue: GridDisplayMode.medium.columns, "Circles.GridColumns") var gridColumns: Int
 
     @State var displayModeState: CircleDisplayMode = .grid
     @State var listDisplayModeState: ListDisplayMode = .regular
-    @State var gridDisplayModeState: GridDisplayMode = .medium
+    @State var gridColumnsState: Int = GridDisplayMode.medium.columns
 
     @AppStorage(wrappedValue: false, "Database.Initialized") var isDatabaseInitialized: Bool
     @AppStorage(wrappedValue: true, "Customization.DoubleTapToVisit") var isDoubleTapToVisitEnabled: Bool
@@ -39,7 +39,7 @@ struct CatalogView: View {
                 case .grid:
                     if let searchedCircles = catalogCache.searchedCircles {
                         CircleGrid(
-                            displayMode: gridDisplayModeState,
+                            columns: $gridColumnsState,
                             circles: searchedCircles,
                             namespace: namespace,
                             onSelect: { circle in
@@ -49,7 +49,7 @@ struct CatalogView: View {
                         )
                     } else {
                         CircleGrid(
-                            displayMode: gridDisplayModeState,
+                            columns: $gridColumnsState,
                             circles: catalogCache.displayedCircles,
                             showsOverlayWhenEmpty: !selections.genres.isEmpty || selections.map != nil,
                             namespace: namespace,
@@ -63,7 +63,7 @@ struct CatalogView: View {
                     if let searchedCircles = catalogCache.searchedCircles {
                         CircleList(
                             circles: searchedCircles,
-                            displayMode: listDisplayModeState,
+                            displayMode: $listDisplayModeState,
                             namespace: namespace,
                             onSelect: { circle in
                                 unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
@@ -74,7 +74,7 @@ struct CatalogView: View {
                         CircleList(
                             circles: catalogCache.displayedCircles,
                             showsOverlayWhenEmpty: !selections.genres.isEmpty || selections.map != nil,
-                            displayMode: listDisplayModeState,
+                            displayMode: $listDisplayModeState,
                             namespace: namespace,
                             onSelect: { circle in
                                 unifier.append(.namespacedCircleDetail(circle: circle, namespace: namespace))
@@ -116,7 +116,7 @@ struct CatalogView: View {
             }
             displayModeState = displayMode
             listDisplayModeState = listDisplayMode
-            gridDisplayModeState = gridDisplayMode
+            gridColumnsState = gridColumns
             consumeSearchRequest()
         }
         .onChange(of: unifier.isSearchRequested) {
@@ -128,8 +128,8 @@ struct CatalogView: View {
         .onChange(of: listDisplayModeState) {
             listDisplayMode = listDisplayModeState
         }
-        .onChange(of: gridDisplayModeState) {
-            gridDisplayMode = gridDisplayModeState
+        .onChange(of: gridColumnsState) {
+            gridColumns = gridColumnsState
         }
         .onChange(of: selections.catalogSelectionID) {
             reloadDisplayedCircles()
@@ -156,7 +156,7 @@ struct CatalogView: View {
         DisplaySettingsMenu(
             displayMode: $displayModeState,
             listDisplayMode: $listDisplayModeState,
-            gridDisplayMode: $gridDisplayModeState
+            gridColumns: $gridColumnsState
         )
     }
 

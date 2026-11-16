@@ -7,7 +7,7 @@ struct MyCircleAppearancePreview: View {
     var showsDay: Bool
     var isDoubleTapToVisitEnabled: Bool
 
-    @AppStorage(wrappedValue: .medium, "Circles.GridSize") var displayMode: GridDisplayMode
+    @AppStorage(wrappedValue: GridDisplayMode.medium.columns, "Circles.GridColumns") var columns: Int
 
     let cuts: [(palette: [Color], center: SIMD2<Float>, spaceName: String, day: Int)] = [
         ([.accentColor, .yellow, .pink, .purple], [0.3, 0.6], "東A01a", 1),
@@ -19,20 +19,11 @@ struct MyCircleAppearancePreview: View {
     ]
 
     var cutWidth: CGFloat {
-        let isPhone = UIDevice.current.userInterfaceIdiom == .phone
-        switch displayMode {
-        case .big: return isPhone ? 110.0 : 100.0
-        case .medium: return isPhone ? 76.0 : 68.0
-        case .small: return isPhone ? 48.0 : 44.0
-        }
+        330.0 / CGFloat(columns)
     }
 
     var cutCount: Int {
-        switch displayMode {
-        case .big: return 3
-        case .medium: return 4
-        case .small: return 6
-        }
+        min(cuts.count, Int((CGFloat(columns) * 0.75).rounded(.up)))
     }
 
     var body: some View {
@@ -43,7 +34,7 @@ struct MyCircleAppearancePreview: View {
                     center: cuts[index].center,
                     spaceName: cuts[index].spaceName,
                     day: cuts[index].day,
-                    pillSize: displayMode == .small ? .tiny : .small,
+                    pillSize: GridDisplayMode(nearestTo: columns) == .small ? .tiny : .small,
                     isVisited: isDoubleTapToVisitEnabled && index == 1,
                     showsColor: showsWebCut,
                     showsSpaceName: showsSpaceName,

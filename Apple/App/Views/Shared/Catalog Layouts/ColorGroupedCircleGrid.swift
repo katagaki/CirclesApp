@@ -7,7 +7,7 @@ struct ColorGroupedCircleGrid: View {
 
     let gridSpacing: CGFloat = 1.0
 
-    var displayMode: GridDisplayMode = .medium
+    @Binding var columns: Int
     var groups: [String: [ComiketCircle]]
     var showsOverlayWhenEmpty: Bool = true
     var namespace: Namespace.ID
@@ -18,22 +18,16 @@ struct ColorGroupedCircleGrid: View {
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 
-    var body: some View {
-        let phoneColumnConfiguration = [GridItem(.adaptive(minimum: {
-            switch displayMode {
-            case .big: return 110.0
-            case .medium: return 76.0
-            case .small: return 48.0
-            }
-        }()), spacing: gridSpacing)]
-        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: {
-            switch displayMode {
-            case .big: return 100.0
-            case .medium: return 68.0
-            case .small: return 44.0
-            }
-        }()), spacing: gridSpacing)]
+    @State var width: CGFloat = 0.0
 
+    var gridItems: [GridItem] {
+        Array(
+            repeating: GridItem(.flexible(), spacing: gridSpacing),
+            count: GridDisplayMode.displayedColumns(columns, width: width)
+        )
+    }
+
+    var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0.0) {
                 ForEach(WebCatalogColor.allCases, id: \.self) { color in
@@ -41,14 +35,12 @@ struct ColorGroupedCircleGrid: View {
                         if color == .uncolored && !circles.isEmpty {
                             WebCatalogFavoriteNotice()
                         }
-                        LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
-                                  phoneColumnConfiguration : padOrMacColumnConfiguration,
-                                  spacing: gridSpacing) {
+                        LazyVGrid(columns: gridItems, spacing: gridSpacing) {
                             ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
                                 if let onDoubleTap {
                                     CircleCutImage(
                                         circle, in: namespace, cutType: showWebCut ? .web : .catalog,
-                                        displayMode: displayMode,
+                                        displayMode: GridDisplayMode(nearestTo: columns),
                                         showSpaceName: $showSpaceName, showDay: $showDay
                                     )
                                     .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
@@ -61,6 +53,7 @@ struct ColorGroupedCircleGrid: View {
                                         onSelect(circle)
                                     }
                                     .matchedTransitionSource(id: circle.id, in: namespace)
+                                    .pinchAnchor(id: circle.id)
                                     .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
                                 } else {
                                     Button {
@@ -68,7 +61,7 @@ struct ColorGroupedCircleGrid: View {
                                     } label: {
                                         CircleCutImage(
                                             circle, in: namespace, cutType: showWebCut ? .web : .catalog,
-                                            displayMode: displayMode,
+                                            displayMode: GridDisplayMode(nearestTo: columns),
                                             showSpaceName: $showSpaceName, showDay: $showDay
                                         )
                                         .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
@@ -77,15 +70,22 @@ struct ColorGroupedCircleGrid: View {
                                         onSelect(circle)
                                     }
                                     .matchedTransitionSource(id: circle.id, in: namespace)
+                                    .pinchAnchor(id: circle.id)
                                 }
                             }
                         }
-                                  .background(color.backgroundColor().tertiary)
+                        .background(color.backgroundColor().tertiary)
                     }
                 }
             }
             .frame(maxWidth: .infinity)
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
+        .pinchToResize(
+            $columns,
+            levels: Array(GridDisplayMode.columnRange),
+            itemHeight: itemHeight(columns:width:)
+        )
         .overlay {
             if groups.isEmpty && showsOverlayWhenEmpty {
                 ContentUnavailableView(
@@ -96,5 +96,11 @@ struct ColorGroupedCircleGrid: View {
             }
         }
         .frame(maxHeight: .infinity)
+    }
+
+    func itemHeight(columns: Int, width: CGFloat) -> CGFloat {
+        let displayedColumns = GridDisplayMode.displayedColumns(columns, width: width)
+        let itemWidth = (width - gridSpacing * CGFloat(displayedColumns - 1)) / CGFloat(displayedColumns)
+        return itemWidth * 256.0 / 180.0
     }
 }

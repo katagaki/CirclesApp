@@ -9,6 +9,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
         application.registerForRemoteNotifications()
+        GridDisplayMode.registerLegacyColumnDefaults()
         return true
     }
 

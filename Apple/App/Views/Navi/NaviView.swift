@@ -31,7 +31,7 @@ struct NaviView: View {
     @AppStorage(wrappedValue: false, "Route.HidesSafetyAlert") var hidesSafetyAlert: Bool
     @AppStorage(wrappedValue: .grid, "Circles.DisplayMode") var displayMode: CircleDisplayMode
     @AppStorage(wrappedValue: .regular, "Circles.ListSize") var listDisplayMode: ListDisplayMode
-    @AppStorage(wrappedValue: .medium, "Circles.GridSize") var gridDisplayMode: GridDisplayMode
+    @AppStorage(wrappedValue: GridDisplayMode.medium.columns, "Circles.GridColumns") var gridColumns: Int
 
     var isMapReady: Bool {
         selections.map != nil && selections.date != nil
@@ -46,7 +46,7 @@ struct NaviView: View {
                     switch displayMode {
                     case .grid:
                         CircleGrid(
-                            displayMode: gridDisplayMode,
+                            columns: $gridColumns,
                             circles: results,
                             namespace: namespace,
                             onSelect: startDirections(to:)
@@ -54,7 +54,7 @@ struct NaviView: View {
                     case .list:
                         CircleList(
                             circles: results,
-                            displayMode: listDisplayMode,
+                            displayMode: $listDisplayMode,
                             namespace: namespace,
                             onSelect: startDirections(to:)
                         )

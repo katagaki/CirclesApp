@@ -7,7 +7,7 @@ struct ColorGroupedCircleList: View {
 
     var groups: [String: [ComiketCircle]]
     var showsOverlayWhenEmpty: Bool = true
-    var displayMode: ListDisplayMode
+    @Binding var displayMode: ListDisplayMode
     var namespace: Namespace.ID
     var onSelect: ((ComiketCircle) -> Void)
     var onDoubleTap: ((ComiketCircle) -> Void)?
@@ -54,6 +54,7 @@ struct ColorGroupedCircleList: View {
                                 }
                                 .padding([.leading, .trailing], 20.0)
                                 .padding([.top, .bottom], 10.0)
+                                .pinchAnchor(id: circle.id)
                                 .contextMenu(circle: circle) {
                                     onSelect(circle)
                                 }
@@ -67,6 +68,11 @@ struct ColorGroupedCircleList: View {
                 }
             }
         }
+        .pinchToResize(
+            $displayMode,
+            levels: [.compact, .regular],
+            itemHeight: { mode, _ in mode.rowHeight }
+        )
         .overlay {
             if groups.isEmpty && showsOverlayWhenEmpty {
                 ContentUnavailableView(

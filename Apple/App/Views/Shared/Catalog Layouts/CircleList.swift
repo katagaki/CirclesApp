@@ -6,7 +6,7 @@ struct CircleList: View {
 
     var circles: [ComiketCircle]
     var showsOverlayWhenEmpty: Bool = true
-    var displayMode: ListDisplayMode
+    @Binding var displayMode: ListDisplayMode
     var namespace: Namespace.ID
     var onSelect: ((ComiketCircle) -> Void)
     var onDoubleTap: ((ComiketCircle) -> Void)?
@@ -48,6 +48,7 @@ struct CircleList: View {
                     }
                     .padding([.leading, .trailing], 20.0)
                     .padding([.top, .bottom], 10.0)
+                    .pinchAnchor(id: circle.id)
                     .contextMenu(circle: circle) {
                         onSelect(circle)
                     }
@@ -62,6 +63,11 @@ struct CircleList: View {
                 }
             }
         }
+        .pinchToResize(
+            $displayMode,
+            levels: [.compact, .regular],
+            itemHeight: { mode, _ in mode.rowHeight }
+        )
         .overlay {
             if circles.isEmpty && showsOverlayWhenEmpty {
                 ContentUnavailableView(

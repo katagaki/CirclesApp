@@ -4,7 +4,14 @@ struct DisplaySettingsMenu: View {
 
     @Binding var displayMode: CircleDisplayMode
     @Binding var listDisplayMode: ListDisplayMode
-    @Binding var gridDisplayMode: GridDisplayMode
+    @Binding var gridColumns: Int
+
+    var gridSizeTemplate: Binding<GridDisplayMode?> {
+        Binding(
+            get: { GridDisplayMode(columns: gridColumns) },
+            set: { if let mode = $0 { gridColumns = mode.columns } }
+        )
+    }
 
     var body: some View {
         Menu {
@@ -15,13 +22,13 @@ struct DisplaySettingsMenu: View {
                     .tag(CircleDisplayMode.list)
             }
             if displayMode == .grid {
-                Picker("DisplaySettings.GridSize", selection: $gridDisplayMode.animation(.smooth.speed(2.0))) {
+                Picker("DisplaySettings.GridSize", selection: gridSizeTemplate.animation(.smooth.speed(2.0))) {
                     Label("DisplaySettings.GridSize.Big", systemImage: "square.grid.2x2")
-                        .tag(GridDisplayMode.big)
+                        .tag(GridDisplayMode?.some(.big))
                     Label("DisplaySettings.GridSize.Medium", systemImage: "square.grid.3x3")
-                        .tag(GridDisplayMode.medium)
+                        .tag(GridDisplayMode?.some(.medium))
                     Label("DisplaySettings.GridSize.Small", systemImage: "square.grid.4x3.fill")
-                        .tag(GridDisplayMode.small)
+                        .tag(GridDisplayMode?.some(.small))
                 }
             }
             if displayMode == .list {

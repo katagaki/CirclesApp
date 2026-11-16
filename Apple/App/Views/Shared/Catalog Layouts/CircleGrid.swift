@@ -6,7 +6,7 @@ struct CircleGrid: View {
 
     let gridSpacing: CGFloat = 1.0
 
-    var displayMode: GridDisplayMode = .medium
+    @Binding var columns: Int
     var circles: [ComiketCircle]
     var showsOverlayWhenEmpty: Bool = true
     var namespace: Namespace.ID
@@ -17,31 +17,23 @@ struct CircleGrid: View {
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 
-    var body: some View {
-        let phoneColumnConfiguration = [GridItem(.adaptive(minimum: {
-            switch displayMode {
-            case .big: return 110.0
-            case .medium: return 76.0
-            case .small: return 48.0
-            }
-        }()), spacing: gridSpacing)]
-        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: {
-            switch displayMode {
-            case .big: return 100.0
-            case .medium: return 68.0
-            case .small: return 44.0
-            }
-        }()), spacing: gridSpacing)]
+    @State var width: CGFloat = 0.0
 
+    var gridItems: [GridItem] {
+        Array(
+            repeating: GridItem(.flexible(), spacing: gridSpacing),
+            count: GridDisplayMode.displayedColumns(columns, width: width)
+        )
+    }
+
+    var body: some View {
         ScrollView {
-            LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
-                      phoneColumnConfiguration : padOrMacColumnConfiguration,
-                      spacing: gridSpacing) {
+            LazyVGrid(columns: gridItems, spacing: gridSpacing) {
                 ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
                     if let onDoubleTap {
                         CircleCutImage(
                             circle, in: namespace, cutType: showWebCut ? .web : .catalog,
-                            displayMode: displayMode,
+                            displayMode: GridDisplayMode(nearestTo: columns),
                             showSpaceName: $showSpaceName, showDay: $showDay
                         )
                         .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
@@ -54,6 +46,7 @@ struct CircleGrid: View {
                             onSelect(circle)
                         }
                         .matchedTransitionSource(id: circle.id, in: namespace)
+                        .pinchAnchor(id: circle.id)
                         .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
                     } else {
                         Button {
@@ -61,7 +54,7 @@ struct CircleGrid: View {
                         } label: {
                             CircleCutImage(
                                 circle, in: namespace, cutType: showWebCut ? .web : .catalog,
-                                displayMode: displayMode,
+                                displayMode: GridDisplayMode(nearestTo: columns),
                                 showSpaceName: $showSpaceName, showDay: $showDay
                             )
                             .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
@@ -70,10 +63,17 @@ struct CircleGrid: View {
                             onSelect(circle)
                         }
                         .matchedTransitionSource(id: circle.id, in: namespace)
+                        .pinchAnchor(id: circle.id)
                     }
                 }
             }
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
+        .pinchToResize(
+            $columns,
+            levels: Array(GridDisplayMode.columnRange),
+            itemHeight: itemHeight(columns:width:)
+        )
         .overlay {
             if circles.isEmpty && showsOverlayWhenEmpty {
                 ContentUnavailableView(
@@ -83,5 +83,11 @@ struct CircleGrid: View {
                 )
             }
         }
+    }
+
+    func itemHeight(columns: Int, width: CGFloat) -> CGFloat {
+        let displayedColumns = GridDisplayMode.displayedColumns(columns, width: width)
+        let itemWidth = (width - gridSpacing * CGFloat(displayedColumns - 1)) / CGFloat(displayedColumns)
+        return itemWidth * 256.0 / 180.0
     }
 }

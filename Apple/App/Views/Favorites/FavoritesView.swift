@@ -16,11 +16,11 @@ struct FavoritesView: View {
     @AppStorage(wrappedValue: true, "Favorites.GroupByColor") var isGroupedByColorDefault: Bool
     @AppStorage(wrappedValue: .grid, "Favorites.DisplayMode") var displayMode: CircleDisplayMode
     @AppStorage(wrappedValue: ListDisplayMode.regular, "Favorites.ListDisplayMode") var listDisplayMode: ListDisplayMode
-    @AppStorage(wrappedValue: GridDisplayMode.medium, "Favorites.GridDisplayMode") var gridDisplayMode: GridDisplayMode
+    @AppStorage(wrappedValue: GridDisplayMode.medium.columns, "Favorites.GridColumns") var gridColumns: Int
 
     @State var displayModeState: CircleDisplayMode = .grid
     @State var listDisplayModeState: ListDisplayMode = .regular
-    @State var gridDisplayModeState: GridDisplayMode = .medium
+    @State var gridColumnsState: Int = GridDisplayMode.medium.columns
 
     @State var gridID = UUID()
 
@@ -34,8 +34,8 @@ struct FavoritesView: View {
                 FavoritesCircleCollection(
                     groups: favoriteCircles,
                     displayMode: displayModeState,
-                    listDisplayMode: listDisplayModeState,
-                    gridDisplayMode: gridDisplayModeState,
+                    listDisplayMode: $listDisplayModeState,
+                    gridColumns: $gridColumnsState,
                     namespace: namespace,
                     onSelect: { circle in
                         unifier.append(.namespacedCircleDetail(
@@ -60,7 +60,7 @@ struct FavoritesView: View {
             FavoritesToolbar(
                 displayMode: $displayModeState,
                 listDisplayMode: $listDisplayModeState,
-                gridDisplayMode: $gridDisplayModeState
+                gridColumns: $gridColumnsState
             )
         }
         .task {
@@ -82,7 +82,7 @@ struct FavoritesView: View {
 
             displayModeState = displayMode
             listDisplayModeState = listDisplayMode
-            gridDisplayModeState = gridDisplayMode
+            gridColumnsState = gridColumns
         }
         .onChange(of: displayModeState) {
             displayMode = displayModeState
@@ -90,8 +90,8 @@ struct FavoritesView: View {
         .onChange(of: listDisplayModeState) {
             listDisplayMode = listDisplayModeState
         }
-        .onChange(of: gridDisplayModeState) {
-            gridDisplayMode = gridDisplayModeState
+        .onChange(of: gridColumnsState) {
+            gridColumns = gridColumnsState
         }
         .onChange(of: selections.date) {
             if let favoriteItems = favorites.items {
