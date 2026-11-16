@@ -68,12 +68,21 @@ class SharedBuysSession(private val context: Context, private val scope: Corouti
         private set
     var deviceId by mutableStateOf("")
         private set
-    private var deviceAuthKey = SharedBuysCrypto.newDeviceAuthKey()
-    private var agreementKey = SharedBuysCrypto.newAgreementKey()
+    private var storedDeviceAuthKey: ByteArray? = null
+    private var deviceAuthKey: ByteArray
+        get() = storedDeviceAuthKey ?: SharedBuysCrypto.newDeviceAuthKey().also { storedDeviceAuthKey = it }
+        set(value) { storedDeviceAuthKey = value }
+    private var storedAgreementKey: java.security.KeyPair? = null
+    private var agreementKey: java.security.KeyPair
+        get() = storedAgreementKey ?: SharedBuysCrypto.newAgreementKey().also { storedAgreementKey = it }
+        set(value) { storedAgreementKey = value }
     var ownerDevice: String? by mutableStateOf(null)
         private set
     private var isRekeying = false
-    private var signingKey = SharedBuysCrypto.newSigningKey()
+    private var storedSigningKey: ByteArray? = null
+    private var signingKey: ByteArray
+        get() = storedSigningKey ?: SharedBuysCrypto.newSigningKey().also { storedSigningKey = it }
+        set(value) { storedSigningKey = value }
     private var eventNumber = 0
     private var lastSeq = 0L
     private var clock = 0L
