@@ -2,6 +2,7 @@ package com.tsubuzaki.circlesgo.sharedbuys
 
 import android.content.Context
 import androidx.core.net.toUri
+import com.google.mlkit.common.sdkinternal.MlKitContext
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.codescanner.GmsBarcodeScannerOptions
 import com.google.mlkit.vision.codescanner.GmsBarcodeScanning
@@ -25,6 +26,7 @@ object SharedBuysScanner {
         onCancel: () -> Unit = {},
         onError: (Exception) -> Unit = {}
     ) {
+        MlKitContext.initializeIfNeeded(context.applicationContext)
         val options = GmsBarcodeScannerOptions.Builder()
             .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
             .enableAutoZoom()
