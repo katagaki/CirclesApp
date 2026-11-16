@@ -11,9 +11,11 @@ import com.tsubuzaki.circlesgo.api.Endpoints
 import com.tsubuzaki.circlesgo.api.OnlineState
 import com.tsubuzaki.circlesgo.api.auth.OpenIDClient
 import com.tsubuzaki.circlesgo.api.auth.OpenIDToken
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import java.io.BufferedReader
@@ -80,7 +82,7 @@ class Authenticator(
 
     // MARK: Reachability
 
-    fun setupReachability() {
+    fun setupReachability(scope: CoroutineScope) {
         val connectivityManager =
             context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
@@ -100,12 +102,14 @@ class Authenticator(
             .build()
         connectivityManager.registerNetworkCallback(request, callback)
 
-        val activeNetwork = connectivityManager.activeNetwork
-        val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
-        if (capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true) {
-            handleReachable()
-        } else {
-            handleUnreachable()
+        scope.launch(Dispatchers.IO) {
+            val activeNetwork = connectivityManager.activeNetwork
+            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork)
+            if (capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true) {
+                handleReachable()
+            } else {
+                handleUnreachable()
+            }
         }
     }
 
@@ -118,6 +122,7 @@ class Authenticator(
         }
     }
 
+    @Synchronized
     private fun handleReachable() {
         _onlineState.value = OnlineState.ONLINE
         if (!_isReady.value) {
@@ -130,6 +135,7 @@ class Authenticator(
         }
     }
 
+    @Synchronized
     private fun handleUnreachable() {
         _onlineState.value = OnlineState.OFFLINE
         useOfflineAuthenticationToken()

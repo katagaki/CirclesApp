@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -30,6 +31,8 @@ import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.tables.ComiketDate
 import com.tsubuzaki.circlesgo.database.tables.ComiketMap
 import com.tsubuzaki.circlesgo.state.UserSelections
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun UnifiedControl(
@@ -64,7 +67,9 @@ private fun DatePickerButton(
     // Keyed on the database load count so the picker refreshes when the
     // active event changes
     val commonImagesLoadCount by database.commonImagesLoadCount.collectAsState()
-    val dates = remember(commonImagesLoadCount) { database.dates() }
+    val dates by produceState(emptyList(), commonImagesLoadCount) {
+        value = withContext(Dispatchers.IO) { database.dates() }
+    }
 
     // The menu anchors to its parent layout, so keep it in a box around the
     // button instead of letting it align to the whole toolbar
@@ -112,7 +117,9 @@ private fun HallPickerButton(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val commonImagesLoadCount by database.commonImagesLoadCount.collectAsState()
-    val maps = remember(commonImagesLoadCount) { database.maps() }
+    val maps by produceState(emptyList(), commonImagesLoadCount) {
+        value = withContext(Dispatchers.IO) { database.maps() }
+    }
     val accentColor = accentColorForMap(selectedMap)
 
     Box {

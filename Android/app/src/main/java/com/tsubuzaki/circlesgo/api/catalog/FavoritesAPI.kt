@@ -40,15 +40,15 @@ class FavoritesAPI(private val cache: FavoritesCache) {
                 Pair(items, wcIDMappedItems)
             } else {
                 Log.e(TAG, "Failed to fetch favorites: HTTP $responseCode")
-                loadCachedFavorites()
+                cached()
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to fetch favorites", e)
-            loadCachedFavorites()
+            cached()
         }
     }
 
-    private fun loadCachedFavorites(): Pair<
+    fun cached(): Pair<
             List<UserFavorites.Response.FavoriteItem>,
             Map<Int, UserFavorites.Response.FavoriteItem>
             > {
@@ -181,6 +181,8 @@ class FavoritesAPI(private val cache: FavoritesCache) {
         connection.requestMethod = method
         connection.setRequestProperty("Content-Type", "application/json")
         connection.setRequestProperty("Authorization", "Bearer ${authToken.accessToken}")
+        connection.connectTimeout = 5000
+        connection.readTimeout = 15000
         return connection
     }
 }

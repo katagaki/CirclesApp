@@ -61,10 +61,13 @@ class SharedBuysRelay(private val context: Context, private val scope: Coroutine
         val pushToken: String? = null
     )
 
-    private val client = HttpClient(OkHttp) {
-        expectSuccess = true
-        install(WebSockets)
+    private val lazyClient = lazy {
+        HttpClient(OkHttp) {
+            expectSuccess = true
+            install(WebSockets)
+        }
     }
+    private val client by lazyClient
     private val json = Json { ignoreUnknownKeys = true }
     private var session: io.ktor.websocket.WebSocketSession? = null
     private var job: Job? = null
@@ -172,7 +175,7 @@ class SharedBuysRelay(private val context: Context, private val scope: Coroutine
      */
     fun close() {
         disconnect()
-        runCatching { client.close() }
+        if (lazyClient.isInitialized()) runCatching { client.close() }
     }
 
     fun send(records: List<RelayRecord>, onEvent: (RelayEvent) -> Unit = {}) {

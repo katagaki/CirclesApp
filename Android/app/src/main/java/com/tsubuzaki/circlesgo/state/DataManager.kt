@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.core.content.edit
 import com.tsubuzaki.circlesgo.R
+import com.tsubuzaki.circlesgo.api.OnlineState
 import com.tsubuzaki.circlesgo.api.auth.OpenIDToken
 import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.auth.Authenticator
@@ -80,6 +81,7 @@ class DataManager(
             } else {
                 finishReload(shouldResetSelections = shouldResetSelections)
             }
+            refreshFromNetwork(authToken)
         } catch (e: Exception) {
             Log.e(TAG, "Failed to reload data", e)
             oasis.close()
@@ -107,7 +109,7 @@ class DataManager(
 
             val activeEvent = WebCatalogEvent.Response.Event(id = eventNumber, number = eventNumber)
             database.prepare(activeEvent)
-            selections.reloadData(database)
+            withContext(Dispatchers.IO) { selections.reloadData(database) }
 
             withContext(Dispatchers.IO) {
                 database.loadCommonImages()
@@ -178,7 +180,7 @@ class DataManager(
             oasis.setBodyText(context.getString(R.string.loading_database))
         }
 
-        selections.reloadData(database)
+        withContext(Dispatchers.IO) { selections.reloadData(database) }
 
         if (oasis.isShowing.value) {
             oasis.setHeaderText(context.getString(R.string.loading))
@@ -193,14 +195,20 @@ class DataManager(
             database.loadCircleImages()
         }
 
-        loadFavorites(authToken)
+        loadCachedFavorites()
     }
 
-    private suspend fun loadFavorites(authToken: OpenIDToken) {
+    private suspend fun loadCachedFavorites() {
+        val (items, wcIDMappedItems) = withContext(Dispatchers.IO) { favoritesAPI.cached() }
+        favorites.setItems(items)
+        favorites.setWcIDMappedItems(wcIDMappedItems)
+    }
+
+    private suspend fun refreshFromNetwork(authToken: OpenIDToken) {
+        if (authenticator.onlineState.value != OnlineState.ONLINE) return
+        events.refresh(authToken)
         try {
-            val (items, wcIDMappedItems) = withContext(Dispatchers.IO) {
-                favoritesAPI.all(authToken)
-            }
+            val (items, wcIDMappedItems) = favoritesAPI.all(authToken)
             favorites.setItems(items)
             favorites.setWcIDMappedItems(wcIDMappedItems)
         } catch (e: Exception) {

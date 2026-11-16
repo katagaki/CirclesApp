@@ -4,6 +4,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
+import android.view.View
+import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -52,6 +55,7 @@ import com.tsubuzaki.circlesgo.sharedbuys.SharedBuysSession
 import com.tsubuzaki.circlesgo.ui.guest.GuestView
 import com.tsubuzaki.circlesgo.ui.sharedbuys.SharedBuysDebugScreen
 import com.tsubuzaki.circlesgo.ui.unified.UnifiedView
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -66,7 +70,7 @@ class MainActivity : ComponentActivity() {
         val client = Authenticator.loadClient(this)
         val auth = Authenticator(this, client)
         authenticator = auth
-        auth.setupReachability()
+        auth.setupReachability(lifecycleScope)
 
         val database = CatalogDatabase(this)
         val mapper = Mapper()
@@ -202,6 +206,8 @@ class MainActivity : ComponentActivity() {
                                     unifier.close()
                                 }
                             )
+                        } else if (!isReady) {
+                            return@Surface
                         } else if (isAuthenticating || token == null) {
                             LoginView(
                                 authURL = auth.authURL,
@@ -271,6 +277,20 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        holdFirstFrameUntilReady(auth)
+    }
+
+    private fun holdFirstFrameUntilReady(auth: Authenticator) {
+        val content = findViewById<View>(android.R.id.content)
+        val deadline = SystemClock.uptimeMillis() + FIRST_FRAME_HOLD_LIMIT_MS
+        content.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                if (!auth.isReady.value && SystemClock.uptimeMillis() < deadline) return false
+                content.viewTreeObserver.removeOnPreDrawListener(this)
+                return true
+            }
+        })
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -319,7 +339,9 @@ class MainActivity : ComponentActivity() {
                 val gotCode = authenticator?.getAuthenticationCode(uri) ?: false
                 if (gotCode) {
                     lifecycleScope.launch {
-                        authenticator?.getAuthenticationToken()
+                        val auth = authenticator ?: return@launch
+                        auth.isReady.first { it }
+                        auth.getAuthenticationToken()
                     }
                 }
             }
@@ -391,5 +413,6 @@ class MainActivity : ComponentActivity() {
     companion object {
         private const val BLUETOOTH_PERMISSION_REQUEST = 4001
         private const val NOTIFICATION_PERMISSION_REQUEST = 4002
+        private const val FIRST_FRAME_HOLD_LIMIT_MS = 1000L
     }
 }

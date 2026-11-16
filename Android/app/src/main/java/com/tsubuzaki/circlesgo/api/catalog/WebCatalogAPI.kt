@@ -33,15 +33,15 @@ object WebCatalogAPI {
                 events.response
             } else {
                 Log.e(TAG, "Failed to fetch events: HTTP $responseCode")
-                loadCachedEvents(context)
+                cachedEvents(context)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to fetch events", e)
-            loadCachedEvents(context)
+            cachedEvents(context)
         }
     }
 
-    private fun loadCachedEvents(context: Context): WebCatalogEvent.Response? {
+    fun cachedEvents(context: Context): WebCatalogEvent.Response? {
         val prefs = context.getSharedPreferences("circles_prefs", Context.MODE_PRIVATE)
         val cachedData = prefs.getString(EVENT_CACHE_KEY, null) ?: return null
         return try {
@@ -96,6 +96,7 @@ object WebCatalogAPI {
         connection.requestMethod = "POST"
         connection.setRequestProperty("Authorization", "Bearer ${authToken.accessToken}")
         connection.connectTimeout = 2000
+        connection.readTimeout = 10000
         return connection
     }
 }
