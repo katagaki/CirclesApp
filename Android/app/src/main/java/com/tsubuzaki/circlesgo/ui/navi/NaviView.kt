@@ -44,6 +44,8 @@ import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.state.VisitsState
 import com.tsubuzaki.circlesgo.ui.catalog.CircleGrid
 import com.tsubuzaki.circlesgo.ui.catalog.CircleList
+import com.tsubuzaki.circlesgo.ui.route.RouteOnboardingView
+import com.tsubuzaki.circlesgo.ui.route.RouteSafetyAlert
 import com.tsubuzaki.circlesgo.ui.shared.LocalSharedBuys
 import com.tsubuzaki.circlesgo.ui.unified.UnifiedRouteNoStopsCard
 import kotlinx.coroutines.Dispatchers
@@ -79,6 +81,9 @@ fun NaviView(
     var searchTerm by remember { mutableStateOf("") }
     var results by remember { mutableStateOf<List<ComiketCircle>?>(null) }
     var pendingDestination by remember { mutableStateOf<ComiketCircle?>(null) }
+    var isOnboardingPresented by remember { mutableStateOf(false) }
+    var pendingMode by remember { mutableStateOf<Navigator.Mode?>(null) }
+    var pendingGo by remember { mutableStateOf<(() -> Unit)?>(null) }
     var ownBuysOnMap by remember { mutableStateOf<List<Int>>(emptyList()) }
     var sharedBuysOnMap by remember { mutableStateOf<List<Int>>(emptyList()) }
 
@@ -138,6 +143,26 @@ fun NaviView(
             Navigator.Mode.PRIORITIZED -> navigator.openPriority(colorCounts()) { priority ->
                 startRoute(favoriteColors(), priority, false)
             }
+        }
+    }
+
+    fun go(action: () -> Unit) {
+        if (navigator.hidesSafetyAlert) action() else pendingGo = action
+    }
+
+    fun continueGo() {
+        val action = pendingGo
+        pendingGo = null
+        action?.invoke()
+    }
+
+    fun choose(mode: Navigator.Mode) {
+        pendingMode = mode
+        if (navigator.hasSeenOnboarding) {
+            pendingMode = null
+            proceed(mode)
+        } else {
+            isOnboardingPresented = true
         }
     }
 
@@ -271,10 +296,40 @@ fun NaviView(
                 isEnabled = isMapReady,
                 ownBuysCount = ownBuysOnMap.size,
                 sharedBuysCount = if (sharedBuys != null) sharedBuysOnMap.size else null,
-                onChoose = { mode -> proceed(mode) },
-                onOwnBuys = { routeThrough(ownBuysOnMap) },
-                onSharedBuys = { routeThrough(sharedBuysOnMap) }
+                onChoose = { mode -> go { choose(mode) } },
+                onOwnBuys = { go { routeThrough(ownBuysOnMap) } },
+                onSharedBuys = { go { routeThrough(sharedBuysOnMap) } }
             )
+            TextButton(
+                onClick = {
+                    pendingMode = null
+                    isOnboardingPresented = true
+                },
+                modifier = Modifier.align(Alignment.CenterHorizontally)
+            ) {
+                Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = null)
+                Text(stringResource(R.string.route_onboarding_open), modifier = Modifier.padding(start = 8.dp))
+            }
+        }
+    }
+
+    if (pendingGo != null) {
+        RouteSafetyAlert(
+            onGotIt = { continueGo() },
+            onDontShowAgain = {
+                navigator.setHidesSafetyAlert()
+                continueGo()
+            },
+            onDismiss = { pendingGo = null }
+        )
+    }
+
+    if (isOnboardingPresented) {
+        RouteOnboardingView(navigator) {
+            isOnboardingPresented = false
+            val mode = pendingMode
+            pendingMode = null
+            if (navigator.hasSeenOnboarding && mode != null) proceed(mode)
         }
     }
 }
