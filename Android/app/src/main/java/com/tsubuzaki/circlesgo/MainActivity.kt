@@ -4,6 +4,9 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.os.SystemClock
+import android.view.View
+import android.view.ViewTreeObserver
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -274,6 +277,20 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
+        holdFirstFrameUntilReady(auth)
+    }
+
+    private fun holdFirstFrameUntilReady(auth: Authenticator) {
+        val content = findViewById<View>(android.R.id.content)
+        val deadline = SystemClock.uptimeMillis() + FIRST_FRAME_HOLD_LIMIT_MS
+        content.viewTreeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw(): Boolean {
+                if (!auth.isReady.value && SystemClock.uptimeMillis() < deadline) return false
+                content.viewTreeObserver.removeOnPreDrawListener(this)
+                return true
+            }
+        })
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -396,5 +413,6 @@ class MainActivity : ComponentActivity() {
     companion object {
         private const val BLUETOOTH_PERMISSION_REQUEST = 4001
         private const val NOTIFICATION_PERMISSION_REQUEST = 4002
+        private const val FIRST_FRAME_HOLD_LIMIT_MS = 1000L
     }
 }
