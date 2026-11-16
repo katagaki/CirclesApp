@@ -13,9 +13,11 @@ struct CircleVisualSearchQuery: IntentValueQuery {
             let ciImage = CIImage(cvPixelBuffer: buffer)
             return CIContext().createCGImage(ciImage, from: ciImage.extent)
         }
-        guard let image, let text = await CircleFinder.text(in: image) else { return [] }
+        guard let image else { return [] }
+        let lines = await CircleFinder.lines(in: image)
+        guard !lines.isEmpty else { return [] }
         return await CircleEntity.entities { fetcher in
-            await fetcher.circles(mentionedIn: text)
+            await fetcher.circles(seenIn: lines)
         }
     }
 }

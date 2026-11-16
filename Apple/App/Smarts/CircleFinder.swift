@@ -24,24 +24,40 @@ enum CircleFinder {
     // MARK: Images
 
     static func text(in imageData: Data) async -> String? {
-        await text { try await $0.perform(on: imageData) }
+        text(of: await lines(in: imageData))
     }
 
     static func text(in image: CGImage) async -> String? {
-        await text { try await $0.perform(on: image) }
+        text(of: await lines(in: image))
     }
 
-    private static func text(
+    static func lines(in imageData: Data) async -> [RecognizedLine] {
+        await lines { try await $0.perform(on: imageData) }
+    }
+
+    static func lines(in image: CGImage) async -> [RecognizedLine] {
+        await lines { try await $0.perform(on: image) }
+    }
+
+    private static func text(of lines: [RecognizedLine]) -> String? {
+        lines.isEmpty ? nil : lines.map(\.text).joined(separator: "\n")
+    }
+
+    private static func lines(
         _ perform: (RecognizeTextRequest) async throws -> [RecognizedTextObservation]
-    ) async -> String? {
+    ) async -> [RecognizedLine] {
         var request = RecognizeTextRequest()
         request.recognitionLevel = .accurate
         request.recognitionLanguages = [Locale.Language(identifier: "ja-JP"), Locale.Language(identifier: "en-US")]
         // Correction rewrites block letters and space numbers into words.
         request.usesLanguageCorrection = false
-        guard let observations = try? await perform(request) else { return nil }
-        let lines = observations.compactMap { $0.topCandidates(1).first?.string }
-        return lines.isEmpty ? nil : lines.joined(separator: "\n")
+        guard let observations = try? await perform(request) else { return [] }
+        return RecognizedLine.lines(from: observations.map {
+            RecognizedLine.Fragment(
+                candidates: $0.topCandidates(3).map(\.string),
+                frame: $0.boundingBox.cgRect
+            )
+        })
     }
 
     // MARK: Catalog
