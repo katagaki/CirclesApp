@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.baselineprofile)
 }
 
 fun loadProperties(filename: String): Map<String, String> {
@@ -117,6 +118,10 @@ dependencies {
 
     // AndroidX Browser (Custom Tabs)
     implementation(libs.browser)
+
+    // Startup performance
+    implementation(libs.profileinstaller)
+    baselineProfile(project(":baselineprofile"))
 
     // AndroidX Core
     implementation(libs.core.ktx)

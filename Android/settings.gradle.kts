@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "CirclesGo"
 include(":app")
+include(":baselineprofile")
