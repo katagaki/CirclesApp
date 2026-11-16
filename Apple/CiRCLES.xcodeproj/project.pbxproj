@@ -878,7 +878,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.2;
+				MARKETING_VERSION = 109.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.OnHand;
 				PRODUCT_NAME = CiRCLES;
 				SDKROOT = watchos;
@@ -912,7 +912,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.2;
+				MARKETING_VERSION = 109.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.OnHand;
 				PRODUCT_NAME = CiRCLES;
 				SDKROOT = watchos;
@@ -976,7 +976,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 109.2;
+				MARKETING_VERSION = 109.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.SharedBuysWidget;
 				PRODUCT_NAME = SharedBuysWidget;
 				SDKROOT = iphoneos;
@@ -1003,7 +1003,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 109.2;
+				MARKETING_VERSION = 109.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.SharedBuysWidget;
 				PRODUCT_NAME = SharedBuysWidget;
 				SDKROOT = iphoneos;
@@ -1394,7 +1394,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.2;
+				MARKETING_VERSION = 109.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -1437,7 +1437,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 109.2;
+				MARKETING_VERSION = 109.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator xros xrsimulator";
@@ -1468,7 +1468,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 109.2;
+				MARKETING_VERSION = 109.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1496,7 +1496,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 109.2;
+				MARKETING_VERSION = 109.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.tsubuzaki.CiRCLES.ShareWithCiRCLES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
