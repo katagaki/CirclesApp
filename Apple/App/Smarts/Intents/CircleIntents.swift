@@ -12,6 +12,7 @@ struct OpenCircleIntent: OpenIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
+        guard target.nothingFound == nil else { return .result() }
         CircleFinderRouter.shared.pendingCircle = target.id
         return .result()
     }

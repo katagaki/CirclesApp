@@ -16,6 +16,8 @@ struct CircleEntity: AppEntity {
     let spaceName: String
     /// The circle's cut, small enough to send to the system with the rest of the entity.
     let cut: Data?
+    /// Set on the one result that says Visual Intelligence found no circles.
+    let nothingFound: NothingFound?
 
     var displayRepresentation: DisplayRepresentation {
         DisplayRepresentation(
@@ -31,6 +33,7 @@ struct CircleEntity: AppEntity {
         self.penName = summary.penName
         self.spaceName = summary.spaceName
         self.cut = cut
+        self.nothingFound = nil
     }
 
     static func identifier(eventNumber: Int, circleID: Int) -> String {
@@ -63,11 +66,12 @@ struct CircleEntity: AppEntity {
 struct CircleEntityQuery: EntityStringQuery {
 
     func entities(for identifiers: [CircleEntity.ID]) async throws -> [CircleEntity] {
-        guard let eventNumber = CircleFinder.catalog()?.eventNumber else { return [] }
+        let nothingFound = identifiers.compactMap(CircleEntity.init(nothingFoundIdentifier:))
+        guard let eventNumber = CircleFinder.catalog()?.eventNumber else { return nothingFound }
         let circleIDs = identifiers.compactMap(CircleEntity.parse)
             .filter { $0.eventNumber == eventNumber }
             .map(\.circleID)
-        return await CircleEntity.entities(limit: circleIDs.count) { _ in circleIDs }
+        return nothingFound + (await CircleEntity.entities(limit: circleIDs.count) { _ in circleIDs })
     }
 
     func entities(matching string: String) async throws -> [CircleEntity] {
