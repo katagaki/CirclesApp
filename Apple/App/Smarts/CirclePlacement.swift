@@ -85,13 +85,13 @@ struct CirclePlacement: Equatable, Hashable, Sendable {
         for match in scan(normalized, for: shorthandPattern, accepting: { match in
             // Without a hall area and without a/b, a letter followed by a number is far
             // more likely to be something else ("C107", "A4") than a space.
-            (match.output.area != nil || match.output.suffix != nil)
+            let hasArea = match.output.area != nil
+            let hasDayPrefix = hasDay(match.output.dayNumber, match.output.weekday)
+            return (hasArea || match.output.suffix != nil)
                 && (Int(match.output.space) ?? 0) > 0
                 && !breaksLine(between: match.output.block, and: match.output.space, dash: match.output.dash)
-                && (match.output.area != nil || hasDay(match.output.dayNumber, match.output.weekday)
-                    || startsWord(match.range, in: normalized))
-                && (match.output.area != nil || !isLatinBlockWithoutMarker(match.output.block, match.output.dash,
-                                                                            hasDay: hasDay(match.output.dayNumber, match.output.weekday)))
+                && (hasArea || hasDayPrefix || startsWord(match.range, in: normalized))
+                && (hasArea || !isLatinBlockWithoutMarker(match.output.block, match.output.dash, hasDay: hasDayPrefix))
         }) {
             matches.append((CirclePlacement(
                 circleName: nil,
