@@ -19,61 +19,72 @@ struct CircleGrid: View {
 
     @State var width: CGFloat = 0.0
 
+    @Namespace var pinchNamespace
+
+    var displayedColumns: Int {
+        GridDisplayMode.displayedColumns(columns, width: width)
+    }
+
+    var columnCounts: [Int] {
+        GridDisplayMode.columnRange.map { GridDisplayMode.displayedColumns($0, width: width) }
+    }
+
     var gridItems: [GridItem] {
-        Array(
-            repeating: GridItem(.flexible(), spacing: gridSpacing),
-            count: GridDisplayMode.displayedColumns(columns, width: width)
-        )
+        Array(repeating: GridItem(.flexible(), spacing: gridSpacing), count: displayedColumns)
     }
 
     var body: some View {
         ScrollView {
-            LazyVGrid(columns: gridItems, spacing: gridSpacing) {
-                ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
-                    if let onDoubleTap {
-                        CircleCutImage(
-                            circle, in: namespace, cutType: showWebCut ? .web : .catalog,
-                            displayMode: GridDisplayMode(nearestTo: columns),
-                            showSpaceName: $showSpaceName, showDay: $showDay
-                        )
-                        .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
-                        .onFastDoubleTap(doubleTap: {
-                            onDoubleTap(circle)
-                        }, singleTap: {
-                            onSelect(circle)
-                        })
-                        .contextMenu(circle: circle) {
-                            onSelect(circle)
-                        }
-                        .matchedTransitionSource(id: circle.id, in: namespace)
-                        .pinchAnchor(id: circle.id)
-                        .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
-                    } else {
-                        Button {
-                            onSelect(circle)
-                        } label: {
+            PinchZoomGrid(
+                columnCount: displayedColumns,
+                columnCounts: columnCounts,
+                sections: [PinchZoomSection(count: circles.count)],
+                spacing: gridSpacing,
+                heightRatio: 256.0 / 180.0,
+                onColumnCountChange: setDisplayedColumns
+            ) { _, index in
+                pinchCell(circles[index])
+            } content: {
+                LazyVGrid(columns: gridItems, spacing: gridSpacing) {
+                    ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
+                        if let onDoubleTap {
                             CircleCutImage(
                                 circle, in: namespace, cutType: showWebCut ? .web : .catalog,
                                 displayMode: GridDisplayMode(nearestTo: columns),
                                 showSpaceName: $showSpaceName, showDay: $showDay
                             )
                             .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
+                            .onFastDoubleTap(doubleTap: {
+                                onDoubleTap(circle)
+                            }, singleTap: {
+                                onSelect(circle)
+                            })
+                            .contextMenu(circle: circle) {
+                                onSelect(circle)
+                            }
+                            .matchedTransitionSource(id: circle.id, in: namespace)
+                            .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
+                        } else {
+                            Button {
+                                onSelect(circle)
+                            } label: {
+                                CircleCutImage(
+                                    circle, in: namespace, cutType: showWebCut ? .web : .catalog,
+                                    displayMode: GridDisplayMode(nearestTo: columns),
+                                    showSpaceName: $showSpaceName, showDay: $showDay
+                                )
+                                .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
+                            }
+                            .contextMenu(circle: circle) {
+                                onSelect(circle)
+                            }
+                            .matchedTransitionSource(id: circle.id, in: namespace)
                         }
-                        .contextMenu(circle: circle) {
-                            onSelect(circle)
-                        }
-                        .matchedTransitionSource(id: circle.id, in: namespace)
-                        .pinchAnchor(id: circle.id)
                     }
                 }
             }
         }
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
-        .pinchToResize(
-            $columns,
-            levels: Array(GridDisplayMode.columnRange),
-            itemHeight: itemHeight(columns:width:)
-        )
         .overlay {
             if circles.isEmpty && showsOverlayWhenEmpty {
                 ContentUnavailableView(
@@ -85,9 +96,19 @@ struct CircleGrid: View {
         }
     }
 
-    func itemHeight(columns: Int, width: CGFloat) -> CGFloat {
-        let displayedColumns = GridDisplayMode.displayedColumns(columns, width: width)
-        let itemWidth = (width - gridSpacing * CGFloat(displayedColumns - 1)) / CGFloat(displayedColumns)
-        return itemWidth * 256.0 / 180.0
+    func setDisplayedColumns(_ displayedColumns: Int) {
+        if let match = GridDisplayMode.columnRange.first(where: {
+            GridDisplayMode.displayedColumns($0, width: width) == displayedColumns
+        }) {
+            columns = match
+        }
+    }
+
+    func pinchCell(_ circle: ComiketCircle) -> some View {
+        CircleCutImage(
+            circle, in: pinchNamespace, cutType: showWebCut ? .web : .catalog,
+            displayMode: GridDisplayMode(nearestTo: columns),
+            showSpaceName: $showSpaceName, showDay: $showDay
+        )
     }
 }
