@@ -420,4 +420,20 @@ class DataFetcher(private val database: SQLiteDatabase?) {
             null
         }
     }
+
+    suspend fun mapIDsByBlockID(): Map<Int, Int> = withContext(Dispatchers.IO) {
+        val db = database ?: return@withContext emptyMap()
+        try {
+            val result = mutableMapOf<Int, Int>()
+            db.rawQuery("SELECT blockId, mapId FROM ComiketMappingWC", null).use {
+                while (it.moveToNext()) {
+                    result[it.getInt(0)] = it.getInt(1)
+                }
+            }
+            result
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch map IDs by block ID", e)
+            emptyMap()
+        }
+    }
 }

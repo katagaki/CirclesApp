@@ -2,23 +2,13 @@ package com.tsubuzaki.circlesgo.ui.favorites
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.outlined.GridView
-import androidx.compose.material.icons.outlined.TableRows
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,15 +20,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.api.catalog.FavoritesAPI
 import com.tsubuzaki.circlesgo.auth.Authenticator
+import com.tsubuzaki.circlesgo.api.catalog.WebCatalogColor
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
+import com.tsubuzaki.circlesgo.database.DataFetcher
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
 import com.tsubuzaki.circlesgo.state.CircleDisplayMode
+import com.tsubuzaki.circlesgo.state.FavoritesFilters
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.Unifier
 import com.tsubuzaki.circlesgo.state.UserSelections
@@ -68,57 +61,23 @@ fun FavoritesView(
     val selectedDate by selections.date.collectAsState()
     val authToken by authenticator.token.collectAsState()
 
+    val context = LocalContext.current
+    val filters = remember { FavoritesFilters(context) }
+    val filteredColors by filters.colors.collectAsState()
+    val filteredHalls by filters.halls.collectAsState()
+    val mapIDsByBlockID by filters.mapIDsByBlockID.collectAsState()
+
     var isRefreshing by remember { mutableStateOf(false) }
 
     LaunchedEffect(favoriteItems, selectedDate) {
         val items = favoriteItems ?: return@LaunchedEffect
         scope.launch(Dispatchers.IO) {
-            prepareCircles(items, favorites, selections, database)
+            prepareCircles(items, favorites, filters, selections, database)
         }
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Spacer(modifier = Modifier.weight(1f))
-            TextButton(onClick = {
-                selections.setFavoritesGroupByColor(!isGroupedByColor)
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.Palette,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                        .size(18.dp)
-                )
-                Text(
-                    text = stringResource(R.string.group_by_color),
-                    fontSize = 13.sp
-                )
-            }
-            IconButton(onClick = {
-                selections.setFavoritesDisplayMode(
-                    if (displayMode == CircleDisplayMode.GRID) CircleDisplayMode.LIST
-                    else CircleDisplayMode.GRID
-                )
-            }) {
-                Icon(
-                    imageVector = if (displayMode == CircleDisplayMode.GRID) {
-                        Icons.Outlined.TableRows
-                    } else {
-                        Icons.Outlined.GridView
-                    },
-                    contentDescription = stringResource(
-                        if (displayMode == CircleDisplayMode.GRID) R.string.switch_to_list
-                        else R.string.switch_to_grid
-                    )
-                )
-            }
-        }
+        FavoritesToolbar(database = database, filters = filters, selections = selections)
 
         PullToRefreshBox(
             isRefreshing = isRefreshing,
@@ -138,7 +97,9 @@ fun FavoritesView(
             },
             modifier = Modifier.fillMaxSize()
         ) {
-            val circles = favoriteCircles
+            val circles = favoriteCircles?.let {
+                filters.filtered(it, filteredColors, filteredHalls, mapIDsByBlockID)
+            }
             if (circles == null) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -155,7 +116,7 @@ fun FavoritesView(
                         )
                     }
                 }
-            } else if (circles.isEmpty()) {
+            } else if (circles.values.all { it.isEmpty() }) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -249,10 +210,13 @@ fun FavoritesView(
 private suspend fun prepareCircles(
     favoriteItems: List<com.tsubuzaki.circlesgo.api.catalog.UserFavorites.Response.FavoriteItem>,
     favorites: FavoritesState,
+    filters: FavoritesFilters,
     selections: UserSelections,
     database: CatalogDatabase
 ) {
     val favoriteCircleIdentifiers = FavoritesState.mapped(favoriteItems, database)
+    val mapIDsByBlockID = DataFetcher(database.getTextDatabase()).mapIDsByBlockID()
+    var hasUncoloredFavorites = false
 
     val favoriteCircles = mutableMapOf<String, List<ComiketCircle>>()
     val allCircleIDs = mutableListOf<Int>()
@@ -263,9 +227,14 @@ private suspend fun prepareCircles(
         if (selectedDate != null) {
             circles = circles.filter { it.day == selectedDate.id }
         }
+        if (colorKey == WebCatalogColor.UNCOLORED.value && circles.isNotEmpty()) {
+            hasUncoloredFavorites = true
+        }
         favoriteCircles[colorKey.toString()] = circles
         allCircleIDs.addAll(circles.map { it.id })
     }
     database.prefetchCircleImages(allCircleIDs)
+    filters.setMapIDsByBlockID(mapIDsByBlockID)
+    filters.setHasUncoloredFavorites(hasUncoloredFavorites)
     favorites.setCircles(favoriteCircles)
 }
