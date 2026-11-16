@@ -104,10 +104,21 @@ extension DataFetcher {
         return scores
     }
 
-    /// Whether a name is long enough that finding it in a line is unlikely to be chance.
+    /// Words every screenshot of a placement notice or of X has, which some names are part of.
+    private static let commonText = foldedName(
+        "あなたのサークル「」は、コミックマーケットで「曜日地区ブロックホール」に配置されました"
+        + "コミケWebカタログにてサークル情報ページ公開中ですよろしくお願いします"
+        + "フォローポストする返信件の表示関連性が高い引用リポストいいねブックマーク"
+    )
+
+    /// Whether a name is long enough that finding it in a line is unlikely to be chance:
+    /// `ました` and `サーク` are in almost every post.
     private static func isDistinctive(_ name: String) -> Bool {
         let isLatin = name.allSatisfy { $0.isASCII }
-        return name.count >= (isLatin ? 4 : 3) && name.contains(where: { $0.isLetter })
+        let isKana = name.unicodeScalars.allSatisfy { (0x3041...0x30FF).contains(Int($0.value)) }
+        return name.count >= (isLatin || isKana ? 4 : 3)
+            && name.contains(where: { $0.isLetter })
+            && !commonText.contains(name)
     }
 
     /// Whether a line names the circle: says the name, and for a name in Latin letters, not as
