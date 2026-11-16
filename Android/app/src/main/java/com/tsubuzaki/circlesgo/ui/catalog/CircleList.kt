@@ -1,16 +1,10 @@
 package com.tsubuzaki.circlesgo.ui.catalog
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.HorizontalDivider
@@ -26,9 +20,6 @@ import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.ListDisplayMode
-import com.tsubuzaki.circlesgo.ui.shared.CircleBlockPill
-import com.tsubuzaki.circlesgo.ui.shared.CircleBlockPillSize
-import com.tsubuzaki.circlesgo.ui.shared.CircleCutImage
 
 @Composable
 fun CircleList(
@@ -132,127 +123,6 @@ fun CircleList(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(16.dp)
                 )
-            }
-        }
-    }
-}
-
-@Composable
-fun CircleListRegularRow(
-    circle: ComiketCircle,
-    database: CatalogDatabase,
-    favorites: FavoritesState,
-    showSpaceName: Boolean,
-    showDay: Boolean,
-    onClick: () -> Unit,
-    isPrivacyMode: Boolean = false,
-    showWebCuts: Boolean = false
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .width(70.dp)
-                .height(100.dp)
-        ) {
-            CircleCutImage(
-                circle = circle,
-                database = database,
-                favorites = favorites,
-                isPrivacyMode = isPrivacyMode,
-                showWebCuts = showWebCuts
-            )
-        }
-        Spacer(modifier = Modifier.width(10.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = circle.circleName,
-                style = MaterialTheme.typography.bodyLarge
-            )
-            if (circle.penName.trim().isNotEmpty()) {
-                Text(
-                    text = circle.penName,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            if (showSpaceName || showDay) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (showDay) {
-                        CircleBlockPill(text = stringResource(R.string.day_format, circle.day))
-                        Spacer(modifier = Modifier.width(4.dp))
-                    }
-                    if (showSpaceName) {
-                        circle.spaceName()?.let { spaceName ->
-                            CircleBlockPill(text = spaceName)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun CircleListCompactRow(
-    circle: ComiketCircle,
-    database: CatalogDatabase,
-    favorites: FavoritesState,
-    showSpaceName: Boolean,
-    showDay: Boolean,
-    onClick: () -> Unit,
-    isPrivacyMode: Boolean = false,
-    showWebCuts: Boolean = false
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .width(28.dp)
-                .height(40.dp)
-        ) {
-            CircleCutImage(
-                circle = circle,
-                database = database,
-                favorites = favorites,
-                isPrivacyMode = isPrivacyMode,
-                showWebCuts = showWebCuts
-            )
-        }
-        Spacer(modifier = Modifier.width(10.dp))
-        Text(
-            text = circle.circleName,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f)
-        )
-        if (showSpaceName || showDay) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                if (showDay) {
-                    CircleBlockPill(
-                        text = stringResource(R.string.day_format, circle.day),
-                        size = CircleBlockPillSize.SMALL
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                }
-                if (showSpaceName) {
-                    circle.spaceName()?.let { spaceName ->
-                        CircleBlockPill(
-                            text = spaceName,
-                            size = CircleBlockPillSize.SMALL
-                        )
-                    }
-                }
             }
         }
     }
