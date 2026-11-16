@@ -23,7 +23,9 @@ class IconDrawing(isDark: Boolean) {
     val outline = adaptive(Triple(0f, 0f, 0f), Triple(1f, 1f, 1f), isDark)
     val blue = adaptive(Triple(0f, 0.45f, 0.93f), Triple(0.25f, 0.52f, 0.98f), isDark)
     val green = adaptive(Triple(0.16f, 0.66f, 0.29f), Triple(0.2f, 0.78f, 0.35f), isDark)
+    val deepGreen = adaptive(Triple(0.06f, 0.48f, 0.18f), Triple(0.1f, 0.58f, 0.24f), isDark)
     val red = adaptive(Triple(0.9f, 0.2f, 0.2f), Triple(0.96f, 0.27f, 0.27f), isDark)
+    val deepRed = adaptive(Triple(0.68f, 0.1f, 0.12f), Triple(0.76f, 0.16f, 0.18f), isDark)
     val orange = adaptive(Triple(0.95f, 0.5f, 0.15f), Triple(1f, 0.58f, 0.29f), isDark)
     val pink = adaptive(Triple(0.93f, 0.25f, 0.5f), Triple(0.98f, 0.36f, 0.6f), isDark)
     val deepPink = adaptive(Triple(0.7f, 0.1f, 0.35f), Triple(0.78f, 0.15f, 0.42f), isDark)
@@ -40,6 +42,12 @@ class IconDrawing(isDark: Boolean) {
             points.drop(1).forEach { lineTo(it.x, it.y) }
         }
         drawPath(path, color, style = Stroke(width = width, cap = StrokeCap.Round, join = StrokeJoin.Round))
+    }
+
+    /** Fills [path] with a top-to-bottom gradient across [rect], then outlines it. */
+    fun DrawScope.fillOutlined(path: Path, rect: Rect, top: Color, bottom: Color, lineWidth: Float) {
+        drawPath(path, Brush.verticalGradient(listOf(top, bottom), rect.top, rect.bottom))
+        drawPath(path, outline, style = Stroke(width = lineWidth, join = StrokeJoin.Round))
     }
 
     fun DrawScope.drawDot(center: Offset, radius: Float, color: Color) {

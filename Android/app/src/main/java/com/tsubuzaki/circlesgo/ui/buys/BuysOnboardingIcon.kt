@@ -7,13 +7,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.tsubuzaki.circlesgo.ui.shared.IconDrawing
+import com.tsubuzaki.circlesgo.ui.navi.IconDrawing
 
 enum class BuysOnboardingIconKind { ADD, TRACK, SHARE, SPLIT }
 
@@ -33,6 +36,11 @@ fun BuysOnboardingIcon(kind: BuysOnboardingIconKind, size: Dp = 36.dp) {
     }
 }
 
+private fun roundedRect(rect: Rect, radius: Float): Path =
+    Path().apply { addRoundRect(RoundRect(rect, CornerRadius(radius))) }
+
+private fun oval(rect: Rect): Path = Path().apply { addOval(rect) }
+
 private fun unitRect(x: Float, y: Float, width: Float, height: Float, side: Float) =
     Rect(x * side, y * side, (x + width) * side, (y + height) * side)
 
@@ -41,7 +49,7 @@ private fun circleRect(x: Float, y: Float, radius: Float, side: Float) =
 
 private fun DrawScope.mark(drawing: IconDrawing, units: List<Pair<Float, Float>>, side: Float) {
     with(drawing) {
-        drawPolyline(units.map { Offset(it.first * side, it.second * side) }, Color.White, side * 0.08f)
+        drawLine(units.map { Offset(it.first * side, it.second * side) }, Color.White, side * 0.08f)
     }
 }
 
