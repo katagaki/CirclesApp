@@ -132,14 +132,16 @@ extension DataFetcher {
     }
 
     private static func namesMatch(_ lhs: String, _ rhs: String) -> Bool {
-        let fold: (String) -> String = {
-            CirclePlacement.normalize($0)
-                .folding(options: [.caseInsensitive, .widthInsensitive], locale: nil)
-                .filter { !$0.isWhitespace }
-        }
-        let lhs = fold(lhs)
-        let rhs = fold(rhs)
+        let lhs = foldedName(lhs)
+        let rhs = foldedName(rhs)
         return !lhs.isEmpty && !rhs.isEmpty && (lhs.contains(rhs) || rhs.contains(lhs))
+    }
+
+    /// A name with width, case and spacing folded away, for comparing names however written.
+    static func foldedName(_ name: String) -> String {
+        CirclePlacement.normalize(name)
+            .folding(options: [.caseInsensitive, .widthInsensitive], locale: nil)
+            .filter { !$0.isWhitespace }
     }
 }
 
