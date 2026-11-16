@@ -39,6 +39,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -270,6 +271,8 @@ fun UnifiedView(
             )
         }
 
+        var toolbarAreaHeight by remember { mutableStateOf(0.dp) }
+
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
             sheetPeekHeight = sheetPeekHeight,
@@ -347,6 +350,7 @@ fun UnifiedView(
                     showGenreOverlay = showGenreOverlay,
                     visitsState = visitsState,
                     events = events,
+                    topInset = toolbarAreaHeight,
                     onCircleTapped = { circle ->
                         unifier.showCircleDetail(circle)
                     }
@@ -360,6 +364,7 @@ fun UnifiedView(
             HorizontalFloatingToolbar(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
+                    .onSizeChanged { toolbarAreaHeight = with(density) { it.height.toDp() } }
                     .statusBarsPadding()
                     .padding(horizontal = 16.dp, vertical = 8.dp),
                 colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(),
