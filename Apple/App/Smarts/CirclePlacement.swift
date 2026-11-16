@@ -23,38 +23,93 @@ struct CirclePlacement: Equatable, Hashable, Sendable {
 
     /// Every placement in the text, in the order they appear, without duplicates.
     static func placements(in text: String) -> [CirclePlacement] {
-        let normalized = normalize(text)
-        var placements: [CirclePlacement] = []
-        var claimedRanges: [Range<String.Index>] = []
+        unique(placementMatches(in: normalize(text)).map(\.placement))
+    }
+
+    /// Every placement in text read from an image, where OCR loses what the text was typed as.
+    ///
+    /// Look-alike kanji are read back as the block kana they most likely are (`力` as `カ`), and
+    /// placements without a hall area or a/b, such as `マ-64`, count when the catalog has the block.
+    static func placements(in text: String, knownBlocks: Set<String>) -> [CirclePlacement] {
+        let corrected = correctingMisreads(in: normalize(text))
+        let matches = placementMatches(in: corrected)
+        var placements = matches.map(\.placement)
+        let claimedRanges = matches.map(\.range)
+
+        // Matching only where a word starts keeps `コミ 2` from taking the 2 of `2日目 マ-64`.
+        var index = corrected.startIndex
+        while index < corrected.endIndex {
+            let previous = index > corrected.startIndex ? corrected[corrected.index(before: index)] : nil
+            guard !isWordCharacter(previous), !corrected[index].isWhitespace,
+                  let match = corrected[index...].prefixMatch(of: shorthandPattern),
+                  !claimedRanges.contains(where: { $0.overlaps(match.range) }) else {
+                index = corrected.index(after: index)
+                continue
+            }
+            let blockName = String(match.output.block)
+            let hasDayPrefix = match.output.dayNumber != nil || match.output.weekday != nil
+            let hasDash = match.output.dash != nil
+            let end = corrected[match.range].lastIndex(where: { !$0.isWhitespace }).map(corrected.index(after:))
+                ?? match.range.upperBound
+            let next = end < corrected.endIndex ? corrected[end] : nil
+            guard knownBlocks.contains(blockName.lowercased()),
+                  let spaceNumber = Int(match.output.space), spaceNumber > 0,
+                  // A bare letter and number is too often something else ("A4", "C99").
+                  blockName.first?.isASCII != true || hasDash || hasDayPrefix,
+                  // Without a day or a dash, `あと3日` would read as a placement.
+                  hasDayPrefix || hasDash || !isWordCharacter(next) else {
+                index = corrected.index(after: index)
+                continue
+            }
+            placements.append(CirclePlacement(
+                circleName: nil,
+                weekday: weekdayIndex(match.output.weekday.map(String.init)),
+                dayNumber: match.output.dayNumber.flatMap { Int($0) },
+                blockName: blockName,
+                spaceNumber: spaceNumber,
+                spaceNumberSuffix: suffixIndex(match.output.suffix.map(String.init))
+            ))
+            index = match.range.upperBound
+        }
+        return unique(placements)
+    }
+
+    private static func placementMatches(
+        in normalized: String
+    ) -> [(placement: CirclePlacement, range: Range<String.Index>)] {
+        var matches: [(placement: CirclePlacement, range: Range<String.Index>)] = []
 
         for match in normalized.matches(of: noticePattern) {
-            claimedRanges.append(match.range)
-            placements.append(CirclePlacement(
+            matches.append((CirclePlacement(
                 circleName: String(match.output.name).trimmingCharacters(in: .whitespaces),
                 weekday: weekdayIndex(match.output.weekday.map(String.init)),
                 dayNumber: nil,
                 blockName: String(match.output.block).trimmingCharacters(in: .whitespaces),
                 spaceNumber: Int(match.output.space) ?? 0,
                 spaceNumberSuffix: suffixIndex(match.output.suffix.map(String.init))
-            ))
+            ), match.range))
         }
 
         for match in normalized.matches(of: shorthandPattern)
-        where !claimedRanges.contains(where: { $0.overlaps(match.range) }) {
+        where !matches.contains(where: { $0.range.overlaps(match.range) }) {
             // Without a hall area and without a/b, a letter followed by a number is far
             // more likely to be something else ("C107", "A4") than a space.
             guard match.output.area != nil || match.output.suffix != nil,
                   let spaceNumber = Int(match.output.space), spaceNumber > 0 else { continue }
-            placements.append(CirclePlacement(
+            matches.append((CirclePlacement(
                 circleName: nil,
                 weekday: weekdayIndex(match.output.weekday.map(String.init)),
                 dayNumber: match.output.dayNumber.flatMap { Int($0) },
                 blockName: String(match.output.block),
                 spaceNumber: spaceNumber,
                 spaceNumberSuffix: suffixIndex(match.output.suffix.map(String.init))
-            ))
+            ), match.range))
         }
 
+        return matches
+    }
+
+    private static func unique(_ placements: [CirclePlacement]) -> [CirclePlacement] {
         var seen = Set<CirclePlacement>()
         return placements.filter { seen.insert($0).inserted }
     }
@@ -87,6 +142,51 @@ struct CirclePlacement: Equatable, Hashable, Sendable {
         return parts.joined(separator: " ")
     }
 
+    // MARK: Misreads
+
+    /// Kanji and symbols OCR reads in place of the block kana they look like.
+    private static let blockLookalikes: [Character: Character] = [
+        "力": "カ", "工": "エ", "夕": "タ", "卜": "ト", "二": "ニ",
+        "八": "ハ", "口": "ロ", "千": "チ", "×": "メ"
+    ]
+
+    private static let dashes: Set<Character> = ["-", "－", "ー", "―", "‐", "−"]
+
+    /// Puts back the block kana and digits OCR misread, where they sit next to a space number:
+    /// `東力-O1` reads as `東カ-01`.
+    static func correctingMisreads(in text: String) -> String {
+        var characters = Array(text)
+        for index in characters.indices {
+            let previous = index > characters.startIndex ? characters[index - 1] : nil
+            if let kana = blockLookalikes[characters[index]],
+               let next = characters[(index + 1)...].first(where: { !$0.isWhitespace && !dashes.contains($0) }),
+               next.isASCII && next.isNumber {
+                characters[index] = kana
+            } else if let digit = digitLookalike(characters[index]) {
+                let next = index + 1 < characters.endIndex ? characters[index + 1] : nil
+                let followsDigit = previous?.isASCII == true && previous?.isNumber == true
+                let followsDash = previous.map { dashes.contains($0) } ?? false
+                let precedesDigit = next?.isASCII == true && next?.isNumber == true
+                if followsDigit || (followsDash && precedesDigit) {
+                    characters[index] = digit
+                }
+            }
+        }
+        return String(characters)
+    }
+
+    private static func digitLookalike(_ character: Character) -> Character? {
+        switch character {
+        case "O", "o": "0"
+        case "I", "l", "|": "1"
+        default: nil
+        }
+    }
+
+    private static func isWordCharacter(_ character: Character?) -> Bool {
+        character?.isLetter == true || character?.isNumber == true
+    }
+
     // MARK: Patterns
 
     private static let weekdays = ["日", "月", "火", "水", "木", "金", "土"]
@@ -96,7 +196,7 @@ struct CirclePlacement: Equatable, Hashable, Sendable {
         .ignoresCase()
 
     /// `火曜日 東マ64b`, `2日目 西れ-12ab`, `(土)南a-01a`
-    nonisolated(unsafe) private static let shorthandPattern = #/(?:(?:(?<dayNumber>\d)\s*日目|[(（]?(?<weekday>[日月火水木金土])(?:曜日?)?[)）]?)\s*)?(?<area>[東西南北])?\s*(?<block>[\p{Katakana}\p{Hiragana}A-Za-z])\s*[\-－ー―‐−]?\s*(?<space>\d{1,2})(?!\d)\s*(?<suffix>(?:ab|[ab])(?![A-Za-z]))?/#
+    nonisolated(unsafe) private static let shorthandPattern = #/(?:(?:(?<dayNumber>\d)\s*日目|[(（]?(?<weekday>[日月火水木金土])(?:曜日?)?[)）]?)\s*)?(?<area>[東西南北])?\s*(?<block>[\p{Katakana}\p{Hiragana}A-Za-z])\s*(?<dash>[\-－ー―‐−])?\s*(?<space>\d{1,2})(?!\d)\s*(?<suffix>(?:ab|[ab])(?![A-Za-z]))?/#
 
     private static func weekdayIndex(_ weekday: String?) -> Int? {
         guard let weekday else { return nil }
