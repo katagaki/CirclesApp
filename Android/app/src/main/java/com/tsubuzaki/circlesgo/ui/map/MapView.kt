@@ -6,7 +6,6 @@ import android.graphics.RectF
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.R
 import com.tsubuzaki.circlesgo.database.CatalogDatabase
@@ -49,6 +49,7 @@ fun MapView(
     scrollType: MapAutoScrollType = MapAutoScrollType.NONE,
     visitsState: VisitsState? = null,
     events: Events? = null,
+    topInset: Dp = 0.dp,
     onCircleTapped: (ComiketCircle) -> Unit = {}
 ) {
     val selectedDate by selections.date.collectAsState()
@@ -203,7 +204,6 @@ fun MapView(
         Box(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
-                .statusBarsPadding()
                 .fillMaxSize(),
         ) {
             MapGestureLayer(
@@ -220,6 +220,7 @@ fun MapView(
                 },
                 scrollToPosition = scrollToPosition,
                 onScrollCompleted = { mapper.clearScrollToPosition() },
+                topInset = topInset,
                 onLongPress = { x, y ->
                     if (navigator != null && (navigator.isActive || favoriteItems != null)) {
                         mapper.setPopoverData(null)

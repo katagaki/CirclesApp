@@ -42,6 +42,7 @@ fun MapGestureLayer(
     onZoomChange: (Float) -> Unit,
     scrollToPosition: PointF?,
     onScrollCompleted: () -> Unit,
+    topInset: Dp = 0.dp,
     onLongPress: (Float, Float) -> Unit = { _, _ -> },
     onTapIntercept: (Float, Float) -> Boolean = { _, _ -> false },
     popoverContent: @Composable (Offset, Float, DpSize) -> Unit = { _, _, _ -> },
@@ -58,28 +59,41 @@ fun MapGestureLayer(
     }
 
     val density = LocalDensity.current
+    val topInsetPx = with(density) { topInset.toPx() }
     fun getCoercedOffset(proposedOffset: Offset): Offset {
         val zoomedWidth = with(density) { (canvasWidth * currentZoom).toPx() }
         val zoomedHeight = with(density) { (canvasHeight * currentZoom).toPx() }
 
         val minX = (viewportSize.width - zoomedWidth).coerceAtMost(0f)
-        val minY = (viewportSize.height - zoomedHeight).coerceAtMost(0f)
+        val minY = (viewportSize.height - zoomedHeight).coerceAtMost(topInsetPx)
 
-        return Offset(proposedOffset.x.coerceIn(minX, 0f), proposedOffset.y.coerceIn(minY, 0f))
+        return Offset(
+            proposedOffset.x.coerceIn(minX, 0f),
+            proposedOffset.y.coerceIn(minY, topInsetPx)
+        )
     }
 
-    LaunchedEffect(scrollToPosition, currentZoom, viewportSize, canvasWidth, canvasHeight) {
+    // Move the map with the top inset so what was visible stays put when the
+    // inset is first measured or changes
+    var appliedTopInsetPx by remember { mutableFloatStateOf(0f) }
+    LaunchedEffect(topInsetPx) {
+        offset = getCoercedOffset(offset.copy(y = offset.y + topInsetPx - appliedTopInsetPx))
+        appliedTopInsetPx = topInsetPx
+    }
+
+    LaunchedEffect(scrollToPosition, currentZoom, viewportSize, canvasWidth, canvasHeight, topInset) {
         scrollToPosition?.let {
             if (viewportSize != IntSize.Zero && canvasWidth.value > 0 && canvasHeight.value > 0) {
                 // The target position is in map (dp) units while the viewport
                 // is in pixels, so convert before offsetting. Bias the target
-                // above the vertical centre as well: the bottom sheet covers
-                // the lower part of the map and a centred target lands behind it
+                // above the centre of the area below the top inset as well: the
+                // bottom sheet covers the lower part of the map and a centred
+                // target lands behind it
                 val targetX = with(density) { it.x.dp.toPx() } * currentZoom
                 val targetY = with(density) { it.y.dp.toPx() } * currentZoom
                 val newOffset = Offset(
                     x = (viewportSize.width / 2) - targetX,
-                    y = (viewportSize.height * 0.32f) - targetY
+                    y = topInsetPx + (viewportSize.height - topInsetPx) * 0.32f - targetY
                 )
                 offset = getCoercedOffset(newOffset)
                 onScrollCompleted()
