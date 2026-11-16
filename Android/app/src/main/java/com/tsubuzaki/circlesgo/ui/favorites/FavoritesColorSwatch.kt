@@ -15,6 +15,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.tsubuzaki.circlesgo.api.catalog.WebCatalogColor
 
@@ -24,19 +27,24 @@ fun FavoritesColorSwatch(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val name = stringResource(color.nameRes())
     Box(
         modifier = Modifier
             .size(48.dp)
             .clip(CircleShape)
             .background(color.backgroundColor())
             .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f), CircleShape)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .semantics {
+                contentDescription = name
+                selected = isSelected
+            },
         contentAlignment = Alignment.Center
     ) {
         if (isSelected) {
             Icon(
                 imageVector = Icons.Filled.Check,
-                contentDescription = stringResource(color.nameRes()),
+                contentDescription = null,
                 tint = color.foregroundColor(),
                 modifier = Modifier.size(24.dp)
             )
