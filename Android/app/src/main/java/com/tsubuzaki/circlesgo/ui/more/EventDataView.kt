@@ -64,6 +64,7 @@ import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.database.CatalogDatabaseDownloader
 import com.tsubuzaki.circlesgo.state.Events
 import com.tsubuzaki.circlesgo.ui.shared.DemoUnavailableDialog
+import com.tsubuzaki.circlesgo.ui.shared.KeepScreenOn
 import com.tsubuzaki.circlesgo.ui.shared.LocalAuthenticator
 import com.tsubuzaki.circlesgo.ui.shared.LocalDemoMode
 import com.tsubuzaki.circlesgo.ui.shared.LocalWebCutImageCache
@@ -96,6 +97,10 @@ fun EventDataView(
     var isRefreshing by remember { mutableStateOf(false) }
 
     val activeEventNumber = events.activeEventNumber
+
+    if (activeDownloads.isNotEmpty()) {
+        KeepScreenOn()
+    }
 
     suspend fun refreshLocalData() {
         val stats = withContext(Dispatchers.IO) {

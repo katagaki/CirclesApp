@@ -36,6 +36,10 @@ fun ProgressOverlay(oasis: Oasis) {
     val bodyText by oasis.bodyText.collectAsState()
     val progress by oasis.progress.collectAsState()
 
+    if (isShowing) {
+        KeepScreenOn()
+    }
+
     AnimatedVisibility(
         visible = isShowing,
         enter = fadeIn(),
