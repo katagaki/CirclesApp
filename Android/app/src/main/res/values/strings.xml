@@ -3,7 +3,7 @@
     <string name="app_name">CiRCLES</string>
 
     <!-- Login -->
-    <string name="login_title">Welcome to CiRCLES</string>
+    <string name="login_title">Sign in to use CiRCLES</string>
     <string name="login_hero_map_title">Navigate Halls</string>
     <string name="login_hero_map_description">Plan and execute your visit to the Comic Market</string>
     <string name="login_hero_catalog_title">Browse Circles</string>
@@ -11,7 +11,7 @@
     <string name="login_hero_favorites_title">Manage Favorites</string>
     <string name="login_hero_favorites_description">Assign colors to your favorite circles and easily find them on the day of the Comic Market</string>
     <string name="login_sign_in_prompt">To use CiRCLES, you will need a Comiket Web Catalog Gold Member subscription.</string>
-    <string name="login_sign_in">Sign In</string>
+    <string name="login_sign_in">Sign In With Circle.ms</string>
     <string name="login_demo_mode">Try Demo Mode</string>
 
     <!-- Demo Mode -->
@@ -20,13 +20,13 @@
     <string name="demo_unavailable_dismiss">OK</string>
 
     <!-- Catalog / Search -->
-    <string name="search_circles_placeholder">Search circles…</string>
+    <string name="search_circles_placeholder">Circle Name, Pen Name</string>
     <string name="close_search">Close search</string>
     <string name="clear">Clear</string>
     <string name="search_min_characters">Type at least 2 characters to search.</string>
-    <string name="no_filter_selected">Select a hall and filters\nto browse circles.</string>
-    <string name="no_circles_found">No circles found.</string>
-    <string name="no_circles_found_filters">No circles found.\nTry adjusting filters.</string>
+    <string name="no_filter_selected">Select a genre or hall to view circles.</string>
+    <string name="no_circles_found">No Circles</string>
+    <string name="no_circles_found_filters">No Circles\nPlease check the genre and/or hall selection, or try with another search term.</string>
 
     <!-- Circle Detail -->
     <string name="back">Back</string>
@@ -35,23 +35,23 @@
     <string name="no_description">No description available.</string>
     <string name="book_name">Book Name</string>
     <string name="genre_label">Genre</string>
-    <string name="circle_memo">Circle Memo</string>
+    <string name="circle_memo">Notes (Circle)</string>
     <string name="links">Links</string>
-    <string name="sns_twitter">X/Twitter</string>
+    <string name="sns_twitter">X (Twitter)</string>
     <string name="sns_pixiv">Pixiv</string>
-    <string name="sns_circlems">Circle.ms</string>
+    <string name="sns_circlems">Circle.ms Portal</string>
 
     <!-- Favorites -->
-    <string name="group_by_color">Group by Color</string>
-    <string name="no_favorites_loaded">No favorites loaded.\nSign in and sync to view favorites.</string>
-    <string name="no_favorites_yet">No favorites yet.\nAdd favorites from the web catalog.</string>
+    <string name="group_by_color">Group By Color</string>
+    <string name="no_favorites_loaded">No Favorites\nSign in and sync to view favorites.</string>
+    <string name="no_favorites_yet">No Favorites\nOnce you have added a favorite, it will show up here.</string>
     <string name="add_to_favorites">Add to Favorites</string>
     <string name="edit_favorite">Edit Favorite</string>
     <string name="remove_from_favorites">Remove from Favorites</string>
     <string name="save_favorite">Save Favorite</string>
     <string name="favorite_color">Color</string>
-    <string name="favorite_memo">Memo</string>
-    <string name="favorite_memo_placeholder">Add a memo…</string>
+    <string name="favorite_memo">Notes (Favorites)</string>
+    <string name="favorite_memo_placeholder">Notes (Optional)</string>
     <string name="save">Save</string>
     <string name="remove">Remove</string>
 
@@ -61,7 +61,8 @@
 
     <!-- Sign Out -->
     <string name="sign_out">Sign Out</string>
-    <string name="sign_out_confirm_message">Are you sure you want to sign out? All downloaded data will be deleted.</string>
+    <string name="sign_out_confirm_title">Are You Sure You Want To Sign Out?</string>
+    <string name="sign_out_confirm_message">When you sign in again, map and circle data will need to be downloaded again.</string>
     <string name="exit_demo_mode">Exit Demo Mode</string>
     <string name="exit_demo_mode_confirm_message">Are you sure you want to exit demo mode? All demo data will be deleted.</string>
     <string name="cancel">Cancel</string>
@@ -72,10 +73,10 @@
     <string name="manage_event_data">Manage Event Data</string>
     <string name="show_genre_overlay">Show Genre Overlay</string>
     <string name="darken_map_in_dark_mode">Darken Map in Dark Mode</string>
-    <string name="use_high_resolution_maps">Use High Definition Map</string>
+    <string name="use_high_resolution_maps">Use High Resolution Maps</string>
     <string name="show_space_name">Show Space Number</string>
     <string name="show_day">Show Day</string>
-    <string name="show_web_cuts">Show Web Cuts</string>
+    <string name="show_web_cuts">Show Image from WebCatalog</string>
     <string name="privacy_mode">Privacy Mode</string>
     <string name="link_web_catalog">Comiket Web Catalog</string>
     <string name="link_official_site">Official Comic Market Site</string>
@@ -99,8 +100,8 @@
     <string name="switch_event_title">Change Event?</string>
     <string name="switch_event_message">The selected event will be changed to Comic Market %1$d.</string>
     <string name="switch_event_action">Change</string>
-    <string name="download_event_title">Download Event Data?</string>
-    <string name="download_event_message">Approximately %2$s of data will be downloaded for Comic Market %1$d.</string>
+    <string name="download_event_title">Download Event Data</string>
+    <string name="download_event_message">This will download approximately %1$s of data.</string>
     <string name="download_event_message_unknown_size">Event data for Comic Market %1$d will be downloaded. The download size could not be determined.</string>
     <string name="download_event_estimating">Checking download size…</string>
     <string name="download_event_info_failed">Could not retrieve the event data information. Check your connection and try again.</string>
@@ -112,15 +113,15 @@
     <string name="genres_count_format">Genres (%1$d)</string>
     <string name="block_filter">Block</string>
     <string name="blocks_count_format">Blocks (%1$d)</string>
-    <string name="all_filter">All</string>
+    <string name="all_filter">Reset Filter</string>
 
     <!-- Day / Hall Picker -->
-    <string name="no_day">No day</string>
-    <string name="no_hall">No hall</string>
+    <string name="no_day">No Date</string>
+    <string name="no_hall">-</string>
 
     <!-- Data Loading -->
     <string name="downloading">Updating Data</string>
-    <string name="downloading_text_database">Downloading text database…</string>
+    <string name="downloading_text_database">Downloading event data…</string>
     <string name="downloading_image_database">Downloading images…</string>
     <string name="loading_database">Loading data…</string>
 
@@ -129,25 +130,25 @@
 
     <!-- Map -->
     <string name="loading">Loading…</string>
-    <string name="no_map_selected">No map selected</string>
+    <string name="no_map_selected">No Map Selected</string>
     <string name="switch_to_list">Switch to List</string>
     <string name="switch_to_grid">Switch to Grid</string>
 
     <!-- Buys -->
     <string name="tab_buys">Buys</string>
     <string name="buys_section_title">Buys</string>
-    <string name="buys_add_item">Add Item</string>
+    <string name="buys_add_item">Add</string>
     <string name="buys_add_item_shared">Add to shared list</string>
     <string name="buys_item_name_placeholder">Item name</string>
     <string name="buys_item_cost_placeholder">Cost</string>
     <string name="buys_total">Total</string>
-    <string name="buys_grand_total">Grand Total (All Days)</string>
-    <string name="buys_cost_value">%1$d yen</string>
+    <string name="buys_grand_total">Grand Total</string>
+    <string name="buys_cost_value">¥%1$,d</string>
     <string name="buys_quick_cost">¥%1$,d</string>
     <string name="buys_no_buys">No Buys</string>
-    <string name="buys_no_buys_description">Add items you plan to buy from a circle\'s detail page.</string>
-    <string name="buys_no_buys_on_day">No Buys On This Day</string>
-    <string name="buys_no_buys_on_day_description">You have no planned buys for the selected day.</string>
+    <string name="buys_no_buys_description">Add items you want to buy from circle detail views.</string>
+    <string name="buys_no_buys_on_day">No Buys on This Day</string>
+    <string name="buys_no_buys_on_day_description">Select another day to see the rest of your buys.</string>
     <string name="buys_onboarding_open">How Buys Works</string>
     <string name="buys_onboarding_title">Buys</string>
     <string name="buys_onboarding_subtitle">Plan what to buy, and shop with friends.</string>
@@ -170,8 +171,8 @@
 
     <!-- Circle Detail -->
     <string name="show_on_map">Show on Map</string>
-    <string name="previous_circle">Previous circle</string>
-    <string name="next_circle">Next circle</string>
+    <string name="previous_circle">Previous Circle</string>
+    <string name="next_circle">Next Circle</string>
     <string name="first_circle_message">This is the first circle.</string>
     <string name="last_circle_message">This is the last circle.</string>
     <string name="ok">OK</string>
@@ -185,18 +186,18 @@
     <string name="tags_label">Tags</string>
 
     <!-- Circle Cut Types -->
-    <string name="cut_catalog">Catalog Cut</string>
-    <string name="cut_web">Web Cut</string>
+    <string name="cut_catalog">Catalog</string>
+    <string name="cut_web">Web</string>
 
     <!-- Web Catalog Favorites Notice -->
     <string name="favorites_web_catalog_notice_title">About favorites added from the Web Catalog</string>
     <string name="favorites_web_catalog_notice_description">Colors chosen from the Web Catalog\'s 18-color palette are not shown correctly in the app. Sorry for the inconvenience, but please select the color again in the app.</string>
 
     <!-- Display Options -->
-    <string name="display_options">Display options</string>
+    <string name="display_options">Display Settings</string>
     <string name="display_grid">Grid</string>
     <string name="display_list">List</string>
-    <string name="grid_size_big">Large</string>
+    <string name="grid_size_big">Big</string>
     <string name="grid_size_medium">Medium</string>
     <string name="grid_size_small">Small</string>
     <string name="list_style_regular">Regular</string>
@@ -225,7 +226,7 @@
     <string name="buys_shared_rotate_key">Change join code</string>
     <string name="buys_shared_rotate_key_explain">Moves everyone still here to a new code. Anyone who only has the old code, or who was removed, can no longer see the list.</string>
     <string name="buys_shared_you">You</string>
-    <string name="buys_unknown_circle">Unknown circle (ID: %1$d)</string>
+    <string name="buys_unknown_circle">Unknown Circle (ID: %1$d)</string>
     <!-- Guest Mode -->
     <string name="guest_leave">Leave This List</string>
     <string name="login_guest_mode">Join as a Guest</string>
@@ -266,7 +267,7 @@
     <string name="navi_buys_none">Nothing left to buy in this hall</string>
     <string name="navi_buys_shared_footer">Shared Buys visits items assigned to you or to no one.</string>
     <string name="navi_favorite_memo">Notes (Favorites)</string>
-    <string name="navi_no_results">No circles found</string>
+    <string name="navi_no_results">No Results Found</string>
     <string name="route_walk_ahead">Walk ahead</string>
     <string name="route_begin">Start at %1$s</string>
     <string name="route_entrance">Go in through the entrance shown on the map</string>
@@ -310,15 +311,15 @@
     <string name="route_closure_reopen">Reopen</string>
     <string name="route_onboarding_open">About Guide…</string>
     <string name="route_onboarding_title">Guide</string>
-    <string name="route_onboarding_subtitle">Directions to your favorites, right on the hall map.</string>
-    <string name="route_onboarding_modes_title">Two Ways to Go</string>
-    <string name="route_onboarding_modes_message">Automatic takes the shortest walk. Choose Colors goes color by color.</string>
+    <string name="route_onboarding_subtitle">Directions to your favorites and buys, right on the hall map.</string>
+    <string name="route_onboarding_modes_title">Choose How to Go</string>
+    <string name="route_onboarding_modes_message">Automatic takes the shortest walk, and Choose Colors goes color by color. My Buys and Shared Buys visit circles with items left to buy.</string>
     <string name="route_onboarding_origin_title">Long-Press Where You Are</string>
-    <string name="route_onboarding_origin_message">Long-press the map and choose You Are Here.</string>
+    <string name="route_onboarding_origin_message">Long-press the map and choose You Are Here. Otherwise, the route starts from an entrance.</string>
     <string name="route_onboarding_steps_title">Step Through with Buttons</string>
-    <string name="route_onboarding_steps_message">Tap Next as you go.</string>
+    <string name="route_onboarding_steps_message">Tap Next as you go. At each circle, tap Visited or Skip.</string>
     <string name="route_onboarding_detour_title">Detour Around Closures</string>
-    <string name="route_onboarding_detour_message">Tap Detour for another way, or long-press the map to close off a hall.</string>
+    <string name="route_onboarding_detour_message">Tap Detour when the way ahead is blocked, or long-press the map to close off an aisle or a hall. Closures reopen after 30 minutes.</string>
     <string name="route_onboarding_start">Get Started</string>
     <string name="route_safety_alert_title">Be aware of your surroundings when navigating the event halls.</string>
     <string name="route_safety_alert_got_it">Got It</string>
