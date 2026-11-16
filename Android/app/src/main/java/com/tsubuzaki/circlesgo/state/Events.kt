@@ -6,8 +6,10 @@ import com.tsubuzaki.circlesgo.api.OnlineState
 import com.tsubuzaki.circlesgo.api.auth.OpenIDToken
 import com.tsubuzaki.circlesgo.api.catalog.WebCatalogAPI
 import com.tsubuzaki.circlesgo.api.catalog.WebCatalogEvent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
 class Events(private val context: Context) {
@@ -25,6 +27,8 @@ class Events(private val context: Context) {
         private set
     var latestEvent: WebCatalogEvent.Response.Event? = null
         private set
+
+    private var isEventDataFresh = false
 
     private val _activeEvent = MutableStateFlow<WebCatalogEvent.Response.Event?>(null)
     val activeEvent: StateFlow<WebCatalogEvent.Response.Event?> = _activeEvent
@@ -47,6 +51,7 @@ class Events(private val context: Context) {
 
     fun reset() {
         eventData = null
+        isEventDataFresh = false
         latestEvent = null
         activeEventNumber = -1
         _activeEvent.value = null
@@ -73,25 +78,46 @@ class Events(private val context: Context) {
     }
 
     suspend fun prepare(authToken: OpenIDToken) {
-        if (eventData != null && latestEvent != null) {
-            if (eventData!!.list.none { it.number == activeEventNumber }) {
-                activeEventNumber = latestEvent!!.number
-                prefs.edit { putInt(ACTIVE_EVENT_NUMBER_KEY, activeEventNumber) }
-                isActiveEventLatest = true
+        if (eventData == null || latestEvent == null) {
+            val cached = withContext(Dispatchers.IO) { WebCatalogAPI.cachedEvents(context) }
+            if (cached != null) {
+                useEventData(cached)
+            } else {
+                useEventData(WebCatalogAPI.events(authToken, context) ?: return)
+                isEventDataFresh = true
             }
-            isActiveEventLatest = activeEventNumber == eventData!!.latestEventNumber
+        }
+        applyEventData()
+    }
 
-            val eventInList = eventData!!.list.firstOrNull { it.number == activeEventNumber }
-            if (eventInList != null) {
-                _activeEvent.value = WebCatalogEvent.Response.Event(
-                    id = eventInList.id,
-                    number = activeEventNumber
-                )
-            }
-        } else {
-            eventData = WebCatalogAPI.events(authToken, context)
-            latestEvent = eventData?.list?.firstOrNull { it.id == eventData?.latestEventID }
-            prepare(authToken)
+    suspend fun refresh(authToken: OpenIDToken) {
+        if (isEventDataFresh) return
+        val fetched = WebCatalogAPI.events(authToken, context) ?: return
+        isEventDataFresh = true
+        useEventData(fetched)
+        applyEventData()
+    }
+
+    private fun useEventData(response: WebCatalogEvent.Response) {
+        eventData = response
+        latestEvent = response.list.firstOrNull { it.id == response.latestEventID }
+    }
+
+    private fun applyEventData() {
+        val data = eventData ?: return
+        val latest = latestEvent ?: return
+        if (data.list.none { it.number == activeEventNumber }) {
+            activeEventNumber = latest.number
+            prefs.edit { putInt(ACTIVE_EVENT_NUMBER_KEY, activeEventNumber) }
+        }
+        isActiveEventLatest = activeEventNumber == data.latestEventNumber
+
+        val eventInList = data.list.firstOrNull { it.number == activeEventNumber }
+        if (eventInList != null) {
+            _activeEvent.value = WebCatalogEvent.Response.Event(
+                id = eventInList.id,
+                number = activeEventNumber
+            )
         }
     }
 
