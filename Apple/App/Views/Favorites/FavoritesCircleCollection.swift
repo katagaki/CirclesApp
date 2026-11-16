@@ -8,8 +8,8 @@ struct FavoritesCircleCollection: View {
 
     var groups: [String: [ComiketCircle]]
     var displayMode: CircleDisplayMode
-    var listDisplayMode: ListDisplayMode
-    var gridDisplayMode: GridDisplayMode
+    @Binding var listDisplayMode: ListDisplayMode
+    @Binding var gridColumns: Int
     var namespace: Namespace.ID
     var onSelect: (ComiketCircle) -> Void
     var onDoubleTap: ((ComiketCircle) -> Void)?
@@ -48,7 +48,7 @@ struct FavoritesCircleCollection: View {
                 switch displayMode {
                 case .grid:
                     ColorGroupedCircleGrid(
-                        displayMode: gridDisplayMode,
+                        columns: $gridColumns,
                         groups: groups,
                         showsOverlayWhenEmpty: false,
                         namespace: namespace,
@@ -59,7 +59,7 @@ struct FavoritesCircleCollection: View {
                     ColorGroupedCircleList(
                         groups: groups,
                         showsOverlayWhenEmpty: false,
-                        displayMode: listDisplayMode,
+                        displayMode: $listDisplayMode,
                         namespace: namespace,
                         onSelect: onSelect,
                         onDoubleTap: onDoubleTap
@@ -70,7 +70,7 @@ struct FavoritesCircleCollection: View {
                 switch displayMode {
                 case .grid:
                     CircleGrid(
-                        displayMode: gridDisplayMode,
+                        columns: $gridColumns,
                         circles: circles,
                         showsOverlayWhenEmpty: false,
                         namespace: namespace,
@@ -81,7 +81,7 @@ struct FavoritesCircleCollection: View {
                     CircleList(
                         circles: circles,
                         showsOverlayWhenEmpty: false,
-                        displayMode: listDisplayMode,
+                        displayMode: $listDisplayMode,
                         namespace: namespace,
                         onSelect: onSelect,
                         onDoubleTap: onDoubleTap

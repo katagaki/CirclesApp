@@ -6,7 +6,7 @@ struct CircleGrid: View {
 
     let gridSpacing: CGFloat = 1.0
 
-    var displayMode: GridDisplayMode = .medium
+    @Binding var columns: Int
     var circles: [ComiketCircle]
     var showsOverlayWhenEmpty: Bool = true
     var namespace: Namespace.ID
@@ -17,63 +17,74 @@ struct CircleGrid: View {
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 
-    var body: some View {
-        let phoneColumnConfiguration = [GridItem(.adaptive(minimum: {
-            switch displayMode {
-            case .big: return 110.0
-            case .medium: return 76.0
-            case .small: return 48.0
-            }
-        }()), spacing: gridSpacing)]
-        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: {
-            switch displayMode {
-            case .big: return 100.0
-            case .medium: return 68.0
-            case .small: return 44.0
-            }
-        }()), spacing: gridSpacing)]
+    @State var width: CGFloat = 0.0
 
+    @Namespace var pinchNamespace
+
+    var displayedColumns: Int {
+        GridDisplayMode.displayedColumns(columns, width: width)
+    }
+
+    var columnCounts: [Int] {
+        GridDisplayMode.columnRange.map { GridDisplayMode.displayedColumns($0, width: width) }
+    }
+
+    var gridItems: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: gridSpacing), count: displayedColumns)
+    }
+
+    var body: some View {
         ScrollView {
-            LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
-                      phoneColumnConfiguration : padOrMacColumnConfiguration,
-                      spacing: gridSpacing) {
-                ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
-                    if let onDoubleTap {
-                        CircleCutImage(
-                            circle, in: namespace, cutType: showWebCut ? .web : .catalog,
-                            displayMode: displayMode,
-                            showSpaceName: $showSpaceName, showDay: $showDay
-                        )
-                        .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
-                        .onFastDoubleTap(doubleTap: {
-                            onDoubleTap(circle)
-                        }, singleTap: {
-                            onSelect(circle)
-                        })
-                        .contextMenu(circle: circle) {
-                            onSelect(circle)
-                        }
-                        .matchedTransitionSource(id: circle.id, in: namespace)
-                        .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
-                    } else {
-                        Button {
-                            onSelect(circle)
-                        } label: {
+            PinchZoomGrid(
+                columnCount: displayedColumns,
+                columnCounts: columnCounts,
+                sections: [PinchZoomSection(count: circles.count)],
+                spacing: gridSpacing,
+                heightRatio: 256.0 / 180.0,
+                onColumnCountChange: setDisplayedColumns
+            ) { _, index in
+                pinchCell(circles[index])
+            } content: {
+                LazyVGrid(columns: gridItems, spacing: gridSpacing) {
+                    ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
+                        if let onDoubleTap {
                             CircleCutImage(
                                 circle, in: namespace, cutType: showWebCut ? .web : .catalog,
-                                displayMode: displayMode,
+                                displayMode: GridDisplayMode(nearestTo: columns),
                                 showSpaceName: $showSpaceName, showDay: $showDay
                             )
                             .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
+                            .onFastDoubleTap(doubleTap: {
+                                onDoubleTap(circle)
+                            }, singleTap: {
+                                onSelect(circle)
+                            })
+                            .contextMenu(circle: circle) {
+                                onSelect(circle)
+                            }
+                            .matchedTransitionSource(id: circle.id, in: namespace)
+                            .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
+                        } else {
+                            Button {
+                                onSelect(circle)
+                            } label: {
+                                CircleCutImage(
+                                    circle, in: namespace, cutType: showWebCut ? .web : .catalog,
+                                    displayMode: GridDisplayMode(nearestTo: columns),
+                                    showSpaceName: $showSpaceName, showDay: $showDay
+                                )
+                                .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
+                            }
+                            .contextMenu(circle: circle) {
+                                onSelect(circle)
+                            }
+                            .matchedTransitionSource(id: circle.id, in: namespace)
                         }
-                        .contextMenu(circle: circle) {
-                            onSelect(circle)
-                        }
-                        .matchedTransitionSource(id: circle.id, in: namespace)
                     }
                 }
             }
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
         .overlay {
             if circles.isEmpty && showsOverlayWhenEmpty {
                 ContentUnavailableView(
@@ -83,5 +94,21 @@ struct CircleGrid: View {
                 )
             }
         }
+    }
+
+    func setDisplayedColumns(_ displayedColumns: Int) {
+        if let match = GridDisplayMode.columnRange.first(where: {
+            GridDisplayMode.displayedColumns($0, width: width) == displayedColumns
+        }) {
+            columns = match
+        }
+    }
+
+    func pinchCell(_ circle: ComiketCircle) -> some View {
+        CircleCutImage(
+            circle, in: pinchNamespace, cutType: showWebCut ? .web : .catalog,
+            displayMode: GridDisplayMode(nearestTo: columns),
+            showSpaceName: .constant(false), showDay: .constant(false)
+        )
     }
 }

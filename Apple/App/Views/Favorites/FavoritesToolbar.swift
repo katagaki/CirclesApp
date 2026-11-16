@@ -9,7 +9,7 @@ struct FavoritesToolbar: ToolbarContent {
 
     @Binding var displayMode: CircleDisplayMode
     @Binding var listDisplayMode: ListDisplayMode
-    @Binding var gridDisplayMode: GridDisplayMode
+    @Binding var gridColumns: Int
 
     var body: some ToolbarContent {
 
@@ -49,7 +49,7 @@ struct FavoritesToolbar: ToolbarContent {
         DisplaySettingsMenu(
             displayMode: $displayMode,
             listDisplayMode: $listDisplayMode,
-            gridDisplayMode: $gridDisplayMode
+            gridColumns: $gridColumns
         )
     }
 }

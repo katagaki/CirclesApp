@@ -7,7 +7,7 @@ struct ColorGroupedCircleGrid: View {
 
     let gridSpacing: CGFloat = 1.0
 
-    var displayMode: GridDisplayMode = .medium
+    @Binding var columns: Int
     var groups: [String: [ComiketCircle]]
     var showsOverlayWhenEmpty: Bool = true
     var namespace: Namespace.ID
@@ -18,74 +18,108 @@ struct ColorGroupedCircleGrid: View {
     @AppStorage(wrappedValue: false, "Customization.ShowDay") var showDay: Bool
     @AppStorage(wrappedValue: false, "Customization.ShowWebCut") var showWebCut: Bool
 
-    var body: some View {
-        let phoneColumnConfiguration = [GridItem(.adaptive(minimum: {
-            switch displayMode {
-            case .big: return 110.0
-            case .medium: return 76.0
-            case .small: return 48.0
-            }
-        }()), spacing: gridSpacing)]
-        let padOrMacColumnConfiguration = [GridItem(.adaptive(minimum: {
-            switch displayMode {
-            case .big: return 100.0
-            case .medium: return 68.0
-            case .small: return 44.0
-            }
-        }()), spacing: gridSpacing)]
+    @State var width: CGFloat = 0.0
+    @State var noticeHeight: CGFloat = 0.0
 
+    @Namespace var pinchNamespace
+
+    var displayedColumns: Int {
+        GridDisplayMode.displayedColumns(columns, width: width)
+    }
+
+    var columnCounts: [Int] {
+        GridDisplayMode.columnRange.map { GridDisplayMode.displayedColumns($0, width: width) }
+    }
+
+    var gridItems: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: gridSpacing), count: displayedColumns)
+    }
+
+    var presentColors: [WebCatalogColor] {
+        WebCatalogColor.allCases.filter { groups[String($0.rawValue)] != nil }
+    }
+
+    var pinchSections: [PinchZoomSection] {
+        presentColors.map { color in
+            let circles = groups[String(color.rawValue)] ?? []
+            return PinchZoomSection(
+                count: circles.count,
+                leading: color == .uncolored && !circles.isEmpty ? noticeHeight : 0.0,
+                background: AnyShapeStyle(color.backgroundColor().tertiary)
+            )
+        }
+    }
+
+    var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 0.0) {
-                ForEach(WebCatalogColor.allCases, id: \.self) { color in
-                    if let circles = groups[String(color.rawValue)] {
-                        if color == .uncolored && !circles.isEmpty {
-                            WebCatalogFavoriteNotice()
-                        }
-                        LazyVGrid(columns: UIDevice.current.userInterfaceIdiom == .phone ?
-                                  phoneColumnConfiguration : padOrMacColumnConfiguration,
-                                  spacing: gridSpacing) {
-                            ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
-                                if let onDoubleTap {
-                                    CircleCutImage(
-                                        circle, in: namespace, cutType: showWebCut ? .web : .catalog,
-                                        displayMode: displayMode,
-                                        showSpaceName: $showSpaceName, showDay: $showDay
-                                    )
-                                    .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
-                                    .onFastDoubleTap(doubleTap: {
-                                        onDoubleTap(circle)
-                                    }, singleTap: {
-                                        onSelect(circle)
-                                    })
-                                    .contextMenu(circle: circle) {
-                                        onSelect(circle)
+            PinchZoomGrid(
+                columnCount: displayedColumns,
+                columnCounts: columnCounts,
+                sections: pinchSections,
+                spacing: gridSpacing,
+                heightRatio: 256.0 / 180.0,
+                onColumnCountChange: setDisplayedColumns
+            ) {
+                WebCatalogFavoriteNotice()
+            } cell: { section, index in
+                if let circles = groups[String(presentColors[section].rawValue)] {
+                    pinchCell(circles[index])
+                }
+            } content: {
+                VStack(alignment: .leading, spacing: 0.0) {
+                    ForEach(WebCatalogColor.allCases, id: \.self) { color in
+                        if let circles = groups[String(color.rawValue)] {
+                            if color == .uncolored && !circles.isEmpty {
+                                WebCatalogFavoriteNotice()
+                                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: {
+                                        noticeHeight = $0
                                     }
-                                    .matchedTransitionSource(id: circle.id, in: namespace)
-                                    .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
-                                } else {
-                                    Button {
-                                        onSelect(circle)
-                                    } label: {
+                            }
+                            LazyVGrid(columns: gridItems, spacing: gridSpacing) {
+                                ForEach(Array(circles.enumerated()), id: \.element.id) { index, circle in
+                                    if let onDoubleTap {
                                         CircleCutImage(
                                             circle, in: namespace, cutType: showWebCut ? .web : .catalog,
-                                            displayMode: displayMode,
+                                            displayMode: GridDisplayMode(nearestTo: columns),
                                             showSpaceName: $showSpaceName, showDay: $showDay
                                         )
                                         .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
+                                        .onFastDoubleTap(doubleTap: {
+                                            onDoubleTap(circle)
+                                        }, singleTap: {
+                                            onSelect(circle)
+                                        })
+                                        .contextMenu(circle: circle) {
+                                            onSelect(circle)
+                                        }
+                                        .matchedTransitionSource(id: circle.id, in: namespace)
+                                        .popoverTip(index == 0 ? DoubleTapVisitTip() : nil)
+                                    } else {
+                                        Button {
+                                            onSelect(circle)
+                                        } label: {
+                                            CircleCutImage(
+                                                circle, in: namespace, cutType: showWebCut ? .web : .catalog,
+                                                displayMode: GridDisplayMode(nearestTo: columns),
+                                                showSpaceName: $showSpaceName, showDay: $showDay
+                                            )
+                                            .matchedGeometryEffect(id: "\(circle.id).Cut", in: namespace)
+                                        }
+                                        .contextMenu(circle: circle) {
+                                            onSelect(circle)
+                                        }
+                                        .matchedTransitionSource(id: circle.id, in: namespace)
                                     }
-                                    .contextMenu(circle: circle) {
-                                        onSelect(circle)
-                                    }
-                                    .matchedTransitionSource(id: circle.id, in: namespace)
                                 }
                             }
+                            .background(color.backgroundColor().tertiary)
                         }
-                                  .background(color.backgroundColor().tertiary)
                     }
                 }
+                .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity)
         }
+        .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
         .overlay {
             if groups.isEmpty && showsOverlayWhenEmpty {
                 ContentUnavailableView(
@@ -96,5 +130,21 @@ struct ColorGroupedCircleGrid: View {
             }
         }
         .frame(maxHeight: .infinity)
+    }
+
+    func setDisplayedColumns(_ displayedColumns: Int) {
+        if let match = GridDisplayMode.columnRange.first(where: {
+            GridDisplayMode.displayedColumns($0, width: width) == displayedColumns
+        }) {
+            columns = match
+        }
+    }
+
+    func pinchCell(_ circle: ComiketCircle) -> some View {
+        CircleCutImage(
+            circle, in: pinchNamespace, cutType: showWebCut ? .web : .catalog,
+            displayMode: GridDisplayMode(nearestTo: columns),
+            showSpaceName: .constant(false), showDay: .constant(false)
+        )
     }
 }
