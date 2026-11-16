@@ -336,4 +336,29 @@
     <plurals name="route_priority_count">
         <item quantity="other">%1$d件</item>
     </plurals>
+
+    <!-- Favorites Filters -->
+    <string name="color_none">色なし</string>
+    <string name="color_orange">オレンジ</string>
+    <string name="color_pink">ピンク</string>
+    <string name="color_yellow">イエロー</string>
+    <string name="color_green">グリーン</string>
+    <string name="color_light_blue">ライトブルー</string>
+    <string name="color_purple">パープル</string>
+    <string name="color_blue">ブルー</string>
+    <string name="color_light_green">ライトグリーン</string>
+    <string name="color_red">レッド</string>
+    <string name="color_dark_orange">ダークオレンジ</string>
+    <string name="color_dark_purple">深紫</string>
+    <string name="color_teal">ティール</string>
+    <string name="color_maroon">マルーン</string>
+    <string name="color_violet">青紫</string>
+    <string name="color_gold">ゴールド</string>
+    <string name="color_dark_green">深緑</string>
+    <string name="color_crimson">クリムゾン</string>
+    <string name="color_deep_pink">濃いピンク</string>
+    <string name="colors_multiple">複数の色</string>
+    <string name="select_color">色を選択</string>
+    <string name="hall_filter">棟</string>
+    <string name="halls_multiple">複数棟</string>
 </resources>

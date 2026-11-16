@@ -1,6 +1,8 @@
 package com.tsubuzaki.circlesgo.api.catalog
 
+import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
+import com.tsubuzaki.circlesgo.R
 
 enum class WebCatalogColor(val value: Int) {
     UNCOLORED(0),
@@ -54,6 +56,31 @@ enum class WebCatalogColor(val value: Int) {
             DARK_GREEN, CRIMSON, DEEP_PINK -> Color.White
 
             YELLOW, CYAN, LIME, GOLD -> Color.Black
+        }
+    }
+
+    @StringRes
+    fun nameRes(): Int {
+        return when (this) {
+            UNCOLORED -> R.string.color_none
+            ORANGE -> R.string.color_orange
+            PINK -> R.string.color_pink
+            YELLOW -> R.string.color_yellow
+            GREEN -> R.string.color_green
+            CYAN -> R.string.color_light_blue
+            PURPLE -> R.string.color_purple
+            BLUE -> R.string.color_blue
+            LIME -> R.string.color_light_green
+            RED -> R.string.color_red
+            DARK_ORANGE -> R.string.color_dark_orange
+            DARK_PURPLE -> R.string.color_dark_purple
+            TEAL -> R.string.color_teal
+            MAROON -> R.string.color_maroon
+            VIOLET -> R.string.color_violet
+            GOLD -> R.string.color_gold
+            DARK_GREEN -> R.string.color_dark_green
+            CRIMSON -> R.string.color_crimson
+            DEEP_PINK -> R.string.color_deep_pink
         }
     }
 

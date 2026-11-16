@@ -343,4 +343,29 @@
         <item quantity="one">%1$d circle</item>
         <item quantity="other">%1$d circles</item>
     </plurals>
+
+    <!-- Favorites Filters -->
+    <string name="color_none">No Color</string>
+    <string name="color_orange">Orange</string>
+    <string name="color_pink">Pink</string>
+    <string name="color_yellow">Yellow</string>
+    <string name="color_green">Green</string>
+    <string name="color_light_blue">Light Blue</string>
+    <string name="color_purple">Purple</string>
+    <string name="color_blue">Blue</string>
+    <string name="color_light_green">Light Green</string>
+    <string name="color_red">Red</string>
+    <string name="color_dark_orange">Dark Orange</string>
+    <string name="color_dark_purple">Dark Purple</string>
+    <string name="color_teal">Teal</string>
+    <string name="color_maroon">Maroon</string>
+    <string name="color_violet">Violet</string>
+    <string name="color_gold">Gold</string>
+    <string name="color_dark_green">Dark Green</string>
+    <string name="color_crimson">Crimson</string>
+    <string name="color_deep_pink">Deep Pink</string>
+    <string name="colors_multiple">Multiple Colors</string>
+    <string name="select_color">Select Color</string>
+    <string name="hall_filter">Hall</string>
+    <string name="halls_multiple">Multiple Halls</string>
 </resources>
