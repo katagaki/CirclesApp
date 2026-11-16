@@ -52,6 +52,7 @@ import com.tsubuzaki.circlesgo.sharedbuys.SharedBuysSession
 import com.tsubuzaki.circlesgo.ui.guest.GuestView
 import com.tsubuzaki.circlesgo.ui.sharedbuys.SharedBuysDebugScreen
 import com.tsubuzaki.circlesgo.ui.unified.UnifiedView
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -66,7 +67,7 @@ class MainActivity : ComponentActivity() {
         val client = Authenticator.loadClient(this)
         val auth = Authenticator(this, client)
         authenticator = auth
-        auth.setupReachability()
+        auth.setupReachability(lifecycleScope)
 
         val database = CatalogDatabase(this)
         val mapper = Mapper()
@@ -202,6 +203,8 @@ class MainActivity : ComponentActivity() {
                                     unifier.close()
                                 }
                             )
+                        } else if (!isReady) {
+                            return@Surface
                         } else if (isAuthenticating || token == null) {
                             LoginView(
                                 authURL = auth.authURL,
@@ -319,7 +322,9 @@ class MainActivity : ComponentActivity() {
                 val gotCode = authenticator?.getAuthenticationCode(uri) ?: false
                 if (gotCode) {
                     lifecycleScope.launch {
-                        authenticator?.getAuthenticationToken()
+                        val auth = authenticator ?: return@launch
+                        auth.isReady.first { it }
+                        auth.getAuthenticationToken()
                     }
                 }
             }
