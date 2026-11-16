@@ -34,25 +34,23 @@ struct CirclePlacement: Equatable, Hashable, Sendable {
         let corrected = correctingMisreads(in: normalize(text))
         let matches = placementMatches(in: corrected)
         var placements = matches.map(\.placement)
-        let claimedRanges = matches.map(\.range)
+        let claimedRanges = matches.compactMap(\.range)
 
-        // Matching only where a word starts keeps `あと3日` from reading as a placement.
+        // Without a day or a dash, `あと3日` would read as a placement.
         for match in scan(corrected, for: shorthandPattern, accepting: { match in
-            let previous = match.range.lowerBound > corrected.startIndex
-                ? corrected[corrected.index(before: match.range.lowerBound)] : nil
             let blockName = String(match.output.block)
-            let hasDayPrefix = match.output.dayNumber != nil || match.output.weekday != nil
+            let hasDayPrefix = hasDay(match.output.dayNumber, match.output.weekday)
             let hasDash = match.output.dash != nil
             let end = corrected[match.range].lastIndex(where: { !$0.isWhitespace }).map(corrected.index(after:))
                 ?? match.range.upperBound
             let next = end < corrected.endIndex ? corrected[end] : nil
-            return !isWordCharacter(previous)
+            return (match.output.area != nil || hasDayPrefix || startsWord(match.range, in: corrected))
                 && !claimedRanges.contains(where: { $0.overlaps(match.range) })
                 && knownBlocks.contains(blockName.lowercased())
                 && (Int(match.output.space) ?? 0) > 0
-                // A bare letter and number is too often something else ("A4", "C99").
-                && (blockName.first?.isASCII != true || hasDash || hasDayPrefix)
-                && (hasDayPrefix || hasDash || !isWordCharacter(next))
+                && !breaksLine(between: match.output.block, and: match.output.space, dash: match.output.dash)
+                && !isLatinBlockWithoutMarker(match.output.block, match.output.dash, hasDay: hasDayPrefix)
+                && (hasDayPrefix || hasDash || !(next?.isLetter == true || next?.isNumber == true))
         }) {
             placements.append(CirclePlacement(
                 circleName: nil,
@@ -68,27 +66,32 @@ struct CirclePlacement: Equatable, Hashable, Sendable {
 
     private static func placementMatches(
         in normalized: String
-    ) -> [(placement: CirclePlacement, range: Range<String.Index>)] {
-        var matches: [(placement: CirclePlacement, range: Range<String.Index>)] = []
+    ) -> [(placement: CirclePlacement, range: Range<String.Index>?)] {
+        var matches: [(placement: CirclePlacement, range: Range<String.Index>?)] = []
 
-        for match in normalized.matches(of: noticePattern) {
+        // A notice wraps wherever the screen ends, often inside a word: `コミ` / `ックマーケット`.
+        let unwrapped = normalized.replacingOccurrences(of: "\n", with: "")
+        for match in unwrapped.matches(of: noticePattern) {
             matches.append((CirclePlacement(
-                circleName: String(match.output.name).trimmingCharacters(in: .whitespaces),
+                circleName: match.output.name.map { String($0).trimmingCharacters(in: .whitespaces) },
                 weekday: weekdayIndex(match.output.weekday.map(String.init)),
                 dayNumber: nil,
                 blockName: String(match.output.block).trimmingCharacters(in: .whitespaces),
                 spaceNumber: Int(match.output.space) ?? 0,
                 spaceNumberSuffix: suffixIndex(match.output.suffix.map(String.init))
-            ), match.range))
+            ), nil))
         }
 
-        let noticeRanges = matches.map(\.range)
         for match in scan(normalized, for: shorthandPattern, accepting: { match in
             // Without a hall area and without a/b, a letter followed by a number is far
             // more likely to be something else ("C107", "A4") than a space.
-            !noticeRanges.contains(where: { $0.overlaps(match.range) })
-                && (match.output.area != nil || match.output.suffix != nil)
+            (match.output.area != nil || match.output.suffix != nil)
                 && (Int(match.output.space) ?? 0) > 0
+                && !breaksLine(between: match.output.block, and: match.output.space, dash: match.output.dash)
+                && (match.output.area != nil || hasDay(match.output.dayNumber, match.output.weekday)
+                    || startsWord(match.range, in: normalized))
+                && (match.output.area != nil || !isLatinBlockWithoutMarker(match.output.block, match.output.dash,
+                                                                            hasDay: hasDay(match.output.dayNumber, match.output.weekday)))
         }) {
             matches.append((CirclePlacement(
                 circleName: nil,
@@ -196,20 +199,42 @@ struct CirclePlacement: Equatable, Hashable, Sendable {
         }
     }
 
-    private static func isWordCharacter(_ character: Character?) -> Bool {
-        character?.isLetter == true || character?.isNumber == true
+    /// Whether a match that starts with its block letter starts a word rather than ending one,
+    /// as `ク-15b` ends `ブロック-15b`. Hiragana may come before it, since particles do: `でナ-37ab`.
+    private static func startsWord(_ range: Range<String.Index>, in text: String) -> Bool {
+        guard range.lowerBound > text.startIndex else { return true }
+        let previous = text[text.index(before: range.lowerBound)]
+        let isHiragana = previous.unicodeScalars.allSatisfy { (0x3041...0x309F).contains(Int($0.value)) }
+        return !previous.isLetter || isHiragana
+    }
+
+    /// Whether a line ends between a block and its number with no dash joining them, as when
+    /// `お願いします` ends one line and `12:34` starts the next. A wrapped `ナ` / `ー37ab` counts.
+    private static func breaksLine(between block: Substring, and space: Substring, dash: Substring?) -> Bool {
+        dash == nil && block.base[block.endIndex..<space.startIndex].contains("\n")
+    }
+
+    private static func hasDay(_ dayNumber: Substring?, _ weekday: Substring?) -> Bool {
+        dayNumber != nil || weekday != nil
+    }
+
+    /// A Latin letter and a number with nothing marking them as a space, such as `A4` or `C99`,
+    /// is too often something else.
+    private static func isLatinBlockWithoutMarker(_ block: Substring, _ dash: Substring?, hasDay: Bool) -> Bool {
+        block.first?.isASCII == true && dash == nil && !hasDay
     }
 
     // MARK: Patterns
 
     private static let weekdays = ["日", "月", "火", "水", "木", "金", "土"]
 
-    /// `貴方のサークル「〇〇」は、〇曜日 〇地区 “〇”ブロック－〇〇(〇〇ホール) に配置されました`
-    nonisolated(unsafe) private static let noticePattern = #/サークル[「『](?<name>.+?)[」』]は[、,]?\s*(?:(?<weekday>[日月火水木金土])曜日?)?\s*(?:\S{1,2}?地区)?\s*["“”'‘’「『]?(?<block>[^\s"“”'‘’」』]{1,2}?)["“”'‘’」』]?\s*ブロック\s*[\-－ー―‐−]?\s*(?<space>\d{1,3})\s*(?<suffix>ab|[ab])?/#
+    /// `あなたのサークル「〇〇」は、コミックマーケット〇〇で「〇曜日 〇地区 “〇”ブロック－〇〇 (〇〇ホール)」に配置されました`,
+    /// and the older `貴方のサークル「〇〇」は、〇曜日 …`, with or without the circle's name.
+    nonisolated(unsafe) private static let noticePattern = #/サークル(?:[「『](?<name>[^」』]+?)[」』])?は[、,]?\s*(?:コミックマーケット\s*\d+\s*で\s*)?[「『]?\s*(?:(?<weekday>[日月火水木金土])曜日?)?\s*(?:\S{1,2}?地区)?\s*["“”'‘’「『]?(?<block>[^\s"“”'‘’」』]{1,2}?)["“”'‘’」』]?\s*ブロック\s*[\-－ー―‐−]?\s*(?<space>\d{1,3})\s*(?<suffix>ab|[ab])?/#
         .ignoresCase()
 
-    /// `火曜日 東マ64b`, `2日目 西れ-12ab`, `(土)南a-01a`
-    nonisolated(unsafe) private static let shorthandPattern = #/(?:(?:(?<dayNumber>\d)\s*日目|[(（]?(?<weekday>[日月火水木金土])(?!目)(?:曜日?)?[)）]?)\s*)?(?<area>[東西南北])?\s*(?<block>[\p{Katakana}\p{Hiragana}A-Za-z])\s*(?<dash>[\-－ー―‐−])?\s*(?<space>\d{1,2})(?!\d)\s*(?<suffix>(?:ab|[ab])(?![A-Za-z]))?/#
+    /// `火曜日 東マ64b`, `2日目 西れ-12ab`, `(土)南a-01a`, `東2ソ23ab`, `東7 “F”44a`, `南1・m15ab`
+    nonisolated(unsafe) private static let shorthandPattern = #/(?:(?:(?<dayNumber>\d)\s*日目|[(（]?(?<weekday>[日月火水木金土])(?!目)(?:曜日?)?[)）]?)\s*)?(?:(?<area>[東西南北])\s*\d?\s*[\-－ー―‐−・]?\s*)?["“”'‘’]?(?<block>[\p{Katakana}\p{Hiragana}A-Za-z])["“”'‘’]?\s*(?<dash>[\-－ー―‐−])?\s*(?<space>\d{1,2})(?!\d)\s*(?<suffix>(?:ab|[ab])(?![A-Za-z]))?/#
 
     private static func weekdayIndex(_ weekday: String?) -> Int? {
         guard let weekday else { return nil }
