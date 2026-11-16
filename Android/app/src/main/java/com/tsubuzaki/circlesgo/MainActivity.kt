@@ -29,6 +29,7 @@ import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.ui.shared.LocalAuthenticator
 import com.tsubuzaki.circlesgo.ui.shared.LocalDemoMode
 import com.tsubuzaki.circlesgo.ui.shared.LocalEvents
+import com.tsubuzaki.circlesgo.ui.shared.LocalNavigator
 import com.tsubuzaki.circlesgo.ui.shared.LocalSharedBuys
 import com.tsubuzaki.circlesgo.ui.shared.LocalVisitsState
 import com.tsubuzaki.circlesgo.ui.shared.LocalWebCutImageCache
@@ -38,6 +39,7 @@ import com.tsubuzaki.circlesgo.state.DemoState
 import com.tsubuzaki.circlesgo.state.Events
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.Mapper
+import com.tsubuzaki.circlesgo.state.Navigator
 import com.tsubuzaki.circlesgo.state.Oasis
 import com.tsubuzaki.circlesgo.state.UnifiedPath
 import com.tsubuzaki.circlesgo.state.Unifier
@@ -99,6 +101,7 @@ class MainActivity : ComponentActivity() {
         )
 
         sharedBuys = SharedBuysHost.session(this)
+        val navigator = Navigator(this, database, visitsState, lifecycleScope)
 
         handleDeepLink(intent)
 
@@ -113,7 +116,8 @@ class MainActivity : ComponentActivity() {
                     LocalDemoMode provides isDemoActive,
                     LocalVisitsState provides visitsState,
                     LocalEvents provides events,
-                    LocalSharedBuys provides sharedBuys
+                    LocalSharedBuys provides sharedBuys,
+                    LocalNavigator provides navigator
                 ) {
                     val buys = sharedBuys
                     if (buys != null && buys.isDebugVisible) {

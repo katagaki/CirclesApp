@@ -39,13 +39,14 @@ fun MapVisitedLayer(
     canvasWidth: Dp,
     canvasHeight: Dp,
     database: CatalogDatabase,
-    darkenInDarkMode: Boolean = true
+    darkenInDarkMode: Boolean = true,
+    excludedWebCatalogIDs: Set<Int> = emptySet()
 ) {
     var favoriteRects by remember { mutableStateOf<List<RectF>>(emptyList()) }
     var plainRects by remember { mutableStateOf<List<RectF>>(emptyList()) }
     val isMapInverted = isSystemInDarkTheme() && darkenInDarkMode
 
-    LaunchedEffect(layouts, visits, favoriteItems, eventNumber) {
+    LaunchedEffect(layouts, visits, favoriteItems, eventNumber, excludedWebCatalogIDs) {
         val circleIDs = visits
             .filter { it.eventNumber == eventNumber }
             .map { it.circleID }
@@ -57,7 +58,7 @@ fun MapVisitedLayer(
 
         withContext(Dispatchers.IO) {
             val fetcher = DataFetcher(database.getTextDatabase())
-            val visitedWCIDs = fetcher.webCatalogIDs(circleIDs).toSet()
+            val visitedWCIDs = fetcher.webCatalogIDs(circleIDs).toSet() - excludedWebCatalogIDs
 
             val allWCIDs = layouts.values.flatten().toSet().toList()
             val suffixes = fetcher.spaceNumberSuffixes(allWCIDs)

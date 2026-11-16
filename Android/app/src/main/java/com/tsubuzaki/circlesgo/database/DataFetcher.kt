@@ -4,6 +4,8 @@ import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import com.tsubuzaki.circlesgo.database.tables.ComiketLayout
 import com.tsubuzaki.circlesgo.database.tables.LayoutCatalogMapping
+import com.tsubuzaki.circlesgo.wayfinding.RouteHall
+import com.tsubuzaki.circlesgo.wayfinding.RouteRect
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.util.Calendar
@@ -418,6 +420,78 @@ class DataFetcher(private val database: SQLiteDatabase?) {
         } catch (e: Exception) {
             Log.e(TAG, "Failed to fetch map ID", e)
             null
+        }
+    }
+
+    /**
+     * The halls a map is split into, in high-resolution map pixels. Areas without a
+     * printed range are the walls around them and are left out.
+     */
+    suspend fun hallAreas(mapID: Int): List<RouteHall> = withContext(Dispatchers.IO) {
+        val db = database ?: return@withContext emptyList()
+        try {
+            val cursor = db.rawQuery(
+                "SELECT name, x2, y2, w2, h2 FROM ComiketAreaWC WHERE mapId = ?",
+                arrayOf(mapID.toString())
+            )
+            val result = mutableListOf<RouteHall>()
+            cursor.use {
+                while (it.moveToNext()) {
+                    val width = it.getInt(3)
+                    val height = it.getInt(4)
+                    if (width <= 0 || height <= 0) continue
+                    result.add(
+                        RouteHall(
+                            name = it.getString(0) ?: "",
+                            rect = RouteRect(
+                                it.getInt(1).toDouble(), it.getInt(2).toDouble(),
+                                width.toDouble(), height.toDouble()
+                            )
+                        )
+                    )
+                }
+            }
+            result.sortedBy { it.rect.minX }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch hall areas", e)
+            emptyList()
+        }
+    }
+
+    suspend fun routeCircles(webCatalogIDs: List<Int>): Map<Int, RouteCircle> = withContext(Dispatchers.IO) {
+        val db = database ?: return@withContext emptyMap()
+        if (webCatalogIDs.isEmpty()) return@withContext emptyMap()
+        try {
+            val placeholders = webCatalogIDs.joinToString(",") { "?" }
+            val args = webCatalogIDs.map { it.toString() }.toTypedArray()
+            val cursor = db.rawQuery(
+                """
+                SELECT c.id, e.WCId, c.circleName, c.spaceNo, c.spaceNoSub, b.name
+                FROM ComiketCircleWC c
+                INNER JOIN ComiketCircleExtend e ON c.id = e.id
+                LEFT OUTER JOIN ComiketBlockWC b ON c.blockId = b.id
+                WHERE e.WCId IN ($placeholders)
+                """.trimIndent(),
+                args
+            )
+            val result = mutableMapOf<Int, RouteCircle>()
+            cursor.use {
+                while (it.moveToNext()) {
+                    val circle = RouteCircle(
+                        circleID = it.getInt(0),
+                        webCatalogID = it.getInt(1),
+                        name = it.getString(2) ?: "",
+                        spaceNumber = it.getInt(3),
+                        spaceNumberSuffix = it.getInt(4),
+                        blockName = if (it.isNull(5)) "" else it.getString(5)
+                    )
+                    result[circle.webCatalogID] = circle
+                }
+            }
+            result
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to fetch route circles", e)
+            emptyMap()
         }
     }
 

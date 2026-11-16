@@ -12,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -41,10 +42,14 @@ fun MapGestureLayer(
     onZoomChange: (Float) -> Unit,
     scrollToPosition: PointF?,
     onScrollCompleted: () -> Unit,
+    onLongPress: (Float, Float) -> Unit = { _, _ -> },
+    onTapIntercept: (Float, Float) -> Boolean = { _, _ -> false },
     popoverContent: @Composable (Offset, Float, DpSize) -> Unit = { _, _, _ -> },
     content: @Composable () -> Unit
 ) {
     var currentZoom by remember { mutableFloatStateOf(zoomScale) }
+    val currentOnLongPress by rememberUpdatedState(onLongPress)
+    val currentOnTapIntercept by rememberUpdatedState(onTapIntercept)
     var offset by remember { mutableStateOf(Offset.Zero) }
     var viewportSize by remember { mutableStateOf(IntSize.Zero) }
 
@@ -101,12 +106,18 @@ fun MapGestureLayer(
                 }
             }
             .pointerInput(layouts, density, currentZoom, offset) {
-                detectTapGestures { tapOffset ->
+                detectTapGestures(onLongPress = { pressOffset ->
+                    val mapX = (pressOffset.x - offset.x) / currentZoom / density.density
+                    val mapY = (pressOffset.y - offset.y) / currentZoom / density.density
+                    currentOnLongPress(mapX, mapY)
+                }) { tapOffset ->
                     val mapX = (tapOffset.x - offset.x) / currentZoom
                     val mapY = (tapOffset.y - offset.y) / currentZoom
 
                     val mapXDp = mapX / density.density
                     val mapYDp = mapY / density.density
+
+                    if (currentOnTapIntercept(mapXDp, mapYDp)) return@detectTapGestures
 
                     val x = mapXDp.toInt()
                     val y = mapYDp.toInt()
