@@ -117,19 +117,6 @@ final class Navigator {
         }
     }
 
-    /// Shrinks the message back into the pill, then lets the pill go.
-    func dismissNoStops() {
-        withAnimation(.smooth.speed(2.0)) {
-            isStatusExpanded = false
-        }
-        Task {
-            try? await Task.sleep(for: .seconds(0.35))
-            withAnimation(.smooth.speed(2.0)) {
-                isNoStopsAlertPresented = false
-            }
-        }
-    }
-
     var colorPriority: [WebCatalogColor]? {
         context?.colorPriority
     }
@@ -172,7 +159,6 @@ final class Navigator {
                 expandAfterAppearing()
             } else if planned == nil {
                 endActivity()
-                expandAfterAppearing()
             } else if let planned {
                 await storeActivityCuts(for: planned.stops, database: database)
                 guard !Task.isCancelled else { return }

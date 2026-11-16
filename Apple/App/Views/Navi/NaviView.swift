@@ -64,13 +64,6 @@ struct NaviView: View {
                 NaviActiveRoute()
             } else {
                 List {
-                    if navigator.isNoStopsAlertPresented {
-                        Section {
-                            UnifiedRouteNoStopsCard {
-                                navigator.dismissNoStops()
-                            }
-                        }
-                    }
                     NaviModesSection(
                         isEnabled: isMapReady,
                         ownBuysCount: ownBuysOnMap.count,
@@ -134,6 +127,14 @@ struct NaviView: View {
                 hidesSafetyAlert = true
                 continueGo()
             }
+        }
+        .alert(
+            "Route.NoStops.Title",
+            isPresented: Bindable(navigator).isNoStopsAlertPresented
+        ) {
+            Button("Shared.OK", role: .cancel) {}
+        } message: {
+            Text("Route.NoStops.Message")
         }
         .sheet(isPresented: $isOnboardingPresented) {
             guard hasSeenOnboarding, let mode = navigator.pendingMode else {
