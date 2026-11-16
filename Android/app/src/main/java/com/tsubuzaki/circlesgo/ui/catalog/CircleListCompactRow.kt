@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +21,7 @@ import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.ui.shared.CircleBlockPill
 import com.tsubuzaki.circlesgo.ui.shared.CircleBlockPillSize
 import com.tsubuzaki.circlesgo.ui.shared.CircleCutImage
+import com.tsubuzaki.circlesgo.ui.shared.CircleNameText
 
 @Composable
 fun CircleListCompactRow(
@@ -55,8 +55,8 @@ fun CircleListCompactRow(
             )
         }
         Spacer(modifier = Modifier.width(10.dp))
-        Text(
-            text = circle.circleName,
+        CircleNameText(
+            circle = circle,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.weight(1f)
         )

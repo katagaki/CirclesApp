@@ -22,6 +22,7 @@ import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.ui.shared.CircleBlockPill
 import com.tsubuzaki.circlesgo.ui.shared.CircleCutImage
+import com.tsubuzaki.circlesgo.ui.shared.CircleNameText
 
 @Composable
 fun CircleListRegularRow(
@@ -56,8 +57,8 @@ fun CircleListRegularRow(
         }
         Spacer(modifier = Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = circle.circleName,
+            CircleNameText(
+                circle = circle,
                 style = MaterialTheme.typography.bodyLarge
             )
             if (circle.penName.trim().isNotEmpty()) {
