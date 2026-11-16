@@ -108,7 +108,7 @@ struct CircleGrid: View {
         CircleCutImage(
             circle, in: pinchNamespace, cutType: showWebCut ? .web : .catalog,
             displayMode: GridDisplayMode(nearestTo: columns),
-            showSpaceName: $showSpaceName, showDay: $showDay
+            showSpaceName: .constant(false), showDay: .constant(false)
         )
     }
 }
