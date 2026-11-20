@@ -274,8 +274,8 @@
     <string name="route_turn_left">%1$s、左に曲がって%2$sに入ります</string>
     <string name="route_turn_right">%1$s、右に曲がって%2$sに入ります</string>
     <string name="route_turn_straight">%1$s、そのまま%2$sに入ります</string>
-    <string name="route_arrive_left">%1$s、%2$sは左手です</string>
-    <string name="route_arrive_right">%1$s、%2$sは右手です</string>
+    <string name="route_arrive_left">%1$s、%2$sは左側です</string>
+    <string name="route_arrive_right">%1$s、%2$sは右側です</string>
     <string name="route_arrive_ahead">%1$s、%2$sは正面です</string>
     <string name="route_passage_corridor">通路</string>
     <string name="route_passage_corridor_along">%1$s沿いの通路</string>
