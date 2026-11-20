@@ -31,6 +31,10 @@
             tools:node="remove" />
 
         <activity
+            android:name="com.google.mlkit.vision.codescanner.internal.GmsBarcodeScanningDelegateActivity"
+            tools:remove="android:screenOrientation" />
+
+        <activity
             android:name=".MainActivity"
             android:configChanges="uiMode"
             android:exported="true"
