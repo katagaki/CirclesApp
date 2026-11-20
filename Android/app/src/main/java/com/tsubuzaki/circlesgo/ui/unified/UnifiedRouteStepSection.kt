@@ -26,6 +26,7 @@ import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.Navigator
 import com.tsubuzaki.circlesgo.state.Unifier
+import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.ui.navi.NaviBuysCarousel
 import com.tsubuzaki.circlesgo.ui.navi.NaviUpcomingCircle
 import com.tsubuzaki.circlesgo.ui.navi.icon
@@ -35,6 +36,7 @@ fun UnifiedRouteStepSection(
     navigator: Navigator,
     database: CatalogDatabase,
     favorites: FavoritesState,
+    selections: UserSelections,
     unifier: Unifier,
     buysCache: BuysCache,
     eventNumber: Int
@@ -81,7 +83,7 @@ fun UnifiedRouteStepSection(
                 )
             }
         }
-        NaviUpcomingCircle(stop, step.isArrival, navigator, database, favorites, unifier)
+        NaviUpcomingCircle(stop, step.isArrival, navigator, database, favorites, selections, unifier)
         Box(modifier = Modifier.fillMaxWidth()) {
             NaviBuysCarousel(stop.circleID, eventNumber, buysCache)
         }

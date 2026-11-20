@@ -27,6 +27,7 @@ import com.tsubuzaki.circlesgo.database.tables.ComiketCircle
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.Navigator
 import com.tsubuzaki.circlesgo.state.Unifier
+import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.ui.shared.CircleBlockPill
 import com.tsubuzaki.circlesgo.ui.unified.UnifiedRouteCircleCut
 import com.tsubuzaki.circlesgo.wayfinding.RouteStop
@@ -44,6 +45,7 @@ fun NaviUpcomingCircle(
     navigator: Navigator,
     database: CatalogDatabase,
     favorites: FavoritesState,
+    selections: UserSelections,
     unifier: Unifier
 ) {
     var circle by remember(stop.circleID) { mutableStateOf<ComiketCircle?>(null) }
@@ -60,7 +62,7 @@ fun NaviUpcomingCircle(
             .padding(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        UnifiedRouteCircleCut(circle, database, favorites, unifier)
+        UnifiedRouteCircleCut(circle, database, favorites, selections, unifier)
         Column(
             modifier = Modifier.weight(1f).heightIn(min = 80.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)

@@ -247,7 +247,7 @@ fun NaviView(
     Column(modifier = Modifier.fillMaxSize()) {
         if (navigator.isActive) {
             NaviActiveRoute(
-                navigator, database, favorites, unifier, buysCache, eventNumber,
+                navigator, database, favorites, selections, unifier, buysCache, eventNumber,
                 modifier = Modifier.weight(1f)
             )
             NaviStepToolbar(navigator)
