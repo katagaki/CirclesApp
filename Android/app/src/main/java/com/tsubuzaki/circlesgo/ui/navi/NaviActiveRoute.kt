@@ -13,6 +13,7 @@ import com.tsubuzaki.circlesgo.database.CatalogDatabase
 import com.tsubuzaki.circlesgo.state.FavoritesState
 import com.tsubuzaki.circlesgo.state.Navigator
 import com.tsubuzaki.circlesgo.state.Unifier
+import com.tsubuzaki.circlesgo.state.UserSelections
 import com.tsubuzaki.circlesgo.ui.unified.UnifiedRouteStepSection
 import com.tsubuzaki.circlesgo.ui.unified.UnifiedRouteTrappedSection
 
@@ -21,6 +22,7 @@ fun NaviActiveRoute(
     navigator: Navigator,
     database: CatalogDatabase,
     favorites: FavoritesState,
+    selections: UserSelections,
     unifier: Unifier,
     buysCache: BuysCache,
     eventNumber: Int,
@@ -36,7 +38,7 @@ fun NaviActiveRoute(
             navigator.isFinished -> NaviFinishedCard(navigator.route?.stops?.size ?: 0)
             navigator.isTrapped -> UnifiedRouteTrappedSection()
             navigator.currentStep == null -> NaviPlanningCard()
-            else -> UnifiedRouteStepSection(navigator, database, favorites, unifier, buysCache, eventNumber)
+            else -> UnifiedRouteStepSection(navigator, database, favorites, selections, unifier, buysCache, eventNumber)
         }
     }
 }
