@@ -38,7 +38,7 @@ android {
         minSdk = 26
         targetSdk = 37
         versionCode = System.getenv("VERSION_CODE")?.toIntOrNull() ?: 5
-        versionName = "109.2.1"
+        versionName = "109.2.2"
         buildConfigField("String", "PLAY_PROJECT_NUMBER", "\"${playProjectNumber()}\"")
         buildConfigField("boolean", "SHARED_BUYS_BLUETOOTH", "false")
     }

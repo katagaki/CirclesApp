@@ -11449,7 +11449,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@、%2$@は左手です"
+            "value": "%1$@、%2$@は左側です"
           }
         },
         "ko": {
@@ -11483,7 +11483,7 @@
         "ja": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@、%2$@は右手です"
+            "value": "%1$@、%2$@は右側です"
           }
         },
         "ko": {
