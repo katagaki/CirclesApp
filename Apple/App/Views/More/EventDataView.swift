@@ -276,6 +276,10 @@ struct EventDataView: View {
             }
         }
 
+        await database.refreshCorporateDatabase(
+            for: event, authToken: token, isActiveEvent: event.number == events.activeEventNumber
+        )
+
         activeDownloads.removeValue(forKey: event.number)
         if activeDownloads.isEmpty {
             UIApplication.shared.isIdleTimerDisabled = false
@@ -348,6 +352,7 @@ extension EventDataView {
             let stripped = fileName
                 .replacingOccurrences(of: "webcatalog", with: "")
                 .replacingOccurrences(of: "Image1.db", with: "")
+                .replacingOccurrences(of: "Booth.db", with: "")
                 .replacingOccurrences(of: ".db", with: "")
             guard let eventNumber = Int(stripped) else { continue }
             let size = (try? FileManager.default.attributesOfItem(

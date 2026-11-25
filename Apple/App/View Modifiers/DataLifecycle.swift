@@ -276,6 +276,12 @@ extension DataLifecycleModifier {
                 database.prepare(for: activeEvent)
             }
 
+            if !authenticator.isOfflineModeActive {
+                Task {
+                    await database.refreshCorporateDatabase(for: activeEvent, authToken: token)
+                }
+            }
+
             if oasis.isShowing {
                 await oasis.setBodyText("Loading.Database")
             }

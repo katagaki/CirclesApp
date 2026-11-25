@@ -39,6 +39,14 @@ public struct WebCatalogDatabase: Codable, Sendable {
             }
         }
 
+        public func databaseForCorporateBooths(using compression: CompressionMode = .zip) -> URL? {
+            if let urlString = urls["boothdb\(compression.rawValue)_ssl"] {
+                return URL(string: urlString)
+            } else {
+                return nil
+            }
+        }
+
         public enum SQLiteMode: String {
             case sqlite2
             case sqlite3

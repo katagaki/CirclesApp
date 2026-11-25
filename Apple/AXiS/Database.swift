@@ -13,6 +13,8 @@ public class Database {
     @ObservationIgnored public var imageDatabase: Connection?
     @ObservationIgnored public var textDatabaseURL: URL?
     @ObservationIgnored public var imageDatabaseURL: URL?
+    @ObservationIgnored public var corporateDatabase: Connection?
+    @ObservationIgnored public var corporateDatabaseURL: URL?
     @ObservationIgnored public var commonImageNames: Set<String> = []
     @ObservationIgnored public var circleImageIDs: Set<Int> = []
     @ObservationIgnored private let decodedImageCache: NSCache<NSString, UIImage> = {
@@ -23,6 +25,7 @@ public class Database {
 
     public var commonImagesLoadCount: Int = 0
     public var circleImagesLoadCount: Int = 0
+    public var corporateLoadCount: Int = 0
 
     public let dataStoreURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
     public static let groupContainerURL = FileManager.default.containerURL(
@@ -37,6 +40,16 @@ public class Database {
 
     static func indexedFlagKey(forEvent number: Int) -> String {
         "\(indexedFlagKeyPrefix)\(number)"
+    }
+
+    static let corporateUpdateDateKeyPrefix = "Database.Corporate.UpdateDate."
+
+    static func corporateUpdateDateKey(forEvent number: Int) -> String {
+        "\(corporateUpdateDateKeyPrefix)\(number)"
+    }
+
+    static func corporateDatabaseName(for number: Int) -> String {
+        "webcatalog\(number)Booth.db"
     }
 
     func cachedDecodedImage(_ key: String) -> UIImage? {
@@ -78,6 +91,13 @@ public class Database {
         return imageDatabase
     }
 
+    public func getCorporateDatabase() -> Connection? {
+        if let corporateDatabaseURL, corporateDatabase == nil {
+            corporateDatabase = try? Connection(corporateDatabaseURL.path(percentEncoded: false), readonly: true)
+        }
+        return corporateDatabase
+    }
+
     private func applyReadOnlyPragmas(to connection: Connection?) {
         guard let connection else { return }
         try? connection.execute(
@@ -102,6 +122,7 @@ public class Database {
         #endif
         textDatabase = nil
         imageDatabase = nil
+        corporateDatabase = nil
     }
 
     public func prepare(for event: WebCatalogEvent.Response.Event) {
@@ -138,6 +159,14 @@ public class Database {
                 #endif
                 self.imageDatabaseURL = imageDatabaseURL
             }
+
+            let corporateDatabaseURL = dataStoreURL.appending(path: Database.corporateDatabaseName(for: event.number))
+            if FileManager.default.fileExists(atPath: corporateDatabaseURL.path(percentEncoded: false)) {
+                self.corporateDatabaseURL = corporateDatabaseURL
+            } else {
+                self.corporateDatabaseURL = nil
+            }
+            corporateLoadCount += 1
         }
     }
 
@@ -163,11 +192,15 @@ public class Database {
             databaseInformation = nil
             textDatabase = nil
             imageDatabase = nil
+            corporateDatabase = nil
+            corporateDatabaseURL = nil
+            corporateLoadCount += 1
             commonImageNames.removeAll()
             circleImageIDs.removeAll()
             decodedImageCache.removeAllObjects()
             for key in UserDefaults.standard.dictionaryRepresentation().keys
-            where key.hasPrefix(Database.indexedFlagKeyPrefix) {
+            where key.hasPrefix(Database.indexedFlagKeyPrefix)
+                || key.hasPrefix(Database.corporateUpdateDateKeyPrefix) {
                 UserDefaults.standard.removeObject(forKey: key)
             }
             try? FileManager.default.removeItem(at: dataStoreURL)
@@ -194,8 +227,18 @@ public class Database {
                 decodedImageCache.removeAllObjects()
             }
 
-            UserDefaults.standard.removeObject(forKey: Database.indexedFlagKey(forEvent: event.number))
+            let targetCorporateDatabaseURL = dataStoreURL
+                .appending(path: Database.corporateDatabaseName(for: event.number))
+            if corporateDatabaseURL == targetCorporateDatabaseURL {
+                corporateDatabase = nil
+                corporateDatabaseURL = nil
+                corporateLoadCount += 1
+            }
 
+            UserDefaults.standard.removeObject(forKey: Database.indexedFlagKey(forEvent: event.number))
+            UserDefaults.standard.removeObject(forKey: Database.corporateUpdateDateKey(forEvent: event.number))
+
+            try? FileManager.default.removeItem(at: targetCorporateDatabaseURL)
             try? FileManager.default.removeItem(at: targetTextDatabaseURL)
             try? FileManager.default.removeItem(at: targetImageDatabaseURL)
             if let groupTextDatabaseURL {
@@ -212,6 +255,8 @@ public class Database {
         imageDatabaseURL = nil
         textDatabase = nil
         imageDatabase = nil
+        corporateDatabase = nil
+        corporateDatabaseURL = nil
         decodedImageCache.removeAllObjects()
         commonImageNames.removeAll()
         circleImageIDs.removeAll()
