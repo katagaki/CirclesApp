@@ -192,7 +192,7 @@ extension Database {
         return decoded
     }
 
-    private func decodedCost(of image: UIImage) -> Int {
+    func decodedCost(of image: UIImage) -> Int {
         if let cgImage = image.cgImage {
             return cgImage.bytesPerRow * cgImage.height
         }
